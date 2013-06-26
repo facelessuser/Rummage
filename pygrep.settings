@@ -1,0 +1,8 @@
+{
+    // An array defining the command and parameters to open a file in the editor of your choice.
+    // {$file} and {$line} are used to tell the editor what file and line to use.
+    "editor": {
+        "windows": ["C:\\Program Files\\Sublime Text 3\\sublime_text.exe", "{$file}:{$line}"],
+        "osx": ["/Users/facelessuser/bin/subl", "{$file}:{$line}"]
+     }
+}
