@@ -255,12 +255,12 @@ class _DirWalker(object):
                 valid = self.__is_size_okay(join(base, name))
         return valid
 
-    def __valid_folder(self, folder):
+    def __valid_folder(self, base, name):
         """
         Returns whether a folder can be searched.
         """
 
-        return not self.__is_hidden(folder) and not (self.folder_exclude != None and self.folder_exclude.match(folder)) and self.recursive
+        return not self.__is_hidden(join(base, name)) and not (self.folder_exclude != None and self.folder_exclude.match(name)) and self.recursive
 
     def run(self):
         global _FILES
@@ -268,7 +268,7 @@ class _DirWalker(object):
         _FILES = []
         for base, dirs, files in walk(self.dir):
             # Remove child folders based on exclude rules
-            [dirs.remove(name) for name in dirs[:] if not self.__valid_folder(join(base, name))]
+            [dirs.remove(name) for name in dirs[:] if not self.__valid_folder(base, name)]
 
             # Seach files if they were found
             if len(files):
