@@ -63,6 +63,10 @@ def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
     return ure.compile(pattern, flags)
 
 
+def _literal_pattern(pattern, ignorecase=False):
+    return pattern.lower() if ignorecase else pattern
+
+
 class GrepException(Exception):
     pass
 
@@ -99,7 +103,7 @@ class _FileSearch(object):
         self.context = context
 
         # Prepare search
-        self.pattern = pattern if self.literal else _re_pattern(pattern, self.ignorecase, self.dotall)
+        self.pattern = _literal_pattern(pattern, self.ignorecase) if self.literal else _re_pattern(pattern, self.ignorecase, self.dotall)
         self.find_method = self.__findall_literal if self.literal else self.pattern.finditer
 
     def __get_lines(self, content, m):

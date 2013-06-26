@@ -217,14 +217,15 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
         self.reset_table()
         self.init_update_timer()
         self.m_grep_notebook.SetSelection(0)
-        if start_path and exists(start_path):
-            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+        if start_path and exists(start_path):
+            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
+            self.m_searchfor_textbox.SetFocus()
 
     def on_dir_changed(self, event):
         if not self.searchin_update:
