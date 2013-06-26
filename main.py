@@ -1,7 +1,7 @@
 import gui
 import wx
 import re
-from os.path import abspath, exists, basename, dirname, join, normpath
+from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
 import _lib.pygrep as pygrep
 from _lib.pygrep import _PLATFORM
 import sys
@@ -179,10 +179,11 @@ class GrepArgs(object):
         self.pattern = None
         self.target = None
         self.show_hidden = False
+        self.size_compare = None
 
 
 class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
-    def __init__(self, parent, script_path):
+    def __init__(self, parent, script_path, start_path):
         gui.PyGrep.__init__(self, parent)
 
         # result_list_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -200,10 +201,11 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
         # self.m_result_file_list.Bind(wx.EVT_LEFT_DCLICK, self.on_file_dclick)
 
         # self.Layout()
-        debug("Auto")
-        debug(self.m_filematch_textbox.AutoComplete(["*.*", "*.py"]))
+        # debug("Auto")
+        # debug(self.m_filematch_textbox.AutoComplete(["*.*", "*.py"]))
         extend_sb(self.m_statusbar)
 
+        self.searchin_update = False
         self.checking = False
         self.kill = False
         self.script_path = script_path
@@ -214,7 +216,38 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
             self.open_debug_console()
         self.reset_table()
         self.init_update_timer()
+        self.m_grep_notebook.SetSelection(0)
+        if start_path and exists(start_path):
+            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
+        best = self.m_settings_panel.GetBestSize()
+        current = self.m_settings_panel.GetSize()
+        offset = best[1] - current[1]
+        mainframe = self.GetSize()
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+    def on_dir_changed(self, event):
+        if not self.searchin_update:
+            pth = self.m_searchin_dir_picker.GetPath()
+            if exists(pth):
+                self.searchin_update = True
+                self.m_searchin_text.SetValue(pth)
+                self.searchin_update = False
+        event.Skip()
+
+    def on_searchin_changed(self, event):
+        pth = self.m_searchin_text.GetValue()
+        if isfile(pth):
+            self.m_limit_size_panel.Enable(False)
+            self.m_limit_panel.Enable(False)
+        else:
+            self.m_limit_size_panel.Enable(True)
+            self.m_limit_panel.Enable(True)
+        if not self.searchin_update:
+            if isdir(pth):
+                self.m_searchin_dir_picker.SetPath(pth)
+            self.searchin_update = False
+        event.Skip()
 
     def reset_table(self):
         self.m_result_list.ClearAll()
@@ -272,6 +305,9 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
                     return
             if self.validate_regex(self.m_exclude_textbox.Value):
                 return
+            if not exists(self.m_searchin_text.GetValue()):
+                errormsgS("Please enter a valid search path!")
+                return
             debug("search")
             self.do_search()
 
@@ -293,33 +329,35 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
         self.thread = None
         self.reset_table()
         self.args.reset()
-        self.args.target = self.m_searchin_dir_picker.GetPath()
-        if not exists(self.args.target):
-            errormsg("Directory does not exist!")
-            return
+
+        # Path
+        self.args.target = self.m_searchin_text.GetValue()
+
+        # Search Options
         self.args.ignore_case = not self.m_case_checkbox.GetValue()
         self.args.dotall = self.m_dotmatch_checkbox.GetValue()
         self.args.regexp = self.m_search_regex_radio.GetValue()
-        self.args.show_hidden = self.m_hidden_checkbox.GetValue()
         self.args.recursive = self.m_subfolder_checkbox.GetValue()
-        self.args.pattern = self.m_searchfor_textbox.Value
         self.args.all_utf8 = self.m_utf8_checkbox.GetValue()
-        if self.m_filematchregex_radio.GetValue():
-            self.args.regexfilepattern = [self.m_filematch_textbox.Value]
-        elif self.m_filematch_textbox.Value:
-            self.args.filepattern = [self.m_filematch_textbox.Value]
+        self.args.pattern = self.m_searchfor_textbox.Value
 
-        if self.m_exclude_textbox.Value != "":
-            self.args.directory_exclude = [self.m_exclude_textbox.Value]
-
-        if self.m_size_radio.GetValue():
-            size = self.m_size_text.GetValue()
-            if size == "":
-                errormsg("Please enter a valid file size!")
-                return
-            size_compare = (SIZE_COMPARE[self.m_logic_choice.GetSelection()], int(size))
-        else:
-            size_compare = None
+        # Limit Options
+        if isdir(self.args.target):
+            self.args.show_hidden = self.m_hidden_checkbox.GetValue()
+            if self.m_filematchregex_radio.GetValue():
+                self.args.regexfilepattern = [self.m_filematch_textbox.Value]
+            elif self.m_filematch_textbox.Value:
+                self.args.filepattern = [self.m_filematch_textbox.Value]
+            if self.m_exclude_textbox.Value != "":
+                self.args.directory_exclude = [self.m_exclude_textbox.Value]
+            if self.m_size_radio.GetValue():
+                size = self.m_size_text.GetValue()
+                if size == "":
+                    errormsg("Please enter a valid file size!")
+                    return
+                self.args.size_compare = (SIZE_COMPARE[self.m_logic_choice.GetSelection()], int(size))
+            else:
+                self.args.size_compare = None
 
         debug(self.args.target)
 
@@ -335,7 +373,7 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
                 get_flags(self.args),
                 self.args.show_hidden,
                 self.args.all_utf8,
-                size_compare
+                self.args.size_compare
             )
         )
         self.thread.setDaemon(True)
@@ -363,6 +401,7 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
                 self.m_statusbar.set_status("Searching: %d/%d %d%%" % (completed, completed, 100))
                 self.m_progressbar.SetRange(completed)
                 self.m_progressbar.SetValue(completed)
+                wx.GetApp().Yield()
                 self.kill = False
             self.checking = False
         event.Skip()
@@ -462,10 +501,11 @@ def warnmsg(msg, title="WARNING", bitmap=None):
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(prog='pygrep', description='A python grep like tool.')
+    parser = argparse.ArgumentParser(prog='Rummage', description='A python grep like tool.')
     # Flag arguments
     parser.add_argument('--version', action='version', version=('%(prog)s ' + __version__))
     parser.add_argument('--debug', '-d', action='store_true', default=False, help=argparse.SUPPRESS)
+    parser.add_argument('--searchpath', '-s', nargs=1, default=None, help="Path to search.")
     return parser.parse_args()
 
 
@@ -476,7 +516,7 @@ def gui_main(script):
         set_debug_mode(True)
     app = CustomApp(redirect=args.debug)
     Settings.load_settings(join(script, "pygrep.settings"))
-    PyGrepFrame(None, script).Show()
+    PyGrepFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
     app.MainLoop()
 
 

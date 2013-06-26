@@ -288,6 +288,13 @@ class Grep(object):
         Initialize Grep object.
         """
 
+        global _RUNNING
+        global _ABORT
+        if not _RUNNING and _ABORT:
+            _ABORT = False
+        if _RUNNING:
+            raise GrepException("Grep process already running!")
+
         self.search = _FileSearch(pattern, flags, context)
         self.buffer_input = bool(flags & BUFFER_INPUT)
         self.all_utf8 = all_utf8
@@ -297,6 +304,7 @@ class Grep(object):
         self.max = max_count
         file_regex_match = bool(flags & FILE_REGEX_MATCH)
         self.kill = False
+        self.thread = None
         if not self.buffer_input and isdir(self.target):
             self.thread = threading.Thread(
                 target=threaded_walker,
@@ -391,6 +399,18 @@ class Grep(object):
                         max_count -= result["count"]
                         if max_count == 0:
                             done = True
+        elif self.buffer_input:
+            # Perform search
+            result = self.search.search("buffer input", self.target, max_count)
+            result["size"] = "--KB"
+            result["encode"] = "--"
+            yield result
         else:
             # Perform search
-            yield self.search.search("buffer input", self.target, max_count)
+            file_name = self.target
+            content = self.__read_file(file_name)
+            if content != None:
+                result = self.search.search(file_name, content, max_count)
+                result["size"] = "%.2fKB" % (float(getsize(file_name)) / 1024.0)
+                result["encode"] = self.current_encoding
+                yield result
