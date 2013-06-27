@@ -1,7 +1,7 @@
 import gui
 import wx
 import re
-from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
+from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile, expanduser
 import _lib.pygrep as pygrep
 from _lib.pygrep import _PLATFORM
 import sys
@@ -16,6 +16,7 @@ from _lib.custom_statusbar import extend_sb, extend
 import subprocess
 from _lib.json import sanitize_json
 import json
+import codecs
 # import wx.lib.agw.ultimatelistctrl as ULC
 
 # wx.SystemOptions.SetOptionInt("mac.listctrl.always_use_generic", 0)
@@ -34,18 +35,56 @@ SIZE_COMPARE = {
     2: "lt"
 }
 
+
+def get_settings_file():
+    settings = "rummage.settings"
+    if _PLATFORM == "windows":
+        home = expanduser("~")
+        pass
+    elif _PLATFORM == "osx":
+        folder = expanduser("~/Library/Preferences/")
+        if exists(folder):
+            settings = join(folder, settings)
+    elif _PLATFORM == "linux":
+        pass
+    if not exists(settings):
+        try:
+            with codecs.open(settings, "w", encoding="utf-8") as f:
+                f.write(json.dumps({"editor": []}, sort_keys=True, indent=4, separators=(',', ': ')))
+        except Exception:
+            pass
+    return settings
+
+
 class Settings(object):
     filename = None
+    allow_save = True
+
     @classmethod
     def load_settings(cls, filename):
         cls.settings_file = filename
         cls.settings = {}
         if cls.settings_file is not None:
             try:
-                with open(cls.settings_file, "r") as f:
+                with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
                     cls.settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
             except Exception as e:
                 errormsg("Failed to load settings file!\n\n%s" % str(e))
+
+    @classmethod
+    def reload_settings(cls):
+        settings = None
+        if cls.settings_file is not None:
+            try:
+                with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
+                    settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
+            except Exception:
+                pass
+        if settings is not None:
+            cls.settings = settings
+            cls.allow_save = True
+        else:
+            cls.allow_save = False
 
     @classmethod
     def get_editor(cls, filename, line):
@@ -75,18 +114,26 @@ class Settings(object):
         return cls.settings.get(key, [])
 
     @classmethod
-    def save_settings(cls):
+    def save_settings(cls, silent=False):
+        if not cls.allow_save:
+            return
         try:
-            with open(cls.settings_file, "w") as f:
+            with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(cls.settings, sort_keys=True, indent=4, separators=(',', ': ')))
         except Exception as e:
-            errormsg("Failed to save settings file!\n\n%s" % str(e))
+            if not silent:
+                errormsg("Failed to save settings file!\n\n%s" % str(e))
+            else:
+                cls.allow_save = False
 
 
 def editor_open(filename, line):
     returncode = None
 
     cmd = Settings.get_editor(filename, line)
+    if len(cmd) == 0:
+        errormsg("No editor is currently set!")
+        return
     debug(cmd)
 
     if sys.platform.startswith('win'):
@@ -379,8 +426,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         debug(self.args.target)
 
+        Settings.reload_settings()
         Settings.add_search_setting("target", self.args.target)
-
         if self.args.regexp:
             Settings.add_search_setting("regex_search", self.args.pattern)
         else:
@@ -390,6 +437,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             Settings.add_search_setting("folder_exclude", self.args.directory_exclude)
             Settings.add_search_setting("regex_file_search", self.args.regexfilepattern)
             Settings.add_search_setting("file_search", self.args.filepattern)
+        Settings.save_settings(silent=True)
 
         update_choices(self.m_searchin_text, "target")
         update_choices(self.m_searchfor_textbox, "regex_search" if self.m_search_regex_radio.GetValue() else "search")
@@ -551,7 +599,7 @@ def gui_main(script):
     if args.debug:
         set_debug_mode(True)
     app = CustomApp(redirect=args.debug)
-    Settings.load_settings(join(script, "rummage.settings"))
+    Settings.load_settings(join(script, get_settings_file()))
     RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
     app.MainLoop()
 
