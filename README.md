@@ -7,8 +7,8 @@ Rummage is a GUI for grep like searches in python.
 <img src="http://dl.dropboxusercontent.com/u/342698/Rummage/Results.png" border="0">
 
 # Todo
-- Create settings in User folder (stop committing it to the repo)
-- Save last used settings
+- ~~Create settings in User folder (stop committing it to the repo)~~
+- ~~Save last used settings~~
 - ~~Save a cache of used search terms to autocomplete in the future (windows is straight forward...OSX is going to need workaround)~~
 - Expose dialog to set editor to use to open results
 - Add replace option...if I feel like it

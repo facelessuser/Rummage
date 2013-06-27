@@ -1,22 +1,22 @@
 import gui
 import wx
 import re
-from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile, expanduser
-import _lib.pygrep as pygrep
-from _lib.pygrep import _PLATFORM
 import sys
 import threading
 import argparse
+import subprocess
 from time import time, sleep
-from _lib.custom_app import CustomApp, DebugFrameExtender, init_app_log
+from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
+
+import _lib.pygrep as pygrep
+from _lib.generic_dialogs import *
+from _lib.custom_app import CustomApp, DebugFrameExtender
 from _lib.custom_app import set_debug_mode, set_debug_console, get_debug_mode, get_debug_console
 from _lib.custom_app import debug, debug_struct, info, error
-import _lib.messages as messages
 from _lib.custom_statusbar import extend_sb, extend
-import subprocess
-from _lib.json import sanitize_json
-import json
-import codecs
+from _lib.settings import Settings, _PLATFORM
+from _lib.autocomplete_combo import AutoCompleteCombo
+
 # import wx.lib.agw.ultimatelistctrl as ULC
 
 # wx.SystemOptions.SetOptionInt("mac.listctrl.always_use_generic", 0)
@@ -34,97 +34,6 @@ SIZE_COMPARE = {
     1: "eq",
     2: "lt"
 }
-
-
-def get_settings_file():
-    settings = "rummage.settings"
-    if _PLATFORM == "windows":
-        home = expanduser("~")
-        pass
-    elif _PLATFORM == "osx":
-        folder = expanduser("~/Library/Preferences/")
-        if exists(folder):
-            settings = join(folder, settings)
-    elif _PLATFORM == "linux":
-        pass
-    if not exists(settings):
-        try:
-            with codecs.open(settings, "w", encoding="utf-8") as f:
-                f.write(json.dumps({"editor": []}, sort_keys=True, indent=4, separators=(',', ': ')))
-        except Exception:
-            pass
-    return settings
-
-
-class Settings(object):
-    filename = None
-    allow_save = True
-
-    @classmethod
-    def load_settings(cls, filename):
-        cls.settings_file = filename
-        cls.settings = {}
-        if cls.settings_file is not None:
-            try:
-                with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
-                    cls.settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
-            except Exception as e:
-                errormsg("Failed to load settings file!\n\n%s" % str(e))
-
-    @classmethod
-    def reload_settings(cls):
-        settings = None
-        if cls.settings_file is not None:
-            try:
-                with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
-                    settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
-            except Exception:
-                pass
-        if settings is not None:
-            cls.settings = settings
-            cls.allow_save = True
-        else:
-            cls.allow_save = False
-
-    @classmethod
-    def get_editor(cls, filename, line):
-        editor = cls.settings.get("editor", [])
-        if isinstance(editor, dict):
-            editor = editor.get(_PLATFORM, [])
-
-        return [arg.replace("{$file}", filename).replace("{$line}", str(line)) for arg in editor]
-
-    @classmethod
-    def set_editor(cls, editor):
-        cls.settings["editor"] = editor
-
-    @classmethod
-    def add_search_setting(cls, key, value):
-        if value is None or value == "":
-            return
-        values = cls.settings.get(key, [])
-        if value not in values:
-            values.append(value)
-            if len(values) > 20:
-                del values[0]
-        cls.settings[key] = values
-
-    @classmethod
-    def get_search_setting(cls, key):
-        return cls.settings.get(key, [])
-
-    @classmethod
-    def save_settings(cls, silent=False):
-        if not cls.allow_save:
-            return
-        try:
-            with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
-                f.write(json.dumps(cls.settings, sort_keys=True, indent=4, separators=(',', ': ')))
-        except Exception as e:
-            if not silent:
-                errormsg("Failed to save settings file!\n\n%s" % str(e))
-            else:
-                cls.allow_save = False
 
 
 def editor_open(filename, line):
@@ -160,7 +69,43 @@ def editor_open(filename, line):
     return returncode
 
 
-def threaded_grep(target, pattern, file_pattern, folder_exclude, flags, show_hidden, all_utf8, size):
+def get_flags(args):
+    flags = 0
+
+    if args.regexfilepattern != None:
+        flags |= pygrep.FILE_REGEX_MATCH
+
+    if not args.regexp:
+        flags |= pygrep.LITERAL
+    elif args.dotall:
+        flags |= pygrep.DOTALL
+
+    if args.ignore_case:
+        flags |= pygrep.IGNORECASE
+
+    if args.recursive:
+        flags |= pygrep.RECURSIVE
+
+    return flags
+
+
+def not_none(item, alt=None):
+    return item if item != None else alt
+
+
+def update_choices(obj, key, load_last=False):
+    choices = Settings.get_search_setting(key, [])
+    if hasattr(obj, "update_choices"):
+        obj.update_choices(choices, load_last)
+    else:
+        extend(obj, AutoCompleteCombo)
+        obj.setup(choices, load_last)
+
+
+def threaded_grep(
+    target, pattern, file_pattern, folder_exclude,
+    flags, show_hidden, all_utf8, size
+):
     global _RUNNING
     _RUNNING = True
     grep = GrepThread(
@@ -201,30 +146,6 @@ class GrepThread(object):
                 break
 
 
-def get_flags(args):
-    flags = 0
-
-    if args.regexfilepattern != None:
-        flags |= pygrep.FILE_REGEX_MATCH
-
-    if not args.regexp:
-        flags |= pygrep.LITERAL
-    elif args.dotall:
-        flags |= pygrep.DOTALL
-
-    if args.ignore_case:
-        flags |= pygrep.IGNORECASE
-
-    if args.recursive:
-        flags |= pygrep.RECURSIVE
-
-    return flags
-
-
-def not_none(item, alt=None):
-    return item if item != None else alt
-
-
 class GrepArgs(object):
     def __init__(self):
         self.reset()
@@ -241,18 +162,6 @@ class GrepArgs(object):
         self.target = None
         self.show_hidden = False
         self.size_compare = None
-
-
-def update_choices(obj, key, load_last=False):
-    obj.Clear()
-    value = obj.GetValue()
-    obj.AppendItems(Settings.get_search_setting(key))
-    if load_last:
-        idx = obj.GetCount() - 1
-        if idx != -1:
-            obj.SetSelection(idx)
-    else:
-        obj.SetStringSelection(value)
 
 
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
@@ -282,14 +191,39 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
 
+        if Settings.get_search_setting("regex_toggle", True):
+            self.m_search_regex_radio.SetValue(True)
+        else:
+            self.m_search_text_radio.SetValue(True)
+
+        if Settings.get_search_setting("regex_file_toggle", False):
+            self.m_filematchregex_radio.SetValue(True)
+        else:
+            self.m_filematchtext_radio.SetValue(True)
+
+        if Settings.get_search_setting("size_check_toggle", False):
+            self.m_size_radio.SetValue(True)
+        else:
+            self.m_all_size_radio.SetValue(True)
+
+        self.m_logic_choice.SetStringSelection(Settings.get_search_setting("size_compare_string", "greater than"))
+        self.m_size_text.SetValue(Settings.get_search_setting("size_limit_string", "1000"))
+
+        self.m_case_checkbox.SetValue(Settings.get_search_setting("ignore_case_toggle", False))
+        self.m_dotmatch_checkbox.SetValue(Settings.get_search_setting("dotall_toggle", False))
+        self.m_utf8_checkbox.SetValue(Settings.get_search_setting("utf8_toggle", False))
+
+        self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
+        self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", False))
+
         update_choices(self.m_searchin_text, "target")
-        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_search_regex_radio.GetValue() else "search")
+        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_search_regex_radio.GetValue() else "literal_search")
         update_choices(self.m_exclude_textbox, "folder_exclude", load_last=True)
         update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_filematchregex_radio.GetValue() else "file_search", load_last=True)
 
         if start_path and exists(start_path):
             self.m_searchin_text.SetValue(abspath(normpath(start_path)))
-            self.m_searchfor_textbox.SetFocus()
+        self.m_searchfor_textbox.SetFocus()
 
     def on_dir_changed(self, event):
         if not self.searchin_update:
@@ -360,6 +294,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 global _ABORT
                 _ABORT = True
                 self.kill = True
+            else:
+                self.stop_update_timer()
         else:
             debug("validate")
             if self.m_search_regex_radio.GetValue():
@@ -426,18 +362,35 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         debug(self.args.target)
 
-        Settings.reload_settings()
-        Settings.add_search_setting("target", self.args.target)
-        if self.args.regexp:
-            Settings.add_search_setting("regex_search", self.args.pattern)
-        else:
-            Settings.add_search_setting("literal_search", self.args.pattern)
+        history = [
+            ("target", self.args.target),
+            ("regex_search", self.args.pattern) if self.args.regexp else ("literal_search", self.args.pattern)
+        ]
 
         if isdir(self.args.target):
-            Settings.add_search_setting("folder_exclude", self.args.directory_exclude)
-            Settings.add_search_setting("regex_file_search", self.args.regexfilepattern)
-            Settings.add_search_setting("file_search", self.args.filepattern)
-        Settings.save_settings(silent=True)
+            history += [
+                ("folder_exclude", self.args.directory_exclude),
+                ("regex_file_search", self.args.regexfilepattern),
+                ("file_search", self.args.filepattern)
+            ]
+
+        toggles = [
+            ("regex_toggle", self.args.regexp),
+            ("ignore_case_toggle", self.args.ignore_case),
+            ("dotall_toggle", self.args.dotall),
+            ("utf8_toggle", self.args.all_utf8),
+            ("recursive_toggle", self.args.recursive),
+            ("hidden_toggle", self.args.show_hidden),
+            ("regex_file_toggle", self.m_filematchregex_radio.GetValue()),
+            ("size_check_toggle", self.m_size_radio.GetValue())
+        ]
+
+        strings = [
+            ("size_compare_string", self.m_logic_choice.GetStringSelection()),
+            ("size_limit_string", self.m_size_text.GetValue())
+        ]
+
+        Settings.add_search_settings(history, toggles, strings)
 
         update_choices(self.m_searchin_text, "target")
         update_choices(self.m_searchfor_textbox, "regex_search" if self.m_search_regex_radio.GetValue() else "search")
@@ -478,6 +431,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.current_table_idx[0] = count1 - 1
             self.current_table_idx[1] = count2 - 1
             if not running:
+                self.m_statusbar.set_status("Searching: %d/%d %d%%" % (completed, completed, 100))
+                self.m_progressbar.SetRange(100)
+                self.m_progressbar.SetValue(100)
                 self.stop_update_timer()
                 self.m_search_button.SetLabel("Search")
             if self.kill and not running:
@@ -493,7 +449,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_result_list.Freeze()
         p_range = self.m_progressbar.GetRange()
         p_value = self.m_progressbar.GetValue()
-        self.m_statusbar.set_status("Searching: %d/%d %d%%" % (done, total, int(float(done)/float(total) * 100)))
+        self.m_statusbar.set_status("Searching: %d/%d %d%%" % (done, total, int(float(done)/float(total) * 100)) if total != 0 else (0, 0))
         if p_range != total:
             self.m_progressbar.SetRange(total)
         if p_value != done:
@@ -531,11 +487,25 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def on_regex_enabled(self, event):
         if self.m_search_regex_radio.GetValue():
-            self.validate_search_regex()
+            update_choices(self.m_searchfor_textbox, "regex_search")
+            # self.validate_search_regex()
+        event.Skip()
+
+    def on_text_enabled(self, event):
+        if self.m_search_text_radio.GetValue():
+            update_choices(self.m_searchfor_textbox, "literal_search")
+        event.Skip()
 
     def on_filematch_regex_enabled(self, event):
         if self.m_filematchregex_radio.GetValue():
-            self.validate_regex(self.m_filematch_textbox.Value)
+            # self.validate_regex(self.m_filematch_textbox.Value)
+            update_choices(self.m_filematch_textbox, "regex_file_search")
+        event.Skip()
+
+    def on_filematch_text_enabled(self, event):
+        if self.m_filematchtext_radio.GetValue():
+            update_choices(self.m_filematch_textbox, "file_search")
+        event.Skip()
 
     def validate_search_regex(self):
         flags = 0
@@ -559,29 +529,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_close(self, event):
         if self.thread is not None:
             self.thread.abort = True
-        Settings.save_settings()
         self.close_debug_console()
         event.Skip()
-
-
-#################################################
-# Basic Dialogs
-#################################################
-def yesno(question, title='Yes or no?', bitmap=None, yes="Okay", no="Cancel"):
-    return messages.promptmsg(question, title, bitmap, yes, no)
-
-
-def infomsg(msg, title="INFO", bitmap=None):
-    messages.infomsg(msg, title, bitmap)
-
-
-def errormsg(msg, title="ERROR", bitmap=None):
-    error(msg)
-    messages.errormsg(msg, title, bitmap)
-
-
-def warnmsg(msg, title="WARNING", bitmap=None):
-    messages.warnmsg(msg, title, bitmap)
 
 
 def parse_arguments():
@@ -594,12 +543,11 @@ def parse_arguments():
 
 
 def gui_main(script):
-    init_app_log(join(script, "rummage.log"))
+    Settings.load_settings()
     args = parse_arguments()
     if args.debug:
         set_debug_mode(True)
     app = CustomApp(redirect=args.debug)
-    Settings.load_settings(join(script, get_settings_file()))
     RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
     app.MainLoop()
 
