@@ -12,14 +12,14 @@ from _lib.custom_app import CustomApp, DebugFrameExtender, init_app_log
 from _lib.custom_app import set_debug_mode, set_debug_console, get_debug_mode, get_debug_console
 from _lib.custom_app import debug, debug_struct, info, error
 import _lib.messages as messages
-from _lib.custom_statusbar import extend_sb
+from _lib.custom_statusbar import extend_sb, extend
 import subprocess
 from _lib.json import sanitize_json
 import json
 # import wx.lib.agw.ultimatelistctrl as ULC
 
 # wx.SystemOptions.SetOptionInt("mac.listctrl.always_use_generic", 0)
-# import wx.lib.mixins.listctrl as listctrlmixin
+import wx.lib.mixins.listctrl as listmix
 
 __version__ = "1.0.0"
 
@@ -58,7 +58,21 @@ class Settings(object):
     @classmethod
     def set_editor(cls, editor):
         cls.settings["editor"] = editor
-        cls.save_settings()
+
+    @classmethod
+    def add_search_setting(cls, key, value):
+        if value is None or value == "":
+            return
+        values = cls.settings.get(key, [])
+        if value not in values:
+            values.append(value)
+            if len(values) > 20:
+                del values[0]
+        cls.settings[key] = values
+
+    @classmethod
+    def get_search_setting(cls, key):
+        return cls.settings.get(key, [])
 
     @classmethod
     def save_settings(cls):
@@ -160,8 +174,8 @@ def get_flags(args):
     return flags
 
 
-def not_none(item, alt=None, idx=None):
-    return (item if idx == None else item[idx]) if item != None else alt
+def not_none(item, alt=None):
+    return item if item != None else alt
 
 
 class GrepArgs(object):
@@ -182,9 +196,24 @@ class GrepArgs(object):
         self.size_compare = None
 
 
+def update_choices(obj, key, load_last=False):
+    obj.Clear()
+    value = obj.GetValue()
+    obj.AppendItems(Settings.get_search_setting(key))
+    if load_last:
+        idx = obj.GetCount() - 1
+        if idx != -1:
+            obj.SetSelection(idx)
+    else:
+        obj.SetStringSelection(value)
+
+
 class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
         gui.PyGrep.__init__(self, parent)
+
+        extend(self.m_result_list, listmix.ColumnSorterMixin)
+        extend(self.m_result_file_list, listmix.ColumnSorterMixin)
 
         # result_list_sizer = wx.BoxSizer(wx.VERTICAL)
         # self.m_result_list = ULC.UltimateListCtrl(self.m_result_content_panel, wx.ID_ANY, agwStyle=wx.LC_REPORT | wx.LC_SINGLE_SEL | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT)
@@ -202,6 +231,9 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
 
         # self.Layout()
         # debug("Auto")
+
+        # self.m_searchin_text.SetChoices(Settings.get_search_setting("target"))
+        # self.m_searchin_text.AutoComplete(Settings.get_search_setting("target"))
         # debug(self.m_filematch_textbox.AutoComplete(["*.*", "*.py"]))
         extend_sb(self.m_statusbar)
 
@@ -223,6 +255,12 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+        update_choices(self.m_searchin_text, "target")
+        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_search_regex_radio.GetValue() else "search")
+        update_choices(self.m_exclude_textbox, "folder_exclude", load_last=True)
+        update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_filematchregex_radio.GetValue() else "file_search", load_last=True)
+
         if start_path and exists(start_path):
             self.m_searchin_text.SetValue(abspath(normpath(start_path)))
             self.m_searchfor_textbox.SetFocus()
@@ -346,11 +384,11 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
         if isdir(self.args.target):
             self.args.show_hidden = self.m_hidden_checkbox.GetValue()
             if self.m_filematchregex_radio.GetValue():
-                self.args.regexfilepattern = [self.m_filematch_textbox.Value]
+                self.args.regexfilepattern = self.m_filematch_textbox.Value
             elif self.m_filematch_textbox.Value:
-                self.args.filepattern = [self.m_filematch_textbox.Value]
+                self.args.filepattern = self.m_filematch_textbox.Value
             if self.m_exclude_textbox.Value != "":
-                self.args.directory_exclude = [self.m_exclude_textbox.Value]
+                self.args.directory_exclude = self.m_exclude_textbox.Value
             if self.m_size_radio.GetValue():
                 size = self.m_size_text.GetValue()
                 if size == "":
@@ -362,6 +400,23 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
 
         debug(self.args.target)
 
+        Settings.add_search_setting("target", self.args.target)
+
+        if self.args.regexp:
+            Settings.add_search_setting("regex_search", self.args.pattern)
+        else:
+            Settings.add_search_setting("literal_search", self.args.pattern)
+
+        if isdir(self.args.target):
+            Settings.add_search_setting("folder_exclude", self.args.directory_exclude)
+            Settings.add_search_setting("regex_file_search", self.args.regexfilepattern)
+            Settings.add_search_setting("file_search", self.args.filepattern)
+
+        update_choices(self.m_searchin_text, "target")
+        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_search_regex_radio.GetValue() else "search")
+        update_choices(self.m_exclude_textbox, "folder_exclude")
+        update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_filematchregex_radio.GetValue() else "file_search")
+
         self.current_table_idx = [-1, -1]
         self.m_search_button.SetLabel("Stop")
         self.thread = threading.Thread(
@@ -369,8 +424,8 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
             args=(
                 self.args.target,
                 self.args.pattern,
-                not_none(self.args.regexfilepattern, alt=not_none(self.args.filepattern, idx=0), idx=0),
-                not_none(self.args.directory_exclude, idx=0),
+                not_none(self.args.regexfilepattern, alt=not_none(self.args.filepattern)),
+                not_none(self.args.directory_exclude),
                 get_flags(self.args),
                 self.args.show_hidden,
                 self.args.all_utf8,
@@ -477,6 +532,7 @@ class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
     def on_close(self, event):
         if self.thread is not None:
             self.thread.abort = True
+        Settings.save_settings()
         self.close_debug_console()
         event.Skip()
 
