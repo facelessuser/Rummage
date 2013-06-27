@@ -208,33 +208,12 @@ def update_choices(obj, key, load_last=False):
         obj.SetStringSelection(value)
 
 
-class PyGrepFrame(gui.PyGrep, DebugFrameExtender):
+class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
-        gui.PyGrep.__init__(self, parent)
+        super(RummageFrame, self).__init__(parent)
 
         extend(self.m_result_list, listmix.ColumnSorterMixin)
         extend(self.m_result_file_list, listmix.ColumnSorterMixin)
-
-        # result_list_sizer = wx.BoxSizer(wx.VERTICAL)
-        # self.m_result_list = ULC.UltimateListCtrl(self.m_result_content_panel, wx.ID_ANY, agwStyle=wx.LC_REPORT | wx.LC_SINGLE_SEL | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT)
-        # result_list_sizer.Add(self.m_result_list, 1, wx.ALL|wx.EXPAND, 5)
-        # self.m_result_content_panel.SetSizer(result_list_sizer)
-        # self.m_result_content_panel.Layout()
-        # self.m_result_list.Bind(wx.EVT_LEFT_DCLICK, self.on_content_dclick)
-
-        # result_file_list_sizer = wx.BoxSizer(wx.VERTICAL)
-        # self.m_result_file_list = ULC.UltimateListCtrl(self.m_result_file_panel, wx.ID_ANY, agwStyle=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        # result_file_list_sizer.Add( self.m_result_file_list, 1, wx.ALL|wx.EXPAND, 5 )
-        # self.m_result_file_panel.SetSizer(result_file_list_sizer)
-        # self.m_result_file_panel.Layout()
-        # self.m_result_file_list.Bind(wx.EVT_LEFT_DCLICK, self.on_file_dclick)
-
-        # self.Layout()
-        # debug("Auto")
-
-        # self.m_searchin_text.SetChoices(Settings.get_search_setting("target"))
-        # self.m_searchin_text.AutoComplete(Settings.get_search_setting("target"))
-        # debug(self.m_filematch_textbox.AutoComplete(["*.*", "*.py"]))
         extend_sb(self.m_statusbar)
 
         self.searchin_update = False
@@ -567,13 +546,13 @@ def parse_arguments():
 
 
 def gui_main(script):
-    init_app_log(join(script, "pygrep.log"))
+    init_app_log(join(script, "rummage.log"))
     args = parse_arguments()
     if args.debug:
         set_debug_mode(True)
     app = CustomApp(redirect=args.debug)
-    Settings.load_settings(join(script, "pygrep.settings"))
-    PyGrepFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
+    Settings.load_settings(join(script, "rummage.settings"))
+    RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
     app.MainLoop()
 
 

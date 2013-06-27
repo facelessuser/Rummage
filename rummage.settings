@@ -1,0 +1,12 @@
+{
+    "editor": {
+        "osx": [
+            "/Users/facelessuser/bin/subl",
+            "{$file}:{$line}"
+        ],
+        "windows": [
+            "C:\\Program Files\\Sublime Text 3\\sublime_text.exe",
+            "{$file}:{$line}"
+        ]
+    }
+}

@@ -40,7 +40,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size">-1,-1</property>
-            <property name="name">PyGrep</property>
+            <property name="name">RummageFrame</property>
             <property name="pos"></property>
             <property name="size">771,520</property>
             <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER</property>
