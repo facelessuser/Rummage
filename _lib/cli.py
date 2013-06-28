@@ -1,5 +1,5 @@
-'''
-pygrep cli
+"""
+Rummage (cli)
 
 Licensed under MIT
 Copyright (c) 2011 Isaac Muse <isaacmuse@gmail.com>
@@ -10,11 +10,11 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-'''
+"""
 import argparse
-from os.path import abspath, exists
 import pygrep as pygrep
 import sys
+from os.path import abspath, exists
 __VERSION__ = "1.0.0"
 
 
@@ -155,7 +155,7 @@ def run(args):
 
 def cli_main():
     # Setup arg parsing object
-    parser = argparse.ArgumentParser(prog="pygrep", description="Grep like file searcher.", add_help=False)
+    parser = argparse.ArgumentParser(prog="Rummage", description="Grep like file searcher.", add_help=False)
     # Flag arguments
     parser.add_argument("--version", action="version", version=("%(prog)s " + __VERSION__))
     parser.add_argument("--help", action="help", help="Show this help message and exit.")

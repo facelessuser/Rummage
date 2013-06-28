@@ -1,11 +1,20 @@
-from _lib.custom_app import CustomApp, DebugFrameExtender, init_app_log
+"""
+Licensed under MIT
+Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
 import codecs
 import json
-from _lib.file_strip.json import sanitize_json
+import sys
 from os import mkdir
 from os.path import expanduser, exists, join, getmtime
+from _lib.custom_app import CustomApp, DebugFrameExtender, init_app_log
+from _lib.file_strip.json import sanitize_json
 from _lib.custom_app import debug, debug_struct, info, error
-import sys
 from _lib.generic_dialogs import *
 
 if sys.platform.startswith('win'):
