@@ -161,11 +161,41 @@ class GrepArgs(object):
         self.size_compare = None
 
 
+from wx.lib.embeddedimage import PyEmbeddedImage
+
+up_arrow = PyEmbeddedImage(
+    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
+    "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYcDiQEC+CwYwAAACZpVFh0Q29tbWVudAAA"
+    "AAAAQ3JlYXRlZCB3aXRoIEdJTVAgb24gYSBNYWOV5F9bAAABAUlEQVQ4y+1TsUrEQBScyy4b"
+    "SM4t5FJYXJFNYZNCUlsE3gf4B7Z2VqedFjb+h2CTD0i3f2AfrtoqEOFMSLOQXAQLCZ4Y737g"
+    "pnrMm3kMAw84gu1bEtGVUupVKfVujFlPaZw95mXf93dlWX4AWBHRcko3+8fMuq57aZrmnLHv"
+    "kFLKteu611rrz4MJrLW3dV0rxhiCIBg5BeDmYAdJklxaa1eccz6afd9HVVVsGIaLOI7fjDHV"
+    "ZIIsy8622+2TEMKJoujX4TAMwTmftW37TETzkee7oqIoHtI0nXueByEEpJR/W3eckzzP7wE8"
+    "TpZIRAsApztUPQ5a6w0RLbTWm+MH/OALZQRQbMRRXLwAAAAASUVORK5CYII=")
+
+#----------------------------------------------------------------------
+down_arrow = PyEmbeddedImage(
+    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
+    "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYcDiMtBhO+yAAAACZpVFh0Q29tbWVudAAA"
+    "AAAAQ3JlYXRlZCB3aXRoIEdJTVAgb24gYSBNYWOV5F9bAAABEUlEQVQ4y+2SPUrFQBCAx92Q"
+    "YhM2kLytgpAiKdIGS7ttcgYP4DGEkEYsLCwESwvxANZzARtv8Ba0SLGrgYjkR4IWEsmL7+EF"
+    "3lTDx8wH8wOwj4MlkFKuAMCfobcpQUQjpVwhopmYNW8uiuLaGHPEGCO2bQPnfEOe5zkQQvof"
+    "F579EaRpWpZleWdZFo+iCJqm2RDUdQ2EkHfP8y52jpBl2XHf95eUUiKE+OVKKXBd90sIcYqI"
+    "TxOnS0FVVc9xHLtt26Zd11HHcUBrDYyxzyAIbhHxYV5Ptm2WMXbl+/56HEfQWk9sDQA3/15h"
+    "do3DYRjutdYfYRgyADhBxJdlHd0lUEo1SZK8cs5zADhHxMf912+Pb+1SWoEigSF+AAAAAElF"
+    "TkSuQmCC")
+
+
 class MixinSortPanel(listmix.ColumnSorterMixin):
     def setup(self, l, c):
         self.list = l
         self.column_count = c
         self.itemDataMap = {}
+        self.images = wx.ImageList(16, 16)
+        self.sort_up = self.images.Add(up_arrow.GetBitmap())
+        self.sort_down = self.images.Add(down_arrow.GetBitmap())
+        self.list.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
+        self._first_time_run = True
 
     def reset_item_map(self):
         self.itemDataMap = {}
@@ -174,10 +204,16 @@ class MixinSortPanel(listmix.ColumnSorterMixin):
         self.itemDataMap[idx] = tuple([a for a in args])
 
     def init_sort(self):
-        listmix.ColumnSorterMixin.__init__(self, self.column_count)
+        if self._first_time_run:
+            listmix.ColumnSorterMixin.__init__(self, self.column_count)
+            self._first_time_run = False
+        self.SortListItems(col=0, ascending=1)
 
     def GetListCtrl(self):
         return self.list
+
+    def GetSortImages(self):
+        return self.sort_up, self.sort_down
 
     def get_map_item(self, idx, col=0):
         return self.itemDataMap[idx][col]
