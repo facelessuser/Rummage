@@ -78,7 +78,9 @@ class Settings(object):
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
         elif _PLATFORM == "osx":
-            folder = expanduser("~/Library/Preferences/")
+            folder = expanduser("~/Library/Application Support/Rummage")
+            if not exists(folder):
+                mkdir(folder)
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)

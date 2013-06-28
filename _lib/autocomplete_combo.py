@@ -1,4 +1,5 @@
 import wx
+import sys
 
 
 class AutoCompleteCombo(object):
@@ -6,13 +7,14 @@ class AutoCompleteCombo(object):
         self.update_semaphore = False
         self.popped = False
         self.choices = None
-        self.Bind(wx.EVT_TEXT, self.on_text_change)
-        self.Bind(wx.EVT_CHAR, self.on_char)
-        self.Bind(wx.EVT_COMBOBOX, self.on_selected)
-        self.Bind(wx.EVT_KEY_UP, self.on_combo_key)
-        self.Bind(wx.EVT_TEXT_ENTER, self.on_enter_key)
-        self.Bind(wx.EVT_COMBOBOX_DROPDOWN, self.on_popup)
-        self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
+        if sys.platform != "darwin":
+            self.Bind(wx.EVT_KEY_UP, self.on_combo_key)
+            self.Bind(wx.EVT_TEXT_ENTER, self.on_enter_key)
+            self.Bind(wx.EVT_TEXT, self.on_text_change)
+            self.Bind(wx.EVT_CHAR, self.on_char)
+            self.Bind(wx.EVT_COMBOBOX, self.on_selected)
+            self.Bind(wx.EVT_COMBOBOX_DROPDOWN, self.on_popup)
+            self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
         self.update_choices(choices, load_last)
 
     def tab_forward(self):
@@ -51,9 +53,8 @@ class AutoCompleteCombo(object):
         event.Skip()
 
     def on_char(self, event):
-        # Don't trigger on backspace or delete
         key = event.GetKeyCode()
-        if key in [8, 127]:
+        if key in [wx.WXK_DELETE, wx.WXK_BACK]:
             self.update_semaphore = True
         elif key == wx.WXK_TAB:
             if event.ShiftDown():

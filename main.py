@@ -214,7 +214,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_utf8_checkbox.SetValue(Settings.get_search_setting("utf8_toggle", False))
 
         self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
-        self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", False))
+        self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
 
         update_choices(self.m_searchin_text, "target")
         update_choices(self.m_searchfor_textbox, "regex_search" if self.m_search_regex_radio.GetValue() else "literal_search")
