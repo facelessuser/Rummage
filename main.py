@@ -17,9 +17,6 @@ from _lib.custom_statusbar import extend_sb, extend
 from _lib.settings import Settings, _PLATFORM
 from _lib.autocomplete_combo import AutoCompleteCombo
 
-# import wx.lib.agw.ultimatelistctrl as ULC
-
-# wx.SystemOptions.SetOptionInt("mac.listctrl.always_use_generic", 0)
 import wx.lib.mixins.listctrl as listmix
 
 __version__ = "1.0.0"
@@ -164,13 +161,41 @@ class GrepArgs(object):
         self.size_compare = None
 
 
+class MixinSortPanel(listmix.ColumnSorterMixin):
+    def setup(self, l, c):
+        self.list = l
+        self.column_count = c
+        self.itemDataMap = {}
+
+    def reset_item_map(self):
+        self.itemDataMap = {}
+
+    def set_item_map(self, idx, *args):
+        self.itemDataMap[idx] = tuple([a for a in args])
+
+    def init_sort(self):
+        listmix.ColumnSorterMixin.__init__(self, self.column_count)
+
+    def GetListCtrl(self):
+        return self.list
+
+    def get_map_item(self, idx, col=0):
+        return self.itemDataMap[idx][col]
+
+
+def extend_list(l, p, c):
+    extend(p, MixinSortPanel)
+    p.setup(l, c)
+
+
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
         super(RummageFrame, self).__init__(parent)
 
-        extend(self.m_result_list, listmix.ColumnSorterMixin)
-        extend(self.m_result_file_list, listmix.ColumnSorterMixin)
         extend_sb(self.m_statusbar)
+        self.reset_table()
+        extend_list(self.m_result_list, self.m_result_content_panel, 3)
+        extend_list(self.m_result_file_list, self.m_result_file_panel, 5)
 
         self.searchin_update = False
         self.checking = False
@@ -181,7 +206,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.set_keybindings(debug_event=self.on_debug_console)
         if get_debug_mode():
             self.open_debug_console()
-        self.reset_table()
         self.init_update_timer()
         self.m_grep_notebook.SetSelection(0)
         best = self.m_settings_panel.GetBestSize()
@@ -273,8 +297,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if item != -1:
             filename = self.m_result_list.GetItem(item, col=0).GetText()
             line = self.m_result_list.GetItem(item, col=1).GetText()
-            idx = self.m_result_list.GetItemData(item)
-            path = self.m_result_file_list.GetItem(idx, col=3).GetText()
+            row = self.m_result_list.GetItemData(item)
+            file_row = self.m_result_content_panel.get_map_item(row, col=3)
+            path = self.m_result_file_panel.get_map_item(file_row, col=3)
             self.open_in_editor(join(normpath(path), filename), line)
         event.Skip()
 
@@ -284,7 +309,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if item != -1:
             filename = self.m_result_file_list.GetItem(item, col=0).GetText()
             path = self.m_result_file_list.GetItem(item, col=3).GetText()
-            line = self.m_result_file_list.GetItemData(item)
+            row = self.m_result_file_list.GetItemData(item)
+            line = str(self.m_result_file_panel.get_map_item(row, col=5))
             self.open_in_editor(join(normpath(path), filename), line)
         event.Skip()
 
@@ -413,6 +439,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             )
         )
         self.thread.setDaemon(True)
+        self.m_result_content_panel.reset_item_map()
+        self.m_result_file_panel.reset_item_map()
         self.thread.start()
         self.m_grep_notebook.SetSelection(1)
         self.start_update_timer()
@@ -436,10 +464,16 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_progressbar.SetValue(100)
                 self.stop_update_timer()
                 self.m_search_button.SetLabel("Search")
+                if completed > 0:
+                    self.m_result_file_panel.init_sort()
+                    self.m_result_content_panel.init_sort()
             if self.kill and not running:
                 self.m_statusbar.set_status("Searching: %d/%d %d%%" % (completed, completed, 100))
                 self.m_progressbar.SetRange(completed)
                 self.m_progressbar.SetValue(completed)
+                if completed > 0:
+                    self.m_result_file_panel.init_sort()
+                    self.m_result_content_panel.init_sort()
                 wx.GetApp().Yield()
                 self.kill = False
             self.checking = False
@@ -461,12 +495,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_result_file_list.SetStringItem(count, 2, str(f["count"]))
             self.m_result_file_list.SetStringItem(count, 3, dirname(f["name"]))
             self.m_result_file_list.SetStringItem(count, 4, f["encode"])
-            self.m_result_file_list.SetItemData(count, f["results"][0]["lineno"])
+            self.m_result_file_list.SetItemData(count, count)
+            self.m_result_file_panel.set_item_map(count, basename(f["name"]), float(f["size"].strip("KB")), f["count"], dirname(f["name"]), f["encode"], f["results"][0]["lineno"])
             for r in f["results"]:
                 self.m_result_list.InsertStringItem(count2, basename(f["name"]))
                 self.m_result_list.SetStringItem(count2, 1, str(r["lineno"]))
                 self.m_result_list.SetStringItem(count2, 2, r["lines"].replace("\r", "").split("\n")[0])
-                self.m_result_list.SetItemData(count2, count)
+                self.m_result_list.SetItemData(count2, count2)
+                self.m_result_content_panel.set_item_map(count2, basename(f["name"]), r["lineno"], r["lines"].replace("\r", "").split("\n")[0], count)
                 count2 += 1
             count += 1
         self.m_result_list.Thaw()

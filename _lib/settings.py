@@ -39,7 +39,6 @@ class Settings(object):
                 with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
                     cls.cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
             except Exception as e:
-                print(e)
                 errormsg("Failed to load settings file!\n\n%s" % str(e))
         debug(cls.settings)
         debug(cls.cache)

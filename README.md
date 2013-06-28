@@ -9,10 +9,11 @@ Rummage is a GUI for grep like searches in python.
 # Todo
 - ~~Create settings in User folder (stop committing it to the repo)~~
 - ~~Save last used settings~~
+- ~~Make result columns sortable~~
 - ~~Save a cache of used search terms to autocomplete in the future (windows is straight forward...OSX is going to need workaround)~~
+- Autocomplete for mac doesn't work (need to try and make interface consistent across platforms).  May have to implement an object from scratch.
 - Expose dialog to set editor to use to open results
-- Add replace option...if I feel like it
-- Make result columns sortable
+- Add replace option...eventually (I mainly use search)
 - Other stuff I think of
 
 # License
