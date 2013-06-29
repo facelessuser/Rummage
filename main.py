@@ -242,19 +242,32 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.searchin_update = False
         event.Skip()
 
+    def on_searchin_selected(self, event):
+        self.check_searchin()
+        event.Skip()
+
     def on_searchin_changed(self, event):
+        self.check_searchin()
+        event.Skip()
+
+    def enable_panel(self, panel, enable):
+        # For some odd reason, OSX panel Enable doesn't work
+        # This is a work around
+        for child in panel.GetChildren():
+            child.Enable(enable)
+
+    def check_searchin(self):
         pth = self.m_searchin_text.GetValue()
         if isfile(pth):
-            self.m_limit_size_panel.Enable(False)
-            self.m_limit_panel.Enable(False)
+            self.enable_panel(self.m_limit_size_panel, False)
+            self.enable_panel(self.m_limit_panel, False)
         else:
-            self.m_limit_size_panel.Enable(True)
-            self.m_limit_panel.Enable(True)
+            self.enable_panel(self.m_limit_size_panel, True)
+            self.enable_panel(self.m_limit_panel, True)
         if not self.searchin_update:
             if isdir(pth):
                 self.m_searchin_dir_picker.SetPath(pth)
             self.searchin_update = False
-        event.Skip()
 
     def reset_table(self):
         self.m_result_list.ClearAll()
@@ -317,7 +330,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if self.validate_regex(self.m_exclude_textbox.Value):
                 return
             if not exists(self.m_searchin_text.GetValue()):
-                errormsgS("Please enter a valid search path!")
+                errormsg("Please enter a valid search path!")
                 return
             debug("search")
             self.do_search()

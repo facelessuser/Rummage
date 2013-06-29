@@ -21,12 +21,12 @@ class AutoCompleteCombo(object):
         self.choices = None
         if sys.platform != "darwin":
             self.Bind(wx.EVT_KEY_UP, self.on_combo_key)
-            self.Bind(wx.EVT_TEXT_ENTER, self.on_enter_key)
-            self.Bind(wx.EVT_TEXT, self.on_text_change)
             self.Bind(wx.EVT_CHAR, self.on_char)
             self.Bind(wx.EVT_COMBOBOX, self.on_selected)
             self.Bind(wx.EVT_COMBOBOX_DROPDOWN, self.on_popup)
             self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
+        self.Bind(wx.EVT_TEXT, self.on_text_change)
+        self.Bind(wx.EVT_TEXT_ENTER, self.on_enter_key)
         self.update_choices(choices, load_last)
 
     def tab_forward(self):
@@ -83,17 +83,18 @@ class AutoCompleteCombo(object):
 
     def on_text_change(self, event):
         found = False
-        if not self.update_semaphore:
-            value = event.GetString()
-            for choice in sorted(self.choices) :
-                if choice.startswith(value):
-                    self.update_semaphore = True
-                    self.SetValue(choice)
-                    self.SetInsertionPoint(len(value))
-                    self.SetMark(len(value), len(choice))
-                    found = True
-                    break
-        else:
-            self.update_semaphore = False
+        if sys.platform != "darwin":
+            if not self.update_semaphore:
+                value = event.GetString()
+                for choice in sorted(self.choices) :
+                    if choice.startswith(value):
+                        self.update_semaphore = True
+                        self.SetValue(choice)
+                        self.SetInsertionPoint(len(value))
+                        self.SetMark(len(value), len(choice))
+                        found = True
+                        break
+            else:
+                self.update_semaphore = False
         if not found:
             event.Skip()
