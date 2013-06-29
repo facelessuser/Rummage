@@ -23,7 +23,6 @@ up_arrow = PyEmbeddedImage(
     "wsL48ePHOmdnZ26YOAuyouvXr5c6ODhwc3FxMbCxsTHw8fFhhjoTE8+2bdvyGRgY2kYTMZUA"
     "AElBSjR/j22+AAAAAElFTkSuQmCC")
 
-#----------------------------------------------------------------------
 down_arrow = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
     "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYcDzAUOTsdZQAAACZpVFh0Q29tbWVudAAA"
@@ -35,6 +34,11 @@ down_arrow = PyEmbeddedImage(
     "iG3b97PZbK6qaltV1WQYhkNKaf6dnf5UD+e89n0fYYx3syw7o5TeruLwuo4ty7oEgGvG2PMf"
     "fuV31ftuS80saUMAAAAASUVORK5CYII=")
 
+doc = PyEmbeddedImage(
+    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAABEQkJjY2P///93"
+    "ZMrLAAAAAXRSTlMAQObYZgAAAClJREFUCFtjYEAFjKEhQOL/XSDx6r4DkHUVSLzaD2L9B7FW"
+    "42OFhjoAAPlQF/qFKDe3AAAAAElFTkSuQmCC")
+
 
 class MixinSortPanel(listmix.ColumnSorterMixin):
     def setup(self, l, c):
@@ -42,6 +46,7 @@ class MixinSortPanel(listmix.ColumnSorterMixin):
         self.column_count = c
         self.itemDataMap = {}
         self.images = wx.ImageList(16, 16)
+        self.doc = self.images.Add(doc.GetBitmap())
         self.sort_up = self.images.Add(up_arrow.GetBitmap())
         self.sort_down = self.images.Add(down_arrow.GetBitmap())
         self.list.SetImageList(self.images, wx.IMAGE_LIST_SMALL)

@@ -85,7 +85,7 @@ class AutoCompleteCombo(object):
         found = False
         if not self.update_semaphore:
             value = event.GetString()
-            for choice in self.choices :
+            for choice in sorted(self.choices) :
                 if choice.startswith(value):
                     self.update_semaphore = True
                     self.SetValue(choice)

@@ -443,7 +443,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.current_table_idx[0] = count1 - 1
             self.current_table_idx[1] = count2 - 1
             if not running:
-                self.m_statusbar.set_status("Searching: %d/%d %d%%" % (completed, completed, 100))
+                self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (completed, completed, 100, count2))
                 self.m_progressbar.SetRange(100)
                 self.m_progressbar.SetValue(100)
                 self.stop_update_timer()
@@ -452,7 +452,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_result_file_panel.init_sort()
                     self.m_result_content_panel.init_sort()
             if self.kill and not running:
-                self.m_statusbar.set_status("Searching: %d/%d %d%%" % (completed, completed, 100))
+                self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (completed, completed, 100, count2))
                 self.m_progressbar.SetRange(completed)
                 self.m_progressbar.SetValue(completed)
                 if completed > 0:
@@ -467,7 +467,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_result_list.Freeze()
         p_range = self.m_progressbar.GetRange()
         p_value = self.m_progressbar.GetValue()
-        self.m_statusbar.set_status("Searching: %d/%d %d%%" % (done, total, int(float(done)/float(total) * 100)) if total != 0 else (0, 0))
+        self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (done, total, int(float(done)/float(total) * 100), count2) if total != 0 else (0, 0, 0))
         if p_range != total:
             self.m_progressbar.SetRange(total)
         if p_value != done:
@@ -479,28 +479,31 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_result_file_list.SetStringItem(count, 2, str(f["count"]))
             self.m_result_file_list.SetStringItem(count, 3, dirname(f["name"]))
             self.m_result_file_list.SetStringItem(count, 4, f["encode"])
+            self.m_result_file_list.SetItemImage(count, 0)
             self.m_result_file_list.SetItemData(count, count)
             self.m_result_file_panel.set_item_map(count, basename(f["name"]), float(f["size"].strip("KB")), f["count"], dirname(f["name"]), f["encode"], f["results"][0]["lineno"])
             for r in f["results"]:
                 self.m_result_list.InsertStringItem(count2, basename(f["name"]))
                 self.m_result_list.SetStringItem(count2, 1, str(r["lineno"]))
                 self.m_result_list.SetStringItem(count2, 2, r["lines"].replace("\r", "").split("\n")[0])
+                self.m_result_list.SetItemImage(count2, 0)
                 self.m_result_list.SetItemData(count2, count2)
                 self.m_result_content_panel.set_item_map(count2, basename(f["name"]), r["lineno"], r["lines"].replace("\r", "").split("\n")[0], count)
                 count2 += 1
             count += 1
         self.m_result_list.Thaw()
         if len(results):
-            self.m_result_file_list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-            self.m_result_file_list.SetColumnWidth(1, wx.LIST_AUTOSIZE)
-            self.m_result_file_list.SetColumnWidth(2, wx.LIST_AUTOSIZE)
-            self.m_result_file_list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
-            self.m_result_file_list.SetColumnWidth(4, wx.LIST_AUTOSIZE)
-            self.m_result_list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-            self.m_result_list.SetColumnWidth(1, wx.LIST_AUTOSIZE)
-            self.m_result_list.SetColumnWidth(2, wx.LIST_AUTOSIZE)
+            self.column_resize(self.m_result_file_list, 5)
+            self.column_resize(self.m_result_list, 3)
+        self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (done, total, int(float(done)/float(total) * 100), count2) if total != 0 else (0, 0, 0))
         wx.GetApp().Yield()
         return count, count2
+
+    def column_resize(self, obj, count, minimum=100):
+        for i in range(0, count):
+            obj.SetColumnWidth(i, wx.LIST_AUTOSIZE)
+            if obj.GetColumnWidth(i) < minimum:
+                obj.SetColumnWidth(i, minimum)
 
     def get_search_status(self):
         return self.searching

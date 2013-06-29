@@ -333,7 +333,7 @@ class Grep(object):
         return pattern
 
     def __read_file(self, file_name):
-        encodings = ["ascii", "utf-8"] if not self.all_utf8 else ["utf-8"]
+        encodings = ["ascii", "utf-8", "utf-16-le"]
         for encode in encodings:
             try:
                 with codecs.open(file_name, encoding=encode) as f:
