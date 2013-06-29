@@ -242,6 +242,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.searchin_update = False
         event.Skip()
 
+    def on_searchin_enter(self, event):
+        self.check_searchin()
+        event.Skip()
+
     def on_searchin_selected(self, event):
         self.check_searchin()
         event.Skip()

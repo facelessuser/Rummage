@@ -477,7 +477,7 @@
                                                                                 <event name="OnSetFocus"></event>
                                                                                 <event name="OnSize"></event>
                                                                                 <event name="OnText">on_searchin_changed</event>
-                                                                                <event name="OnTextEnter"></event>
+                                                                                <event name="OnTextEnter">on_searchin_enter</event>
                                                                                 <event name="OnUpdateUI"></event>
                                                                             </object>
                                                                         </object>
