@@ -12,7 +12,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import ure
-import codecs
 import threading
 import sys
 from os import walk
@@ -333,14 +332,17 @@ class Grep(object):
         return pattern
 
     def __read_file(self, file_name):
-        encodings = ["ascii", "utf-8", "utf-16-le"]
-        for encode in encodings:
-            try:
-                with codecs.open(file_name, encoding=encode) as f:
-                    self.current_encoding = encode
-                    return f.read()
-            except:
-                pass
+        encodings = ["ascii", "utf-8", "utf-16"]
+        try:
+            with codecs.open(file_name, "rb") as f:
+                content = f.read()
+                for encode in encodings:
+                    try:
+                        return content.decode(encode)
+                    except Exception as e:
+                        continue
+        except:
+            pass
         # Unknown encoding, maybe binary, something else?
         return None
 
