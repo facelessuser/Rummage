@@ -125,13 +125,13 @@ class Settings(object):
                 cls.cache = cache
 
     @classmethod
-    def get_editor(cls, filename, line):
+    def get_editor(cls, filename, line, col):
         cls.reload_settings()
         editor = cls.settings.get("editor", [])
         if isinstance(editor, dict):
             editor = editor.get(_PLATFORM, [])
 
-        return [arg.replace("{$file}", filename).replace("{$line}", str(line)) for arg in editor]
+        return [arg.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col)) for arg in editor]
 
     @classmethod
     def set_editor(cls, editor):

@@ -44,10 +44,10 @@ SIZE_COMPARE = {
 }
 
 
-def editor_open(filename, line):
+def editor_open(filename, line, col):
     returncode = None
 
-    cmd = Settings.get_editor(filename, line)
+    cmd = Settings.get_editor(filename, line, col)
     if len(cmd) == 0:
         errormsg("No editor is currently set!")
         return
@@ -289,8 +289,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.set_status("")
         wx.GetApp().Yield()
 
-    def open_in_editor(self, filename, line):
-        editor_open(filename, line)
+    def open_in_editor(self, filename, line, col):
+        editor_open(filename, line, col)
 
     def on_content_dclick(self, event):
         pos = event.GetPosition()
@@ -300,8 +300,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             line = self.m_result_list.GetItem(item, col=1).GetText()
             row = self.m_result_list.GetItemData(item)
             file_row = self.m_result_content_panel.get_map_item(row, col=3)
+            col = str(self.m_result_content_panel.get_map_item(row, col=4))
             path = self.m_result_file_panel.get_map_item(file_row, col=3)
-            self.open_in_editor(join(normpath(path), filename), line)
+            self.open_in_editor(join(normpath(path), filename), line, col)
         event.Skip()
 
     def on_file_dclick(self, event):
@@ -312,7 +313,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             path = self.m_result_file_list.GetItem(item, col=3).GetText()
             row = self.m_result_file_list.GetItemData(item)
             line = str(self.m_result_file_panel.get_map_item(row, col=5))
-            self.open_in_editor(join(normpath(path), filename), line)
+            col = str(self.m_result_file_panel.get_map_item(row, col=6))
+            self.open_in_editor(join(normpath(path), filename), line, col)
         event.Skip()
 
     def on_search_click(self, event):
@@ -498,14 +500,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_result_file_list.SetStringItem(count, 4, f["encode"])
             self.m_result_file_list.SetItemImage(count, 0)
             self.m_result_file_list.SetItemData(count, count)
-            self.m_result_file_panel.set_item_map(count, basename(f["name"]), float(f["size"].strip("KB")), f["count"], dirname(f["name"]), f["encode"], f["results"][0]["lineno"])
+            self.m_result_file_panel.set_item_map(count, basename(f["name"]), float(f["size"].strip("KB")), f["count"], dirname(f["name"]), f["encode"], f["results"][0]["lineno"], f["results"][0]["colno"])
             for r in f["results"]:
                 self.m_result_list.InsertStringItem(count2, basename(f["name"]))
                 self.m_result_list.SetStringItem(count2, 1, str(r["lineno"]))
                 self.m_result_list.SetStringItem(count2, 2, r["lines"].replace("\r", "").split("\n")[0])
                 self.m_result_list.SetItemImage(count2, 0)
                 self.m_result_list.SetItemData(count2, count2)
-                self.m_result_content_panel.set_item_map(count2, basename(f["name"]), r["lineno"], r["lines"].replace("\r", "").split("\n")[0], count)
+                self.m_result_content_panel.set_item_map(count2, basename(f["name"]), r["lineno"], r["lines"].replace("\r", "").split("\n")[0], count,  r["colno"])
                 count2 += 1
             count += 1
         self.m_result_list.Thaw()

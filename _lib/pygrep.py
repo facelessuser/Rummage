@@ -156,6 +156,14 @@ class _FileSearch(object):
             yield _FindRegion(start, start + offset)
             start += offset
 
+    def __get_col(self, content, absolute_col):
+        col = 1
+        for x in reversed(range(0, absolute_col)):
+            if content[x] == "\n":
+                break
+            col += 1
+        return col
+
     def search(self, target, file_content, max_count=None):
         """
         Search target file or buffer returning a generator of results.
@@ -170,7 +178,8 @@ class _FileSearch(object):
                 else:
                     max_count -= 1
             result = {
-                "lineno": file_content.count("\n", 0, m.start()) + 1
+                "lineno": file_content.count("\n", 0, m.start()) + 1,
+                "colno": self.__get_col(file_content, m.start())
             }
             result["lines"], result["match"], result["context_count"] = self.__get_lines(file_content, m)
             results["results"].append(result)
@@ -334,14 +343,15 @@ class Grep(object):
     def __read_file(self, file_name):
         encodings = ["ascii", "utf-8", "utf-16"]
         try:
-            with codecs.open(file_name, "rb") as f:
+            with open(file_name, "rb") as f:
                 content = f.read()
                 for encode in encodings:
+                    self.current_encoding = encode
                     try:
                         return content.decode(encode)
                     except Exception as e:
                         continue
-        except:
+        except Exception as e:
             pass
         # Unknown encoding, maybe binary, something else?
         return None
