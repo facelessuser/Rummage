@@ -217,7 +217,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_logic_choice.SetStringSelection(Settings.get_search_setting("size_compare_string", "greater than"))
         self.m_size_text.SetValue(Settings.get_search_setting("size_limit_string", "1000"))
 
-        self.m_case_checkbox.SetValue(Settings.get_search_setting("ignore_case_toggle", False))
+        self.m_case_checkbox.SetValue(not Settings.get_search_setting("ignore_case_toggle", False))
         self.m_dotmatch_checkbox.SetValue(Settings.get_search_setting("dotall_toggle", False))
         self.m_utf8_checkbox.SetValue(Settings.get_search_setting("utf8_toggle", False))
 
