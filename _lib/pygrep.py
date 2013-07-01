@@ -346,7 +346,6 @@ class Grep(object):
 
     def __decode_file(self, filename):
         bfr, self.current_encoding = text_decode.decode(filename)
-        # print self.current_encoding, filename
         return bfr
 
     def __read_file(self, file_name):
@@ -358,33 +357,49 @@ class Grep(object):
                     content = f.read()
                     return content
             except:
-                print(str(traceback.format_exc()))
+                # print(str(traceback.format_exc()))
                 pass
             return None
 
         # Non-Lazy decoding
-        try:
-            return self.__decode_file(file_name)
-        except Exception:
-            print(str(traceback.format_exc()))
-            pass
-        # Lazy decoding
-        # encodings = ["ascii", "utf-8", "utf-16"]
         # try:
-        #     with open(file_name, "rb") as f:
-        #         content = f.read()
-        #         for encode in encodings:
-        #             self.current_encoding = encode
-        #             try:
-        #                 return content.decode(encode)
-        #             except Exception as e:
-        #                 continue
+        #     return self.__decode_file(file_name)
+        # except Exception:
+        #     print(str(traceback.format_exc()))
+        #     pass
+        # Lazy decoding
+        encodings = [
+            "ascii",
+            "utf-8-sig",
+            "utf-16",
+            "latin-1"
+        ]
+        encodings_map = {
+            0: "ASCII",
+            1: "UTF8",
+            2: "UTF16",
+            3: "Latin-1"
+        }
+        content = None
+        try:
+            with open(file_name, "rb") as f:
+                content = f.read()
+                count = 0
+                for encode in encodings:
+                    self.current_encoding = encodings_map[count]
+                    try:
+                        return unicode(content, encode)
+                    except:
+                        # print(str(traceback.format_exc()))
+                        self.current_encoding = "BIN"
+                        pass
+                    count += 1
 
         except Exception:
             # print(str(traceback.format_exc()))
             pass
         # Unknown encoding, maybe binary, something else?
-        return None
+        return content
 
     def get_status(self):
         if self.thread is not None:

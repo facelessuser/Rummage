@@ -70,15 +70,13 @@ def __is_utf8(current, bytes):
     return False
 
 
-def __is_utf8_quick(self, byte, bin):
+def __is_utf8_quick(byte, bin):
     # http://etutorials.org/Programming/secure+programming/Chapter+3.+Input+Validation/3.12+Detecting+Illegal+UTF-8+Characters/
     # http://stackoverflow.com/questions/1319022/really-good-bad-utf-8-example-test-data
     # http://stackoverflow.com/questions/775412/how-does-a-file-with-chinese-characters-know-how-many-bytes-to-use-per-character
     offset = 0
 
-    if byte in [0xC0, 0xC1] or byte >= 0xF5:
-        return False
-    if (byte & 0xC0) == 0x80:
+    if byte == 0xC0 or byte == 0xC1 or byte >= 0xF5:
         return False
     elif (byte & 0xE0) == 0xC0:
         offset == 1
@@ -93,17 +91,9 @@ def __is_utf8_quick(self, byte, bin):
     if offset:
         bytes = bin.quick_read(offset)
         for idx in range(0, len(bytes)):
-            if b[idx] & 0xC0 != 0x80:
+            if (b[idx] & 0xC0) != 0x80:
                 return False
     return True
-
-
-def __is_binary(is_null, last_char):
-    return is_null and (last_char is not None and last_char == 0x00)
-
-
-def __is_null(b):
-    return b == 0x00
 
 
 class BinStream(object):
@@ -187,7 +177,10 @@ class BinStream(object):
             bytes = self.read_bytes(4096)
 
     def decode(self, encode):
-        return unicode(self.bfr, encode)
+        if encode is not None:
+            return unicode(self.bfr, encode)
+        else:
+            self.bfr, "BIN"
 
     def __iter__(self):
         self.bin.seek(0)
@@ -286,9 +279,9 @@ def decode(filename):
     encoding = BINARY
     try:
         bin = BinStream(filename)
-        encoding= __guess_encoding(bin)
+        encoding = __guess_encoding(bin)
     except:
-        # print(str(traceback.format_exc()))
+        print(str(traceback.format_exc()))
         pass
 
     if bin is not None:
@@ -296,7 +289,7 @@ def decode(filename):
         bin.close()
 
         if bin.test_binary():
-            encoding == BINARY
+            encoding = BINARY
 
     if encoding != BINARY:
         enc, name = encoding_map[encoding]
@@ -311,7 +304,13 @@ def decode(filename):
             #         return f.read(), name
             return bin.decode(enc), name
         except:
+            # print filename
             # print(str(traceback.format_exc()))
             encoding = BINARY
 
-    return bin.bfr if bin is not None else None, encoding_map[encoding][1]
+    # try:
+    #     with open(filename, "rb") as f:
+    #         return f.read(), encoding_map[encoding][1]
+    # except:
+    #     pass
+    return bin.decode(encoding)
