@@ -235,7 +235,7 @@ def __guess_encoding(bin):
 
         # Check if Ascii and if not, try and validate buffer as UTF8
         if not utf8_invalid:
-            if __is_utf8_quic(b, bin):
+            if __is_utf8_quick(b, bin):
                 encoding = UTF8
             else:
                 utf8_invalid = True
