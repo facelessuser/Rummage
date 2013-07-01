@@ -258,8 +258,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def enable_panel(self, panel, enable):
         # For some odd reason, OSX panel Enable doesn't work
         # This is a work around
-        for child in panel.GetChildren():
-            child.Enable(enable)
+        if _PLATFORM == "windows":
+            panel.Enable(enable)
+        else:
+            for child in panel.GetChildren():
+                child.Enable(enable)
 
     def check_searchin(self):
         pth = self.m_searchin_text.GetValue()
@@ -505,7 +508,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             for r in f["results"]:
                 self.m_result_list.InsertStringItem(count2, basename(f["name"]))
                 self.m_result_list.SetStringItem(count2, 1, str(r["lineno"]))
-                self.m_result_list.SetStringItem(count2, 2, r["lines"].replace("\r", "").split("\n")[0])
+                self.m_result_list.SetStringItem(count2, 2, r["lines"].split(f["line_ending"])[0].replace("\r", ""))
                 self.m_result_list.SetItemImage(count2, 0)
                 self.m_result_list.SetItemData(count2, count2)
                 self.m_result_content_panel.set_item_map(count2, basename(f["name"]), r["lineno"], r["lines"].replace("\r", "").split("\n")[0], count,  r["colno"])

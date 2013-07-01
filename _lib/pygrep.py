@@ -46,6 +46,8 @@ if _PLATFORM == "osx":
 elif _PLATFORM == "windows":
     import ctypes
 
+LINE_ENDINGS = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
+
 
 def threaded_walker(directory, file_pattern, file_regex_match, folder_exclude, recursive, show_hidden, size):
     global _RUNNING
@@ -160,10 +162,10 @@ class _FileSearch(object):
             yield _FindRegion(start, start + offset)
             start += offset
 
-    def __get_col(self, content, absolute_col):
+    def __get_col(self, content, absolute_col, line_ending):
         col = 1
         for x in reversed(range(0, absolute_col)):
-            if content[x] == "\n":
+            if content[x] == line_ending:
                 break
             col += 1
         return col
@@ -173,7 +175,13 @@ class _FileSearch(object):
         Search target file or buffer returning a generator of results.
         """
 
-        results = {"name": target, "count": 0, "results": []}
+        ending = LINE_ENDINGS.search(file_content)
+        line_ending = "\n"
+        if ending is not None:
+            if ending.group(2):
+                line_ending = "\r"
+
+        results = {"name": target, "count": 0, "line_ending": line_ending, "results": []}
 
         for m in self.__findall(file_content.lower() if self.literal and self.ignorecase else file_content):
             if max_count != None:
@@ -181,9 +189,10 @@ class _FileSearch(object):
                     break
                 else:
                     max_count -= 1
+
             result = {
-                "lineno": file_content.count("\n", 0, m.start()) + 1,
-                "colno": self.__get_col(file_content, m.start())
+                "lineno": file_content.count(line_ending, 0, m.start()) + 1,
+                "colno": self.__get_col(file_content, m.start(), line_ending)
             }
             result["lines"], result["match"], result["context_count"] = self.__get_lines(file_content, m)
             results["results"].append(result)
@@ -352,7 +361,7 @@ class Grep(object):
         # Force UTF for all
         if self.all_utf8:
             try:
-                self.current_encoding = "forced:UTF8"
+                self.current_encoding = "UTF8"
                 with codecs.open(file_name, encoding="utf-8-sig", errors="replace") as f:
                     content = f.read()
                     return content
@@ -378,7 +387,7 @@ class Grep(object):
             0: "ASCII",
             1: "UTF8",
             2: "UTF16",
-            3: "Latin-1"
+            3: "LATIN-1"
         }
         content = None
         try:
