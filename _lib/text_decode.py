@@ -112,6 +112,8 @@ class BinStream(object):
         self.index = 0
         self.last_char = None
         self.current_char = None
+        self.has_null = False
+        self.is_binary = False
         self.bfr = None
         self.length = getsize(filename)
         self.__check_bom()
@@ -119,17 +121,17 @@ class BinStream(object):
     def __check_bom(self):
         self.bom = None
         if self.length > 1:
-            b = self.read_bytes(2)
+            b = self.read_bytes(2, False)
             bom = b[0] << 8 | b[1]
             if bom == 0xFFFE or bom == 0xFEFF:
                 self.bom = 0xFFFE
         if self.bom is None and self.length > 2:
-            b = self.read_bytes(1)
+            b = self.read_bytes(1, False)
             bom = bom << 8 | b[0]
             if bom == 0xEFBBEF:
                 self.bom == 0xEFBBEF
         elif self.bom is not None and self.length > 3 and bom ==0xFFFE:
-            b = self.read_bytes(1)
+            b = self.read_bytes(1, False)
             bom = bom << 8 | b[0]
             if bom == 0xFFFE0000:
                 self.bom = None
@@ -139,27 +141,50 @@ class BinStream(object):
     def has_bom(self):
         return self.bom
 
-    def read_bytes(self, num):
+    def __is_null(self, b):
+        null = b == 0x00
+        if null:
+            self.has_null = True
+        return null
+
+    def test_binary(self, raw_bytes=[]):
+        if not self.is_binary:
+            last_char = self.last_char
+            for r in raw_bytes:
+                is_null = self.__is_null(r)
+                if is_null and (last_char is not None and self.is_null(last_char)):
+                    self.is_binary = BINARY
+                    break
+                last_char = r
+        return self.is_binary
+
+    def read_bytes(self, num, binary_check=True):
         bytes = self.bin.read(num)
         if self.bfr is None:
             self.bfr = bytes
         else:
             self.bfr += bytes
-        return struct.unpack("=" + ("B" * len(bytes)), bytes)
+        raw_bytes = struct.unpack("=" + ("B" * len(bytes)), bytes)
 
-    def quick_read(self, num):
+        if binary_check:
+            self.test_binary(raw_bytes)
+
+        return raw_bytes
+
+    def quick_read(self, num, binary_check=True):
         bytes = self.bin.read(num)
         raw_bytes = struct.unpack("=" + ("B" * len(bytes)), bytes)
+
+        if binary_check:
+            self.test_binary(raw_bytes)
+
         self.bin.seek(self.index)
         return raw_bytes
 
     def finish_read(self):
-        bytes = self.bin.read(4096)
+        bytes = self.read_bytes(4096)
         while bytes:
-            if self.bfr is None:
-                self.bfr = bytes
-            else:
-                self.bfr += bytes
+            bytes = self.read_bytes(4096)
 
     def decode(self, encode):
         return unicode(self.bfr, encode)
@@ -216,19 +241,16 @@ def __guess_encoding(bin):
     for b in bin:
         is_null = False
 
-        # for b in raw_bytes:
-        is_null = __is_null(b)
-        if is_null:
-            has_null = True
-        if __is_binary(is_null, bin.last_char):
-            encoding = BINARY
-            break
         if bin.last_char is not None:
+
+            if bin.is_binary:
+                encoding = BINARY
+                break
 
             # Nulls do not exist in ANSI
             # Nulls aren't as likely in UTF8, but not impossible
             # Nulls are more likely in UTF16 so we are just making a guess
-            if is_null:
+            if bin.has_null:
                 if is_even_bytes:
                     possibly_utf16 = True
                 else:
@@ -273,6 +295,9 @@ def decode(filename):
         bin.finish_read()
         bin.close()
 
+        if bin.test_binary():
+            encoding == BINARY
+
     if encoding != BINARY:
         enc, name = encoding_map[encoding]
         try:
@@ -289,4 +314,4 @@ def decode(filename):
             # print(str(traceback.format_exc()))
             encoding = BINARY
 
-    return None, encoding_map[encoding][1]
+    return bin.bfr if bin is not None else None, encoding_map[encoding][1]

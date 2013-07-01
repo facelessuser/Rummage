@@ -363,22 +363,22 @@ class Grep(object):
             return None
 
         # Non-Lazy decoding
-        # try:
-        #     return self.__decode_file(file_name)
-        # except Exception:
-        #     print(str(traceback.format_exc()))
-        #     pass
-        # Lazy decoding
-        encodings = ["ascii", "utf-8", "utf-16"]
         try:
-            with open(file_name, "rb") as f:
-                content = f.read()
-                for encode in encodings:
-                    self.current_encoding = encode
-                    try:
-                        return content.decode(encode)
-                    except Exception as e:
-                        continue
+            return self.__decode_file(file_name)
+        except Exception:
+            print(str(traceback.format_exc()))
+            pass
+        # Lazy decoding
+        # encodings = ["ascii", "utf-8", "utf-16"]
+        # try:
+        #     with open(file_name, "rb") as f:
+        #         content = f.read()
+        #         for encode in encodings:
+        #             self.current_encoding = encode
+        #             try:
+        #                 return content.decode(encode)
+        #             except Exception as e:
+        #                 continue
 
         except Exception:
             # print(str(traceback.format_exc()))
