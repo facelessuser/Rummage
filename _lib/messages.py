@@ -643,6 +643,18 @@ def filepickermsg(msg, wildcard, save=False):
     dlg.Destroy()
     return select
 
+def dirpickermsg(msg, default_path=""):
+    select = None
+    style = wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
+    dlg = wx.DirDialog(
+        None, msg,
+        default_path,
+        style=style
+    )
+    if dlg.ShowModal() == wx.ID_OK:
+        select = dlg.GetPath()
+    dlg.Destroy()
+    return select
 
 def promptmsg(question, caption = 'PROMPT', bitmap=None, yes="Okay", no="Cancel"):
     dlg = Messages(None, question, caption, style=PROMPT, yes=yes, no=no, bitmap=bitmap)

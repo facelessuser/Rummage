@@ -21,6 +21,7 @@ from time import sleep
 import struct
 import traceback
 import codecs
+import text_decode
 
 LITERAL = 1
 IGNORECASE = 2
@@ -343,119 +344,45 @@ class Grep(object):
             pattern = file_pattern
         return pattern
 
-    def __is_utf8(self, current, bytes):
-        # http://www.w3.org/International/questions/qa-forms-utf-8
-        b = [current]
-        try:
-            b.append(bytes.next())
-        except StopIteration:
-            b.append(None)
-
-        if b[0] is None or b[1] is None:
-            return False
-
-        if 0xC2 <= b[0] <= 0xDF and 0x80 <= b[1] <= 0xBF:
-            return True
-
-        try:
-            b.append(bytes.next())
-        except StopIteration:
-            b.append(None)
-
-        if b[2] is None:
-            return False
-        if b[0] == 0xE0 and 0xA0 <= b[1] <= 0xBF and 0x80 <= b[2] <= 0xBF:
-            return True
-        if (
-            (0xE1 <= b[0] <=0xEC or b[0] == 0xEE or b[0] == 0xEF) and
-            0x80 <= b[1] <= 0xBF and 0x80 <= b[2] <= 0xBF
-        ):
-            return True
-        elif b[0] == 0xED and 0x80 <= b[1] <= 0x9F and 0x80 <= b[2] <= 0xBF:
-            return True
-
-        try:
-            b.append(bytes.next())
-        except StopIteration:
-            b.append(None)
-
-        if b[3] is None:
-            return False
-
-        if b[0] == 0xF0 and 0x90 <= b[1] <= 0xBF and 0x80 <= b[2] <= 0xBF and 0x80 <= b[3] <= 0xBF:
-            return True
-        elif 0xF1 <= b[0] <= 0xF3 and 0x80 <= b[1] <= 0xBF and 0x80 <= b[2] <= 0xBF and 0x80 <= b[3] <= 0xBF:
-            return True
-        elif b[0] == 0xF4 and 0x80 <= b[1] <= 0x8F and 0x80 <= b[2] <= 0xBF and 0x80 <= b[3] <= 0xBF:
-            return True
-        return False
-
-    def __is_binary(self, b):
-        return b == 0x00
-
-    def __is_ascii(self, b):
-        return b <= 0x7F
-
-    def __decode_file(self, filename, maxblocksize=4096):
-        is_binary = False
-        is_ascii = True
-        is_utf8 = True
-        bfr = ""
-        with open(filename, "rb") as bin:
-            bytes = bin.read(maxblocksize)
-            while bytes:
-                b8 = iter(struct.unpack("=" + ("B" * len(bytes)), bytes))
-
-                for b in b8:
-                    is_binary = self.__is_binary(b)
-                    if not self.__is_binary(b):
-                        if not self.__is_ascii(b):
-                            is_ascii = False
-                            is_utf8 = self.__is_utf8(b, b8)
-                            if not is_utf8:
-                                break
-                    else:
-                        is_binary = True
-                        break
-
-                if is_binary or (not is_utf8 and not is_ascii):
-                    break
-
-                bfr += bytes
-                bytes = bin.read(maxblocksize)
-
-        if is_binary:
-            return None, "binary"
-        elif is_ascii:
-            self.current_encoding = "ascii"
-            return bfr.decode("ascii")
-        elif is_utf8:
-            self.current_encoding = "utf-8"
-            return bfr.decode("utf-8")
-        return None, "binary"
+    def __decode_file(self, filename):
+        bfr, self.current_encoding = text_decode.decode(filename)
+        # print self.current_encoding, filename
+        return bfr
 
     def __read_file(self, file_name):
+        # Force UTF for all
+        if self.all_utf8:
+            try:
+                self.current_encoding = "forced:UTF8"
+                with codecs.open(file_name, encoding="utf-8-sig", errors="replace") as f:
+                    content = f.read()
+                    return content
+            except:
+                print(str(traceback.format_exc()))
+                pass
+            return None
+
         # Non-Lazy decoding
+        # try:
+        #     return self.__decode_file(file_name)
+        # except Exception:
+        #     print(str(traceback.format_exc()))
+        #     pass
+        # Lazy decoding
+        encodings = ["ascii", "utf-8", "utf-16"]
         try:
-            return self.__decode_file(file_name)
+            with open(file_name, "rb") as f:
+                content = f.read()
+                for encode in encodings:
+                    self.current_encoding = encode
+                    try:
+                        return content.decode(encode)
+                    except Exception as e:
+                        continue
+
         except Exception:
             # print(str(traceback.format_exc()))
             pass
-        # Lazy decoding
-        # encodings = ["ascii", "utf-8", "utf-16"]
-        # try:
-        #     with open(file_name, "rb") as f:
-        #         content = f.read()
-        #         for encode in encodings:
-        #             self.current_encoding = encode
-        #             try:
-        #                 return content.decode(encode)
-        #             except Exception as e:
-        #                 continue
-
-        # except Exception:
-        #     # print(str(traceback.format_exc()))
-        #     pass
         # Unknown encoding, maybe binary, something else?
         return None
 

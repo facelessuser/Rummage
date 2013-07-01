@@ -192,12 +192,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.open_debug_console()
         self.init_update_timer()
         self.m_grep_notebook.SetSelection(0)
-        best = self.m_settings_panel.GetBestSize()
-        current = self.m_settings_panel.GetSize()
-        offset = best[1] - current[1]
-        mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
-        self.SetMinSize(self.GetSize())
 
         if Settings.get_search_setting("regex_toggle", True):
             self.m_search_regex_radio.SetValue(True)
@@ -232,6 +226,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if start_path and exists(start_path):
             self.m_searchin_text.SetValue(abspath(normpath(start_path)))
         self.m_searchfor_textbox.SetFocus()
+
+        best = self.m_settings_panel.GetBestSize()
+        current = self.m_settings_panel.GetSize()
+        offset = best[1] - current[1]
+        mainframe = self.GetSize()
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        self.SetMinSize(self.GetSize())
 
     def on_dir_changed(self, event):
         if not self.searchin_update:
@@ -589,7 +590,7 @@ def gui_main(script):
     args = parse_arguments()
     if args.debug:
         set_debug_mode(True)
-    app = CustomApp(redirect=args.debug)
+    app = CustomApp(redirect=True)
     RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
     app.MainLoop()
 
