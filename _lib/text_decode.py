@@ -70,6 +70,32 @@ def __is_utf8(current, bytes):
     return False
 
 
+def __is_utf8_quick(self, byte, bin):
+    # http://stackoverflow.com/questions/775412/how-does-a-file-with-chinese-characters-know-how-many-bytes-to-use-per-character
+    offset = 0
+
+    if byte in [0xC0, 0xC1] or byte >= 0xF5:
+        return False
+    if (byte & 0xC0) == 0x80:
+        return False
+    elif (byte & 0xE0) == 0xC0:
+        offset == 1
+    elif (byte & 0xF0) == 0xE0:
+        offset == 2
+    elif (byte & 0xF8) == 0xF0:
+        offset == 3
+    # elif (byte & 0xFC) == 0xF8:
+    #     offset == 4
+    # elif (byte & 0xFE) == 0xFC:
+    #     offset == 5
+    if offset:
+        bytes = bin.quick_read(offset)
+        for idx in range(0, len(bytes)):
+            if b[idx] & 0xC0 != 0x80:
+                return False
+    return True
+
+
 def __is_binary(is_null, last_char):
     return is_null and (last_char is not None and last_char == 0x00)
 
@@ -118,6 +144,12 @@ class BinStream(object):
         else:
             self.bfr += bytes
         return struct.unpack("=" + ("B" * len(bytes)), bytes)
+
+    def quick_read(self, num):
+        bytes = self.bin.read(num)
+        raw_bytes = struct.unpack("=" + ("B" * len(bytes)), bytes)
+        self.bin.seek(self.index)
+        return raw_bytes
 
     def finish_read(self):
         bytes = self.bin.read(4096)
@@ -203,7 +235,7 @@ def __guess_encoding(bin):
 
         # Check if Ascii and if not, try and validate buffer as UTF8
         if not utf8_invalid:
-            if __is_utf8(b, bin):
+            if __is_utf8_quic(b, bin):
                 encoding = UTF8
             else:
                 utf8_invalid = True
