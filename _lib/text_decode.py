@@ -71,6 +71,8 @@ def __is_utf8(current, bytes):
 
 
 def __is_utf8_quick(self, byte, bin):
+    # http://etutorials.org/Programming/secure+programming/Chapter+3.+Input+Validation/3.12+Detecting+Illegal+UTF-8+Characters/
+    # http://stackoverflow.com/questions/1319022/really-good-bad-utf-8-example-test-data
     # http://stackoverflow.com/questions/775412/how-does-a-file-with-chinese-characters-know-how-many-bytes-to-use-per-character
     offset = 0
 
