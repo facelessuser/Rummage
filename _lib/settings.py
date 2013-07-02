@@ -125,7 +125,7 @@ class Settings(object):
                 cls.cache = cache
 
     @classmethod
-    def get_editor(cls, filename="${file}", line="${line}", col="${col}"):
+    def get_editor(cls, filename="{$file}", line="{$line}", col="{$col}"):
         cls.reload_settings()
         editor = cls.settings.get("editor", [])
         if isinstance(editor, dict):
@@ -148,6 +148,34 @@ class Settings(object):
     def set_single_instance(cls, single):
         cls.reload_settings()
         cls.settings["single_instance"] = single
+        cls.save_settings()
+
+    @classmethod
+    def add_search(cls, name, search, is_regex):
+        cls.reload_settings()
+        searches = cls.settings.get("saved_searches", [])
+        searches.append((name, search, is_regex))
+        cls.settings["saved_searches"] = searches
+        cls.save_settings()
+
+    @classmethod
+    def get_search(cls, idx=None):
+        value = None
+        cls.reload_settings()
+        searches = cls.settings.get("saved_searches", [])
+        if idx is None:
+            value = searches
+        elif idx < len(searches):
+            value = searches[idx]
+        return value
+
+    @classmethod
+    def delete_search(cls, idx):
+        cls.reload_settings()
+        searches = cls.settings.get("saved_searches", [])
+        if idx < len(searches):
+            del searches[idx]
+        cls.settings["saved_searches"] = searches
         cls.save_settings()
 
     @classmethod

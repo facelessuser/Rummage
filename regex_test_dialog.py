@@ -29,6 +29,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     def on_use(self, event):
         self.GetParent().m_searchfor_textbox.SetValue(self.m_regex_text.GetValue())
+        self.GetParent().m_search_regex_radio.SetValue(True)
         self.Close()
 
     def on_cancel(self, event):

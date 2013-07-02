@@ -30,8 +30,10 @@ RECURSIVE = 8
 FILE_REGEX_MATCH = 16
 BUFFER_INPUT = 32
 
+_LOCK = threading.Lock()
 _FILES = []
 _RUNNING = False
+_STARTED = False
 _ABORT = False
 
 if sys.platform.startswith('win'):
@@ -51,10 +53,14 @@ LINE_ENDINGS = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
 
 def threaded_walker(directory, file_pattern, file_regex_match, folder_exclude, recursive, show_hidden, size):
     global _RUNNING
-    _RUNNING = True
+    global _STARTED
+    with _LOCK:
+        _RUNNING = True
+        _STARTED = True
     walker = _DirWalker(directory, file_pattern, file_regex_match, folder_exclude, recursive, show_hidden, size)
     walker.run()
-    _RUNNING = False
+    with _LOCK:
+        _RUNNING = False
 
 
 def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
@@ -264,8 +270,9 @@ class _DirWalker(object):
                 matched = False
                 exclude = False
                 for p in self.file_pattern:
-                    if fnmatch(name.lower(), p[1:]):
-                        exclude = True
+                    if len(p) > 1 and p[0] == "-":
+                        if fnmatch(name.lower(), p[1:]):
+                            exclude = True
                     elif fnmatch(name.lower(), p):
                         matched = True
                 if exclude:
@@ -286,7 +293,8 @@ class _DirWalker(object):
     def run(self):
         global _FILES
         global _ABORT
-        _FILES = []
+        with _LOCK:
+            _FILES = []
         for base, dirs, files in walk(self.dir):
             # Remove child folders based on exclude rules
             [dirs.remove(name) for name in dirs[:] if not self.__valid_folder(base, name)]
@@ -295,11 +303,13 @@ class _DirWalker(object):
             if len(files):
                 # Only search files in that are in the inlcude rules
                 for f in [(name, self.current_size) for name in files[:] if self.__valid_file(base, name)]:
-                    _FILES.append((join(base, f[0]), f[1]))
+                    with _LOCK:
+                        _FILES.append((join(base, f[0]), f[1]))
                     if _ABORT:
                         break
             if _ABORT:
-                _ABORT = False
+                with _LOCK:
+                    _ABORT = False
                 break
 
 
@@ -307,7 +317,8 @@ class Grep(object):
     def __init__(
         self, target, pattern, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None,
-        show_hidden=False, all_utf8=False, size=None
+        show_hidden=False, all_utf8=False, size=None,
+        text=False
     ):
         """
         Initialize Grep object.
@@ -315,10 +326,11 @@ class Grep(object):
 
         global _RUNNING
         global _ABORT
-        if not _RUNNING and _ABORT:
-            _ABORT = False
-        if _RUNNING:
-            raise GrepException("Grep process already running!")
+        with _LOCK:
+            if not _RUNNING and _ABORT:
+                _ABORT = False
+            if _RUNNING:
+                raise GrepException("Grep process already running!")
 
         self.search = _FileSearch(pattern, flags, context)
         self.buffer_input = bool(flags & BUFFER_INPUT)
@@ -327,6 +339,7 @@ class Grep(object):
         self.idx = -1
         self.target = abspath(target) if not self.buffer_input else target
         self.max = max_count
+        self.process_binary = text
         file_regex_match = bool(flags & FILE_REGEX_MATCH)
         self.kill = False
         self.thread = None
@@ -407,6 +420,8 @@ class Grep(object):
         except Exception:
             # print(str(traceback.format_exc()))
             pass
+        if not self.process_binary:
+            content = None
         # Unknown encoding, maybe binary, something else?
         return content
 
@@ -418,7 +433,8 @@ class Grep(object):
 
     def abort(self):
         global _ABORT
-        _ABORT = True
+        with _LOCK:
+            _ABORT = True
         self.kill = True
 
     def find(self):
@@ -427,13 +443,20 @@ class Grep(object):
         If given a file directly, it will search the file only.
         Return the results of each file via a generator.
         """
-
+        global _STARTED
         max_count = int(self.max) if self.max != None else None
 
         if self.thread is not None:
             self.idx = -1
             self.thread.start()
             done = False
+            # Try to wait in case the
+            # "is running" check happens too quick
+            while not _STARTED:
+                sleep(0.3)
+            with _LOCK:
+                _STARTED = False
+
             while not done:
                 file_info = None
                 while file_info is None:

@@ -30,26 +30,34 @@ from _lib.settings import Settings, _PLATFORM
 from _lib.autocomplete_combo import AutoCompleteCombo
 from _lib.sorted_columns import extend_list
 from regex_test_dialog import RegexTestDialog
+from load_search_dialog import LoadSearchDialog
+from save_search_dialog import SaveSearchDialog
+from settings_dialog import SettingsDialog
+
 
 __version__ = "1.0.0"
 
+_LOCK = threading.Lock()
 _RUNNING = False
 _RESULTS = []
 _COMPLETED = 0
 _TOTAL = 0
+_PROCESSED = 0
 _ABORT = False
 _RUNTIME = None
 SIZE_COMPARE = {
-    0: "gt",
-    1: "eq",
-    2: "lt"
+    0: "any",
+    1: "gt",
+    2: "eq",
+    3: "lt"
 }
 
 
 def editor_open(filename, line, col):
     returncode = None
 
-    cmd = Settings.get_editor(filename, line, col)
+    print filename, line, col
+    cmd = Settings.get_editor(filename=filename, line=line, col=col)
     if len(cmd) == 0:
         errormsg("No editor is currently set!")
         return
@@ -114,11 +122,13 @@ def update_choices(obj, key, load_last=False):
 
 def threaded_grep(
     target, pattern, file_pattern, folder_exclude,
-    flags, show_hidden, all_utf8, size
+    flags, show_hidden, all_utf8, size, text
 ):
     global _RUNNING
     global _RUNTIME
-    _RUNNING = True
+    with _LOCK:
+        _RUNTIME = ""
+        _RUNNING = True
     start = time()
     grep = GrepThread(
         pygrep.Grep(
@@ -129,13 +139,15 @@ def threaded_grep(
             flags=flags,
             show_hidden=show_hidden,
             all_utf8=all_utf8,
-            size=size
+            size=size,
+            text=text
         )
     )
     grep.run()
     bench = time() - start
-    _RUNTIME = "%01.2f seconds" % bench
-    _RUNNING = False
+    with _LOCK:
+        _RUNTIME = "%01.2f seconds" % bench
+        _RUNNING = False
 
 
 class GrepThread(object):
@@ -152,11 +164,14 @@ class GrepThread(object):
         _TOTAL = 0
         for f in self.grep.find():
             if f["count"] != 0:
-                _RESULTS.append(f)
-            _COMPLETED, _TOTAL = self.grep.get_status()
+                with _LOCK:
+                    _RESULTS.append(f)
+            with _LOCK:
+                _COMPLETED, _TOTAL = self.grep.get_status()
             if _ABORT:
                 self.grep.abort()
-                _ABORT = False
+                with _LOCK:
+                    _ABORT = False
                 break
 
 
@@ -178,173 +193,6 @@ class GrepArgs(object):
         self.size_compare = None
 
 
-class ArgDialog(gui.ArgDialog):
-    def __init__(self, parent, value):
-        super(ArgDialog, self).__init__(parent)
-
-        self.arg = value
-        self.m_arg_text.SetValue(value)
-
-        best = self.m_arg_panel.GetBestSize()
-        current = self.m_arg_panel.GetSize()
-        offset = best[1] - current[1]
-        mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
-        self.SetMinSize(self.GetSize())
-
-    def on_apply(self, event):
-        value = self.m_arg_text.GetValue()
-        if value != "":
-            self.arg = value
-        self.Close()
-
-    def get_arg(self):
-        return self.arg
-
-    def on_cancel(self, event):
-        self.Close()
-
-
-class EditorDialog(gui.EditorDialog):
-    def __init__(self, parent, editor=[]):
-        super(EditorDialog, self).__init__(parent)
-        self.editor = editor
-
-        if len(editor) != 0:
-            self.m_editor_picker.SetPath(editor[0])
-
-        if len(editor) > 1:
-            self.m_arg_list.Clear()
-            for x in range(1, len(editor)):
-                self.m_arg_list.Append(editor[x])
-
-        best = self.m_editor_panel.GetBestSize()
-        current = self.m_editor_panel.GetSize()
-        offset = best[1] - current[1]
-        mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
-        self.SetMinSize(self.GetSize())
-
-    def on_arg_enter(self, event):
-        self.add_arg()
-        event.Skip()
-
-    def on_add(self, event):
-        self.add_arg()
-        event.Skip()
-
-    def add_arg(self):
-        value = self.m_arg_text.GetValue()
-        if value != "":
-            self.m_arg_list.Append(value)
-            value = self.m_arg_text.SetValue("")
-
-    def on_edit(self, event):
-        value = self.m_arg_list.GetSelection()
-        if value >= 0:
-            dlg = ArgDialog(self, self.m_arg_list.GetString(value))
-            dlg.ShowModal()
-            string = dlg.get_arg()
-            dlg.Destroy()
-
-            items = []
-            for x in range(0, self.m_arg_list.GetCount()):
-                if x == value:
-                    items.append(string)
-                if x != value:
-                    items.append(self.m_arg_list.GetString(x))
-            self.m_arg_list.Clear()
-            for x in items:
-                self.m_arg_list.Append(x)
-
-    def on_up(self, event):
-        value = self.m_arg_list.GetSelection()
-        if value > 0:
-            string = self.m_arg_list.GetString(value)
-            items = []
-            for x in range(0, self.m_arg_list.GetCount()):
-                if x == value - 1:
-                    items.append(string)
-                if x != value:
-                    items.append(self.m_arg_list.GetString(x))
-            self.m_arg_list.Clear()
-            for x in items:
-                self.m_arg_list.Append(x)
-
-    def on_down(self, event):
-        value = self.m_arg_list.GetSelection()
-        count = self.m_arg_list.GetCount()
-        if value < count - 1:
-            string = self.m_arg_list.GetString(value)
-            items = []
-            for x in range(0, count):
-                if x != value:
-                    items.append(self.m_arg_list.GetString(x))
-                    if x == value + 1:
-                        items.append(string)
-            self.m_arg_list.Clear()
-            for x in items:
-                self.m_arg_list.Append(x)
-
-    def on_remove(self, event):
-        value = self.m_arg_list.GetSelection()
-        if value >= 0:
-            items = []
-            for x in range(0, self.m_arg_list.GetCount()):
-                if x != value:
-                    items.append(self.m_arg_list.GetString(x))
-            self.m_arg_list.Clear()
-            for x in items:
-                self.m_arg_list.Append(x)
-
-    def on_apply(self, event):
-        editor = []
-        app = self.m_editor_picker.GetPath()
-        if app != "":
-            editor.append(app)
-        for x in range(0, self.m_arg_list.GetCount()):
-            editor.append(self.m_arg_list.GetString(x))
-        self.editor = editor
-        self.Close()
-
-    def on_cancel(self, event):
-        self.Close()
-
-    def get_editor(self):
-        return self.editor
-
-
-class SettingsDialog(gui.SettingsDialog):
-    def __init__(self, parent):
-        super(SettingsDialog, self).__init__(parent)
-
-        self.editor = Settings.get_editor()
-        self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
-        self.m_single_checkbox.SetValue(Settings.get_single_instance())
-
-        best = self.m_settings_panel.GetBestSize()
-        current = self.m_settings_panel.GetSize()
-        offset = best[1] - current[1]
-        mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
-        self.SetMinSize(self.GetSize())
-
-    def on_editor_change(self, event):
-        dlg = EditorDialog(self, self.editor)
-        dlg.ShowModal()
-        self.editor = dlg.get_editor()
-        Settings.set_editor(self.editor)
-        self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
-        dlg.Destroy()
-        event.Skip()
-
-    def on_single_toggle(self, event):
-        Settings.set_single_instance(self.m_single_checkbox.GetValue())
-
-    def on_cancel(self, event):
-        self.Close()
-
-
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
         super(RummageFrame, self).__init__(parent)
@@ -354,6 +202,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         extend_list(self.m_result_list, self.m_result_content_panel, 3)
         extend_list(self.m_result_file_list, self.m_result_file_panel, 6)
 
+        self.debounce_search = False
         self.searchin_update = False
         self.checking = False
         self.kill = False
@@ -366,20 +215,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.init_update_timer()
         self.m_grep_notebook.SetSelection(0)
 
-        if Settings.get_search_setting("regex_toggle", True):
-            self.m_search_regex_radio.SetValue(True)
-        else:
-            self.m_search_text_radio.SetValue(True)
-
-        if Settings.get_search_setting("regex_file_toggle", False):
-            self.m_filematchregex_radio.SetValue(True)
-        else:
-            self.m_filematchtext_radio.SetValue(True)
-
-        if Settings.get_search_setting("size_check_toggle", False):
-            self.m_size_radio.SetValue(True)
-        else:
-            self.m_all_size_radio.SetValue(True)
+        self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
+        self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
 
         self.m_logic_choice.SetStringSelection(Settings.get_search_setting("size_compare_string", "greater than"))
         self.m_size_text.SetValue(Settings.get_search_setting("size_limit_string", "1000"))
@@ -390,11 +227,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
+        self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
 
         update_choices(self.m_searchin_text, "target")
-        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_search_regex_radio.GetValue() else "literal_search")
+        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
         update_choices(self.m_exclude_textbox, "folder_exclude", load_last=True)
-        update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_filematchregex_radio.GetValue() else "file_search", load_last=True)
+        update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
 
         if start_path and exists(start_path):
             self.m_searchin_text.SetValue(abspath(normpath(start_path)))
@@ -432,6 +270,24 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_searchin_changed(self, event):
         self.check_searchin()
         event.Skip()
+
+    def on_save_search(self, event):
+        search = self.m_searchfor_textbox.GetValue()
+        if search == "":
+            errormsg("There is no search to save!")
+            return
+        dlg = SaveSearchDialog(self, search, self.m_regex_search_checkbox.GetValue())
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def on_load_search(self, event):
+        dlg = LoadSearchDialog(self)
+        dlg.ShowModal()
+        search, is_regex = dlg.get_search()
+        dlg.Destroy()
+        if search is not None and is_regex is not None:
+            self.m_searchfor_textbox.SetValue(search)
+            self.m_regex_search_checkbox.SetValue(regex_search)
 
     def enable_panel(self, panel, enable):
         # For some odd reason, OSX panel Enable doesn't work
@@ -501,19 +357,24 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         event.Skip()
 
     def on_search_click(self, event):
+        with _LOCK:
+            if self.debounce_search:
+                return
+        self.debounce_search = True
         if self.m_search_button.GetLabel() == "Stop":
             if self.thread is not None:
                 global _ABORT
-                _ABORT = True
+                with _LOCK:
+                    _ABORT = True
                 self.kill = True
             else:
                 self.stop_update_timer()
         else:
             debug("validate")
-            if self.m_search_regex_radio.GetValue():
+            if self.m_regex_search_checkbox.GetValue():
                 if self.validate_search_regex():
                     return
-            if self.m_filematchregex_radio.GetValue():
+            if self.m_fileregex_checkbox.GetValue():
                 if self.validate_regex(self.m_filematch_textbox.Value):
                     return
             if self.validate_regex(self.m_exclude_textbox.Value):
@@ -523,6 +384,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 return
             debug("search")
             self.do_search()
+            self.debounce_search = False
+        event.Skip()
 
     def init_update_timer(self):
         self.update_timer = wx.Timer(self)
@@ -549,28 +412,32 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Search Options
         self.args.ignore_case = not self.m_case_checkbox.GetValue()
         self.args.dotall = self.m_dotmatch_checkbox.GetValue()
-        self.args.regexp = self.m_search_regex_radio.GetValue()
+        self.args.regexp = self.m_regex_search_checkbox.GetValue()
         self.args.recursive = self.m_subfolder_checkbox.GetValue()
         self.args.all_utf8 = self.m_utf8_checkbox.GetValue()
         self.args.pattern = self.m_searchfor_textbox.Value
+        self.args.text = self.m_binary_checkbox.GetValue()
 
         # Limit Options
         if isdir(self.args.target):
             self.args.show_hidden = self.m_hidden_checkbox.GetValue()
-            if self.m_filematchregex_radio.GetValue():
+            if self.m_fileregex_checkbox.GetValue():
                 self.args.regexfilepattern = self.m_filematch_textbox.Value
             elif self.m_filematch_textbox.Value:
                 self.args.filepattern = self.m_filematch_textbox.Value
             if self.m_exclude_textbox.Value != "":
                 self.args.directory_exclude = self.m_exclude_textbox.Value
-            if self.m_size_radio.GetValue():
+            cmp_size = self.m_logic_choice.GetSelection()
+            if cmp_size:
                 size = self.m_size_text.GetValue()
                 if size == "":
                     errormsg("Please enter a valid file size!")
                     return
-                self.args.size_compare = (SIZE_COMPARE[self.m_logic_choice.GetSelection()], int(size))
+                self.args.size_compare = (SIZE_COMPARE[cm_size], int(size))
             else:
                 self.args.size_compare = None
+        else:
+            self.args.text = True
 
         debug(self.args.target)
 
@@ -593,8 +460,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("utf8_toggle", self.args.all_utf8),
             ("recursive_toggle", self.args.recursive),
             ("hidden_toggle", self.args.show_hidden),
-            ("regex_file_toggle", self.m_filematchregex_radio.GetValue()),
-            ("size_check_toggle", self.m_size_radio.GetValue())
+            ("regex_file_toggle", self.m_fileregex_checkbox.GetValue())
         ]
 
         strings = [
@@ -605,9 +471,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         Settings.add_search_settings(history, toggles, strings)
 
         update_choices(self.m_searchin_text, "target")
-        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_search_regex_radio.GetValue() else "search")
+        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
         update_choices(self.m_exclude_textbox, "folder_exclude")
-        update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_filematchregex_radio.GetValue() else "file_search")
+        update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search")
 
         self.current_table_idx = [-1, -1]
         self.m_search_button.SetLabel("Stop")
@@ -621,32 +487,42 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 get_flags(self.args),
                 self.args.show_hidden,
                 self.args.all_utf8,
-                self.args.size_compare
+                self.args.size_compare,
+                self.args.text
             )
         )
         self.thread.setDaemon(True)
         self.m_result_content_panel.reset_item_map()
         self.m_result_file_panel.reset_item_map()
-        self.start_time = time()
+        with _LOCK:
+            global _PROCESSED
+            _PROCESSED = 0
         self.thread.start()
         self.m_grep_notebook.SetSelection(1)
         self.start_update_timer()
 
     def check_updates(self, event):
+        global _RESULTS
         debug("timer")
         if not self.checking:
             self.checking = True
-            running = _RUNNING
-            completed = _COMPLETED
-            total = _TOTAL
+            with _LOCK:
+                running = _RUNNING
+                completed = _COMPLETED
+                total = _TOTAL
+                processed = _PROCESSED
             count1 = self.current_table_idx[0] + 1
             count2 = self.current_table_idx[1] + 1
             if completed > count1:
-                count1, count2 = self.update_table(count1, count2, completed, total, *_RESULTS[count1: completed])
+                with _LOCK:
+                    results = _RESULTS[0:completed - count1]
+                    _RESULTS = _RESULTS[completed - count1:len(_RESULTS)]
+                count1, count2 = self.update_table(count1, count2, completed, total, *results)
             self.current_table_idx[0] = count1 - 1
             self.current_table_idx[1] = count2 - 1
             if not running:
-                benchmark = _RUNTIME
+                with _LOCK:
+                    benchmark = _RUNTIME
 
                 self.stop_update_timer()
                 self.m_search_button.SetLabel("Search")
@@ -663,6 +539,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_result_file_panel.init_sort()
                     self.m_result_content_panel.init_sort()
                 wx.GetApp().Yield()
+                self.debounce_search = False
             self.checking = False
         event.Skip()
 
@@ -712,25 +589,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def get_search_status(self):
         return self.searching
 
-    def on_regex_enabled(self, event):
-        if self.m_search_regex_radio.GetValue():
+    def on_regex_search_toggle(self, event):
+        if self.m_regex_search_checkbox.GetValue():
             update_choices(self.m_searchfor_textbox, "regex_search")
-            # self.validate_search_regex()
-        event.Skip()
-
-    def on_text_enabled(self, event):
-        if self.m_search_text_radio.GetValue():
+        else:
             update_choices(self.m_searchfor_textbox, "literal_search")
         event.Skip()
 
-    def on_filematch_regex_enabled(self, event):
-        if self.m_filematchregex_radio.GetValue():
-            # self.validate_regex(self.m_filematch_textbox.Value)
+    def on_fileregex_toggle(self, event):
+        if self.m_fileregex_checkbox.GetValue():
             update_choices(self.m_filematch_textbox, "regex_file_search")
-        event.Skip()
-
-    def on_filematch_text_enabled(self, event):
-        if self.m_filematchtext_radio.GetValue():
+        else:
             update_choices(self.m_filematch_textbox, "file_search")
         event.Skip()
 
