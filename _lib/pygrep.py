@@ -16,7 +16,7 @@ import threading
 import sys
 from os import walk
 from fnmatch import fnmatch
-from os.path import isdir, join, abspath, basename, getsize
+from os.path import isdir, join, abspath, basename, getsize, getmtime
 from time import sleep
 import struct
 import traceback
@@ -464,6 +464,7 @@ class Grep(object):
                     result = self.search.search(file_name, content, max_count)
                     result["size"] = '%.2fKB' % (float(sz) / 1024.0)
                     result["encode"] = self.current_encoding
+                    result["time"] = getmtime(file_name)
                     yield result
                     if max_count != None:
                         max_count -= result["count"]

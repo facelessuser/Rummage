@@ -17,7 +17,7 @@ import sys
 import threading
 import argparse
 import subprocess
-from time import time, sleep
+from time import time, sleep, ctime
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
 
 import _lib.pygrep as pygrep
@@ -38,6 +38,7 @@ _RESULTS = []
 _COMPLETED = 0
 _TOTAL = 0
 _ABORT = False
+_RUNTIME = None
 SIZE_COMPARE = {
     0: "gt",
     1: "eq",
@@ -116,7 +117,9 @@ def threaded_grep(
     flags, show_hidden, all_utf8, size
 ):
     global _RUNNING
+    global _RUNTIME
     _RUNNING = True
+    start = time()
     grep = GrepThread(
         pygrep.Grep(
             target=target,
@@ -130,6 +133,8 @@ def threaded_grep(
         )
     )
     grep.run()
+    bench = time() - start
+    _RUNTIME = "%01.2f seconds" % bench
     _RUNNING = False
 
 
@@ -180,7 +185,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         extend_sb(self.m_statusbar)
         self.reset_table()
         extend_list(self.m_result_list, self.m_result_content_panel, 3)
-        extend_list(self.m_result_file_list, self.m_result_file_panel, 5)
+        extend_list(self.m_result_file_list, self.m_result_file_panel, 6)
 
         self.searchin_update = False
         self.checking = False
@@ -289,6 +294,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_result_file_list.InsertColumn(2, "Matches")
         self.m_result_file_list.InsertColumn(3, "Path")
         self.m_result_file_list.InsertColumn(4, "Encoding")
+        self.m_result_file_list.InsertColumn(5, "Time")
         self.m_progressbar.SetRange(100)
         self.m_progressbar.SetValue(0)
         self.m_statusbar.set_status("")
@@ -317,8 +323,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             filename = self.m_result_file_list.GetItem(item, col=0).GetText()
             path = self.m_result_file_list.GetItem(item, col=3).GetText()
             row = self.m_result_file_list.GetItemData(item)
-            line = str(self.m_result_file_panel.get_map_item(row, col=5))
-            col = str(self.m_result_file_panel.get_map_item(row, col=6))
+            line = str(self.m_result_file_panel.get_map_item(row, col=6))
+            col = str(self.m_result_file_panel.get_map_item(row, col=7))
             self.open_in_editor(join(normpath(path), filename), line, col)
         event.Skip()
 
@@ -449,6 +455,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread.setDaemon(True)
         self.m_result_content_panel.reset_item_map()
         self.m_result_file_panel.reset_item_map()
+        self.start_time = time()
         self.thread.start()
         self.m_grep_notebook.SetSelection(1)
         self.start_update_timer()
@@ -467,23 +474,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.current_table_idx[0] = count1 - 1
             self.current_table_idx[1] = count2 - 1
             if not running:
-                self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (completed, completed, 100, count2))
-                self.m_progressbar.SetRange(100)
-                self.m_progressbar.SetValue(100)
+                benchmark = _RUNTIME
+
                 self.stop_update_timer()
                 self.m_search_button.SetLabel("Search")
-                if completed > 0:
-                    self.m_result_file_panel.init_sort()
-                    self.m_result_content_panel.init_sort()
-            if self.kill and not running:
-                self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (completed, completed, 100, count2))
-                self.m_progressbar.SetRange(completed)
-                self.m_progressbar.SetValue(completed)
+                if self.kill:
+                    self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
+                    self.m_progressbar.SetRange(completed)
+                    self.m_progressbar.SetValue(completed)
+                    self.kill = False
+                else:
+                    self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
+                    self.m_progressbar.SetRange(100)
+                    self.m_progressbar.SetValue(100)
                 if completed > 0:
                     self.m_result_file_panel.init_sort()
                     self.m_result_content_panel.init_sort()
                 wx.GetApp().Yield()
-                self.kill = False
             self.checking = False
         event.Skip()
 
@@ -503,9 +510,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_result_file_list.SetStringItem(count, 2, str(f["count"]))
             self.m_result_file_list.SetStringItem(count, 3, dirname(f["name"]))
             self.m_result_file_list.SetStringItem(count, 4, f["encode"])
+            self.m_result_file_list.SetStringItem(count, 5, ctime(f["time"]))
             self.m_result_file_list.SetItemImage(count, 0)
             self.m_result_file_list.SetItemData(count, count)
-            self.m_result_file_panel.set_item_map(count, basename(f["name"]), float(f["size"].strip("KB")), f["count"], dirname(f["name"]), f["encode"], f["results"][0]["lineno"], f["results"][0]["colno"])
+            self.m_result_file_panel.set_item_map(count, basename(f["name"]), float(f["size"].strip("KB")), f["count"], dirname(f["name"]), f["encode"], f["time"], f["results"][0]["lineno"], f["results"][0]["colno"])
             for r in f["results"]:
                 self.m_result_list.InsertStringItem(count2, basename(f["name"]))
                 self.m_result_list.SetStringItem(count2, 1, str(r["lineno"]))
@@ -517,7 +525,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             count += 1
         self.m_result_list.Thaw()
         if len(results):
-            self.column_resize(self.m_result_file_list, 5)
+            self.column_resize(self.m_result_file_list, 6)
             self.column_resize(self.m_result_list, 3)
         self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (done, total, int(float(done)/float(total) * 100), count2) if total != 0 else (0, 0, 0))
         wx.GetApp().Yield()
