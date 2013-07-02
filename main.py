@@ -178,6 +178,33 @@ class GrepArgs(object):
         self.size_compare = None
 
 
+class ArgDialog(gui.ArgDialog):
+    def __init__(self, parent, value):
+        super(ArgDialog, self).__init__(parent)
+
+        self.arg = value
+        self.m_arg_text.SetValue(value)
+
+        best = self.m_arg_panel.GetBestSize()
+        current = self.m_arg_panel.GetSize()
+        offset = best[1] - current[1]
+        mainframe = self.GetSize()
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        self.SetMinSize(self.GetSize())
+
+    def on_apply(self, event):
+        value = self.m_arg_text.GetValue()
+        if value != "":
+            self.arg = value
+        self.Close()
+
+    def get_arg(self):
+        return self.arg
+
+    def on_cancel(self, event):
+        self.Close()
+
+
 class EditorDialog(gui.EditorDialog):
     def __init__(self, parent, editor=[]):
         super(EditorDialog, self).__init__(parent)
@@ -190,6 +217,13 @@ class EditorDialog(gui.EditorDialog):
             self.m_arg_list.Clear()
             for x in range(1, len(editor)):
                 self.m_arg_list.Append(editor[x])
+
+        best = self.m_editor_panel.GetBestSize()
+        current = self.m_editor_panel.GetSize()
+        offset = best[1] - current[1]
+        mainframe = self.GetSize()
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        self.SetMinSize(self.GetSize())
 
     def on_arg_enter(self, event):
         self.add_arg()
@@ -204,6 +238,53 @@ class EditorDialog(gui.EditorDialog):
         if value != "":
             self.m_arg_list.Append(value)
             value = self.m_arg_text.SetValue("")
+
+    def on_edit(self, event):
+        value = self.m_arg_list.GetSelection()
+        if value >= 0:
+            dlg = ArgDialog(self, self.m_arg_list.GetString(value))
+            dlg.ShowModal()
+            string = dlg.get_arg()
+            dlg.Destroy()
+
+            items = []
+            for x in range(0, self.m_arg_list.GetCount()):
+                if x == value:
+                    items.append(string)
+                if x != value:
+                    items.append(self.m_arg_list.GetString(x))
+            self.m_arg_list.Clear()
+            for x in items:
+                self.m_arg_list.Append(x)
+
+    def on_up(self, event):
+        value = self.m_arg_list.GetSelection()
+        if value > 0:
+            string = self.m_arg_list.GetString(value)
+            items = []
+            for x in range(0, self.m_arg_list.GetCount()):
+                if x == value - 1:
+                    items.append(string)
+                if x != value:
+                    items.append(self.m_arg_list.GetString(x))
+            self.m_arg_list.Clear()
+            for x in items:
+                self.m_arg_list.Append(x)
+
+    def on_down(self, event):
+        value = self.m_arg_list.GetSelection()
+        count = self.m_arg_list.GetCount()
+        if value < count - 1:
+            string = self.m_arg_list.GetString(value)
+            items = []
+            for x in range(0, count):
+                if x != value:
+                    items.append(self.m_arg_list.GetString(x))
+                    if x == value + 1:
+                        items.append(string)
+            self.m_arg_list.Clear()
+            for x in items:
+                self.m_arg_list.Append(x)
 
     def on_remove(self, event):
         value = self.m_arg_list.GetSelection()
@@ -240,6 +321,13 @@ class SettingsDialog(gui.SettingsDialog):
         self.editor = Settings.get_editor()
         self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
+
+        best = self.m_settings_panel.GetBestSize()
+        current = self.m_settings_panel.GetSize()
+        offset = best[1] - current[1]
+        mainframe = self.GetSize()
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        self.SetMinSize(self.GetSize())
 
     def on_editor_change(self, event):
         dlg = EditorDialog(self, self.editor)
@@ -695,8 +783,9 @@ def gui_main(script):
     args = parse_arguments()
     if args.debug:
         set_debug_mode(True)
-    app = CustomApp(redirect=True)
-    RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
+    app = CustomApp(redirect=True, single_instance_name="Rummage")
+    if app.is_instance_okay() or not Settings.get_single_instance():
+        RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
     app.MainLoop()
 
 

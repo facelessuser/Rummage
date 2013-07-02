@@ -103,7 +103,7 @@ class CustomApp(wx.App):
         self.name = "%s-%s" % (self.single_instance, wx.GetUserId())
         self.instance = wx.SingleInstanceChecker(self.name)
         if self.instance.IsAnotherRunning():
-            wx.MessageBox("Only one instance allowed!", "ERROR", wx.OK | wx.ICON_ERROR)
+            # wx.MessageBox("Only one instance allowed!", "ERROR", wx.OK | wx.ICON_ERROR)
             return False
         return True
 
