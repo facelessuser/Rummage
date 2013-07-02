@@ -125,7 +125,7 @@ class Settings(object):
                 cls.cache = cache
 
     @classmethod
-    def get_editor(cls, filename, line, col):
+    def get_editor(cls, filename="${file}", line="${line}", col="${col}"):
         cls.reload_settings()
         editor = cls.settings.get("editor", [])
         if isinstance(editor, dict):

@@ -178,6 +178,32 @@ class GrepArgs(object):
         self.size_compare = None
 
 
+class EditorDialog(gui.EditorDialog):
+    def __init__(self, parent, editor):
+        super(EditorDialog, self).__init__(parent)
+
+        if len(editor) != 0:
+            self.m_editor_picker.SetPath(editor[0])
+
+        if len(editor) > 1:
+            self.m_arg_list.Clear()
+            for x in range(1, len(editor)):
+                self.m_arg_list.Append(editor[x])
+
+
+class SettingsDialog(gui.SettingsDialog):
+    def __init__(self, parent):
+        super(SettingsDialog, self).__init__(parent)
+
+        self.editor = Settings.get_editor()
+        self.m_editor_text.SetValue(" ".join(self.editor))
+
+    def on_editor_change(self, event):
+        dlg = EditorDialog(self, self.editor)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
         super(RummageFrame, self).__init__(parent)
@@ -239,6 +265,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+    def on_preferences(self, event):
+        dlg = SettingsDialog(self)
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def on_dir_changed(self, event):
         if not self.searchin_update:
