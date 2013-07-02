@@ -29,6 +29,7 @@ from _lib.custom_statusbar import extend_sb, extend
 from _lib.settings import Settings, _PLATFORM
 from _lib.autocomplete_combo import AutoCompleteCombo
 from _lib.sorted_columns import extend_list
+from regex_test_dialog import RegexTestDialog
 
 __version__ = "1.0.0"
 
@@ -577,6 +578,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.thread.abort = True
         self.close_debug_console()
         event.Skip()
+
+    def on_test_regex(self, event):
+        self.m_regex_test_button.Enable(False)
+        RegexTestDialog(
+            self,
+            self.m_case_checkbox.GetValue(),
+            self.m_dotmatch_checkbox.GetValue(),
+            self.m_searchfor_textbox.GetValue()
+        ).Show()
 
 
 def parse_arguments():
