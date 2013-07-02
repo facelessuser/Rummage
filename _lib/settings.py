@@ -140,6 +140,17 @@ class Settings(object):
         cls.save_settings()
 
     @classmethod
+    def get_single_instance(cls):
+        cls.reload_settings()
+        return cls.settings.get("single_instance", False)
+
+    @classmethod
+    def set_single_instance(cls, single):
+        cls.reload_settings()
+        cls.settings["single_instance"] = single
+        cls.save_settings()
+
+    @classmethod
     def add_search_settings(cls, history, toggles, strings):
         cls.reload_settings()
         debug(history)

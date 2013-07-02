@@ -179,8 +179,9 @@ class GrepArgs(object):
 
 
 class EditorDialog(gui.EditorDialog):
-    def __init__(self, parent, editor):
+    def __init__(self, parent, editor=[]):
         super(EditorDialog, self).__init__(parent)
+        self.editor = editor
 
         if len(editor) != 0:
             self.m_editor_picker.SetPath(editor[0])
@@ -190,18 +191,70 @@ class EditorDialog(gui.EditorDialog):
             for x in range(1, len(editor)):
                 self.m_arg_list.Append(editor[x])
 
+    def on_arg_enter(self, event):
+        self.add_arg()
+        event.Skip()
+
+    def on_add(self, event):
+        self.add_arg()
+        event.Skip()
+
+    def add_arg(self):
+        value = self.m_arg_text.GetValue()
+        if value != "":
+            self.m_arg_list.Append(value)
+            value = self.m_arg_text.SetValue("")
+
+    def on_remove(self, event):
+        value = self.m_arg_list.GetSelection()
+        if value >= 0:
+            items = []
+            for x in range(0, self.m_arg_list.GetCount()):
+                if x != value:
+                    items.append(self.m_arg_list.GetString(x))
+            self.m_arg_list.Clear()
+            for x in items:
+                self.m_arg_list.Append(x)
+
+    def on_apply(self, event):
+        editor = []
+        app = self.m_editor_picker.GetPath()
+        if app != "":
+            editor.append(app)
+        for x in range(0, self.m_arg_list.GetCount()):
+            editor.append(self.m_arg_list.GetString(x))
+        self.editor = editor
+        self.Close()
+
+    def on_cancel(self, event):
+        self.Close()
+
+    def get_editor(self):
+        return self.editor
+
 
 class SettingsDialog(gui.SettingsDialog):
     def __init__(self, parent):
         super(SettingsDialog, self).__init__(parent)
 
         self.editor = Settings.get_editor()
-        self.m_editor_text.SetValue(" ".join(self.editor))
+        self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
+        self.m_single_checkbox.SetValue(Settings.get_single_instance())
 
     def on_editor_change(self, event):
         dlg = EditorDialog(self, self.editor)
         dlg.ShowModal()
+        self.editor = dlg.get_editor()
+        Settings.set_editor(self.editor)
+        self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
         dlg.Destroy()
+        event.Skip()
+
+    def on_single_toggle(self, event):
+        Settings.set_single_instance(self.m_single_checkbox.GetValue())
+
+    def on_cancel(self, event):
+        self.Close()
 
 
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
