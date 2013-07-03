@@ -5,12 +5,17 @@ import traceback
 
 
 class RegexTestDialog(gui.RegexTestDialog):
-    def __init__(self, parent, is_case, is_dot, text=""):
+    def __init__(self, parent, is_case, is_dot, text="", stand_alone=False):
         super(RegexTestDialog, self).__init__(parent)
 
         self.m_case_checkbox.SetValue(is_case)
         self.m_dot_checkbox.SetValue(is_dot)
         self.m_regex_text.SetValue(text)
+        self.stand_alone = stand_alone
+
+        if stand_alone:
+            self.m_use_regex_button.Hide()
+            self.m_use_regex_button.GetParent().GetSizer().Layout()
 
         best = self.m_tester_panel.GetBestSize()
         current = self.m_tester_panel.GetSize()
@@ -24,7 +29,8 @@ class RegexTestDialog(gui.RegexTestDialog):
         event.Skip()
 
     def on_close(self, event):
-        self.GetParent().m_regex_test_button.Enable(True)
+        if not self.stand_alone:
+            self.GetParent().m_regex_test_button.Enable(True)
         event.Skip()
 
     def on_use(self, event):

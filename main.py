@@ -213,6 +213,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.debounce_search = False
         self.searchin_update = False
+        self.tester = None
         self.checking = False
         self.kill = False
         self.script_path = script_path
@@ -644,17 +645,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_close(self, event):
         if self.thread is not None:
             self.thread.abort = True
+        if self.tester is not None:
+            try:
+                self.tester.Close()
+            except:
+                pass
         self.close_debug_console()
         event.Skip()
 
     def on_test_regex(self, event):
         self.m_regex_test_button.Enable(False)
-        RegexTestDialog(
+        self.tester = RegexTestDialog(
             self,
             self.m_case_checkbox.GetValue(),
             self.m_dotmatch_checkbox.GetValue(),
             self.m_searchfor_textbox.GetValue()
-        ).Show()
+        )
+        self.tester.Show()
 
 
 def parse_arguments():
@@ -663,6 +670,7 @@ def parse_arguments():
     parser.add_argument('--version', action='version', version=('%(prog)s ' + __version__))
     parser.add_argument('--debug', '-d', action='store_true', default=False, help=argparse.SUPPRESS)
     parser.add_argument('--searchpath', '-s', nargs=1, default=None, help="Path to search.")
+    parser.add_argument('--regextool', '-r', action='store_true', default=False, help="Open just the regex tester.")
     return parser.parse_args()
 
 
@@ -673,7 +681,10 @@ def gui_main(script):
         set_debug_mode(True)
     app = CustomApp(redirect=True, single_instance_name="Rummage")
     if app.is_instance_okay() or not Settings.get_single_instance():
-        RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
+        if args.regextool:
+            RegexTestDialog(None, False, False, stand_alone=True).Show()
+        else:
+            RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
     app.MainLoop()
 
 
