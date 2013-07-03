@@ -240,7 +240,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         update_choices(self.m_searchin_text, "target")
         update_choices(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
-        update_choices(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude", load_last=True)
+        update_choices(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
         update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
 
         if start_path and exists(start_path):
