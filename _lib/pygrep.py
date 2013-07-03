@@ -28,7 +28,8 @@ IGNORECASE = 2
 DOTALL = 4
 RECURSIVE = 8
 FILE_REGEX_MATCH = 16
-BUFFER_INPUT = 32
+DIR_REGEX_MATCH = 32
+BUFFER_INPUT = 64
 
 _LOCK = threading.Lock()
 _FILES = []
@@ -51,13 +52,13 @@ elif _PLATFORM == "windows":
 LINE_ENDINGS = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
 
 
-def threaded_walker(directory, file_pattern, file_regex_match, folder_exclude, recursive, show_hidden, size):
+def threaded_walker(directory, file_pattern, file_regex_match, folder_exclude, dir_regex_match, recursive, show_hidden, size):
     global _RUNNING
     global _STARTED
     with _LOCK:
         _RUNNING = True
         _STARTED = True
-    walker = _DirWalker(directory, file_pattern, file_regex_match, folder_exclude, recursive, show_hidden, size)
+    walker = _DirWalker(directory, file_pattern, file_regex_match, folder_exclude, dir_regex_match, recursive, show_hidden, size)
     walker.run()
     with _LOCK:
         _RUNNING = False
@@ -208,11 +209,12 @@ class _FileSearch(object):
 
 
 class _DirWalker(object):
-    def __init__(self, directory, file_pattern, file_regex_match, folder_exclude, recursive, show_hidden, size):
+    def __init__(self, directory, file_pattern, file_regex_match, folder_exclude, dir_regex_match, recursive, show_hidden, size):
         self.dir = directory
         self.size = size
         self.file_pattern = file_pattern
         self.file_regex_match = file_regex_match
+        self.dir_regex_match = dir_regex_match
         self.folder_exclude = folder_exclude
         self.recursive = recursive
         self.show_hidden = show_hidden
@@ -273,6 +275,7 @@ class _DirWalker(object):
                     if len(p) > 1 and p[0] == "-":
                         if fnmatch(name.lower(), p[1:]):
                             exclude = True
+                            break
                     elif fnmatch(name.lower(), p):
                         matched = True
                 if exclude:
@@ -288,7 +291,29 @@ class _DirWalker(object):
         Returns whether a folder can be searched.
         """
 
-        return not self.__is_hidden(join(base, name)) and not (self.folder_exclude != None and self.folder_exclude.match(name)) and self.recursive
+        valid = True
+        if not self.recursive:
+            valid = False
+        elif self.__is_hidden(join(base, name)):
+            valid = False
+        elif self.folder_exclude != None:
+            if self.dir_regex_match:
+                valid = False if self.folder_exclude.match(name) != None else True
+            else:
+                matched = False
+                exclude = False
+                for p in self.folder_exclude:
+                    if len(p) > 1 and p[0] == "-":
+                        if fnmatch(name.lower(), p[1:]):
+                            matched = True
+                            break
+                    elif fnmatch(name.lower(), p):
+                        exclude = True
+                if matched:
+                    valid = True
+                elif exclude:
+                    valid = False
+        return valid
 
     def run(self):
         global _FILES
@@ -341,6 +366,7 @@ class Grep(object):
         self.max = max_count
         self.process_binary = text
         file_regex_match = bool(flags & FILE_REGEX_MATCH)
+        dir_regex_match = bool(flags & DIR_REGEX_MATCH)
         self.kill = False
         self.thread = None
         if not self.buffer_input and isdir(self.target):
@@ -350,7 +376,8 @@ class Grep(object):
                     self.target,
                     self.__get_file_pattern(file_pattern, file_regex_match),
                     file_regex_match,
-                    folder_exclude if folder_exclude == None else ure.compile(folder_exclude, ure.IGNORECASE | ure.UNICODE),
+                    self.__get_dir_pattern(folder_exclude, dir_regex_match),
+                    dir_regex_match,
                     bool(flags & RECURSIVE),
                     show_hidden,
                     size
@@ -358,12 +385,16 @@ class Grep(object):
             )
             self.thread.setDaemon(True)
 
+    def __get_dir_pattern(self, folder_exclude, dir_regex_match):
+        pattern = None
+        if folder_exclude != None:
+            pattern = ure.compile(folder_exclude, ure.IGNORECASE) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
+        return pattern
+
     def __get_file_pattern(self, file_pattern, file_regex_match):
         pattern = None
         if file_pattern != None:
-            pattern = ure.compile(file_pattern, ure.IGNORECASE | ure.UNICODE) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
-        else:
-            pattern = file_pattern
+            pattern = ure.compile(file_pattern, ure.IGNORECASE) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
     def __decode_file(self, filename):

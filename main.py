@@ -104,6 +104,9 @@ def get_flags(args):
     if args.recursive:
         flags |= pygrep.RECURSIVE
 
+    if args.regexdirpattern:
+        flags |= pygrep.DIR_REGEX_MATCH
+
     return flags
 
 
@@ -185,6 +188,7 @@ class GrepArgs(object):
         self.dotall = False
         self.recursive = False
         self.directory_exclude = None
+        self.regexdirpattern = False
         self.regexfilepattern = None
         self.filepattern = None
         self.pattern = None
@@ -231,7 +235,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         update_choices(self.m_searchin_text, "target")
         update_choices(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
-        update_choices(self.m_exclude_textbox, "folder_exclude", load_last=True)
+        update_choices(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude", load_last=True)
         update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
 
         if start_path and exists(start_path):
@@ -377,8 +381,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if self.m_fileregex_checkbox.GetValue():
                 if self.validate_regex(self.m_filematch_textbox.Value):
                     return
-            if self.validate_regex(self.m_exclude_textbox.Value):
-                return
+            if self.m_dirregex_checkbox.GetValue():
+                if self.validate_regex(self.m_exclude_textbox.Value):
+                    return
             if not exists(self.m_searchin_text.GetValue()):
                 errormsg("Please enter a valid search path!")
                 return
@@ -427,13 +432,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.args.filepattern = self.m_filematch_textbox.Value
             if self.m_exclude_textbox.Value != "":
                 self.args.directory_exclude = self.m_exclude_textbox.Value
+            if self.m_dirregex_checkbox.GetValue():
+                self.args.regexdirpattern = True
             cmp_size = self.m_logic_choice.GetSelection()
             if cmp_size:
                 size = self.m_size_text.GetValue()
                 if size == "":
                     errormsg("Please enter a valid file size!")
                     return
-                self.args.size_compare = (SIZE_COMPARE[cm_size], int(size))
+                self.args.size_compare = (SIZE_COMPARE[cmp_size], int(size))
             else:
                 self.args.size_compare = None
         else:
@@ -448,7 +455,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if isdir(self.args.target):
             history += [
-                ("folder_exclude", self.args.directory_exclude),
+                ("regex_folder_exclude", self.args.directory_exclude) if self.m_dirregex_checkbox.GetValue() else ("folder_exclude", self.args.directory_exclude),
                 ("regex_file_search", self.args.regexfilepattern),
                 ("file_search", self.args.filepattern)
             ]
@@ -472,7 +479,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         update_choices(self.m_searchin_text, "target")
         update_choices(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
-        update_choices(self.m_exclude_textbox, "folder_exclude")
+        update_choices(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
         update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search")
 
         self.current_table_idx = [-1, -1]
@@ -601,6 +608,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             update_choices(self.m_filematch_textbox, "regex_file_search")
         else:
             update_choices(self.m_filematch_textbox, "file_search")
+        event.Skip()
+
+    def on_dirregex_toggle(self, event):
+        if self.m_dirregex_checkbox.GetValue():
+            update_choices(self.m_exclude_textbox, "regex_folder_exclude")
+        else:
+            update_choices(self.m_exclude_textbox, "folder_exclude")
         event.Skip()
 
     def validate_search_regex(self):
