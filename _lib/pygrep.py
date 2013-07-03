@@ -22,6 +22,7 @@ import struct
 import traceback
 import codecs
 import text_decode
+import traceback
 
 LITERAL = 1
 IGNORECASE = 2
@@ -58,8 +59,12 @@ def threaded_walker(directory, file_pattern, file_regex_match, folder_exclude, d
     with _LOCK:
         _RUNNING = True
         _STARTED = True
-    walker = _DirWalker(directory, file_pattern, file_regex_match, folder_exclude, dir_regex_match, recursive, show_hidden, size)
-    walker.run()
+    try:
+        walker = _DirWalker(directory, file_pattern, file_regex_match, folder_exclude, dir_regex_match, recursive, show_hidden, size)
+        walker.run()
+    except:
+        print(str(traceback.format_exc()))
+        pass
     with _LOCK:
         _RUNNING = False
 

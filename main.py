@@ -17,6 +17,7 @@ import sys
 import threading
 import argparse
 import subprocess
+import traceback
 from time import time, sleep, ctime
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
 
@@ -133,20 +134,24 @@ def threaded_grep(
         _RUNTIME = ""
         _RUNNING = True
     start = time()
-    grep = GrepThread(
-        pygrep.Grep(
-            target=target,
-            pattern=pattern,
-            file_pattern=file_pattern,
-            folder_exclude=folder_exclude,
-            flags=flags,
-            show_hidden=show_hidden,
-            all_utf8=all_utf8,
-            size=size,
-            text=text
+    try:
+        grep = GrepThread(
+            pygrep.Grep(
+                target=target,
+                pattern=pattern,
+                file_pattern=file_pattern,
+                folder_exclude=folder_exclude,
+                flags=flags,
+                show_hidden=show_hidden,
+                all_utf8=all_utf8,
+                size=size,
+                text=text
+            )
         )
-    )
-    grep.run()
+        grep.run()
+    except:
+        print(str(traceback.format_exc()))
+        pass
     bench = time() - start
     with _LOCK:
         _RUNTIME = "%01.2f seconds" % bench
