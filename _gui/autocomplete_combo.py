@@ -14,7 +14,7 @@ import wx
 import sys
 from wx.combo import ComboPopup, ComboCtrl
 
-wx.SystemOptions.SetOptionInt("mac.listctrl.always_use_generic", 0)
+# wx.SystemOptions.SetOptionInt("mac.listctrl.always_use_generic", 0)
 
 class AutoCompleteCombo(ComboCtrl):
     def __init__(self, parent, choices=[], load_last=False):
@@ -22,10 +22,10 @@ class AutoCompleteCombo(ComboCtrl):
         self.update_semaphore = False
         self.choices = None
         self.UseAltPopupWindow(True)
-        self.list = ListCtrlComboPopup(self)
+        self.list = ListCtrlComboPopup(self, self.GetTextCtrl())
         self.SetPopupControl(self.list)
-        self.Bind(wx.EVT_KEY_UP, self.on_combo_key)
-        self.Bind(wx.EVT_KEY_DOWN, self.on_combo_key2)
+        self.Bind(wx.EVT_KEY_UP, self.on_key_up)
+        self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_CHAR, self.on_char)
         self.Bind(wx.EVT_COMBOBOX_DROPDOWN, self.on_popup)
         self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
@@ -34,38 +34,38 @@ class AutoCompleteCombo(ComboCtrl):
         self.update_choices(choices, load_last)
 
     def tab_forward(self):
-        self.Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsForward)
+        self.GetTextCtrl().Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsForward)
 
     def tab_back(self):
-        self.Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsBackward)
+        self.GetTextCtrl().Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsBackward)
 
     def update_choices(self, items, load_last=False):
         self.choices = items
-        value = self.GetValue()
-        self.list.Clear()
-        self.list.AppendItems(items)
+        value = self.list.get_selected_text()
+        self.list.clear()
+        self.list.append_items(items)
         if load_last:
             idx = self.list.GetItemCount() - 1
             if idx != -1:
-                self.GetTextCtrl().SetValue(self.list.GetItemText(0))
+                self.list.select_item(0)
         else:
             self.update_semaphore = True
-            self.SetValue(value)
+            self.list.set_selected_text(value)
 
     def on_popup(self, event):
         self.popped = True
         event.Skip()
 
     def on_dismiss(self, event):
-        if self.list.set_value != -1:
-            self.GetTextCtrl().SetValue(self.list.GetItemText(self.list.set_value))
-        self.list.set_value = -1
+        value = self.list.is_value_waiting()
+        if value >= 0:
+            self.list.select_item(value)
+        self.list.set_waiting_value(-1)
         event.Skip()
 
     def on_enter_key(self, event):
-        print("enter")
         if self.list.curitem != -1:
-            self.GetTextCtrl().SetValue(self.list.GetItemText(self.list.curitem))
+            self.list.select_item(self.list.curitem)
         self.tab_forward()
         event.Skip()
 
@@ -81,7 +81,7 @@ class AutoCompleteCombo(ComboCtrl):
                 self.tab_forward()
         event.Skip()
 
-    def on_combo_key(self, event):
+    def on_key_up(self, event):
         key = event.GetKeyCode()
         if key == wx.WXK_DOWN:
             if self.IsPopupShown():
@@ -102,9 +102,9 @@ class AutoCompleteCombo(ComboCtrl):
     def pick_item(self):
         value = self.GetTextCtrl().GetValue()
         if value in self.choices:
-            self.list.sel_item(self.choices.index(value))
+            self.list.set_item(self.choices.index(value))
 
-    def on_combo_key2(self, event):
+    def on_key_down(self, event):
         key = event.GetKeyCode()
         if key == wx.WXK_DOWN or key == wx.WXK_UP:
             if self.IsPopupShown():
@@ -148,7 +148,8 @@ class AutoCompleteCombo(ComboCtrl):
             event.Skip()
 
 class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
-    def __init__(self, parent):
+    def __init__(self, parent, txt_ctrl):
+        self.txt_ctrl = txt_ctrl
         self.set_value = -1
         # Since we are using multiple inheritance, and don't know yet
         # which window is to be the parent, we'll do 2-phase create of
@@ -159,15 +160,30 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         # Also init the ComboPopup base class.
         wx.combo.ComboPopup.__init__(self)
 
-    def AppendItems(self, items):
+    def select_item(self, idx):
+        self.txt_ctrl.SetValue(self.GetItemText(0))
+
+    def get_selected_text(self):
+        return self.txt_ctrl.GetValue()
+
+    def set_selected_text(self, text):
+        self.txt_ctrl.SetValue(text)
+
+    def set_waiting_value(self, value):
+        self.set_value = value
+
+    def is_value_waiting(self):
+        return self.set_value
+
+    def append_items(self, items):
         for x in items:
             self.AddItem(x)
 
     def AddItem(self, txt):
         self.InsertStringItem(self.GetItemCount(), txt)
 
-    def OnMotion(self, evt):
-        item, flags = self.HitTest(evt.GetPosition())
+    def on_motion(self, evt):
+        item, _ = self.HitTest(evt.GetPosition())
         if item >= 0:
             self.Select(item)
             self.curitem = item
@@ -182,7 +198,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
             self.curitem -= 1
             self.Select(self.curitem)
 
-    def sel_item(self, idx):
+    def set_item(self, idx):
         self.curitem = idx
         self.Select(self.curitem)
 
@@ -194,9 +210,8 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
             self.set_value = item
         self.Dismiss()
 
-    def Clear(self):
+    def clear(self):
         self.ClearAll()
-
 
     # The following methods are those that are overridable from the
     # ComboPopup base class.
@@ -205,25 +220,25 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         """ This is called immediately after construction finishes.  You can
         use self.GetCombo if needed to get to the ComboCtrl instance. """
 
-        # self.value = -1
         self.curitem = -1
-
 
     def Create(self, parent):
         """ Create the popup child control. Return True for success. """
 
         wx.ListCtrl.Create(self, parent,
                            style=wx.LC_LIST|wx.LC_SINGLE_SEL|wx.SIMPLE_BORDER)
-        # self.Bind(wx.EVT_MOTION, self.OnMotion)
+        self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
 
         return True
-
 
     def GetControl(self):
         """ Return the widget that is to be used for the popup. """
 
         return self
+
+    def GetAdjustedSize(self, minWidth, prefHeight, maxHeight):
+        return wx.combo.ComboPopup.GetAdjustedSize(self, minWidth, 200, maxHeight)
 
     def OnPopup(self):
         """ Called immediately after the popup is shown. """

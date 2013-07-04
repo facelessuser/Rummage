@@ -77,16 +77,18 @@ def not_none(item, alt=None):
     return item if item != None else alt
 
 
-def update_choices(obj, key, load_last=False):
+def replace_with_autocomplete(obj, key, load_last=False):
     choices = Settings.get_search_setting(key, [])
-    if hasattr(obj, "update_choices"):
-        obj.update_choices(choices, load_last)
-    else:
-        temp = AutoCompleteCombo(obj.GetParent(), choices, load_last)
-        sz = obj.GetContainingSizer()
-        sz.Replace(obj, temp)
-        obj.Destroy()
-        return temp
+    auto_complete = AutoCompleteCombo(obj.GetParent(), choices, load_last)
+    sz = obj.GetContainingSizer()
+    sz.Replace(obj, auto_complete)
+    obj.Destroy()
+    return auto_complete
+
+
+def update_autocomplete(obj, key, load_last=False):
+    choices = Settings.get_search_setting(key, [])
+    obj.update_choices(choices, load_last)
 
 
 def threaded_grep(
@@ -166,7 +168,7 @@ class GrepArgs(object):
         self.show_hidden = False
         self.size_compare = None
 
-from wx.combo import ComboPopup, ComboCtrl
+
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
         super(RummageFrame, self).__init__(parent)
@@ -215,14 +217,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
 
-        self.m_searchin_text = update_choices(self.m_searchin_text, "target")
-        self.m_searchfor_textbox = update_choices(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
-        self.m_exclude_textbox = update_choices(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
-        self.m_filematch_textbox = update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
+        self.m_searchin_text = replace_with_autocomplete(self.m_searchin_text, "target")
+        self.m_searchfor_textbox = replace_with_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
+        self.m_exclude_textbox = replace_with_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
+        self.m_filematch_textbox = replace_with_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
 
         if start_path and exists(start_path):
             self.m_searchin_text.SetValue(abspath(normpath(start_path)))
-        self.m_searchfor_textbox.SetFocus()
+        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
 
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
@@ -416,10 +418,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         Settings.add_search_settings(history, toggles, strings)
 
-        update_choices(self.m_searchin_text, "target")
-        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
-        update_choices(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
-        update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search")
+        update_autocomplete(self.m_searchin_text, "target")
+        update_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
+        update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
+        update_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search")
 
         self.current_table_idx = [-1, -1]
         self.m_search_button.SetLabel("Stop")
@@ -529,23 +531,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def on_regex_search_toggle(self, event):
         if self.m_regex_search_checkbox.GetValue():
-            update_choices(self.m_searchfor_textbox, "regex_search")
+            update_autocomplete(self.m_searchfor_textbox, "regex_search")
         else:
-            update_choices(self.m_searchfor_textbox, "literal_search")
+            update_autocomplete(self.m_searchfor_textbox, "literal_search")
         event.Skip()
 
     def on_fileregex_toggle(self, event):
         if self.m_fileregex_checkbox.GetValue():
-            update_choices(self.m_filematch_textbox, "regex_file_search")
+            update_autocomplete(self.m_filematch_textbox, "regex_file_search")
         else:
-            update_choices(self.m_filematch_textbox, "file_search")
+            update_autocomplete(self.m_filematch_textbox, "file_search")
         event.Skip()
 
     def on_dirregex_toggle(self, event):
         if self.m_dirregex_checkbox.GetValue():
-            update_choices(self.m_exclude_textbox, "regex_folder_exclude")
+            update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude")
         else:
-            update_choices(self.m_exclude_textbox, "folder_exclude")
+            update_autocomplete(self.m_exclude_textbox, "folder_exclude")
         event.Skip()
 
     def validate_search_regex(self):
