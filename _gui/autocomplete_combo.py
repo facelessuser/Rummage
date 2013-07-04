@@ -177,10 +177,15 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
 
     def append_items(self, items):
         for x in items:
-            self.AddItem(x)
+            self.add_item(x)
 
-    def AddItem(self, txt):
-        self.InsertStringItem(self.GetItemCount(), txt)
+    def add_item(self, text):
+        # self.Append(text)
+        if self.GetColumnCount() == 0:
+            self.InsertColumn(0, 'Col 0')
+        print self.GetItemCount()
+        self.InsertStringItem(self.GetItemCount(), text)
+        self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
 
     def on_motion(self, evt):
         item, _ = self.HitTest(evt.GetPosition())
@@ -225,8 +230,10 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def Create(self, parent):
         """ Create the popup child control. Return True for success. """
 
-        wx.ListCtrl.Create(self, parent,
-                           style=wx.LC_LIST|wx.LC_SINGLE_SEL|wx.SIMPLE_BORDER)
+        wx.ListCtrl.Create(
+            self, parent,
+            style=wx.LC_REPORT | wx.LC_NO_HEADER | wx.LC_SINGLE_SEL | wx.SIMPLE_BORDER
+        )
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
 
