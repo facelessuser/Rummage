@@ -130,7 +130,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
                 width = lw + 10
                 if width > self.widest_cell[x]:
                     self.widest_cell[x] = width
-            self.size_guess -= 1
+            self.size_sample -= 1
 
     def get_map_item(self, idx, col=0, abs=False):
         return self.itemDataMap[self.itemIndexMap[idx] if not abs else idx][col]

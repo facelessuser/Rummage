@@ -82,8 +82,11 @@ def update_choices(obj, key, load_last=False):
     if hasattr(obj, "update_choices"):
         obj.update_choices(choices, load_last)
     else:
-        extend(obj, AutoCompleteCombo)
-        obj.setup(choices, load_last)
+        temp = AutoCompleteCombo(obj.GetParent(), choices, load_last)
+        sz = obj.GetContainingSizer()
+        sz.Replace(obj, temp)
+        obj.Destroy()
+        return temp
 
 
 def threaded_grep(
@@ -163,7 +166,7 @@ class GrepArgs(object):
         self.show_hidden = False
         self.size_compare = None
 
-
+from wx.combo import ComboPopup, ComboCtrl
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
         super(RummageFrame, self).__init__(parent)
@@ -212,10 +215,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
 
-        update_choices(self.m_searchin_text, "target")
-        update_choices(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
-        update_choices(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
-        update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
+        self.m_searchin_text = update_choices(self.m_searchin_text, "target")
+        self.m_searchfor_textbox = update_choices(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
+        self.m_exclude_textbox = update_choices(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
+        self.m_filematch_textbox = update_choices(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
 
         if start_path and exists(start_path):
             self.m_searchin_text.SetValue(abspath(normpath(start_path)))
