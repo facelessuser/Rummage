@@ -17,16 +17,15 @@
         <property name="internationalize">0</property>
         <property name="name">Rummage</property>
         <property name="namespace"></property>
-        <property name="path">.</property>
+        <property name="path">./_gui</property>
         <property name="precompiled_header"></property>
         <property name="relative_path">1</property>
         <property name="skip_php_events">1</property>
         <property name="skip_python_events">1</property>
         <property name="use_enum">0</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Frame" expanded="0">
+        <object class="Frame" expanded="1">
             <property name="aui_managed">0</property>
-            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg">wxSYS_COLOUR_BTNFACE</property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -86,16 +85,16 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="0">
+            <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
                 <property name="name">bFrameSizer</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
-                <object class="sizeritem" expanded="0">
+                <object class="sizeritem" expanded="1">
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxFlexGridSizer" expanded="0">
+                    <object class="wxFlexGridSizer" expanded="1">
                         <property name="cols">1</property>
                         <property name="flexible_direction">wxBOTH</property>
                         <property name="growablecols">0</property>
@@ -107,11 +106,11 @@
                         <property name="permission">none</property>
                         <property name="rows">2</property>
                         <property name="vgap">0</property>
-                        <object class="sizeritem" expanded="0">
+                        <object class="sizeritem" expanded="1">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND | wxALL</property>
                             <property name="proportion">1</property>
-                            <object class="wxNotebook" expanded="0">
+                            <object class="wxNotebook" expanded="1">
                                 <property name="BottomDockable">1</property>
                                 <property name="LeftDockable">1</property>
                                 <property name="RightDockable">1</property>
@@ -157,7 +156,7 @@
                                 <property name="resize">Resizable</property>
                                 <property name="show">1</property>
                                 <property name="size"></property>
-                                <property name="style">wxNB_NOPAGETHEME</property>
+                                <property name="style">wxNB_FIXEDWIDTH|wxNB_NOPAGETHEME</property>
                                 <property name="subclass"></property>
                                 <property name="toolbar_pane">0</property>
                                 <property name="tooltip"></property>
@@ -3352,11 +3351,11 @@
                                         </object>
                                     </object>
                                 </object>
-                                <object class="notebookpage" expanded="0">
+                                <object class="notebookpage" expanded="1">
                                     <property name="bitmap"></property>
                                     <property name="label">Files</property>
                                     <property name="select">0</property>
-                                    <object class="wxPanel" expanded="0">
+                                    <object class="wxPanel" expanded="1">
                                         <property name="BottomDockable">1</property>
                                         <property name="LeftDockable">1</property>
                                         <property name="RightDockable">1</property>
@@ -3430,7 +3429,7 @@
                                         <event name="OnSetFocus"></event>
                                         <event name="OnSize"></event>
                                         <event name="OnUpdateUI"></event>
-                                        <object class="wxBoxSizer" expanded="0">
+                                        <object class="wxBoxSizer" expanded="1">
                                             <property name="minimum_size"></property>
                                             <property name="name">bSizer7</property>
                                             <property name="orient">wxVERTICAL</property>
@@ -3484,7 +3483,7 @@
                                                     <property name="resize">Resizable</property>
                                                     <property name="show">1</property>
                                                     <property name="size"></property>
-                                                    <property name="style">wxLC_HRULES|wxLC_REPORT|wxLC_SINGLE_SEL</property>
+                                                    <property name="style">wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VIRTUAL</property>
                                                     <property name="subclass"></property>
                                                     <property name="toolbar_pane">0</property>
                                                     <property name="tooltip"></property>
@@ -3502,7 +3501,7 @@
                                                     <event name="OnKeyUp"></event>
                                                     <event name="OnKillFocus"></event>
                                                     <event name="OnLeaveWindow"></event>
-                                                    <event name="OnLeftDClick">on_file_dclick</event>
+                                                    <event name="OnLeftDClick"></event>
                                                     <event name="OnLeftDown"></event>
                                                     <event name="OnLeftUp"></event>
                                                     <event name="OnListBeginDrag"></event>
@@ -3543,11 +3542,11 @@
                                         </object>
                                     </object>
                                 </object>
-                                <object class="notebookpage" expanded="0">
+                                <object class="notebookpage" expanded="1">
                                     <property name="bitmap"></property>
                                     <property name="label">Content</property>
                                     <property name="select">0</property>
-                                    <object class="wxPanel" expanded="0">
+                                    <object class="wxPanel" expanded="1">
                                         <property name="BottomDockable">1</property>
                                         <property name="LeftDockable">1</property>
                                         <property name="RightDockable">1</property>
@@ -3621,7 +3620,7 @@
                                         <event name="OnSetFocus"></event>
                                         <event name="OnSize"></event>
                                         <event name="OnUpdateUI"></event>
-                                        <object class="wxBoxSizer" expanded="0">
+                                        <object class="wxBoxSizer" expanded="1">
                                             <property name="minimum_size"></property>
                                             <property name="name">bSizer6</property>
                                             <property name="orient">wxVERTICAL</property>
@@ -3675,7 +3674,7 @@
                                                     <property name="resize">Resizable</property>
                                                     <property name="show">1</property>
                                                     <property name="size"></property>
-                                                    <property name="style">wxLC_HRULES|wxLC_REPORT|wxLC_SINGLE_SEL</property>
+                                                    <property name="style">wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VIRTUAL</property>
                                                     <property name="subclass"></property>
                                                     <property name="toolbar_pane">0</property>
                                                     <property name="tooltip"></property>
@@ -3693,7 +3692,7 @@
                                                     <event name="OnKeyUp"></event>
                                                     <event name="OnKillFocus"></event>
                                                     <event name="OnLeaveWindow"></event>
-                                                    <event name="OnLeftDClick">on_content_dclick</event>
+                                                    <event name="OnLeftDClick"></event>
                                                     <event name="OnLeftDown"></event>
                                                     <event name="OnLeftUp"></event>
                                                     <event name="OnListBeginDrag"></event>
@@ -3701,7 +3700,7 @@
                                                     <event name="OnListBeginRDrag"></event>
                                                     <event name="OnListCacheHint"></event>
                                                     <event name="OnListColBeginDrag"></event>
-                                                    <event name="OnListColClick">on_col_click</event>
+                                                    <event name="OnListColClick"></event>
                                                     <event name="OnListColDragging"></event>
                                                     <event name="OnListColEndDrag"></event>
                                                     <event name="OnListColRightClick"></event>
@@ -3941,7 +3940,6 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
-            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -4510,7 +4508,6 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
-            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -5101,7 +5098,6 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
-            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -6413,7 +6409,6 @@
         </object>
         <object class="Frame" expanded="1">
             <property name="aui_managed">0</property>
-            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg">wxSYS_COLOUR_BTNFACE</property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -7193,7 +7188,6 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
-            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -7660,7 +7654,6 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
-            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>

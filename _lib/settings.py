@@ -12,10 +12,12 @@ import json
 import sys
 from os import mkdir
 from os.path import expanduser, exists, join, getmtime
-from _lib.custom_app import CustomApp, DebugFrameExtender, init_app_log
+
 from _lib.file_strip.json import sanitize_json
-from _lib.custom_app import debug, debug_struct, info, error
-from _lib.generic_dialogs import *
+
+from _gui.custom_app import debug, debug_struct, info, error
+from _gui.custom_app import init_app_log
+from _gui.generic_dialogs import *
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"

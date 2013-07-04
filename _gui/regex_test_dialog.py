@@ -1,5 +1,5 @@
 import wx
-import gui
+import _gui.gui as gui
 import _lib.ure as ure
 import traceback
 
