@@ -18,7 +18,7 @@ from wx.combo import ComboPopup, ComboCtrl
 
 class AutoCompleteCombo(ComboCtrl):
     def __init__(self, parent, choices=[], load_last=False):
-        ComboCtrl.__init__(self, parent, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, style=wx.TE_PROCESS_ENTER|wx.TAB_TRAVERSAL)
+        ComboCtrl.__init__(self, parent, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, style=wx.TE_PROCESS_ENTER)
         self.update_semaphore = False
         self.choices = None
         self.UseAltPopupWindow(True)
@@ -27,11 +27,15 @@ class AutoCompleteCombo(ComboCtrl):
         self.Bind(wx.EVT_KEY_UP, self.on_key_up)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_CHAR, self.on_char)
+        self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
         self.Bind(wx.EVT_COMBOBOX_DROPDOWN, self.on_popup)
         self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
         self.Bind(wx.EVT_TEXT, self.on_text_change)
-        self.Bind(wx.EVT_TEXT_ENTER, self.on_enter_key)
         self.update_choices(choices, load_last)
+
+    def on_focus(self, event):
+        self.GetTextCtrl().SetFocus()
+        event.Skip()
 
     def tab_forward(self):
         self.Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsForward)
@@ -59,12 +63,11 @@ class AutoCompleteCombo(ComboCtrl):
     def on_dismiss(self, event):
         value = self.list.is_value_waiting()
         if value >= 0:
+            self.GetTextCtrl().SetSelection(0, 0)
             self.list.select_item(value)
-        self.list.set_waiting_value(-1)
-        event.Skip()
-
-    def on_enter_key(self, event):
-        self.tab_forward()
+            self.GetTextCtrl().SetSelection(0, len(self.GetTextCtrl().GetValue()))
+            self.list.set_waiting_value(-1)
+            return
         event.Skip()
 
     def on_char(self, event):
@@ -145,7 +148,7 @@ class AutoCompleteCombo(ComboCtrl):
 class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def __init__(self, parent, txt_ctrl):
         self.txt_ctrl = txt_ctrl
-        self.set_value = -1
+        self.waiting_value = -1
         # Since we are using multiple inheritance, and don't know yet
         # which window is to be the parent, we'll do 2-phase create of
         # the ListCtrl instead, and call its Create method later in
@@ -165,17 +168,16 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         self.txt_ctrl.SetValue(text)
 
     def set_waiting_value(self, value):
-        self.set_value = value
+        self.waiting_value = value
 
     def is_value_waiting(self):
-        return self.set_value
+        return self.waiting_value
 
     def append_items(self, items):
         for x in items:
             self.add_item(x)
 
     def add_item(self, text):
-        # self.Append(text)
         if self.GetColumnCount() == 0:
             self.InsertColumn(0, 'Col 0')
         self.InsertStringItem(self.GetItemCount(), text)
@@ -202,9 +204,9 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def OnLeftDown(self, evt):
         item, _ = self.HitTest(evt.GetPosition())
         if item >= 0:
-            self.Select(item)
-            self.set_value = item
-        self.Dismiss()
+            self.waiting_value = item
+        wx.CallAfter(self.Dismiss)
+        evt.Skip()
 
     def clear(self):
         self.ClearAll()
@@ -214,10 +216,8 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         if key == wx.WXK_RETURN:
             curitem = self.GetFirstSelected()
             if curitem != -1:
-                self.select_item(curitem)
-            self.txt_ctrl.SetSelection(0, len(self.txt_ctrl.GetValue()))
-            self.Dismiss()
-            return
+                self.waiting_value = curitem
+            wx.CallAfter(self.Dismiss)
         evt.Skip()
 
     # The following methods are those that are overridable from the
