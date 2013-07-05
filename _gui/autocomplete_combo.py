@@ -34,10 +34,10 @@ class AutoCompleteCombo(ComboCtrl):
         self.update_choices(choices, load_last)
 
     def tab_forward(self):
-        self.GetTextCtrl().Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsForward)
+        self.Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsForward)
 
     def tab_back(self):
-        self.GetTextCtrl().Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsBackward)
+        self.Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsBackward)
 
     def update_choices(self, items, load_last=False):
         self.choices = items
@@ -64,8 +64,8 @@ class AutoCompleteCombo(ComboCtrl):
         event.Skip()
 
     def on_enter_key(self, event):
-        if self.list.curitem != -1:
-            self.list.select_item(self.list.curitem)
+        # if self.list.curitem != -1:
+        #     self.list.select_item(self.list.curitem)
         self.tab_forward()
         event.Skip()
 
@@ -132,7 +132,6 @@ class AutoCompleteCombo(ComboCtrl):
                         best = None
                 if best is not None:
                     for f in found_items:
-                        print(best)
                         if f != best and not f.startswith(best):
                             best = None
                             break
@@ -183,7 +182,6 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         # self.Append(text)
         if self.GetColumnCount() == 0:
             self.InsertColumn(0, 'Col 0')
-        print self.GetItemCount()
         self.InsertStringItem(self.GetItemCount(), text)
         self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
 
@@ -218,6 +216,13 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def clear(self):
         self.ClearAll()
 
+    def on_key_down(self, evt):
+        key = evt.GetKeyCode()
+        if key == wx.WXK_RETURN:
+            if self.curitem != -1:
+                self.select_item(self.curitem)
+        self.txt_ctrl.SetSelection(0, len(self.txt_ctrl.GetValue()))
+
     # The following methods are those that are overridable from the
     # ComboPopup base class.
 
@@ -234,6 +239,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
             self, parent,
             style=wx.LC_REPORT | wx.LC_NO_HEADER | wx.LC_SINGLE_SEL | wx.SIMPLE_BORDER
         )
+        self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
 
