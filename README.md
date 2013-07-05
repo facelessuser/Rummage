@@ -1,12 +1,14 @@
 Rummage
 =======
 
-Rummage is a GUI for grep like searches in python.
+Rummage is a GUI for grep like searches in python.  It was inspired by the tool I use in windows called GrepWin found here: http://stefanstools.sourceforge.net/grepWin.html.  I mainly used the tool for searches, and I wanted a similar tool in OSX...so I wrote Rummage.  The feel is loosely based off of GrepWin, though currently it has no replace options (not sure if/when I will add replace).  It is written in Python; therefore, it will be slower on searches than it would be if the searching were written in C (maybe down the line).  The big reason I wrote this is so I can build a similar tool on both OSX, Windows, and/or Linux (though I haven't yet tested Linux).
+
+The regex used is based off of the Python regex engine `re` (http://docs.python.org/2/library/re.html), with a wrapper that also allows you to do some unicode stuff like this `[\p{Ll}\p{Lu}]` and '\p{Ll}\p{Lu}`.  So keep this in mind if not all regex you know is recognized (but most functional regex should).
 
 <img src="http://dl.dropboxusercontent.com/u/342698/Rummage/Options.png" border="0">
 <img src="http://dl.dropboxusercontent.com/u/342698/Rummage/Results.png" border="0">
 
-# Todo (So far)
+# Planned Enhancements
 See Issues
 
 # License
