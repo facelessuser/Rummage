@@ -159,8 +159,8 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         # Also init the ComboPopup base class.
         wx.combo.ComboPopup.__init__(self)
 
-    def select_item(self, idx):
-        self.txt_ctrl.SetValue(self.GetItemText(0))
+    def select_item(self, idx=None):
+        self.txt_ctrl.SetValue(self.GetItemText(idx if idx is not None else 0))
 
     def get_selected_text(self):
         return self.txt_ctrl.GetValue()
