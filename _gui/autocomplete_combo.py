@@ -17,10 +17,11 @@ from wx.combo import ComboPopup, ComboCtrl
 # wx.SystemOptions.SetOptionInt("mac.listctrl.always_use_generic", 0)
 
 class AutoCompleteCombo(ComboCtrl):
-    def __init__(self, parent, choices=[], load_last=False):
+    def __init__(self, parent, choices=[], load_last=False, changed_callback=None):
         ComboCtrl.__init__(self, parent, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, style=wx.TE_PROCESS_ENTER)
         self.update_semaphore = False
         self.choices = None
+        self.changed_callback = changed_callback
         self.UseAltPopupWindow(True)
         self.list = ListCtrlComboPopup(self, self.GetTextCtrl())
         self.SetPopupControl(self.list)
@@ -142,6 +143,8 @@ class AutoCompleteCombo(ComboCtrl):
                     tc.SetSelection(len(value), len(best))
         else:
             self.update_semaphore = False
+        if self.changed_callback is not None:
+            self.changed_callback()
         if not found:
             event.Skip()
 

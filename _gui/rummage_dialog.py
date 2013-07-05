@@ -77,9 +77,9 @@ def not_none(item, alt=None):
     return item if item != None else alt
 
 
-def replace_with_autocomplete(obj, key, load_last=False):
+def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None):
     choices = Settings.get_search_setting(key, [])
-    auto_complete = AutoCompleteCombo(obj.GetParent(), choices, load_last)
+    auto_complete = AutoCompleteCombo(obj.GetParent(), choices, load_last, changed_callback)
     sz = obj.GetContainingSizer()
     sz.Replace(obj, auto_complete)
     obj.Destroy()
@@ -217,7 +217,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
 
-        self.m_searchin_text = replace_with_autocomplete(self.m_searchin_text, "target")
+        self.m_searchin_text = replace_with_autocomplete(self.m_searchin_text, "target", changed_callback=self.on_searchin_changed)
         self.m_searchfor_textbox = replace_with_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
         self.m_exclude_textbox = replace_with_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
         self.m_filematch_textbox = replace_with_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
@@ -253,15 +253,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.searchin_update = False
         event.Skip()
 
-    def on_searchin_enter(self, event):
-        self.check_searchin()
-        event.Skip()
-
-    def on_searchin_selected(self, event):
-        self.check_searchin()
-        event.Skip()
-
-    def on_searchin_changed(self, event):
+    def on_searchin_changed(self):
         self.check_searchin()
         event.Skip()
 
