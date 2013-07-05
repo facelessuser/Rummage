@@ -255,7 +255,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def on_searchin_changed(self):
         self.check_searchin()
-        event.Skip()
 
     def on_save_search(self, event):
         search = self.m_searchfor_textbox.GetValue()
