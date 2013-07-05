@@ -64,15 +64,12 @@ class AutoCompleteCombo(ComboCtrl):
         event.Skip()
 
     def on_enter_key(self, event):
-        # if self.list.curitem != -1:
-        #     self.list.select_item(self.list.curitem)
         self.tab_forward()
         event.Skip()
 
     def on_char(self, event):
         key = event.GetKeyCode()
         if key in [wx.WXK_DELETE, wx.WXK_BACK]:
-            self.curitem = -1
             self.update_semaphore = True
         elif key == wx.WXK_TAB:
             if event.ShiftDown():
@@ -140,7 +137,6 @@ class AutoCompleteCombo(ComboCtrl):
                     tc.SetValue(best)
                     tc.SetInsertionPoint(len(best))
                     tc.SetSelection(len(value), len(best))
-            self.list.curitem = -1
         else:
             self.update_semaphore = False
         if not found:
@@ -189,27 +185,24 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         item, _ = self.HitTest(evt.GetPosition())
         if item >= 0:
             self.Select(item)
-            self.curitem = item
 
     def next_item(self):
-        if self.curitem < self.GetItemCount() - 1:
-            self.curitem += 1
-            self.Select(self.curitem)
+        curitem = self.GetFirstSelected()
+        if curitem < self.GetItemCount() - 1:
+            self.Select(curitem + 1)
 
     def prev_item(self):
-        if self.curitem > 0 and self.GetItemCount() > 0:
-            self.curitem -= 1
-            self.Select(self.curitem)
+        curitem = self.GetFirstSelected()
+        if curitem > 0 and self.GetItemCount() > 0:
+            self.Select(curitem - 1)
 
     def set_item(self, idx):
-        self.curitem = idx
-        self.Select(self.curitem)
+        self.Select(idx)
 
     def OnLeftDown(self, evt):
         item, _ = self.HitTest(evt.GetPosition())
         if item >= 0:
             self.Select(item)
-            self.curitem = item
             self.set_value = item
         self.Dismiss()
 
@@ -219,9 +212,11 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def on_key_down(self, evt):
         key = evt.GetKeyCode()
         if key == wx.WXK_RETURN:
-            if self.curitem != -1:
-                self.select_item(self.curitem)
+            curitem = self.GetFirstSelected()
+            if curitem != -1:
+                self.select_item(curitem)
             self.txt_ctrl.SetSelection(0, len(self.txt_ctrl.GetValue()))
+            self.Dismiss()
             return
         evt.Skip()
 
@@ -232,7 +227,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         """ This is called immediately after construction finishes.  You can
         use self.GetCombo if needed to get to the ComboCtrl instance. """
 
-        self.curitem = -1
+        pass
 
     def Create(self, parent):
         """ Create the popup child control. Return True for success. """
