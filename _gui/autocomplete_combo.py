@@ -221,7 +221,9 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         if key == wx.WXK_RETURN:
             if self.curitem != -1:
                 self.select_item(self.curitem)
-        self.txt_ctrl.SetSelection(0, len(self.txt_ctrl.GetValue()))
+            self.txt_ctrl.SetSelection(0, len(self.txt_ctrl.GetValue()))
+            return
+        evt.Skip()
 
     # The following methods are those that are overridable from the
     # ComboPopup base class.
