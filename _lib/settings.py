@@ -212,6 +212,22 @@ class Settings(object):
         cls.save_cache()
 
     @classmethod
+    def get_history_record_count(cls, history_types = []):
+        cls.reload_settings()
+        count = 0
+        for h in history_types:
+            count += len(cls.cache.get(h, []))
+        return count
+
+    @classmethod
+    def clear_history_records(cls, history_types=[]):
+        cls.reload_settings()
+        for h in history_types:
+            if cls.cache.get(h, None) is not None:
+                cls.cache[h] = []
+        cls.save_cache()
+
+    @classmethod
     def get_search_setting(cls, key, default):
         cls.reload_settings()
         return cls.cache.get(key, default)

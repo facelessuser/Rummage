@@ -242,6 +242,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_preferences(self, event):
         dlg = SettingsDialog(self)
         dlg.ShowModal()
+        if dlg.history_cleared():
+            update_autocomplete(self.m_searchin_text, "target")
+            update_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
+            update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
+            update_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search")
         dlg.Destroy()
 
     def on_dir_changed(self, event):
@@ -294,6 +299,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if not self.searchin_update:
             if isdir(pth):
                 self.m_searchin_dir_picker.SetPath(pth)
+            elif isfile(pth):
+                self.m_searchin_dir_picker.SetPath(dirname(pth))
             self.searchin_update = False
 
     def on_search_click(self, event):
