@@ -231,18 +231,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
         super(RummageFrame, self).__init__(parent)
 
-        extend_sb(self.m_statusbar)
-
-        self.m_grep_notebook.DeletePage(2)
-        self.m_grep_notebook.DeletePage(1)
-        self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
-        self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
-
-        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, "Files", False)
-        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
-        self.m_result_file_panel.load_table()
-        self.m_result_content_panel.load_table()
-
         self.debounce_search = False
         self.searchin_update = False
         self.tester = None
@@ -255,11 +243,26 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if get_debug_mode():
             self.open_debug_console()
         self.init_update_timer()
+
+        # Extend the statusbar
+        extend_sb(self.m_statusbar)
+        self.m_statusbar.set_status("")
+
+        # Replace result panel placeholders with new custom panels
+        self.m_grep_notebook.DeletePage(2)
+        self.m_grep_notebook.DeletePage(1)
+        self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
+        self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
+        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, "Files", False)
+        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
+        self.m_result_file_panel.load_table()
+        self.m_result_content_panel.load_table()
         self.m_grep_notebook.SetSelection(0)
 
+        # Set progress bar to 0
         self.m_progressbar.SetRange(100)
         self.m_progressbar.SetValue(0)
-        self.m_statusbar.set_status("")
+
 
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
@@ -289,7 +292,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_exclude_textbox = replace_with_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
         self.m_filematch_textbox = replace_with_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
 
-        if _PLATFORM == "windows":
+        if _PLATFORM != "osx":
             self.m_searchin_text.MoveBeforeInTabOrder(self.m_searchin_dir_picker)
             self.m_searchfor_textbox.MoveBeforeInTabOrder(self.m_regex_search_checkbox)
             self.m_modified_date_picker.MoveAfterInTabOrder(self.m_size_text)
@@ -350,25 +353,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_searchfor_textbox.SetValue(search)
             self.m_regex_search_checkbox.SetValue(regex_search)
 
-    def enable_panel(self, panel, enable):
-        # For some odd reason, OSX panel Enable doesn't work
-        # This is a work around
-        if _PLATFORM == "windows":
-            panel.Enable(enable)
-        else:
-            for child in panel.GetChildren():
-                child.Enable(enable)
-
     def check_searchin(self):
         pth = self.m_searchin_text.GetValue()
         if isfile(pth):
-            self.enable_panel(self.m_limit_size_panel, False)
-            self.enable_panel(self.m_limit_panel, False)
-            self.enable_panel(self.m_limit_toggle_panel, False)
+            self.m_limiter_panel.Hide()
+            self.m_limiter_panel.GetContainingSizer().Layout()
         else:
-            self.enable_panel(self.m_limit_size_panel, True)
-            self.enable_panel(self.m_limit_panel, True)
-            self.enable_panel(self.m_limit_toggle_panel, True)
+            self.m_limiter_panel.Show()
+            self.m_limiter_panel.GetContainingSizer().Layout()
         if not self.searchin_update:
             if isdir(pth):
                 self.m_searchin_dir_picker.SetPath(pth)
@@ -391,21 +383,34 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.stop_update_timer()
         else:
             debug("validate")
+            fail = False
+            msg = ""
             if self.m_regex_search_checkbox.GetValue():
                 if self.validate_search_regex():
-                    return
-            if self.m_fileregex_checkbox.GetValue():
+                    msg = "Please enter a valid search regex!"
+                    fail = True
+            if not fail and self.m_fileregex_checkbox.GetValue():
                 if self.validate_regex(self.m_filematch_textbox.Value):
-                    return
-            if self.m_dirregex_checkbox.GetValue():
+                    msg = "Please enter a valid file regex!"
+                    fail = True
+            if not fail and self.m_dirregex_checkbox.GetValue():
                 if self.validate_regex(self.m_exclude_textbox.Value):
-                    return
+                    msg = "Please enter a valid exlcude directory regex!"
+                    fail = True
             if not exists(self.m_searchin_text.GetValue()):
-                errormsg("Please enter a valid search path!")
-                self.debounce_search = False
-                return
-            debug("search")
-            self.do_search()
+                msg = "Please enter a valid search path!"
+                fail = True
+            if (
+                self.m_logic_choice.GetStringSelection() != "any" and
+                re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
+            ):
+                msg = "Please enter a valid size!"
+                fail = True
+            if fail:
+                errormsg(msg)
+            else:
+                debug("search")
+                self.do_search()
             self.debounce_search = False
         event.Skip()
 
@@ -430,6 +435,44 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.set_status("")
         self.args.reset()
 
+        if self.set_arguments():
+            return
+
+        self.save_history()
+
+        self.current_table_idx = [-1, -1]
+        self.m_search_button.SetLabel("Stop")
+        self.thread = threading.Thread(
+            target=threaded_grep,
+            args=(
+                self.args.target,
+                self.args.pattern,
+                not_none(self.args.regexfilepattern, alt=not_none(self.args.filepattern)),
+                not_none(self.args.directory_exclude),
+                get_flags(self.args),
+                self.args.show_hidden,
+                self.args.all_utf8,
+                self.args.size_compare,
+                self.args.modified_compare,
+                self.args.created_compare,
+                self.args.text
+            )
+        )
+        self.thread.setDaemon(True)
+        self.m_grep_notebook.DeletePage(2)
+        self.m_grep_notebook.DeletePage(1)
+        self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
+        self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
+        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, "Files", False)
+        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
+
+        with _LOCK:
+            global _PROCESSED
+            _PROCESSED = 0
+        self.thread.start()
+        self.start_update_timer()
+
+    def set_arguments(self):
         # Path
         self.args.target = self.m_searchin_text.GetValue()
 
@@ -458,15 +501,18 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 size = self.m_size_text.GetValue()
                 if size == "":
                     errormsg("Please enter a valid file size!")
-                    return
+                    return True
                 self.args.size_compare = (LIMIT_COMPARE[cmp_size], int(size))
             else:
                 self.args.size_compare = None
             cmp_modified = self.m_modified_choice.GetSelection()
             cmp_created = self.m_created_choice.GetSelection()
             if cmp_modified:
-                print("modified", cmp_modified)
-                mod_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+                try:
+                    mod_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+                except:
+                    errormsg("Please enter a modified date!")
+                    return True
                 mod_t = self.m_modified_time_picker.GetValue()
                 d = mod_d.split("/")
                 t = mod_t.split(":")
@@ -475,7 +521,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 )
                 self.args.modified_compare = (LIMIT_COMPARE[cmp_modified], mod_epoch)
             if cmp_created:
-                cre_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+                try:
+                    cre_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+                except:
+                    errormsg("Please enter a valid created date!")
+                    return True
                 cre_t = self.m_modified_time_picker.GetValue()
                 d = cre_d.split("/")
                 t = cre_t.split(":")
@@ -487,7 +537,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.args.text = True
 
         debug(self.args.target)
+        return False
 
+    def save_history(self):
         history = [
             ("target", self.args.target),
             ("regex_search", self.args.pattern) if self.args.regexp else ("literal_search", self.args.pattern)
@@ -512,14 +564,22 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         strings = [
             ("size_compare_string", self.m_logic_choice.GetStringSelection()),
-            ("size_limit_string", self.m_size_text.GetValue()),
             ("modified_compare_string", self.m_modified_choice.GetStringSelection()),
-            ("modified_date_string", self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")),
-            ("modified_time_string", self.m_modified_time_picker.GetValue()),
-            ("created_compare_string", self.m_created_choice.GetStringSelection()),
-            ("created_date_string", self.m_created_date_picker.GetValue().Format("%m/%d/%Y")),
-            ("created_time_string", self.m_created_time_picker.GetValue())
+            ("created_compare_string", self.m_created_choice.GetStringSelection())
         ]
+
+        if self.m_logic_choice.GetStringSelection() != "any":
+            strings += [("size_limit_string", self.m_size_text.GetValue())]
+        if self.m_modified_choice.GetStringSelection() != "on any":
+            strings += [
+                ("modified_date_string", self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")),
+                ("modified_time_string", self.m_modified_time_picker.GetValue())
+            ]
+        if self.m_created_choice.GetStringSelection() != "on any":
+            strings += [
+                ("created_date_string", self.m_created_date_picker.GetValue().Format("%m/%d/%Y")),
+                ("created_time_string", self.m_created_time_picker.GetValue())
+            ]
 
         Settings.add_search_settings(history, toggles, strings)
 
@@ -527,40 +587,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         update_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
         update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
         update_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search")
-
-        self.current_table_idx = [-1, -1]
-        self.m_search_button.SetLabel("Stop")
-        self.thread = threading.Thread(
-            target=threaded_grep,
-            args=(
-                self.args.target,
-                self.args.pattern,
-                not_none(self.args.regexfilepattern, alt=not_none(self.args.filepattern)),
-                not_none(self.args.directory_exclude),
-                get_flags(self.args),
-                self.args.show_hidden,
-                self.args.all_utf8,
-                self.args.size_compare,
-                self.args.modified_compare,
-                self.args.created_compare,
-                self.args.text
-            )
-        )
-        self.thread.setDaemon(True)
-        self.m_grep_notebook.DeletePage(2)
-        self.m_grep_notebook.DeletePage(1)
-        self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
-        self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
-        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, "Files", False)
-        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
-        self.enable_panel(self.m_result_file_panel, False)
-        self.enable_panel(self.m_result_content_panel, False)
-
-        with _LOCK:
-            global _PROCESSED
-            _PROCESSED = 0
-        self.thread.start()
-        self.start_update_timer()
 
     def check_updates(self, event):
         global _RESULTS
@@ -598,8 +624,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_progressbar.SetValue(100)
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
-                self.enable_panel(self.m_result_file_panel, True)
-                self.enable_panel(self.m_result_content_panel, True)
                 self.m_grep_notebook.SetSelection(1)
                 wx.GetApp().Yield()
                 self.debounce_search = False

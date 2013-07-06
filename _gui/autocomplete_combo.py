@@ -18,7 +18,7 @@ from wx.combo import ComboPopup, ComboCtrl
 
 class AutoCompleteCombo(ComboCtrl):
     def __init__(self, parent, choices=[], load_last=False, changed_callback=None):
-        ComboCtrl.__init__(self, parent, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, style=wx.TE_PROCESS_ENTER)
+        ComboCtrl.__init__(self, parent, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, style=wx.TAB_TRAVERSAL | wx.TE_PROCESS_ENTER)
         self.update_semaphore = False
         self.choices = None
         self.changed_callback = changed_callback
