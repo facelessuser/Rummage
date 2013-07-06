@@ -17,6 +17,7 @@ import threading
 import traceback
 from time import time, sleep, ctime
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
+import wx.lib.masked as masked
 
 import _lib.pygrep as pygrep
 from _lib.settings import Settings, _PLATFORM
@@ -75,6 +76,23 @@ def get_flags(args):
 
 def not_none(item, alt=None):
     return item if item != None else alt
+
+
+def replace_with_genericdatepicker(obj):
+    dpc = wx.GenericDatePickerCtrl(obj.GetParent(), style=wx.TAB_TRAVERSAL | wx.DP_DROPDOWN | wx.DP_SHOWCENTURY | wx.DP_ALLOWNONE)
+    print(dir(dpc))
+    sz = obj.GetContainingSizer()
+    sz.Replace(obj, dpc)
+    obj.Destroy()
+    return dpc
+
+
+def replace_with_timepicker(obj, spin):
+    time_picker = masked.TimeCtrl(obj.GetParent(), style=wx.TE_PROCESS_TAB, spinButton=spin, oob_color="white", fmt24hr=True)
+    sz = obj.GetContainingSizer()
+    sz.Replace(obj, time_picker)
+    obj.Destroy()
+    return time_picker
 
 
 def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None):
@@ -217,6 +235,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
 
+        self.m_modified_date_picker = replace_with_genericdatepicker(self.m_modified_date_picker)
+        self.m_created_date_picker = replace_with_genericdatepicker(self.m_created_date_picker)
+
+        self.m_modified_time_picker = replace_with_timepicker(self.m_modified_time_picker, self.m_modified_spin)
+        self.m_created_time_picker = replace_with_timepicker(self.m_created_time_picker, self.m_created_spin)
+
         self.m_searchin_text = replace_with_autocomplete(self.m_searchin_text, "target", changed_callback=self.on_searchin_changed)
         self.m_searchfor_textbox = replace_with_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
         self.m_exclude_textbox = replace_with_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
@@ -293,9 +317,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if isfile(pth):
             self.enable_panel(self.m_limit_size_panel, False)
             self.enable_panel(self.m_limit_panel, False)
+            self.enable_panel(self.m_limit_toggle_panel, False)
         else:
             self.enable_panel(self.m_limit_size_panel, True)
             self.enable_panel(self.m_limit_panel, True)
+            self.enable_panel(self.m_limit_toggle_panel, True)
         if not self.searchin_update:
             if isdir(pth):
                 self.m_searchin_dir_picker.SetPath(pth)
