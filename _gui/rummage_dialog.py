@@ -54,13 +54,9 @@ LIMIT_COMPARE = {
 }
 
 ZERO = timedelta(0)
-UTC = UTCTimezone()
-EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 class UTCTimezone(tzinfo):
-    """UTC"""
-
     def utcoffset(self, dt):
         return ZERO
 
@@ -69,6 +65,10 @@ class UTCTimezone(tzinfo):
 
     def dst(self, dt):
         return ZERO
+
+
+UTC = UTCTimezone()
+EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 def totimestamp(dt, epoch=EPOCH):

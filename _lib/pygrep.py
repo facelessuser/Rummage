@@ -274,8 +274,6 @@ class _DirWalker(object):
         self.size = size
         self.modified = modified
         self.created = created
-        print(self.created)
-        print(self.modified)
         self.file_pattern = file_pattern
         self.file_regex_match = file_regex_match
         self.dir_regex_match = dir_regex_match
@@ -328,8 +326,6 @@ class _DirWalker(object):
         if self.modified is None:
             mod_okay = True
         else:
-            print(pth)
-            print(self.modified, self.modified_time)
             mod_okay = self.__compare_value(self.modified, self.modified_time)
         if self.created is None:
             cre_okay = True
