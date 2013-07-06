@@ -17,12 +17,14 @@ import sys
 from os import walk
 from fnmatch import fnmatch
 from os.path import isdir, join, abspath, basename, getsize, getmtime
+from os.path import getctime as get_creation_time
 from time import sleep
 import struct
 import traceback
 import codecs
 import text_decode
 import traceback
+from ctypes import *
 
 LITERAL = 1
 IGNORECASE = 2
@@ -53,14 +55,61 @@ elif _PLATFORM == "windows":
 LINE_ENDINGS = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
 
 
-def threaded_walker(directory, file_pattern, file_regex_match, folder_exclude, dir_regex_match, recursive, show_hidden, size):
+class struct_timespec(Structure):
+    _fields_ = [('tv_sec', c_long), ('tv_nsec', c_long)]
+
+
+class struct_stat64(Structure):
+    _fields_ = [
+        ('st_dev', c_int32),
+        ('st_mode', c_uint16),
+        ('st_nlink', c_uint16),
+        ('st_ino', c_uint64),
+        ('st_uid', c_uint32),
+        ('st_gid', c_uint32),
+        ('st_rdev', c_int32),
+        ('st_atimespec', struct_timespec),
+        ('st_mtimespec', struct_timespec),
+        ('st_ctimespec', struct_timespec),
+        ('st_birthtimespec', struct_timespec),
+        ('dont_care', c_uint64 * 8)
+    ]
+
+
+libc = CDLL('libc.dylib')
+stat64 = libc.stat64
+stat64.argtypes = [c_char_p, POINTER(struct_stat64)]
+
+
+def getctime(pth):
+    if _PLATFORM == "osx":
+        # Get the appropriate creation time on OSX
+        buf = struct_stat64()
+        rv = stat64(pth, pointer(buf))
+        if rv != 0:
+            raise OSError("Couldn't stat file %r" % pth)
+        return buf.st_birthtimespec.tv_sec
+    else:
+        # Get the creation time for everyone else
+        return get_creation_time(pth)
+
+
+def threaded_walker(
+    directory, file_pattern, file_regex_match,
+    folder_exclude, dir_regex_match, recursive,
+    show_hidden, size, modified, created
+):
     global _RUNNING
     global _STARTED
     with _LOCK:
         _RUNNING = True
         _STARTED = True
     try:
-        walker = _DirWalker(directory, file_pattern, file_regex_match, folder_exclude, dir_regex_match, recursive, show_hidden, size)
+        walker = _DirWalker(
+            directory, file_pattern, file_regex_match,
+            folder_exclude, dir_regex_match, recursive,
+            show_hidden, size, modified, created
+        )
         walker.run()
     except:
         print(str(traceback.format_exc()))
@@ -214,9 +263,17 @@ class _FileSearch(object):
 
 
 class _DirWalker(object):
-    def __init__(self, directory, file_pattern, file_regex_match, folder_exclude, dir_regex_match, recursive, show_hidden, size):
+    def __init__(
+            self, directory, file_pattern, file_regex_match,
+            folder_exclude, dir_regex_match, recursive,
+            show_hidden, size, modified, created
+        ):
         self.dir = directory
         self.size = size
+        self.modified = modified
+        self.created = created
+        print(self.created)
+        print(self.modified)
         self.file_pattern = file_pattern
         self.file_regex_match = file_regex_match
         self.dir_regex_match = dir_regex_match
@@ -245,23 +302,48 @@ class _DirWalker(object):
                 return f.startswith('.') and f != ".."
         return False
 
+    def __compare_value(self, limit_check, current):
+        value_okay = False
+        qualifier = limit_check[0]
+        limit = limit_check[1]
+        if qualifier == "eq":
+            if current == limit:
+                value_okay = True
+        elif qualifier == "lt":
+            if current < limit:
+                value_okay = True
+        elif qualifier == "gt":
+            if current > limit:
+                value_okay = True
+        return value_okay
+
+    def __is_times_okay(self, pth):
+        times_okay = False
+        mod_okay = False
+        cre_okay = False
+        self.modified_time = getmtime(pth)
+        self.created_time = getctime(pth)
+        if self.modified is None:
+            mod_okay = True
+        else:
+            print(pth)
+            print(self.modified, self.modified_time)
+            mod_okay = self.__compare_value(self.modified, self.modified_time)
+        if self.created is None:
+            cre_okay = True
+        else:
+            cre_okay = self.__compare_value(self.created, self.created_time)
+        if mod_okay and cre_okay:
+            times_okay = True
+        return times_okay
+
     def __is_size_okay(self, pth):
         size_okay = False
         self.current_size = getsize(pth)
         if self.size is None:
             size_okay = True
         else:
-            qualifier = self.size[0]
-            limit = self.size[1]
-            if qualifier == "eq":
-                if self.current_size == limit:
-                    size_okay = True
-            elif qualifier == "lt":
-                if self.current_size < limit:
-                    size_okay = True
-            elif qualifier == "gt":
-                if self.current_size > limit:
-                    size_okay = True
+            size_okay = self.__compare_value(self.size, self.current_size)
         return size_okay
 
     def __valid_file(self, base, name):
@@ -289,6 +371,8 @@ class _DirWalker(object):
                     valid = True
             if valid:
                 valid = self.__is_size_okay(join(base, name))
+            if valid:
+                valid = self.__is_times_okay(join(base, name))
         return valid
 
     def __valid_folder(self, base, name):
@@ -332,9 +416,9 @@ class _DirWalker(object):
             # Seach files if they were found
             if len(files):
                 # Only search files in that are in the inlcude rules
-                for f in [(name, self.current_size) for name in files[:] if self.__valid_file(base, name)]:
+                for f in [(name, self.current_size, self.modified_time, self.created_time) for name in files[:] if self.__valid_file(base, name)]:
                     with _LOCK:
-                        _FILES.append((join(base, f[0]), f[1]))
+                        _FILES.append((join(base, f[0]), f[1], f[2], f[3]))
                     if _ABORT:
                         break
             if _ABORT:
@@ -348,7 +432,7 @@ class Grep(object):
         self, target, pattern, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None,
         show_hidden=False, all_utf8=False, size=None,
-        text=False
+        modified=None, created=None, text=False
     ):
         """
         Initialize Grep object.
@@ -385,7 +469,9 @@ class Grep(object):
                     dir_regex_match,
                     bool(flags & RECURSIVE),
                     show_hidden,
-                    size
+                    size,
+                    modified,
+                    created
                 )
             )
             self.thread.setDaemon(True)
@@ -523,7 +609,8 @@ class Grep(object):
                     result = self.search.search(file_name, content, max_count)
                     result["size"] = '%.2fKB' % (float(sz) / 1024.0)
                     result["encode"] = self.current_encoding
-                    result["time"] = getmtime(file_name)
+                    result["m_time"] = file_info[2]
+                    result["c_time"] = file_info[3]
                     yield result
                     if max_count != None:
                         max_count -= result["count"]

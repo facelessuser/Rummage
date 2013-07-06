@@ -174,7 +174,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
 class ResultFileList(ResultList):
     def __init__(self, parent):
-        super(ResultFileList, self).__init__(parent, ["File", "Size", "Matches", "Path", "Encoding", "Time"])
+        super(ResultFileList, self).__init__(parent, ["File", "Size", "Matches", "Path", "Encoding", "Modified", "Created"])
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
 
     def get_item_text(self, item, col, abs=False):
@@ -182,7 +182,7 @@ class ResultFileList(ResultList):
             item = self.itemIndexMap[item]
         if col == 1:
             return u'%.2fKB' % self.itemDataMap[item][col]
-        elif col == 5:
+        elif col in [5, 6]:
             return ctime(self.itemDataMap[item][col])
         else:
             return unicode(self.itemDataMap[item][col])
@@ -193,8 +193,8 @@ class ResultFileList(ResultList):
         if item != -1:
             filename = self.GetItem(item, col=0).GetText()
             path = self.GetItem(item, col=3).GetText()
-            line = str(self.get_map_item(item, col=6))
-            col = str(self.get_map_item(item, col=7))
+            line = str(self.get_map_item(item, col=7))
+            col = str(self.get_map_item(item, col=8))
             editor_open(join(normpath(path), filename), line, col)
         event.Skip()
 

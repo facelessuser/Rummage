@@ -15,9 +15,11 @@ import wx
 import sys
 import threading
 import traceback
-from time import time, sleep, ctime
+import calendar
+from time import time, sleep, ctime, mktime, strptime, gmtime
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
 import wx.lib.masked as masked
+from datetime import datetime, timedelta, tzinfo
 
 import _lib.pygrep as pygrep
 from _lib.settings import Settings, _PLATFORM
@@ -35,6 +37,7 @@ from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
 from _gui.sorted_columns import FileResultPanel, ResultFileList, ResultContentList
 
+
 _LOCK = threading.Lock()
 _RUNNING = False
 _RESULTS = []
@@ -43,12 +46,34 @@ _TOTAL = 0
 _PROCESSED = 0
 _ABORT = False
 _RUNTIME = None
-SIZE_COMPARE = {
+LIMIT_COMPARE = {
     0: "any",
     1: "gt",
     2: "eq",
     3: "lt"
 }
+
+ZERO = timedelta(0)
+UTC = UTCTimezone()
+EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
+
+
+class UTCTimezone(tzinfo):
+    """UTC"""
+
+    def utcoffset(self, dt):
+        return ZERO
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return ZERO
+
+
+def totimestamp(dt, epoch=EPOCH):
+    td = dt - epoch
+    return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 1e6
 
 
 def get_flags(args):
@@ -78,17 +103,27 @@ def not_none(item, alt=None):
     return item if item != None else alt
 
 
-def replace_with_genericdatepicker(obj):
+def replace_with_genericdatepicker(obj, key):
+    d = Settings.get_search_setting(key, None)
     dpc = wx.GenericDatePickerCtrl(obj.GetParent(), style=wx.TAB_TRAVERSAL | wx.DP_DROPDOWN | wx.DP_SHOWCENTURY | wx.DP_ALLOWNONE)
-    print(dir(dpc))
+    if d is None:
+        day = wx.DateTime()
+        day.SetToCurrent()
+        dpc.SetValue(day)
+    else:
+        day = wx.DateTime()
+        saved_day = d.split("/")
+        day.Set(int(saved_day[0]) - 1, int(saved_day[1]), int(saved_day[2]))
+        dpc.SetValue(day)
     sz = obj.GetContainingSizer()
     sz.Replace(obj, dpc)
     obj.Destroy()
     return dpc
 
 
-def replace_with_timepicker(obj, spin):
-    time_picker = masked.TimeCtrl(obj.GetParent(), style=wx.TE_PROCESS_TAB, spinButton=spin, oob_color="white", fmt24hr=True)
+def replace_with_timepicker(obj, spin, key):
+    t = Settings.get_search_setting(key, wx.DateTime.Now().Format("%H:%M:%S"))
+    time_picker = masked.TimeCtrl(obj.GetParent(), value=t, style=wx.TE_PROCESS_TAB, spinButton=spin, oob_color="white", fmt24hr=True)
     sz = obj.GetContainingSizer()
     sz.Replace(obj, time_picker)
     obj.Destroy()
@@ -111,7 +146,8 @@ def update_autocomplete(obj, key, load_last=False):
 
 def threaded_grep(
     target, pattern, file_pattern, folder_exclude,
-    flags, show_hidden, all_utf8, size, text
+    flags, show_hidden, all_utf8, size, modified,
+    created, text
 ):
     global _RUNNING
     global _RUNTIME
@@ -129,6 +165,8 @@ def threaded_grep(
                 flags=flags,
                 show_hidden=show_hidden,
                 all_utf8=all_utf8,
+                modified=modified,
+                created=created,
                 size=size,
                 text=text
             )
@@ -185,6 +223,8 @@ class GrepArgs(object):
         self.target = None
         self.show_hidden = False
         self.size_compare = None
+        self.modified_compare = None
+        self.created_compare = None
 
 
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
@@ -224,7 +264,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
 
-        self.m_logic_choice.SetStringSelection(Settings.get_search_setting("size_compare_string", "greater than"))
+        self.m_logic_choice.SetStringSelection(Settings.get_search_setting("size_compare_string", "any"))
         self.m_size_text.SetValue(Settings.get_search_setting("size_limit_string", "1000"))
 
         self.m_case_checkbox.SetValue(not Settings.get_search_setting("ignore_case_toggle", False))
@@ -235,11 +275,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
 
-        self.m_modified_date_picker = replace_with_genericdatepicker(self.m_modified_date_picker)
-        self.m_created_date_picker = replace_with_genericdatepicker(self.m_created_date_picker)
+        self.m_modified_choice.SetStringSelection(Settings.get_search_setting("modified_compare_string", "on any"))
+        self.m_created_choice.SetStringSelection(Settings.get_search_setting("created_compare_string", "on any"))
 
-        self.m_modified_time_picker = replace_with_timepicker(self.m_modified_time_picker, self.m_modified_spin)
-        self.m_created_time_picker = replace_with_timepicker(self.m_created_time_picker, self.m_created_spin)
+        self.m_modified_date_picker = replace_with_genericdatepicker(self.m_modified_date_picker, "modified_date_string")
+        self.m_created_date_picker = replace_with_genericdatepicker(self.m_created_date_picker, "created_date_string")
+
+        self.m_modified_time_picker = replace_with_timepicker(self.m_modified_time_picker, self.m_modified_spin, "modified_time_string")
+        self.m_created_time_picker = replace_with_timepicker(self.m_created_time_picker, self.m_created_spin, "created_time_string")
 
         self.m_searchin_text = replace_with_autocomplete(self.m_searchin_text, "target", changed_callback=self.on_searchin_changed)
         self.m_searchfor_textbox = replace_with_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
@@ -249,6 +292,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if _PLATFORM == "windows":
             self.m_searchin_text.MoveBeforeInTabOrder(self.m_searchin_dir_picker)
             self.m_searchfor_textbox.MoveBeforeInTabOrder(self.m_regex_search_checkbox)
+            self.m_modified_date_picker.MoveAfterInTabOrder(self.m_size_text)
+            self.m_modified_time_picker.MoveAfterInTabOrder(self.m_modified_date_picker)
+            self.m_created_date_picker.MoveAfterInTabOrder(self.m_modified_time_picker)
+            self.m_created_time_picker.MoveAfterInTabOrder(self.m_created_date_picker)
             self.m_exclude_textbox.MoveBeforeInTabOrder(self.m_dirregex_checkbox)
             self.m_filematch_textbox.MoveBeforeInTabOrder(self.m_fileregex_checkbox)
 
@@ -355,6 +402,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     return
             if not exists(self.m_searchin_text.GetValue()):
                 errormsg("Please enter a valid search path!")
+                self.debounce_search = False
                 return
             debug("search")
             self.do_search()
@@ -411,9 +459,30 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 if size == "":
                     errormsg("Please enter a valid file size!")
                     return
-                self.args.size_compare = (SIZE_COMPARE[cmp_size], int(size))
+                self.args.size_compare = (LIMIT_COMPARE[cmp_size], int(size))
             else:
                 self.args.size_compare = None
+            cmp_modified = self.m_modified_choice.GetSelection()
+            cmp_created = self.m_created_choice.GetSelection()
+            if cmp_modified:
+                print("modified", cmp_modified)
+                mod_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+                mod_t = self.m_modified_time_picker.GetValue()
+                d = mod_d.split("/")
+                t = mod_t.split(":")
+                mod_epoch = totimestamp(
+                    datetime(int(d[2]), int(d[0]), int(d[1]), int(t[0]), int(t[1]), int(t[2]), 0, UTC)
+                )
+                self.args.modified_compare = (LIMIT_COMPARE[cmp_modified], mod_epoch)
+            if cmp_created:
+                cre_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+                cre_t = self.m_modified_time_picker.GetValue()
+                d = cre_d.split("/")
+                t = cre_t.split(":")
+                cre_epoch = totimestamp(
+                    datetime.datetime(int(d[2]), int(d[0]), int(d[1]), int(t[0]), int(t[1]), int(t[2]), 0, utc)
+                )
+                self.args.created_compare = (LIMIT_COMPARE[cmp_created], cre_epoch)
         else:
             self.args.text = True
 
@@ -443,7 +512,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         strings = [
             ("size_compare_string", self.m_logic_choice.GetStringSelection()),
-            ("size_limit_string", self.m_size_text.GetValue())
+            ("size_limit_string", self.m_size_text.GetValue()),
+            ("modified_compare_string", self.m_modified_choice.GetStringSelection()),
+            ("modified_date_string", self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")),
+            ("modified_time_string", self.m_modified_time_picker.GetValue()),
+            ("created_compare_string", self.m_created_choice.GetStringSelection()),
+            ("created_date_string", self.m_created_date_picker.GetValue().Format("%m/%d/%Y")),
+            ("created_time_string", self.m_created_time_picker.GetValue())
         ]
 
         Settings.add_search_settings(history, toggles, strings)
@@ -466,6 +541,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.args.show_hidden,
                 self.args.all_utf8,
                 self.args.size_compare,
+                self.args.modified_compare,
+                self.args.created_compare,
                 self.args.text
             )
         )
@@ -541,8 +618,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         for f in results:
             self.m_result_file_panel.set_item_map(
                 count, basename(f["name"]), float(f["size"].strip("KB")), f["count"],
-                dirname(f["name"]), f["encode"], f["time"], f["results"][0]["lineno"],
-                f["results"][0]["colno"]
+                dirname(f["name"]), f["encode"], f["m_time"], f["c_time"],
+                f["results"][0]["lineno"], f["results"][0]["colno"]
             )
             for r in f["results"]:
                 self.m_result_content_panel.set_item_map(
