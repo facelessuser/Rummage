@@ -55,6 +55,7 @@ elif _PLATFORM == "windows":
 LINE_ENDINGS = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
 
 
+# http://stackoverflow.com/questions/946967/get-file-creation-time-with-python-on-mac
 class struct_timespec(Structure):
     _fields_ = [('tv_sec', c_long), ('tv_nsec', c_long)]
 
