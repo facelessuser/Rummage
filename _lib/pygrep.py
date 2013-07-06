@@ -11,7 +11,6 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import ure
 import threading
 import sys
 from os import walk
@@ -25,6 +24,8 @@ import codecs
 import text_decode
 import traceback
 from ctypes import *
+
+import _lib.ure as ure
 
 LITERAL = 1
 IGNORECASE = 2
@@ -620,8 +621,10 @@ class Grep(object):
         elif self.buffer_input:
             # Perform search
             result = self.search.search("buffer input", self.target, max_count)
-            result["size"] = "--KB"
+            result["size"] = "--"
             result["encode"] = "--"
+            result["m_time"] = "--"
+            result["c_time"] = "--"
             yield result
         else:
             # Perform search
@@ -631,4 +634,6 @@ class Grep(object):
                 result = self.search.search(file_name, content, max_count)
                 result["size"] = "%.2fKB" % (float(getsize(file_name)) / 1024.0)
                 result["encode"] = self.current_encoding
+                result["m_time"] = getmtime(file_name)
+                result["c_time"] = getctime(file_name)
                 yield result
