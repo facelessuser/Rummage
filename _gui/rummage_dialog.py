@@ -263,7 +263,20 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_progressbar.SetRange(100)
         self.m_progressbar.SetValue(0)
 
+        self.setup_inputs()
 
+        if start_path and exists(start_path):
+            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
+        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
+
+        best = self.m_settings_panel.GetBestSize()
+        current = self.m_settings_panel.GetSize()
+        offset = best[1] - current[1]
+        mainframe = self.GetSize()
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        self.SetMinSize(self.GetSize())
+
+    def setup_inputs(self):
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
 
@@ -301,17 +314,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_created_time_picker.MoveAfterInTabOrder(self.m_created_date_picker)
             self.m_exclude_textbox.MoveBeforeInTabOrder(self.m_dirregex_checkbox)
             self.m_filematch_textbox.MoveBeforeInTabOrder(self.m_fileregex_checkbox)
-
-        if start_path and exists(start_path):
-            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
-        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
-
-        best = self.m_settings_panel.GetBestSize()
-        current = self.m_settings_panel.GetSize()
-        offset = best[1] - current[1]
-        mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
-        self.SetMinSize(self.GetSize())
 
     def on_preferences(self, event):
         dlg = SettingsDialog(self)
