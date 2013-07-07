@@ -23,6 +23,7 @@ import traceback
 import codecs
 import text_decode
 import traceback
+from file_hidden import is_hidden
 from ctypes import *
 
 import _lib.ure as ure
@@ -47,11 +48,6 @@ elif sys.platform == "darwin":
     _PLATFORM = "osx"
 else:
     _PLATFORM = "linux"
-
-if _PLATFORM == "osx":
-    import Foundation
-elif _PLATFORM == "windows":
-    import ctypes
 
 LINE_ENDINGS = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
 
@@ -284,25 +280,7 @@ class _DirWalker(object):
 
     def __is_hidden(self, path):
         if not self.show_hidden:
-            if _PLATFORM == "windows":
-                attrs = ctypes.windll.kernel32.GetFileAttributesW(path)
-                return attrs != -1 and bool(attrs & 2)
-            elif _PLATFORM == "osx":
-                f = basename(path)
-                try:
-                    pool = Foundation.NSAutoreleasePool.alloc().init()
-                    hidden = (
-                        (f.startswith('.') and f != "..") or
-                        Foundation.NSURL.fileURLWithPath_(path).getResourceValue_forKey_error_(
-                            None, Foundation.NSURLIsHiddenKey, None
-                        )[1]
-                    )
-                    del pool
-                    return hidden
-                except:
-                    return f.startswith('.') and f != ".."
-            else:
-                return f.startswith('.') and f != ".."
+            return is_hidden(path)
         return False
 
     def __compare_value(self, limit_check, current):

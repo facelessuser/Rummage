@@ -97,7 +97,7 @@ def parse_options(args, obj):
         err = True
     else:
         # Log the name without extension for use later
-        obj.name, _ = args.name
+        obj.name = args.name
 
     # Parse Settings file
     if not err:
