@@ -289,15 +289,18 @@ class _DirWalker(object):
                 return attrs != -1 and bool(attrs & 2)
             elif _PLATFORM == "osx":
                 f = basename(path)
-
-                pool = Foundation.NSAutoreleasePool.alloc().init()
-                hidden = (
-                    (f.startswith('.') and f != "..") or
-                    Foundation.NSURL.fileURLWithPath_(path).getResourceValue_forKey_error_(
-                        None, Foundation.NSURLIsHiddenKey, None
-                    )[1]
-                )
-                del pool
+                try:
+                    pool = Foundation.NSAutoreleasePool.alloc().init()
+                    hidden = (
+                        (f.startswith('.') and f != "..") or
+                        Foundation.NSURL.fileURLWithPath_(path).getResourceValue_forKey_error_(
+                            None, Foundation.NSURLIsHiddenKey, None
+                        )[1]
+                    )
+                    del pool
+                    return hidden
+                except:
+                    return f.startswith('.') and f != ".."
             else:
                 return f.startswith('.') and f != ".."
         return False

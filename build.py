@@ -97,7 +97,7 @@ def parse_options(args, obj):
         err = True
     else:
         # Log the name without extension for use later
-        obj.name, _ = path.splitext(path.basename(obj.script))
+        obj.name, _ = args.name
 
     # Parse Settings file
     if not err:
@@ -112,7 +112,7 @@ def parse_options(args, obj):
         err = True
 
     # Get executable name to build
-    obj.app = path.join(obj.out_dir, obj.name) + args.extension
+    obj.app = path.join(obj.dist_path, obj.name) + args.extension
 
     # Construct build params for build processs
     obj.params = (
@@ -122,7 +122,7 @@ def parse_options(args, obj):
         (['-w', '--workpath=%s' % obj.out_dir] if args.gui else ['--workpath=%s' % obj.out_dir]) +
         ['--distpath=%s' % obj.dist_path] +
         ['--name=%s' % args.name] +
-        [obj.script]
+        ['-y', obj.script]
     )
     return err
 
