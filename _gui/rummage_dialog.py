@@ -16,6 +16,7 @@ import sys
 import threading
 import traceback
 import calendar
+import webbrowser
 from time import time, sleep, ctime, mktime, strptime, gmtime
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
 import wx.lib.masked as masked
@@ -36,6 +37,12 @@ from _gui.load_search_dialog import LoadSearchDialog
 from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
 from _gui.sorted_columns import FileResultPanel, ResultFileList, ResultContentList
+
+__app__ = "Rummage"
+__version__ = "0.0.1"
+__status__ = "Alpha"
+__maintainers__ = [("Isaac Muse", "IsaacMuse@gmail.com")]
+__helpurl__ = "https://github.com/facelessuser/Rummage/issues"
 
 
 _LOCK = threading.Lock()
@@ -227,6 +234,32 @@ class GrepArgs(object):
         self.created_compare = None
 
 
+class AboutDialog(gui.AboutDialog):
+    def __init__(self, parent):
+        super(AboutDialog, self).__init__(parent)
+
+        # self.m_bitmap = wx.StaticBitmap(
+        #     self.m_about_panel, wx.ID_ANY, app_icon.GetBitmap(), wx.DefaultPosition, wx.Size(64, 64), 0
+        # )
+        self.m_app_label.SetLabel(__app__)
+        self.m_version_label.SetLabel(
+            "Version: %s %s" % (__version__, __status__)
+        )
+        self.m_developers_label.SetLabel(
+            "Developers(s):\n%s" % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in __maintainers__]))
+        )
+        self.Fit()
+
+    def on_toggle(self, event):
+        if self.m_dev_toggle.GetValue():
+            self.m_dev_toggle.SetLabel("Contact <<")
+            self.m_developers_label.Show()
+        else:
+            self.m_dev_toggle.SetLabel("Contact >>")
+            self.m_developers_label.Hide()
+        self.Fit()
+
+
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
         super(RummageFrame, self).__init__(parent)
@@ -239,9 +272,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.script_path = script_path
         self.args = GrepArgs()
         self.thread = None
+
+        # Setup debugging
         self.set_keybindings(debug_event=self.on_debug_console)
         if get_debug_mode():
             self.open_debug_console()
+
+        # Setup search timer
         self.init_update_timer()
 
         # Extend the statusbar
@@ -263,12 +300,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_progressbar.SetRange(100)
         self.m_progressbar.SetValue(0)
 
-        self.setup_inputs()
+        # Setup the inputs history and replace
+        # placeholder objects with actual objecs
+        self.setup_inputs(start_path)
 
-        if start_path and exists(start_path):
-            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
-        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
-
+        # Optimally resize window
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
@@ -276,7 +312,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
 
-    def setup_inputs(self):
+    def setup_inputs(self, start_path):
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
 
@@ -294,6 +330,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_modified_choice.SetStringSelection(Settings.get_search_setting("modified_compare_string", "on any"))
         self.m_created_choice.SetStringSelection(Settings.get_search_setting("created_compare_string", "on any"))
 
+        # GUI is built with WxFormBuilder, but it isn't easy to fill in custom objects.
+        # So place holder objects are added for the sake of planning the gui, and then they
+        # are replaced here with the actual objects.
         self.m_modified_date_picker = replace_with_genericdatepicker(self.m_modified_date_picker, "modified_date_string")
         self.m_created_date_picker = replace_with_genericdatepicker(self.m_created_date_picker, "created_date_string")
 
@@ -305,6 +344,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_exclude_textbox = replace_with_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
         self.m_filematch_textbox = replace_with_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
 
+        # We caused some tab traversal chaos with the object replacement.
+        # Fix it in platforms where it matters.
         if _PLATFORM != "osx":
             self.m_searchin_text.MoveBeforeInTabOrder(self.m_searchin_dir_picker)
             self.m_searchfor_textbox.MoveBeforeInTabOrder(self.m_regex_search_checkbox)
@@ -314,6 +355,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_created_time_picker.MoveAfterInTabOrder(self.m_created_date_picker)
             self.m_exclude_textbox.MoveBeforeInTabOrder(self.m_dirregex_checkbox)
             self.m_filematch_textbox.MoveBeforeInTabOrder(self.m_fileregex_checkbox)
+
+        # Init search path with passed in path
+        if start_path and exists(start_path):
+            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
+        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
 
     def on_preferences(self, event):
         dlg = SettingsDialog(self)
@@ -384,37 +430,49 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             else:
                 self.stop_update_timer()
         else:
-            debug("validate")
-            fail = False
-            msg = ""
-            if self.m_regex_search_checkbox.GetValue():
-                if self.validate_search_regex():
-                    msg = "Please enter a valid search regex!"
-                    fail = True
-            if not fail and self.m_fileregex_checkbox.GetValue():
-                if self.validate_regex(self.m_filematch_textbox.Value):
-                    msg = "Please enter a valid file regex!"
-                    fail = True
-            if not fail and self.m_dirregex_checkbox.GetValue():
-                if self.validate_regex(self.m_exclude_textbox.Value):
-                    msg = "Please enter a valid exlcude directory regex!"
-                    fail = True
-            if not exists(self.m_searchin_text.GetValue()):
-                msg = "Please enter a valid search path!"
-                fail = True
-            if (
-                self.m_logic_choice.GetStringSelection() != "any" and
-                re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
-            ):
-                msg = "Please enter a valid size!"
-                fail = True
-            if fail:
-                errormsg(msg)
-            else:
-                debug("search")
+            if not self.validate_search_inputs():
                 self.do_search()
             self.debounce_search = False
         event.Skip()
+
+    def validate_search_inputs(self):
+        debug("validate")
+        fail = False
+        msg = ""
+        if self.m_regex_search_checkbox.GetValue():
+            if self.validate_search_regex():
+                msg = "Please enter a valid search regex!"
+                fail = True
+        if not fail and self.m_fileregex_checkbox.GetValue():
+            if self.validate_regex(self.m_filematch_textbox.Value):
+                msg = "Please enter a valid file regex!"
+                fail = True
+        if not fail and self.m_dirregex_checkbox.GetValue():
+            if self.validate_regex(self.m_exclude_textbox.Value):
+                msg = "Please enter a valid exlcude directory regex!"
+                fail = True
+        if not exists(self.m_searchin_text.GetValue()):
+            msg = "Please enter a valid search path!"
+            fail = True
+        if (
+            self.m_logic_choice.GetStringSelection() != "any" and
+            re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
+        ):
+            msg = "Please enter a valid size!"
+            fail = True
+        try:
+            self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+        except:
+            msg = "Please enter a modified date!"
+            fail = True
+        try:
+            self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
+        except:
+            msg = "Please enter a created date!"
+            fail = True
+        if fail:
+            errormsg(msg)
+        return fail
 
     def init_update_timer(self):
         self.update_timer = wx.Timer(self)
@@ -432,18 +490,20 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def do_search(self):
         self.thread = None
+
+        # Reset status
         self.m_progressbar.SetRange(100)
         self.m_progressbar.SetValue(0)
         self.m_statusbar.set_status("")
-        self.args.reset()
 
-        if self.set_arguments():
-            return
+        # Change button to stop search
+        self.m_search_button.SetLabel("Stop")
 
+        # Setup arguments
+        self.set_arguments()
         self.save_history()
 
-        self.current_table_idx = [-1, -1]
-        self.m_search_button.SetLabel("Stop")
+        # Setup search thread
         self.thread = threading.Thread(
             target=threaded_grep,
             args=(
@@ -461,6 +521,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             )
         )
         self.thread.setDaemon(True)
+
+        # Reset result tables
+        self.current_table_idx = [-1, -1]
         self.m_grep_notebook.DeletePage(2)
         self.m_grep_notebook.DeletePage(1)
         self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
@@ -468,6 +531,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, "Files", False)
         self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
 
+        # Run search thread
         with _LOCK:
             global _PROCESSED
             _PROCESSED = 0
@@ -475,6 +539,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.start_update_timer()
 
     def set_arguments(self):
+        self.args.reset()
         # Path
         self.args.target = self.m_searchin_text.GetValue()
 
@@ -501,20 +566,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             cmp_size = self.m_logic_choice.GetSelection()
             if cmp_size:
                 size = self.m_size_text.GetValue()
-                if size == "":
-                    errormsg("Please enter a valid file size!")
-                    return True
                 self.args.size_compare = (LIMIT_COMPARE[cmp_size], int(size))
             else:
                 self.args.size_compare = None
             cmp_modified = self.m_modified_choice.GetSelection()
             cmp_created = self.m_created_choice.GetSelection()
             if cmp_modified:
-                try:
-                    mod_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
-                except:
-                    errormsg("Please enter a modified date!")
-                    return True
+                mod_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
                 mod_t = self.m_modified_time_picker.GetValue()
                 d = mod_d.split("/")
                 t = mod_t.split(":")
@@ -523,11 +581,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 )
                 self.args.modified_compare = (LIMIT_COMPARE[cmp_modified], mod_epoch)
             if cmp_created:
-                try:
-                    cre_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
-                except:
-                    errormsg("Please enter a valid created date!")
-                    return True
+                cre_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
                 cre_t = self.m_modified_time_picker.GetValue()
                 d = cre_d.split("/")
                 t = cre_t.split(":")
@@ -539,7 +593,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.args.text = True
 
         debug(self.args.target)
-        return False
 
     def save_history(self):
         history = [
@@ -722,3 +775,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_searchfor_textbox.GetValue()
         )
         self.tester.Show()
+
+    def on_issues(self, event):
+        webbrowser.open_new_tab(__helpurl__)
+
+    def on_about(self, event):
+        dlg = AboutDialog(self)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def on_exit(self, event):
+        self.Close()
