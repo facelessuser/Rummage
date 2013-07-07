@@ -39,3 +39,7 @@ nosetests.xml
 *.log
 
 *.bak
+
+*.spec
+
+pyinstaller
