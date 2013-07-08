@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 from os.path import exists, dirname, abspath, join
 import sys
@@ -140,6 +141,7 @@ def build(obj):
 
     # Kick off build process
     print "Building %s..." % obj.app
+    print "Please be patient; this might take a while.\nResults and/or errors will be posted when complete."
     output = process.communicate()
 
     # Chekc for bad error code

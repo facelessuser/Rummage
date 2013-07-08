@@ -302,17 +302,27 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Setup the inputs history and replace
         # placeholder objects with actual objecs
-        self.setup_inputs(start_path)
+        self.setup_inputs()
 
+        self.optimize_size(True)
+
+        # Init search path with passed in path
+        if start_path and exists(start_path):
+            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
+        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
+
+    def optimize_size(self, first_time=False):
         # Optimally resize window
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
-        self.SetMinSize(self.GetSize())
+        if first_time or offset > 0:
+            self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        if first_time:
+            self.SetMinSize(self.GetSize())
 
-    def setup_inputs(self, start_path):
+    def setup_inputs(self):
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
 
@@ -355,11 +365,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_created_time_picker.MoveAfterInTabOrder(self.m_created_date_picker)
             self.m_exclude_textbox.MoveBeforeInTabOrder(self.m_dirregex_checkbox)
             self.m_filematch_textbox.MoveBeforeInTabOrder(self.m_fileregex_checkbox)
-
-        # Init search path with passed in path
-        if start_path and exists(start_path):
-            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
-        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
 
     def on_preferences(self, event):
         dlg = SettingsDialog(self)
@@ -406,9 +411,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if isfile(pth):
             self.m_limiter_panel.Hide()
             self.m_limiter_panel.GetContainingSizer().Layout()
+            self.optimize_size()
         else:
             self.m_limiter_panel.Show()
             self.m_limiter_panel.GetContainingSizer().Layout()
+            self.optimize_size()
         if not self.searchin_update:
             if isdir(pth):
                 self.m_searchin_dir_picker.SetPath(pth)

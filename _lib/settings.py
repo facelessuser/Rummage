@@ -29,6 +29,7 @@ else:
 SETTINGS_FILE = "rummage.settings"
 CACHE_FILE = "rummage.cache"
 LOG_FILE = "rummage.log"
+FIFO = "rummage.fifo"
 
 class Settings(object):
     filename = None
@@ -87,6 +88,7 @@ class Settings(object):
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
+            cls.fifo = join(folder, FIFO)
         elif _PLATFORM == "osx":
             folder = expanduser("~/Library/Application Support/Rummage")
             if not exists(folder):
@@ -94,10 +96,15 @@ class Settings(object):
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
+            cls.fifo = join(folder, FIFO)
         elif _PLATFORM == "linux":
+            folder = expanduser("~/.config/Rummage")
+            if not exists(folder):
+                mkdir(folder)
             settings = SETTINGS_FILE
             cache = CACHE_FILE
             log = LOG_FILE
+            cls.fifo = join(folder, FIFO)
         try:
             for filename in [settings, cache]:
                 if not exists(filename):
@@ -106,6 +113,10 @@ class Settings(object):
         except Exception:
             pass
         return settings, cache, log
+
+    @classmethod
+    def get_fifo(cls):
+        return cls.fifo
 
     @classmethod
     def reload_settings(cls):

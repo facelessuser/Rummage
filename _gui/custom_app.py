@@ -119,6 +119,9 @@ class CustomApp(wx.App):
             self.init_callback()
         return True
 
+    def OnExit(self):
+        del self.instance
+
 
 class DebugFrameExtender(object):
     def set_keybindings(self, keybindings=[], debug_event=None):
