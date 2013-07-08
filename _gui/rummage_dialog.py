@@ -321,6 +321,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         if first_time:
             self.SetMinSize(self.GetSize())
+        self.Refresh()
 
     def setup_inputs(self):
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))

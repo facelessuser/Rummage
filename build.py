@@ -1,8 +1,7 @@
 #!/usr/bin/python
 import sys
 from os.path import exists, dirname, abspath, join
-import sys
-from os import path, mkdir
+from os import path, mkdir, chdir
 import shutil
 import argparse
 import subprocess
@@ -30,37 +29,47 @@ class BuildParams(object):
     pyinstaller_script = None
     out_dir = None
     script = None
-    copy_from = None
-    copy_to = None
-    name = None
     upx_bin = None
     dist_path = None
+    name = None
+    extension = None
+    icon = None
 
 
-def parse_settings(obj):
+def parse_settings(args, obj):
     # Configure build parameters
     err = False
 
     script_path = dirname(abspath(sys.argv[0]))
-    obj.python_bin = sys.executable
+    obj.python_bin = dirname(sys.executable)
     obj.pyinstaller_script = join(script_path, "pyinstaller", "pyinstaller.py")
     obj.out_dir = join(script_path, "build")
     obj.dist_path = join(script_path, "bin")
     obj.upx_bin = None
-    # obj.upx_bin = "" if _PLATFORM == "windows" else None
+    obj.name = args.name
+    obj.extension = args.extension
+    obj.script = path.abspath(path.normpath(args.script))
+    obj.icon = args.icon
 
-    # if obj.upx_bin != None and not path.exists(path.join(obj.upx_bin, "upx.exe")):
-    #     print >> sys.stderr, "Could not find UPX binary!"
-    #     obj.upx_bin = None
-    #     err |= True
-    if obj.pyinstaller_script == None or not path.exists(obj.pyinstaller_script):
+    if not path.exists(obj.script):
+        print >> sys.stderr, "Could not find %s!" % obj.script
+        err = True
+    elif args.icon != None and not path.exists(args.icon):
+        print >> sys.stderr, "Could not find %s!" % obj.icon
+        err = True
+    elif obj.pyinstaller_script == None or not path.exists(obj.pyinstaller_script):
         print >> sys.stderr, "Could not find pyinstaller.py!"
         err |= True
+
     if not path.exists(obj.out_dir):
         err |= create_dir(obj.out_dir)
     elif not path.isdir(obj.out_dir):
         print >> sys.stderr, "%s is not a directory!" % output_directory
         err |= True
+
+    # Get executable name to build
+    if not err:
+        obj.app = path.join(obj.dist_path, obj.name) + obj.extension
     return err
 
 
@@ -91,46 +100,32 @@ def clean_build(build_dir):
 def parse_options(args, obj):
     err = False
 
-    # Get script to build
-    obj.script = path.abspath(path.normpath(args.script))
-    if not path.exists(obj.script):
-        print >> sys.stderr, "Could not find %s!" % obj.script
-        err = True
-    else:
-        # Log the name without extension for use later
-        obj.name = args.name
-
     # Parse Settings file
     if not err:
-        settings = parse_settings(obj)
-        err = (settings == None)
+        err = parse_settings(args, obj)
 
     # See if cleaning is required
     if not err and args.clean and path.exists(obj.out_dir):
         err = clean_build(obj.out_dir)
 
-    if args.icon != None and not path.exists(args.icon):
-        err = True
-
-    # Get executable name to build
-    obj.app = path.join(obj.dist_path, obj.name) + args.extension
-
     # Construct build params for build processs
-    obj.params = (
-        [obj.python_bin, obj.pyinstaller_script, '-F'] +
-        (['--upx-dir=%s' % obj.upx_bin] if obj.upx_bin is not None else []) +
-        (['--icon=%s' % args.icon] if args.icon is not None else []) +
-        (['-w', '--workpath=%s' % obj.out_dir] if args.gui else ['--workpath=%s' % obj.out_dir]) +
-        ['--distpath=%s' % obj.dist_path] +
-        ['--name=%s' % args.name] +
-        ['-y', obj.script]
-    )
+    if not err:
+        obj.params = (
+            ["python", obj.pyinstaller_script, '-F'] +
+            (['--upx-dir=%s' % obj.upx_bin] if obj.upx_bin is not None else []) +
+            (['--icon=%s' % args.icon] if args.icon is not None else []) +
+            (['-w', '--workpath=%s' % obj.out_dir] if args.gui else ['--workpath=%s' % obj.out_dir]) +
+            ['--distpath=%s' % obj.dist_path] +
+            ['--name=%s' % args.name] +
+            ['-y', obj.script]
+        )
     return err
 
 
 def build(obj):
     err = False
 
+    chdir(obj.python_bin)
     # Setup build process
     process = subprocess.Popen(
         obj.params,
@@ -144,7 +139,7 @@ def build(obj):
     print "Please be patient; this might take a while.\nResults and/or errors will be posted when complete."
     output = process.communicate()
 
-    # Chekc for bad error code
+    # Check for bad error code
     if process.returncode:
         print >> sys.stderr, "Compilation failed!"
         err = True
@@ -155,13 +150,18 @@ def build(obj):
     return err
 
 def main():
-    parser = argparse.ArgumentParser(prog='PyAppBuild', description='Python App building script for Pyinstaller')
+    parser = argparse.ArgumentParser(prog='Build', description='Python script for building apps for Pyinstaller')
     # Flag arguments
     parser.add_argument('--version', action='version', version='%(prog)s 1.0.0')
     parser.add_argument('--clean', '-c', action='store_true', default=False, help='Clean build before re-building.')
+    parser.add_argument('name', default=None, help='Name of app')
     inputs = parser.parse_args()
     if _PLATFORM == "osx":
-        args = Args("main.py", "Rummage", True, inputs.clean, ".app")
+        args = Args("main.py", inputs.name, True, inputs.clean, ".app")
+    elif _PLATFORM == "windows":
+        args = Args("main.py", inputs.name, True, inputs.clean, ".exe")
+    else:
+        args = Args("main.py", inputs.name, True, inputs.clean, "")
 
     # Parse options
     build_params = BuildParams()

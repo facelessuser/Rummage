@@ -57,26 +57,27 @@ class struct_timespec(Structure):
     _fields_ = [('tv_sec', c_long), ('tv_nsec', c_long)]
 
 
-class struct_stat64(Structure):
-    _fields_ = [
-        ('st_dev', c_int32),
-        ('st_mode', c_uint16),
-        ('st_nlink', c_uint16),
-        ('st_ino', c_uint64),
-        ('st_uid', c_uint32),
-        ('st_gid', c_uint32),
-        ('st_rdev', c_int32),
-        ('st_atimespec', struct_timespec),
-        ('st_mtimespec', struct_timespec),
-        ('st_ctimespec', struct_timespec),
-        ('st_birthtimespec', struct_timespec),
-        ('dont_care', c_uint64 * 8)
-    ]
+if _PLATFORM == "osx":
+    class struct_stat64(Structure):
+        _fields_ = [
+            ('st_dev', c_int32),
+            ('st_mode', c_uint16),
+            ('st_nlink', c_uint16),
+            ('st_ino', c_uint64),
+            ('st_uid', c_uint32),
+            ('st_gid', c_uint32),
+            ('st_rdev', c_int32),
+            ('st_atimespec', struct_timespec),
+            ('st_mtimespec', struct_timespec),
+            ('st_ctimespec', struct_timespec),
+            ('st_birthtimespec', struct_timespec),
+            ('dont_care', c_uint64 * 8)
+        ]
 
 
-libc = CDLL('libc.dylib')
-stat64 = libc.stat64
-stat64.argtypes = [c_char_p, POINTER(struct_stat64)]
+    libc = CDLL('libc.dylib')
+    stat64 = libc.stat64
+    stat64.argtypes = [c_char_p, POINTER(struct_stat64)]
 
 
 def getctime(pth):

@@ -16,6 +16,22 @@ import wx
 import simplelog
 import sys
 import json
+import wx.lib.newevent
+import os
+import thread
+import time
+
+if sys.platform.startswith('win'):
+    _PLATFORM = "windows"
+elif sys.platform == "darwin":
+    _PLATFORM = "osx"
+else:
+    _PLATFORM = "linux"
+
+if _PLATFORM == "windows":
+    import win32pipe, win32file
+
+PipeEvent, EVT_PIPE_ARGS = wx.lib.newevent.NewEvent()
 
 log = None
 last_level = simplelog.ERROR
@@ -121,6 +137,155 @@ class CustomApp(wx.App):
 
     def OnExit(self):
         del self.instance
+
+
+class ArgPipeThread(object):
+    def __init__(self, app, pipe_name):
+        self.app = app
+        self.pipe_name = pipe_name
+
+    def Start(self):
+        self.check_pipe = True
+        self.running = True
+        thread.start_new_thread(self.Run, ())
+
+    def Stop(self):
+        self.check_pipe = False
+        if _PLATFORM == "windows":
+            fileHandle = win32file.CreateFile(
+                '\\\\.\\pipe\\rummage',
+                win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                0, None,
+                win32file.OPEN_EXISTING,
+                0, None
+            )
+            data = '\n'
+            win32file.WriteFile(fileHandle, data)
+            win32file.CloseHandle(fileHandle)
+        else:
+            if not os.path.exists(self.pipe_name):
+                os.mkfifo(self.pipe_name)
+            pid = os.fork()
+            with open(self.pipe_name, "w") as pipeout:
+                pipeout.write('\n')
+                pipeout.flush()
+
+    def IsRunning(self):
+        return self.running
+
+    def Run(self):
+        if _PLATFORM == "windows":
+            data = ""
+            p = win32pipe.CreateNamedPipe(
+                '\\\\.\\pipe\\rummage',
+                win32pipe.PIPE_ACCESS_DUPLEX,
+                win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_WAIT,
+                1, 65536, 65536, 300, None
+            )
+            while self.check_pipe:
+                win32pipe.ConnectNamedPipe(p, None)
+                result = win32file.ReadFile(p, 4096)
+                if result[0] == 0:
+                    data += result[1].replace("\r", "")
+                    if len(data) and data[-1] == "\n":
+                        lines = data.rstrip("\n").split("\n")
+                        evt = PipeEvent(data=lines[-1])
+                        wx.PostEvent(self.app, evt)
+                        data = ""
+                win32pipe.DisconnectNamedPipe(p)
+                time.sleep(0.2)
+        else:
+            if not os.path.exists(self.pipe_name):
+                os.mkfifo(self.pipe_name)
+
+            pid = os.fork()
+            while self.check_pipe:
+                with open(self.pipe_name, "r") as pipein:
+                    line = pipein.readline()[:-1]
+                    if line != "":
+                        evt = PipeEvent(data=line)
+                        wx.PostEvent(self.app, evt)
+                    time.sleep(0.2)
+        self.running = False
+
+
+class PipeApp(CustomApp):
+    def __init__(self, *args, **kwargs):
+        self.active_pipe = False
+        self.pipe_thread = None
+        self.pipe_name = kwargs.get("pipe_name", None)
+        if "pipe_name" in kwargs:
+            del kwargs["pipe_name"]
+        super(PipeApp, self).__init__(*args, **kwargs)
+
+    def OnInit(self):
+        super(PipeApp, self).OnInit()
+        self.Bind(EVT_PIPE_ARGS, self.OnPipeArgs)
+        if self.pipe_name is not None:
+            if self.is_instance_okay():
+                self.receive_arg_pipe()
+            else:
+                self.send_arg_pipe()
+                return False
+        return True
+
+    def send_arg_pipe(self):
+        if len(sys.argv) > 1:
+            if _PLATFORM == "windows":
+                argv = iter(sys.argv[1:])
+                args = []
+                for a in argv:
+                    args.append(a)
+                    if a == "-s":
+                        try:
+                            args.append(os.path.abspath(os.path.normpath(argv.next())))
+                        except StopIteration:
+                            break
+                fileHandle = win32file.CreateFile(
+                    '\\\\.\\pipe\\rummage',
+                    win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                    0, None,
+                    win32file.OPEN_EXISTING,
+                    0, None
+                )
+                data = '|'.join(args) + '\n'
+                win32file.WriteFile(fileHandle, data)
+                win32file.CloseHandle(fileHandle)
+            else:
+                if not os.path.exists(self.pipe_name):
+                    os.mkfifo(self.pipe_name)
+
+                pid = os.fork()
+                with open(self.pipe_name, "w") as pipeout:
+                    argv = iter(sys.argv[1:])
+                    args = []
+                    for a in argv:
+                        args.append(a)
+                        if a == "-s":
+                            try:
+                                args.append(os.path.abspath(os.path.normpath(argv.next())))
+                            except StopIteration:
+                                break
+                    pipeout.write('|'.join(args) + '\n')
+                    pipeout.flush()
+
+    def receive_arg_pipe(self):
+        self.active_pipe = True
+        self.pipe_thread = ArgPipeThread(self, self.pipe_name)
+        self.pipe_thread.Start()
+
+    def OnExit(self):
+        if self.active_pipe:
+            wx.Yield()
+            self.pipe_thread.Stop()
+            running = True
+            while running:
+                running = self.pipe_thread.IsRunning()
+                time.sleep(0.1)
+        super(PipeApp, self).OnExit()
+
+    def OnPipeArgs(self, event):
+        event.Skip()
 
 
 class DebugFrameExtender(object):
