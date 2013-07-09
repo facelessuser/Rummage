@@ -308,7 +308,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Init search path with passed in path
         if start_path and exists(start_path):
-            self.m_searchin_text.SetValue(abspath(normpath(start_path)))
+            self.m_searchin_text.safe_set_value(abspath(normpath(start_path)))
         self.m_searchfor_textbox.GetTextCtrl().SetFocus()
 
     def optimize_size(self, first_time=False):

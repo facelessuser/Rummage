@@ -112,6 +112,11 @@ class AutoCompleteCombo(ComboCtrl):
                 return
         event.Skip()
 
+    def safe_set_value(self, text):
+        self.update_semaphore = True
+        self.GetTextCtrl().SetValue(text)
+        self.update_semaphore = False
+
     def on_text_change(self, event):
         found = False
         if not self.update_semaphore:
