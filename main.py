@@ -22,6 +22,7 @@ from _gui.custom_app import PipeApp, set_debug_mode
 from _gui.custom_app import debug, debug_struct, info, error
 from _gui.rummage_dialog import RummageFrame
 from _gui.regex_test_dialog import RegexTestDialog
+from _gui.platform_window_focus import platform_window_focus
 
 __version__ = "1.0.0"
 
@@ -54,11 +55,7 @@ class RummageApp(PipeApp):
                     except StopIteration:
                         break
             frame.m_searchin_text.SetValue(filename)
-            if frame.IsIconized():
-                frame.Iconize(False)
-            if not frame.IsShown():
-                frame.Show(True)
-            frame.Raise()
+            platform_window_focus(frame)
 
 
 def gui_main(script):
@@ -66,6 +63,8 @@ def gui_main(script):
     args = parse_arguments()
     if args.debug:
         set_debug_mode(True)
+
+    wx.Log.EnableLogging(False)
 
     if Settings.get_single_instance():
         app = RummageApp(redirect=True, single_instance_name="Rummage", pipe_name=Settings.get_fifo())

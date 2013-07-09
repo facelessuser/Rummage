@@ -88,7 +88,7 @@ class Settings(object):
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
-            cls.fifo = join(folder, FIFO)
+            cls.fifo = join(folder, '\\\\.\\pipe\\rummage')
         elif _PLATFORM == "osx":
             folder = expanduser("~/Library/Application Support/Rummage")
             if not exists(folder):

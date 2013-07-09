@@ -153,7 +153,7 @@ class ArgPipeThread(object):
         self.check_pipe = False
         if _PLATFORM == "windows":
             fileHandle = win32file.CreateFile(
-                '\\\\.\\pipe\\rummage',
+                self.pipe_name,
                 win32file.GENERIC_READ | win32file.GENERIC_WRITE,
                 0, None,
                 win32file.OPEN_EXISTING,
@@ -163,12 +163,8 @@ class ArgPipeThread(object):
             win32file.WriteFile(fileHandle, data)
             win32file.CloseHandle(fileHandle)
         else:
-            if not os.path.exists(self.pipe_name):
-                os.mkfifo(self.pipe_name)
-            pid = os.fork()
             with open(self.pipe_name, "w") as pipeout:
                 pipeout.write('\n')
-                pipeout.flush()
 
     def IsRunning(self):
         return self.running
@@ -177,7 +173,7 @@ class ArgPipeThread(object):
         if _PLATFORM == "windows":
             data = ""
             p = win32pipe.CreateNamedPipe(
-                '\\\\.\\pipe\\rummage',
+                self.pipe_name,
                 win32pipe.PIPE_ACCESS_DUPLEX,
                 win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_WAIT,
                 1, 65536, 65536, 300, None
@@ -195,12 +191,14 @@ class ArgPipeThread(object):
                 win32pipe.DisconnectNamedPipe(p)
                 time.sleep(0.2)
         else:
+            if os.path.exists(self.pipe_name):
+                os.unlink(self.pipe_name)
             if not os.path.exists(self.pipe_name):
                 os.mkfifo(self.pipe_name)
 
             pid = os.fork()
-            while self.check_pipe:
-                with open(self.pipe_name, "r") as pipein:
+            with open(self.pipe_name, "r") as pipein:
+                while self.check_pipe:
                     line = pipein.readline()[:-1]
                     if line != "":
                         evt = PipeEvent(data=line)
@@ -242,7 +240,7 @@ class PipeApp(CustomApp):
                         except StopIteration:
                             break
                 fileHandle = win32file.CreateFile(
-                    '\\\\.\\pipe\\rummage',
+                    self.pipe_name,
                     win32file.GENERIC_READ | win32file.GENERIC_WRITE,
                     0, None,
                     win32file.OPEN_EXISTING,
@@ -252,10 +250,6 @@ class PipeApp(CustomApp):
                 win32file.WriteFile(fileHandle, data)
                 win32file.CloseHandle(fileHandle)
             else:
-                if not os.path.exists(self.pipe_name):
-                    os.mkfifo(self.pipe_name)
-
-                pid = os.fork()
                 with open(self.pipe_name, "w") as pipeout:
                     argv = iter(sys.argv[1:])
                     args = []
@@ -267,7 +261,6 @@ class PipeApp(CustomApp):
                             except StopIteration:
                                 break
                     pipeout.write('|'.join(args) + '\n')
-                    pipeout.flush()
 
     def receive_arg_pipe(self):
         self.active_pipe = True
