@@ -196,7 +196,6 @@ class ArgPipeThread(object):
             if not os.path.exists(self.pipe_name):
                 os.mkfifo(self.pipe_name)
 
-            pid = os.fork()
             with open(self.pipe_name, "r") as pipein:
                 while self.check_pipe:
                     line = pipein.readline()[:-1]
