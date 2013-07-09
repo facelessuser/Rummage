@@ -35,10 +35,41 @@ It displays results in two ways:
 - Content: Lists the line numbers on which the match was found.  It also shows the content of said line.  Double clicking will open the match at the line in your editor (if you have configured Rummage to use your editor).
 
 
-# Planned Enhancements
+Building
+=======
+
+## OSX
+Requirements:
+
+- Update OSX python to at least 2.7.3 (Built in OSX python seems incomplete)
+- Install wxpython 2.9.4.0 from: http://downloads.sourceforge.net/wxpython/wxPython2.9-osx-2.9.4.0-cocoa-py2.7.dmg
+- This repo
+- Place pyinstaller 2.0 repo inside the rummage repo: https://github.com/pyinstaller/pyinstaller
+
+Build:
+
+Run build with the python you are using `python build.py -c Rummage`
+
+## Windows
+Requirements:
+
+- Use Python version 2.7.3.1 or hopefully later (If using portable python, use 2.7.3.1 only.  Pyinstaller seems to not work with later versions.)
+- Must have wxpython 2.9.4.0 (Portable python comes with a slightly older 2.9.X verison, but it seems compatible)
+- Must have PyWin32
+
+Build:
+
+Run build with the python you are using `python build.py -c Rummage`
+
+Binaries will be in the `bin` folder in your project.
+
+Planned Enhancements
+=======
+
 See Issues
 
-# License
+License
+=======
 
 Rummage is released under the MIT license.
 
