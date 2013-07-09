@@ -8,8 +8,7 @@ The regex used is based off of the Python regex engine `re` (http://docs.python.
 Screenshots
 =======
 
-<img src="http://dl.dropboxusercontent.com/u/342698/Rummage/Options.png" border="0">
-<img src="http://dl.dropboxusercontent.com/u/342698/Rummage/Results.png" border="0">
+<img src="http://dl.dropboxusercontent.com/u/342698/Rummage/rummage_osx.png" border="0">
 
 Usage
 =======
