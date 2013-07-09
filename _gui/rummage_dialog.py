@@ -21,6 +21,7 @@ from time import time, sleep, ctime, mktime, strptime, gmtime
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
 import wx.lib.masked as masked
 from datetime import datetime, timedelta, tzinfo
+import wx.lib.newevent
 
 import _lib.pygrep as pygrep
 from _lib.settings import Settings, _PLATFORM
@@ -37,6 +38,9 @@ from _gui.load_search_dialog import LoadSearchDialog
 from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
 from _gui.sorted_columns import FileResultPanel, ResultFileList, ResultContentList
+from _gui.messages import dirpickermsg
+
+DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
 
 __app__ = "Rummage"
 __version__ = "0.0.1"
@@ -234,6 +238,39 @@ class GrepArgs(object):
         self.created_compare = None
 
 
+class DirPickButton(object):
+    def GetPath(self):
+        return self.directory
+
+    def SetPath(self, directory):
+        if directory is not None and exists(directory) and isdir(directory):
+            self.directory = directory
+
+    def dir_init(self, default_path=None, dir_change_evt=None):
+        self.directory = None
+        self.Bind(wx.EVT_BUTTON, self.on_dir_pick)
+        self.Bind(EVT_DIR_CHANGE, self.on_dir_change)
+        self.SetPath(default_path)
+        self.dir_change_callback = dir_change_evt
+
+    def on_dir_change(self, event):
+        if self.dir_change_callback is not None:
+            self.dir_change_callback(event)
+        event.Skip()
+
+    def on_dir_pick(self, event):
+        directory = self.GetPath()
+        if directory is None or not exists(directory) or not isdir(directory):
+            directory = ""
+        directory = dirpickermsg("Select directory to rummage", directory)
+        if directory == "":
+            directory = None
+        self.SetPath(directory)
+        evt = DirChangeEvent(directory=directory)
+        wx.PostEvent(self, evt)
+        event.Skip()
+
+
 class AboutDialog(gui.AboutDialog):
     def __init__(self, parent):
         super(AboutDialog, self).__init__(parent)
@@ -284,6 +321,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Extend the statusbar
         extend_sb(self.m_statusbar)
         self.m_statusbar.set_status("")
+
+        # Extend browse button
+        extend(self.m_searchin_dir_picker, DirPickButton)
+        self.m_searchin_dir_picker.dir_init(dir_change_evt=self.on_dir_changed)
 
         # Replace result panel placeholders with new custom panels
         self.m_grep_notebook.DeletePage(2)
@@ -379,8 +420,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def on_dir_changed(self, event):
         if not self.searchin_update:
-            pth = self.m_searchin_dir_picker.GetPath()
-            if exists(pth):
+            pth = event.directory
+            if pth is not None and exists(pth):
                 self.searchin_update = True
                 self.m_searchin_text.SetValue(pth)
                 self.searchin_update = False
