@@ -41,7 +41,7 @@ Building
 ## OSX
 Requirements:
 
-- Update OSX python to at least 2.7.3 (Built in OSX python seems incomplete).  If I recall correctly, I used this guid to update http://docs.python-guide.org/en/latest/starting/install/osx.html.
+- Update OSX python to at least 2.7.3 (Built in OSX python seems incomplete and did not work with pyinstaller...at least when I intially tried.  Upgrading doesn't hurt).  I think I just downloaded the Python 2.7.3 dmg installed and changed the PATH to point to the new version of python (Don't quite remember now).
 - Install wxpython 2.9.4.0 from: http://downloads.sourceforge.net/wxpython/wxPython2.9-osx-2.9.4.0-cocoa-py2.7.dmg
 - Download this repo
 - Place pyinstaller 2.0 repo inside the rummage repo: https://github.com/pyinstaller/pyinstaller
