@@ -18,7 +18,7 @@ import traceback
 import calendar
 import webbrowser
 from time import time, sleep, ctime, mktime, strptime, gmtime
-from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
+from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile, expanduser
 import wx.lib.masked as masked
 from datetime import datetime, timedelta, tzinfo
 import wx.lib.newevent
@@ -247,7 +247,7 @@ class DirPickButton(object):
             self.directory = directory
 
     def dir_init(self, default_path=None, dir_change_evt=None):
-        self.directory = None
+        self.directory = expanduser("~")
         self.Bind(wx.EVT_BUTTON, self.on_dir_pick)
         self.Bind(EVT_DIR_CHANGE, self.on_dir_change)
         self.SetPath(default_path)
@@ -261,9 +261,9 @@ class DirPickButton(object):
     def on_dir_pick(self, event):
         directory = self.GetPath()
         if directory is None or not exists(directory) or not isdir(directory):
-            directory = ""
+            directory = expanduser("~")
         directory = dirpickermsg("Select directory to rummage", directory)
-        if directory == "":
+        if directory is None or directory == "":
             directory = None
         self.SetPath(directory)
         evt = DirChangeEvent(directory=directory)
