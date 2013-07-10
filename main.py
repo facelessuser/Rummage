@@ -53,9 +53,10 @@ class RummageApp(PipeApp):
                         break
                     except StopIteration:
                         break
-            frame.m_searchin_text.safe_set_value(filename)
-            frame.m_grep_notebook.SetSelection(0)
-            frame.m_searchfor_textbox.GetTextCtrl().SetFocus()
+            if filename is not None:
+                frame.m_searchin_text.safe_set_value(filename)
+                frame.m_grep_notebook.SetSelection(0)
+                frame.m_searchfor_textbox.GetTextCtrl().SetFocus()
             platform_window_focus(frame)
 
     def MacReopenApp(self):
