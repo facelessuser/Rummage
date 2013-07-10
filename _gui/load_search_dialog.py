@@ -102,6 +102,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.SetMinSize(self.GetSize())
 
         self.load_searches()
+        self.m_search_list.SetFocus()
 
     def load_searches(self):
         count = 0

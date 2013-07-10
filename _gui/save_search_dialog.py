@@ -29,6 +29,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+        self.m_name_text.SetFocus()
 
     def on_apply(self, event):
         value = self.m_name_text.GetValue()
