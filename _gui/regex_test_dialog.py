@@ -2,11 +2,13 @@ import wx
 import _gui.gui as gui
 import _lib.ure as ure
 import traceback
+from _icons.rum_ico import rum_64
 
 
 class RegexTestDialog(gui.RegexTestDialog):
     def __init__(self, parent, is_case, is_dot, text="", stand_alone=False):
         super(RegexTestDialog, self).__init__(None)
+        self.SetIcon(rum_64.GetIcon())
         self.parent = parent
 
         self.m_case_checkbox.SetValue(is_case)

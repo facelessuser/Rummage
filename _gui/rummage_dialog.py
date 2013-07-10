@@ -22,6 +22,7 @@ from os.path import abspath, exists, basename, dirname, join, normpath, isdir, i
 import wx.lib.masked as masked
 from datetime import datetime, timedelta, tzinfo
 import wx.lib.newevent
+import version
 
 import _lib.pygrep as pygrep
 from _lib.settings import Settings, _PLATFORM
@@ -40,13 +41,9 @@ from _gui.settings_dialog import SettingsDialog
 from _gui.sorted_columns import FileResultPanel, ResultFileList, ResultContentList
 from _gui.messages import dirpickermsg
 
-DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
+from _icons.rum_ico import rum_64
 
-__app__ = "Rummage"
-__version__ = "0.0.1"
-__status__ = "Alpha"
-__maintainers__ = [("Isaac Muse", "IsaacMuse@gmail.com")]
-__helpurl__ = "https://github.com/facelessuser/Rummage/issues"
+DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
 
 
 _LOCK = threading.Lock()
@@ -275,15 +272,15 @@ class AboutDialog(gui.AboutDialog):
     def __init__(self, parent):
         super(AboutDialog, self).__init__(parent)
 
-        # self.m_bitmap = wx.StaticBitmap(
-        #     self.m_about_panel, wx.ID_ANY, app_icon.GetBitmap(), wx.DefaultPosition, wx.Size(64, 64), 0
-        # )
-        self.m_app_label.SetLabel(__app__)
+        self.m_bitmap = wx.StaticBitmap(
+            self.m_about_panel, wx.ID_ANY, rum_64.GetBitmap(), wx.DefaultPosition, wx.Size(64, 64), 0
+        )
+        self.m_app_label.SetLabel(version.app)
         self.m_version_label.SetLabel(
-            "Version: %s %s" % (__version__, __status__)
+            "Version: %s %s" % (version.version, version.status)
         )
         self.m_developers_label.SetLabel(
-            "Developers(s):\n%s" % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in __maintainers__]))
+            "Developers(s):\n%s" % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in version.maintainers]))
         )
         self.Fit()
 
@@ -300,6 +297,8 @@ class AboutDialog(gui.AboutDialog):
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path):
         super(RummageFrame, self).__init__(parent)
+
+        self.SetIcon(rum_64.GetIcon())
 
         self.debounce_search = False
         self.searchin_update = False
@@ -423,7 +422,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             pth = event.directory
             if pth is not None and exists(pth):
                 self.searchin_update = True
-                self.m_searchin_text.SetValue(pth)
+                self.m_searchin_text.safe_set_value(pth)
                 self.searchin_update = False
         event.Skip()
 
@@ -826,7 +825,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.tester.Show()
 
     def on_issues(self, event):
-        webbrowser.open_new_tab(__helpurl__)
+        webbrowser.open_new_tab(version.help)
 
     def on_about(self, event):
         dlg = AboutDialog(self)

@@ -23,14 +23,13 @@ from _gui.custom_app import debug, debug_struct, info, error
 from _gui.rummage_dialog import RummageFrame
 from _gui.regex_test_dialog import RegexTestDialog
 from _gui.platform_window_focus import platform_window_focus
-
-__version__ = "1.0.0"
+import version
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(prog='Rummage', description='A python grep like tool.')
+    parser = argparse.ArgumentParser(prog=version.app, description='A python grep like tool.')
     # Flag arguments
-    parser.add_argument('--version', action='version', version=('%(prog)s ' + __version__))
+    parser.add_argument('--version', action='version', version=('%(prog)s ' + version.version))
     parser.add_argument('--debug', '-d', action='store_true', default=False, help=argparse.SUPPRESS)
     parser.add_argument('--searchpath', '-s', nargs=1, default=None, help="Path to search.")
     parser.add_argument('--regextool', '-r', action='store_true', default=False, help="Open just the regex tester.")

@@ -159,7 +159,7 @@ def main():
     if _PLATFORM == "osx":
         args = Args("main.py", inputs.name, True, inputs.clean, ".app")
     elif _PLATFORM == "windows":
-        args = Args("main.py", inputs.name, True, inputs.clean, ".exe")
+        args = Args("main.py", inputs.name, True, inputs.clean, ".exe", abspath("_icons\\rummage.ico"))
     else:
         args = Args("main.py", inputs.name, True, inputs.clean, "")
 
