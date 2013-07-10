@@ -217,7 +217,7 @@ class PipeApp(CustomApp):
 
     def OnInit(self):
         super(PipeApp, self).OnInit()
-        self.Bind(EVT_PIPE_ARGS, self.OnPipeArgs)
+        self.Bind(EVT_PIPE_ARGS, self.on_pipe_args)
         if self.pipe_name is not None:
             if self.is_instance_okay():
                 self.receive_arg_pipe()
@@ -229,15 +229,7 @@ class PipeApp(CustomApp):
     def send_arg_pipe(self):
         if len(sys.argv) > 1:
             if _PLATFORM == "windows":
-                argv = iter(sys.argv[1:])
-                args = []
-                for a in argv:
-                    args.append(a)
-                    if a == "-s":
-                        try:
-                            args.append(os.path.abspath(os.path.normpath(argv.next())))
-                        except StopIteration:
-                            break
+                args = self.process_args(sys.argv[1:])
                 fileHandle = win32file.CreateFile(
                     self.pipe_name,
                     win32file.GENERIC_READ | win32file.GENERIC_WRITE,
@@ -250,16 +242,11 @@ class PipeApp(CustomApp):
                 win32file.CloseHandle(fileHandle)
             else:
                 with open(self.pipe_name, "w") as pipeout:
-                    argv = iter(sys.argv[1:])
-                    args = []
-                    for a in argv:
-                        args.append(a)
-                        if a == "-s":
-                            try:
-                                args.append(os.path.abspath(os.path.normpath(argv.next())))
-                            except StopIteration:
-                                break
+                    args = self.process_args(sys.argv[1:])
                     pipeout.write('|'.join(args) + '\n')
+
+    def process_args(self, arguments):
+        return arguments
 
     def receive_arg_pipe(self):
         self.active_pipe = True
@@ -276,7 +263,7 @@ class PipeApp(CustomApp):
                 time.sleep(0.1)
         super(PipeApp, self).OnExit()
 
-    def OnPipeArgs(self, event):
+    def on_pipe_args(self, event):
         event.Skip()
 
 

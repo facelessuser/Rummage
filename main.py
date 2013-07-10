@@ -40,7 +40,7 @@ class RummageApp(PipeApp):
     def __init__(self, *args, **kwargs):
         super(RummageApp, self).__init__(*args, **kwargs)
 
-    def OnPipeArgs(self, event):
+    def on_pipe_args(self, event):
         frame = self.GetTopWindow()
         if frame is not None and isinstance(frame, RummageFrame):
             args = iter(event.data.split("|"))
@@ -58,6 +58,18 @@ class RummageApp(PipeApp):
                 frame.m_grep_notebook.SetSelection(0)
                 frame.m_searchfor_textbox.GetTextCtrl().SetFocus()
             platform_window_focus(frame)
+
+    def process_args(self, arguments):
+        argv = iter(arguments)
+        args = []
+        for a in argv:
+            args.append(a)
+            if a == "-s":
+                try:
+                    args.append(os.path.abspath(os.path.normpath(argv.next())))
+                except StopIteration:
+                    break
+        return args
 
     def MacReopenApp(self):
         frame = self.GetTopWindow()
