@@ -58,6 +58,10 @@ class RummageApp(PipeApp):
             frame.m_searchfor_textbox.GetTextCtrl().SetFocus()
             platform_window_focus(frame)
 
+    def MacReopenApp(self):
+        frame = self.GetTopWindow()
+        platform_window_focus(frame)
+
 
 def gui_main(script):
     Settings.load_settings()

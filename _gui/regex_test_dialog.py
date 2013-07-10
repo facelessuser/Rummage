@@ -1,7 +1,7 @@
 import wx
+import traceback
 import _gui.gui as gui
 import _lib.ure as ure
-import traceback
 from _icons.rum_ico import rum_64
 
 
