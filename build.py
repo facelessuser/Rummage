@@ -157,7 +157,7 @@ def main():
     parser.add_argument('name', default=None, help='Name of app')
     inputs = parser.parse_args()
     if _PLATFORM == "osx":
-        args = Args("main.py", inputs.name, True, inputs.clean, ".app")
+        args = Args("main.py", inputs.name, True, inputs.clean, ".app", abspath("_icons/rummage.icns"))
     elif _PLATFORM == "windows":
         args = Args("main.py", inputs.name, True, inputs.clean, ".exe", abspath("_icons\\rummage.ico"))
     else:
