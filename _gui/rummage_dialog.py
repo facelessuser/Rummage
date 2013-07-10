@@ -35,11 +35,12 @@ from _gui.custom_app import debug, debug_struct, info, error
 from _gui.custom_statusbar import extend_sb, extend
 from _gui.regex_test_dialog import RegexTestDialog
 from _gui.autocomplete_combo import AutoCompleteCombo
-from _gui.load_search_dialog import LoadSearchDialog
+from _gui.load_search_dialog import LoadSearchDialog, glass
 from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
 from _gui.sorted_columns import FileResultPanel, ResultFileList, ResultContentList
 from _gui.messages import dirpickermsg
+from _gui.notify import Notify
 
 from _icons.rum_ico import rum_64
 
@@ -176,7 +177,8 @@ def threaded_grep(
                 modified=modified,
                 created=created,
                 size=size,
-                text=text
+                text=text,
+                truncate_lines=True
             )
         )
         grep.run()
@@ -720,11 +722,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
                     self.m_progressbar.SetRange(completed)
                     self.m_progressbar.SetValue(completed)
+                    Notify().error("Rummage", "Search Aborted by user!\n%d matches found!" % count2, sound=True)
                     self.kill = False
                 else:
                     self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
                     self.m_progressbar.SetRange(100)
                     self.m_progressbar.SetValue(100)
+                    Notify().info("Rummage", "Search Completed!\n%d matches found!" % count2, sound=True)
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
                 self.m_grep_notebook.SetSelection(1)

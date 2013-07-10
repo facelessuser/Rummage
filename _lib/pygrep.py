@@ -160,12 +160,15 @@ class _FindRegion(object):
 
 
 class _FileSearch(object):
-    def __init__(self, pattern, flags, context):
+    def __init__(self, pattern, flags, context, truncate_lines):
         self.literal = bool(flags & LITERAL)
         self.ignorecase = bool(flags & IGNORECASE)
         self.dotall = bool(flags & DOTALL)
-
-        self.context = context
+        self.truncate_lines = truncate_lines
+        if self.truncate_lines:
+            self.context = (0, 0)
+        else:
+            self.context = context
 
         # Prepare search
         self.pattern = _literal_pattern(pattern, self.ignorecase) if self.literal else _re_pattern(pattern, self.ignorecase, self.dotall)
@@ -202,6 +205,16 @@ class _FileSearch(object):
 
         match_start = m.start() - start
         match_end = match_start + m.end() - m.start()
+        if self.truncate_lines:
+            length = end - start
+            if length > 256:
+                end = start + 256
+                length = 256
+
+            if match_start > length:
+                match_start = length
+            if match_end > length:
+                match_end = 256
         return content[start:end], (match_start, match_end), (before, after)
 
     def __findall(self, file_content):
@@ -412,7 +425,7 @@ class Grep(object):
         self, target, pattern, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None,
         show_hidden=False, all_utf8=False, size=None,
-        modified=None, created=None, text=False
+        modified=None, created=None, text=False, truncate_lines=False
     ):
         """
         Initialize Grep object.
@@ -426,7 +439,7 @@ class Grep(object):
             if _RUNNING:
                 raise GrepException("Grep process already running!")
 
-        self.search = _FileSearch(pattern, flags, context)
+        self.search = _FileSearch(pattern, flags, context, truncate_lines)
         self.buffer_input = bool(flags & BUFFER_INPUT)
         self.all_utf8 = all_utf8
         self.current_encoding = None

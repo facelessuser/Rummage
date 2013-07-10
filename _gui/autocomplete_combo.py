@@ -14,8 +14,6 @@ import wx
 import sys
 from wx.combo import ComboPopup, ComboCtrl
 
-# wx.SystemOptions.SetOptionInt("mac.listctrl.always_use_generic", 0)
-
 class AutoCompleteCombo(ComboCtrl):
     def __init__(self, parent, choices=[], load_last=False, changed_callback=None):
         ComboCtrl.__init__(self, parent, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, style=wx.TAB_TRAVERSAL | wx.TE_PROCESS_ENTER)
@@ -157,6 +155,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def __init__(self, parent, txt_ctrl):
         self.txt_ctrl = txt_ctrl
         self.waiting_value = -1
+        self.parent = parent
         # Since we are using multiple inheritance, and don't know yet
         # which window is to be the parent, we'll do 2-phase create of
         # the ListCtrl instead, and call its Create method later in
@@ -191,8 +190,8 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         self.InsertStringItem(self.GetItemCount(), text)
         self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
 
-    def on_motion(self, evt):
-        item, _ = self.HitTest(evt.GetPosition())
+    def on_motion(self, event):
+        item, _ = self.HitTest(event.GetPosition())
         if item >= 0:
             self.Select(item)
 
@@ -209,24 +208,29 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def set_item(self, idx):
         self.Select(idx)
 
-    def OnLeftDown(self, evt):
-        item, _ = self.HitTest(evt.GetPosition())
+    def on_left_down(self, event):
+        item, _ = self.HitTest(event.GetPosition())
         if item >= 0:
             self.waiting_value = item
         wx.CallAfter(self.Dismiss)
-        evt.Skip()
+        event.Skip()
 
     def clear(self):
         self.ClearAll()
 
-    def on_key_down(self, evt):
-        key = evt.GetKeyCode()
+    def on_key_down(self, event):
+        key = event.GetKeyCode()
         if key == wx.WXK_RETURN:
             curitem = self.GetFirstSelected()
             if curitem != -1:
                 self.waiting_value = curitem
             wx.CallAfter(self.Dismiss)
-        evt.Skip()
+        event.Skip()
+
+    def on_resize_dropdown(self, event):
+        if self.GetColumnWidth(0) < self.GetSize()[0] - 20:
+            self.SetColumnWidth(0, self.GetSize()[0] - 20)
+        event.Skip()
 
     # The following methods are those that are overridable from the
     # ComboPopup base class.
@@ -246,7 +250,8 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         )
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_MOTION, self.on_motion)
-        self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
+        self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
+        self.Bind(wx.EVT_SIZE, self.on_resize_dropdown)
 
         return True
 

@@ -127,7 +127,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
             for x in range(0, self.column_count):
                 text = self.get_item_text(idx, x, True)
                 lw, _, _, _ = self.dc.GetFullTextExtent(text)
-                width = lw + 10
+                width = lw + 30
                 if width > self.widest_cell[x]:
                     self.widest_cell[x] = width
             self.size_sample -= 1
