@@ -722,13 +722,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
                     self.m_progressbar.SetRange(completed)
                     self.m_progressbar.SetValue(completed)
-                    Notify().error("Rummage", "Search Aborted by user!\n%d matches found!" % count2, sound=True)
+                    if _PLATFORM == "windows":
+                        Notify().error("Rummage", "Search Aborted by user!\n%d matches found!" % count2, sound=True)
                     self.kill = False
                 else:
                     self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
                     self.m_progressbar.SetRange(100)
                     self.m_progressbar.SetValue(100)
-                    Notify().info("Rummage", "Search Completed!\n%d matches found!" % count2, sound=True)
+                    if _PLATFORM == "windows":
+                        Notify().info("Rummage", "Search Completed!\n%d matches found!" % count2, sound=True)
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
                 self.m_grep_notebook.SetSelection(1)

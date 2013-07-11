@@ -66,7 +66,7 @@ class RummageApp(PipeApp):
             args.append(a)
             if a == "-s":
                 try:
-                    args.append(os.path.abspath(os.path.normpath(argv.next())))
+                    args.append(abspath(normpath(argv.next())))
                 except StopIteration:
                     break
         return args

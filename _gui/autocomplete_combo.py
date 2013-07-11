@@ -228,8 +228,9 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         event.Skip()
 
     def on_resize_dropdown(self, event):
-        if self.GetColumnWidth(0) < self.GetSize()[0] - 20:
-            self.SetColumnWidth(0, self.GetSize()[0] - 20)
+        if self.GetColumnCount():
+            if self.GetColumnWidth(0) < self.GetSize()[0] - 20:
+                self.SetColumnWidth(0, self.GetSize()[0] - 20)
         event.Skip()
 
     # The following methods are those that are overridable from the
