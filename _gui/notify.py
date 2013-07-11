@@ -55,7 +55,8 @@ try:
             if _PLATFORM != "osx":
                 fallback(title, description, sound)
         if sound:
-            pass
+            if _PLATFORM == "windows":
+                winsound.PlaySound("*", winsound.SND_ALIAS)
 except:
     print("no growl")
     def growl_notify(note_type, title, description, sound, fallback):
