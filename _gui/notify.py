@@ -24,28 +24,78 @@ if _PLATFORM == "windows":
     import winsound
 
 
-class Notify(wx.NotificationMessage):
-    def __init__(self, *args, **kwargs):
-        super(Notify, self).__init__(*args, **kwargs)
+if _PLATFORM == "osx":
+    try:
+        import gntp.notifier
 
-    def Show(self, sound=False):
-        super(Notify, self).Show()
-        if sound:
-            if _PLATFORM == "windows":
-                winsound.PlaySound("*", winsound.SND_ALIAS)
+        growl = gntp.notifier.GrowlNotifier(
+            applicationName = "Rummage",
+            notifications = ["Info","Warning", "Error"],
+            defaultNotifications = ["Info"]
+        )
+        growl.register()
+    except:
+        pass
 
-    def notify(self, title, message, icon=0, sound=False):
-        flags = icon
-        self.SetFlags(icon)
-        self.SetTitle(title)
-        self.SetMessage(message)
-        self.Show(sound)
+    class Notify(object):
+        def __init__(self, title="", message="", sound=False):
+            self.title = title
+            self.message = message
+            self.type = "Info"
 
-    def info(self, title, message, sound=False):
-        self.notify(title, message, icon=wx.ICON_INFORMATION, sound=sound)
+        def Show(self, sound=False):
+            try:
+                growl.notify(
+                    noteType = self.type,
+                    title = self.title,
+                    description = self.message,
+                    sticky = False,
+                    priority = 1
+                )
+            except:
+                pass
+            if sound:
+                pass
 
-    def error(self, title, message, sound=False):
-        self.notify(title, message, icon=wx.ICON_ERROR, sound=sound)
+        def _notify(self, title, message, msg_type="Info", sound=False):
+            self.title = title
+            self.message = message
+            self.type = msg_type
 
-    def warning(self, title, message, sound=False):
-        self.notify(title, message, icon=wx.ICON_WARNING, sound=sound)
+            self.Show(sound)
+
+        def info(self, title, message, sound=False):
+            self._notify(title, message, msg_type="Info", sound=sound)
+
+        def error(self, title, message, sound=False):
+            self._notify(title, message, msg_type="Error", sound=sound)
+
+        def warning(self, title, message, sound=False):
+            self._notify(title, message, msg_type="Warning", sound=sound)
+
+else:
+    class Notify(wx.NotificationMessage):
+        def __init__(self, *args, **kwargs):
+            super(Notify, self).__init__(*args, **kwargs)
+
+        def Show(self, sound=False):
+            super(Notify, self).Show()
+            if sound:
+                if _PLATFORM == "windows":
+                    winsound.PlaySound("*", winsound.SND_ALIAS)
+
+        def _notify(self, title, message, icon=0, sound=False):
+            flags = icon
+            self.SetFlags(icon)
+            self.SetTitle(title)
+            self.SetMessage(message)
+            self.Show(sound)
+
+        def info(self, title, message, sound=False):
+            self._notify(title, message, icon=wx.ICON_INFORMATION, sound=sound)
+
+        def error(self, title, message, sound=False):
+            self._notify(title, message, icon=wx.ICON_ERROR, sound=sound)
+
+        def warning(self, title, message, sound=False):
+            self._notify(title, message, icon=wx.ICON_WARNING, sound=sound)
