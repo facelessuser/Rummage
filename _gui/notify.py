@@ -73,9 +73,9 @@ class Notify(wx.NotificationMessage):
         super(Notify, self).__init__(*args, **kwargs)
         self.SetFlags(self.flags)
 
-    def Show(self, sound=False):
+    def Show(self):
         super(Notify, self).Show()
-        if sound:
+        if self.sound:
             if _PLATFORM == "windows":
                 winsound.PlaySound("*", winsound.SND_ALIAS)
 

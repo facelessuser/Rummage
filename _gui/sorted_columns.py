@@ -23,6 +23,7 @@ from _gui.custom_app import debug, debug_struct, info, error
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
+USE_SAMPLE_SIZE = False
 
 up_arrow = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
@@ -105,15 +106,21 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.sort_down = self.images.Add(down_arrow.GetBitmap())
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
 
-    def resize_columns(self, minimum=MINIMUM_COL_SIZE):
+    def resize_last_columns(self):
+        total_width = 0
+        last_width = 0
         for i in range(0, self.column_count):
-            self.SetColumnWidth(i, wx.LIST_AUTOSIZE)
-            if self.GetColumnWidth(i) < minimum:
-                self.SetColumnWidth(i, minimum)
+            total_width += self.GetColumnWidth(i)
+            if i == self.column_count - 1:
+                last_width = self.GetColumnWidth(i)
+        if total_width < self.GetSize()[0] - 20:
+            self.SetColumnWidth(self.column_count - 1, last_width + self.GetSize()[0] - total_width)
+
 
     def init_column_size(self, minimum=MINIMUM_COL_SIZE):
         for i in range(0, self.column_count):
             self.SetColumnWidth(i, self.widest_cell[i])
+        self.resize_last_columns()
         self.size_sample = 0
 
     def get_column_count(self):
@@ -123,7 +130,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.itemDataMap[idx] = tuple([a for a in args])
         # Sample the first "size_sample" to determine
         # column width for when table first loads
-        if self.size_sample:
+        if self.size_sample or not USE_SAMPLE_SIZE:
             for x in range(0, self.column_count):
                 text = self.get_item_text(idx, x, True)
                 lw, _, _, _ = self.dc.GetFullTextExtent(text)
