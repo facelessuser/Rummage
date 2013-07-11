@@ -12,6 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 import wx
 import sys
+import gntp.notifier
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -23,79 +24,81 @@ else:
 if _PLATFORM == "windows":
     import winsound
 
+GROWL_ICON = None
 
-if _PLATFORM == "osx":
-    try:
-        import gntp.notifier
 
-        growl = gntp.notifier.GrowlNotifier(
-            applicationName = "Rummage",
-            notifications = ["Info","Warning", "Error"],
-            defaultNotifications = ["Info"]
-        )
-        growl.register()
-    except:
-        pass
+growl = gntp.notifier.GrowlNotifier(
+    applicationName = "Rummage",
+    notifications = ["Info","Warning", "Error"],
+    defaultNotifications = ["Info"]
+)
 
-    class Notify(object):
-        def __init__(self, title="", message="", sound=False):
-            self.title = title
-            self.message = message
-            self.type = "Info"
 
-        def Show(self, sound=False):
-            try:
-                growl.notify(
-                    noteType = self.type,
-                    title = self.title,
-                    description = self.message,
-                    sticky = False,
-                    priority = 1
-                )
-            except:
-                pass
-            if sound:
-                pass
+def set_growl_icon(icon):
+    global GROWL_ICON
+    GROWL_ICON = icon
 
-        def _notify(self, title, message, msg_type="Info", sound=False):
-            self.title = title
-            self.message = message
-            self.type = msg_type
 
-            self.Show(sound)
+try:
+    growl.register()
+    def growl_notify(note_type, title, description, sound, fallback):
+        try:
+            growl.notify(
+                noteType = note_type,
+                title = title,
+                description = description,
+                icon=GROWL_ICON,
+                sticky = False,
+                priority = 1
+            )
+        except:
+            if _PLATFORM != "osx":
+                fallback(title, description, sound)
+        if sound:
+            pass
+except:
+    print("no growl")
+    def growl_notify(note_type, title, description, sound, fallback):
+        fallback(title, description, sound)
 
-        def info(self, title, message, sound=False):
-            self._notify(title, message, msg_type="Info", sound=sound)
 
-        def error(self, title, message, sound=False):
-            self._notify(title, message, msg_type="Error", sound=sound)
+class Notify(wx.NotificationMessage):
+    def __init__(self, *args, **kwargs):
+        self.sound = kwargs.get("sound", False)
+        self.flags = kwargs.get("flags", 0)
+        if "sound" in kwargs:
+            del kwargs["sound"]
+        if "flags" in kwargs:
+            del kwargs["flags"]
+        super(Notify, self).__init__(*args, **kwargs)
+        self.SetFlags(self.flags)
 
-        def warning(self, title, message, sound=False):
-            self._notify(title, message, msg_type="Warning", sound=sound)
+    def Show(self, sound=False):
+        super(Notify, self).Show()
+        if sound:
+            if _PLATFORM == "windows":
+                winsound.PlaySound("*", winsound.SND_ALIAS)
 
-else:
-    class Notify(wx.NotificationMessage):
-        def __init__(self, *args, **kwargs):
-            super(Notify, self).__init__(*args, **kwargs)
 
-        def Show(self, sound=False):
-            super(Notify, self).Show()
-            if sound:
-                if _PLATFORM == "windows":
-                    winsound.PlaySound("*", winsound.SND_ALIAS)
+def info(title, message="", sound=False):
+    default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_INFORMATION, sound=sound).Show()
+    if growl is not None:
+        growl_notify("Info", title, message, sound, default_notify)
+    elif _PLATFORM != "osx":
+        default_notify(title, message, sound)
 
-        def _notify(self, title, message, icon=0, sound=False):
-            flags = icon
-            self.SetFlags(icon)
-            self.SetTitle(title)
-            self.SetMessage(message)
-            self.Show(sound)
 
-        def info(self, title, message, sound=False):
-            self._notify(title, message, icon=wx.ICON_INFORMATION, sound=sound)
+def error(title, message, sound=False):
+    default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_ERROR, sound=sound).Show()
+    if growl is not None:
+        growl_notify("Error", title, message, sound, default_notify)
+    elif _PLATFORM != "osx":
+        default_notify(title, message, sound)
 
-        def error(self, title, message, sound=False):
-            self._notify(title, message, icon=wx.ICON_ERROR, sound=sound)
 
-        def warning(self, title, message, sound=False):
-            self._notify(title, message, icon=wx.ICON_WARNING, sound=sound)
+def warning(title, message, sound=False):
+    default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_WARNING, sound=sound).Show()
+    if growl is not None:
+        growl_notify("Warning", title, message, sound, default_notify)
+    elif _PLATFORM != "osx":
+        default_notify(title, message, sound)

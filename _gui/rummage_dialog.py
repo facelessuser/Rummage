@@ -40,7 +40,7 @@ from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
 from _gui.sorted_columns import FileResultPanel, ResultFileList, ResultContentList
 from _gui.messages import dirpickermsg
-from _gui.notify import Notify
+import _gui.notify as notify
 
 from _icons.rum_ico import rum_64
 
@@ -722,13 +722,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
                     self.m_progressbar.SetRange(completed)
                     self.m_progressbar.SetValue(completed)
-                    Notify().error("Rummage", "Search Aborted by user!\n%d matches found!" % count2, sound=True)
+                    notify.error("Search Aborted", "\n%d matches found!" % count2, sound=True)
                     self.kill = False
                 else:
                     self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
                     self.m_progressbar.SetRange(100)
                     self.m_progressbar.SetValue(100)
-                    Notify().info("Rummage", "Search Completed!\n%d matches found!" % count2, sound=True)
+                    notify.info("Search Completed", "\n%d matches found!" % count2, sound=True)
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
                 self.m_grep_notebook.SetSelection(1)
