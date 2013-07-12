@@ -11,12 +11,17 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import wx
+import sys
 import _gui.gui as gui
 
 
 class ArgDialog(gui.ArgDialog):
     def __init__(self, parent, value):
         super(ArgDialog, self).__init__(parent)
+
+        self.set_keybindings(
+            [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+        )
 
         self.arg = value
         self.m_arg_text.SetValue(value)
@@ -28,6 +33,22 @@ class ArgDialog(gui.ArgDialog):
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
         self.m_arg_text.SetFocus()
+
+    def set_keybindings(self, keybindings):
+        tbl = []
+        for binding in keybindings:
+            keyid = wx.NewId()
+            self.Bind(wx.EVT_MENU, binding[2], id=keyid)
+            tbl.append((binding[0], binding[1], keyid))
+
+        if len(keybindings):
+            self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
+
+    def on_textctrl_selectall(self, event):
+        text = self.FindFocus()
+        if isinstance(text, wx.TextCtrl):
+            text.SelectAll()
+        event.Skip()
 
     def on_apply(self, event):
         value = self.m_arg_text.GetValue()

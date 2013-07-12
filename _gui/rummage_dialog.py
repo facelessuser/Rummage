@@ -311,8 +311,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args = GrepArgs()
         self.thread = None
 
+        [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+
         # Setup debugging
-        self.set_keybindings(debug_event=self.on_debug_console)
+        self.set_keybindings(
+            [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)],
+            debug_event=self.on_debug_console
+        )
+
         if get_debug_mode():
             self.open_debug_console()
 
@@ -350,6 +356,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.optimize_size(True)
 
         self.init_search_path(start_path)
+
+    def on_textctrl_selectall(self, event):
+        text = self.FindFocus()
+        if isinstance(text, (wx.TextCtrl, AutoCompleteCombo)):
+            text.SelectAll()
+        event.Skip()
 
     def init_search_path(self, start_path):
         # Init search path with passed in path
@@ -465,7 +477,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_limiter_panel.GetSizer().Layout()
             self.m_limiter_panel.GetContainingSizer().Layout()
             self.m_settings_panel.GetSizer().Layout()
-            self.m_settings_panel.GetContainingSizer().Layout()
             self.optimize_size()
         if not self.searchin_update:
             if isdir(pth):

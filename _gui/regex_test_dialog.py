@@ -1,5 +1,6 @@
 import wx
 import traceback
+import sys
 import _gui.gui as gui
 import _lib.ure as ure
 from _icons.rum_ico import rum_64
@@ -10,6 +11,10 @@ class RegexTestDialog(gui.RegexTestDialog):
         super(RegexTestDialog, self).__init__(None)
         self.SetIcon(rum_64.GetIcon())
         self.parent = parent
+
+        self.set_keybindings(
+            [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+        )
 
         self.m_case_checkbox.SetValue(is_case)
         self.m_dot_checkbox.SetValue(is_dot)
@@ -26,6 +31,22 @@ class RegexTestDialog(gui.RegexTestDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+    def set_keybindings(self, keybindings):
+        tbl = []
+        for binding in keybindings:
+            keyid = wx.NewId()
+            self.Bind(wx.EVT_MENU, binding[2], id=keyid)
+            tbl.append((binding[0], binding[1], keyid))
+
+        if len(keybindings):
+            self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
+
+    def on_textctrl_selectall(self, event):
+        text = self.FindFocus()
+        if isinstance(text, wx.TextCtrl):
+            text.SelectAll()
+        event.Skip()
 
     def on_size(self, event):
         self.GetSizer().Layout()
