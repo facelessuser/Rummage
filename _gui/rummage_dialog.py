@@ -684,6 +684,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("utf8_toggle", self.args.all_utf8),
             ("recursive_toggle", self.args.recursive),
             ("hidden_toggle", self.args.show_hidden),
+            ("binary_toggle", self.args.text),
             ("regex_file_toggle", self.m_fileregex_checkbox.GetValue())
         ]
 
@@ -787,7 +788,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_result_content_panel.set_item_map(
                         count2 - self.content_table_offset, basename(f["name"]), lineno, 1,
                         r["lines"].replace("\r", "").split("\n")[0],
-                        count,  r["colno"]
+                        count,  r["colno"], f["encode"]
                     )
                     last_line = lineno
                 count2 += 1

@@ -22,19 +22,6 @@ class AutoCompleteCombo(ComboCtrl):
         self.changed_callback = changed_callback
         self.UseAltPopupWindow(True)
 
-        tc = self.GetTextCtrl()
-        selectallid = wx.NewId()
-        tc.Bind(
-            wx.EVT_MENU,
-            lambda e: tc.SetSelection(0, len(tc.GetValue())),
-            id=selectallid
-        )
-        mod = wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL
-        accel_tbl = wx.AcceleratorTable(
-            [(mod, ord('A'), selectallid)]
-        )
-        tc.SetAcceleratorTable(accel_tbl)
-
         self.list = ListCtrlComboPopup(self, self.GetTextCtrl())
         self.SetPopupControl(self.list)
         self.Bind(wx.EVT_KEY_UP, self.on_key_up)

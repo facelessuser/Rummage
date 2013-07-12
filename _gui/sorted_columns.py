@@ -51,6 +51,15 @@ doc = PyEmbeddedImage(
     "ZMrLAAAAAXRSTlMAQObYZgAAAClJREFUCFtjYEAFjKEhQOL/XSDx6r4DkHUVSLzaD2L9B7FW"
     "42OFhjoAAPlQF/qFKDe3AAAAAElFTkSuQmCC")
 
+bin = PyEmbeddedImage(
+    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
+    "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QcMDhMnVPkfCgAAAN9JREFUOMvVkiEOg0AQ"
+    "RT8NAkHQXICM5QyUWs6Aw3ENToAnQaMJaalEgWUTuATgMExVmybdpVT2u5nZ/TOTecDfS3sP"
+    "fM/jvce3+13bdfM9j2V65mUNTr+Me63rjyn1o58v57M0rx/trDKSrtD3PbquAwBs24Y4jpEk"
+    "idT8w2AcRwRBgLIsAQBRFMG2bTRNgzzPv6/gOA7CMHzFbdsiTVMURYGqqvDzFQzDwDRNWJYF"
+    "pmniKwdCCCYiJiIehoGzLGPXdZmIWAjBu7CpQJrnmdd1lcJ06IyWZSlr+lFgVHoAn0+KFv99"
+    "5sIAAAAASUVORK5CYII=")
+
 
 def editor_open(filename, line, col):
     returncode = None
@@ -103,6 +112,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
         self.images = wx.ImageList(16, 16)
         self.doc = self.images.Add(doc.GetBitmap())
+        self.bin = self.images.Add(bin.GetBitmap())
         self.sort_up = self.images.Add(up_arrow.GetBitmap())
         self.sort_down = self.images.Add(down_arrow.GetBitmap())
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
@@ -195,6 +205,10 @@ class ResultFileList(ResultList):
         else:
             return unicode(self.itemDataMap[item][col])
 
+    def OnGetItemImage(self, item):
+        encoding = self.itemDataMap[self.itemIndexMap[item]][4]
+        return 1 if encoding == "BIN" else 0
+
     def on_dclick(self, event):
         pos = event.GetPosition()
         item = self.HitTestSubItem(pos)[0]
@@ -224,6 +238,10 @@ class ResultContentList(ResultList):
             width = lw + 30
             if width > self.widest_cell[2]:
                 self.widest_cell[2] = width
+
+    def OnGetItemImage(self, item):
+        encoding = self.itemDataMap[self.itemIndexMap[item]][6]
+        return 1 if encoding == "BIN" else 0
 
     def on_dclick(self, event):
         pos = event.GetPosition()

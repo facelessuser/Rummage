@@ -13,6 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 import threading
 import sys
+import re
 from os import walk
 from fnmatch import fnmatch
 from os.path import isdir, join, abspath, basename, getsize, getmtime
@@ -25,6 +26,7 @@ import text_decode
 import traceback
 from file_hidden import is_hidden
 from ctypes import *
+import struct
 
 import _lib.ure as ure
 
@@ -50,6 +52,7 @@ else:
     _PLATFORM = "linux"
 
 LINE_ENDINGS = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
+HEX_TX_TABLE = ("." * 32) + "".join(chr(c) for c in xrange(32, 127)) + ("." * 129)
 
 
 # http://stackoverflow.com/questions/946967/get-file-creation-time-with-python-on-mac
@@ -128,8 +131,15 @@ def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
     return ure.compile(pattern, flags)
 
 
-def _literal_pattern(pattern, ignorecase=False):
-    return pattern.lower() if ignorecase else pattern
+def _literal_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
+    flags = ure.UNICODE
+    if multiline:
+        flags |= ure.MULTILINE
+    if ignorecase:
+        flags |= ure.IGNORECASE
+    if dotall:
+        flags |= ure.DOTALL
+    return ure.compile(ure.escape(pattern), flags)
 
 
 class GrepException(Exception):
@@ -172,9 +182,13 @@ class _FileSearch(object):
 
         # Prepare search
         self.pattern = _literal_pattern(pattern, self.ignorecase) if self.literal else _re_pattern(pattern, self.ignorecase, self.dotall)
-        self.find_method = self.__findall_literal if self.literal else self.pattern.finditer
+        self.find_method = self.pattern.finditer
 
-    def __get_lines(self, content, m):
+    def __tx_bin(self, content):
+        def_struct = lambda content: struct.Struct("=" + ("B" * len(content))).unpack(content)
+        return content.translate(HEX_TX_TABLE)
+
+    def __get_lines(self, content, m, binary=False):
         """
         Return the full line(s) of code of the found region.
         """
@@ -215,25 +229,11 @@ class _FileSearch(object):
                 match_start = length
             if match_end > length:
                 match_end = 256
-        return content[start:end], (match_start, match_end), (before, after)
+        return content[start:end] if not binary else self.__tx_bin(content[start:end]), (match_start, match_end), (before, after)
 
     def __findall(self, file_content):
         for m in self.find_method(file_content):
             yield m
-
-    def __findall_literal(self, file_content):
-        """
-        Literal find all.
-        """
-
-        start = 0
-        offset = len(self.pattern)
-        while True:
-            start = file_content.find(self.pattern, start)
-            if start == -1:
-                return
-            yield _FindRegion(start, start + offset)
-            start += offset
 
     def __get_col(self, content, absolute_col, line_ending):
         col = 1
@@ -243,7 +243,7 @@ class _FileSearch(object):
             col += 1
         return col
 
-    def search(self, target, file_content, max_count=None):
+    def search(self, target, file_content, max_count=None, binary=False):
         """
         Search target file or buffer returning a generator of results.
         """
@@ -256,7 +256,7 @@ class _FileSearch(object):
 
         results = {"name": target, "count": 0, "line_ending": line_ending, "results": []}
 
-        for m in self.__findall(file_content.lower() if self.literal and self.ignorecase else file_content):
+        for m in self.__findall(file_content):
             if max_count != None:
                 if max_count == 0:
                     break
@@ -267,7 +267,7 @@ class _FileSearch(object):
                 "lineno": file_content.count(line_ending, 0, m.start()) + 1,
                 "colno": self.__get_col(file_content, m.start(), line_ending)
             }
-            result["lines"], result["match"], result["context_count"] = self.__get_lines(file_content, m)
+            result["lines"], result["match"], result["context_count"] = self.__get_lines(file_content, m, binary)
             results["results"].append(result)
             results["count"] += 1
 
@@ -485,6 +485,11 @@ class Grep(object):
         bfr, self.current_encoding = text_decode.decode(filename)
         return bfr
 
+    def __is_binary(self, content): 
+        length = 512 if len(content) > 512 else len(content)
+        self.is_binary = re.search(b"[\x00]{2}", content[0:length]) is not None
+        return self.is_binary
+
     def __read_file(self, file_name):
         # Force UTF for all
         if self.all_utf8:
@@ -522,15 +527,18 @@ class Grep(object):
             with open(file_name, "rb") as f:
                 content = f.read()
                 count = 0
-                for encode in encodings:
-                    self.current_encoding = encodings_map[count]
-                    try:
-                        return unicode(content, encode)
-                    except:
-                        # print(str(traceback.format_exc()))
-                        self.current_encoding = "BIN"
-                        pass
-                    count += 1
+                if self.__is_binary(content):
+                    self.current_encoding = "BIN"
+                else:
+                    for encode in encodings:
+                        self.current_encoding = encodings_map[count]
+                        try:
+                            return unicode(content, encode)
+                        except:
+                            # print(str(traceback.format_exc()))
+                            self.current_encoding = "BIN"
+                            pass
+                        count += 1
 
         except Exception:
             # print(str(traceback.format_exc()))
@@ -599,7 +607,7 @@ class Grep(object):
                     content = self.__read_file(file_name)
                     if content == None:
                         continue
-                    result = self.search.search(file_name, content, max_count)
+                    result = self.search.search(file_name, content, max_count, self.is_binary)
                     result["size"] = '%.2fKB' % (float(sz) / 1024.0)
                     result["encode"] = self.current_encoding
                     result["m_time"] = file_info[2]
@@ -611,7 +619,7 @@ class Grep(object):
                             done = True
         elif self.buffer_input:
             # Perform search
-            result = self.search.search("buffer input", self.target, max_count)
+            result = self.search.search("buffer input", self.target, max_count, False)
             result["size"] = "--"
             result["encode"] = "--"
             result["m_time"] = "--"
@@ -622,7 +630,7 @@ class Grep(object):
             file_name = self.target
             content = self.__read_file(file_name)
             if content != None:
-                result = self.search.search(file_name, content, max_count)
+                result = self.search.search(file_name, content, max_count, self.is_binary)
                 result["size"] = "%.2fKB" % (float(getsize(file_name)) / 1024.0)
                 result["encode"] = self.current_encoding
                 result["m_time"] = getmtime(file_name)
