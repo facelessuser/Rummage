@@ -494,6 +494,7 @@ class Grep(object):
         # Force UTF for all
         if self.all_utf8:
             try:
+                self.is_binary = False
                 self.current_encoding = "UTF8"
                 with codecs.open(file_name, encoding="utf-8-sig", errors="replace") as f:
                     content = f.read()
