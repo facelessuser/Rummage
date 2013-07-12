@@ -55,6 +55,7 @@ class AutoCompleteCombo(ComboCtrl):
         else:
             self.update_semaphore = True
             self.list.set_selected_text(value)
+        self.list.resize_dropdown()
 
     def on_popup(self, event):
         self.popped = True
@@ -228,10 +229,13 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
             wx.CallAfter(self.Dismiss)
         event.Skip()
 
-    def on_resize_dropdown(self, event):
+    def resize_dropdown(self):
         if self.GetColumnCount():
             if self.GetColumnWidth(0) < self.GetSize()[0] - 20:
                 self.SetColumnWidth(0, self.GetSize()[0] - 20)
+
+    def on_resize_dropdown(self, event):
+        self.resize_dropdown()
         event.Skip()
 
     # The following methods are those that are overridable from the
