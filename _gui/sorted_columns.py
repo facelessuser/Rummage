@@ -99,6 +99,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.attr1.SetBackgroundColour(wx.Colour(0xEE, 0xEE, 0xEE))
         self.dc = wx.ClientDC(self)
         self.dc.SetFont(self.GetFont())
+        self.last_idx_sized = -1
 
         self.images = wx.ImageList(16, 16)
         self.doc = self.images.Add(doc.GetBitmap())
@@ -115,7 +116,6 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
                 last_width = self.GetColumnWidth(i)
         if total_width < self.GetSize()[0] - 20:
             self.SetColumnWidth(self.column_count - 1, last_width + self.GetSize()[0] - total_width)
-
 
     def init_column_size(self, minimum=MINIMUM_COL_SIZE):
         for i in range(0, self.column_count):
@@ -137,6 +137,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
                 width = lw + 30
                 if width > self.widest_cell[x]:
                     self.widest_cell[x] = width
+            self.last_idx_sized = idx
             self.size_sample -= 1
 
     def get_map_item(self, idx, col=0, abs=False):
@@ -208,8 +209,21 @@ class ResultFileList(ResultList):
 
 class ResultContentList(ResultList):
     def __init__(self, parent):
-        super(ResultContentList, self).__init__(parent, ["File", "Line", "Context"])
+        super(ResultContentList, self).__init__(parent, ["File", "Line", "Matches", "Context"])
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
+
+    def increment_match_count(self, idx):
+        entry = list(self.itemDataMap[idx])
+        entry[2] += 1
+        self.itemDataMap[idx] = tuple(entry)
+        # Sample the first "size_sample" to determine
+        # column width for when table first loads
+        if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
+            text = self.get_item_text(idx, 2, True)
+            lw, _, _, _ = self.dc.GetFullTextExtent(text)
+            width = lw + 30
+            if width > self.widest_cell[2]:
+                self.widest_cell[2] = width
 
     def on_dclick(self, event):
         pos = event.GetPosition()
@@ -217,8 +231,8 @@ class ResultContentList(ResultList):
         if item != -1:
             filename = self.GetItem(item, col=0).GetText()
             line = self.GetItem(item, col=1).GetText()
-            file_row = self.get_map_item(item, col=3)
-            col = str(self.get_map_item(item, col=4))
+            file_row = self.get_map_item(item, col=4)
+            col = str(self.get_map_item(item, col=5))
             path = self.GetParent().GetParent().GetParent().m_result_file_panel.list.get_map_item(file_row, col=3, abs=True)
             editor_open(join(normpath(path), filename), line, col)
         event.Skip()
@@ -232,6 +246,9 @@ class FileResultPanel(wx.Panel):
         sizer.Add(self.list, 1, wx.ALL|wx.EXPAND, 5)
         self.SetSizer(sizer)
         self.Layout()
+
+    def increment_match_count(self, idx):
+        self.list.increment_match_count(idx)
 
     def set_item_map(self, idx, *args):
         self.list.set_item_map(idx, *args)
