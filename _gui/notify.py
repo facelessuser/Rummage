@@ -24,6 +24,28 @@ else:
 if _PLATFORM == "windows":
     import winsound
 
+if _PLATFORM == "osx":
+    from ctypes import *
+    import ctypes.util as util
+
+    appkit = cdll.LoadLibrary(util.find_library('AppKit'))
+    cf = cdll.LoadLibrary(util.find_library('CoreFoundation'))
+    objc = cdll.LoadLibrary(util.find_library('objc'))
+
+    kCFStringEncodingUTF8 = 0x08000100
+
+    cf.CFStringCreateWithCString.restype = c_void_p
+    cf.CFStringCreateWithCString.argtypes = [c_void_p, c_char_p, c_uint32]
+
+    objc.objc_getClass.restype = c_void_p
+    objc.sel_registerName.restype = c_void_p
+    objc.objc_msgSend.restype = c_void_p
+    objc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+
+    NSSound = c_void_p(objc.objc_getClass('NSSound'))
+    NSAutoreleasePool = c_void_p(objc.objc_getClass('NSAutoreleasePool'))
+
+
 GROWL_ICON = None
 
 
@@ -37,6 +59,28 @@ growl = gntp.notifier.GrowlNotifier(
 def set_growl_icon(icon):
     global GROWL_ICON
     GROWL_ICON = icon
+
+
+def _nsstring(string):
+    return c_void_p(cf.CFStringCreateWithCString(None, string.encode('utf8'), kCFStringEncodingUTF8))
+
+
+def _callmethod(obj, method, *args, **kwargs):
+    cast_return = kwargs.get("cast_return", c_void_p)
+    return cast_return(objc.objc_msgSend(obj, objc.sel_registerName(method), *args))
+
+
+def play_alert(sound=None):
+    if _PLATFORM == "osx":
+        pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
+        snd = _nsstring(sound if sound is not None else "Glass")
+        soundobj = _callmethod(NSSound, "soundNamed:", snd)
+        _callmethod(soundobj, "play")
+        _callmethod(pool, "drain")
+        del pool
+    elif _PLATFORM == "windows":
+        snd = sound if sound is not None else "*"
+        winsound.PlaySound(snd, winsound.SND_ALIAS)
 
 
 try:
@@ -55,8 +99,7 @@ try:
             if _PLATFORM != "osx":
                 fallback(title, description, sound)
         if sound:
-            if _PLATFORM == "windows":
-                winsound.PlaySound("*", winsound.SND_ALIAS)
+            play_alert()
 except:
     print("no growl")
     def growl_notify(note_type, title, description, sound, fallback):
@@ -77,8 +120,7 @@ class Notify(wx.NotificationMessage):
     def Show(self):
         super(Notify, self).Show()
         if self.sound:
-            if _PLATFORM == "windows":
-                winsound.PlaySound("*", winsound.SND_ALIAS)
+            play_alert()
 
 
 def info(title, message="", sound=False):

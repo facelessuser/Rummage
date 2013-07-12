@@ -23,7 +23,7 @@ from _gui.custom_app import debug, debug_struct, info, error
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
-USE_SAMPLE_SIZE = False
+USE_SAMPLE_SIZE = True
 
 up_arrow = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
