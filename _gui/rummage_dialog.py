@@ -346,8 +346,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # placeholder objects with actual objecs
         self.setup_inputs()
 
+        # Pick optimal size
         self.optimize_size(True)
 
+        self.init_search_path(start_path)
+
+    def init_search_path(self, start_path):
         # Init search path with passed in path
         if start_path and exists(start_path):
             self.m_searchin_text.safe_set_value(abspath(normpath(start_path)))
@@ -457,7 +461,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.optimize_size()
         else:
             self.m_limiter_panel.Show()
+            self.m_limiter_panel.Fit()
+            self.m_limiter_panel.GetSizer().Layout()
             self.m_limiter_panel.GetContainingSizer().Layout()
+            self.m_settings_panel.GetSizer().Layout()
+            self.m_settings_panel.GetContainingSizer().Layout()
             self.optimize_size()
         if not self.searchin_update:
             if isdir(pth):
