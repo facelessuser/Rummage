@@ -37,6 +37,15 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
         self.m_history_label.SetLabel("%d Records" % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
+
+        self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
+        self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
+        self.alert_methods = Settings.get_platform_notify()
+        self.m_notify_choice.Clear()
+        for a in self.alert_methods:
+            self.m_notify_choice.Append(a)
+        self.m_notify_choice.SetStringSelection(Settings.get_notify_method())
+
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
@@ -61,6 +70,18 @@ class SettingsDialog(gui.SettingsDialog):
         self.history_records_cleared = True
         self.m_history_label.SetLabel("0 Records")
         self.m_history_clear_button.Enable(False)
+
+    def on_notify_choice(self, event):
+        Settings.set_notify_method(self.m_notify_choice.GetStringSelection())
+        event.Skip()
+
+    def on_notify_toggle(self, event):
+        Settings.set_notify(self.m_visual_alert_checkbox.GetValue())
+        event.Skip()
+
+    def on_alert_toggle(self, event):
+        Settings.set_alert(self.m_audio_alert_checkbox.GetValue())
+        event.Skip()
 
     def on_single_toggle(self, event):
         Settings.set_single_instance(self.m_single_checkbox.GetValue())

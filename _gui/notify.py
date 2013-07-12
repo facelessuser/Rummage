@@ -47,6 +47,7 @@ if _PLATFORM == "osx":
 
 
 GROWL_ICON = None
+GROWL_ENABLED = False
 
 
 growl = gntp.notifier.GrowlNotifier(
@@ -54,6 +55,15 @@ growl = gntp.notifier.GrowlNotifier(
     notifications = ["Info","Warning", "Error"],
     defaultNotifications = ["Info"]
 )
+
+
+def enable_growl(enable):
+    global GROWL_ENABLED
+    GROWL_ENABLED = enable and has_growl()
+
+
+def has_growl():
+    return growl is not None
 
 
 def set_growl_icon(icon):
@@ -125,7 +135,7 @@ class Notify(wx.NotificationMessage):
 
 def info(title, message="", sound=False):
     default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_INFORMATION, sound=sound).Show()
-    if growl is not None:
+    if has_growl() and GROWL_ENABLED:
         growl_notify("Info", title, message, sound, default_notify)
     elif _PLATFORM != "osx":
         default_notify(title, message, sound)
@@ -133,7 +143,7 @@ def info(title, message="", sound=False):
 
 def error(title, message, sound=False):
     default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_ERROR, sound=sound).Show()
-    if growl is not None:
+    if has_growl() and GROWL_ENABLED:
         growl_notify("Error", title, message, sound, default_notify)
     elif _PLATFORM != "osx":
         default_notify(title, message, sound)
@@ -141,7 +151,7 @@ def error(title, message, sound=False):
 
 def warning(title, message, sound=False):
     default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_WARNING, sound=sound).Show()
-    if growl is not None:
+    if has_growl() and GROWL_ENABLED:
         growl_notify("Warning", title, message, sound, default_notify)
     elif _PLATFORM != "osx":
         default_notify(title, message, sound)

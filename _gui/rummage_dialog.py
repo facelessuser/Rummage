@@ -722,13 +722,19 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
                     self.m_progressbar.SetRange(completed)
                     self.m_progressbar.SetValue(completed)
-                    notify.error("Search Aborted", "\n%d matches found!" % count2, sound=True)
+                    if Settings.get_notify():
+                        notify.error("Search Aborted", "\n%d matches found!" % count2, sound=Settings.get_alert())
+                    elif Settings.get_alert():
+                        notify.play_alert()
                     self.kill = False
                 else:
                     self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
                     self.m_progressbar.SetRange(100)
                     self.m_progressbar.SetValue(100)
-                    notify.info("Search Completed", "\n%d matches found!" % count2, sound=True)
+                    if Settings.get_notify():
+                        notify.info("Search Completed", "\n%d matches found!" % count2, sound=Settings.get_alert())
+                    elif Settings.get_alert():
+                        notify.play_alert()
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
                 self.m_grep_notebook.SetSelection(1)

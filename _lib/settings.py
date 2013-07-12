@@ -18,6 +18,7 @@ from _lib.file_strip.json import sanitize_json
 from _gui.custom_app import debug, debug_struct, info, error
 from _gui.custom_app import init_app_log
 from _gui.generic_dialogs import *
+import _gui.notify as notify
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -30,6 +31,12 @@ SETTINGS_FILE = "rummage.settings"
 CACHE_FILE = "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
+
+NOTIFY_STYLES = {
+    "osx": ["growl"],
+    "windows": ["native", "growl"],
+    "linux": ["default"]
+}
 
 class Settings(object):
     filename = None
@@ -54,6 +61,11 @@ class Settings(object):
                 errormsg("Failed to load settings file!\n\n%s" % str(e))
         debug(cls.settings)
         debug(cls.cache)
+        cls.init_notify()
+
+    @classmethod
+    def init_notify(cls):
+        notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
 
     @classmethod
     def get_times(cls):
@@ -170,6 +182,51 @@ class Settings(object):
         searches.append((name, search, is_regex))
         cls.settings["saved_searches"] = searches
         cls.save_settings()
+
+    @classmethod
+    def get_alert(cls):
+        cls.reload_settings()
+        return cls.settings.get("alert_enabled", True)
+
+    @classmethod
+    def get_notify(cls):
+        cls.reload_settings()
+        return cls.settings.get("notify_enabled", True)
+
+    @classmethod
+    def get_platform_notify(cls):
+        return NOTIFY_STYLES[_PLATFORM]
+
+    @classmethod
+    def get_notify_method(cls):
+        cls.reload_settings()
+        method = cls.settings.get("notify_method", NOTIFY_STYLES[_PLATFORM][0])
+        if method is None or method == "wxpython" or method not in NOTIFY_STYLES[_PLATFORM]:
+            method = NOTIFY_STYLES[_PLATFORM][0]
+        return method
+
+    @classmethod
+    def set_alert(cls, enable):
+        cls.reload_settings()
+        cls.settings["alert_enabled"] = enable
+        cls.save_settings()
+
+    @classmethod
+    def set_notify(cls, enable):
+        cls.reload_settings()
+        cls.settings["notify_enabled"] = enable
+        cls.save_settings()
+
+    @classmethod
+    def set_notify_method(cls, notify_method):
+        if notify_method not in ["native", "default", "growl"]:
+            notify_method = NOTIFY_STYLES[_PLATFORM][0]
+        if notify_method in ["default", "native"]:
+            notify_method = "wxpython"
+        cls.reload_settings()
+        cls.settings["notify_method"] = notify_method
+        cls.save_settings()
+        cls.init_notify()
 
     @classmethod
     def get_search(cls, idx=None):
