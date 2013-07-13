@@ -1,0 +1,6 @@
+{
+    "rummage_binary": [
+        {"platform": "windows", "binary": "C:\\Program Files (x86)\\Rummage\\Rummage.exe"},
+        {"platform": "osx", "binary": "/Applications/Rummage.app/Contents/MacOS/Rummage"}
+    ]
+}

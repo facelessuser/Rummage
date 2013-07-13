@@ -1,0 +1,4 @@
+[
+    { "caption": "-", "id": "file" },
+    {"caption": "Rummage Here…", "command": "rummage_file"}
+]
