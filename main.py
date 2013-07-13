@@ -35,7 +35,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(prog=version.app, description='A python grep like tool.')
     # Flag arguments
     parser.add_argument('--version', action='version', version=('%(prog)s ' + version.version))
-    parser.add_argument('--debug', '-d', action='store_true', default=False, help=argparse.SUPPRESS)
+    parser.add_argument('--show_log', '-l', action='store_true', default=False, help="Open log on startup")
     parser.add_argument('--searchpath', '-s', nargs=1, default=None, help="Path to search.")
     parser.add_argument('--regextool', '-r', action='store_true', default=False, help="Open just the regex tester.")
     return parser.parse_args()
@@ -84,7 +84,7 @@ class RummageApp(PipeApp):
 def gui_main(script):
     Settings.load_settings()
     args = parse_arguments()
-    if args.debug:
+    if args.show_log:
         set_debug_mode(True)
 
     wx.Log.EnableLogging(False)
@@ -98,7 +98,7 @@ def gui_main(script):
         if args.regextool:
             RegexTestDialog(None, False, False, stand_alone=True).Show()
         else:
-            RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None, open_debug=args.debug).Show()
+            RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None, open_debug=args.show_log).Show()
     app.MainLoop()
 
 
