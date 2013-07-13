@@ -16,7 +16,7 @@ from os.path import expanduser, exists, join, getmtime
 from _lib.file_strip.json import sanitize_json
 
 from _gui.custom_app import debug, debug_struct, info, error
-from _gui.custom_app import init_app_log
+from _gui.custom_app import init_app_log, set_debug_mode
 from _gui.generic_dialogs import *
 import _gui.notify as notify
 
@@ -59,9 +59,23 @@ class Settings(object):
                     cls.cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
             except Exception as e:
                 errormsg("Failed to load settings file!\n\n%s" % str(e))
+        if cls.get_debug():
+            set_debug_mode(True)
         debug(cls.settings)
         debug(cls.cache)
         cls.init_notify()
+
+    @classmethod
+    def get_debug(cls):
+        cls.reload_settings()
+        return cls.settings.get("debug", False)
+
+    @classmethod
+    def set_debug(cls, enable):
+        cls.reload_settings()
+        cls.settings["debug"] = enable
+        set_debug_mode(enable)
+        cls.save_settings()
 
     @classmethod
     def init_notify(cls):

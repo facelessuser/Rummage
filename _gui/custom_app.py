@@ -286,6 +286,16 @@ class DebugFrameExtender(object):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
 
     def open_debug_console(self):
+        set_debug_console(True)
+        # echo out log to console
+        log.set_echo(True)
+        if wx.GetApp().stdioWin is None:
+            wx.GetApp().stdioWin.write(log.read(), False)
+        else:
+            wx.GetApp().stdioWin.write("", False)
+        debug("**Debug Console Opened**")
+
+    def toggle_debug_console(self):
         """
         Open up the debug console if closed
         or close if opened.
@@ -373,7 +383,8 @@ def error_struct(obj, label="Object"):
 def init_app_log(name, level=simplelog.ERROR):
     global log
     global last_level
-    last_level = level
+    if level != simplelog.DEBUG:
+        last_level = level
     simplelog.init_global_log(name, level=last_level)
     log = simplelog.get_global_log()
 
@@ -383,10 +394,13 @@ def set_debug_mode(value):
     global last_level
     DEBUG_MODE = bool(value)
     current_level = log.get_level()
-    if DEBUG_MODE and current_level > simplelog.DEBUG:
-        last_level = current_level
+    if DEBUG_MODE:
+        if current_level > simplelog.DEBUG:
+            last_level = current_level
         log.set_level(simplelog.DEBUG)
-    elif not DEBUG_MODE and last_level != simplelog.DEBUG:
+    elif not DEBUG_MODE:
+        if last_level == simplelog.DEBUG:
+            last_level = simplelog.ERROR
         log.set_level(last_level)
 
 

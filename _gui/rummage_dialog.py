@@ -297,7 +297,7 @@ class AboutDialog(gui.AboutDialog):
 
 
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
-    def __init__(self, parent, script_path, start_path):
+    def __init__(self, parent, script_path, start_path, open_debug=False):
         super(RummageFrame, self).__init__(parent)
 
         self.SetIcon(rum_64.GetIcon())
@@ -319,7 +319,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             debug_event=self.on_debug_console
         )
 
-        if get_debug_mode():
+        if open_debug:
             self.open_debug_console()
 
         # Setup search timer
@@ -838,7 +838,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             return True
 
     def on_debug_console(self, event):
-        self.open_debug_console()
+        self.toggle_debug_console()
 
     def on_close(self, event):
         if self.thread is not None:

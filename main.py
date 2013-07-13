@@ -98,7 +98,7 @@ def gui_main(script):
         if args.regextool:
             RegexTestDialog(None, False, False, stand_alone=True).Show()
         else:
-            RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None).Show()
+            RummageFrame(None, script, args.searchpath[0] if args.searchpath is not None else None, open_debug=args.debug).Show()
     app.MainLoop()
 
 

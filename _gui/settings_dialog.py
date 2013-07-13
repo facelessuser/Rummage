@@ -37,6 +37,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
         self.m_history_label.SetLabel("%d Records" % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
+        self.m_debug_checkbox.SetValue(Settings.get_debug())
 
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
@@ -85,6 +86,12 @@ class SettingsDialog(gui.SettingsDialog):
 
     def on_single_toggle(self, event):
         Settings.set_single_instance(self.m_single_checkbox.GetValue())
+
+    def on_debug_toggle(self, event):
+        Settings.set_debug(self.m_debug_checkbox.GetValue())
+
+    def on_show_log(self, event):
+        self.GetParent().open_debug_console()
 
     def on_cancel(self, event):
         self.Close()
