@@ -40,6 +40,7 @@ from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
 from _gui.sorted_columns import FileResultPanel, ResultFileList, ResultContentList
 from _gui.messages import dirpickermsg
+from _gui.messages import Error as error_icon
 import _gui.notify as notify
 
 from _icons.rum_ico import rum_64
@@ -204,7 +205,7 @@ class GrepThread(object):
         _COMPLETED = 0
         _TOTAL = 0
         for f in self.grep.find():
-            if f["count"] != 0:
+            if f["count"] != 0 or f["error"] is not None:
                 with _LOCK:
                     _RESULTS.append(f)
             with _LOCK:
@@ -594,6 +595,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Reset result tables
         self.current_table_idx = [-1, -1]
         self.content_table_offset = 0
+        self.table_offset = 0
         self.m_grep_notebook.DeletePage(2)
         self.m_grep_notebook.DeletePage(1)
         self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
@@ -756,6 +758,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         notify.info("Search Completed", "\n%d matches found!" % count2, sound=Settings.get_alert())
                     elif Settings.get_alert():
                         notify.play_alert()
+                if self.table_offset:
+                    graphic = error_icon.GetImage()
+                    graphic.Rescale(16, 16)
+                    image = wx.BitmapFromImage(graphic)
+                    self.m_statusbar.set_icon(
+                        "errors", image,
+                        msg="%d errors\nSee log for details." % self.table_offset,
+                        context=[("View Log", lambda e: self.open_debug_console())]
+                    )
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
                 self.m_grep_notebook.SetSelection(1)
@@ -773,11 +784,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if p_value != done:
             self.m_progressbar.SetValue(done)
         for f in results:
-            self.m_result_file_panel.set_item_map(
-                count, basename(f["name"]), float(f["size"].strip("KB")), f["count"],
-                dirname(f["name"]), f["encode"], f["m_time"], f["c_time"],
-                f["results"][0]["lineno"], f["results"][0]["colno"]
-            )
+            if f["error"] is None:
+                self.m_result_file_panel.set_item_map(
+                    count - self.table_offset, basename(f["name"]), float(f["size"].strip("KB")), f["count"],
+                    dirname(f["name"]), f["encode"], f["m_time"], f["c_time"],
+                    f["results"][0]["lineno"], f["results"][0]["colno"]
+                )
+            else:
+                error("Cound not process %s:\n%s" % (f["name"], f["error"]))
+                self.table_offset += 1
+                count += 1
+                continue
             last_line = None
             for r in f["results"]:
                 lineno = r["lineno"]
@@ -788,7 +805,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_result_content_panel.set_item_map(
                         count2 - self.content_table_offset, basename(f["name"]), lineno, 1,
                         r["lines"].replace("\r", "").split("\n")[0],
-                        count,  r["colno"], f["encode"]
+                        count - self.table_offset,  r["colno"], f["encode"]
                     )
                     last_line = lineno
                 count2 += 1

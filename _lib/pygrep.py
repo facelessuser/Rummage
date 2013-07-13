@@ -22,8 +22,6 @@ from time import sleep
 import struct
 import traceback
 import codecs
-import text_decode
-import traceback
 from file_hidden import is_hidden
 from ctypes import *
 import struct
@@ -254,7 +252,7 @@ class _FileSearch(object):
             if ending.group(2):
                 line_ending = "\r"
 
-        results = {"name": target, "count": 0, "line_ending": line_ending, "results": []}
+        results = {"name": target, "count": 0, "line_ending": line_ending, "error": None, "results": []}
 
         for m in self.__findall(file_content):
             if max_count != None:
@@ -485,7 +483,7 @@ class Grep(object):
         bfr, self.current_encoding = text_decode.decode(filename)
         return bfr
 
-    def __is_binary(self, content): 
+    def __is_binary(self, content):
         length = 512 if len(content) > 512 else len(content)
         self.is_binary = re.search(b"[\x00]{2}", content[0:length]) is not None
         return self.is_binary
@@ -605,14 +603,18 @@ class Grep(object):
                 else:
                     file_name = file_info[0]
                     sz = file_info[1]
-                    content = self.__read_file(file_name)
-                    if content == None:
-                        continue
-                    result = self.search.search(file_name, content, max_count, self.is_binary)
-                    result["size"] = '%.2fKB' % (float(sz) / 1024.0)
-                    result["encode"] = self.current_encoding
-                    result["m_time"] = file_info[2]
-                    result["c_time"] = file_info[3]
+                    try:
+                        content = self.__read_file(file_name)
+                        if content == None:
+                            continue
+                        result = self.search.search(file_name, content, max_count, self.is_binary)
+                        result["size"] = '%.2fKB' % (float(sz) / 1024.0)
+                        result["encode"] = self.current_encoding
+                        result["m_time"] = file_info[2]
+                        result["c_time"] = file_info[3]
+                    except:
+                        results = {"name": file_name, "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
+                        yield results
                     yield result
                     if max_count != None:
                         max_count -= result["count"]
@@ -620,20 +622,28 @@ class Grep(object):
                             done = True
         elif self.buffer_input:
             # Perform search
-            result = self.search.search("buffer input", self.target, max_count, False)
-            result["size"] = "--"
-            result["encode"] = "--"
-            result["m_time"] = "--"
-            result["c_time"] = "--"
-            yield result
+            try:
+                result = self.search.search("buffer input", self.target, max_count, False)
+                result["size"] = "--"
+                result["encode"] = "--"
+                result["m_time"] = "--"
+                result["c_time"] = "--"
+                yield result
+            except:
+                results = {"name": "buffer input", "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
+                yield results
         else:
             # Perform search
             file_name = self.target
-            content = self.__read_file(file_name)
-            if content != None:
-                result = self.search.search(file_name, content, max_count, self.is_binary)
-                result["size"] = "%.2fKB" % (float(getsize(file_name)) / 1024.0)
-                result["encode"] = self.current_encoding
-                result["m_time"] = getmtime(file_name)
-                result["c_time"] = getctime(file_name)
-                yield result
+            try:
+                content = self.__read_file(file_name)
+                if content != None:
+                    result = self.search.search(file_name, content, max_count, self.is_binary)
+                    result["size"] = "%.2fKB" % (float(getsize(file_name)) / 1024.0)
+                    result["encode"] = self.current_encoding
+                    result["m_time"] = getmtime(file_name)
+                    result["c_time"] = getctime(file_name)
+                    yield result
+            except:
+                results = {"name": file_name, "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
+                yield results

@@ -13,6 +13,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import wx
 import wx.lib.agw.supertooltip as STT
 from collections import OrderedDict
+import sys
+
+if sys.platform.startswith('win'):
+    _PLATFORM = "windows"
+elif sys.platform == "darwin":
+    _PLATFORM = "osx"
+else:
+    _PLATFORM = "linux"
 
 
 class ContextMenu(wx.Menu):
@@ -102,8 +110,14 @@ class IconTrayExtension(object):
     def place_icons(self, resize=False):
         x_offset = 0
         if resize:
-            # In wxPython 2.9, the first icon inserted changes the size, additional icons don't
-            self.SetStatusWidths([-1, (len(self.sb_icons) - 1) * 20 + 1])
+            if _PLATFORM == "osx":
+                self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 10])
+            elif _PLATFORM == "windows":
+                # In wxPython 2.9, the first icon inserted changes the size, additional icons don't
+                self.SetStatusWidths([-1, (len(self.sb_icons) - 1) * 20 + 1])
+            else:
+                # Linux? Haven't tested yet.
+                self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 1])
         rect = self.GetFieldRect(1)
         for v in self.sb_icons.values():
             v.SetPosition((rect.x + x_offset, rect.y))
