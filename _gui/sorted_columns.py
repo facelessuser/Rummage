@@ -20,6 +20,7 @@ from os.path import normpath, join
 from _lib.settings import Settings
 
 from _gui.custom_app import debug, debug_struct, info, error
+from _gui.generic_dialogs import errormsg
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
