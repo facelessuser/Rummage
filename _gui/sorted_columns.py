@@ -64,7 +64,6 @@ bin = PyEmbeddedImage(
 def editor_open(filename, line, col):
     returncode = None
 
-    debug(filename, line, col)
     cmd = Settings.get_editor(filename=filename, line=line, col=col)
     if len(cmd) == 0:
         errormsg("No editor is currently set!")
@@ -193,7 +192,25 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
 class ResultFileList(ResultList):
     def __init__(self, parent):
         super(ResultFileList, self).__init__(parent, ["File", "Size", "Matches", "Path", "Encoding", "Modified", "Created"])
+        self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
+        self.Bind(wx.EVT_MOTION, self.on_motion)
+        self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
+
+    def on_enter_window(self, event):
+        self.last_moused = (-1, "")
+        event.Skip()
+
+    def on_motion(self, event):
+        pos = event.GetPosition()
+        item = self.HitTestSubItem(pos)[0]
+        if item != -1:
+            actual_item = self.itemIndexMap[item]
+            if actual_item != self.last_moused[0]:
+                d = self.itemDataMap[actual_item]
+                self.last_moused = (actual_item, join(d[3], d[0]))
+            self.GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
+        event.Skip()
 
     def get_item_text(self, item, col, abs=False):
         if not abs:
@@ -224,7 +241,33 @@ class ResultFileList(ResultList):
 class ResultContentList(ResultList):
     def __init__(self, parent):
         super(ResultContentList, self).__init__(parent, ["File", "Line", "Matches", "Context"])
+        self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
+        self.Bind(wx.EVT_MOTION, self.on_motion)
+        self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
+
+    def on_enter_window(self, event):
+        self.last_moused = (-1, "")
+        event.Skip()
+
+    def on_motion(self, event):
+        pos = event.GetPosition()
+        item = self.HitTestSubItem(pos)[0]
+        if item != -1:
+            actual_item = self.itemIndexMap[item]
+            if actual_item != self.last_moused[0]:
+                pth = self.itemDataMap[actual_item][0]
+                self.last_moused = (actual_item, join(pth[1], pth[0]))
+            self.GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
+        event.Skip()
+
+    def get_item_text(self, item, col, abs=False):
+        if not abs:
+            item = self.itemIndexMap[item]
+        if col == 0:
+            return unicode(self.itemDataMap[item][col][0])
+        else:
+            return unicode(self.itemDataMap[item][col])
 
     def increment_match_count(self, idx):
         entry = list(self.itemDataMap[idx])

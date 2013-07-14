@@ -803,7 +803,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.content_table_offset += 1
                 else:
                     self.m_result_content_panel.set_item_map(
-                        count2 - self.content_table_offset, basename(f["name"]), lineno, 1,
+                        count2 - self.content_table_offset, (basename(f["name"]), dirname(f["name"])), lineno, 1,
                         r["lines"].replace("\r", "").split("\n")[0],
                         count - self.table_offset,  r["colno"], f["encode"]
                     )
