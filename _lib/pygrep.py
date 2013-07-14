@@ -85,7 +85,7 @@ def getctime(pth):
     if _PLATFORM == "osx":
         # Get the appropriate creation time on OSX
         buf = struct_stat64()
-        rv = stat64(pth, pointer(buf))
+        rv = stat64(pth.encode("utf-8"), pointer(buf))
         if rv != 0:
             raise OSError("Couldn't stat file %r" % pth)
         return buf.st_birthtimespec.tv_sec

@@ -1,5 +1,5 @@
 __app__ = "Rummage"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __status__ = "Beta"
 __maintainers__ = [("Isaac Muse", "IsaacMuse@gmail.com")]
 __help__ = "https://github.com/facelessuser/Rummage/issues"

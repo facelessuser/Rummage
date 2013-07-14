@@ -113,7 +113,10 @@ try:
 except:
     print("no growl")
     def growl_notify(note_type, title, description, sound, fallback):
-        fallback(title, description, sound)
+        if _PLATFORM != "osx":
+            fallback(title, description, sound)
+        elif sound:
+            play_alert()
 
 
 class Notify(wx.NotificationMessage):
