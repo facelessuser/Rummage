@@ -27,6 +27,7 @@ from ctypes import *
 import struct
 
 import _lib.ure as ure
+# import _lib.text_decode
 
 LITERAL = 1
 IGNORECASE = 2
@@ -342,28 +343,31 @@ class _DirWalker(object):
         Returns whether a file can be searched.
         """
 
-        valid = False
-        if self.file_pattern != None and not self.__is_hidden(join(base, name)):
-            if self.file_regex_match:
-                valid = True if self.file_pattern.match(name) != None else False
-            else:
-                matched = False
-                exclude = False
-                for p in self.file_pattern:
-                    if len(p) > 1 and p[0] == "-":
-                        if fnmatch(name.lower(), p[1:]):
-                            exclude = True
-                            break
-                    elif fnmatch(name.lower(), p):
-                        matched = True
-                if exclude:
-                    valid = False
-                elif matched:
-                    valid = True
-            if valid:
-                valid = self.__is_size_okay(join(base, name))
-            if valid:
-                valid = self.__is_times_okay(join(base, name))
+        try:
+            valid = False
+            if self.file_pattern != None and not self.__is_hidden(join(base, name)):
+                if self.file_regex_match:
+                    valid = True if self.file_pattern.match(name) != None else False
+                else:
+                    matched = False
+                    exclude = False
+                    for p in self.file_pattern:
+                        if len(p) > 1 and p[0] == "-":
+                            if fnmatch(name.lower(), p[1:]):
+                                exclude = True
+                                break
+                        elif fnmatch(name.lower(), p):
+                            matched = True
+                    if exclude:
+                        valid = False
+                    elif matched:
+                        valid = True
+                if valid:
+                    valid = self.__is_size_okay(join(base, name))
+                if valid:
+                    valid = self.__is_times_okay(join(base, name))
+        except:
+            valid = False
         return valid
 
     def __valid_folder(self, base, name):
@@ -372,27 +376,30 @@ class _DirWalker(object):
         """
 
         valid = True
-        if not self.recursive:
+        try:
+            if not self.recursive:
+                valid = False
+            elif self.__is_hidden(join(base, name)):
+                valid = False
+            elif self.folder_exclude != None:
+                if self.dir_regex_match:
+                    valid = False if self.folder_exclude.match(name) != None else True
+                else:
+                    matched = False
+                    exclude = False
+                    for p in self.folder_exclude:
+                        if len(p) > 1 and p[0] == "-":
+                            if fnmatch(name.lower(), p[1:]):
+                                matched = True
+                                break
+                        elif fnmatch(name.lower(), p):
+                            exclude = True
+                    if matched:
+                        valid = True
+                    elif exclude:
+                        valid = False
+        except:
             valid = False
-        elif self.__is_hidden(join(base, name)):
-            valid = False
-        elif self.folder_exclude != None:
-            if self.dir_regex_match:
-                valid = False if self.folder_exclude.match(name) != None else True
-            else:
-                matched = False
-                exclude = False
-                for p in self.folder_exclude:
-                    if len(p) > 1 and p[0] == "-":
-                        if fnmatch(name.lower(), p[1:]):
-                            matched = True
-                            break
-                    elif fnmatch(name.lower(), p):
-                        exclude = True
-                if matched:
-                    valid = True
-                elif exclude:
-                    valid = False
         return valid
 
     def run(self):
@@ -479,9 +486,9 @@ class Grep(object):
             pattern = ure.compile(file_pattern, ure.IGNORECASE) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
-    def __decode_file(self, filename):
-        bfr, self.current_encoding = text_decode.decode(filename)
-        return bfr
+    # def __decode_file(self, filename):
+    #     bfr, self.current_encoding = text_decode.decode(filename)
+    #     return bfr
 
     def __is_binary(self, content):
         length = 512 if len(content) > 512 else len(content)
