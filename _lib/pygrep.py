@@ -456,6 +456,7 @@ class Grep(object):
         dir_regex_match = bool(flags & DIR_REGEX_MATCH)
         self.kill = False
         self.thread = None
+        self.is_binary = False
         if not self.buffer_input and isdir(self.target):
             self.thread = threading.Thread(
                 target=threaded_walker,
@@ -495,6 +496,14 @@ class Grep(object):
         self.is_binary = re.search(b"[\x00]{2}", content[0:length]) is not None
         return self.is_binary
 
+    def __has_bom(self, content):
+        bom = None
+        if content[:3] == codecs.BOM_UTF8:
+            bom = "utf-8-sig"
+        if content[:2] in [codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE]:
+            bom = "utf-16"
+        return bom
+
     def __read_file(self, file_name):
         # Force UTF for all
         if self.all_utf8:
@@ -533,7 +542,16 @@ class Grep(object):
             with open(file_name, "rb") as f:
                 content = f.read()
                 count = 0
-                if self.__is_binary(content):
+                encode = self.__has_bom(content)
+                if encode is not None:
+                    self.current_encoding = encodings_map[encodings.index(encode)]
+                    try:
+                        return unicode(content, encode)
+                    except:
+                        # print(str(traceback.format_exc()))
+                        self.is_binary = True
+                        self.current_encoding = "BIN"
+                elif self.__is_binary(content):
                     self.current_encoding = "BIN"
                 else:
                     for encode in encodings:
@@ -542,6 +560,7 @@ class Grep(object):
                             return unicode(content, encode)
                         except:
                             # print(str(traceback.format_exc()))
+                            self.is_binary = True
                             self.current_encoding = "BIN"
                             pass
                         count += 1
