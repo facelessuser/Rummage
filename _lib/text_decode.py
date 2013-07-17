@@ -148,7 +148,7 @@ def guess(filename):
                 elif BAD_UTF8.search(content) is None:
                     encoding = UTF8
                 else:
-                    # Would be nice if to guess
+                    # Would be nice to guess
                     # between cp1252 and latin-1
                     encoding = LATIN1
             elif single:
