@@ -566,6 +566,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_progressbar.SetValue(0)
         self.m_statusbar.set_status("")
 
+        # Remove errors icon in status bar
+        self.m_statusbar.remove_icon("errors")
+
         # Change button to stop search
         self.m_search_button.SetLabel("Stop")
 

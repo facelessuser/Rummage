@@ -27,7 +27,7 @@ from ctypes import *
 import struct
 
 import _lib.ure as ure
-# import _lib.text_decode
+import _lib.text_decode as text_decode
 
 LITERAL = 1
 IGNORECASE = 2
@@ -280,7 +280,7 @@ class _DirWalker(object):
             show_hidden, size, modified, created
         ):
         self.dir = directory
-        self.size = size
+        self.size = (size[0], size[1] * 1024) if size is not None else size
         self.modified = modified
         self.created = created
         self.file_pattern = file_pattern
@@ -487,9 +487,11 @@ class Grep(object):
             pattern = ure.compile(file_pattern, ure.IGNORECASE) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
-    # def __decode_file(self, filename):
-    #     bfr, self.current_encoding = text_decode.decode(filename)
-    #     return bfr
+    def __decode_file(self, filename):
+        bfr, self.current_encoding = text_decode.guess(filename)
+        if self.current_encoding == "BIN":
+            self.is_binary = True
+        return bfr
 
     def __is_binary(self, content):
         length = 512 if len(content) > 512 else len(content)
@@ -505,10 +507,12 @@ class Grep(object):
         return bom
 
     def __read_file(self, file_name):
+        content = None
+        self.current_encoding = "BIN"
+        self.is_binary = False
         # Force UTF for all
         if self.all_utf8:
             try:
-                self.is_binary = False
                 self.current_encoding = "UTF8"
                 with codecs.open(file_name, encoding="utf-8-sig", errors="replace") as f:
                     content = f.read()
@@ -519,57 +523,58 @@ class Grep(object):
             return None
 
         # Non-Lazy decoding
-        # try:
-        #     return self.__decode_file(file_name)
-        # except Exception:
-        #     print(str(traceback.format_exc()))
-        #     pass
-        # Lazy decoding
-        encodings = [
-            "ascii",
-            "utf-8-sig",
-            "utf-16",
-            "latin-1"
-        ]
-        encodings_map = {
-            0: "ASCII",
-            1: "UTF8",
-            2: "UTF16",
-            3: "LATIN-1"
-        }
-        content = None
         try:
-            with open(file_name, "rb") as f:
-                content = f.read()
-                count = 0
-                encode = self.__has_bom(content)
-                if encode is not None:
-                    self.current_encoding = encodings_map[encodings.index(encode)]
-                    try:
-                        return unicode(content, encode)
-                    except:
-                        # print(str(traceback.format_exc()))
-                        self.is_binary = True
-                        self.current_encoding = "BIN"
-                elif self.__is_binary(content):
-                    self.current_encoding = "BIN"
-                else:
-                    for encode in encodings:
-                        self.current_encoding = encodings_map[count]
-                        try:
-                            return unicode(content, encode)
-                        except:
-                            # print(str(traceback.format_exc()))
-                            self.is_binary = True
-                            self.current_encoding = "BIN"
-                            pass
-                        count += 1
-
+            return self.__decode_file(file_name)
         except Exception:
-            # print(str(traceback.format_exc()))
-            pass
-        if not self.process_binary:
-            content = None
+            print(str(traceback.format_exc()))
+            return None
+        # Lazy decoding
+        # encodings = [
+        #     "ascii",
+        #     "utf-8-sig",
+        #     "utf-16",
+        #     "latin-1"
+        # ]
+        # encodings_map = {
+        #     0: "ASCII",
+        #     1: "UTF8",
+        #     2: "UTF16",
+        #     3: "LATIN-1"
+        # }
+        # content = None
+        # try:
+        #     with open(file_name, "rb") as f:
+        #         content = f.read()
+        #         count = 0
+        #         encode = self.__has_bom(content)
+        #         if encode is not None:
+        #             self.current_encoding = encodings_map[encodings.index(encode)]
+        #             try:
+        #                 return unicode(content, encode)
+        #             except:
+        #                 # print(str(traceback.format_exc()))
+        #                 self.is_binary = True
+        #                 self.current_encoding = "BIN"
+        #         elif self.__is_binary(content):
+        #             self.current_encoding = "BIN"
+        #         else:
+        #             for encode in encodings:
+        #                 self.current_encoding = encodings_map[count]
+        #                 self.is_binary = False
+        #                 try:
+        #                     return unicode(content, encode)
+        #                 except:
+        #                     # print(str(traceback.format_exc()))
+        #                     self.is_binary = True
+        #                     self.current_encoding = "BIN"
+        #                     pass
+        #                 count += 1
+
+        # except Exception:
+        #     # print(str(traceback.format_exc()))
+        #     pass
+        # if not self.process_binary:
+        #     content = None
         # Unknown encoding, maybe binary, something else?
         return content
 
