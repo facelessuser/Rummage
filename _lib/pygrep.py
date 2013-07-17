@@ -528,53 +528,7 @@ class Grep(object):
         except Exception:
             print(str(traceback.format_exc()))
             return None
-        # Lazy decoding
-        # encodings = [
-        #     "ascii",
-        #     "utf-8-sig",
-        #     "utf-16",
-        #     "latin-1"
-        # ]
-        # encodings_map = {
-        #     0: "ASCII",
-        #     1: "UTF8",
-        #     2: "UTF16",
-        #     3: "LATIN-1"
-        # }
-        # content = None
-        # try:
-        #     with open(file_name, "rb") as f:
-        #         content = f.read()
-        #         count = 0
-        #         encode = self.__has_bom(content)
-        #         if encode is not None:
-        #             self.current_encoding = encodings_map[encodings.index(encode)]
-        #             try:
-        #                 return unicode(content, encode)
-        #             except:
-        #                 # print(str(traceback.format_exc()))
-        #                 self.is_binary = True
-        #                 self.current_encoding = "BIN"
-        #         elif self.__is_binary(content):
-        #             self.current_encoding = "BIN"
-        #         else:
-        #             for encode in encodings:
-        #                 self.current_encoding = encodings_map[count]
-        #                 self.is_binary = False
-        #                 try:
-        #                     return unicode(content, encode)
-        #                 except:
-        #                     # print(str(traceback.format_exc()))
-        #                     self.is_binary = True
-        #                     self.current_encoding = "BIN"
-        #                     pass
-        #                 count += 1
 
-        # except Exception:
-        #     # print(str(traceback.format_exc()))
-        #     pass
-        # if not self.process_binary:
-        #     content = None
         # Unknown encoding, maybe binary, something else?
         return content
 
@@ -590,91 +544,100 @@ class Grep(object):
             _ABORT = True
         self.kill = True
 
+    def multi_file_read(self, max_count):
+        global _STARTED
+        self.idx = -1
+        self.thread.start()
+        done = False
+        # Try to wait in case the
+        # "is running" check happens too quick
+        while not _STARTED:
+            sleep(0.3)
+        with _LOCK:
+            _STARTED = False
+
+        while not done:
+            file_info = None
+            while file_info is None:
+                if _RUNNING:
+                    if len(_FILES) - 1 > self.idx:
+                        self.idx += 1
+                        file_info = _FILES[self.idx]
+                    else:
+                        sleep(0.3)
+                else:
+                    if len(_FILES) - 1 > self.idx and not self.kill:
+                        self.idx += 1
+                        file_info = _FILES[self.idx]
+                    elif self.kill:
+                        break
+                    else:
+                        done = True
+                        break
+
+            if file_info is None:
+                done = True
+            else:
+                file_name = file_info[0]
+                sz = file_info[1]
+                try:
+                    content = self.__read_file(file_name)
+                    if content == None:
+                        continue
+                    result = self.search.search(file_name, content, max_count, self.is_binary)
+                    result["size"] = '%.2fKB' % (float(sz) / 1024.0)
+                    result["encode"] = self.current_encoding
+                    result["m_time"] = file_info[2]
+                    result["c_time"] = file_info[3]
+                except:
+                    results = {"name": file_name, "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
+                    yield results
+                yield result
+                if max_count != None:
+                    max_count -= result["count"]
+                    if max_count == 0:
+                        done = True
+
+    def single_file_read(self, file_name, max_count):
+        # Perform search
+        try:
+            content = self.__read_file(file_name)
+            if content != None:
+                result = self.search.search(file_name, content, max_count, self.is_binary)
+                result["size"] = "%.2fKB" % (float(getsize(file_name)) / 1024.0)
+                result["encode"] = self.current_encoding
+                result["m_time"] = getmtime(file_name)
+                result["c_time"] = getctime(file_name)
+                return result
+        except:
+            results = {"name": file_name, "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
+            return results
+
+    def buffer_read(self, file_name, max_count):
+        # Perform search
+        try:
+            result = self.search.search("buffer input", file_name, max_count, False)
+            result["size"] = "--"
+            result["encode"] = "--"
+            result["m_time"] = "--"
+            result["c_time"] = "--"
+            return result
+        except:
+            results = {"name": "buffer input", "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
+            return results
+
     def find(self):
         """
         Walks through a given directory searching files via the provided pattern.
         If given a file directly, it will search the file only.
         Return the results of each file via a generator.
         """
-        global _STARTED
         max_count = int(self.max) if self.max != None else None
 
         if self.thread is not None:
-            self.idx = -1
-            self.thread.start()
-            done = False
-            # Try to wait in case the
-            # "is running" check happens too quick
-            while not _STARTED:
-                sleep(0.3)
-            with _LOCK:
-                _STARTED = False
-
-            while not done:
-                file_info = None
-                while file_info is None:
-                    if _RUNNING:
-                        if len(_FILES) - 1 > self.idx:
-                            self.idx += 1
-                            file_info = _FILES[self.idx]
-                        else:
-                            sleep(0.3)
-                    else:
-                        if len(_FILES) - 1 > self.idx and not self.kill:
-                            self.idx += 1
-                            file_info = _FILES[self.idx]
-                        elif self.kill:
-                            break
-                        else:
-                            done = True
-                            break
-
-                if file_info is None:
-                    done = True
-                else:
-                    file_name = file_info[0]
-                    sz = file_info[1]
-                    try:
-                        content = self.__read_file(file_name)
-                        if content == None:
-                            continue
-                        result = self.search.search(file_name, content, max_count, self.is_binary)
-                        result["size"] = '%.2fKB' % (float(sz) / 1024.0)
-                        result["encode"] = self.current_encoding
-                        result["m_time"] = file_info[2]
-                        result["c_time"] = file_info[3]
-                    except:
-                        results = {"name": file_name, "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
-                        yield results
-                    yield result
-                    if max_count != None:
-                        max_count -= result["count"]
-                        if max_count == 0:
-                            done = True
-        elif self.buffer_input:
-            # Perform search
-            try:
-                result = self.search.search("buffer input", self.target, max_count, False)
-                result["size"] = "--"
-                result["encode"] = "--"
-                result["m_time"] = "--"
-                result["c_time"] = "--"
+            for result in self.multi_file_read(max_count):
                 yield result
-            except:
-                results = {"name": "buffer input", "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
-                yield results
+        elif self.buffer_input:
+            yield self.buffer_read(self.target, max_count)
         else:
-            # Perform search
-            file_name = self.target
-            try:
-                content = self.__read_file(file_name)
-                if content != None:
-                    result = self.search.search(file_name, content, max_count, self.is_binary)
-                    result["size"] = "%.2fKB" % (float(getsize(file_name)) / 1024.0)
-                    result["encode"] = self.current_encoding
-                    result["m_time"] = getmtime(file_name)
-                    result["c_time"] = getctime(file_name)
-                    yield result
-            except:
-                results = {"name": file_name, "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
-                yield results
+            yield self.single_file_read(self.target, max_count)
