@@ -32,14 +32,60 @@ encoding_map = {
     BINARY: (None, "BIN")
 }
 
-BAD_ASCII = re.compile(b'([\x00-\x08]|[\x0B\x0C]|[\x0E-\x1F]|[\x7F-\xFF])')
-BAD_UTF8 = re.compile(
-    b'([\xF8-\xFF]|[\xC0-\xDF](?![\x80-\xBF])|[\xE0-\xEF](?![\x80-\xBF]{2})|[\xF0-\xF7](?![\x80-\xBF]{3})|(?<=[\x00-\x7F\xF8-\xFF])[\x80-\xBF]|((?<![\xC0-\xDF]|[\xE0-\xEF]|[\xF0-\xF7])|(?<![\xF0-\xF7][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF])|(?<![\xF0-\xF7][\x80-\xBF]{2}))[\x80-\xBF]|(?<=[\xE0-\xEF])[\x80-\xBF](?![\x80-\xBF])|(?<=[\xF0-\xF7])[\x80-\xBF](?![\x80-\xBF]{2})|(?<=[\xF0-\xF7][\x80-\xBF])[\x80-\xBF](?![\x80-\xBF]))'
+BAD_ASCII = re.compile(
+    b'''
+        (
+            [\x00-\x08] |  # ASCII Control Chars
+            [\x0B\x0C] |   # ASCII Control Chars
+            [\x0E-\x1F] |  # ASCII Control Chars
+            [\x7F-\xFF]    # Invalid ASCII Chars
+        )
+    ''',
+    re.VERBOSE
 )
 
-GOOD_ASCII = re.compile(b'\A[\x09\x0A\x0D\x20-\x7E]*\Z')
+BAD_UTF8 = re.compile(
+    b'''
+        (
+            [\xF8-\xFF] |                                               # Invalid UTF-8 Bytes
+            [\xC0-\xDF](?![\x80-\xBF]) |                                # Invalid UTF-8 Sequence Start
+            [\xE0-\xEF](?![\x80-\xBF]{2}) |                             # Invalid UTF-8 Sequence Start
+            [\xF0-\xF7](?![\x80-\xBF]{3}) |                             # Invalid UTF-8 Sequence Start
+            (?<=[\x00-\x7F\xF8-\xFF])[\x80-\xBF] |                      # Invalid UTF-8 Sequence Middle
+            (                                                           # Overlong Sequence
+                (?<![\xC0-\xDF] | [\xE0-\xEF] | [\xF0-\xF7]) |
+                (?<![\xF0-\xF7][\x80-\xBF] | [\xE0-\xEF][\x80-\xBF]) |
+                (?<![\xF0-\xF7][\x80-\xBF]{2})
+            ) [\x80-\xBF] |
+            (?<=[\xE0-\xEF])[\x80-\xBF](?![\x80-\xBF]) |                # Short 3 byte sequence
+            (?<=[\xF0-\xF7])[\x80-\xBF](?![\x80-\xBF]{2}) |             # Short 4 byte sequence
+            (?<=[\xF0-\xF7][\x80-\xBF])[\x80-\xBF](?![\x80-\xBF])       # Short 4 byte sequence
+        )
+     ''',
+     re.VERBOSE
+)
+
+GOOD_ASCII = re.compile(
+    b'''
+        \A[\x09\x0A\x0D\x20-\x7E]*\Z  # ASCII (minus control chars not commonly used)
+    ''',
+    re.VERBOSE
+)
+
 GOOD_UTF8 = re.compile(
-    b'\A([\x09\x0A\x0D\x20-\x7E]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})*\Z',
+    b'''
+        \A(
+            [\x09\x0A\x0D\x20-\x7E] |            # ASCII
+            [\xC2-\xDF][\x80-\xBF] |             # non-overlong 2-byte
+            \xE0[\xA0-\xBF][\x80-\xBF] |         # excluding overlongs
+            [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} |  # straight 3-byte
+            \xED[\x80-\x9F][\x80-\xBF] |         # excluding surrogates
+            \xF0[\x90-\xBF][\x80-\xBF]{2} |      # planes 1-3
+            [\xF1-\xF3][\x80-\xBF]{3} |          # planes 4-15
+            \xF4[\x80-\x8F][\x80-\xBF]{2}        # plane 16
+        )*\Z
+    ''',
+    re.VERBOSE
 )
 
 UTF_BOM = re.compile(
