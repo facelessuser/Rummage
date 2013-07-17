@@ -572,6 +572,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Change button to stop search
         self.m_search_button.SetLabel("Stop")
 
+        # Init search status
+        self.m_statusbar.set_status("Searching: 0/0 0%% Matches: 0")
+
         # Setup arguments
         self.set_arguments()
         self.save_history()

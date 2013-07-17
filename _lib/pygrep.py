@@ -145,29 +145,6 @@ class GrepException(Exception):
     pass
 
 
-class _FindRegion(object):
-    def __init__(self, start, end):
-        """
-        Initialize find region result object.
-        """
-
-        self.__find_range = [start, end]
-
-    def start(self):
-        """
-        Return start of find region result.
-        """
-
-        return self.__find_range[0]
-
-    def end(self):
-        """
-        Return end of find region result.
-        """
-
-        return self.__find_range[1]
-
-
 class _FileSearch(object):
     def __init__(self, pattern, flags, context, truncate_lines):
         self.literal = bool(flags & LITERAL)
@@ -488,23 +465,10 @@ class Grep(object):
         return pattern
 
     def __decode_file(self, filename):
-        bfr, self.current_encoding = text_decode.guess(filename)
+        bfr, self.current_encoding = text_decode.guess(filename, False)
         if self.current_encoding == "BIN":
             self.is_binary = True
         return bfr
-
-    def __is_binary(self, content):
-        length = 512 if len(content) > 512 else len(content)
-        self.is_binary = re.search(b"[\x00]{2}", content[0:length]) is not None
-        return self.is_binary
-
-    def __has_bom(self, content):
-        bom = None
-        if content[:3] == codecs.BOM_UTF8:
-            bom = "utf-8-sig"
-        if content[:2] in [codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE]:
-            bom = "utf-16"
-        return bom
 
     def __read_file(self, file_name):
         content = None

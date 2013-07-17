@@ -23,20 +23,28 @@ UTF8 = 2
 UTF16 = 3
 UTF32 = 4
 LATIN1 = 5
+CP1252 = 6
 encoding_map = {
     ASCII: ("ascii", "ASCII"),
     UTF8: ("utf-8-sig", "UTF8"),
     UTF16: ("utf-16", "UTF16"),
     UTF16: ("utf-32", "UTF32"),
     LATIN1: ("latin-1", "LATIN-1"),
+    CP1252: ("cp1252", "CP1252"),
     BINARY: (None, "BIN")
 }
+
+BAD_LATIN = re.compile(
+    b'''
+    [\x80-\x9F]  # Invalid LATIN-1 Chars
+    '''
+)
 
 BAD_ASCII = re.compile(
     b'''
         (
             [\x00-\x08] |  # ASCII Control Chars
-            [\x0B\x0C] |   # ASCII Control Chars
+            [\x0B\x0C]  |  # ASCII Control Chars
             [\x0E-\x1F] |  # ASCII Control Chars
             [\x7F-\xFF]    # Invalid ASCII Chars
         )
@@ -44,25 +52,44 @@ BAD_ASCII = re.compile(
     re.VERBOSE
 )
 
+# BAD_UTF8 = re.compile(
+#     b'''
+#         (
+#             [\xF8-\xFF]                                              |  # Invalid UTF-8 Bytes
+#             [\xC0-\xDF](?![\x80-\xBF])                               |  # Invalid UTF-8 Sequence Start
+#             [\xE0-\xEF](?![\x80-\xBF]{2})                            |  # Invalid UTF-8 Sequence Start
+#             [\xF0-\xF7](?![\x80-\xBF]{3})                            |  # Invalid UTF-8 Sequence Start
+#             (?<=[\x00-\x7F\xF8-\xFF])[\x80-\xBF]                     |  # Invalid UTF-8 Sequence Middle
+#             (                                                           # Overlong Sequence
+#                 (?<![\xC0-\xDF] | [\xE0-\xEF] | [\xF0-\xF7])         |
+#                 (?<![\xF0-\xF7][\x80-\xBF] | [\xE0-\xEF][\x80-\xBF]) |
+#                 (?<![\xF0-\xF7][\x80-\xBF]{2})
+#             ) [\x80-\xBF]                                            |
+#             (?<=[\xE0-\xEF])[\x80-\xBF](?![\x80-\xBF])               |  # Short 3 byte sequence
+#             (?<=[\xF0-\xF7])[\x80-\xBF](?![\x80-\xBF]{2})            |  # Short 4 byte sequence
+#             (?<=[\xF0-\xF7][\x80-\xBF])[\x80-\xBF](?![\x80-\xBF])       # Short 4 byte sequence
+#         )
+#      ''',
+#      re.VERBOSE
+# )
+
 BAD_UTF8 = re.compile(
     b'''
-        (
-            [\xF8-\xFF] |                                               # Invalid UTF-8 Bytes
-            [\xC0-\xDF](?![\x80-\xBF]) |                                # Invalid UTF-8 Sequence Start
-            [\xE0-\xEF](?![\x80-\xBF]{2}) |                             # Invalid UTF-8 Sequence Start
-            [\xF0-\xF7](?![\x80-\xBF]{3}) |                             # Invalid UTF-8 Sequence Start
-            (?<=[\x00-\x7F\xF8-\xFF])[\x80-\xBF] |                      # Invalid UTF-8 Sequence Middle
-            (                                                           # Overlong Sequence
-                (?<![\xC0-\xDF] | [\xE0-\xEF] | [\xF0-\xF7]) |
-                (?<![\xF0-\xF7][\x80-\xBF] | [\xE0-\xEF][\x80-\xBF]) |
-                (?<![\xF0-\xF7][\x80-\xBF]{2})
-            ) [\x80-\xBF] |
-            (?<=[\xE0-\xEF])[\x80-\xBF](?![\x80-\xBF]) |                # Short 3 byte sequence
-            (?<=[\xF0-\xF7])[\x80-\xBF](?![\x80-\xBF]{2}) |             # Short 4 byte sequence
-            (?<=[\xF0-\xF7][\x80-\xBF])[\x80-\xBF](?![\x80-\xBF])       # Short 4 byte sequence
-        )
-     ''',
-     re.VERBOSE
+        [\xE0-\xEF].{0,1}([^\x80-\xBF]|$) |
+        [\xF0-\xF7].{0,2}([^\x80-\xBF]|$) |
+        [\xF8-\xFB].{0,3}([^\x80-\xBF]|$) |
+        [\xFC-\xFD].{0,4}([^\x80-\xBF]|$) |
+        [\xFE-\xFE].{0,5}([^\x80-\xBF]|$) |
+        [\x00-\x7F][\x80-\xBF]            |
+        [\xC0-\xDF].[\x80-\xBF]           |
+        [\xE0-\xEF]..[\x80-\xBF]          |
+        [\xF0-\xF7]...[\x80-\xBF]         |
+        [\xF8-\xFB]....[\x80-\xBF]        |
+        [\xFC-\xFD].....[\x80-\xBF]       |
+        [\xFE-\xFE]......[\x80-\xBF]      |
+        ^[\x80-\xBF]
+    ''',
+    re.VERBOSE
 )
 
 GOOD_ASCII = re.compile(
@@ -75,14 +102,14 @@ GOOD_ASCII = re.compile(
 GOOD_UTF8 = re.compile(
     b'''
         \A(
-            [\x09\x0A\x0D\x20-\x7E] |            # ASCII
-            [\xC2-\xDF][\x80-\xBF] |             # non-overlong 2-byte
-            \xE0[\xA0-\xBF][\x80-\xBF] |         # excluding overlongs
-            [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} |  # straight 3-byte
-            \xED[\x80-\x9F][\x80-\xBF] |         # excluding surrogates
-            \xF0[\x90-\xBF][\x80-\xBF]{2} |      # planes 1-3
-            [\xF1-\xF3][\x80-\xBF]{3} |          # planes 4-15
-            \xF4[\x80-\x8F][\x80-\xBF]{2}        # plane 16
+            [\x09\x0A\x0D\x20-\x7E]           | # ASCII
+            [\xC2-\xDF][\x80-\xBF]            | # non-overlong 2-byte
+            \xE0[\xA0-\xBF][\x80-\xBF]        | # excluding overlongs
+            [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} | # straight 3-byte
+            \xED[\x80-\x9F][\x80-\xBF]        | # excluding surrogates
+            \xF0[\x90-\xBF][\x80-\xBF]{2}     | # planes 1-3
+            [\xF1-\xF3][\x80-\xBF]{3}         | # planes 4-15
+            \xF4[\x80-\x8F][\x80-\xBF]{2}       # plane 16
         )*\Z
     ''',
     re.VERBOSE
@@ -125,7 +152,7 @@ def __has_bom(content):
     return bom
 
 
-def guess(filename):
+def guess(filename, use_ascii=True):
     content = None
     encoding = None
     try:
@@ -143,14 +170,14 @@ def guess(filename):
                 encoding = BINARY
                 print(filename)
             elif not single:
-                if BAD_ASCII.search(content) is None:
-                    encoding = ASCII
-                elif BAD_UTF8.search(content) is None:
+                # if BAD_ASCII.search(content) is None:
+                #     encoding = ASCII
+                if BAD_UTF8.search(content) is None:
                     encoding = UTF8
-                else:
-                    # Would be nice to guess
-                    # between cp1252 and latin-1
+                elif BAD_LATIN.search(content) is None:
                     encoding = LATIN1
+                else:
+                    encoding = CP1252
             elif single:
                 encoding = UTF16
 
