@@ -17,8 +17,13 @@ import _gui.gui as gui
 
 class ArgDialog(gui.ArgDialog):
     def __init__(self, parent, value):
+        """
+        Init ArgDialog object
+        """
+
         super(ArgDialog, self).__init__(parent)
 
+        # Ensure OS platform selectall shortcut works
         self.set_keybindings(
             [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
@@ -26,6 +31,7 @@ class ArgDialog(gui.ArgDialog):
         self.arg = value
         self.m_arg_text.SetValue(value)
 
+        # Ensure good sizing for frame
         best = self.m_arg_panel.GetBestSize()
         current = self.m_arg_panel.GetSize()
         offset = best[1] - current[1]
@@ -35,6 +41,10 @@ class ArgDialog(gui.ArgDialog):
         self.m_arg_text.SetFocus()
 
     def set_keybindings(self, keybindings):
+        """
+        Set keybindings for frame
+        """
+
         tbl = []
         for binding in keybindings:
             keyid = wx.NewId()
@@ -45,19 +55,35 @@ class ArgDialog(gui.ArgDialog):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
 
     def on_textctrl_selectall(self, event):
+        """
+        Select all in TextCtrl
+        """
+
         text = self.FindFocus()
         if isinstance(text, wx.TextCtrl):
             text.SelectAll()
         event.Skip()
 
     def on_apply(self, event):
+        """
+        Set arguments on apply
+        """
+
         value = self.m_arg_text.GetValue()
         if value != "":
             self.arg = value
         self.Close()
 
     def get_arg(self):
+        """
+        Get arguments
+        """
+
         return self.arg
 
     def on_cancel(self, event):
+        """
+        Close dialog
+        """
+
         self.Close()

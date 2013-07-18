@@ -18,9 +18,14 @@ from _gui.arg_dialog import ArgDialog
 
 class EditorDialog(gui.EditorDialog):
     def __init__(self, parent, editor=[]):
+        """
+        Init EditorDialog object
+        """
+
         super(EditorDialog, self).__init__(parent)
         self.editor = editor
 
+        # Ensure OS platform selectall shortcut works
         self.set_keybindings(
             [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
@@ -33,6 +38,7 @@ class EditorDialog(gui.EditorDialog):
             for x in range(1, len(editor)):
                 self.m_arg_list.Append(editor[x])
 
+        # Ensure good size for frame
         best = self.m_editor_panel.GetBestSize()
         current = self.m_editor_panel.GetSize()
         offset = best[1] - current[1]
@@ -41,6 +47,10 @@ class EditorDialog(gui.EditorDialog):
         self.SetMinSize(self.GetSize())
 
     def set_keybindings(self, keybindings):
+        """
+        Set keybindings for frame
+        """
+
         tbl = []
         for binding in keybindings:
             keyid = wx.NewId()
@@ -51,26 +61,46 @@ class EditorDialog(gui.EditorDialog):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
 
     def on_textctrl_selectall(self, event):
+        """
+        Selectall for TextCtrl
+        """
+
         text = self.FindFocus()
         if isinstance(text, wx.TextCtrl):
             text.SelectAll()
         event.Skip()
 
     def on_arg_enter(self, event):
+        """
+        Add argument on enter key
+        """
+
         self.add_arg()
         event.Skip()
 
     def on_add(self, event):
+        """
+        Add argument button event
+        """
+
         self.add_arg()
         event.Skip()
 
     def add_arg(self):
+        """
+        Add argument
+        """
+
         value = self.m_arg_text.GetValue()
         if value != "":
             self.m_arg_list.Append(value)
             value = self.m_arg_text.SetValue("")
 
     def on_edit(self, event):
+        """
+        Edit argument
+        """
+
         value = self.m_arg_list.GetSelection()
         if value >= 0:
             dlg = ArgDialog(self, self.m_arg_list.GetString(value))
@@ -89,6 +119,10 @@ class EditorDialog(gui.EditorDialog):
                 self.m_arg_list.Append(x)
 
     def on_up(self, event):
+        """
+        Move argument up
+        """
+
         value = self.m_arg_list.GetSelection()
         if value > 0:
             string = self.m_arg_list.GetString(value)
@@ -103,6 +137,10 @@ class EditorDialog(gui.EditorDialog):
                 self.m_arg_list.Append(x)
 
     def on_down(self, event):
+        """
+        Move argument down
+        """
+
         value = self.m_arg_list.GetSelection()
         count = self.m_arg_list.GetCount()
         if value < count - 1:
@@ -118,6 +156,10 @@ class EditorDialog(gui.EditorDialog):
                 self.m_arg_list.Append(x)
 
     def on_remove(self, event):
+        """
+        Remove argument
+        """
+
         value = self.m_arg_list.GetSelection()
         if value >= 0:
             items = []
@@ -129,6 +171,10 @@ class EditorDialog(gui.EditorDialog):
                 self.m_arg_list.Append(x)
 
     def on_apply(self, event):
+        """
+        Set editor command with arguments on apply
+        """
+
         editor = []
         app = self.m_editor_picker.GetPath()
         if app != "":
@@ -139,7 +185,15 @@ class EditorDialog(gui.EditorDialog):
         self.Close()
 
     def on_cancel(self, event):
+        """
+        Close on cancel
+        """
+
         self.Close()
 
     def get_editor(self):
+        """
+        Get the selected editor
+        """
+
         return self.editor

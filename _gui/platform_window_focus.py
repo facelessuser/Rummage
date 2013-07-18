@@ -15,6 +15,10 @@ if _is_osx:
 
 
 def platform_window_focus(frame):
+    """
+    Focus the window frame
+    """
+
     # General window raising
     if frame.IsIconized():
         frame.Iconize(False)
