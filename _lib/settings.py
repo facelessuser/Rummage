@@ -44,6 +44,10 @@ class Settings(object):
 
     @classmethod
     def load_settings(cls):
+        """
+        Load the settings
+        """
+
         cls.settings_file, cls.cache_file, log = cls.get_settings_files()
         init_app_log(log)
         cls.settings = {}
@@ -67,22 +71,30 @@ class Settings(object):
 
     @classmethod
     def get_debug(cls):
+        """
+        Get debug level setting
+        """
+
         cls.reload_settings()
         return cls.settings.get("debug", False)
 
     @classmethod
     def set_debug(cls, enable):
+        """
+        Set debug level setting
+        """
+
         cls.reload_settings()
         cls.settings["debug"] = enable
         set_debug_mode(enable)
         cls.save_settings()
 
     @classmethod
-    def init_notify(cls):
-        notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
-
-    @classmethod
     def get_times(cls):
+        """
+        Get timestamp on files
+        """
+
         try:
             settings_time = getmtime(cls.settings_file)
             cache_time = getmtime(cls.cache_file)
@@ -95,6 +107,10 @@ class Settings(object):
 
     @classmethod
     def changed(cls):
+        """
+        Check if settings or cache have changed
+        """
+
         old_settings = cls.settings_time
         old_cache = cls.cache_time
         cls.get_times()
@@ -107,6 +123,10 @@ class Settings(object):
 
     @classmethod
     def get_settings_files(cls):
+        """
+        Get settings, cache, log, and fifo location
+        """
+
         if _PLATFORM == "windows":
             folder = expanduser("~\\.rummage")
             if not exists(folder):
@@ -142,10 +162,18 @@ class Settings(object):
 
     @classmethod
     def get_fifo(cls):
+        """
+        Get fifo pipe
+        """
+
         return cls.fifo
 
     @classmethod
     def reload_settings(cls):
+        """
+        Check if the settings have changed and reload if needed
+        """
+
         if cls.changed():
             debug("Reloading settings.")
             settings = None
@@ -165,6 +193,10 @@ class Settings(object):
 
     @classmethod
     def get_editor(cls, filename="{$file}", line="{$line}", col="{$col}"):
+        """
+        Get editor command and replace file, line, and col symbols
+        """
+
         cls.reload_settings()
         editor = cls.settings.get("editor", [])
         if isinstance(editor, dict):
@@ -174,23 +206,39 @@ class Settings(object):
 
     @classmethod
     def set_editor(cls, editor):
+        """
+        Set editor command
+        """
+
         cls.reload_settings()
         cls.settings["editor"] = editor
         cls.save_settings()
 
     @classmethod
     def get_single_instance(cls):
+        """
+        Get single instance setting
+        """
+
         cls.reload_settings()
         return cls.settings.get("single_instance", False)
 
     @classmethod
     def set_single_instance(cls, single):
+        """
+        Set single instance setting
+        """
+
         cls.reload_settings()
         cls.settings["single_instance"] = single
         cls.save_settings()
 
     @classmethod
     def add_search(cls, name, search, is_regex):
+        """
+        Add saved search
+        """
+
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", [])
         searches.append((name, search, is_regex))
@@ -198,52 +246,11 @@ class Settings(object):
         cls.save_settings()
 
     @classmethod
-    def get_alert(cls):
-        cls.reload_settings()
-        return cls.settings.get("alert_enabled", True)
-
-    @classmethod
-    def get_notify(cls):
-        cls.reload_settings()
-        return cls.settings.get("notify_enabled", True)
-
-    @classmethod
-    def get_platform_notify(cls):
-        return NOTIFY_STYLES[_PLATFORM]
-
-    @classmethod
-    def get_notify_method(cls):
-        cls.reload_settings()
-        method = cls.settings.get("notify_method", NOTIFY_STYLES[_PLATFORM][0])
-        if method is None or method == "wxpython" or method not in NOTIFY_STYLES[_PLATFORM]:
-            method = NOTIFY_STYLES[_PLATFORM][0]
-        return method
-
-    @classmethod
-    def set_alert(cls, enable):
-        cls.reload_settings()
-        cls.settings["alert_enabled"] = enable
-        cls.save_settings()
-
-    @classmethod
-    def set_notify(cls, enable):
-        cls.reload_settings()
-        cls.settings["notify_enabled"] = enable
-        cls.save_settings()
-
-    @classmethod
-    def set_notify_method(cls, notify_method):
-        if notify_method not in ["native", "default", "growl"]:
-            notify_method = NOTIFY_STYLES[_PLATFORM][0]
-        if notify_method in ["default", "native"]:
-            notify_method = "wxpython"
-        cls.reload_settings()
-        cls.settings["notify_method"] = notify_method
-        cls.save_settings()
-        cls.init_notify()
-
-    @classmethod
     def get_search(cls, idx=None):
+        """
+        Get saved searches or search at index if given
+        """
+
         value = None
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", [])
@@ -255,6 +262,10 @@ class Settings(object):
 
     @classmethod
     def delete_search(cls, idx):
+        """
+        Delete the search at given index
+        """
+
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", [])
         if idx < len(searches):
@@ -263,7 +274,101 @@ class Settings(object):
         cls.save_settings()
 
     @classmethod
+    def get_alert(cls):
+        """
+        Get alert setting
+        """
+
+        cls.reload_settings()
+        return cls.settings.get("alert_enabled", True)
+
+    @classmethod
+    def set_alert(cls, enable):
+        """
+        Set alert setting
+        """
+
+        cls.reload_settings()
+        cls.settings["alert_enabled"] = enable
+        cls.save_settings()
+
+    @classmethod
+    def init_notify(cls):
+        """
+        Setup growl notification
+        """
+
+        notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
+
+    @classmethod
+    def get_notify(cls):
+        """
+        Get notification setting
+        """
+
+        cls.reload_settings()
+        return cls.settings.get("notify_enabled", True)
+
+    @classmethod
+    def set_notify(cls, enable):
+        """
+        Set notification setting
+        """
+
+        cls.reload_settings()
+        cls.settings["notify_enabled"] = enable
+        cls.save_settings()
+
+    @classmethod
+    def get_platform_notify(cls):
+        """
+        Get all possible platform notification styles
+        """
+
+        return NOTIFY_STYLES[_PLATFORM]
+
+    @classmethod
+    def get_notify_method(cls):
+        """
+        Get notification style
+        """
+
+        cls.reload_settings()
+        method = cls.settings.get("notify_method", NOTIFY_STYLES[_PLATFORM][0])
+        if method is None or method == "wxpython" or method not in NOTIFY_STYLES[_PLATFORM]:
+            method = NOTIFY_STYLES[_PLATFORM][0]
+        return method
+
+    @classmethod
+    def set_notify_method(cls, notify_method):
+        """
+        Set notification style
+        """
+
+        if notify_method not in ["native", "default", "growl"]:
+            notify_method = NOTIFY_STYLES[_PLATFORM][0]
+        if notify_method in ["default", "native"]:
+            notify_method = "wxpython"
+        cls.reload_settings()
+        cls.settings["notify_method"] = notify_method
+        cls.save_settings()
+        cls.init_notify()
+
+    @classmethod
+    def get_search_setting(cls, key, default):
+        """
+        Get search history setting from cache
+        """
+
+        cls.reload_settings()
+        return cls.cache.get(key, default)
+
+    @classmethod
     def add_search_settings(cls, history, toggles, strings):
+        """
+        Add search settings to cache (more like history...but whatever)
+        """
+
         cls.reload_settings()
         debug(history)
         for i in history:
@@ -295,6 +400,10 @@ class Settings(object):
 
     @classmethod
     def get_history_record_count(cls, history_types = []):
+        """
+        Get number of history items saved
+        """
+
         cls.reload_settings()
         count = 0
         for h in history_types:
@@ -303,6 +412,10 @@ class Settings(object):
 
     @classmethod
     def clear_history_records(cls, history_types=[]):
+        """
+        Clear history types
+        """
+
         cls.reload_settings()
         for h in history_types:
             if cls.cache.get(h, None) is not None:
@@ -310,12 +423,11 @@ class Settings(object):
         cls.save_cache()
 
     @classmethod
-    def get_search_setting(cls, key, default):
-        cls.reload_settings()
-        return cls.cache.get(key, default)
-
-    @classmethod
     def save_settings(cls):
+        """
+        Save settings
+        """
+
         try:
             with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(cls.settings, sort_keys=True, indent=4, separators=(',', ': ')))
@@ -324,6 +436,10 @@ class Settings(object):
 
     @classmethod
     def save_cache(cls):
+        """
+        Save cache
+        """
+
         try:
             with codecs.open(cls.cache_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(cls.cache, sort_keys=True, indent=4, separators=(',', ': ')))

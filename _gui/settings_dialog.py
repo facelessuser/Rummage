@@ -14,6 +14,7 @@ import wx
 import _gui.gui as gui
 from _lib.settings import Settings
 from _gui.editor_dialog import EditorDialog
+from _gui.platform_window_focus import platform_window_focus
 
 
 class SettingsDialog(gui.SettingsDialog):
@@ -132,6 +133,9 @@ class SettingsDialog(gui.SettingsDialog):
         """
 
         self.GetParent().open_debug_console()
+        stdiowin = wx.GetApp().stdioWin
+        if stdiowin is not None:
+            platform_window_focus(stdiowin.frame)
 
     def on_cancel(self, event):
         """
