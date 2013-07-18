@@ -18,6 +18,10 @@ from _gui.editor_dialog import EditorDialog
 
 class SettingsDialog(gui.SettingsDialog):
     def __init__(self, parent):
+        """
+        Init SettingsDialog object
+        """
+
         super(SettingsDialog, self).__init__(parent)
 
         self.history_types = [
@@ -55,9 +59,17 @@ class SettingsDialog(gui.SettingsDialog):
         self.SetMinSize(self.GetSize())
 
     def history_cleared(self):
+        """
+        Return if history was cleared
+        """
+
         return self.history_records_cleared
 
     def on_editor_change(self, event):
+        """
+        Show editor dialog and update setting on return
+        """
+
         dlg = EditorDialog(self, self.editor)
         dlg.ShowModal()
         self.editor = dlg.get_editor()
@@ -67,31 +79,63 @@ class SettingsDialog(gui.SettingsDialog):
         event.Skip()
 
     def on_clear_history(self, event):
+        """
+        Clear history
+        """
+
         Settings.clear_history_records(self.history_types)
         self.history_records_cleared = True
         self.m_history_label.SetLabel("0 Records")
         self.m_history_clear_button.Enable(False)
 
     def on_notify_choice(self, event):
+        """
+        Update notify method
+        """
+
         Settings.set_notify_method(self.m_notify_choice.GetStringSelection())
         event.Skip()
 
     def on_notify_toggle(self, event):
+        """
+        Update whether notifications are used
+        """
+
         Settings.set_notify(self.m_visual_alert_checkbox.GetValue())
         event.Skip()
 
     def on_alert_toggle(self, event):
+        """
+        Update if alert sound is used
+        """
+
         Settings.set_alert(self.m_audio_alert_checkbox.GetValue())
         event.Skip()
 
     def on_single_toggle(self, event):
+        """
+        Update if single instance is used
+        """
+
         Settings.set_single_instance(self.m_single_checkbox.GetValue())
 
     def on_debug_toggle(self, event):
+        """
+        Update if debug logging is used
+        """
+
         Settings.set_debug(self.m_debug_checkbox.GetValue())
 
     def on_show_log(self, event):
+        """
+        Show log
+        """
+
         self.GetParent().open_debug_console()
 
     def on_cancel(self, event):
+        """
+        Close on cancel
+        """
+
         self.Close()
