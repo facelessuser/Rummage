@@ -25,6 +25,12 @@ else:
 
 class ContextMenu(wx.Menu):
     def __init__(self, parent, menu, pos):
+        """
+        Attach the context menu to to the parent
+        at the location given and with the items
+        defined
+        """
+
         wx.Menu.__init__(self)
         self._callbacks = {}
 
@@ -38,6 +44,10 @@ class ContextMenu(wx.Menu):
         parent.PopupMenu(self, pos)
 
     def on_callback(self, event):
+        """
+        Execute the menu item callback
+        """
+
         menuid = event.GetId()
         self._callbacks[menuid](event)
         event.Skip()
@@ -45,6 +55,10 @@ class ContextMenu(wx.Menu):
 
 class ToolTip(STT.SuperToolTip):
     def __init__(self, target, message, header="", style="Office 2007 Blue", start_delay=.1):
+        """
+        Attach the defined tooltip to the target
+        """
+
         super(ToolTip, self).__init__(message, header=header)
         self.SetTarget(target)
         self.ApplyStyle(style)
@@ -52,12 +66,22 @@ class ToolTip(STT.SuperToolTip):
         target.tooltip = self
 
     def hide(self):
+        """
+        Hide the tooltip
+        """
+
         if self._superToolTip:
             self._superToolTip.Destroy()
 
 
 class TimedStatusExtension(object):
     def set_timed_status(self, text):
+        """
+        Set the status for a short time.
+        Save the previous status for restore
+        when the timed status completes.
+        """
+
         if self.text_timer.IsRunning():
             self.text_timer.Stop()
         else:
@@ -66,15 +90,26 @@ class TimedStatusExtension(object):
         self.text_timer.Start(5000, oneShot=True)
 
     def sb_time_setup(self):
+        """
+        Setup timer for timed status
+        """
+
         self.saved_text = ""
         self.text_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.clear_text, self.text_timer)
 
     def clear_text(self, event):
+        """
+        Clear the status
+        """
+
         self.SetStatusText(self.saved_text, 0)
 
     def set_status(self, text):
-        self.SetStatusText(text, 0)
+        """
+        Set the status
+        """
+
         if self.text_timer.IsRunning():
             self.text_timer.Stop()
         self.SetStatusText(text, 0)
@@ -82,6 +117,10 @@ class TimedStatusExtension(object):
 
 class IconTrayExtension(object):
     def remove_icon(self, name):
+        """
+        Remove an icon from the tray
+        """
+
         if name in self.sb_icons:
             self.hide_tooltip(name)
             self.sb_icons[name].Destroy()
@@ -89,10 +128,19 @@ class IconTrayExtension(object):
             self.place_icons(resize=True)
 
     def hide_tooltip(self, name):
+        """
+        Hide the tooltip
+        """
+
         if self.sb_icons[name].tooltip:
             self.sb_icons[name].tooltip.hide()
 
     def set_icon(self, name, icon, msg=None, context=None):
+        """
+        Set the given icon in the tray.
+        Attach a menu and/or tooltip if provided.
+        """
+
         if name in self.sb_icons:
             self.hide_tooltip(name)
             self.sb_icons[name].Destroy()
@@ -104,10 +152,18 @@ class IconTrayExtension(object):
         self.place_icons(resize=True)
 
     def show_menu(self, name, context):
+        """
+        Show context menu on icon in tray
+        """
+
         self.hide_tooltip(name)
         ContextMenu(self, context, self.sb_icons[name].GetPosition())
 
     def place_icons(self, resize=False):
+        """
+        Calculate new icon position and icon tray size
+        """
+
         x_offset = 0
         if resize:
             if _PLATFORM == "osx":
@@ -126,10 +182,18 @@ class IconTrayExtension(object):
             x_offset += 20
 
     def on_sb_size(self, event):
+        """
+        Ensure icons are properly placed on resize
+        """
+
         event.Skip()
         self.place_icons()
 
     def sb_tray_setup(self):
+        """
+        Setup the status bar with icon tray
+        """
+
         self.SetFieldsCount(2)
         self.SetStatusText('', 0)
         self.SetStatusWidths([-1, 1])
@@ -139,17 +203,29 @@ class IconTrayExtension(object):
 
 class CustomStatusExtension(IconTrayExtension, TimedStatusExtension):
     def sb_setup(self):
+        """
+        Setup the extention variant of the CustomStatusBar object
+        """
+
         self.sb_tray_setup()
         self.sb_time_setup()
 
 
 class CustomStatusBar(wx.StatusBar, CustomStatusExtension):
     def __init__(self, parent):
+        """
+        Init the CustomStatusBar object
+        """
+
         super(CustomStatusBar, self).__init__(parent)
         self.sb_setup()
 
 
 def extend(instance, extension):
+    """
+    Extend instance with extension class
+    """
+
     instance.__class__ = type(
         '%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
         (instance.__class__, extension),
@@ -158,5 +234,9 @@ def extend(instance, extension):
 
 
 def extend_sb(sb):
+    """
+    Extend the statusbar
+    """
+
     extend(sb, CustomStatusExtension)
     sb.sb_setup()
