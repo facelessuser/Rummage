@@ -63,6 +63,10 @@ bin = PyEmbeddedImage(
 
 
 def editor_open(filename, line, col):
+    """
+    Open editor with the optional filename, line, and col parameters
+    """
+
     returncode = None
 
     cmd = Settings.get_editor(filename=filename, line=line, col=col)
@@ -97,6 +101,10 @@ def editor_open(filename, line, col):
 
 class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def __init__(self, parent, columns):
+        """
+        Init the base class ResultList object
+        """
+
         super(ResultList, self).__init__(parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_VIRTUAL)
         self.column_count = len(columns)
         self.headers = columns
@@ -117,7 +125,11 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.sort_down = self.images.Add(down_arrow.GetBitmap())
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
 
-    def resize_last_columns(self):
+    def resize_last_column(self):
+        """
+        Resize the last column
+        """
+
         total_width = 0
         last_width = 0
         for i in range(0, self.column_count):
@@ -128,15 +140,27 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
             self.SetColumnWidth(self.column_count - 1, last_width + self.GetSize()[0] - total_width)
 
     def init_column_size(self, minimum=MINIMUM_COL_SIZE):
+        """
+        Setup the initial column size
+        """
+
         for i in range(0, self.column_count):
             self.SetColumnWidth(i, self.widest_cell[i])
-        self.resize_last_columns()
+        self.resize_last_column()
         self.size_sample = 0
 
     def get_column_count(self):
+        """
+        Get column count
+        """
+
         return self.column_count
 
     def set_item_map(self, idx, *args):
+        """
+        Set new entry in item map
+        """
+
         self.itemDataMap[idx] = tuple([a for a in args])
         # Sample the first "size_sample" to determine
         # column width for when table first loads
@@ -151,9 +175,17 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
             self.size_sample -= 1
 
     def get_map_item(self, idx, col=0, abs=False):
+        """
+        Get attribute in in item map entry and the given index
+        """
+
         return self.itemDataMap[self.itemIndexMap[idx] if not abs else idx][col]
 
     def load_list(self):
+        """
+        Load the list of items from the item map
+        """
+
         for x in range(0, self.column_count):
             self.InsertColumn(x, self.headers[x])
         self.SetItemCount(len(self.itemDataMap))
@@ -162,6 +194,10 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.init_column_size()
 
     def SortItems(self,sorter=cmp):
+        """
+        Sort items
+        """
+
         items = list(self.itemDataMap.keys())
         items.sort(sorter)
         self.itemIndexMap = items
@@ -170,23 +206,47 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.Refresh()
 
     def OnGetItemText(self, item, col):
+        """
+        Override method to return the text for the given item and col
+        """
+
         return self.get_item_text(item, col)
 
     def get_item_text(self, idx, col, abs=False):
+        """
+        Return the text for the given item and col
+        """
+
         return unicode(self.itemDataMap[self.itemIndexMap[idx] if not abs else idx][col])
 
     def OnGetItemAttr(self, item):
+        """
+        Override method to get attributes for the cells in the given item
+        """
+
         if item % 2 == 0:
             return self.attr1
         return -1
 
     def OnGetItemImage (self, item):
+        """
+        Override method to get the image for the given item
+        """
+
         return 0
 
     def GetSortImages(self):
+        """
+        Override method to provide sort images in column headers
+        """
+
         return self.sort_down, self.sort_up
 
     def GetListCtrl(self):
+        """
+        Get ListCtrl object (self)
+        """
+
         return self
 
 
@@ -302,6 +362,10 @@ class ResultContentList(ResultList):
 
 class FileResultPanel(wx.Panel):
     def __init__(self, parent, obj):
+        """
+        Init the FileResultPanel obj
+        """
+
         super(FileResultPanel, self).__init__(parent)
         self.list = obj(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -310,13 +374,29 @@ class FileResultPanel(wx.Panel):
         self.Layout()
 
     def increment_match_count(self, idx):
+        """
+        Increment the match count of the given item
+        """
+
         self.list.increment_match_count(idx)
 
     def set_item_map(self, idx, *args):
+        """
+        Set the given item in the item map
+        """
+
         self.list.set_item_map(idx, *args)
 
     def get_map_item(self, idx, col=0):
+        """
+        Get the given item in the item map
+        """
+
         return self.list.get_map_item(idx, col)
 
     def load_table(self):
+        """
+        Load the list of items
+        """
+
         self.list.load_list()
