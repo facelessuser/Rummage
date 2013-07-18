@@ -48,6 +48,7 @@ def _build_unicode_property_table(unicode_range):
     """
     Build property table for unicode range.
     """
+
     table = {}
     p = None
     for i in range(*unicode_range):
@@ -74,6 +75,7 @@ def _build_unicode_key_pattern():
     """
     Build regex key pattern
     """
+
     unicode_prop = r"\p\{(%s)\}"
     unicode_keys = []
     for k1, v1 in _unicode_properties.items():
@@ -85,6 +87,7 @@ def _init_unicode():
     """
     Prepare unicode property tables and key pattern
     """
+
     global _unicode_properties
     global _unicode_key_pattern
     _unicode_properties = _build_unicode_property_table((0x0000, 0x10FFFF))
@@ -95,6 +98,7 @@ def find_char_groups(s):
     """
     Find character groups
     """
+
     pos = 0
     groups = []
     escaped = False
@@ -118,6 +122,7 @@ def get_unicode_category(prop):
     """
     Retrieve the unicode category from the table
     """
+
     p1, p2 = (prop[0], prop[1]) if len(prop) > 1 else (prop[0], None)
     return ''.join([x for x in _unicode_properties[p1].values()]) if p2 is None else _unicode_properties[p1][p2]
 
@@ -126,6 +131,7 @@ def parse_unicode_properties(re_pattern):
     """
     Replaces regex property notation with unicode values
     """
+
     char_groups = find_char_groups(re_pattern)
     ure_pattern = re_pattern
     for p in reversed(list(_unicode_key_pattern.finditer(re_pattern))):
@@ -147,6 +153,7 @@ def compile(pattern, flags=0):
     """
     compile after parsing unicode properties and set flag to unicode
     """
+
     return re.compile(parse_unicode_properties(pattern), flags | re.UNICODE)
 
 
@@ -154,6 +161,7 @@ def search(pattern, string, flags=0):
     """
     search after parsing unicode properties and set flag to unicode
     """
+
     re.search(parse_unicode_properties(pattern), string, flags | re.UNICODE)
 
 
@@ -161,6 +169,7 @@ def match(pattern, string, flags=0):
     """
     match after parsing unicode properties and set flag to unicode
     """
+
     re.match(parse_unicode_properties(pattern), string, flags | re.UNICODE)
 
 
@@ -168,6 +177,7 @@ def split(pattern, string, maxsplit=0, flags=0):
     """
     split after parsing unicode properties and set flag to unicode
     """
+
     re.split(parse_unicode_properties(pattern), string, maxsplit, flags | re.UNICODE)
 
 
@@ -175,6 +185,7 @@ def findall(pattern, string, flags=0):
     """
     findall after parsing unicode properties and set flag to unicode
     """
+
     re.findall(parse_unicode_properties(pattern), string, flags | re.UNICODE)
 
 
@@ -182,6 +193,7 @@ def finditer(pattern, string, flags=0):
     """
     finditer after parsing unicode properties and set flag to unicode
     """
+
     re.finditer(parse_unicode_properties(pattern), string, flags | re.UNICODE)
 
 
@@ -189,6 +201,7 @@ def sub(pattern, repl, string, count=0, flags=0):
     """
     sub after parsing unicode properties and set flag to unicode
     """
+
     re.sub(parse_unicode_properties(pattern), repl, string, count, flags | re.UNICODE)
 
 
@@ -196,6 +209,7 @@ def subn(pattern, repl, string, count=0, flags=0):
     """
     subn after parsing unicode properties and set flag to unicode
     """
+
     re.subn(parse_unicode_properties(pattern), repl, string, flags | re.UNICODE)
 
 

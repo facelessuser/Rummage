@@ -32,6 +32,10 @@ notify.set_growl_icon(rum_64.GetData())
 
 
 def parse_arguments():
+    """
+    Parse the arguments
+    """
+
     parser = argparse.ArgumentParser(prog=version.app, description='A python grep like tool.')
     # Flag arguments
     parser.add_argument('--version', action='version', version=('%(prog)s ' + version.version))
@@ -43,9 +47,19 @@ def parse_arguments():
 
 class RummageApp(PipeApp):
     def __init__(self, *args, **kwargs):
+        """
+        Init RummageApp object
+        """
+
         super(RummageApp, self).__init__(*args, **kwargs)
 
     def on_pipe_args(self, event):
+        """
+        When receiving arguments via named pipes,
+        look for the search path argument, and populate
+        the search path in the RummageFrame
+        """
+
         frame = self.GetTopWindow()
         if frame is not None and isinstance(frame, RummageFrame):
             args = iter(event.data.split("|"))
@@ -65,6 +79,10 @@ class RummageApp(PipeApp):
             platform_window_focus(frame)
 
     def process_args(self, arguments):
+        """
+        Event for processing the arguments
+        """
+
         argv = iter(arguments)
         args = []
         for a in argv:
@@ -77,11 +95,20 @@ class RummageApp(PipeApp):
         return args
 
     def MacReopenApp(self):
+        """
+        Ensure that app will be unminimized
+        in OSX on dock icon click
+        """
+
         frame = self.GetTopWindow()
         platform_window_focus(frame)
 
 
 def gui_main(script):
+    """
+    Configure environment, start the app, and launch the appropriate frame
+    """
+
     Settings.load_settings()
     args = parse_arguments()
     if args.show_log:

@@ -29,6 +29,10 @@ def platform_not_implemented(path):
 
 if _PLATFORM == "windows":
     def is_win_hidden(path):
+        """
+        Windows plaform is_hidden
+        """
+
         attrs = ctypes.windll.kernel32.GetFileAttributesW(path)
         return attrs != -1 and bool(attrs & 2)
 else:
@@ -36,22 +40,36 @@ else:
 
 
 def is_nix_hidden(path):
+    """
+    Linux platform is_hidden
+    """
+
     f = basename(path)
     return f.startswith('.') and f != ".."
 
 
 def _test(fn):
+    """
+    Test if osx hidden is working
+    """
+
     path = expanduser("~/Library")
     is_osx_hidden(path)
     # print "OSX Hidden Method: %d, Test Path: %s, Result: %s"  % (_OSX_FOUNDATION_METHOD, path, str(fn(path)))
 
 
 if _PLATFORM == "osx":
+    # OSX is_hidden based on the Foundation module
+
     # http://stackoverflow.com/questions/284115/cross-platform-hidden-file-detection
     try:
         import Foundation
 
         def is_osx_hidden(path):
+            """
+            OSX platform is_hidden
+            """
+
             pool = Foundation.NSAutoreleasePool.alloc().init()
             hidden = (
                 is_nix_hidden(path) or
@@ -69,6 +87,8 @@ if _PLATFORM == "osx":
         pass
 
 if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
+    #Fallback to use ctypes to call the ObjC library CoreFoundation for OSX is_hidden
+
     # http://stackoverflow.com/questions/284115/cross-platform-hidden-file-detection
     try:
         # Setup OSX access to CoreFoundatin for hidden file detection
@@ -99,6 +119,10 @@ if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
 
         @contextlib.contextmanager
         def cfreleasing(stuff):
+            """
+            Releasing Foundation objects
+            """
+
             try:
                 yield
             finally:
@@ -107,6 +131,10 @@ if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
 
 
         def is_osx_hidden(path):
+            """
+            OSX platform is_hidden
+            """
+
             # Convert file name to bytes
             if not isinstance(path, bytes):
                 path = path.encode('UTF-8')
@@ -137,6 +165,10 @@ if _PLATFORM != "osx":
 
 
 def is_hidden(path):
+    """
+    Return if file is hidden based on platform rules
+    """
+
     if _PLATFORM == "windows":
         return is_win_hidden(path)
     elif _PLATFORM == "osx":

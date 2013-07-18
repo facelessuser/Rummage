@@ -16,6 +16,10 @@ else:
 
 class Args(object):
     def __init__(self, script, name, gui, clean, ext, icon=None):
+        """
+        Build arguments
+        """
+
         self.gui = bool(gui)
         self.name = name
         self.clean = bool(clean)
@@ -25,6 +29,10 @@ class Args(object):
 
 
 class BuildParams(object):
+    """
+    Build parametes
+    """
+
     python_bin = None
     pyinstaller_script = None
     out_dir = None
@@ -37,7 +45,10 @@ class BuildParams(object):
 
 
 def parse_settings(args, obj):
-    # Configure build parameters
+    """
+    Configure build parameters based on arguments
+    """
+
     err = False
 
     script_path = dirname(abspath(sys.argv[0]))
@@ -74,7 +85,10 @@ def parse_settings(args, obj):
 
 
 def create_dir(directory):
-    # Create build directory
+    """
+    Create build directory
+    """
+
     err = False
     try:
         print "Creating %s..." % directory
@@ -86,7 +100,10 @@ def create_dir(directory):
 
 
 def clean_build(build_dir):
-    # Clean the build directory
+    """
+    Clean the build directory
+    """
+
     err = False
     try:
         print "Cleaning %s..." % build_dir
@@ -98,6 +115,10 @@ def clean_build(build_dir):
 
 
 def parse_options(args, obj):
+    """
+    Parse the build parameters and build the pyinstaller build command
+    """
+
     err = False
 
     # Parse Settings file
@@ -123,6 +144,10 @@ def parse_options(args, obj):
 
 
 def build(obj):
+    """
+    Launch the build process
+    """
+
     err = False
 
     chdir(obj.python_bin)
@@ -150,6 +175,10 @@ def build(obj):
     return err
 
 def main():
+    """
+    Setup the build process and initiate it
+    """
+
     parser = argparse.ArgumentParser(prog='Build', description='Python script for building apps for Pyinstaller')
     # Flag arguments
     parser.add_argument('--version', action='version', version='%(prog)s 1.0.0')

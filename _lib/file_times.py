@@ -40,7 +40,10 @@ if _PLATFORM == "osx":
     stat64.argtypes = [c_char_p, POINTER(struct_stat64)]
 
     def getctime(pth):
-        # Get the appropriate creation time on OSX
+        """
+        Get the appropriate creation time on OSX
+        """
+
         buf = struct_stat64()
         rv = stat64(pth.encode("utf-8"), pointer(buf))
         if rv != 0:
@@ -52,9 +55,16 @@ else:
 
 
     def getctime(pth):
-        # Get the creation time for everyone else
+        """
+        Get the creation time for everyone else
+        """
+
         return get_creation_time(pth)
 
 
 def getmtime(pth):
+    """
+    Get modified time for everyone
+    """
+
     return get_modified_time(pth)

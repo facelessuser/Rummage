@@ -127,6 +127,11 @@ DOUBLE_NULL_CHECK = re.compile(b"\x00{2}")
 
 
 def __has_null(content):
+    """
+    Check if has null
+    Return two kinds of checks: single null and consecutive nulls
+    """
+
     is_null = False
     is_multi_null = False
     m = ANY_NULL_CHECK.search(content)
@@ -139,6 +144,10 @@ def __has_null(content):
 
 
 def __has_bom(content):
+    """
+    Check for UTF8, UTF16, and UTF32 BOMS
+    """
+
     bom = None
     length = len(content)
     m = UTF_BOM.match(content[:(4 if length >= 4 else length)])
@@ -153,6 +162,10 @@ def __has_bom(content):
 
 
 def guess(filename, use_ascii=True):
+    """
+    Guess the encoding and decode the content of the file
+    """
+
     content = None
     encoding = None
     try:
@@ -167,27 +180,37 @@ def guess(filename, use_ascii=True):
         else:
             single, multi = __has_null(content)
             if multi:
+                # Consecutive nulls found
+                # (Maybe we could try UTF32 if only two or three consecutive nulls found?)
                 encoding = BINARY
-                print(filename)
             elif not single:
-                # if BAD_ASCII.search(content) is None:
-                #     encoding = ASCII
+                # if use_ascii is True, then validate and use ascii encoding
+                if use_ascii and BAD_ASCII.search(content) is None:
+                    # No invalid ascii chars
+                    encoding = ASCII
                 if BAD_UTF8.search(content) is None:
+                    # No invalid utf8 char sequences
                     encoding = UTF8
                 elif BAD_LATIN.search(content) is None:
+                    # No bad latin chars (I think)
                     encoding = LATIN1
                 else:
+                    # Well we tried everything else
                     encoding = CP1252
             elif single:
+                # There were no consecutive nulls,
+                # so let's give this a try
                 encoding = UTF16
 
     if encoding is not None:
+        # Try and decode
         enc, name = encoding_map[encoding]
         try:
             return unicode(content, enc), name
         except:
             pass
 
+    # Gave it our best shot, just return binary
     return content, encoding_map[BINARY][1]
 
 
