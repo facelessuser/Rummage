@@ -42,54 +42,54 @@ BAD_LATIN = re.compile(
 
 BAD_ASCII = re.compile(
     b'''
-        (
-            [\x00-\x08] |  # ASCII Control Chars
-            [\x0B\x0C]  |  # ASCII Control Chars
-            [\x0E-\x1F] |  # ASCII Control Chars
-            [\x7F-\xFF]    # Invalid ASCII Chars
-        )
+    (
+        [\x00-\x08] |  # ASCII Control Chars
+        [\x0B\x0C]  |  # ASCII Control Chars
+        [\x0E-\x1F] |  # ASCII Control Chars
+        [\x7F-\xFF]    # Invalid ASCII Chars
+    )
     ''',
     re.VERBOSE
 )
 
 BAD_UTF8 = re.compile(
     b'''
-        [\xE0-\xEF].{0,1}([^\x80-\xBF]|$) |
-        [\xF0-\xF7].{0,2}([^\x80-\xBF]|$) |
-        [\xF8-\xFB].{0,3}([^\x80-\xBF]|$) |
-        [\xFC-\xFD].{0,4}([^\x80-\xBF]|$) |
-        [\xFE-\xFE].{0,5}([^\x80-\xBF]|$) |
-        [\x00-\x7F][\x80-\xBF]            |
-        [\xC0-\xDF].[\x80-\xBF]           |
-        [\xE0-\xEF]..[\x80-\xBF]          |
-        [\xF0-\xF7]...[\x80-\xBF]         |
-        [\xF8-\xFB]....[\x80-\xBF]        |
-        [\xFC-\xFD].....[\x80-\xBF]       |
-        [\xFE-\xFE]......[\x80-\xBF]      |
-        ^[\x80-\xBF]
+    [\xE0-\xEF].{0,1}([^\x80-\xBF]|$) |
+    [\xF0-\xF7].{0,2}([^\x80-\xBF]|$) |
+    [\xF8-\xFB].{0,3}([^\x80-\xBF]|$) |
+    [\xFC-\xFD].{0,4}([^\x80-\xBF]|$) |
+    [\xFE-\xFE].{0,5}([^\x80-\xBF]|$) |
+    [\x00-\x7F][\x80-\xBF]            |
+    [\xC0-\xDF].[\x80-\xBF]           |
+    [\xE0-\xEF]..[\x80-\xBF]          |
+    [\xF0-\xF7]...[\x80-\xBF]         |
+    [\xF8-\xFB]....[\x80-\xBF]        |
+    [\xFC-\xFD].....[\x80-\xBF]       |
+    [\xFE-\xFE]......[\x80-\xBF]      |
+    ^[\x80-\xBF]
     ''',
     re.VERBOSE
 )
 
 GOOD_ASCII = re.compile(
     b'''
-        \A[\x09\x0A\x0D\x20-\x7E]*\Z  # ASCII (minus control chars not commonly used)
+    \A[\x09\x0A\x0D\x20-\x7E]*\Z  # ASCII (minus control chars not commonly used)
     ''',
     re.VERBOSE
 )
 
 GOOD_UTF8 = re.compile(
     b'''
-        \A(
-            [\x09\x0A\x0D\x20-\x7E]           | # ASCII
-            [\xC2-\xDF][\x80-\xBF]            | # non-overlong 2-byte
-            \xE0[\xA0-\xBF][\x80-\xBF]        | # excluding overlongs
-            [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} | # straight 3-byte
-            \xED[\x80-\x9F][\x80-\xBF]        | # excluding surrogates
-            \xF0[\x90-\xBF][\x80-\xBF]{2}     | # planes 1-3
-            [\xF1-\xF3][\x80-\xBF]{3}         | # planes 4-15
-            \xF4[\x80-\x8F][\x80-\xBF]{2}       # plane 16
-        )*\Z
+    \A(
+        [\x09\x0A\x0D\x20-\x7E]           | # ASCII
+        [\xC2-\xDF][\x80-\xBF]            | # non-overlong 2-byte
+        \xE0[\xA0-\xBF][\x80-\xBF]        | # excluding overlongs
+        [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} | # straight 3-byte
+        \xED[\x80-\x9F][\x80-\xBF]        | # excluding surrogates
+        \xF0[\x90-\xBF][\x80-\xBF]{2}     | # planes 1-3
+        [\xF1-\xF3][\x80-\xBF]{3}         | # planes 4-15
+        \xF4[\x80-\x8F][\x80-\xBF]{2}       # plane 16
+    )*\Z
     ''',
     re.VERBOSE
 )
