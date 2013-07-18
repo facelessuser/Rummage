@@ -16,18 +16,17 @@ import sys
 import re
 from os import walk
 from fnmatch import fnmatch
-from os.path import isdir, join, abspath, basename, getsize, getmtime
-from os.path import getctime as get_creation_time
-from time import sleep
+from os.path import isdir, join, abspath, basename, getsize
+from time import sleep, ctime
 import struct
 import traceback
 import codecs
-from file_hidden import is_hidden
-from ctypes import *
-import struct
 
 import _lib.ure as ure
 import _lib.text_decode as text_decode
+from _lib.file_times import getmtime, getctime
+from _lib.file_hidden import is_hidden
+
 
 LITERAL = 1
 IGNORECASE = 2
@@ -52,47 +51,6 @@ else:
 
 LINE_ENDINGS = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
 HEX_TX_TABLE = ("." * 32) + "".join(chr(c) for c in xrange(32, 127)) + ("." * 129)
-
-
-# http://stackoverflow.com/questions/946967/get-file-creation-time-with-python-on-mac
-class struct_timespec(Structure):
-    _fields_ = [('tv_sec', c_long), ('tv_nsec', c_long)]
-
-
-if _PLATFORM == "osx":
-    class struct_stat64(Structure):
-        _fields_ = [
-            ('st_dev', c_int32),
-            ('st_mode', c_uint16),
-            ('st_nlink', c_uint16),
-            ('st_ino', c_uint64),
-            ('st_uid', c_uint32),
-            ('st_gid', c_uint32),
-            ('st_rdev', c_int32),
-            ('st_atimespec', struct_timespec),
-            ('st_mtimespec', struct_timespec),
-            ('st_ctimespec', struct_timespec),
-            ('st_birthtimespec', struct_timespec),
-            ('dont_care', c_uint64 * 8)
-        ]
-
-
-    libc = CDLL('libc.dylib')
-    stat64 = libc.stat64
-    stat64.argtypes = [c_char_p, POINTER(struct_stat64)]
-
-
-def getctime(pth):
-    if _PLATFORM == "osx":
-        # Get the appropriate creation time on OSX
-        buf = struct_stat64()
-        rv = stat64(pth.encode("utf-8"), pointer(buf))
-        if rv != 0:
-            raise OSError("Couldn't stat file %r" % pth)
-        return buf.st_birthtimespec.tv_sec
-    else:
-        # Get the creation time for everyone else
-        return get_creation_time(pth)
 
 
 def threaded_walker(
@@ -577,14 +535,14 @@ class Grep(object):
             results = {"name": file_name, "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
             return results
 
-    def buffer_read(self, file_name, max_count):
+    def buffer_read(self, target_buffer, max_count):
         # Perform search
         try:
-            result = self.search.search("buffer input", file_name, max_count, False)
-            result["size"] = "--"
+            result = self.search.search("buffer input", target_buffer, max_count, False)
+            result["size"] = len(target_buffer)
             result["encode"] = "--"
-            result["m_time"] = "--"
-            result["c_time"] = "--"
+            result["m_time"] = ctime()
+            result["c_time"] = ctime()
             return result
         except:
             results = {"name": "buffer input", "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
