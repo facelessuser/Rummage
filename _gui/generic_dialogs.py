@@ -11,17 +11,33 @@ import _gui.messages as messages
 import _gui.custom_app as _custom_app
 
 def yesno(question, title='Yes or no?', bitmap=None, yes="Okay", no="Cancel"):
+    """
+    Wrapper for the prompt dialog
+    """
+
     return messages.promptmsg(question, title, bitmap, yes, no)
 
 
 def infomsg(msg, title="INFO", bitmap=None):
+    """
+    Wrapper for the info dialog
+    """
+
     messages.infomsg(msg, title, bitmap)
 
 
 def errormsg(msg, title="ERROR", bitmap=None):
+    """
+    Wrapper for the error dialog that also logs the error
+    """
+
     _custom_app.error(msg)
     messages.errormsg(msg, title, bitmap)
 
 
 def warnmsg(msg, title="WARNING", bitmap=None):
+    """
+    Wrapper for the warning dialog
+    """
+
     messages.warnmsg(msg, title, bitmap)

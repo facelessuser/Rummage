@@ -19,8 +19,13 @@ from _gui.generic_dialogs import errormsg
 
 class SaveSearchDialog(gui.SaveSearchDialog):
     def __init__(self, parent, search, is_regex):
+        """
+        Init SaveSearchDialog object
+        """
+
         super(SaveSearchDialog, self).__init__(parent)
 
+        # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
             [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
@@ -28,6 +33,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.search = search
         self.is_regex = is_regex
 
+        # Ensure good sizing for dialog
         best = self.m_save_panel.GetBestSize()
         current = self.m_save_panel.GetSize()
         offset = best[1] - current[1]
@@ -37,6 +43,10 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.m_name_text.SetFocus()
 
     def set_keybindings(self, keybindings):
+        """
+        Set keybindings for frame
+        """
+
         tbl = []
         for binding in keybindings:
             keyid = wx.NewId()
@@ -47,12 +57,20 @@ class SaveSearchDialog(gui.SaveSearchDialog):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
 
     def on_textctrl_selectall(self, event):
+        """
+        Selectall content of textctrl
+        """
+
         text = self.FindFocus()
         if isinstance(text, wx.TextCtrl):
             text.SelectAll()
         event.Skip()
 
     def on_apply(self, event):
+        """
+        Ensure there is a name, and proceed to add saved regex to settings.
+        """
+
         value = self.m_name_text.GetValue()
         if value == "":
             errormsg("Please give the search a name!")
@@ -62,4 +80,8 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.Close()
 
     def on_cancel(self, event):
+        """
+        Close dialog
+        """
+
         self.Close()

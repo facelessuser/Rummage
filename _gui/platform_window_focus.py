@@ -15,11 +15,14 @@ if _is_osx:
 
 
 def platform_window_focus(frame):
+    # General window raising
     if frame.IsIconized():
         frame.Iconize(False)
     if not frame.IsShown():
         frame.Show(True)
     frame.Raise()
+
+    # OSX specific extra to ensure raise
     if _is_osx:
         try:
             NSApplication = ctypes.c_void_p(objc.objc_getClass('NSApplication'))

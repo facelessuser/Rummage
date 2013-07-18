@@ -50,6 +50,7 @@ GROWL_ICON = None
 GROWL_ENABLED = False
 
 
+# Init growl object
 growl = gntp.notifier.GrowlNotifier(
     applicationName = "Rummage",
     notifications = ["Info","Warning", "Error"],
@@ -58,29 +59,52 @@ growl = gntp.notifier.GrowlNotifier(
 
 
 def enable_growl(enable):
+    """
+    Enable/Disable growl
+    """
     global GROWL_ENABLED
     GROWL_ENABLED = enable and has_growl()
 
 
 def has_growl():
+    """
+    Return if growl is available
+    """
+
     return growl is not None
 
 
 def set_growl_icon(icon):
+    """
+    Set app icon for growl
+    """
+
     global GROWL_ICON
     GROWL_ICON = icon
 
 
 def _nsstring(string):
+    """
+    Return an NSString object
+    """
+
     return c_void_p(cf.CFStringCreateWithCString(None, string.encode('utf8'), kCFStringEncodingUTF8))
 
 
 def _callmethod(obj, method, *args, **kwargs):
+    """
+    ObjC method call
+    """
+
     cast_return = kwargs.get("cast_return", c_void_p)
     return cast_return(objc.objc_msgSend(obj, objc.sel_registerName(method), *args))
 
 
 def play_alert(sound=None):
+    """
+    Play an alert sound for the OS
+    """
+
     if _PLATFORM == "osx":
         pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
         snd = _nsstring(sound if sound is not None else "Glass")
@@ -94,8 +118,15 @@ def play_alert(sound=None):
 
 
 try:
+    # Attempt to register growl
     growl.register()
+
+
     def growl_notify(note_type, title, description, sound, fallback):
+        """
+        Send growl notification
+        """
+
         try:
             growl.notify(
                 noteType = note_type,
@@ -106,21 +137,36 @@ try:
                 priority = 1
             )
         except:
+            # Fallback to wxpython notification
             if _PLATFORM != "osx":
                 fallback(title, description, sound)
         if sound:
+            # Play sound if desired
             play_alert()
 except:
     print("no growl")
+
+
     def growl_notify(note_type, title, description, sound, fallback):
+        """
+        Growl failed to register so create a growl notify that simply
+        calls the fallback
+        """
+
         if _PLATFORM != "osx":
+            # Fallback to wxpython notification
             fallback(title, description, sound)
         elif sound:
+            # Play sound if desired
             play_alert()
 
 
 class Notify(wx.NotificationMessage):
     def __init__(self, *args, **kwargs):
+        """
+        Setup Notify object
+        """
+
         self.sound = kwargs.get("sound", False)
         self.flags = kwargs.get("flags", 0)
         if "sound" in kwargs:
@@ -131,12 +177,20 @@ class Notify(wx.NotificationMessage):
         self.SetFlags(self.flags)
 
     def Show(self):
+        """
+        Show notification
+        """
+
         super(Notify, self).Show()
         if self.sound:
             play_alert()
 
 
 def info(title, message="", sound=False):
+    """
+    Info notification
+    """
+
     default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_INFORMATION, sound=sound).Show()
     if has_growl() and GROWL_ENABLED:
         growl_notify("Info", title, message, sound, default_notify)
@@ -145,6 +199,10 @@ def info(title, message="", sound=False):
 
 
 def error(title, message, sound=False):
+    """
+    Error notification
+    """
+
     default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_ERROR, sound=sound).Show()
     if has_growl() and GROWL_ENABLED:
         growl_notify("Error", title, message, sound, default_notify)
@@ -153,6 +211,10 @@ def error(title, message, sound=False):
 
 
 def warning(title, message, sound=False):
+    """
+    Warning notification
+    """
+
     default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_WARNING, sound=sound).Show()
     if has_growl() and GROWL_ENABLED:
         growl_notify("Warning", title, message, sound, default_notify)

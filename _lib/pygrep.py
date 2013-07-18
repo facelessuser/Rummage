@@ -58,6 +58,10 @@ def threaded_walker(
     folder_exclude, dir_regex_match, recursive,
     show_hidden, size, modified, created
 ):
+    """
+    Peform threaded search
+    """
+
     global _RUNNING
     global _STARTED
     with _LOCK:
@@ -78,6 +82,10 @@ def threaded_walker(
 
 
 def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
+    """
+    Prepare regex search pattern flags
+    """
+
     flags = ure.UNICODE
     if multiline:
         flags |= ure.MULTILINE
@@ -89,6 +97,10 @@ def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
 
 
 def _literal_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
+    """
+    Prepare literal search pattern flags
+    """
+
     flags = ure.UNICODE
     if multiline:
         flags |= ure.MULTILINE
@@ -105,6 +117,10 @@ class GrepException(Exception):
 
 class _FileSearch(object):
     def __init__(self, pattern, flags, context, truncate_lines):
+        """
+        Init the file search object
+        """
+
         self.literal = bool(flags & LITERAL)
         self.ignorecase = bool(flags & IGNORECASE)
         self.dotall = bool(flags & DOTALL)
@@ -119,6 +135,10 @@ class _FileSearch(object):
         self.find_method = self.pattern.finditer
 
     def __tx_bin(self, content):
+        """
+        Format binary data in a friendly way. Display only ASCII.
+        """
+
         def_struct = lambda content: struct.Struct("=" + ("B" * len(content))).unpack(content)
         return content.translate(HEX_TX_TABLE)
 
@@ -165,17 +185,25 @@ class _FileSearch(object):
                 match_end = 256
         return content[start:end] if not binary else self.__tx_bin(content[start:end]), (match_start, match_end), (before, after)
 
-    def __findall(self, file_content):
-        for m in self.find_method(file_content):
-            yield m
-
     def __get_col(self, content, absolute_col, line_ending):
+        """
+        Get column of where result is found in file
+        """
+
         col = 1
         for x in reversed(range(0, absolute_col)):
             if content[x] == line_ending:
                 break
             col += 1
         return col
+
+    def __findall(self, file_content):
+        """
+        Find all occurences of search pattern in file.
+        """
+
+        for m in self.find_method(file_content):
+            yield m
 
     def search(self, target, file_content, max_count=None, binary=False):
         """
@@ -210,10 +238,14 @@ class _FileSearch(object):
 
 class _DirWalker(object):
     def __init__(
-            self, directory, file_pattern, file_regex_match,
-            folder_exclude, dir_regex_match, recursive,
-            show_hidden, size, modified, created
-        ):
+        self, directory, file_pattern, file_regex_match,
+        folder_exclude, dir_regex_match, recursive,
+        show_hidden, size, modified, created
+    ):
+        """
+        Init the directory walker object
+        """
+
         self.dir = directory
         self.size = (size[0], size[1] * 1024) if size is not None else size
         self.modified = modified
@@ -227,11 +259,19 @@ class _DirWalker(object):
         self.files = []
 
     def __is_hidden(self, path):
+        """
+        Check if file is hidden
+        """
+
         if not self.show_hidden:
             return is_hidden(path)
         return False
 
     def __compare_value(self, limit_check, current):
+        """
+        Compare file attribute against limits
+        """
+
         value_okay = False
         qualifier = limit_check[0]
         limit = limit_check[1]
@@ -247,6 +287,10 @@ class _DirWalker(object):
         return value_okay
 
     def __is_times_okay(self, pth):
+        """
+        Verify file times meet requirements
+        """
+
         times_okay = False
         mod_okay = False
         cre_okay = False
@@ -265,6 +309,10 @@ class _DirWalker(object):
         return times_okay
 
     def __is_size_okay(self, pth):
+        """
+        Verify file size meets requirements
+        """
+
         size_okay = False
         self.current_size = getsize(pth)
         if self.size is None:
@@ -338,6 +386,10 @@ class _DirWalker(object):
         return valid
 
     def run(self):
+        """
+        Start search for valid files
+        """
+
         global _FILES
         global _ABORT
         with _LOCK:
@@ -411,27 +463,51 @@ class Grep(object):
             self.thread.setDaemon(True)
 
     def __get_dir_pattern(self, folder_exclude, dir_regex_match):
+        """
+        Compile or format the directory exclusion pattern
+        """
+
         pattern = None
         if folder_exclude != None:
             pattern = ure.compile(folder_exclude, ure.IGNORECASE) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
         return pattern
 
     def __get_file_pattern(self, file_pattern, file_regex_match):
+        """
+        Compile or format the file pattern
+        """
+
         pattern = None
         if file_pattern != None:
             pattern = ure.compile(file_pattern, ure.IGNORECASE) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
     def __decode_file(self, filename):
+        """
+        Calls file encode guesser and decodes file if possible
+        """
+
         bfr, self.current_encoding = text_decode.guess(filename, False)
         if self.current_encoding == "BIN":
             self.is_binary = True
         return bfr
 
     def __read_file(self, file_name):
+        """
+        Open the file in the best guessed encoding for search.
+        Guesses by elimination
+        Currently opens:
+            UTF32 if BOM present
+            UTF16 if BOM present or if only one null found in file
+            UTF8 if it contains no bad UTF8 char sequences or includes UTF8 BOM
+            LATIN-1 if not a file above and contains no NULLs, and no invalid LATIN-1 chars
+            CP1252 if not above and does not contain NULLs
+        """
+
         content = None
         self.current_encoding = "BIN"
         self.is_binary = False
+
         # Force UTF for all
         if self.all_utf8:
             try:
@@ -440,11 +516,11 @@ class Grep(object):
                     content = f.read()
                     return content
             except:
-                # print(str(traceback.format_exc()))
+                print(str(traceback.format_exc()))
                 pass
             return None
 
-        # Non-Lazy decoding
+        # Guess encoding and decode file
         try:
             return self.__decode_file(file_name)
         except Exception:
@@ -455,18 +531,31 @@ class Grep(object):
         return content
 
     def get_status(self):
+        """
+        Return number of files searched out
+        of current number of files crawled
+        """
+
         if self.thread is not None:
             return self.idx + 1 if self.idx != -1 else 0, len(_FILES)
         else:
             return 1, 1
 
     def abort(self):
+        """
+        Abort the search
+        """
+
         global _ABORT
         with _LOCK:
             _ABORT = True
         self.kill = True
 
     def multi_file_read(self, max_count):
+        """
+        Perform search on on files in a directory
+        """
+
         global _STARTED
         self.idx = -1
         self.thread.start()
@@ -478,6 +567,7 @@ class Grep(object):
         with _LOCK:
             _STARTED = False
 
+        # Wait for when a file is available
         while not done:
             file_info = None
             while file_info is None:
@@ -498,8 +588,10 @@ class Grep(object):
                         break
 
             if file_info is None:
+                # No file; quit
                 done = True
             else:
+                # Parse the given file
                 file_name = file_info[0]
                 sz = file_info[1]
                 try:
@@ -507,13 +599,18 @@ class Grep(object):
                     if content == None:
                         continue
                     result = self.search.search(file_name, content, max_count, self.is_binary)
+
+                    # Report additional file info
                     result["size"] = '%.2fKB' % (float(sz) / 1024.0)
                     result["encode"] = self.current_encoding
                     result["m_time"] = file_info[2]
                     result["c_time"] = file_info[3]
                 except:
+                    # Unable to read
                     results = {"name": file_name, "count": 0, "line_ending": None, "error": str(traceback.format_exc()), "results": []}
                     yield results
+
+                # Return search results
                 yield result
                 if max_count != None:
                     max_count -= result["count"]
@@ -521,11 +618,16 @@ class Grep(object):
                         done = True
 
     def single_file_read(self, file_name, max_count):
-        # Perform search
+        """
+        Perform search on a single file
+        """
+
         try:
             content = self.__read_file(file_name)
             if content != None:
                 result = self.search.search(file_name, content, max_count, self.is_binary)
+
+                # Report additional file info
                 result["size"] = "%.2fKB" % (float(getsize(file_name)) / 1024.0)
                 result["encode"] = self.current_encoding
                 result["m_time"] = getmtime(file_name)
@@ -536,9 +638,13 @@ class Grep(object):
             return results
 
     def buffer_read(self, target_buffer, max_count):
-        # Perform search
+        """
+        Perform search on an input buffer
+        """
         try:
             result = self.search.search("buffer input", target_buffer, max_count, False)
+
+            # Report additional file info
             result["size"] = len(target_buffer)
             result["encode"] = "--"
             result["m_time"] = ctime()

@@ -36,8 +36,12 @@ glass = PyEmbeddedImage(
     "+7X9v8GZwN0bJSSNAAAAAElFTkSuQmCC")
 
 
-class MixinSortPanel(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
+class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
     def setup(self, c):
+        """
+        Init MixinSortList object
+        """
+
         self.column_count = c
         self.itemDataMap = {}
         self.images = wx.ImageList(16, 16)
@@ -49,29 +53,61 @@ class MixinSortPanel(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
         listmix.ListRowHighlighter.__init__(self, (0xEE, 0xEE, 0xEE))
 
     def reset_item_map(self):
+        """
+        Reset the item map
+        """
+
         self.itemDataMap = {}
 
     def set_item_map(self, idx, *args):
+        """
+        Add entry to item map
+        """
+
         self.itemDataMap[idx] = tuple([a for a in args])
 
     def init_sort(self):
+        """
+        Do the intial sort
+        """
+
         self.SortListItems(col=0, ascending=1)
         self.RefreshRows()
 
     def GetListCtrl(self):
+        """
+        Return ListCtrl object (self)
+        """
+
         return self
 
     def GetSortImages(self):
+        """
+        Return the sort arrows for the header
+        """
+
         return self.sort_down, self.sort_up
 
     def get_map_item(self, idx, col=0):
+        """
+        Get map element from mapping entry
+        """
+
         return self.itemDataMap[idx][col]
 
     def OnSortOrderChanged(self):
+        """
+        Refresh the rows on sort
+        """
+
         self.RefreshRows()
 
 
 def extend(instance, extension):
+    """
+    Extend object with extension class
+    """
+
     instance.__class__ = type(
         '%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
         (instance.__class__, extension),
@@ -80,12 +116,20 @@ def extend(instance, extension):
 
 
 def extend_list(l, c):
-    extend(l, MixinSortPanel)
+    """
+    Extend list with with special sorting class.
+    """
+
+    extend(l, MixinSortList)
     l.setup(c)
 
 
 class LoadSearchDialog(gui.LoadSearchDialog):
     def __init__(self, parent):
+        """
+        Init LoadSearchDialog
+        """
+
         super(LoadSearchDialog, self).__init__(parent)
 
         self.search = None
@@ -105,6 +149,10 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.m_search_list.SetFocus()
 
     def load_searches(self):
+        """
+        Populate list with search entries
+        """
+
         count = 0
         for x in Settings.get_search():
             search_type = "Regex" if x[2] else "Text"
@@ -120,6 +168,10 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.m_search_list.init_sort()
 
     def on_load(self, event):
+        """
+        Select the search entry for use
+        """
+
         item = self.m_search_list.GetFirstSelected()
         if item == -1:
             return
@@ -129,15 +181,27 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.Close()
 
     def get_search(self):
+        """
+        Get the selected search entry
+        """
+
         return self.search, self.is_regex
 
     def column_resize(self, obj, count, minimum=100):
+        """
+        Resize columns
+        """
+
         for i in range(0, count):
             obj.SetColumnWidth(i, wx.LIST_AUTOSIZE)
             if obj.GetColumnWidth(i) < minimum:
                 obj.SetColumnWidth(i, minimum)
 
     def reset_table(self):
+        """
+        Clear and reset the list
+        """
+
         self.m_search_list.ClearAll()
         self.m_search_list.InsertColumn(0, "Name")
         self.m_search_list.InsertColumn(1, "Search")
@@ -145,6 +209,10 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         wx.GetApp().Yield()
 
     def on_delete(self, event):
+        """
+        Delete search entry
+        """
+
         item = self.m_search_list.GetFirstSelected()
         if item == -1:
             return
@@ -155,4 +223,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.load_searches()
 
     def on_cancel(self, event):
+        """
+        Close dialog
+        """
         self.Close()
