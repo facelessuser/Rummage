@@ -52,27 +52,6 @@ BAD_ASCII = re.compile(
     re.VERBOSE
 )
 
-# BAD_UTF8 = re.compile(
-#     b'''
-#         (
-#             [\xF8-\xFF]                                              |  # Invalid UTF-8 Bytes
-#             [\xC0-\xDF](?![\x80-\xBF])                               |  # Invalid UTF-8 Sequence Start
-#             [\xE0-\xEF](?![\x80-\xBF]{2})                            |  # Invalid UTF-8 Sequence Start
-#             [\xF0-\xF7](?![\x80-\xBF]{3})                            |  # Invalid UTF-8 Sequence Start
-#             (?<=[\x00-\x7F\xF8-\xFF])[\x80-\xBF]                     |  # Invalid UTF-8 Sequence Middle
-#             (                                                           # Overlong Sequence
-#                 (?<![\xC0-\xDF] | [\xE0-\xEF] | [\xF0-\xF7])         |
-#                 (?<![\xF0-\xF7][\x80-\xBF] | [\xE0-\xEF][\x80-\xBF]) |
-#                 (?<![\xF0-\xF7][\x80-\xBF]{2})
-#             ) [\x80-\xBF]                                            |
-#             (?<=[\xE0-\xEF])[\x80-\xBF](?![\x80-\xBF])               |  # Short 3 byte sequence
-#             (?<=[\xF0-\xF7])[\x80-\xBF](?![\x80-\xBF]{2})            |  # Short 4 byte sequence
-#             (?<=[\xF0-\xF7][\x80-\xBF])[\x80-\xBF](?![\x80-\xBF])       # Short 4 byte sequence
-#         )
-#      ''',
-#      re.VERBOSE
-# )
-
 BAD_UTF8 = re.compile(
     b'''
         [\xE0-\xEF].{0,1}([^\x80-\xBF]|$) |
