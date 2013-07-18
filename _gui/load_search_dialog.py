@@ -17,7 +17,7 @@ from wx.lib.embeddedimage import PyEmbeddedImage
 from _lib.settings import Settings
 
 import _gui.gui as gui
-from _gui.sorted_columns import up_arrow, down_arrow
+from _gui.result_panels import up_arrow, down_arrow
 
 
 glass = PyEmbeddedImage(

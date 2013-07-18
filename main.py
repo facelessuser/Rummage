@@ -11,24 +11,14 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import version
-import wx
 import sys
 import argparse
 import traceback
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
 
-from _lib.settings import Settings, _PLATFORM
+from _lib.settings import Settings
 
-from _gui.custom_app import PipeApp, set_debug_mode
-from _gui.custom_app import debug, debug_struct, info, error
-from _gui.rummage_dialog import RummageFrame
-from _gui.regex_test_dialog import RegexTestDialog
-from _gui.platform_window_focus import platform_window_focus
-import _gui.notify as notify
-
-from _icons.rum_ico import rum_64
-
-notify.set_growl_icon(rum_64.GetData())
+from _gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
 
 
 def parse_arguments():
@@ -45,65 +35,6 @@ def parse_arguments():
     return parser.parse_args()
 
 
-class RummageApp(PipeApp):
-    def __init__(self, *args, **kwargs):
-        """
-        Init RummageApp object
-        """
-
-        super(RummageApp, self).__init__(*args, **kwargs)
-
-    def on_pipe_args(self, event):
-        """
-        When receiving arguments via named pipes,
-        look for the search path argument, and populate
-        the search path in the RummageFrame
-        """
-
-        frame = self.GetTopWindow()
-        if frame is not None and isinstance(frame, RummageFrame):
-            args = iter(event.data.split("|"))
-            filename = None
-            for a in args:
-                if a == "-s":
-                    try:
-                        a = args.next()
-                        filename = a
-                        break
-                    except StopIteration:
-                        break
-            if filename is not None:
-                frame.m_searchin_text.safe_set_value(filename)
-                frame.m_grep_notebook.SetSelection(0)
-                frame.m_searchfor_textbox.GetTextCtrl().SetFocus()
-            platform_window_focus(frame)
-
-    def process_args(self, arguments):
-        """
-        Event for processing the arguments
-        """
-
-        argv = iter(arguments)
-        args = []
-        for a in argv:
-            args.append(a)
-            if a == "-s":
-                try:
-                    args.append(abspath(normpath(argv.next())))
-                except StopIteration:
-                    break
-        return args
-
-    def MacReopenApp(self):
-        """
-        Ensure that app will be unminimized
-        in OSX on dock icon click
-        """
-
-        frame = self.GetTopWindow()
-        platform_window_focus(frame)
-
-
 def gui_main(script):
     """
     Configure environment, start the app, and launch the appropriate frame
@@ -113,8 +44,6 @@ def gui_main(script):
     args = parse_arguments()
     if args.show_log:
         set_debug_mode(True)
-
-    wx.Log.EnableLogging(False)
 
     if Settings.get_single_instance():
         app = RummageApp(redirect=True, single_instance_name="Rummage", pipe_name=Settings.get_fifo())

@@ -20,12 +20,12 @@ import webbrowser
 from time import time, sleep, ctime, mktime, strptime, gmtime
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile, expanduser
 import wx.lib.masked as masked
-from datetime import datetime, timedelta, tzinfo
 import wx.lib.newevent
 import version
 
 import _lib.pygrep as pygrep
 from _lib.settings import Settings, _PLATFORM
+from _lib.epoch_timestamp import local_time_to_epoch_timestamp
 
 import _gui.gui as gui
 from _gui.generic_dialogs import *
@@ -38,7 +38,8 @@ from _gui.autocomplete_combo import AutoCompleteCombo
 from _gui.load_search_dialog import LoadSearchDialog, glass
 from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
-from _gui.sorted_columns import FileResultPanel, ResultFileList, ResultContentList
+from _gui.about_dialog import AboutDialog
+from _gui.result_panels import FileResultPanel, ResultFileList, ResultContentList
 from _gui.messages import dirpickermsg
 from _gui.messages import Error as error_icon
 import _gui.notify as notify
@@ -63,30 +64,12 @@ LIMIT_COMPARE = {
     3: "lt"
 }
 
-ZERO = timedelta(0)
-
-
-class UTCTimezone(tzinfo):
-    def utcoffset(self, dt):
-        return ZERO
-
-    def tzname(self, dt):
-        return "UTC"
-
-    def dst(self, dt):
-        return ZERO
-
-
-UTC = UTCTimezone()
-EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
-
-
-def totimestamp(dt, epoch=EPOCH):
-    td = dt - epoch
-    return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 1e6
-
 
 def get_flags(args):
+    """
+    Determine pygrep flags from GrepArgs
+    """
+
     flags = 0
 
     if args.regexfilepattern != None:
@@ -110,12 +93,22 @@ def get_flags(args):
 
 
 def not_none(item, alt=None):
+    """
+    Return item if not None, else return the alternate
+    """
+
     return item if item != None else alt
 
 
 def replace_with_genericdatepicker(obj, key):
+    """
+    Replace object with a GenericDatePickerCtrl
+    """
+
     d = Settings.get_search_setting(key, None)
-    dpc = wx.GenericDatePickerCtrl(obj.GetParent(), style=wx.TAB_TRAVERSAL | wx.DP_DROPDOWN | wx.DP_SHOWCENTURY | wx.DP_ALLOWNONE)
+    dpc = wx.GenericDatePickerCtrl(
+        obj.GetParent(), style=wx.TAB_TRAVERSAL | wx.DP_DROPDOWN | wx.DP_SHOWCENTURY | wx.DP_ALLOWNONE
+    )
     if d is None:
         day = wx.DateTime()
         day.SetToCurrent()
@@ -123,7 +116,7 @@ def replace_with_genericdatepicker(obj, key):
     else:
         day = wx.DateTime()
         saved_day = d.split("/")
-        day.Set(int(saved_day[0]) - 1, int(saved_day[1]), int(saved_day[2]))
+        day.Set(int(saved_day[1]), int(saved_day[0]) - 1, int(saved_day[2]))
         dpc.SetValue(day)
     sz = obj.GetContainingSizer()
     sz.Replace(obj, dpc)
@@ -132,8 +125,14 @@ def replace_with_genericdatepicker(obj, key):
 
 
 def replace_with_timepicker(obj, spin, key):
+    """
+    Replace object with TimeCtrl object
+    """
+
     t = Settings.get_search_setting(key, wx.DateTime.Now().Format("%H:%M:%S"))
-    time_picker = masked.TimeCtrl(obj.GetParent(), value=t, style=wx.TE_PROCESS_TAB, spinButton=spin, oob_color="white", fmt24hr=True)
+    time_picker = masked.TimeCtrl(
+        obj.GetParent(), value=t, style=wx.TE_PROCESS_TAB, spinButton=spin, oob_color="white", fmt24hr=True
+    )
     sz = obj.GetContainingSizer()
     sz.Replace(obj, time_picker)
     obj.Destroy()
@@ -141,6 +140,10 @@ def replace_with_timepicker(obj, spin, key):
 
 
 def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None):
+    """
+    Replace object with AutoCompleteCombo object
+    """
+
     choices = Settings.get_search_setting(key, [])
     auto_complete = AutoCompleteCombo(obj.GetParent(), choices, load_last, changed_callback)
     sz = obj.GetContainingSizer()
@@ -150,6 +153,10 @@ def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None):
 
 
 def update_autocomplete(obj, key, load_last=False):
+    """
+    Convienance function for updating the AutoCompleteCombo choices
+    """
+
     choices = Settings.get_search_setting(key, [])
     obj.update_choices(choices, load_last)
 
@@ -159,6 +166,10 @@ def threaded_grep(
     flags, show_hidden, all_utf8, size, modified,
     created, text
 ):
+    """
+    Threaded pygrep launcher to search desired files
+    """
+
     global _RUNNING
     global _RUNTIME
     with _LOCK:
@@ -194,9 +205,17 @@ def threaded_grep(
 
 class GrepThread(object):
     def __init__(self, grep):
+        """
+        Set up grep thread with the pygrep object
+        """
+
         self.grep = grep
 
     def run(self):
+        """
+        Run the grep search and store the results in a global array
+        Also, store general statistics as well
+        """
         global _ABORT
         global _RESULTS
         global _COMPLETED
@@ -219,9 +238,17 @@ class GrepThread(object):
 
 class GrepArgs(object):
     def __init__(self):
+        """
+        Default the grep args on instatiation
+        """
+
         self.reset()
 
     def reset(self):
+        """
+        Reset grep args to defaults
+        """
+
         self.regexp = False
         self.ignore_case = False
         self.dotall = False
@@ -240,13 +267,25 @@ class GrepArgs(object):
 
 class DirPickButton(object):
     def GetPath(self):
+        """
+        Get current directory path
+        """
+
         return self.directory
 
     def SetPath(self, directory):
+        """
+        Set the current directory path
+        """
+
         if directory is not None and exists(directory) and isdir(directory):
             self.directory = directory
 
     def dir_init(self, default_path=None, dir_change_evt=None):
+        """
+        Init the DirPickButton
+        """
+
         self.directory = expanduser("~")
         self.Bind(wx.EVT_BUTTON, self.on_dir_pick)
         self.Bind(EVT_DIR_CHANGE, self.on_dir_change)
@@ -254,11 +293,20 @@ class DirPickButton(object):
         self.dir_change_callback = dir_change_evt
 
     def on_dir_change(self, event):
+        """
+        If the dir has changed call the callback given
+        """
+
         if self.dir_change_callback is not None:
             self.dir_change_callback(event)
         event.Skip()
 
     def on_dir_pick(self, event):
+        """
+        When a new directory is picked, validate it, and set it if it is good.
+        Call the DirChangeEvent to do any desired callback as well.
+        """
+
         directory = self.GetPath()
         if directory is None or not exists(directory) or not isdir(directory):
             directory = expanduser("~")
@@ -271,34 +319,12 @@ class DirPickButton(object):
         event.Skip()
 
 
-class AboutDialog(gui.AboutDialog):
-    def __init__(self, parent):
-        super(AboutDialog, self).__init__(parent)
-
-        self.m_bitmap = wx.StaticBitmap(
-            self.m_about_panel, wx.ID_ANY, rum_64.GetBitmap(), wx.DefaultPosition, wx.Size(64, 64), 0
-        )
-        self.m_app_label.SetLabel(version.app)
-        self.m_version_label.SetLabel(
-            "Version: %s %s" % (version.version, version.status)
-        )
-        self.m_developers_label.SetLabel(
-            "Developers(s):\n%s" % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in version.maintainers]))
-        )
-        self.Fit()
-
-    def on_toggle(self, event):
-        if self.m_dev_toggle.GetValue():
-            self.m_dev_toggle.SetLabel("Contact <<")
-            self.m_developers_label.Show()
-        else:
-            self.m_dev_toggle.SetLabel("Contact >>")
-            self.m_developers_label.Hide()
-        self.Fit()
-
-
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def __init__(self, parent, script_path, start_path, open_debug=False):
+        """
+        Init the RummageFrame object
+        """
+
         super(RummageFrame, self).__init__(parent)
 
         self.SetIcon(rum_64.GetIcon())
@@ -359,19 +385,30 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.init_search_path(start_path)
 
     def on_textctrl_selectall(self, event):
+        """
+        Select all in the TextCtrl and AutoCompleteCombo objects
+        """
+
         text = self.FindFocus()
         if isinstance(text, (wx.TextCtrl, AutoCompleteCombo)):
             text.SelectAll()
         event.Skip()
 
     def init_search_path(self, start_path):
+        """
+        Initialize the search path input
+        """
+
         # Init search path with passed in path
         if start_path and exists(start_path):
             self.m_searchin_text.safe_set_value(abspath(normpath(start_path)))
         self.m_searchfor_textbox.GetTextCtrl().SetFocus()
 
     def optimize_size(self, first_time=False):
-        # Optimally resize window
+        """
+        Optimally resize window
+        """
+
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
@@ -383,6 +420,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.Refresh()
 
     def setup_inputs(self):
+        """
+        Setup and configure input objects
+        """
+
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
 
@@ -427,6 +468,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_filematch_textbox.MoveBeforeInTabOrder(self.m_fileregex_checkbox)
 
     def on_preferences(self, event):
+        """
+        Show settings dialog, and update history of AutoCompleteCombo if the history was cleared
+        """
+
         dlg = SettingsDialog(self)
         dlg.ShowModal()
         if dlg.history_cleared():
@@ -437,6 +482,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         dlg.Destroy()
 
     def on_dir_changed(self, event):
+        """
+        Event for when the directory changes in the DirPickButton
+        """
+
         if not self.searchin_update:
             pth = event.directory
             if pth is not None and exists(pth):
@@ -446,9 +495,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         event.Skip()
 
     def on_searchin_changed(self):
+        """
+        Callback for when a directory changes via the m_searchin_text control
+        """
+
         self.check_searchin()
 
     def on_save_search(self, event):
+        """
+        Open a dialog to save a search for later use
+        """
+
         search = self.m_searchfor_textbox.GetValue()
         if search == "":
             errormsg("There is no search to save!")
@@ -458,6 +515,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         dlg.Destroy()
 
     def on_load_search(self, event):
+        """
+        Show dialog to pick saved a saved search to use
+        """
+
         dlg = LoadSearchDialog(self)
         dlg.ShowModal()
         search, is_regex = dlg.get_search()
@@ -467,6 +528,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_regex_search_checkbox.SetValue(regex_search)
 
     def check_searchin(self):
+        """
+        Determine if search in input is a file or not, and hide/show elements accordingly
+        """
+
         pth = self.m_searchin_text.GetValue()
         if isfile(pth):
             self.m_limiter_panel.Hide()
@@ -487,6 +552,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.searchin_update = False
 
     def on_search_click(self, event):
+        """
+        Initiate search or stop search depending on search state
+        """
+
         with _LOCK:
             if self.debounce_search:
                 return
@@ -506,6 +575,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         event.Skip()
 
     def validate_search_inputs(self):
+        """
+        Validate the search inputs
+        """
+
         debug("validate")
         fail = False
         msg = ""
@@ -545,20 +618,36 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         return fail
 
     def init_update_timer(self):
+        """
+        Init the update Timer object]
+        """
+
         self.update_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.check_updates, self.update_timer)
 
     def start_update_timer(self):
+        """
+        Start update timer
+        """
+
         if not self.update_timer.IsRunning():
             self.update_timer.Start(2000)
             debug("Grep timer started")
 
     def stop_update_timer(self):
+        """
+        Stop update timer
+        """
+
         if self.update_timer.IsRunning():
             self.update_timer.Stop()
             debug("Grep timer stopped")
 
     def do_search(self):
+        """
+        Start the search
+        """
+
         self.thread = None
 
         # Reset status
@@ -617,6 +706,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.start_update_timer()
 
     def set_arguments(self):
+        """
+        Set the search arguments
+        """
+
         self.args.reset()
         # Path
         self.args.target = self.m_searchin_text.GetValue()
@@ -650,29 +743,32 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             cmp_modified = self.m_modified_choice.GetSelection()
             cmp_created = self.m_created_choice.GetSelection()
             if cmp_modified:
-                mod_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
-                mod_t = self.m_modified_time_picker.GetValue()
-                d = mod_d.split("/")
-                t = mod_t.split(":")
-                mod_epoch = totimestamp(
-                    datetime(int(d[2]), int(d[0]), int(d[1]), int(t[0]), int(t[1]), int(t[2]), 0, UTC)
+                self.args.modified_compare = (
+                    LIMIT_COMPARE[cmp_modified],
+                    local_time_to_epoch_timestamp(
+                        self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
+                        self.m_modified_time_picker.GetValue()
+                    )
                 )
-                self.args.modified_compare = (LIMIT_COMPARE[cmp_modified], mod_epoch)
             if cmp_created:
-                cre_d = self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
-                cre_t = self.m_modified_time_picker.GetValue()
-                d = cre_d.split("/")
-                t = cre_t.split(":")
-                cre_epoch = totimestamp(
-                    datetime.datetime(int(d[2]), int(d[0]), int(d[1]), int(t[0]), int(t[1]), int(t[2]), 0, utc)
+                self.args.created_compare = (
+                    LIMIT_COMPARE[cmp_created],
+                    local_time_to_epoch_timestamp(
+                        self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
+                        self.m_modified_time_picker.GetValue()
+                    )
                 )
-                self.args.created_compare = (LIMIT_COMPARE[cmp_created], cre_epoch)
         else:
             self.args.text = True
 
         debug(self.args.target)
 
     def save_history(self):
+        """
+        Save the current configuration of the search for the next time the app is opened
+        Save a history of search directory, regex, folders, and excludes as well for use again in the future
+        """
+
         history = [
             ("target", self.args.target),
             ("regex_search", self.args.pattern) if self.args.regexp else ("literal_search", self.args.pattern)
@@ -717,12 +813,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         Settings.add_search_settings(history, toggles, strings)
 
+        # Update the combo boxes history for related items
         update_autocomplete(self.m_searchin_text, "target")
         update_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
         update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
         update_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search")
 
     def check_updates(self, event):
+        """
+        Check if updates to the result lists can be done
+        """
+
         global _RESULTS
         debug("timer")
         if not self.checking:
@@ -741,6 +842,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 count1, count2 = self.update_table(count1, count2, completed, total, *results)
             self.current_table_idx[0] = count1 - 1
             self.current_table_idx[1] = count2 - 1
+
+            # Run is finished or has been terminated
             if not running:
                 with _LOCK:
                     benchmark = _RUNTIME
@@ -782,6 +885,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         event.Skip()
 
     def update_table(self, count, count2, done, total, *results):
+        """
+        Update the result lists with current search results
+        """
+
         p_range = self.m_progressbar.GetRange()
         p_value = self.m_progressbar.GetValue()
         self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (done, total, int(float(done)/float(total) * 100), count2) if total != 0 else (0, 0, 0))
@@ -820,10 +927,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         wx.GetApp().Yield()
         return count, count2
 
-    def get_search_status(self):
-        return self.searching
-
     def on_regex_search_toggle(self, event):
+        """
+        Switch literal/regex history depending on toggle state
+        """
+
         if self.m_regex_search_checkbox.GetValue():
             update_autocomplete(self.m_searchfor_textbox, "regex_search")
         else:
@@ -831,6 +939,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         event.Skip()
 
     def on_fileregex_toggle(self, event):
+        """
+        Switch literal/regex history depending on toggle state
+        """
+
         if self.m_fileregex_checkbox.GetValue():
             update_autocomplete(self.m_filematch_textbox, "regex_file_search")
         else:
@@ -838,6 +950,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         event.Skip()
 
     def on_dirregex_toggle(self, event):
+        """
+        Switch literal/regex history depending on toggle state
+        """
+
         if self.m_dirregex_checkbox.GetValue():
             update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude")
         else:
@@ -845,6 +961,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         event.Skip()
 
     def validate_search_regex(self):
+        """
+        Validate search regex
+        """
+
         flags = 0
         if self.m_dotmatch_checkbox.GetValue():
             flags |= re.DOTALL
@@ -853,6 +973,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         return self.validate_regex(self.m_searchfor_textbox.Value, flags)
 
     def validate_regex(self, pattern, flags=0):
+        """
+        Validate regular expresion compiling
+        """
         try:
             re.compile(pattern, flags)
             return False
@@ -861,9 +984,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             return True
 
     def on_debug_console(self, event):
+        """
+        Show debug console
+        """
+
         self.toggle_debug_console()
 
     def on_close(self, event):
+        """
+        Ensure thread is stopped,
+        and ensure tester window, debug console is closed
+        """
         if self.thread is not None:
             self.thread.abort = True
         if self.tester is not None:
@@ -875,6 +1006,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         event.Skip()
 
     def on_test_regex(self, event):
+        """
+        Show regex test dialog
+        """
+
         self.m_regex_test_button.Enable(False)
         self.tester = RegexTestDialog(
             self,
@@ -885,12 +1020,24 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.tester.Show()
 
     def on_issues(self, event):
+        """
+        Open issues site
+        """
+
         webbrowser.open_new_tab(version.help)
 
     def on_about(self, event):
+        """
+        Show about dialog
+        """
+
         dlg = AboutDialog(self)
         dlg.ShowModal()
         dlg.Destroy()
 
     def on_exit(self, event):
+        """
+        Close dialog
+        """
+
         self.Close()

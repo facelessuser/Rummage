@@ -1,5 +1,5 @@
 """
-Sorted Columns
+Result Panels
 
 Licensed under MIT
 Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
@@ -13,14 +13,9 @@ from time import ctime
 import wx
 import wx.lib.mixins.listctrl as listmix
 from wx.lib.embeddedimage import PyEmbeddedImage
-import subprocess
-import sys
 from os.path import normpath, join
 
-from _lib.settings import Settings
-
-from _gui.custom_app import debug, debug_struct, info, error
-from _gui.generic_dialogs import errormsg
+from _gui.open_editor import open_editor
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
@@ -60,43 +55,6 @@ bin = PyEmbeddedImage(
     "idT8w2AcRwRBgLIsAQBRFMG2bTRNgzzPv6/gOA7CMHzFbdsiTVMURYGqqvDzFQzDwDRNWJYF"
     "pmniKwdCCCYiJiIehoGzLGPXdZmIWAjBu7CpQJrnmdd1lcJ06IyWZSlr+lFgVHoAn0+KFv99"
     "5sIAAAAASUVORK5CYII=")
-
-
-def editor_open(filename, line, col):
-    """
-    Open editor with the optional filename, line, and col parameters
-    """
-
-    returncode = None
-
-    cmd = Settings.get_editor(filename=filename, line=line, col=col)
-    if len(cmd) == 0:
-        errormsg("No editor is currently set!")
-        return
-    debug(cmd)
-
-    if sys.platform.startswith('win'):
-        startupinfo = subprocess.STARTUPINFO()
-        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        process = subprocess.Popen(
-            cmd,
-            startupinfo=startupinfo,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            stdin=subprocess.PIPE,
-            shell=False
-        )
-    else:
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            stdin=subprocess.PIPE,
-            shell=False
-        )
-    process.communicate()
-    returncode = process.returncode
-    return returncode
 
 
 class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
@@ -252,6 +210,10 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
 class ResultFileList(ResultList):
     def __init__(self, parent):
+        """
+        Init ResultFileList object
+        """
+
         super(ResultFileList, self).__init__(parent, ["File", "Size", "Matches", "Path", "Encoding", "Modified", "Created"])
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
@@ -259,10 +221,18 @@ class ResultFileList(ResultList):
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
 
     def on_enter_window(self, event):
+        """
+        Reset last moused over item tracker on mouse entering the window
+        """
+
         self.last_moused = (-1, "")
         event.Skip()
 
     def on_motion(self, event):
+        """
+        Display full file path in status bar on item mouseover
+        """
+
         pos = event.GetPosition()
         item = self.HitTestSubItem(pos)[0]
         if item != -1:
@@ -274,6 +244,10 @@ class ResultFileList(ResultList):
         event.Skip()
 
     def get_item_text(self, item, col, abs=False):
+        """
+        Return the text for the given item and col
+        """
+
         if not abs:
             item = self.itemIndexMap[item]
         if col == 1:
@@ -284,10 +258,18 @@ class ResultFileList(ResultList):
             return unicode(self.itemDataMap[item][col])
 
     def OnGetItemImage(self, item):
+        """
+        Override method to get the image for the given item
+        """
+
         encoding = self.itemDataMap[self.itemIndexMap[item]][4]
         return 1 if encoding == "BIN" else 0
 
     def on_dclick(self, event):
+        """
+        Open file at in editor with optional line and column argument
+        """
+
         pos = event.GetPosition()
         item = self.HitTestSubItem(pos)[0]
         if item != -1:
@@ -295,12 +277,16 @@ class ResultFileList(ResultList):
             path = self.GetItem(item, col=3).GetText()
             line = str(self.get_map_item(item, col=7))
             col = str(self.get_map_item(item, col=8))
-            editor_open(join(normpath(path), filename), line, col)
+            open_editor(join(normpath(path), filename), line, col)
         event.Skip()
 
 
 class ResultContentList(ResultList):
     def __init__(self, parent):
+        """
+        Init ResultContentFileList object
+        """
+
         super(ResultContentList, self).__init__(parent, ["File", "Line", "Matches", "Context"])
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
@@ -308,10 +294,18 @@ class ResultContentList(ResultList):
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
 
     def on_enter_window(self, event):
+        """
+        Reset last moused over item tracker on mouse entering the window
+        """
+
         self.last_moused = (-1, "")
         event.Skip()
 
     def on_motion(self, event):
+        """
+        Display full file path in status bar on item mouseover
+        """
+
         pos = event.GetPosition()
         item = self.HitTestSubItem(pos)[0]
         if item != -1:
@@ -323,6 +317,10 @@ class ResultContentList(ResultList):
         event.Skip()
 
     def get_item_text(self, item, col, abs=False):
+        """
+        Return the text for the given item and col
+        """
+
         if not abs:
             item = self.itemIndexMap[item]
         if col == 0:
@@ -331,6 +329,10 @@ class ResultContentList(ResultList):
             return unicode(self.itemDataMap[item][col])
 
     def increment_match_count(self, idx):
+        """
+        Increment the match count of the given item
+        """
+
         entry = list(self.itemDataMap[idx])
         entry[2] += 1
         self.itemDataMap[idx] = tuple(entry)
@@ -344,10 +346,18 @@ class ResultContentList(ResultList):
                 self.widest_cell[2] = width
 
     def OnGetItemImage(self, item):
+        """
+        Override method to get the image for the given item
+        """
+
         encoding = self.itemDataMap[self.itemIndexMap[item]][6]
         return 1 if encoding == "BIN" else 0
 
     def on_dclick(self, event):
+        """
+        Open file at in editor with optional line and column argument
+        """
+
         pos = event.GetPosition()
         item = self.HitTestSubItem(pos)[0]
         if item != -1:
@@ -356,7 +366,7 @@ class ResultContentList(ResultList):
             file_row = self.get_map_item(item, col=4)
             col = str(self.get_map_item(item, col=5))
             path = self.GetParent().GetParent().GetParent().m_result_file_panel.list.get_map_item(file_row, col=3, abs=True)
-            editor_open(join(normpath(path), filename), line, col)
+            open_editor(join(normpath(path), filename), line, col)
         event.Skip()
 
 
