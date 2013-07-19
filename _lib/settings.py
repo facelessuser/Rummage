@@ -152,9 +152,9 @@ class Settings(object):
             folder = expanduser("~/.config/Rummage")
             if not exists(folder):
                 mkdir(folder)
-            settings = SETTINGS_FILE
-            cache = CACHE_FILE
-            log = LOG_FILE
+            settings = join(folder, SETTINGS_FILE)
+            cache = join(folder, CACHE_FILE)
+            log = join(folder, LOG_FILE)
             cls.fifo = join(folder, FIFO)
         try:
             for filename in [settings, cache]:
