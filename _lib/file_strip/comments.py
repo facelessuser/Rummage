@@ -12,42 +12,67 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 '''
 import re
 
+CPP_COMMENTS = re.compile(
+    r"""(/\*[^*]*\*+(?:[^/*][^*]*\*+)*/|\s*//(?:[^\r\n])*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|.[^/"']*)""",
+    re.MULTILINE | re.DOTALL
+)
+
+PY_COMMENTS = re.compile(
+    r"""(\s*#(?:[^\r\n])*)|("{3}(?:\\.|[^\\])*"{3}|'{3}(?:\\.|[^\\])*'{3}|"(?:\\.|[^"\\])*"|'(?:\\.|[^'])*'|.[^#"']*)""",
+    re.MULTILINE | re.DOTALL
+)
+
+LINE_ENDING = re.compile(r"\r?\n", re.MULTILINE)
+
 
 def _strip_regex(pattern, text, preserve_lines):
+    """
+    Strip the comments via regex
+    """
+
     def remove_comments(group, preserve_lines=False):
-        return ''.join([x[0] for x in re.compile(r"\r?\n", re.MULTILINE).findall(group)]) if preserve_lines else ''
+        # Remove comments, and optionally leave the line endings
+        return ''.join([x[0] for x in LINE_ENDING.findall(group)]) if preserve_lines else ''
 
     return (
         ''.join(
             map(
                 lambda m: m.group(2) if m.group(2) else remove_comments(m.group(1), preserve_lines),
-                re.compile(pattern, re.MULTILINE | re.DOTALL).finditer(text)
+                pattern.finditer(text)
             )
         )
     )
 
 
 def _cpp(self, text, preserve_lines=False):
-    return _strip_regex(
-        r"""(/\*[^*]*\*+(?:[^/*][^*]*\*+)*/|\s*//(?:[^\r\n])*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|.[^/"']*)""",
-        text,
-        preserve_lines
-    )
+    """
+    CPP comments regex
+    """
+
+    return _strip_regex(CPP_COMMENTS, text, preserve_lines)
 
 
 def _python(self, text, preserve_lines=False):
-    return _strip_regex(
-        r"""(\s*#(?:[^\r\n])*)|("{3}(?:\\.|[^\\])*"{3}|'{3}(?:\\.|[^\\])*'{3}|"(?:\\.|[^"\\])*"|'(?:\\.|[^'])*'|.[^#"']*)""",
-        text,
-        preserve_lines
-    )
+    """
+    Python comments regex
+    """
+
+    return _strip_regex(PY_COMMENTS, text, preserve_lines)
 
 
 class CommentException(Exception):
     def __init__(self, value):
+        """
+        Init exception
+        """
+
         self.value = value
 
     def __str__(self):
+        """
+        Exception string
+        """
+
         return repr(self.value)
 
 
@@ -55,24 +80,42 @@ class Comments(object):
     styles = []
 
     def __init__(self, style=None, preserve_lines=False):
+        """
+        Init Comments object
+        """
+
         self.preserve_lines = preserve_lines
         self.call = self.__get_style(style)
 
     @classmethod
     def add_style(cls, style, fn):
+        """
+        Add comment style
+        """
+
         if not style in cls.__dict__:
             setattr(cls, style, fn)
             cls.styles.append(style)
 
     def __get_style(self, style):
+        """
+        Get comment styel
+        """
+
         if style in self.styles:
             return getattr(self, style)
         else:
             raise CommentException(style)
 
     def strip(self, text):
+        """
+        Execute comment stripping call
+        """
+
         return self.call(text, self.preserve_lines)
 
+
+# Supported aliases for comment stripping
 Comments.add_style("c", _cpp)
 Comments.add_style("json", _cpp)
 Comments.add_style("cpp", _cpp)

@@ -13,15 +13,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import re
 from comments import Comments
 
+DANGLING_COMMAS = re.compile(
+    r"""((,([\s\r\n]*)(\]))|(,([\s\r\n]*)(\})))|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|.[^,"']*)""",
+    re.MULTILINE | re.DOTALL
+)
+
 
 def strip_dangling_commas(text, preserve_lines=False):
-    regex = re.compile(
-        # ([1st group] dangling commas) | ([8th group] everything else)
-        r"""((,([\s\r\n]*)(\]))|(,([\s\r\n]*)(\})))|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|.[^,"']*)""",
-        re.MULTILINE | re.DOTALL
-    )
+    """
+    Strip dangling commas from JSON (they will kill the parsing)
+    """
 
     def remove_comma(m, preserve_lines=False):
+        """
+        Remove the commas
+        """
+
         if preserve_lines:
             # ,] -> ] else ,} -> }
             return m.group(3) + m.group(4) if m.group(2) else m.group(6) + m.group(7)
@@ -33,15 +40,23 @@ def strip_dangling_commas(text, preserve_lines=False):
         ''.join(
             map(
                 lambda m: m.group(8) if m.group(8) else remove_comma(m, preserve_lines),
-                regex.finditer(text)
+                DANGLING_COMMAS.finditer(text)
             )
         )
     )
 
 
 def strip_comments(text, preserve_lines=False):
+    """
+    Strip JSON comments
+    """
+
     return Comments('json', preserve_lines).strip(text)
 
 
 def sanitize_json(text, preserve_lines=False):
+    """
+    Strip dangling commas and C-style comments
+    """
+
     return strip_dangling_commas(Comments('json', preserve_lines).strip(text), preserve_lines)

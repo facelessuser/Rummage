@@ -12,6 +12,7 @@ import json
 import sys
 from os import mkdir
 from os.path import expanduser, exists, join, getmtime
+import traceback
 
 from _lib.file_strip.json import sanitize_json
 
@@ -61,8 +62,12 @@ class Settings(object):
                     cls.settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
                 with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
                     cls.cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
-            except Exception as e:
-                errormsg("Failed to load settings file!\n\n%s" % str(e))
+            except:
+                e = traceback.format_exc()
+                try:
+                    errormsg("Failed to load settings file!\n\n%s" % str(e))
+                except:
+                    print("Failed to load settings file!\n\n%s" % str(e))
         if cls.get_debug():
             set_debug_mode(True)
         debug(cls.settings)
@@ -431,8 +436,12 @@ class Settings(object):
         try:
             with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(cls.settings, sort_keys=True, indent=4, separators=(',', ': ')))
-        except Exception as e:
-            errormsg("Failed to save settings file!\n\n%s" % str(e))
+        except:
+            e = traceback.format_exc()
+            try:
+                errormsg("Failed to save settings file!\n\n%s" % str(e))
+            except:
+                print("Failed to save settings file!\n\n%s" % str(e))
 
     @classmethod
     def save_cache(cls):
@@ -443,5 +452,9 @@ class Settings(object):
         try:
             with codecs.open(cls.cache_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(cls.cache, sort_keys=True, indent=4, separators=(',', ': ')))
-        except Exception as e:
-            errormsg("Failed to save settings file!\n\n%s" % str(e))
+        except:
+            e = traceback.format_exc()
+            try:
+                errormsg("Failed to save cache file!\n\n%s" % str(e))
+            except:
+                print("Failed to save cache file!\n\n%s" % str(e))
