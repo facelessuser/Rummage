@@ -25,7 +25,7 @@ You can search in regex or literal.
 
 Rummage will keep a history of your last congiuration between sessions.  It will also keep a history of the last 20 configurations of search, file search, etc.
 
-Rummage can generally search ASCII, UTF8, UTF16, Latin-1, and it will search for ASCII strings in binary files if binary file option is enabled.  It really doesn't use an encoding detection right now since detecting the encoding is kind of slow in Python.  It just loops through the aforementioned encodings trying to open the files in different encodings (which turned out to be the fastet so far in Python).
+Rummage can generally search ASCII, UTF8, UTF16 (poor detection without BOM), UTF32 with BOM (haven't really tested this), Latin-1, and maybe cp1252 (Assuming it can rule out Latin-1), and it will search for ASCII strings in binary files if binary file option is enabled.
 
 Rummage has the ability to save and load commonly used regex.  It also has a simple regex tester to help you sort out complicated regex.
 
