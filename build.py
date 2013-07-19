@@ -40,6 +40,7 @@ class BuildParams(object):
     upx_bin = None
     dist_path = None
     name = None
+    clean = None
     extension = None
     icon = None
 
@@ -55,12 +56,13 @@ def parse_settings(args, obj):
     obj.python_bin = dirname(sys.executable)
     obj.pyinstaller_script = join(script_path, "pyinstaller", "pyinstaller.py")
     obj.out_dir = join(script_path, "build")
-    obj.dist_path = join(script_path, "bin")
+    obj.dist_path = join(script_path, "dist")
     obj.upx_bin = None
     obj.name = args.name
     obj.extension = args.extension
     obj.script = path.abspath(path.normpath(args.script))
     obj.icon = args.icon
+    obj.clean = args.clean
 
     if not path.exists(obj.script):
         print >> sys.stderr, "Could not find %s!" % obj.script
@@ -135,6 +137,7 @@ def parse_options(args, obj):
             ["python", obj.pyinstaller_script, '-F'] +
             (['--upx-dir=%s' % obj.upx_bin] if obj.upx_bin is not None else []) +
             (['--icon=%s' % args.icon] if args.icon is not None else []) +
+            (['--clean'] if args.clean is not None else []) +
             (['-w', '--workpath=%s' % obj.out_dir] if args.gui else ['--workpath=%s' % obj.out_dir]) +
             ['--distpath=%s' % obj.dist_path] +
             ['--name=%s' % args.name] +
@@ -186,11 +189,11 @@ def main():
     parser.add_argument('name', default=None, help='Name of app')
     inputs = parser.parse_args()
     if _PLATFORM == "osx":
-        args = Args("main.py", inputs.name, True, inputs.clean, ".app", abspath("_icons/rummage.icns"))
+        args = Args("Rummage.py", inputs.name, True, inputs.clean, ".app", abspath("_icons/rummage.icns"))
     elif _PLATFORM == "windows":
-        args = Args("main.py", inputs.name, True, inputs.clean, ".exe", abspath("_icons\\rummage.ico"))
+        args = Args("Rummage.py", inputs.name, True, inputs.clean, ".exe", abspath("_icons\\rummage.ico"))
     else:
-        args = Args("main.py", inputs.name, True, inputs.clean, "")
+        args = Args("Rummage.py", inputs.name, True, inputs.clean, "")
 
     # Parse options
     build_params = BuildParams()

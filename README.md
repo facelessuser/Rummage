@@ -61,7 +61,7 @@ Build:
 
 Run build with the python you are using `python build.py -c Rummage`
 
-Binaries will be in the `bin` folder in your project.
+Binaries will be in the `dist` folder in your project.
 
 Planned Enhancements
 =======

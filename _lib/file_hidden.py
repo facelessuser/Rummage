@@ -58,34 +58,6 @@ def _test(fn):
     # print "OSX Hidden Method: %d, Test Path: %s, Result: %s"  % (_OSX_FOUNDATION_METHOD, path, str(fn(path)))
 
 
-if _PLATFORM == "osx":
-    # OSX is_hidden based on the Foundation module
-
-    # http://stackoverflow.com/questions/284115/cross-platform-hidden-file-detection
-    try:
-        import Foundation
-
-        def is_osx_hidden(path):
-            """
-            OSX platform is_hidden
-            """
-
-            pool = Foundation.NSAutoreleasePool.alloc().init()
-            hidden = (
-                is_nix_hidden(path) or
-                Foundation.NSURL.fileURLWithPath_(path).getResourceValue_forKey_error_(
-                    None, Foundation.NSURLIsHiddenKey, None
-                )[1]
-            )
-            del pool
-            return hidden
-
-        _OSX_FOUNDATION_METHOD = _OSX_USE_FOUNDATION
-        _test(is_osx_hidden)
-    except:
-        _OSX_FOUNDATION_METHOD = _OSX_FOUNDATION_NOT_LOADED
-        pass
-
 if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
     #Fallback to use ctypes to call the ObjC library CoreFoundation for OSX is_hidden
 
@@ -126,8 +98,8 @@ if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
             try:
                 yield
             finally:
-                for thing in stuff:
-                    cf.CFRelease(thing)
+                for obj in objects:
+                    cf.CFRelease(obj)
 
 
         def is_osx_hidden(path):
@@ -139,17 +111,17 @@ if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
             if not isinstance(path, bytes):
                 path = path.encode('UTF-8')
 
-            stuff = []
-            with cfreleasing(stuff):
+            objects = []
+            with cfreleasing(objects):
                 url = cf.CFURLCreateFromFileSystemRepresentation(None, path, len(path), False)
-                stuff.append(url)
+                objects.append(url)
                 val = ctypes.c_void_p(0)
                 ret = cf.CFURLCopyResourcePropertyForKey(
                     url, kCFURLIsHiddenKey, ctypes.addressof(val), None
                 )
                 if ret:
                     result = cf.CFBooleanGetValue(val)
-                    stuff.append(val)
+                    objects.append(val)
                     return True if result else False
                 raise OSError('CFURLCopyResourcePropertyForKey failed')
 
