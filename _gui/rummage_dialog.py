@@ -560,8 +560,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if self.debounce_search:
                 return
         self.debounce_search = True
-        if self.m_search_button.GetLabel() == "Stop":
+        if self.m_search_button.GetLabel() in ["Stop", "Aborting"]:
             if self.thread is not None:
+                self.m_search_button.SetLabel("Aborting")
+                wx.GetApp().Yield()
                 global _ABORT
                 with _LOCK:
                     _ABORT = True
@@ -583,13 +585,19 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         fail = False
         msg = ""
         if self.m_regex_search_checkbox.GetValue():
-            if self.validate_search_regex():
+            if self.m_searchfor_textbox.GetValue() == "" or self.validate_search_regex():
                 msg = "Please enter a valid search regex!"
                 fail = True
+        elif self.m_searchfor_textbox.GetValue() == "":
+            msg = "Please enter a valid search!"
+            fail = True
         if not fail and self.m_fileregex_checkbox.GetValue():
-            if self.validate_regex(self.m_filematch_textbox.Value):
+            if self.m_filematch_textbox.GetValue().strip() == "" or self.validate_regex(self.m_filematch_textbox.Value):
                 msg = "Please enter a valid file regex!"
                 fail = True
+        elif self.m_filematch_textbox.GetValue().strip() == "":
+            msg = "Please enter a valid file pattern!"
+            fail = True
         if not fail and self.m_dirregex_checkbox.GetValue():
             if self.validate_regex(self.m_exclude_textbox.Value):
                 msg = "Please enter a valid exlcude directory regex!"
