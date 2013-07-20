@@ -66,8 +66,9 @@ try:
 
         try:
             notice = pynotify.Notification(
-                APP_NAME,
-                "%s\n\n%s" % (title, message)
+                title,
+                message,
+                NOTIFY_OSD_ICON
             )
             notice.show()
         except:

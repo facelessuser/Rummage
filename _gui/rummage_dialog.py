@@ -327,6 +327,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         super(RummageFrame, self).__init__(parent)
 
+        if _PLATFORM == "linux":
+            self.m_progressbar.SetInitialSize(wx.Size(-1, 5))
+            self.m_progressbar.GetContainingSizer().Layout()
+            self.Fit()
+
         self.SetIcon(rum_64.GetIcon())
 
         self.debounce_search = False
