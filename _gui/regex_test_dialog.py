@@ -35,8 +35,12 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         self.m_case_checkbox.SetValue(is_case)
         self.m_dot_checkbox.SetValue(is_dot)
-        self.m_regex_text.SetValue(text)
         self.stand_alone = stand_alone
+        self.regex_event_code = -1
+        self.init_regex_timer()
+        self.start_regex_timer()
+
+        self.m_regex_text.SetValue(text)
 
         # If launched as a "stand alone" (main frame) disable unneeded objects
         if stand_alone:
@@ -50,6 +54,39 @@ class RegexTestDialog(gui.RegexTestDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+    def init_regex_timer(self):
+        """
+        Init the update Timer object]
+        """
+
+        self.regex_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.regex_event, self.regex_timer)
+
+    def start_regex_timer(self):
+        """
+        Start update timer
+        """
+
+        if not self.regex_timer.IsRunning():
+            self.regex_timer.Start(500)
+
+    def stop_regex_timer(self):
+        """
+        Stop update timer
+        """
+
+        if self.regex_timer.IsRunning():
+            self.regex_timer.Stop()
+
+    def regex_event(self, event):
+        if self.regex_event_code == 0:
+            self.test_regex()
+            self.regex_event_code -= 1
+        else:
+            if self.regex_event_code > 0:
+                self.regex_event_code = 0
+            event.Skip()
 
     def set_keybindings(self, keybindings):
         """
@@ -75,18 +112,12 @@ class RegexTestDialog(gui.RegexTestDialog):
             text.SelectAll()
         event.Skip()
 
-    def on_size(self, event):
-        """
-        Ensure good sizing
-        """
-
-        self.GetSizer().Layout()
-        event.Skip()
-
     def on_close(self, event):
         """
         Enable parent Rummage Dialog "Test Regex" button on close
         """
+
+        self.stop_regex_timer()
 
         if not self.stand_alone:
             self.parent.m_regex_test_button.Enable(True)
@@ -108,10 +139,18 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         self.Close()
 
-    def test_regex(self, event):
+    def test_regex(self):
         """
         Test and highlight search results in content buffer
         """
+
+        if self.m_regex_text.GetValue() == "":
+            self.m_test_text.SetStyle(
+                0,
+                self.m_test_text.GetLastPosition(),
+                wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
+            )
+            return
 
         flags = 0
         if not self.m_case_checkbox.GetValue():
@@ -130,20 +169,26 @@ class RegexTestDialog(gui.RegexTestDialog):
             )
 
             for m in test.finditer(text):
-                self.m_test_text.SetStyle(
-                    m.start(0),
-                    m.end(0),
-                    wx.TextAttr(colBack=wx.Colour(0xFF, 0xCC, 0x00))
-                )
+                try:
+                    self.m_test_text.SetStyle(
+                        m.start(0),
+                        m.end(0),
+                        wx.TextAttr(colBack=wx.Colour(0xFF, 0xCC, 0x00))
+                    )
+                except:
+                    pass
         except:
             print(str(traceback.format_exc()))
             pass
+
+    def regex_start_event(self, event):
+        self.regex_event_code += 1
         event.Skip()
 
-    on_test_changed = test_regex
+    on_test_changed = regex_start_event
 
-    on_regex_changed = test_regex
+    on_regex_changed = regex_start_event
 
-    on_case_toggle = test_regex
+    on_case_toggle = regex_start_event
 
-    on_dot_toggle = test_regex
+    on_dot_toggle = regex_start_event
