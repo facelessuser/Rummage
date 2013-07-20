@@ -13,6 +13,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import wx
 import sys
 import gntp.notifier
+import subprocess
+from os.path import exists
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -23,6 +25,7 @@ else:
 
 if _PLATFORM == "windows":
     import winsound
+    
 
 if _PLATFORM == "osx":
     from ctypes import *
@@ -48,6 +51,33 @@ if _PLATFORM == "osx":
 
 GROWL_ICON = None
 GROWL_ENABLED = False
+
+
+try:
+    import pynotify
+    pynotify.init("Rummage")
+
+
+    def notify_osd(title, message, sound):
+        try:
+            notice = pynotify.Notification("Rummage", "%s\n\n%s" % (title, message))
+            notice.show()
+        except:
+            pass
+
+        if sound:
+            # Play sound if desired
+            play_alert()
+
+except:
+
+
+    def notify_osd(title, message, sound):
+        if sound:
+            # Play sound if desired
+            play_alert()
+
+    print("no notify osd")
 
 
 # Init growl object
@@ -115,6 +145,11 @@ def play_alert(sound=None):
     elif _PLATFORM == "windows":
         snd = sound if sound is not None else "*"
         winsound.PlaySound(snd, winsound.SND_ALIAS)
+    else:
+        if exists('/usr/share/sounds/gnome/default/alerts/glass.ogg'):
+            subprocess.call(['/usr/bin/canberra-gtk-play', '-f', '/usr/share/sounds/gnome/default/alerts/glass.ogg'])
+        else:
+            subprocess.call(['/usr/bin/canberra-gtk-play','--id','bell'])
 
 
 try:
@@ -194,7 +229,9 @@ def info(title, message="", sound=False):
     default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_INFORMATION, sound=sound).Show()
     if has_growl() and GROWL_ENABLED:
         growl_notify("Info", title, message, sound, default_notify)
-    elif _PLATFORM != "osx":
+    elif _PLATFORM == "linux":
+        notify_osd(title, message, sound)
+    elif _PLATFORM != "osx" or _PLATFORM != "linux":
         default_notify(title, message, sound)
 
 
@@ -206,7 +243,9 @@ def error(title, message, sound=False):
     default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_ERROR, sound=sound).Show()
     if has_growl() and GROWL_ENABLED:
         growl_notify("Error", title, message, sound, default_notify)
-    elif _PLATFORM != "osx":
+    elif _PLATFORM == "linux":
+        notify_osd(title, message, sound)
+    elif _PLATFORM != "osx" or _PLATFORM != "linux":
         default_notify(title, message, sound)
 
 
@@ -218,5 +257,7 @@ def warning(title, message, sound=False):
     default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_WARNING, sound=sound).Show()
     if has_growl() and GROWL_ENABLED:
         growl_notify("Warning", title, message, sound, default_notify)
-    elif _PLATFORM != "osx":
+    elif _PLATFORM == "linux":
+        notify_osd(title, message, sound)
+    elif _PLATFORM != "osx" or _PLATFORM != "linux":
         default_notify(title, message, sound)

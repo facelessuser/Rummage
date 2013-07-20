@@ -36,7 +36,7 @@ FIFO = "rummage.fifo"
 NOTIFY_STYLES = {
     "osx": ["growl"],
     "windows": ["native", "growl"],
-    "linux": ["default"]
+    "linux": ["native"]
 }
 
 class Settings(object):
