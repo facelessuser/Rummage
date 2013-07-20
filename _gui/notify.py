@@ -48,6 +48,7 @@ if _PLATFORM == "osx":
     NSSound = c_void_p(objc.objc_getClass('NSSound'))
     NSAutoreleasePool = c_void_p(objc.objc_getClass('NSAutoreleasePool'))
 
+from . import RUMMAGE_USED_OLD_WX
 
 GROWL_ICON = None
 GROWL_ENABLED = False
@@ -195,8 +196,19 @@ except:
             # Play sound if desired
             play_alert()
 
+if RUMMAGE_USED_OLD_WX:
+    class __NotificationMessage(object):
+        def Show(self):
+            print 'Unsupported in wx < 2.9 call wx.NotificationMessage.Show'
 
-class Notify(wx.NotificationMessage):
+        def SetFlags(self, *args, **kwargs):
+            print 'Unsupported in wx < 2.9 wx.NotificationMessage.SetFlags called'
+else:
+    class __NotificationMessage(wx.NotificationMessage):
+        pass
+
+
+class Notify(__NotificationMessage):
     def __init__(self, *args, **kwargs):
         """
         Setup Notify object
