@@ -140,6 +140,7 @@ class Settings(object):
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
             cls.fifo = join(folder, '\\\\.\\pipe\\rummage')
+            cls.config_folder = folder
         elif _PLATFORM == "osx":
             folder = expanduser("~/Library/Application Support/Rummage")
             if not exists(folder):
@@ -148,6 +149,7 @@ class Settings(object):
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
             cls.fifo = join(folder, FIFO)
+            cls.config_folder = folder
         elif _PLATFORM == "linux":
             folder = expanduser("~/.config/Rummage")
             if not exists(folder):
@@ -156,6 +158,7 @@ class Settings(object):
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
             cls.fifo = join(folder, FIFO)
+            cls.config_folder = folder
         try:
             for filename in [settings, cache]:
                 if not exists(filename):
@@ -164,6 +167,14 @@ class Settings(object):
         except Exception:
             pass
         return settings, cache, log
+
+    @classmethod
+    def get_config_folder(cls):
+        """
+        Return config folder
+        """
+
+        return cls.config_folder
 
     @classmethod
     def get_fifo(cls):

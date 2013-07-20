@@ -13,6 +13,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import wx
 from os.path import abspath, normpath
 
+from _lib.settings import Settings
+
 from _gui.custom_app import PipeApp
 from _gui.platform_window_focus import platform_window_focus
 from _gui.custom_app import *
@@ -22,7 +24,6 @@ import _gui.notify as notify
 
 from _icons.rum_ico import rum_64
 
-notify.set_growl_icon(rum_64.GetData())
 wx.Log.EnableLogging(False)
 
 
@@ -31,6 +32,8 @@ class RummageApp(PipeApp):
         """
         Init RummageApp object
         """
+        # Set the app icon
+        notify.set_app_icon(rum_64.GetData(), Settings.get_config_folder())
 
         super(RummageApp, self).__init__(*args, **kwargs)
 

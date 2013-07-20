@@ -14,7 +14,8 @@ import wx
 import sys
 import gntp.notifier
 import subprocess
-from os.path import exists
+from os.path import exists, join
+from version import app as APP_NAME
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -25,7 +26,7 @@ else:
 
 if _PLATFORM == "windows":
     import winsound
-    
+
 
 if _PLATFORM == "osx":
     from ctypes import *
@@ -48,19 +49,26 @@ if _PLATFORM == "osx":
     NSSound = c_void_p(objc.objc_getClass('NSSound'))
     NSAutoreleasePool = c_void_p(objc.objc_getClass('NSAutoreleasePool'))
 
-
+NOTIFY_OSD_ICON = None
 GROWL_ICON = None
 GROWL_ENABLED = False
 
 
 try:
     import pynotify
-    pynotify.init("Rummage")
+    pynotify.init(APP_NAME)
 
 
     def notify_osd(title, message, sound):
+        """
+        Ubuntu Notify OSD notifications
+        """
+
         try:
-            notice = pynotify.Notification("Rummage", "%s\n\n%s" % (title, message))
+            notice = pynotify.Notification(
+                APP_NAME,
+                "%s\n\n%s" % (title, message)
+            )
             notice.show()
         except:
             pass
@@ -71,8 +79,11 @@ try:
 
 except:
 
-
     def notify_osd(title, message, sound):
+        """
+        Ubuntu Notify OSD notifications fallback (just sound)
+        """
+
         if sound:
             # Play sound if desired
             play_alert()
@@ -82,9 +93,9 @@ except:
 
 # Init growl object
 growl = gntp.notifier.GrowlNotifier(
-    applicationName = "Rummage",
-    notifications = ["Info","Warning", "Error"],
-    defaultNotifications = ["Info"]
+    applicationName = APP_NAME,
+    notifications = ["Info", "Warning", "Error"],
+    defaultNotifications = ["Info", "Warning", "Error"]
 )
 
 
@@ -104,13 +115,22 @@ def has_growl():
     return growl is not None
 
 
-def set_growl_icon(icon):
+def set_app_icon(icon, pth):
     """
     Set app icon for growl
     """
 
     global GROWL_ICON
+    global NOTIFY_OSD_ICON
     GROWL_ICON = icon
+    NOTIFY_OSD_ICON = join(pth, APP_NAME + "-notify.png")
+    try:
+        if not exists(NOTIFY_OSD_ICON):
+            with open(NOTIFY_OSD_ICON, "w") as f:
+                f.write(icon)
+    except:
+        NOTIFY_OSD_ICON = None
+        pass
 
 
 def _nsstring(string):

@@ -563,7 +563,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if self.m_search_button.GetLabel() in ["Stop", "Aborting"]:
             if self.thread is not None:
                 self.m_search_button.SetLabel("Aborting")
-                wx.GetApp().Yield()
                 global _ABORT
                 with _LOCK:
                     _ABORT = True
