@@ -14,6 +14,8 @@ import wx
 import sys
 from wx.combo import ComboPopup, ComboCtrl
 
+from . import RUMMAGE_USED_OLD_WX
+
 class AutoCompleteCombo(ComboCtrl):
     def __init__(self, parent, choices=[], load_last=False, changed_callback=None):
         """
@@ -35,7 +37,8 @@ class AutoCompleteCombo(ComboCtrl):
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_CHAR, self.on_char)
         self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
-        self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
+        if not RUMMAGE_USED_OLD_WX:
+            self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
         self.Bind(wx.EVT_TEXT, self.on_text_change)
 
         # Add choices
