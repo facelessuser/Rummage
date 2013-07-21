@@ -35,8 +35,11 @@ class AutoCompleteCombo(ComboCtrl):
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_CHAR, self.on_char)
         self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
-        self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
         self.Bind(wx.EVT_TEXT, self.on_text_change)
+        try:
+            self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
+        except:
+            pass
 
         # Add choices
         self.update_choices(choices, load_last)

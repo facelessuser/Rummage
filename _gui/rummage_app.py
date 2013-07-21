@@ -20,9 +20,6 @@ from _gui.platform_window_focus import platform_window_focus
 from _gui.custom_app import *
 from _gui.rummage_dialog import RummageFrame
 from _gui.regex_test_dialog import RegexTestDialog
-import _gui.notify as notify
-
-from _icons.rum_ico import rum_64
 
 wx.Log.EnableLogging(False)
 
@@ -32,8 +29,6 @@ class RummageApp(PipeApp):
         """
         Init RummageApp object
         """
-        # Set the app icon
-        notify.set_app_icon(rum_64.GetData(), Settings.get_config_folder())
 
         super(RummageApp, self).__init__(*args, **kwargs)
 
