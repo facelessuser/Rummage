@@ -243,8 +243,6 @@ def has_growl():
 ###################################
 # WxPython Notification
 ###################################
-WXNOTIFY = None
-
 try:
     class WxNotify(wx.NotificationMessage):
         def __init__(self, *args, **kwargs):
