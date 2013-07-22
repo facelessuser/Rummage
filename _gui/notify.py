@@ -106,32 +106,35 @@ def notify_osd_fallback(title, message, sound, fallback):
 
 NOTIFY_OSD = notify_osd_fallback
 
+if _PLATFORM != "linux":
+    try:
+        import pynotify
 
-try:
-    import pynotify
+        def notify_osd_call(title, message, sound, fallback):
+            """
+            Ubuntu Notify OSD notifications
+            """
 
-    def notify_osd_call(title, message, sound, fallback):
-        """
-        Ubuntu Notify OSD notifications
-        """
+            try:
+                notice = pynotify.Notification(
+                    title,
+                    message,
+                    NOTIFY_OSD_ICON
+                )
+                notice.show()
 
-        try:
-            notice = pynotify.Notification(
-                title,
-                message,
-                NOTIFY_OSD_ICON
-            )
-            notice.show()
-
-            if sound:
-                # Play sound if desired
-                play_alert()
-        except:
-            # Fallback to wxpython notification
-            fallback(title, description, sound)
+                if sound:
+                    # Play sound if desired
+                    play_alert()
+            except:
+                # Fallback to wxpython notification
+                fallback(title, description, sound)
 
 
-except:
+    except:
+        notify_osd_call = None
+        print("no notify osd")
+else:
     notify_osd_call = None
     print("no notify osd")
 
@@ -170,31 +173,36 @@ def notify_growl_fallback(note_type, title, description, sound, fallback):
 
 NOTIFY_GROWL = notify_growl_fallback
 
-try:
-    import gntp.notifier
 
-    def notify_growl_call(note_type, title, description, sound, fallback):
-        """
-        Send growl notification
-        """
+if _PLATFORM in ["windows", "osx"]:
+    try:
+        import gntp.notifier
 
-        try:
-            GROWL.notify(
-                noteType = note_type,
-                title = title,
-                description = description,
-                icon=GROWL_ICON,
-                sticky = False,
-                priority = 1
-            )
+        def notify_growl_call(note_type, title, description, sound, fallback):
+            """
+            Send growl notification
+            """
 
-            if sound:
-                # Play sound if desired
-                play_alert()
-        except:
-            # Fallback to wxpython notification
-            fallback(title, description, sound)
-except:
+            try:
+                GROWL.notify(
+                    noteType = note_type,
+                    title = title,
+                    description = description,
+                    icon=GROWL_ICON,
+                    sticky = False,
+                    priority = 1
+                )
+
+                if sound:
+                    # Play sound if desired
+                    play_alert()
+            except:
+                # Fallback to wxpython notification
+                fallback(title, description, sound)
+    except:
+        notify_growl_call = None
+        print("no growl")
+else:
     notify_growl_call = None
     print("no growl")
 
