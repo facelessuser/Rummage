@@ -127,6 +127,7 @@ class CustomApp(wx.App):
             callback: A callback you can do if instance checks out
         """
 
+        self.instance = None
         self.outputWindowClass = GuiLog
         self.custom_init(*args, **kwargs)
         if "single_instance_name" in kwargs:
@@ -185,8 +186,8 @@ class CustomApp(wx.App):
         """
         Cleanup instance check
         """
-
-        del self.instance
+        if self.instance != None:
+            del self.instance
 
 
 class ArgPipeThread(object):

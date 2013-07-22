@@ -20,7 +20,7 @@ from _gui.custom_app import debug, debug_struct, info, error
 from _gui.custom_app import init_app_log, set_debug_mode
 from _gui.generic_dialogs import *
 import _gui.notify as notify
-from _icons.rum_ico import rum_64
+from _icons.rum_ico import rum_64, rum_tray
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -317,7 +317,7 @@ class Settings(object):
 
         # Set up notifications
         if first_time:
-            notify.setup_notifications("Rummage", rum_64.GetData(), cls.get_config_folder())
+            notify.setup_notifications("Rummage", rum_64.GetData(), rum_tray.GetData(), cls.get_config_folder())
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
 
     @classmethod

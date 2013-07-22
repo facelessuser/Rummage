@@ -101,7 +101,7 @@ def notify_osd_fallback(title, message, sound, fallback):
     """
 
     # Fallback to wxpython notification
-    fallback(title, description, sound)
+    fallback(title, message, sound)
 
 
 NOTIFY_OSD = notify_osd_fallback
@@ -241,34 +241,190 @@ def has_growl():
 
 
 ###################################
+# Windows Native Notifications
+###################################
+NOTIFY_WIN_ICON = None
+NOTIFY_WIN = None
+
+class WinNotifyLevel(object):
+    ICON_INFORMATION = 0x01
+    ICON_WARNING = 0x02
+    ICON_ERROR = 0x04
+
+def notify_win_fallback(title, message, sound, icon, fallback):
+    """
+    Notify win calls the fallback
+    """
+
+    fallback(title, message, sound)
+
+NOTIFY_WIN = notify_win_fallback
+
+if _PLATFORM == "windows":
+    try:
+        from win32api import *
+        from win32gui import *
+        import win32con
+        import struct
+        import time
+
+        class NotifyWin(object):
+            def __init__(self, app_name, icon, tooltip=None):
+                """
+                Setup
+                """
+
+                message_map = {
+                    win32con.WM_DESTROY: self.OnDestroy,
+                    win32con.WM_USER + 20 : self.OnTaskbarNotify,
+                }
+
+                self.tooltip = tooltip
+                self.visible = False
+
+                # Register window class
+                wc = WNDCLASS()
+                self.hinst = wc.hInstance = GetModuleHandle(None)
+                wc.lpszClassName = app_name
+                wc.lpfnWndProc = message_map # could also specify a wndproc.
+                self.class_atom = RegisterClass(wc)
+
+                # Create the Window.
+                style = win32con.WS_OVERLAPPED | win32con.WS_SYSMENU
+                self.hwnd = CreateWindow(
+                    self.class_atom, "Taskbar", style,
+                    0, 0, win32con.CW_USEDEFAULT, win32con.CW_USEDEFAULT,
+                    0, 0, self.hinst, None
+                )
+                UpdateWindow(self.hwnd)
+
+                self.hicon = self.get_icon(icon)
+
+            def get_icon(self, icon):
+                icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
+                try:
+                    hicon = LoadImage(
+                        self.hinst, icon,
+                        win32con.IMAGE_ICON,
+                        0, 0, icon_flags
+                    )
+                except:
+                    hicon = LoadIcon(0, win32con.IDI_APPLICATION)
+
+                return hicon
+
+            def show_notification(self, title, msg, sound, icon, fallback):
+                try:
+                    self._show_notification(title, msg, sound, icon)
+                except:
+                    fallback(title, msg, sound)
+
+            def _show_notification(self, title, msg, sound, icon):
+                icon_level = 0
+                if icon & WinNotifyLevel.ICON_INFORMATION:
+                    icon_level |= NIIF_INFO
+                elif icon & WinNotifyLevel.ICON_WARNING:
+                    icon_level |= NIIF_WARNING
+                elif icon & WinNotifyLevel.ICON_ERROR:
+                    icon_level |= NIIF_ERROR
+                flags = NIF_ICON | NIF_MESSAGE | NIF_TIP
+                self.show_icon()
+                Shell_NotifyIcon(
+                    NIM_MODIFY,
+                    (
+                        self.hwnd, 0, NIF_INFO, win32con.WM_USER + 20,
+                        self.hicon, "Balloon tooltip", msg, 200, title,
+                        icon_level
+                    )
+                )
+
+                if sound:
+                    play_alert()
+
+            def OnTaskbarNotify(self, hwnd, msg, wparam, lparam):
+                if lparam == 1028:
+                    self.hide_icon()
+                    # Noification dismissed
+
+            def show_icon(self):
+                """
+                Display the taskbar icon
+                """
+
+                flags = NIF_ICON | NIF_MESSAGE
+                if self.tooltip is not None:
+                    flags |= NIF_TIP
+                    nid = (self.hwnd, 0, flags, win32con.WM_USER + 20, self.hicon, self.tooltip)
+                else:
+                    nid = (self.hwnd, 0, flags, win32con.WM_USER + 20, self.hicon)
+                if self.visible:
+                    self.hide_icon()
+                Shell_NotifyIcon(NIM_ADD, nid)
+                self.visible = True
+
+            def hide_icon(self):
+                """
+                Hide icon
+                """
+
+                if self.visible:
+                    nid = (self.hwnd, 0)
+                    Shell_NotifyIcon(NIM_DELETE, nid)
+                self.visible = False
+
+            def OnDestroy(self, hwnd, msg, wparam, lparam):
+                """
+                Remove icon and notification
+                """
+
+                self.hide_icon()
+                PostQuitMessage(0)
+
+    except:
+        NotifyWin = None
+        print("no win notify")
+else:
+    NotifyWin = None
+    print("no win notify")
+
+
+def setup_noitfy_win(app_name, icon):
+    global NOTIFY_WIN
+
+    if NotifyWin is not None:
+        NOTIFY_WIN = NotifyWin(app_name + "Taskbar", icon, app_name).show_notification
+
+
+###################################
 # WxPython Notification
 ###################################
-try:
-    class WxNotify(wx.NotificationMessage):
-        def __init__(self, *args, **kwargs):
-            """
-            Setup Notify object
-            """
+# try:
+#     class WxNotify(wx.NotificationMessage):
+#         def __init__(self, *args, **kwargs):
+#             """
+#             Setup Notify object
+#             """
 
-            self.sound = kwargs.get("sound", False)
-            self.flags = kwargs.get("flags", 0)
-            if "sound" in kwargs:
-                del kwargs["sound"]
-            if "flags" in kwargs:
-                del kwargs["flags"]
-            super(Notify, self).__init__(*args, **kwargs)
-            self.SetFlags(self.flags)
+#             self.sound = kwargs.get("sound", False)
+#             self.flags = kwargs.get("flags", 0)
+#             if "sound" in kwargs:
+#                 del kwargs["sound"]
+#             if "flags" in kwargs:
+#                 del kwargs["flags"]
+#             super(Notify, self).__init__(*args, **kwargs)
+#             self.SetFlags(self.flags)
 
-        def Show(self):
-            """
-            Show notification
-            """
+#         def Show(self):
+#             """
+#             Show notification
+#             """
 
-            super(Notify, self).Show()
-            if self.sound:
-                play_alert()
-except:
-    WxNotify = None
+#             super(Notify, self).Show()
+#             if self.sound:
+#                 play_alert()
+# except:
+#     WxNotify = None
+WxNotify = None
 
 
 class NotifyFallback(object):
@@ -279,39 +435,48 @@ class NotifyFallback(object):
         if self.sound:
             play_alert()
 
-Notify = WxNotify if _PLATFORM not in ["linux", "osx"] and WxNotify is not None else NotifyFallback
-
+Notify = WxNotify if WxNotify is not None else NotifyFallback
 
 
 ###################################
 # Setup Notifications
 ###################################
-def set_app_icon(app_name, icon, pth):
+def set_app_icon(app_name, png, icon, pth):
     """
     Set app icon for growl
     """
 
     global GROWL_ICON
     global NOTIFY_OSD_ICON
+    global NOTIFY_WIN_ICON
     GROWL_ICON = icon
     NOTIFY_OSD_ICON = join(pth, app_name + "-notify.png")
+    NOTIFY_WIN_ICON = join(pth, app_name + "-notify.ico")
     try:
         if not exists(NOTIFY_OSD_ICON):
-            with open(NOTIFY_OSD_ICON, "w") as f:
-                f.write(icon)
+            with open(NOTIFY_OSD_ICON, "wb") as f:
+                f.write(png)
     except:
         NOTIFY_OSD_ICON = None
         pass
 
+    try:
+        if not exists(NOTIFY_WIN_ICON):
+            with open(NOTIFY_WIN_ICON, "wb") as f:
+                f.write(icon)
+    except:
+        NOTIFY_WIN_ICON = None
 
-def setup_notifications(app_name, icon, config_path):
+
+def setup_notifications(app_name, png, icon, config_path):
     """
     Setup notifications for all platforms
     """
 
-    set_app_icon(app_name, icon, config_path)
+    set_app_icon(app_name, png, icon, config_path)
     setup_notify_growl(app_name)
     setup_notify_osd(app_name)
+    setup_noitfy_win(app_name, NOTIFY_WIN_ICON)
 
 
 ###################################
@@ -327,6 +492,8 @@ def info(title, message="", sound=False):
         NOTIFY_GROWL("Info", title, message, sound, default_notify)
     elif _PLATFORM == "linux":
         NOTIFY_OSD(title, message, sound, default_notify)
+    elif _PLATFORM == "windows":
+        NOTIFY_WIN(title, message, sound, WinNotifyLevel.ICON_INFORMATION, default_notify)
     else:
         default_notify(title, message, sound)
 
@@ -341,6 +508,8 @@ def error(title, message, sound=False):
         NOTIFY_GROWL("Error", title, message, sound, default_notify)
     elif _PLATFORM == "linux":
         NOTIFY_OSD(title, message, sound, default_notify)
+    elif _PLATFORM == "windows":
+        NOTIFY_WIN(title, message, sound, WinNotifyLevel.ICON_ERROR, default_notify)
     else:
         default_notify(title, message, sound)
 
@@ -355,5 +524,7 @@ def warning(title, message, sound=False):
         NOTIFY_GROWL("Warning", title, message, sound, default_notify)
     elif _PLATFORM == "linux":
         NOTIFY_OSD(title, message, sound, default_notify)
+    elif _PLATFORM == "windows":
+        NOTIFY_WIN(title, message, sound, WinNotifyLevel.ICON_WARNING, default_notify)
     else:
         default_notify(title, message, sound)
