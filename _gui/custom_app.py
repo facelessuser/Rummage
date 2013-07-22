@@ -399,7 +399,7 @@ class DebugFrameExtender(object):
         set_debug_console(True)
         # echo out log to console
         log.set_echo(True)
-        if wx.GetApp().stdioWin is None:
+        if wx.GetApp().stdioWin.frame is None:
             wx.GetApp().stdioWin.write(log.read(), False)
         else:
             wx.GetApp().stdioWin.write("", False)

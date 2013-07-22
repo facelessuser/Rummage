@@ -142,7 +142,7 @@ class _FileSearch(object):
         def_struct = lambda content: struct.Struct("=" + ("B" * len(content))).unpack(content)
         return content.translate(HEX_TX_TABLE)
 
-    def __get_lines(self, content, m, binary=False):
+    def __get_lines(self, content, m, line_ending, binary=False):
         """
         Return the full line(s) of code of the found region.
         """
@@ -154,7 +154,7 @@ class _FileSearch(object):
         after = 0
 
         while start > 0:
-            if content[start - 1] != "\n":
+            if content[start - 1] != line_ending:
                 start -= 1
             elif before >= self.context[0]:
                 break
@@ -163,7 +163,7 @@ class _FileSearch(object):
                 start -= 1
 
         while end < bfr_end:
-            if content[end] != "\n":
+            if content[end] != line_ending:
                 end += 1
             elif after >= self.context[1]:
                 break
@@ -229,7 +229,8 @@ class _FileSearch(object):
                 "lineno": file_content.count(line_ending, 0, m.start()) + 1,
                 "colno": self.__get_col(file_content, m.start(), line_ending)
             }
-            result["lines"], result["match"], result["context_count"] = self.__get_lines(file_content, m, binary)
+
+            result["lines"], result["match"], result["context_count"] = self.__get_lines(file_content, m, line_ending, binary)
             results["results"].append(result)
             results["count"] += 1
 
