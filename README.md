@@ -32,7 +32,7 @@ Rummage has the ability to save and load commonly used regex.  It also has a sim
 It displays results in two ways:
 
 - Files: Lists the files with matches and some of the file attributes.  Double clicking an entry will open the file at the first match instance in your editor (if you have configured Rummage to use your editor).
-- Content: Lists the line numbers on which the match was found.  It also shows the content of said line.  Double clicking will open the match at the line in your editor (if you have configured Rummage to use your editor).
+- Content: Lists the line numbers on which the match was found, number of matches on line, and the content of said line.  Double clicking will open the match at the line in your editor (if you have configured Rummage to use your editor).
 
 
 Building
@@ -60,6 +60,11 @@ Requirements:
 Build:
 
 Run build with the python you are using `python build.py -c Rummage`
+
+## Linux
+Requirements:
+
+-Coming soon...
 
 Binaries will be in the `dist` folder in your project.
 
