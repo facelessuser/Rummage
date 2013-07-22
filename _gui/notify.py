@@ -10,7 +10,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import wx
+# import wx
 import sys
 import subprocess
 from os.path import exists, join
@@ -271,7 +271,8 @@ if _PLATFORM == "windows":
         class NotifyWin(object):
             def __init__(self, app_name, icon, tooltip=None):
                 """
-                Setup
+                Create the taskbar for the application and register it.
+                Show nothing by default until called.
                 """
 
                 message_map = {
@@ -301,6 +302,11 @@ if _PLATFORM == "windows":
                 self.hicon = self.get_icon(icon)
 
             def get_icon(self, icon):
+                """
+                Try to load the given icon from the path given,
+                else default to generic application icon from the OS.
+                """
+
                 icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
                 try:
                     hicon = LoadImage(
@@ -314,12 +320,21 @@ if _PLATFORM == "windows":
                 return hicon
 
             def show_notification(self, title, msg, sound, icon, fallback):
+                """
+                Attemp to show notifications.  Provide fallback for consistency
+                with other notifyicatin methods.
+                """
+
                 try:
                     self._show_notification(title, msg, sound, icon)
                 except:
                     fallback(title, msg, sound)
 
             def _show_notification(self, title, msg, sound, icon):
+                """
+                Call windows API to show notification
+                """
+
                 icon_level = 0
                 if icon & WinNotifyLevel.ICON_INFORMATION:
                     icon_level |= NIIF_INFO
@@ -342,6 +357,11 @@ if _PLATFORM == "windows":
                     play_alert()
 
             def OnTaskbarNotify(self, hwnd, msg, wparam, lparam):
+                """
+                When recieving the dismiss code for the notification,
+                hide the icon.
+                """
+
                 if lparam == 1028:
                     self.hide_icon()
                     # Noification dismissed
@@ -389,6 +409,10 @@ else:
 
 
 def setup_noitfy_win(app_name, icon):
+    """
+    Setup win notify
+    """
+
     global NOTIFY_WIN
 
     if NotifyWin is not None:
@@ -429,9 +453,17 @@ WxNotify = None
 
 class NotifyFallback(object):
     def __init__(self, *args, **kwargs):
+        """
+        Init class
+        """
+
         self.sound = kwargs.get("sound", False)
 
     def Show(self):
+        """
+        Fallback just plays an alert
+        """
+
         if self.sound:
             play_alert()
 
@@ -487,7 +519,7 @@ def info(title, message="", sound=False):
     Info notification
     """
 
-    default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_INFORMATION, sound=sound).Show()
+    default_notify = lambda title, message, sound: Notify(title, message, sound=sound).Show()  # flags=wx.ICON_INFORMATION,
     if has_growl() and GROWL_ENABLED:
         NOTIFY_GROWL("Info", title, message, sound, default_notify)
     elif _PLATFORM == "linux":
@@ -503,7 +535,7 @@ def error(title, message, sound=False):
     Error notification
     """
 
-    default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_ERROR, sound=sound).Show()
+    default_notify = lambda title, message, sound: Notify(title, message, sound=sound).Show()  # flags=wx.ICON_ERROR,
     if has_growl() and GROWL_ENABLED:
         NOTIFY_GROWL("Error", title, message, sound, default_notify)
     elif _PLATFORM == "linux":
@@ -519,7 +551,7 @@ def warning(title, message, sound=False):
     Warning notification
     """
 
-    default_notify = lambda title, message, sound: Notify(title, message, flags=wx.ICON_WARNING, sound=sound).Show()
+    default_notify = lambda title, message, sound: Notify(title, message, sound=sound).Show()  # flags=wx.ICON_WARNING,
     if has_growl() and GROWL_ENABLED:
         NOTIFY_GROWL("Warning", title, message, sound, default_notify)
     elif _PLATFORM == "linux":
