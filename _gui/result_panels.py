@@ -265,6 +265,23 @@ class ResultFileList(ResultList):
         encoding = self.itemDataMap[self.itemIndexMap[item]][4]
         return 1 if encoding == "BIN" else 0
 
+    def increment_match_count(self, idx):
+        """
+        Increment the match count of the given item
+        """
+
+        entry = list(self.itemDataMap[idx])
+        entry[2] += 1
+        self.itemDataMap[idx] = tuple(entry)
+        # Sample the first "size_sample" to determine
+        # column width for when table first loads
+        if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
+            text = self.get_item_text(idx, 2, True)
+            lw, _, _, _ = self.dc.GetFullTextExtent(text)
+            width = lw + 30
+            if width > self.widest_cell[2]:
+                self.widest_cell[2] = width
+
     def on_dclick(self, event):
         """
         Open file at in editor with optional line and column argument

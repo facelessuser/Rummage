@@ -54,7 +54,7 @@ _RUNNING = False
 _RESULTS = []
 _COMPLETED = 0
 _TOTAL = 0
-_PROCESSED = 0
+_RECORDS = 0
 _ABORT = False
 _RUNTIME = None
 LIMIT_COMPARE = {
@@ -220,15 +220,21 @@ class GrepThread(object):
         global _RESULTS
         global _COMPLETED
         global _TOTAL
+        global _RECORDS
         _RESULTS = []
         _COMPLETED = 0
         _TOTAL = 0
+        _RECORDS = 0
+        no_results = 0
         for f in self.grep.find():
             if f["count"] != 0 or f["error"] is not None:
                 with _LOCK:
                     _RESULTS.append(f)
+            else:
+                no_results += 1
             with _LOCK:
-                _COMPLETED, _TOTAL = self.grep.get_status()
+                _COMPLETED, _TOTAL, _RECORDS = self.grep.get_status()
+                _RECORDS -= no_results
             if _ABORT:
                 self.grep.abort()
                 with _LOCK:
@@ -700,9 +706,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread.setDaemon(True)
 
         # Reset result tables
-        self.current_table_idx = [-1, -1]
+        self.current_table_idx = [0, 0]
         self.content_table_offset = 0
-        self.table_offset = 0
+        self.error_offset = 0
+        self.error_count = 0
+        self.last_line = None
+        self.last_file_id = None
         self.m_grep_notebook.DeletePage(2)
         self.m_grep_notebook.DeletePage(1)
         self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
@@ -711,9 +720,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
 
         # Run search thread
-        with _LOCK:
-            global _PROCESSED
-            _PROCESSED = 0
         self.thread.start()
         self.start_update_timer()
 
@@ -837,23 +843,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """
 
         global _RESULTS
-        debug("timer")
+        debug("Processing current results")
         if not self.checking:
             self.checking = True
             with _LOCK:
                 running = _RUNNING
                 completed = _COMPLETED
                 total = _TOTAL
-                processed = _PROCESSED
-            count1 = self.current_table_idx[0] + 1
-            count2 = self.current_table_idx[1] + 1
-            if completed > count1:
+                records = _RECORDS
+            count1 = self.current_table_idx[0]
+            count2 = self.current_table_idx[1]
+            if records > count2:
                 with _LOCK:
-                    results = _RESULTS[0:completed - count1]
-                    _RESULTS = _RESULTS[completed - count1:len(_RESULTS)]
+                    results = _RESULTS[0:records - count2]
+                    _RESULTS = _RESULTS[records - count2:len(_RESULTS)]
                 count1, count2 = self.update_table(count1, count2, completed, total, *results)
-            self.current_table_idx[0] = count1 - 1
-            self.current_table_idx[1] = count2 - 1
+            self.current_table_idx[0] = count1
+            self.current_table_idx[1] = count2
 
             # Run is finished or has been terminated
             if not running:
@@ -879,13 +885,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         notify.info("Search Completed", "\n%d matches found!" % count2, sound=Settings.get_alert())
                     elif Settings.get_alert():
                         notify.play_alert()
-                if self.table_offset:
+                if self.error_count:
                     graphic = error_icon.GetImage()
                     graphic.Rescale(16, 16)
                     image = wx.BitmapFromImage(graphic)
                     self.m_statusbar.set_icon(
                         "errors", image,
-                        msg="%d errors\nSee log for details." % self.table_offset,
+                        msg="%d errors\nSee log for details." % self.error_count,
                         context=[("View Log", lambda e: self.open_debug_console())]
                     )
                 self.m_result_file_panel.load_table()
@@ -903,39 +909,53 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         p_range = self.m_progressbar.GetRange()
         p_value = self.m_progressbar.GetValue()
-        self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (done, total, int(float(done)/float(total) * 100), count2) if total != 0 else (0, 0, 0))
-        if p_range != total:
-            self.m_progressbar.SetRange(total)
-        if p_value != done:
-            self.m_progressbar.SetValue(done)
+        actually_done = done - 1 if done > 0 else 0
         for f in results:
             if f["error"] is None:
-                self.m_result_file_panel.set_item_map(
-                    count - self.table_offset, basename(f["name"]), float(f["size"].strip("KB")), f["count"],
-                    dirname(f["name"]), f["encode"], f["m_time"], f["c_time"],
-                    f["results"][0]["lineno"], f["results"][0]["colno"]
-                )
+                if self.last_file_id is None or f["id"] != self.last_file_id:
+                    self.m_result_file_panel.set_item_map(
+                        count, basename(f["name"]), float(f["size"].strip("KB")), f["count"],
+                        dirname(f["name"]), f["encode"], f["m_time"], f["c_time"],
+                        f["results"][0]["lineno"], f["results"][0]["colno"]
+                    )
+                    self.last_file_id = f["id"]
+                    count += 1
+                else:
+                    self.m_result_file_panel.increment_match_count(count - 1)
             else:
+                if self.last_file_id is None or f["id"] != self.last_file_id:
+                    self.content_table_offset += 1
+                    self.error_offset += 1
+                    count += 1
+                    count2 += 1
+                    self.last_file_id = f["id"]
+                self.error_count += 1
                 error("Cound not process %s:\n%s" % (f["name"], f["error"]))
-                self.table_offset += 1
-                count += 1
                 continue
-            last_line = None
-            for r in f["results"]:
+
+            if len(f["results"]):
+                r = f["results"][0]
+                if self.last_file_id is None or f["id"] != self.last_file_id:
+                    self.last_line = None
                 lineno = r["lineno"]
-                if last_line is not None and lineno == last_line:
+                if self.last_line is not None and lineno == self.last_line:
                     self.m_result_content_panel.increment_match_count(count2 - self.content_table_offset - 1)
                     self.content_table_offset += 1
+                    count2 += 1
                 else:
                     self.m_result_content_panel.set_item_map(
                         count2 - self.content_table_offset, (basename(f["name"]), dirname(f["name"])), lineno, 1,
                         r["lines"].replace("\r", "").split("\n")[0],
-                        count - self.table_offset,  r["colno"], f["encode"]
+                        count - 1,  r["colno"], f["encode"]
                     )
-                    last_line = lineno
-                count2 += 1
-            count += 1
-        self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (done, total, int(float(done)/float(total) * 100), count2) if total != 0 else (0, 0, 0))
+                    self.last_line = lineno
+                    count2 += 1
+
+        if p_range != total:
+            self.m_progressbar.SetRange(total)
+        if p_value != done:
+            self.m_progressbar.SetValue(actually_done)
+        self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (actually_done, total, int(float(actually_done)/float(total) * 100), count2 - self.error_offset) if total != 0 else (0, 0, 0))
         wx.GetApp().Yield()
         return count, count2
 
