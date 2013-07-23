@@ -139,12 +139,14 @@ def replace_with_timepicker(obj, spin, key):
     return time_picker
 
 
-def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None):
+def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None, default=[]):
     """
     Replace object with AutoCompleteCombo object
     """
 
-    choices = Settings.get_search_setting(key, [])
+    choices = Settings.get_search_setting(key, default)
+    if choices == [] and choices != default:
+        choices = default
     auto_complete = AutoCompleteCombo(obj.GetParent(), choices, load_last, changed_callback)
     sz = obj.GetContainingSizer()
     sz.Replace(obj, auto_complete)
@@ -152,12 +154,14 @@ def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None):
     return auto_complete
 
 
-def update_autocomplete(obj, key, load_last=False):
+def update_autocomplete(obj, key, load_last=False, default=[]):
     """
     Convienance function for updating the AutoCompleteCombo choices
     """
 
-    choices = Settings.get_search_setting(key, [])
+    choices = Settings.get_search_setting(key, default)
+    if choices == [] and choices != default:
+        choices = default
     obj.update_choices(choices, load_last)
 
 
@@ -464,7 +468,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_searchin_text = replace_with_autocomplete(self.m_searchin_text, "target", changed_callback=self.on_searchin_changed)
         self.m_searchfor_textbox = replace_with_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
         self.m_exclude_textbox = replace_with_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
-        self.m_filematch_textbox = replace_with_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search", load_last=True)
+        self.m_filematch_textbox = replace_with_autocomplete(
+            self.m_filematch_textbox,
+            "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search",
+            load_last=True,
+            default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
+        )
 
         # We caused some tab traversal chaos with the object replacement.
         # Fix it in platforms where it matters.
@@ -489,7 +498,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             update_autocomplete(self.m_searchin_text, "target")
             update_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
             update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
-            update_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search")
+            update_autocomplete(
+                self.m_filematch_textbox,
+                "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search",
+                default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
+            )
         dlg.Destroy()
 
     def on_dir_changed(self, event):
@@ -976,9 +989,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """
 
         if self.m_fileregex_checkbox.GetValue():
-            update_autocomplete(self.m_filematch_textbox, "regex_file_search")
+            update_autocomplete(self.m_filematch_textbox, "regex_file_search", default=[".*"])
         else:
-            update_autocomplete(self.m_filematch_textbox, "file_search")
+            update_autocomplete(self.m_filematch_textbox, "file_search", default=["*?"])
         event.Skip()
 
     def on_dirregex_toggle(self, event):

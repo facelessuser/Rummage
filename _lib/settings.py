@@ -71,8 +71,8 @@ class Settings(object):
                     print("Failed to load settings file!\n\n%s" % str(e))
         if cls.get_debug():
             set_debug_mode(True)
-        debug(cls.settings)
-        debug(cls.cache)
+        debug_struct(cls.settings)
+        debug_struct(cls.cache)
         cls.init_notify(True)
 
     @classmethod
