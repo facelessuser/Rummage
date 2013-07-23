@@ -9,6 +9,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import codecs
+import threading
 
 ALL = 0
 DEBUG = 10
@@ -23,6 +24,7 @@ class Log(object):
         Init Log object
         """
 
+        self._lock = threading.Lock()
         if filemode == "w":
             with codecs.open(filename, "w", "utf-8") as f:
                 pass
@@ -37,15 +39,17 @@ class Log(object):
         Turn on/off echoing to std out
         """
 
-        if self.save_to_file:
-            self.echo = bool(enable)
+        with self._lock:
+            if self.save_to_file:
+                self.echo = bool(enable)
 
     def set_level(self, level):
         """
         Set log level
         """
 
-        self.level = int(level)
+        with self._lock:
+            self.level = int(level)
 
     def get_level(self):
         """
@@ -110,8 +114,9 @@ class Log(object):
         """
 
         if not (echo and self.echo) and self.save_to_file:
-            with codecs.open(self.filename, "a", "utf-8") as f:
-                f.write(self.format % {"message": msg})
+            with self._lock:
+                with codecs.open(self.filename, "a", "utf-8") as f:
+                    f.write(self.format % {"message": msg})
         if echo and self.echo:
             print(self.format % {"message": msg})
 
@@ -121,11 +126,12 @@ class Log(object):
         """
 
         txt = ""
-        try:
-            with codecs.open(self.filename, "r", "utf-8") as f:
-                txt = f.read()
-        except:
-            pass
+        with self._lock:
+            try:
+                with codecs.open(self.filename, "r", "utf-8") as f:
+                    txt = f.read()
+            except:
+                pass
         return txt
 
 
