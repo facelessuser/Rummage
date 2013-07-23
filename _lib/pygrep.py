@@ -153,6 +153,7 @@ class _FileSearch(object):
         before = 0
         after = 0
 
+        # Get the start of the context
         while start > 0:
             if content[start - 1] != line_ending:
                 start -= 1
@@ -162,6 +163,7 @@ class _FileSearch(object):
                 before += 1
                 start -= 1
 
+        # Get the end of the context
         while end < bfr_end:
             if content[end] != line_ending:
                 end += 1
@@ -171,19 +173,30 @@ class _FileSearch(object):
                 after += 1
                 end += 1
 
+        # Make the match start and end relative to the context snippet
         match_start = m.start() - start
         match_end = match_start + m.end() - m.start()
+
+        # Truncate long lines if desired
         if self.truncate_lines:
             length = end - start
             if length > 256:
                 end = start + 256
                 length = 256
 
+            # Recalculate relative match start and end
             if match_start > length:
                 match_start = length
             if match_end > length:
                 match_end = 256
-        return content[start:end] if not binary else self.__tx_bin(content[start:end]), (match_start, match_end), (before, after)
+
+        # Return the context snippet, where the match occurs,
+        # and how many lines of context before and after
+        return (
+            content[start:end] if not binary else self.__tx_bin(content[start:end]),
+            (match_start, match_end),
+            (before, after)
+        )
 
     def __get_col(self, content, absolute_col, line_ending):
         """
@@ -196,6 +209,15 @@ class _FileSearch(object):
                 break
             col += 1
         return col
+
+    def __get_line_ending(self, file_content):
+        """
+        Get the line ending for the file content by
+        scanning for and evaluating the first new line occurance.
+        """
+
+        ending = LINE_ENDINGS.search(file_content)
+        return "\r" if ending is not None and ending.group(2) else "\n"
 
     def __findall(self, file_content):
         """
@@ -210,15 +232,14 @@ class _FileSearch(object):
         Search target file or buffer returning a generator of results.
         """
 
-        ending = LINE_ENDINGS.search(file_content)
-        line_ending = "\n"
-        if ending is not None:
-            if ending.group(2):
-                line_ending = "\r"
+        line_ending = None
 
         count = 0
         for m in self.__findall(file_content):
             count += 1
+            if line_ending is None:
+                line_ending = self.__get_line_ending(file_content)
+
             results = {"name": target, "count": 0, "line_ending": line_ending, "error": None, "results": []}
 
             if max_count != None:
@@ -557,45 +578,60 @@ class Grep(object):
             _ABORT = True
         self.kill = True
 
+    def __wait_for_thread(self):
+        """
+        Wait for thread to start
+        """
+
+        global _STARTED
+        self.thread.start()
+
+        # Try to wait in case the
+        # "is running" check happens too quick
+        while not _STARTED:
+            sleep(0.1)
+        with _LOCK:
+            _STARTED = False
+
+    def __get_next_file(self):
+        """
+        Get the next file from the file crawler results
+        """
+
+        file_info = None
+        while file_info is None:
+            if _RUNNING:
+                if len(_FILES) - 1 > self.idx:
+                    self.idx += 1
+                    file_info = _FILES[self.idx]
+                else:
+                    sleep(0.1)
+            else:
+                if len(_FILES) - 1 > self.idx and not self.kill:
+                    self.idx += 1
+                    file_info = _FILES[self.idx]
+                elif self.kill:
+                    break
+                else:
+                    break
+        return file_info
+
     def multi_file_read(self, max_count):
         """
         Perform search on on files in a directory
         """
 
-        global _STARTED
         self.idx = -1
-        self.thread.start()
-        done = False
-        # Try to wait in case the
-        # "is running" check happens too quick
-        while not _STARTED:
-            sleep(0.3)
-        with _LOCK:
-            _STARTED = False
+
+        self.__wait_for_thread()
 
         # Wait for when a file is available
-        while not done:
-            file_info = None
-            while file_info is None:
-                if _RUNNING:
-                    if len(_FILES) - 1 > self.idx:
-                        self.idx += 1
-                        file_info = _FILES[self.idx]
-                    else:
-                        sleep(0.3)
-                else:
-                    if len(_FILES) - 1 > self.idx and not self.kill:
-                        self.idx += 1
-                        file_info = _FILES[self.idx]
-                    elif self.kill:
-                        break
-                    else:
-                        done = True
-                        break
+        while True:
+            file_info = self.__get_next_file()
 
             if file_info is None:
                 # No file; quit
-                done = True
+                break
             else:
                 # Parse the given file
                 file_name = file_info[0]
@@ -627,7 +663,7 @@ class Grep(object):
                     yield results
 
                 if max_count != None and max_count == 0:
-                    done = True
+                    break
 
     def single_file_read(self, file_name, max_count):
         """
@@ -659,6 +695,7 @@ class Grep(object):
         """
         Perform search on an input buffer
         """
+
         try:
             for  result in self.search.search("buffer input", target_buffer, max_count, False):
                 # Report additional file info
