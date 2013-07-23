@@ -218,28 +218,24 @@ class _FileSearch(object):
 
         count = 0
         for m in self.__findall(file_content):
-                try:
-                    count += 1
-                    results = {"name": target, "count": 0, "line_ending": line_ending, "error": None, "results": []}
+            count += 1
+            results = {"name": target, "count": 0, "line_ending": line_ending, "error": None, "results": []}
 
-                    if max_count != None:
-                        if max_count == 0:
-                            break
-                        else:
-                            max_count -= 1
+            if max_count != None:
+                if max_count == 0:
+                    break
+                else:
+                    max_count -= 1
 
-                    result = {
-                        "lineno": file_content.count(line_ending, 0, m.start()) + 1,
-                        "colno": self.__get_col(file_content, m.start(), line_ending)
-                    }
+            result = {
+                "lineno": file_content.count(line_ending, 0, m.start()) + 1,
+                "colno": self.__get_col(file_content, m.start(), line_ending)
+            }
 
-                    result["lines"], result["match"], result["context_count"] = self.__get_lines(file_content, m, line_ending, binary)
-                    results["results"].append(result)
-                    results["count"] += 1
-                    yield results
-                except GeneratorExit as e:
-                    raise e
-                    pass
+            result["lines"], result["match"], result["context_count"] = self.__get_lines(file_content, m, line_ending, binary)
+            results["results"].append(result)
+            results["count"] += 1
+            yield results
 
         if count == 0:
             yield {"name": target, "count": 0, "error": None}
