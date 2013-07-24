@@ -15,7 +15,7 @@ else:
 
 
 class Args(object):
-    def __init__(self, script, name, gui, clean, ext, icon=None):
+    def __init__(self, script, name, gui, clean, ext, icon=None, portable=False, imports=[]):
         """
         Build arguments
         """
@@ -26,6 +26,8 @@ class Args(object):
         self.icon = icon
         self.script = script
         self.extension = ext
+        self.portable = portable
+        self.imports = imports
 
 
 class BuildParams(object):
@@ -33,7 +35,8 @@ class BuildParams(object):
     Build parametes
     """
 
-    python_bin = None
+    python_bin_path = None
+    python_executable = None
     pyinstaller_script = None
     out_dir = None
     script = None
@@ -43,6 +46,8 @@ class BuildParams(object):
     clean = None
     extension = None
     icon = None
+    portable = None
+    imports = None
 
 
 def parse_settings(args, obj):
@@ -53,7 +58,8 @@ def parse_settings(args, obj):
     err = False
 
     script_path = dirname(abspath(sys.argv[0]))
-    obj.python_bin = dirname(sys.executable)
+    obj.python_bin_path = dirname(sys.executable)
+    obj.python_bin = sys.executable
     obj.pyinstaller_script = join(script_path, "pyinstaller", "pyinstaller.py")
     obj.out_dir = join(script_path, "build")
     obj.dist_path = join(script_path, "dist")
@@ -63,6 +69,8 @@ def parse_settings(args, obj):
     obj.script = path.abspath(path.normpath(args.script))
     obj.icon = args.icon
     obj.clean = args.clean
+    obj.portable = args.portable
+    obj.imports = args.imports
 
     if not path.exists(obj.script):
         print >> sys.stderr, "Could not find %s!" % obj.script
@@ -116,6 +124,17 @@ def clean_build(build_dir):
     return err
 
 
+def get_hidden_imports(imports):
+    """
+    Return list of hidden imports
+    """
+
+    hidden_imports = []
+    for i in imports:
+        hidden_imports.append('--hidden-import=%s' % i)
+    return hidden_imports
+
+
 def parse_options(args, obj):
     """
     Parse the build parameters and build the pyinstaller build command
@@ -134,12 +153,13 @@ def parse_options(args, obj):
     # Construct build params for build processs
     if not err:
         obj.params = (
-            ["python", obj.pyinstaller_script, '-F'] +
+            [("python" if obj.portable else obj.python_bin), obj.pyinstaller_script, '-F'] +
             (['--upx-dir=%s' % obj.upx_bin] if obj.upx_bin is not None else []) +
             (['--icon=%s' % args.icon] if args.icon is not None else []) +
             (['--clean'] if args.clean is not None else []) +
             (['-w', '--workpath=%s' % obj.out_dir] if args.gui else ['--workpath=%s' % obj.out_dir]) +
             ['--distpath=%s' % obj.dist_path] +
+            get_hidden_imports(obj.imports) +
             ['--name=%s' % args.name] +
             ['-y', obj.script]
         )
@@ -153,7 +173,8 @@ def build(obj):
 
     err = False
 
-    chdir(obj.python_bin)
+    if obj.portable:
+        chdir(obj.python_bin_path)
     # Setup build process
     process = subprocess.Popen(
         obj.params,
@@ -186,14 +207,21 @@ def main():
     # Flag arguments
     parser.add_argument('--version', action='version', version='%(prog)s 1.0.0')
     parser.add_argument('--clean', '-c', action='store_true', default=False, help='Clean build before re-building.')
+    parser.add_argument('--portable', '-p', action='store_true', default=False, help='Build with portable python (windows)')
     parser.add_argument('name', default=None, help='Name of app')
     inputs = parser.parse_args()
     if _PLATFORM == "osx":
         args = Args("Rummage.py", inputs.name, True, inputs.clean, ".app", abspath("_icons/rummage.icns"))
     elif _PLATFORM == "windows":
-        args = Args("Rummage.py", inputs.name, True, inputs.clean, ".exe", abspath("_icons\\rummage.ico"))
+        args = Args("Rummage.py", inputs.name, True, inputs.clean, ".exe", abspath("_icons\\rummage.ico"), args.portable)
     else:
-        args = Args("Rummage.py", inputs.name, True, inputs.clean, "")
+        args = Args(
+            "Rummage.py", inputs.name, True, inputs.clean, "",
+            imports=[
+                "gobject", "glib", "glib._glib", "glib.option", "object.constants",
+                "gobject._gobject", "gobject.propertyhelper", "gtk", "gtk._gtk"
+            ]
+        )
 
     # Parse options
     build_params = BuildParams()
