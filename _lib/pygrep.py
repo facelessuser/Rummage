@@ -747,8 +747,8 @@ class Grep(object):
         file_info, content, error = self.__get_file_info(
             "buffer input",
             len(target_buffer),
-            c_time(),
-            c_time(),
+            ctime(),
+            ctime(),
             content=target_buffer
         )
 

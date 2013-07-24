@@ -106,7 +106,7 @@ def notify_osd_fallback(title, message, sound, fallback):
 
 NOTIFY_OSD = notify_osd_fallback
 
-if _PLATFORM != "linux":
+if _PLATFORM == "linux":
     try:
         import pynotify
 
@@ -129,7 +129,6 @@ if _PLATFORM != "linux":
             except:
                 # Fallback to wxpython notification
                 fallback(title, description, sound)
-
 
     except:
         notify_osd_call = None
