@@ -54,7 +54,11 @@ class GuiLog(wx.PyOnDemandOutputWindow):
         Create the logging console
         """
 
-        wx.PyOnDemandOutputWindow.CreateOutputWindow(self, st)
+        self.frame = wx.Frame(self.parent, -1, self.title, self.pos, self.size, style=wx.DEFAULT_FRAME_STYLE)
+        self.text  = wx.TextCtrl(self.frame, -1, "", style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH)
+        self.text.AppendText(st)
+        self.frame.Show(True)
+        self.frame.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
         # Create debug keybinding to open debug console
         debugid= wx.NewId()

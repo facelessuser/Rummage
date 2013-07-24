@@ -37,6 +37,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_dot_checkbox.SetValue(is_dot)
         self.stand_alone = stand_alone
         self.regex_event_code = -1
+        self.testing = False
         self.init_regex_timer()
         self.start_regex_timer()
 
@@ -81,8 +82,11 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     def regex_event(self, event):
         if self.regex_event_code == 0:
-            self.test_regex()
-            self.regex_event_code -= 1
+            if not self.testing:
+                self.test_regex()
+                self.regex_event_code -= 1
+            else:
+                event.Skip()
         else:
             if self.regex_event_code > 0:
                 self.regex_event_code = 0
@@ -143,49 +147,61 @@ class RegexTestDialog(gui.RegexTestDialog):
         """
         Test and highlight search results in content buffer
         """
+        if not self.testing:
+            self.testing = True
+            if self.m_regex_text.GetValue() == "":
+                self.m_test_text.SetStyle(
+                    0,
+                    self.m_test_text.GetLastPosition(),
+                    wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
+                )
+                self.testing = False
+                return
 
-        if self.m_regex_text.GetValue() == "":
-            self.m_test_text.SetStyle(
-                0,
-                self.m_test_text.GetLastPosition(),
-                wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
-            )
-            return
+            flags = 0
+            if not self.m_case_checkbox.GetValue():
+                flags |= ure.IGNORECASE
+            if self.m_dot_checkbox:
+                flags |= ure.DOTALL
 
-        flags = 0
-        if not self.m_case_checkbox.GetValue():
-            flags |= ure.IGNORECASE
-        if self.m_dot_checkbox:
-            flags |= ure.DOTALL
+            try:
+                test = ure.compile(self.m_regex_text.GetValue(), flags)
+            except:
+                self.testing = False
+                return
 
-        try:
-            test = ure.compile(self.m_regex_text.GetValue(), flags)
-            text = self.m_test_text.GetValue()
-            # Reset Colors
-            self.m_test_text.SetStyle(
-                0,
-                self.m_test_text.GetLastPosition(),
-                wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
-            )
+            try:
+                text = self.m_test_text.GetValue()
+                # Reset Colors
+                self.m_test_text.SetStyle(
+                    0,
+                    self.m_test_text.GetLastPosition(),
+                    wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
+                )
 
-            for m in test.finditer(text):
-                try:
-                    self.m_test_text.SetStyle(
-                        m.start(0),
-                        m.end(0),
-                        wx.TextAttr(colBack=wx.Colour(0xFF, 0xCC, 0x00))
-                    )
-                except:
-                    pass
-        except:
-            print(str(traceback.format_exc()))
-            pass
+                for m in test.finditer(text):
+                    try:
+                        self.m_test_text.SetStyle(
+                            m.start(0),
+                            m.end(0),
+                            wx.TextAttr(colBack=wx.Colour(0xFF, 0xCC, 0x00))
+                        )
+                    except:
+                        pass
+            except:
+                print(str(traceback.format_exc()))
+                pass
+            self.testing = False
 
     def regex_start_event(self, event):
         self.regex_event_code += 1
         event.Skip()
 
-    on_test_changed = regex_start_event
+    def on_test_changed(self, event):
+        if not self.testing:
+            self.regex_start_event(event)
+        else:
+            event.Skip()
 
     on_regex_changed = regex_start_event
 

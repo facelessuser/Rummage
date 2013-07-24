@@ -18,6 +18,7 @@ from os import walk
 from fnmatch import fnmatch
 from os.path import isdir, join, abspath, basename, getsize
 from time import sleep, ctime
+from collections import namedtuple
 import struct
 import traceback
 import codecs
@@ -112,6 +113,29 @@ def _literal_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
 
 
 class GrepException(Exception):
+    pass
+
+
+class FileInfo(namedtuple('FileInfo', ['id', 'name', 'size', 'modified', 'created', 'encoding'], verbose=False)):
+    """
+    Class for tracking file info
+    """
+    pass
+
+
+class FileRecord(namedtuple('FileRecord', ['info', 'match', 'error'], verbose=False)):
+    """
+    A record that reports file info, matching status, and errors
+    """
+
+    pass
+
+
+class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines', 'ending', 'context'], verbose=False)):
+    """
+    A record that contains match info, lineno content, context, etc.
+    """
+
     pass
 
 
@@ -234,32 +258,38 @@ class _FileSearch(object):
 
         line_ending = None
 
-        count = 0
+        file_record_sent = False
+
         for m in self.__findall(file_content):
-            count += 1
             if line_ending is None:
                 line_ending = self.__get_line_ending(file_content)
 
-            results = {"name": target, "count": 0, "line_ending": line_ending, "error": None, "results": []}
-
+            # Have we exceeded the maximum desired matches?
             if max_count != None:
                 if max_count == 0:
                     break
                 else:
                     max_count -= 1
 
-            result = {
-                "lineno": file_content.count(line_ending, 0, m.start()) + 1,
-                "colno": self.__get_col(file_content, m.start(), line_ending)
-            }
+            if not file_record_sent:
+                file_record_sent = True
+                yield FileRecord(target, True, None)
 
-            result["lines"], result["match"], result["context_count"] = self.__get_lines(file_content, m, line_ending, binary)
-            results["results"].append(result)
-            results["count"] += 1
-            yield results
 
-        if count == 0:
-            yield {"name": target, "count": 0, "error": None}
+            # Get context etc.
+            lines, match, context = self.__get_lines(file_content, m, line_ending, binary)
+
+            yield MatchRecord(
+                file_content.count(line_ending, 0, m.start()) + 1,    # lineno
+                self.__get_col(file_content, m.start(), line_ending), # colno
+                match,                                                # Postion of match
+                lines,                                                # Line(s) in which match is found
+                line_ending,                                          # Line ending for file
+                context                                               # Number of lines shown before and after matched line(s)
+            )
+
+        if not file_record_sent:
+            yield FileRecord(target, False, None)
 
 
 class _DirWalker(object):
@@ -537,25 +567,13 @@ class Grep(object):
 
         # Force UTF for all
         if self.all_utf8:
-            try:
-                self.current_encoding = "UTF8"
-                with codecs.open(file_name, encoding="utf-8-sig", errors="replace") as f:
-                    content = f.read()
-                    return content
-            except:
-                print(str(traceback.format_exc()))
-                pass
-            return None
+            self.current_encoding = "UTF8"
+            with codecs.open(file_name, encoding="utf-8-sig", errors="replace") as f:
+                content = f.read()
+                return content
 
         # Guess encoding and decode file
-        try:
-            return self.__decode_file(file_name)
-        except Exception:
-            print(str(traceback.format_exc()))
-            return None
-
-        # Unknown encoding, maybe binary, something else?
-        return content
+        return self.__decode_file(file_name)
 
     def get_status(self):
         """
@@ -593,28 +611,63 @@ class Grep(object):
         with _LOCK:
             _STARTED = False
 
+    def __get_file_info(self, filename, size, m_time, c_time, content=None):
+        """
+        Create file info record
+        """
+
+        string_buffer = content is not None
+        error = None
+        file_info = None
+
+        try:
+            if content is None:
+                content = self.__read_file(filename)
+                if content is None:
+                    raise GrepException("Could not read %s" % filename)
+        except:
+            error = str(traceback.format_exc())
+
+        try:
+            file_info = FileInfo(
+                self.idx,
+                filename,
+                "%.2fKB" % (float(size) / 1024.0),
+                m_time,
+                c_time,
+                self.current_encoding if not string_buffer else "--"
+            )
+        except:
+            if error is None:
+                error = str(traceback.format_exc())
+
+        return file_info, content, error
+
+
     def __get_next_file(self):
         """
         Get the next file from the file crawler results
         """
 
         file_info = None
+        error = None
+        content = None
         while file_info is None:
             if _RUNNING:
                 if len(_FILES) - 1 > self.idx:
                     self.idx += 1
-                    file_info = _FILES[self.idx]
+                    info = _FILES[self.idx]
+                    file_info, content, error = self.__get_file_info(info[0], info[1], info[2], info[3])
                 else:
                     sleep(0.1)
             else:
                 if len(_FILES) - 1 > self.idx and not self.kill:
                     self.idx += 1
-                    file_info = _FILES[self.idx]
-                elif self.kill:
-                    break
+                    info = _FILES[self.idx]
+                    file_info, content, error = self.__get_file_info(info[0], info[1], info[2], info[3])
                 else:
                     break
-        return file_info
+        return file_info, content, error
 
     def multi_file_read(self, max_count):
         """
@@ -627,40 +680,31 @@ class Grep(object):
 
         # Wait for when a file is available
         while True:
-            file_info = self.__get_next_file()
+            file_info, content, error = self.__get_next_file()
 
-            if file_info is None:
+            if error is not None:
+                # Unable to read
+                yield FileRecord(file_info, False, error)
+            elif file_info is None:
                 # No file; quit
                 break
+            elif content is None or (self.is_binary and not self.process_binary):
+                continue
             else:
                 # Parse the given file
-                file_name = file_info[0]
-                sz = file_info[1]
                 try:
-                    content = self.__read_file(file_name)
-                    if content == None:
-                        continue
-                    for result in self.search.search(file_name, content, max_count, self.is_binary):
+                    for result in self.search.search(file_info, content, max_count, self.is_binary):
                         # Report additional file info
-                        result["id"] = self.idx
-                        result["size"] = '%.2fKB' % (float(sz) / 1024.0)
-                        result["encode"] = self.current_encoding
-                        result["m_time"] = file_info[2]
-                        result["c_time"] = file_info[3]
                         self.records += 1
                         yield result
 
-                        if max_count != None:
-                            max_count -= result["count"]
+                        if max_count != None and isinstance(result, MatchRecord):
+                            max_count -= 1
 
                         if self.kill:
                             break
                 except GeneratorExit as e:
                     pass
-                except:
-                    # Unable to read
-                    results = {"id": self.idx, "name": file_name, "count": 0, "error": str(traceback.format_exc())}
-                    yield results
 
                 if max_count != None and max_count == 0:
                     break
@@ -670,50 +714,57 @@ class Grep(object):
         Perform search on a single file
         """
 
-        try:
-            content = self.__read_file(file_name)
-            if content != None:
-                for result in self.search.search(file_name, content, max_count, self.is_binary):
-                    # Report additional file info
-                    result["id"] = 0
-                    result["size"] = "%.2fKB" % (float(getsize(file_name)) / 1024.0)
-                    result["encode"] = self.current_encoding
-                    result["m_time"] = getmtime(file_name)
-                    result["c_time"] = getctime(file_name)
+        self.idx = 0
+
+        file_info, content, error = self.__get_file_info(
+            file_name,
+            getsize(file_name),
+            getmtime(file_name),
+            getctime(file_name)
+        )
+
+        if error is not None:
+            # Unable to read
+            yield FileRecord(file_info, False, error)
+        elif file_info is not None or content is not None:
+            try:
+                for result in self.search.search(file_info, content, max_count, self.is_binary):
                     self.records += 1
                     yield result
 
                     if self.kill:
                         break
-        except GeneratorExit as e:
-            pass
-        except:
-            # Unable to read
-            yield {"id": 0, "name": file_name, "count": 0, "error": str(traceback.format_exc())}
+            except GeneratorExit as e:
+                pass
 
     def buffer_read(self, target_buffer, max_count):
         """
         Perform search on an input buffer
         """
 
-        try:
-            for  result in self.search.search("buffer input", target_buffer, max_count, False):
-                # Report additional file info
-                result["id"] = 0
-                result["size"] = len(target_buffer)
-                result["encode"] = "--"
-                result["m_time"] = ctime()
-                result["c_time"] = ctime()
-                self.records += 1
-                yield result
+        self.idx = 0
 
-                if self.kill:
-                    break
-        except GeneratorExit as e:
-            pass
-        except:
+        file_info, content, error = self.__get_file_info(
+            "buffer input",
+            len(target_buffer),
+            c_time(),
+            c_time(),
+            content=target_buffer
+        )
+
+        if error is not None:
             # Unable to read
-            yield {"id": 0, "name": "buffer_input", "count": 0, "error": str(traceback.format_exc())}
+            yield FileRecord(file_info, False, error)
+        elif file_info is not None or content is not None:
+            try:
+                for  result in self.search.search(file_info, content, max_count, False):
+                    self.records += 1
+                    yield result
+
+                    if self.kill:
+                        break
+            except GeneratorExit as e:
+                pass
 
     def find(self):
         """

@@ -55,6 +55,7 @@ _RESULTS = []
 _COMPLETED = 0
 _TOTAL = 0
 _RECORDS = 0
+_ERRORS = []
 _ABORT = False
 _RUNTIME = None
 LIMIT_COMPARE = {
@@ -225,15 +226,24 @@ class GrepThread(object):
         global _COMPLETED
         global _TOTAL
         global _RECORDS
+        global _ERRORS
         _RESULTS = []
         _COMPLETED = 0
         _TOTAL = 0
         _RECORDS = 0
+        _ERRORS = []
         no_results = 0
         for f in self.grep.find():
-            if f["count"] != 0 or f["error"] is not None:
+            if (
+                (isinstance(f, pygrep.FileRecord) and f.match) or
+                isinstance(f, pygrep.MatchRecord)
+            ):
                 with _LOCK:
                     _RESULTS.append(f)
+            elif isinstance(f, pygrep.FileRecord) and f.error is not None:
+                with _LOCK:
+                    _ERRORS.append(f)
+                    no_results += 1
             else:
                 no_results += 1
             with _LOCK:
@@ -462,12 +472,22 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_modified_date_picker = replace_with_genericdatepicker(self.m_modified_date_picker, "modified_date_string")
         self.m_created_date_picker = replace_with_genericdatepicker(self.m_created_date_picker, "created_date_string")
 
-        self.m_modified_time_picker = replace_with_timepicker(self.m_modified_time_picker, self.m_modified_spin, "modified_time_string")
-        self.m_created_time_picker = replace_with_timepicker(self.m_created_time_picker, self.m_created_spin, "created_time_string")
+        self.m_modified_time_picker = replace_with_timepicker(
+            self.m_modified_time_picker, self.m_modified_spin, "modified_time_string"
+        )
+        self.m_created_time_picker = replace_with_timepicker(
+            self.m_created_time_picker, self.m_created_spin, "created_time_string"
+        )
 
-        self.m_searchin_text = replace_with_autocomplete(self.m_searchin_text, "target", changed_callback=self.on_searchin_changed)
-        self.m_searchfor_textbox = replace_with_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search")
-        self.m_exclude_textbox = replace_with_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
+        self.m_searchin_text = replace_with_autocomplete(
+            self.m_searchin_text, "target", changed_callback=self.on_searchin_changed
+        )
+        self.m_searchfor_textbox = replace_with_autocomplete(
+            self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
+        )
+        self.m_exclude_textbox = replace_with_autocomplete(
+            self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
+        )
         self.m_filematch_textbox = replace_with_autocomplete(
             self.m_filematch_textbox,
             "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search",
@@ -496,8 +516,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         dlg.ShowModal()
         if dlg.history_cleared():
             update_autocomplete(self.m_searchin_text, "target")
-            update_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
-            update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
+            update_autocomplete(
+                self.m_searchfor_textbox,
+                "regex_search" if self.m_regex_search_checkbox.GetValue() else "search"
+            )
+            update_autocomplete(
+                self.m_exclude_textbox,
+                "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
+            )
             update_autocomplete(
                 self.m_filematch_textbox,
                 "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search",
@@ -721,10 +747,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Reset result tables
         self.current_table_idx = [0, 0]
         self.content_table_offset = 0
-        self.error_offset = 0
-        self.error_count = 0
+        self.non_match_record = 0
+        self.create_file_entry = False
         self.last_line = None
-        self.last_file_id = None
         self.m_grep_notebook.DeletePage(2)
         self.m_grep_notebook.DeletePage(1)
         self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
@@ -846,9 +871,18 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Update the combo boxes history for related items
         update_autocomplete(self.m_searchin_text, "target")
-        update_autocomplete(self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "search")
-        update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude")
-        update_autocomplete(self.m_filematch_textbox, "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search")
+        update_autocomplete(
+            self.m_searchfor_textbox,
+            "regex_search" if self.m_regex_search_checkbox.GetValue() else "search"
+        )
+        update_autocomplete(
+            self.m_exclude_textbox,
+            "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
+        )
+        update_autocomplete(
+            self.m_filematch_textbox,
+            "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search"
+        )
 
     def check_updates(self, event):
         """
@@ -856,6 +890,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """
 
         global _RESULTS
+        global _ERRORS
         debug("Processing current results")
         if not self.checking:
             self.checking = True
@@ -882,31 +917,64 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.stop_update_timer()
                 self.m_search_button.SetLabel("Search")
                 if self.kill:
-                    self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
+                    self.m_statusbar.set_status(
+                        "Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (
+                            completed,
+                            completed,
+                            100,
+                            (count2 - self.non_match_record),
+                            benchmark
+                        )
+                    )
                     self.m_progressbar.SetRange(completed)
                     self.m_progressbar.SetValue(completed)
                     if Settings.get_notify():
-                        notify.error("Search Aborted", "\n%d matches found!" % count2, sound=Settings.get_alert())
+                        notify.error(
+                            "Search Aborted",
+                            "\n%d matches found!" % (count2 - self.non_match_record),
+                            sound=Settings.get_alert()
+                        )
                     elif Settings.get_alert():
                         notify.play_alert()
                     self.kill = False
                 else:
-                    self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (completed, completed, 100, count2, benchmark))
+                    self.m_statusbar.set_status(
+                        "Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (
+                            completed,
+                            completed,
+                            100,
+                            (count2 - self.non_match_record),
+                            benchmark
+                        )
+                    )
                     self.m_progressbar.SetRange(100)
                     self.m_progressbar.SetValue(100)
                     if Settings.get_notify():
-                        notify.info("Search Completed", "\n%d matches found!" % count2, sound=Settings.get_alert())
+                        notify.info(
+                            "Search Completed",
+                            "\n%d matches found!" % (count2 - self.non_match_record),
+                            sound=Settings.get_alert()
+                        )
                     elif Settings.get_alert():
                         notify.play_alert()
-                if self.error_count:
-                    graphic = error_icon.GetImage()
-                    graphic.Rescale(16, 16)
-                    image = wx.BitmapFromImage(graphic)
-                    self.m_statusbar.set_icon(
-                        "errors", image,
-                        msg="%d errors\nSee log for details." % self.error_count,
-                        context=[("View Log", lambda e: self.open_debug_console())]
-                    )
+                with _LOCK:
+                    error_count = len(_ERRORS)
+                    if error_count:
+                        graphic = error_icon.GetImage()
+                        graphic.Rescale(16, 16)
+                        image = wx.BitmapFromImage(graphic)
+                        self.m_statusbar.set_icon(
+                            "errors", image,
+                            msg="%d errors\nSee log for details." % self.error_count,
+                            context=[("View Log", lambda e: self.open_debug_console())]
+                        )
+                        for e in _ERRORS:
+                            error(
+                                "Cound not process %s:\n%s" % (
+                                    unicode(e.info.name) if e.info is not None else "file", e.error
+                                )
+                            )
+                        _ERRORS = []
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
                 self.m_grep_notebook.SetSelection(1)
@@ -924,42 +992,38 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         p_value = self.m_progressbar.GetValue()
         actually_done = done - 1 if done > 0 else 0
         for f in results:
-            if f["error"] is None:
-                if self.last_file_id is None or f["id"] != self.last_file_id:
+            if isinstance(f, pygrep.FileRecord):
+                self.non_match_record += 1
+                self.file_info = f.info
+                self.create_file_entry = True
+                count2 += 1
+                self.last_line = None
+            else:
+                if self.create_file_entry:
                     self.m_result_file_panel.set_item_map(
-                        count, basename(f["name"]), float(f["size"].strip("KB")), f["count"],
-                        dirname(f["name"]), f["encode"], f["m_time"], f["c_time"],
-                        f["results"][0]["lineno"], f["results"][0]["colno"]
+                        count, basename(self.file_info.name), float(self.file_info.size.strip("KB")), 1,
+                        dirname(self.file_info.name), self.file_info.encoding, self.file_info.modified,
+                        self.file_info.created, f.lineno, f.colno
                     )
-                    self.last_file_id = f["id"]
                     count += 1
+                    self.create_file_entry = False
                 else:
                     self.m_result_file_panel.increment_match_count(count - 1)
-            else:
-                if self.last_file_id is None or f["id"] != self.last_file_id:
-                    self.content_table_offset += 1
-                    self.error_offset += 1
-                    count += 1
-                    count2 += 1
-                    self.last_file_id = f["id"]
-                self.error_count += 1
-                error("Cound not process %s:\n%s" % (f["name"], f["error"]))
-                continue
 
-            if len(f["results"]):
-                r = f["results"][0]
-                if self.last_file_id is None or f["id"] != self.last_file_id:
-                    self.last_line = None
-                lineno = r["lineno"]
+                lineno = f.lineno
                 if self.last_line is not None and lineno == self.last_line:
-                    self.m_result_content_panel.increment_match_count(count2 - self.content_table_offset - 1)
+                    self.m_result_content_panel.increment_match_count(
+                        count2 - self.content_table_offset - self.non_match_record - 1
+                    )
                     self.content_table_offset += 1
                     count2 += 1
                 else:
                     self.m_result_content_panel.set_item_map(
-                        count2 - self.content_table_offset, (basename(f["name"]), dirname(f["name"])), lineno, 1,
-                        r["lines"].replace("\r", "").split("\n")[0],
-                        count - 1,  r["colno"], f["encode"]
+                        count2 - self.content_table_offset - self.non_match_record,
+                        (basename(self.file_info.name), dirname(self.file_info.name)),
+                        lineno, 1,
+                        f.lines.replace("\r", "").split("\n")[0],
+                        count - 1,  f.colno, self.file_info.encoding
                     )
                     self.last_line = lineno
                     count2 += 1
@@ -968,7 +1032,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_progressbar.SetRange(total)
         if p_value != done:
             self.m_progressbar.SetValue(actually_done)
-        self.m_statusbar.set_status("Searching: %d/%d %d%% Matches: %d" % (actually_done, total, int(float(actually_done)/float(total) * 100), count2 - self.error_offset) if total != 0 else (0, 0, 0))
+        self.m_statusbar.set_status(
+            "Searching: %d/%d %d%% Matches: %d" % (
+                actually_done, total,
+                int(float(actually_done)/float(total) * 100),
+                (count2 - self.non_match_record)
+            ) if total != 0 else (0, 0, 0)
+        )
         wx.GetApp().Yield()
         return count, count2
 
