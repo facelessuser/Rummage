@@ -175,7 +175,7 @@ NOTIFY_GROWL = notify_growl_fallback
 
 if _PLATFORM in ["windows", "osx"]:
     try:
-        import gntp.notifier
+        import _3rdparty.gntp.notifier
 
         def notify_growl_call(note_type, title, description, sound, fallback):
             """
