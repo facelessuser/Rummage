@@ -21,7 +21,18 @@ CSS_HTML = \
 '''
 /* Sortable tables */
 table.sortable thead {
-    background-color:#2b5b72;
+    /*background-color:#2b5b72;*/
+    background: #c5deea; /* Old browsers */
+    background: -moz-linear-gradient(top,  #c5deea 0%, #397997 31%, #2b5b72 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c5deea), color-stop(31%,#397997), color-stop(100%,#2b5b72)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #c5deea 0%,#397997 31%,#2b5b72 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #c5deea 0%,#397997 31%,#2b5b72 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #c5deea 0%,#397997 31%,#2b5b72 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #c5deea 0%,#397997 31%,#2b5b72 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c5deea', endColorstr='#2b5b72',GradientType=0 ); /* IE6-9 */
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-shadow: 2px 2px #333333;
     color:#eeeeee;
     font-weight: bold;
     cursor: default;
