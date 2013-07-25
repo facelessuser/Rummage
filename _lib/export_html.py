@@ -60,10 +60,12 @@ h1 {
     color:#ccffff;
 }
 body {
+    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
     text-align: center;
     background: #6597ae;
 }
 table {
+    font-size: small;
     border: 10px solid #397997;
     text-align: left;
     margin: auto;
