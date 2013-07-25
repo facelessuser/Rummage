@@ -26,6 +26,7 @@ import version
 import _lib.pygrep as pygrep
 from _lib.settings import Settings, _PLATFORM
 from _lib.epoch_timestamp import local_time_to_epoch_timestamp
+import _lib.export_html as export_html
 
 import _gui.gui as gui
 from _gui.generic_dialogs import *
@@ -1133,6 +1134,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_searchfor_textbox.GetValue()
         )
         self.tester.Show()
+
+    def on_export(self, event):
+        export_html.export(
+            self.m_result_file_panel.list.itemDataMap,
+            self.m_result_content_panel.list.itemDataMap
+        )
 
     def on_issues(self, event):
         """

@@ -391,6 +391,11 @@ class RummageFrame ( wx.Frame ):
 		self.m_preferences = wx.MenuItem( self.m_file_menu, wx.ID_PREFERENCES, u"&Preferences", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_file_menu.AppendItem( self.m_preferences )
 		
+		self.m_export_menuitem = wx.MenuItem( self.m_file_menu, wx.ID_ANY, u"Export to HTML", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_file_menu.AppendItem( self.m_export_menuitem )
+		
+		self.m_file_menu.AppendSeparator()
+		
 		self.m_quit_menuitem = wx.MenuItem( self.m_file_menu, wx.ID_EXit, u"&Exit", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_file_menu.AppendItem( self.m_quit_menuitem )
 		
@@ -424,6 +429,7 @@ class RummageFrame ( wx.Frame ):
 		self.m_fileregex_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fileregex_toggle )
 		self.m_search_button.Bind( wx.EVT_BUTTON, self.on_search_click )
 		self.Bind( wx.EVT_MENU, self.on_preferences, id = self.m_preferences.GetId() )
+		self.Bind( wx.EVT_MENU, self.on_export, id = self.m_export_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_exit, id = self.m_quit_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_about, id = self.m_about_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_issues, id = self.m_issues_menuitem.GetId() )
@@ -467,6 +473,9 @@ class RummageFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_preferences( self, event ):
+		event.Skip()
+	
+	def on_export( self, event ):
 		event.Skip()
 	
 	def on_exit( self, event ):
