@@ -1,9 +1,20 @@
-import tempfile
 import webbrowser
 import re
 from time import ctime
 from os.path import join
+import codecs
+import sys
+
 from _3rdparty.sorttable.sorttable import sorttable as SORT_JS
+
+from _gui.messages import filepickermsg
+
+if sys.platform.startswith('win'):
+    _PLATFORM = "windows"
+elif sys.platform == "darwin":
+    _PLATFORM = "osx"
+else:
+    _PLATFORM = "linux"
 
 
 CSS_HTML = \
@@ -54,6 +65,7 @@ table {
     border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
+    border-spacing:0;
 }
 table td, table th {
     padding-left: 10px;
@@ -246,13 +258,14 @@ def export_result_content_list(res, html):
 
 
 def export(result_list, result_content_list):
-    # Eventually this will be done by a save file dialog
-    open_html = lambda x: tempfile.NamedTemporaryFile(mode = 'w+', delete=False, suffix=x)
+    export_html = filepickermsg("Export to...", "*.html", True)
+    if export_html is None:
+        return
 
-    with open_html(".html") as html:
+    with codecs.open(export_html, "w", encoding="utf-8") as html:
         html.write(
             HTML_HEADER % {
-                "js": SORT_JS.encode('utf-8'),
+                "js": SORT_JS,
                 "morejs": LOAD_TAB,
                 "css": CSS_HTML
             }
@@ -265,4 +278,8 @@ def export(result_list, result_content_list):
         html.write(TAB_INIT)
         html.write(BODY_END)
 
-    webbrowser.open(html.name, new=2)
+    if _PLATFORM == "osx":
+        import subprocess
+        subprocess.Popen(['open', html.name])
+    else:
+        webbrowser.open(html.name, new=2)
