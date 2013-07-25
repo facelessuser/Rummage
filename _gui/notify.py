@@ -216,7 +216,7 @@ def setup_notify_growl(app_name):
     global notify_growl_call
     try:
         # Init growl object
-        GROWL = gntp.notifier.GrowlNotifier(
+        GROWL = _3rdparty.gntp.notifier.GrowlNotifier(
             applicationName = app_name,
             notifications = ["Info", "Warning", "Error"],
             defaultNotifications = ["Info", "Warning", "Error"]

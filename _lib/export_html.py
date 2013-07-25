@@ -21,7 +21,7 @@ CSS_HTML = \
 '''
 /* Sortable tables */
 table.sortable thead {
-    background-color:#666666;
+    background-color:#2b5b72;
     color:#eeeeee;
     font-weight: bold;
     cursor: default;
@@ -40,7 +40,9 @@ h1 {
 }
 /* Tab Bar */
 #bar a{
-    padding:4px 6px;
+    padding-top:10px;
+    padding-left: 20px;
+    padding-right: 20px;
     background:#397997;
     color:#eeeeee;
     text-decoration:none;
@@ -49,9 +51,14 @@ h1 {
     border-top-right-radius: 10px;
     -moz-border-radius-topleft: 10px;
     border-top-left-radius: 10px;
-    border-left: solid;
+    /*border-left: solid;*/
 }
-#bar a:hover{color:#ccffff;}
+#bar a.unselected {
+    background: #2b5b72;
+}
+#bar a:hover{
+    color:#ccffff;
+}
 body {
     text-align: center;
     background: #6597ae;
@@ -144,8 +151,8 @@ RESULT_CONTENT_TABLE_HEADER = \
 TABS_START = \
 '''
 <div id="bar">
-<a href="javascript:select_tab(1)">Files</a>
-<a href="javascript:select_tab(2)">Content</a>
+<a id="tabbutton1" href="javascript:select_tab(1)">Files</a>
+<a id="tabbutton2" href="javascript:select_tab(2)">Content</a>
 </div>
 
 <div id="container">
@@ -164,8 +171,12 @@ LOAD_TAB = \
 function select_tab(num) {
     var load_id = "tab" + num.toString();
     var other_id = (num == 1) ? "tab2" : "tab1";
+    var load_button = "tabbutton" + num.toString();
+    var other_button = (num == 1) ? "tabbutton2" : "tabbutton1";
     document.getElementById(other_id).style.display = "none";
     document.getElementById(load_id).style.display = "block";
+    document.getElementById(load_button).className = "";
+    document.getElementById(other_button).className = "unselected";
 }
 </script>
 '''
