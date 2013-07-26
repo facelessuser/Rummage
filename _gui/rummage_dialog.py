@@ -171,7 +171,7 @@ def update_autocomplete(obj, key, load_last=False, default=[]):
 def threaded_grep(
     target, pattern, file_pattern, folder_exclude,
     flags, show_hidden, all_utf8, size, modified,
-    created, text
+    created, text, count_only, boolean
 ):
     """
     Threaded pygrep launcher to search desired files
@@ -197,7 +197,9 @@ def threaded_grep(
                 created=created,
                 size=size,
                 text=text,
-                truncate_lines=True
+                truncate_lines=True,
+                count_only=count_only,
+                boolean=boolean
             )
         )
         grep.run()
@@ -285,6 +287,8 @@ class GrepArgs(object):
         self.size_compare = None
         self.modified_compare = None
         self.created_compare = None
+        self.count_only = False
+        self.boolean = False
 
 
 class DirPickButton(object):
@@ -460,6 +464,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_case_checkbox.SetValue(not Settings.get_search_setting("ignore_case_toggle", False))
         self.m_dotmatch_checkbox.SetValue(Settings.get_search_setting("dotall_toggle", False))
         self.m_utf8_checkbox.SetValue(Settings.get_search_setting("utf8_toggle", False))
+        self.m_boolean_checkbox.SetValue(Settings.get_search_setting("boolean_toggle", False))
+        self.m_count_only_checkbox.SetValue(Settings.get_search_setting("count_only_toggle", False))
 
         self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
@@ -741,7 +747,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.args.size_compare,
                 self.args.modified_compare,
                 self.args.created_compare,
-                self.args.text
+                self.args.text,
+                self.args.count_only,
+                self.args.boolean
             )
         )
         self.thread.setDaemon(True)
@@ -780,6 +788,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args.all_utf8 = self.m_utf8_checkbox.GetValue()
         self.args.pattern = self.m_searchfor_textbox.Value
         self.args.text = self.m_binary_checkbox.GetValue()
+        self.args.count_only = self.m_count_only_checkbox.GetValue()
+        self.args.boolean = self.m_boolean_checkbox.GetValue()
 
         # Limit Options
         if isdir(self.args.target):
@@ -847,7 +857,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("recursive_toggle", self.args.recursive),
             ("hidden_toggle", self.args.show_hidden),
             ("binary_toggle", self.args.text),
-            ("regex_file_toggle", self.m_fileregex_checkbox.GetValue())
+            ("regex_file_toggle", self.m_fileregex_checkbox.GetValue()),
+            ("boolean_toggle", self.args.boolean),
+            ("count_only_toggle", self.args.count_only)
         ]
 
         strings = [
@@ -1011,6 +1023,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.create_file_entry = False
                 else:
                     self.m_result_file_panel.increment_match_count(count - 1)
+
+                if self.args.count_only or self.args.boolean:
+                    count2 += 1
+                    self.content_table_offset += 1
+                    continue
 
                 lineno = f.lineno
                 if self.last_line is not None and lineno == self.last_line:

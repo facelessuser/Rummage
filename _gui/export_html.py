@@ -226,6 +226,15 @@ TABS_START = \
 <div class="main">
 '''
 
+TABS_START_SINGLE = \
+'''
+<div id="bar">
+<a id="tabbutton1" href="javascript:select_tab(1)">Files</a>
+</div>
+
+<div class="main">
+'''
+
 TABS_END = \
 '''
 </div>
@@ -239,10 +248,15 @@ function select_tab(num) {
     var other_id = (num == 1) ? "tab2" : "tab1";
     var load_button = "tabbutton" + num.toString();
     var other_button = (num == 1) ? "tabbutton2" : "tabbutton1";
-    document.getElementById(other_id).className = "tab_hidden";
     document.getElementById(load_id).className = "";
     document.getElementById(load_button).className = "";
-    document.getElementById(other_button).className = "unselected";
+    try {
+        // In case there is only one tab catch if there is no other
+        document.getElementById(other_id).className = "tab_hidden";
+        document.getElementById(other_button).className = "unselected";
+    } catch (err) {
+        // pass
+    }
 }
 </script>
 '''
@@ -350,7 +364,7 @@ def export(export_html, result_list, result_content_list):
             }
         )
         html.write(BODY_START % {"icon": base64.b64encode(rum_64.GetData())})
-        html.write(TABS_START)
+        html.write(TABS_START if len(result_content_list) else TABS_START_SINGLE)
         export_result_list(result_list, html)
         export_result_content_list(result_content_list, html)
         html.write(TABS_END)

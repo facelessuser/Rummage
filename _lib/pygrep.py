@@ -140,7 +140,7 @@ class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines'
 
 
 class _FileSearch(object):
-    def __init__(self, pattern, flags, context, truncate_lines):
+    def __init__(self, pattern, flags, context, truncate_lines, boolean, count_only):
         """
         Init the file search object
         """
@@ -148,6 +148,8 @@ class _FileSearch(object):
         self.literal = bool(flags & LITERAL)
         self.ignorecase = bool(flags & IGNORECASE)
         self.dotall = bool(flags & DOTALL)
+        self.boolean = bool(boolean)
+        self.count_only = bool(count_only)
         self.truncate_lines = truncate_lines
         if self.truncate_lines:
             self.context = (0, 0)
@@ -261,8 +263,9 @@ class _FileSearch(object):
         file_record_sent = False
 
         for m in self.__findall(file_content):
-            if line_ending is None:
-                line_ending = self.__get_line_ending(file_content)
+            if not self.boolean and not self.count_only:
+                if line_ending is None:
+                    line_ending = self.__get_line_ending(file_content)
 
             # Have we exceeded the maximum desired matches?
             if max_count != None:
@@ -275,18 +278,30 @@ class _FileSearch(object):
                 file_record_sent = True
                 yield FileRecord(target, True, None)
 
+            if not self.boolean and not self.count_only:
+                # Get context etc.
+                lines, match, context = self.__get_lines(file_content, m, line_ending, binary)
 
-            # Get context etc.
-            lines, match, context = self.__get_lines(file_content, m, line_ending, binary)
+                yield MatchRecord(
+                    file_content.count(line_ending, 0, m.start()) + 1,    # lineno
+                    self.__get_col(file_content, m.start(), line_ending), # colno
+                    match,                                                # Postion of match
+                    lines,                                                # Line(s) in which match is found
+                    line_ending,                                          # Line ending for file
+                    context                                               # Number of lines shown before and after matched line(s)
+                )
+            else:
+                yield MatchRecord(
+                    0,                                                    # lineno
+                    0,                                                    # colno
+                    (m.start(), m.end()),                                 # Postion of match
+                    None,                                                 # Line(s) in which match is found
+                    None,                                                 # Line ending for file
+                    (0, 0)                                                # Number of lines shown before and after matched line(s)
+                )
 
-            yield MatchRecord(
-                file_content.count(line_ending, 0, m.start()) + 1,    # lineno
-                self.__get_col(file_content, m.start(), line_ending), # colno
-                match,                                                # Postion of match
-                lines,                                                # Line(s) in which match is found
-                line_ending,                                          # Line ending for file
-                context                                               # Number of lines shown before and after matched line(s)
-            )
+            if self.boolean:
+                break
 
         if not file_record_sent:
             yield FileRecord(target, False, None)
@@ -473,7 +488,8 @@ class Grep(object):
         self, target, pattern, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None,
         show_hidden=False, all_utf8=False, size=None,
-        modified=None, created=None, text=False, truncate_lines=False
+        modified=None, created=None, text=False, truncate_lines=False,
+        boolean=False, count_only=False
     ):
         """
         Initialize Grep object.
@@ -487,7 +503,7 @@ class Grep(object):
             if _RUNNING:
                 raise GrepException("Grep process already running!")
 
-        self.search = _FileSearch(pattern, flags, context, truncate_lines)
+        self.search = _FileSearch(pattern, flags, context, truncate_lines, boolean, count_only)
         self.buffer_input = bool(flags & BUFFER_INPUT)
         self.all_utf8 = all_utf8
         self.current_encoding = None
