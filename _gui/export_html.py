@@ -159,7 +159,7 @@ HTML_HEADER = \
 <html>
 <head>
 <link rel="icon" type"image/png" href="data:image/png;base64,%(icon)s"/>
-<title>Export</title>
+<title>Rummage Results</title>
 <style type="text/css">
 %(css)s
 </style>
