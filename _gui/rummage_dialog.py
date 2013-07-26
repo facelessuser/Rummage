@@ -24,12 +24,13 @@ import wx.lib.newevent
 import version
 
 import _lib.pygrep as pygrep
-from _lib.settings import Settings, _PLATFORM
 from _lib.epoch_timestamp import local_time_to_epoch_timestamp
-import _lib.export_html as export_html
-import _lib.export_csv as export_csv
+import _lib.notify as notify
 
 import _gui.gui as gui
+import _gui.export_html as export_html
+import _gui.export_csv as export_csv
+from _gui.settings import Settings, _PLATFORM
 from _gui.generic_dialogs import *
 from _gui.custom_app import DebugFrameExtender
 from _gui.custom_app import get_debug_mode
@@ -44,7 +45,6 @@ from _gui.about_dialog import AboutDialog
 from _gui.result_panels import FileResultPanel, ResultFileList, ResultContentList
 from _gui.messages import dirpickermsg, filepickermsg
 from _gui.messages import Error as error_icon
-import _gui.notify as notify
 
 from _icons.rum_ico import rum_64
 

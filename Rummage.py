@@ -16,8 +16,7 @@ import argparse
 import traceback
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
 
-from _lib.settings import Settings
-
+from _gui.settings import Settings
 from _gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
 
 

@@ -13,8 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import wx
 import wx.lib.mixins.listctrl as listmix
 
-from _lib.settings import Settings
-
+from _gui.settings import Settings
 import _gui.gui as gui
 from _gui.result_panels import up_arrow, down_arrow
 from _icons.glass import glass

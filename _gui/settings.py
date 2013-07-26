@@ -15,11 +15,11 @@ from os.path import expanduser, exists, join, getmtime
 import traceback
 
 from _lib.file_strip.json import sanitize_json
+import _lib.notify as notify
 
 from _gui.custom_app import debug, debug_struct, info, error
 from _gui.custom_app import init_app_log, set_debug_mode
 from _gui.generic_dialogs import *
-import _gui.notify as notify
 from _icons.rum_ico import rum_64, rum_tray
 
 if sys.platform.startswith('win'):

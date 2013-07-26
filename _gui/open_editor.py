@@ -12,8 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import subprocess
 import sys
 
-from _lib.settings import Settings
-
+from _gui.settings import Settings
 from _gui.custom_app import debug, debug_struct, info, error
 from _gui.generic_dialogs import errormsg
 

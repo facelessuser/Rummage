@@ -12,7 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 import wx
 import _gui.gui as gui
-from _lib.settings import Settings
+from _gui.settings import Settings
 from _gui.editor_dialog import EditorDialog
 from _gui.platform_window_focus import platform_window_focus
 
