@@ -175,7 +175,7 @@ NOTIFY_GROWL = notify_growl_fallback
 
 if _PLATFORM in ["windows", "osx"]:
     try:
-        import _3rdparty.gntp.notifier
+        import gntp.notifier
 
         def notify_growl_call(note_type, title, description, sound, fallback):
             """
@@ -216,14 +216,15 @@ def setup_notify_growl(app_name):
     global notify_growl_call
     try:
         # Init growl object
-        GROWL = _3rdparty.gntp.notifier.GrowlNotifier(
+        GROWL = gntp.notifier.GrowlNotifier(
             applicationName = app_name,
             notifications = ["Info", "Warning", "Error"],
             defaultNotifications = ["Info", "Warning", "Error"]
         )
 
         GROWL.register()
-    except:
+    except Exception as e:
+        print str(e)
         GROWL = None
 
     if GROWL is not None:

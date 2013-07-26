@@ -41,7 +41,7 @@ from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
 from _gui.about_dialog import AboutDialog
 from _gui.result_panels import FileResultPanel, ResultFileList, ResultContentList
-from _gui.messages import dirpickermsg
+from _gui.messages import dirpickermsg, filepickermsg
 from _gui.messages import Error as error_icon
 import _gui.notify as notify
 
@@ -1136,7 +1136,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.tester.Show()
 
     def on_export(self, event):
+        html_file = filepickermsg("Export to...", "*.html", True)
+        if html_file is None:
+            return
         export_html.export(
+            html_file,
             self.m_result_file_panel.list.itemDataMap,
             self.m_result_content_panel.list.itemDataMap
         )

@@ -3,11 +3,12 @@ import re
 from time import ctime
 from os.path import join
 import codecs
+import base64
 import sys
+from _icons.rum_ico import rum_64
+from _icons.glass import glass
 
-from _3rdparty.sorttable.sorttable import sorttable as SORT_JS
-
-from _gui.messages import filepickermsg
+from sorttable.sorttable import sorttable as SORT_JS
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -19,10 +20,33 @@ else:
 
 CSS_HTML = \
 '''
+body {
+    padding: 0;
+    margin: 0;
+    height: auto;
+    background: #28343b;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAIAAAC2BqGFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QcZFxghKl5cpgAAAoBJREFUeNrt3D1OxEAMhuHBNFRIlMBBch96Gm6ZgwDXoFkp2lU28fjna3inHlvWo9HEjjb78PH5NYrW98/vkKxlWapSreuqqdlQFqz3t1dDWaBcc6JRPlUugEbZo5yFRtmpnIJG2a8ch0Z5SjkIjfKscgQa5YDyNDTKMeU5aJTDyhPQKGeUvdAoJ5Vd0Cjnlc+hUS5RPoFGuUr5CBrlQuW70CjXKu9Do1yuvAONcofyLTTKTcpX0Cj3KW/QKLcqX6BR7lYeYxjKAuVR+AMalI9nbENZoKw40Sgrrg6UFXc0yoqHIcqKrgNlRXuHsqKPRlkxsKCsmAxRVozgKCvedaDs2WYoC5Sz0Cj7NxvKAuU4NMqzIYayQDkCjXIs0FAWKM9Bo5wJN5QFyl5olPNJDGWB8jk0ylWpDGWB8hE0yrW1GcoC5X1olDsqNJQFyrfQKPfVaSgLlDdolLurNZQ13zwYypqaDWXBWpbFUBYo15xolE+VC6BR9ihnoVF2KqegUfYrx6FRnlIOQqM8qxyBRjmgPA2Nckx5DhrlsPIENMoZZS80ykllFzTKeeVzaJRLlE+gUa5SPoJGuVD5LjTKtcr70CiXK+9Ao9yhfAuNcpPyFTTKfcobNMqtyhdolLuVxxiPT88vKHcrD9l/k/5z5XVdDWWBsuJEo6y4OlBW3NEoKx6GKCu6DpQV7R3Kij4aZcXAgrJiMkRZMYKjrHjXgbJnm6EsUM5Co+zfbCgLlOPQKM+GGMoC5Qg0yrFAQ1mgPAeNcibcUBYoe6FRzicxlAXK59AoV6UylAXKR9Ao19ZmKAuU96FR7qjQUBYo30Kj3FenoSxQ3qBR7q7WUNZ8WfIHzN7PzlyBKZMAAAAASUVORK5CYII=');
+    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+    text-align: center;
+}
+h1 {
+    position: relative;
+    top: 0;
+    margin-top: 0;
+    padding-top: 50px;
+    color: white;
+    text-shadow: 2px 2px #333333;
+}
+img {
+    padding: 0;
+    border: 0;
+    vertical-align: middle;
+    width:32px;
+    height: auto;
+}
 /* Sortable tables */
 table.sortable thead {
-    /*background-color:#2b5b72;*/
-    background: #c5deea; /* Old browsers */
+    background-color:#2b5b72; /* Old browsers */
     background: -moz-linear-gradient(top,  #c5deea 0%, #397997 31%, #2b5b72 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c5deea), color-stop(31%,#397997), color-stop(100%,#2b5b72)); /* Chrome,Safari4+ */
     background: -webkit-linear-gradient(top,  #c5deea 0%,#397997 31%,#2b5b72 100%); /* Chrome10+,Safari5.1+ */
@@ -46,17 +70,12 @@ table.sortable tbody tr:nth-child(2n) td {
 table.sortable tbody tr:nth-child(2n+1) td {
   background: #fffffff;
 }
-h1 {
-    color: white;
-    text-shadow: 2px 2px #333333;
-}
 /* Tab Bar */
 #bar a{
     margin: 0px;
-    padding-top:10px;
+    padding-top:5px;
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 3px;
     color:#eeeeee;
     text-decoration:none;
     font-weight:bold;
@@ -89,15 +108,9 @@ h1 {
     background: -ms-linear-gradient(top,  #ffffff 1%,#397997 5%,#2b5b72 100%); /* IE10+ */
     background: linear-gradient(to bottom,  #ffffff 1%,#397997 5%,#2b5b72 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#2b5b72',GradientType=0 ); /* IE6-9 */
-
 }
 #bar a:hover{
     color:#ccffff;
-}
-body {
-    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
-    text-align: center;
-    background: #6597ae;
 }
 table {
     position: relative;
@@ -122,19 +135,29 @@ table td, table th {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+dif.tab_hidden:after {
+    visibility: hidden;
+}
+
+div.tab_hidden {
+    display: none;
+}
 div#bar {
     margin: auto;
 }
-div#main {
-    width: 50%;
-    margin: 0 auto;
+div.main {
+    zoom: 1;
+    padding-bottom: 50px;
 }
+
 '''
 
 HTML_HEADER = \
 '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+<link rel="icon" type"image/png" href="data:image/png;base64,%(icon)s"/>
 <title>Export</title>
 <style type="text/css">
 %(css)s
@@ -199,13 +222,11 @@ TABS_START = \
 <a id="tabbutton2" href="javascript:select_tab(2)">Content</a>
 </div>
 
-<div id="container">
 <div class="main">
 '''
 
 TABS_END = \
 '''
-</div>
 </div>
 '''
 
@@ -217,8 +238,8 @@ function select_tab(num) {
     var other_id = (num == 1) ? "tab2" : "tab1";
     var load_button = "tabbutton" + num.toString();
     var other_button = (num == 1) ? "tabbutton2" : "tabbutton1";
-    document.getElementById(other_id).style.display = "none";
-    document.getElementById(load_id).style.display = "block";
+    document.getElementById(other_id).className = "tab_hidden";
+    document.getElementById(load_id).className = "";
     document.getElementById(load_button).className = "";
     document.getElementById(other_button).className = "unselected";
 }
@@ -235,7 +256,7 @@ select_tab(1)
 BODY_START = \
 '''
 <body>
-<h1 id="title">Rummage Results</h1>
+<h1 id="title"><img src="data:image/bmp;base64,%(icon)s"/>Rummage Results</h1>
 '''
 
 BODY_END = \
@@ -266,7 +287,7 @@ def html_encode(text):
 
 def export_result_list(res, html):
     length = len(res)
-    html.write('<div class="tab" id="tab1" style="display: block;">')
+    html.write('<div id="tab1">')
     html.write('<table class="sortable">')
     html.write(RESULT_TABLE_HEADER)
 
@@ -293,7 +314,7 @@ def export_result_list(res, html):
 
 def export_result_content_list(res, html):
     length = len(res)
-    html.write('<div class="tab" id="tab2" style="display: block;">')
+    html.write('<div id="tab2"">')
     html.write('<table class="sortable">')
     html.write(RESULT_CONTENT_TABLE_HEADER)
 
@@ -312,20 +333,18 @@ def export_result_content_list(res, html):
     html.write('</div>')
 
 
-def export(result_list, result_content_list):
-    export_html = filepickermsg("Export to...", "*.html", True)
-    if export_html is None:
-        return
+def export(export_html, result_list, result_content_list):
 
     with codecs.open(export_html, "w", encoding="utf-8") as html:
         html.write(
             HTML_HEADER % {
                 "js": SORT_JS,
                 "morejs": LOAD_TAB,
-                "css": CSS_HTML
+                "css": CSS_HTML,
+                "icon": base64.b64encode(glass.GetData())
             }
         )
-        html.write(BODY_START)
+        html.write(BODY_START % {"icon": base64.b64encode(rum_64.GetData())})
         html.write(TABS_START)
         export_result_list(result_list, html)
         export_result_content_list(result_content_list, html)

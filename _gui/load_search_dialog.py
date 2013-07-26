@@ -12,28 +12,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 import wx
 import wx.lib.mixins.listctrl as listmix
-from wx.lib.embeddedimage import PyEmbeddedImage
 
 from _lib.settings import Settings
 
 import _gui.gui as gui
 from _gui.result_panels import up_arrow, down_arrow
-
-
-glass = PyEmbeddedImage(
-    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-    "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QcDFTYBJhcW1wAAAB1pVFh0Q29tbWVudAAA"
-    "AAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAACBElEQVQ4y5XTT0jTYRgH8O/zvL8/UzZHtUNh"
-    "0mooUw+BlxAjJJAlXSYInaRYpzoHgdi9Lt1LrBEEJRNzSH+lVgRRtzzEjGo2gjXdUpn7tfj9"
-    "9ns6xGDQ/uD39LzvCx9enud9CQ0yd/eeBscx/YH9vycnoi5ahOoXM4lFOrJRmBGmiGZ6Ou2K"
-    "taUb5oPYxfOzbYHbs3EPQ1a6enpHQv39crDLQyWrgtX372Btbz27EJs60wjgWqGUuql1h0e8"
-    "PX1wSaNNy4XP68Xw6THpCByKxOfil5sCt5aeepj4krPvMMoOZNOqomA5SG9W4DOIOoMD0A0z"
-    "1gjQAMDc2Q6LZsBRHlRB5IDAUCAQ8rs2RBlgo6O36Q1Uly+rwQWLI0IKQgogBoiRK/8bArt2"
-    "rikwFT37i5lTnlKeWFOilAIrBV3XYZMukvsCBuZbNpGAc2bx2w/18zMp1xZTV1B/SqiufyR3"
-    "J78ePBq60fYdJOYfHQC5DzWiIWbFrFQ1vbbmTyaTltK0k69SK6stgVqWFpcDROTPZDLWwkJi"
-    "mYiGAEoPj0cGr09fddsC9ZmITp4qFgqvRQRE9OHN29SJ+nPVDkinP33v6wuHbNs+7rpudzB4"
-    "zMhm11/+18SWH4boCjMXAaDqONOjo2PjewKev3iyQcx3RAQigopVfrwnAABCgwPXROSrQCCQ"
-    "+7X9v8GZwN0bJSSNAAAAAElFTkSuQmCC")
+from _icons.glass import glass
 
 
 class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
