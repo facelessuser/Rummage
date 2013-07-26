@@ -177,7 +177,7 @@ HTML_HEADER = \
 RESULT_ROW = \
 '''
 <tr>
-<td sorttable_customkey="%(file_sort)s">%(file)s</td>
+<td>%(file)s</td>
 <td sorttable_customkey="%(size_sort)s">%(size)s</td>
 <td>%(matches)s</td>
 <td>%(path)s</td>
@@ -317,7 +317,6 @@ def export_result_list(res, html):
         item = res[x]
         html.write(
             RESULT_ROW % {
-                "file_sort": html_encode(join(item[3], item[0])),
                 "file": html_encode(item[0]),
                 "size_sort": str(item[1]),
                 "size": '%.2fKB' % item[1],
