@@ -213,7 +213,7 @@ def main():
     if _PLATFORM == "osx":
         args = Args("Rummage.py", inputs.name, True, inputs.clean, ".app", abspath("_icons/rummage.icns"))
     elif _PLATFORM == "windows":
-        args = Args("Rummage.py", inputs.name, True, inputs.clean, ".exe", abspath("_icons\\rummage.ico"), args.portable)
+        args = Args("Rummage.py", inputs.name, True, inputs.clean, ".exe", abspath("_icons\\rummage.ico"), inputs.portable)
     else:
         args = Args(
             "Rummage.py", inputs.name, True, inputs.clean, "",
