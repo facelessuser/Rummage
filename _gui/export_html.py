@@ -38,6 +38,9 @@ h1 {
     color: white;
     text-shadow: 2px 2px #333333;
 }
+#search_label {
+    color: white;
+}
 img {
     padding: 0;
     border: 0;
@@ -237,6 +240,7 @@ TABS_START_SINGLE = \
 
 TABS_END = \
 '''
+<label id="search_label">%(type)s search: %(search)s</label>
 </div>
 '''
 
@@ -352,7 +356,7 @@ def export_result_content_list(res, html):
     html.write('</div>')
 
 
-def export(export_html, result_list, result_content_list):
+def export(export_html, search, regex_search, result_list, result_content_list):
 
     with codecs.open(export_html, "w", encoding="utf-8") as html:
         html.write(
@@ -367,7 +371,12 @@ def export(export_html, result_list, result_content_list):
         html.write(TABS_START if len(result_content_list) else TABS_START_SINGLE)
         export_result_list(result_list, html)
         export_result_content_list(result_content_list, html)
-        html.write(TABS_END)
+        html.write(
+            TABS_END % {
+                "search": html_encode(search),
+                "type": "Regex" if regex_search else "Literal"
+            }
+        )
         html.write(TAB_INIT)
         html.write(BODY_END)
 

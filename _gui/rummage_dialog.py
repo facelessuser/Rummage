@@ -1165,6 +1165,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             return
         export_html.export(
             html_file,
+            self.args.pattern,
+            self.args.regexp,
             self.m_result_file_panel.list.itemDataMap,
             self.m_result_content_panel.list.itemDataMap
         )
@@ -1181,6 +1183,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             return
         export_csv.export(
             csv_file,
+            self.args.pattern,
+            self.args.regexp,
             self.m_result_file_panel.list.itemDataMap,
             self.m_result_content_panel.list.itemDataMap
         )

@@ -82,9 +82,11 @@ def export_result_content_list(res, csv):
     csv.write("\n")
 
 
-def export(export_csv, result_list, result_content_list):
+def export(export_csv, search, regex_search, result_list, result_content_list):
 
     with codecs.open(export_csv, "w", encoding="utf-8") as csv:
+        search_expression = "Regex Search, %s\n\n" % csv_encode(search) if regex_search else "Literal Search, %s\n\n" % csv_encode(search)
+        csv.write(search_expression)
         export_result_list(result_list, csv)
         export_result_content_list(result_content_list, csv)
 
