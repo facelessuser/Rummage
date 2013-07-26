@@ -27,6 +27,7 @@ import _lib.pygrep as pygrep
 from _lib.settings import Settings, _PLATFORM
 from _lib.epoch_timestamp import local_time_to_epoch_timestamp
 import _lib.export_html as export_html
+import _lib.export_csv as export_csv
 
 import _gui.gui as gui
 from _gui.generic_dialogs import *
@@ -1135,12 +1136,34 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         )
         self.tester.Show()
 
-    def on_export(self, event):
+    def on_export_html(self, event):
+        if (
+            len(self.m_result_file_panel.list.itemDataMap) == 0 and
+            len(self.m_result_content_panel.list.itemDataMap) == 0
+        ):
+            errormsg("There is nothing to export!")
+            return
         html_file = filepickermsg("Export to...", "*.html", True)
         if html_file is None:
             return
         export_html.export(
             html_file,
+            self.m_result_file_panel.list.itemDataMap,
+            self.m_result_content_panel.list.itemDataMap
+        )
+
+    def on_export_csv(self, event):
+        if (
+            len(self.m_result_file_panel.list.itemDataMap) == 0 and
+            len(self.m_result_content_panel.list.itemDataMap) == 0
+        ):
+            errormsg("There is nothing to export!")
+            return
+        csv_file = filepickermsg("Export to...", "*.csv", True)
+        if csv_file is None:
+            return
+        export_csv.export(
+            csv_file,
             self.m_result_file_panel.list.itemDataMap,
             self.m_result_content_panel.list.itemDataMap
         )

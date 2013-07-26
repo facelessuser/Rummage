@@ -4,6 +4,7 @@ from time import ctime
 from os.path import join
 import codecs
 import base64
+import subprocess
 import sys
 from _icons.rum_ico import rum_64
 from _icons.glass import glass
@@ -25,7 +26,7 @@ body {
     margin: 0;
     height: auto;
     background: #28343b;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAIAAAC2BqGFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QcZFxghKl5cpgAAAoBJREFUeNrt3D1OxEAMhuHBNFRIlMBBch96Gm6ZgwDXoFkp2lU28fjna3inHlvWo9HEjjb78PH5NYrW98/vkKxlWapSreuqqdlQFqz3t1dDWaBcc6JRPlUugEbZo5yFRtmpnIJG2a8ch0Z5SjkIjfKscgQa5YDyNDTKMeU5aJTDyhPQKGeUvdAoJ5Vd0Cjnlc+hUS5RPoFGuUr5CBrlQuW70CjXKu9Do1yuvAONcofyLTTKTcpX0Cj3KW/QKLcqX6BR7lYeYxjKAuVR+AMalI9nbENZoKw40Sgrrg6UFXc0yoqHIcqKrgNlRXuHsqKPRlkxsKCsmAxRVozgKCvedaDs2WYoC5Sz0Cj7NxvKAuU4NMqzIYayQDkCjXIs0FAWKM9Bo5wJN5QFyl5olPNJDGWB8jk0ylWpDGWB8hE0yrW1GcoC5X1olDsqNJQFyrfQKPfVaSgLlDdolLurNZQ13zwYypqaDWXBWpbFUBYo15xolE+VC6BR9ihnoVF2KqegUfYrx6FRnlIOQqM8qxyBRjmgPA2Nckx5DhrlsPIENMoZZS80ykllFzTKeeVzaJRLlE+gUa5SPoJGuVD5LjTKtcr70CiXK+9Ao9yhfAuNcpPyFTTKfcobNMqtyhdolLuVxxiPT88vKHcrD9l/k/5z5XVdDWWBsuJEo6y4OlBW3NEoKx6GKCu6DpQV7R3Kij4aZcXAgrJiMkRZMYKjrHjXgbJnm6EsUM5Co+zfbCgLlOPQKM+GGMoC5Qg0yrFAQ1mgPAeNcibcUBYoe6FRzicxlAXK59AoV6UylAXKR9Ao19ZmKAuU96FR7qjQUBYo30Kj3FenoSxQ3qBR7q7WUNZ8WfIHzN7PzlyBKZMAAAAASUVORK5CYII=');
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAIAAAC2BqGFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QcaAhwIBNjPuwAAAn1JREFUeNrt3E1qw0AMhuGpKKUEArlVz9Ab9PiBQCili24CJsGxNfr5Nn1nPRLiYRhLJs7Lx+fXKFq/P99Dsg7HU1Wq6+WsqdlQFqzXt3dDWaBcc6JR3lUugEbZo5yFRtmpnIJG2a8ch0Z5SjkIjfKscgQa5YDyNDTKMeU5aJTDyhPQKGeUvdAoJ5Vd0CjnlfehUS5R3oFGuUp5CxrlQuWn0CjXKq9Do1yuvAKNcofyIzTKTcp30Cj3KS/QKLcq36BR7lYeYxjKAuVR+AMalLdnbENZoKw40Sgrrg6UFXc0yoqHIcqKrgNlRXuHsqKPRlkxsKCsmAxRVozgKCvedaDs2WYoC5Sz0Cj7NxvKAuU4NMqzIYayQDkCjXIs0FAWKM9Bo5wJN5QFyl5olPNJDGWB8j40ylWpDGWB8hY0yrW1GcoC5XVolDsqNJQFyo/QKPfVaSgLlBdolLurNZQ13zwYypqaDWXBOhxPhrJAueZEo7yrXACNskc5C42yUzkFjbJfOQ6N8pRyEBrlWeUINMoB5WlolGPKc9Aoh5UnoFHOKHuhUU4qu6BRzivvQ6NcorwDjXKV8hY0yoXKT6FRrlVeh0a5XHkFGuUO5UdolJuU76BR7lNeoFFuVb5Bo9ytPMYwlAXKQ/bfpP9c+Xo5G8oCZcWJRllxdaCsuKNRVjwMUVZ0HSgr2juUFX00yoqBBWXFZIiyYgRHWfGuA2XPNkNZoJyFRtm/2VAWKMehUZ4NMZQFyhFolGOBhrJAeQ4a5Uy4oSxQ9kKjnE9iKAuU96FRrkplKAuUt6BRrq3NUBYor0Oj3FGhoSxQfoRGua9OQ1mgvECj3F2toaz55uEPVbjSBFmfMz0AAAAASUVORK5CYII=');
     font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
     text-align: center;
 }
@@ -287,6 +288,8 @@ def html_encode(text):
 
 def export_result_list(res, html):
     length = len(res)
+    if length == 0:
+        return
     html.write('<div id="tab1">')
     html.write('<table class="sortable">')
     html.write(RESULT_TABLE_HEADER)
@@ -314,6 +317,8 @@ def export_result_list(res, html):
 
 def export_result_content_list(res, html):
     length = len(res)
+    if length == 0:
+        return
     html.write('<div id="tab2"">')
     html.write('<table class="sortable">')
     html.write(RESULT_CONTENT_TABLE_HEADER)
@@ -353,7 +358,13 @@ def export(export_html, result_list, result_content_list):
         html.write(BODY_END)
 
     if _PLATFORM == "osx":
-        import subprocess
         subprocess.Popen(['open', html.name])
-    else:
+    elif _PLATFORM == "windows":
         webbrowser.open(html.name, new=2)
+    else:
+        try:
+            # Maybe...?
+            subprocess.Popen(['xdg-open', html.name])
+        except OSError:
+            # Well we gave it our best...
+            pass

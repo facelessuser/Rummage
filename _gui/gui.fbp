@@ -26,6 +26,7 @@
         <property name="use_microsoft_bom">0</property>
         <object class="Frame" expanded="1">
             <property name="aui_managed">0</property>
+            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg">wxSYS_COLOUR_BTNFACE</property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -4960,20 +4961,40 @@
                         <event name="OnMenuSelection">on_preferences</event>
                         <event name="OnUpdateUI"></event>
                     </object>
-                    <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">Export to HTML</property>
-                        <property name="name">m_export_menuitem</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">on_export</event>
-                        <event name="OnUpdateUI"></event>
+                    <object class="submenu" expanded="1">
+                        <property name="label">Export</property>
+                        <property name="name">m_export_submenuitem</property>
+                        <property name="permission">protected</property>
+                        <object class="wxMenuItem" expanded="1">
+                            <property name="bitmap"></property>
+                            <property name="checked">0</property>
+                            <property name="enabled">1</property>
+                            <property name="help"></property>
+                            <property name="id">wxID_ANY</property>
+                            <property name="kind">wxITEM_NORMAL</property>
+                            <property name="label">HTML</property>
+                            <property name="name">m_export_html_menuitem</property>
+                            <property name="permission">none</property>
+                            <property name="shortcut"></property>
+                            <property name="unchecked_bitmap"></property>
+                            <event name="OnMenuSelection">on_export_html</event>
+                            <event name="OnUpdateUI"></event>
+                        </object>
+                        <object class="wxMenuItem" expanded="1">
+                            <property name="bitmap"></property>
+                            <property name="checked">0</property>
+                            <property name="enabled">1</property>
+                            <property name="help"></property>
+                            <property name="id">wxID_ANY</property>
+                            <property name="kind">wxITEM_NORMAL</property>
+                            <property name="label">CSV</property>
+                            <property name="name">m_export_csv_menuitem</property>
+                            <property name="permission">none</property>
+                            <property name="shortcut"></property>
+                            <property name="unchecked_bitmap"></property>
+                            <event name="OnMenuSelection">on_export_csv</event>
+                            <event name="OnUpdateUI"></event>
+                        </object>
                     </object>
                     <object class="separator" expanded="1">
                         <property name="name">m_separator1</property>
@@ -5034,6 +5055,7 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
+            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -5602,6 +5624,7 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
+            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -6885,6 +6908,7 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
+            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -8196,6 +8220,7 @@
         </object>
         <object class="Frame" expanded="1">
             <property name="aui_managed">0</property>
+            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg">wxSYS_COLOUR_BTNFACE</property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -8975,6 +9000,7 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
+            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -9441,6 +9467,7 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
+            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -10008,6 +10035,7 @@
         </object>
         <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
+            <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
