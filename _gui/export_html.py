@@ -80,6 +80,7 @@ table.sortable tbody tr:nth-child(2n+1) td {
     padding-top:5px;
     padding-left: 20px;
     padding-right: 20px;
+    padding-bottom: 5px;
     color:#eeeeee;
     text-decoration:none;
     font-weight:bold;
