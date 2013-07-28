@@ -284,7 +284,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         Select item on hover
         """
 
-        item, _ = self.HitTest(event.GetPosition())
+        item, flags = self.HitTest(event.GetPosition())
         if item >= 0:
             self.Select(item)
 
@@ -318,7 +318,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         Select item and dismiss popup on left mouse click
         """
 
-        item, _ = self.HitTest(event.GetPosition())
+        item, flags = self.HitTest(event.GetPosition())
         if item >= 0:
             self.waiting_value = item
         wx.CallAfter(self.Dismiss)

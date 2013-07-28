@@ -125,7 +125,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         if self.size_sample or not USE_SAMPLE_SIZE:
             for x in range(0, self.column_count):
                 text = self.get_item_text(idx, x, True)
-                lw, _, _, _ = self.dc.GetFullTextExtent(text)
+                lw, lh, d, e = self.dc.GetFullTextExtent(text)
                 width = lw + 30
                 if width > self.widest_cell[x]:
                     self.widest_cell[x] = width
@@ -277,7 +277,7 @@ class ResultFileList(ResultList):
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
             text = self.get_item_text(idx, 2, True)
-            lw, _, _, _ = self.dc.GetFullTextExtent(text)
+            lw, lh, d, e = self.dc.GetFullTextExtent(text)
             width = lw + 30
             if width > self.widest_cell[2]:
                 self.widest_cell[2] = width
@@ -357,7 +357,7 @@ class ResultContentList(ResultList):
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
             text = self.get_item_text(idx, 2, True)
-            lw, _, _, _ = self.dc.GetFullTextExtent(text)
+            lw, lh, d, e = self.dc.GetFullTextExtent(text)
             width = lw + 30
             if width > self.widest_cell[2]:
                 self.widest_cell[2] = width
