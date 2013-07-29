@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-07-29 11:40+MDT\n"
+"POT-Creation-Date: 2013-07-29 16:20+MDT\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,16 @@ msgstr ""
 msgid "Contact"
 msgstr ""
 
-#: _gui/generic_dialogs.py:13
+#: _gui/arg_dialog.py:50
+msgid "Edit Argument"
+msgstr ""
+
+#: _gui/arg_dialog.py:51
+msgid "Apply"
+msgstr ""
+
+#: _gui/arg_dialog.py:52 _gui/generic_dialogs.py:13
+#: _gui/load_search_dialog.py:146 _gui/save_search_dialog.py:53
 msgid "Cancel"
 msgstr ""
 
@@ -57,15 +66,27 @@ msgstr ""
 msgid "WARNING"
 msgstr ""
 
-#: _gui/load_search_dialog.py:191
+#: _gui/load_search_dialog.py:143
+msgid "Searches"
+msgstr ""
+
+#: _gui/load_search_dialog.py:144
+msgid "Remove"
+msgstr ""
+
+#: _gui/load_search_dialog.py:145
+msgid "Load"
+msgstr ""
+
+#: _gui/load_search_dialog.py:203 _gui/save_search_dialog.py:54
 msgid "Name"
 msgstr ""
 
-#: _gui/load_search_dialog.py:192 _gui/rummage_dialog.py:73
+#: _gui/load_search_dialog.py:204 _gui/rummage_dialog.py:73
 msgid "Search"
 msgstr ""
 
-#: _gui/load_search_dialog.py:193
+#: _gui/load_search_dialog.py:205
 msgid "Type"
 msgstr ""
 
@@ -231,7 +252,15 @@ msgstr ""
 msgid "Export to..."
 msgstr ""
 
-#: _gui/save_search_dialog.py:79
+#: _gui/save_search_dialog.py:51
+msgid "Save Search"
+msgstr ""
+
+#: _gui/save_search_dialog.py:52
+msgid "Save"
+msgstr ""
+
+#: _gui/save_search_dialog.py:88
 msgid "Please give the search a name!"
 msgstr ""
 
