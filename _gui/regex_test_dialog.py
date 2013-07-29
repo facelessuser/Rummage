@@ -45,6 +45,8 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         self.m_regex_text.SetValue(text)
 
+        self.localize()
+
         # If launched as a "stand alone" (main frame) disable unneeded objects
         if stand_alone:
             self.m_use_regex_button.Hide()
@@ -57,6 +59,16 @@ class RegexTestDialog(gui.RegexTestDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+    def localize(self):
+        self.SetTitle(_("Regex Tester"))
+        self.m_use_regex_button.SetLabel(_("Use"))
+        self.m_close_button.SetLabel(_("Close"))
+        self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
+        self.m_dot_checkbox.SetLabel(_("Dot matches newline"))
+        self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(_("Text"))
+        self.m_regex_text.GetContainingSizer().GetStaticBox().SetLabel(_("Regex Input"))
+        self.Fit()
 
     def init_regex_timer(self):
         """

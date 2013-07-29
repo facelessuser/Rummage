@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-07-29 16:20+MDT\n"
+"POT-Creation-Date: 2013-07-29 16:36+MDT\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -92,6 +92,34 @@ msgstr ""
 
 #: _gui/open_editor.py:31
 msgid "No editor is currently set!"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:64
+msgid "Regex Tester"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:65
+msgid "Use"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:66
+msgid "Close"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:67
+msgid "Search case-sensitive"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:68
+msgid "Dot matches newline"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:69
+msgid "Text"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:70
+msgid "Regex Input"
 msgstr ""
 
 #: _gui/result_panels.py:222 _gui/result_panels.py:323
