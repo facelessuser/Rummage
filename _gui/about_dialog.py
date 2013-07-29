@@ -14,6 +14,7 @@ import wx
 import version
 import _gui.gui as gui
 from _icons.rum_ico import rum_64
+from _lib.localization import get as _
 
 
 class AboutDialog(gui.AboutDialog):
@@ -24,15 +25,17 @@ class AboutDialog(gui.AboutDialog):
 
         super(AboutDialog, self).__init__(parent)
 
+        self.SetTitle(_("About"))
+
         self.m_bitmap = wx.StaticBitmap(
             self.m_about_panel, wx.ID_ANY, rum_64.GetBitmap(), wx.DefaultPosition, wx.Size(64, 64), 0
         )
         self.m_app_label.SetLabel(version.app)
         self.m_version_label.SetLabel(
-            "Version: %s %s" % (version.version, version.status)
+            _("Version: %s %s") % (version.version, version.status)
         )
         self.m_developers_label.SetLabel(
-            "Developers(s):\n%s" % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in version.maintainers]))
+            _("Developers(s):\n%s") % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in version.maintainers]))
         )
         self.Fit()
 
@@ -42,9 +45,9 @@ class AboutDialog(gui.AboutDialog):
         """
 
         if self.m_dev_toggle.GetValue():
-            self.m_dev_toggle.SetLabel("Contact <<")
+            self.m_dev_toggle.SetLabel(_("Contact") + " <<")
             self.m_developers_label.Show()
         else:
-            self.m_dev_toggle.SetLabel("Contact >>")
+            self.m_dev_toggle.SetLabel(_("Contact") + " >>")
             self.m_developers_label.Hide()
         self.Fit()

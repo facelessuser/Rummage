@@ -1,0 +1,35 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2013-07-28 22:24+MDT\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: _gui/about_dialog.py:28
+msgid "About"
+msgstr ""
+
+#: _gui/about_dialog.py:35
+msgid "Version: %s %s"
+msgstr ""
+
+#: _gui/about_dialog.py:38
+msgid ""
+"Developers(s):\n"
+"%s"
+msgstr ""
+
+#: _gui/about_dialog.py:48 _gui/about_dialog.py:51
+msgid "Contact"
+msgstr ""
+

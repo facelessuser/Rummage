@@ -51,7 +51,13 @@ class SettingsDialog(gui.SettingsDialog):
         for a in self.alert_methods:
             self.m_notify_choice.Append(a)
         self.m_notify_choice.SetStringSelection(Settings.get_notify_method())
-
+        self.m_lang_choice.Clear()
+        for l in Settings.get_languages():
+            self.m_lang_choice.Append(l)
+        locale = Settings.get_language()
+        if locale is None:
+            locale = "en_US"
+        self.m_lang_choice.SetStringSelection(locale)
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
@@ -136,6 +142,15 @@ class SettingsDialog(gui.SettingsDialog):
         stdiowin = wx.GetApp().stdioWin
         if stdiowin is not None:
             platform_window_focus(stdiowin.frame)
+
+    def on_language(cls, event):
+        """
+        Set selected on_language
+        """
+
+        value = self.m_lang_choice.GetStringSelection()
+        Settings.set_language(value)
+        event.Skip()
 
     def on_cancel(self, event):
         """

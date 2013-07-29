@@ -10,16 +10,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import codecs
 import json
 import sys
-from os import mkdir
-from os.path import expanduser, exists, join, getmtime
+from os import mkdir, listdir
+from os.path import expanduser, exists, join, getmtime, isdir
 import traceback
 
 from _lib.file_strip.json import sanitize_json
 import _lib.notify as notify
+import _lib.localization as localization
 
 from _gui.custom_app import debug, debug_struct, info, error
 from _gui.custom_app import init_app_log, set_debug_mode
 from _gui.generic_dialogs import *
+
 from _icons.rum_ico import rum_64, rum_tray
 
 if sys.platform.startswith('win'):
@@ -71,9 +73,46 @@ class Settings(object):
                     print("Failed to load settings file!\n\n%s" % str(e))
         if cls.get_debug():
             set_debug_mode(True)
+        localization.setup('rummage', join(cls.config_folder, "locale"), cls.get_language())
         debug_struct(cls.settings)
         debug_struct(cls.cache)
         cls.init_notify(True)
+
+    @classmethod
+    def get_language(cls):
+        """
+        Get locale language
+        """
+
+        locale = cls.settings.get("locale", "en_US")
+        if locale == "en_US" and not exists(join(cls.config_folder, "locale", "en_US")):
+            locale = None
+        return locale
+
+    @classmethod
+    def set_language(cls, language):
+        """
+        Set locale language
+        """
+
+        cls.settings["locale"] = language
+
+    @classmethod
+    def get_languages(cls):
+        """
+        Return langauges
+        """
+
+        languages = []
+        base = join(cls.config_folder, "locale")
+        if exists(base):
+            for file_obj in listdir(base):
+                if isdir(join(base, file_obj)):
+                    languages.append(file_obj)
+        if len(languages) == 0 or "en_US" not in languages:
+            languages.append("en_US")
+        languages.sort()
+        return languages
 
     @classmethod
     def get_debug(cls):
