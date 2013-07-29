@@ -51,7 +51,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.SetTitle(_("Save Search"))
         self.m_apply_button.SetLabel(_("Save"))
         self.m_cancel_button.SetLabel(_("Cancel"))
-        self.m_name_label.SetLabel(_("Name Stuff, Yeah"))
+        self.m_name_label.SetLabel(_("Name"))
         self.Fit()
 
     def set_keybindings(self, keybindings):
