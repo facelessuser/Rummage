@@ -36,6 +36,8 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.search = search
         self.is_regex = is_regex
 
+        self.localize()
+
         # Ensure good sizing for dialog
         best = self.m_save_panel.GetBestSize()
         current = self.m_save_panel.GetSize()
@@ -44,6 +46,13 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
         self.m_name_text.SetFocus()
+
+    def localize(self):
+        self.SetTitle(_("Save Search"))
+        self.m_apply_button.SetLabel(_("Save"))
+        self.m_cancel_button.SetLabel(_("Cancel"))
+        self.m_name_label.SetLabel(_("Name Stuff, Yeah"))
+        self.Fit()
 
     def set_keybindings(self, keybindings):
         """

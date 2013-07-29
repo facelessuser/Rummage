@@ -31,6 +31,8 @@ class ArgDialog(gui.ArgDialog):
         self.arg = value
         self.m_arg_text.SetValue(value)
 
+        self.localize()
+
         # Ensure good sizing for frame
         best = self.m_arg_panel.GetBestSize()
         current = self.m_arg_panel.GetSize()
@@ -39,6 +41,15 @@ class ArgDialog(gui.ArgDialog):
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
         self.m_arg_text.SetFocus()
+
+    def localize(self):
+        """
+        Localize dialog
+        """
+
+        self.SetTitle(_("Edit Argument"))
+        self.m_apply_button.SetLabel(_("Apply"))
+        self.m_cancel_button.SetLabel(_("Cancel"))
 
     def set_keybindings(self, keybindings):
         """

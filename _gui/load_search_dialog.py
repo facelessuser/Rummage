@@ -123,6 +123,8 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.reset_table()
         extend_list(self.m_search_list, 3)
 
+        self.localize()
+
         best = self.m_load_panel.GetBestSize()
         current = self.m_load_panel.GetSize()
         offset = best[1] - current[1]
@@ -132,6 +134,16 @@ class LoadSearchDialog(gui.LoadSearchDialog):
 
         self.load_searches()
         self.m_search_list.SetFocus()
+
+    def localize(self):
+        """
+        Localize dialog
+        """
+
+        self.SetTitle(_("Searches"))
+        self.m_delete_button.SetLabel(_("Remove"))
+        self.m_load_button.SetLabel(_("Load"))
+        self.m_cancel_button.SetLabel(_("Cancel"))
 
     def load_searches(self):
         """
