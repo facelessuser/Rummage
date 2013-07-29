@@ -8,9 +8,9 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import _gui.messages as messages
-import _gui.custom_app as _custom_app
+from _lib.localization import get as _
 
-def yesno(question, title='Yes or no?', bitmap=None, yes="Okay", no="Cancel"):
+def yesno(question, title=_('Yes or no?'), bitmap=None, yes=_("Okay"), no=_("Cancel")):
     """
     Wrapper for the prompt dialog
     """
@@ -18,7 +18,7 @@ def yesno(question, title='Yes or no?', bitmap=None, yes="Okay", no="Cancel"):
     return messages.promptmsg(question, title, bitmap, yes, no)
 
 
-def infomsg(msg, title="INFO", bitmap=None):
+def infomsg(msg, title=_("INFO"), bitmap=None):
     """
     Wrapper for the info dialog
     """
@@ -26,16 +26,15 @@ def infomsg(msg, title="INFO", bitmap=None):
     messages.infomsg(msg, title, bitmap)
 
 
-def errormsg(msg, title="ERROR", bitmap=None):
+def errormsg(msg, title=_("ERROR"), bitmap=None):
     """
     Wrapper for the error dialog that also logs the error
     """
 
-    _custom_app.error(msg)
     messages.errormsg(msg, title, bitmap)
 
 
-def warnmsg(msg, title="WARNING", bitmap=None):
+def warnmsg(msg, title=_("WARNING"), bitmap=None):
     """
     Wrapper for the warning dialog
     """

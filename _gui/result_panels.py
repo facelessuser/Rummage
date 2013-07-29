@@ -17,6 +17,8 @@ from os.path import normpath, join
 
 from _gui.open_editor import open_editor
 
+from _lib.localization import get as _
+
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
 USE_SAMPLE_SIZE = True
@@ -214,7 +216,18 @@ class ResultFileList(ResultList):
         Init ResultFileList object
         """
 
-        super(ResultFileList, self).__init__(parent, ["File", "Size", "Matches", "Path", "Encoding", "Modified", "Created"])
+        super(ResultFileList, self).__init__(
+            parent,
+            [
+                _("File"),
+                _("Size"),
+                _("Matches"),
+                _("Path"),
+                _("Encoding"),
+                _("Modified"),
+                _("Created")
+            ]
+        )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
@@ -304,7 +317,15 @@ class ResultContentList(ResultList):
         Init ResultContentFileList object
         """
 
-        super(ResultContentList, self).__init__(parent, ["File", "Line", "Matches", "Context"])
+        super(ResultContentList, self).__init__(
+            parent,
+            [
+                _("File"),
+                _("Line"),
+                _("Matches"),
+                _("Context")
+            ]
+        )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)

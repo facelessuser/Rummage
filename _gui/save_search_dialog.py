@@ -17,6 +17,8 @@ import _gui.gui as gui
 from _gui.settings import Settings
 from _gui.generic_dialogs import errormsg
 
+from _lib.localization import get as _
+
 
 class SaveSearchDialog(gui.SaveSearchDialog):
     def __init__(self, parent, search, is_regex):
@@ -74,7 +76,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
 
         value = self.m_name_text.GetValue()
         if value == "":
-            errormsg("Please give the search a name!")
+            errormsg(_("Please give the search a name!"))
             return
 
         Settings.add_search(value, self.search, self.is_regex)

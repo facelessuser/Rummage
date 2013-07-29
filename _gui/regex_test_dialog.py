@@ -17,6 +17,8 @@ import _gui.gui as gui
 import _lib.ure as ure
 from _icons.rum_ico import rum_64
 
+from _lib.localization import get as _
+
 
 class RegexTestDialog(gui.RegexTestDialog):
     def __init__(self, parent, is_case, is_dot, text="", stand_alone=False):

@@ -16,6 +16,8 @@ from _gui.settings import Settings
 from _gui.custom_app import debug, debug_struct, info, error
 from _gui.generic_dialogs import errormsg
 
+from _lib.localization import get as _
+
 
 def open_editor(filename, line, col):
     """
@@ -26,7 +28,8 @@ def open_editor(filename, line, col):
 
     cmd = Settings.get_editor(filename=filename, line=line, col=col)
     if len(cmd) == 0:
-        errormsg("No editor is currently set!")
+        errormsg(_("No editor is currently set!"))
+        error(u"No editor set: %s" % unicode(cmd))
         return
     debug(cmd)
 

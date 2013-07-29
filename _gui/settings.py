@@ -17,6 +17,7 @@ import traceback
 from _lib.file_strip.json import sanitize_json
 import _lib.notify as notify
 import _lib.localization as localization
+from _lib.localization import get as _
 
 from _gui.custom_app import debug, debug_struct, info, error
 from _gui.custom_app import init_app_log, set_debug_mode
@@ -68,9 +69,10 @@ class Settings(object):
             except:
                 e = traceback.format_exc()
                 try:
-                    errormsg("Failed to load settings file!\n\n%s" % str(e))
+                    errormsg(_("Failed to load settings file!"))
+                    error(e)
                 except:
-                    print("Failed to load settings file!\n\n%s" % str(e))
+                    print(str(e))
         if cls.get_debug():
             set_debug_mode(True)
         localization.setup('rummage', join(cls.config_folder, "locale"), cls.get_language())
@@ -493,9 +495,10 @@ class Settings(object):
         except:
             e = traceback.format_exc()
             try:
-                errormsg("Failed to save settings file!\n\n%s" % str(e))
+                errormsg(_("Failed to save settings file!"))
+                error(e)
             except:
-                print("Failed to save settings file!\n\n%s" % str(e))
+                print(str(e))
 
     @classmethod
     def save_cache(cls):
@@ -509,6 +512,7 @@ class Settings(object):
         except:
             e = traceback.format_exc()
             try:
-                errormsg("Failed to save cache file!\n\n%s" % str(e))
+                errormsg(_("Failed to save cache file!"))
+                error(e)
             except:
-                print("Failed to save cache file!\n\n%s" % str(e))
+                print(str(e))

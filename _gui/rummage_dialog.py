@@ -26,6 +26,7 @@ import version
 import _lib.pygrep as pygrep
 from _lib.epoch_timestamp import local_time_to_epoch_timestamp
 import _lib.notify as notify
+from _lib.localization import get as _
 
 import _gui.gui as gui
 import _gui.export_html as export_html
@@ -60,12 +61,17 @@ _RECORDS = 0
 _ERRORS = []
 _ABORT = False
 _RUNTIME = None
+
 LIMIT_COMPARE = {
     0: "any",
     1: "gt",
     2: "eq",
     3: "lt"
 }
+
+SEARCH_BTN_STOP = _("Stop")
+SEARCH_BTN_SEARCH = _("Search")
+SEARCH_BTN_ABORT = _("Aborting")
 
 
 def get_flags(args):
@@ -204,11 +210,11 @@ def threaded_grep(
         )
         grep.run()
     except:
-        print(str(traceback.format_exc()))
+        error(traceback.format_exc())
         pass
     bench = time() - start
     with _LOCK:
-        _RUNTIME = "%01.2f seconds" % bench
+        _RUNTIME = _("%01.2f seconds") % bench
         _RUNNING = False
 
 
@@ -336,7 +342,7 @@ class DirPickButton(object):
         directory = self.GetPath()
         if directory is None or not exists(directory) or not isdir(directory):
             directory = expanduser("~")
-        directory = dirpickermsg("Select directory to rummage", directory)
+        directory = dirpickermsg(_("Select directory to rummage"), directory)
         if directory is None or directory == "":
             directory = None
         self.SetPath(directory)
@@ -396,8 +402,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_grep_notebook.DeletePage(1)
         self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
         self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
-        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, "Files", False)
-        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
+        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, _("Files"), False)
+        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, _("Content"), False)
         self.m_result_file_panel.load_table()
         self.m_result_content_panel.load_table()
         self.m_grep_notebook.SetSelection(0)
@@ -566,7 +572,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         search = self.m_searchfor_textbox.GetValue()
         if search == "":
-            errormsg("There is no search to save!")
+            errormsg(_("There is no search to save!"))
             return
         dlg = SaveSearchDialog(self, search, self.m_regex_search_checkbox.GetValue())
         dlg.ShowModal()
@@ -618,9 +624,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if self.debounce_search:
                 return
         self.debounce_search = True
-        if self.m_search_button.GetLabel() in ["Stop", "Aborting"]:
+        if self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
             if self.thread is not None:
-                self.m_search_button.SetLabel("Aborting")
+                self.m_search_button.SetLabel(SEARCH_BTN_ABORT)
                 global _ABORT
                 with _LOCK:
                     _ABORT = True
@@ -643,40 +649,40 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         msg = ""
         if self.m_regex_search_checkbox.GetValue():
             if self.m_searchfor_textbox.GetValue() == "" or self.validate_search_regex():
-                msg = "Please enter a valid search regex!"
+                msg = _("Please enter a valid search regex!")
                 fail = True
         elif self.m_searchfor_textbox.GetValue() == "":
-            msg = "Please enter a valid search!"
+            msg = _("Please enter a valid search!")
             fail = True
         if not fail and self.m_fileregex_checkbox.GetValue():
             if self.m_filematch_textbox.GetValue().strip() == "" or self.validate_regex(self.m_filematch_textbox.Value):
                 msg = "Please enter a valid file regex!"
                 fail = True
         elif self.m_filematch_textbox.GetValue().strip() == "":
-            msg = "Please enter a valid file pattern!"
+            msg = _("Please enter a valid file pattern!")
             fail = True
         if not fail and self.m_dirregex_checkbox.GetValue():
             if self.validate_regex(self.m_exclude_textbox.Value):
-                msg = "Please enter a valid exlcude directory regex!"
+                msg = _("Please enter a valid exlcude directory regex!")
                 fail = True
         if not exists(self.m_searchin_text.GetValue()):
-            msg = "Please enter a valid search path!"
+            msg = _("Please enter a valid search path!")
             fail = True
         if (
             self.m_logic_choice.GetStringSelection() != "any" and
             re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
         ):
-            msg = "Please enter a valid size!"
+            msg = _("Please enter a valid size!")
             fail = True
         try:
             self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
         except:
-            msg = "Please enter a modified date!"
+            msg = _("Please enter a modified date!")
             fail = True
         try:
             self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
         except:
-            msg = "Please enter a created date!"
+            msg = _("Please enter a created date!")
             fail = True
         if fail:
             errormsg(msg)
@@ -724,10 +730,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.remove_icon("errors")
 
         # Change button to stop search
-        self.m_search_button.SetLabel("Stop")
+        self.m_search_button.SetLabel(SEARCH_BTN_STOP)
 
         # Init search status
-        self.m_statusbar.set_status("Searching: 0/0 0%% Matches: 0")
+        self.m_statusbar.set_status(_("Searching: 0/0 0%% Matches: 0"))
 
         # Setup arguments
         self.set_arguments()
@@ -929,10 +935,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     benchmark = _RUNTIME
 
                 self.stop_update_timer()
-                self.m_search_button.SetLabel("Search")
+                self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
                 if self.kill:
                     self.m_statusbar.set_status(
-                        "Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (
+                        _("Searching: %d/%d %d%% Matches: %d Benchmark: %s") % (
                             completed,
                             completed,
                             100,
@@ -944,8 +950,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_progressbar.SetValue(completed)
                     if Settings.get_notify():
                         notify.error(
-                            "Search Aborted",
-                            "\n%d matches found!" % (count2 - self.non_match_record),
+                            _("Search Aborted"),
+                            _("\n%d matches found!") % (count2 - self.non_match_record),
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -953,7 +959,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.kill = False
                 else:
                     self.m_statusbar.set_status(
-                        "Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (
+                        _("Searching: %d/%d %d%% Matches: %d Benchmark: %s") % (
                             completed,
                             completed,
                             100,
@@ -965,8 +971,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_progressbar.SetValue(100)
                     if Settings.get_notify():
                         notify.info(
-                            "Search Completed",
-                            "\n%d matches found!" % (count2 - self.non_match_record),
+                            _("Search Completed"),
+                            _("\n%d matches found!") % (count2 - self.non_match_record),
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -978,14 +984,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         graphic.Rescale(16, 16)
                         image = wx.BitmapFromImage(graphic)
                         self.m_statusbar.set_icon(
-                            "errors", image,
-                            msg="%d errors\nSee log for details." % self.error_count,
-                            context=[("View Log", lambda e: self.open_debug_console())]
+                            _("errors"), image,
+                            msg=_("%d errors\nSee log for details.") % self.error_count,
+                            context=[(_("View Log"), lambda e: self.open_debug_console())]
                         )
                         for e in _ERRORS:
                             error(
-                                "Cound not process %s:\n%s" % (
-                                    unicode(e.info.name) if e.info is not None else "file", e.error
+                                _("Cound not process %s:\n%s") % (
+                                    unicode(e.info.name) if e.info is not None else _("file"), e.error
                                 )
                             )
                         _ERRORS = []
@@ -1052,7 +1058,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if p_value != done:
             self.m_progressbar.SetValue(actually_done)
         self.m_statusbar.set_status(
-            "Searching: %d/%d %d%% Matches: %d" % (
+            _("Searching: %d/%d %d%% Matches: %d") % (
                 actually_done, total,
                 int(float(actually_done)/float(total) * 100),
                 (count2 - self.non_match_record)
@@ -1114,7 +1120,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             re.compile(pattern, flags)
             return False
         except:
-            errormsg("Invalid Regular Expression!")
+            errormsg(_("Invalid Regular Expression!"))
+            error(traceback.format_exc())
             return True
 
     def on_debug_console(self, event):
@@ -1158,9 +1165,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             len(self.m_result_file_panel.list.itemDataMap) == 0 and
             len(self.m_result_content_panel.list.itemDataMap) == 0
         ):
-            errormsg("There is nothing to export!")
+            errormsg(_("There is nothing to export!"))
             return
-        html_file = filepickermsg("Export to...", "*.html", True)
+        html_file = filepickermsg(_("Export to..."), "*.html", True)
         if html_file is None:
             return
         export_html.export(
@@ -1176,9 +1183,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             len(self.m_result_file_panel.list.itemDataMap) == 0 and
             len(self.m_result_content_panel.list.itemDataMap) == 0
         ):
-            errormsg("There is nothing to export!")
+            errormsg(_("There is nothing to export!"))
             return
-        csv_file = filepickermsg("Export to...", "*.csv", True)
+        csv_file = filepickermsg(_("Export to..."), "*.csv", True)
         if csv_file is None:
             return
         export_csv.export(

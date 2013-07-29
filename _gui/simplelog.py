@@ -65,7 +65,7 @@ class Log(object):
 
         return format % {
             "loglevel": lvl,
-            "message": str(msg if fmt is None else fmt(msg))
+            "message": unicode(msg if fmt is None else fmt(msg))
         }
 
     def debug(self, msg, format="%(loglevel)s: %(message)s\n", echo=True, fmt=None):

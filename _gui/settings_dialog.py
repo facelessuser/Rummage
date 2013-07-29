@@ -16,6 +16,11 @@ from _gui.settings import Settings
 from _gui.editor_dialog import EditorDialog
 from _gui.platform_window_focus import platform_window_focus
 
+from _lib.localization import get as _
+
+
+RECORDS = _("%d Records")
+
 
 class SettingsDialog(gui.SettingsDialog):
     def __init__(self, parent):
@@ -40,7 +45,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.editor = Settings.get_editor()
         self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
-        self.m_history_label.SetLabel("%d Records" % history_records)
+        self.m_history_label.SetLabel(RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
         self.m_debug_checkbox.SetValue(Settings.get_debug())
 
@@ -92,7 +97,7 @@ class SettingsDialog(gui.SettingsDialog):
 
         Settings.clear_history_records(self.history_types)
         self.history_records_cleared = True
-        self.m_history_label.SetLabel("0 Records")
+        self.m_history_label.SetLabel(RECORDS % 0)
         self.m_history_clear_button.Enable(False)
 
     def on_notify_choice(self, event):

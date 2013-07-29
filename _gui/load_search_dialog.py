@@ -18,6 +18,8 @@ import _gui.gui as gui
 from _gui.result_panels import up_arrow, down_arrow
 from _icons.glass import glass
 
+from _lib.localization import get as _
+
 
 class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
     def setup(self, c):
@@ -186,9 +188,9 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         """
 
         self.m_search_list.ClearAll()
-        self.m_search_list.InsertColumn(0, "Name")
-        self.m_search_list.InsertColumn(1, "Search")
-        self.m_search_list.InsertColumn(2, "Type")
+        self.m_search_list.InsertColumn(0, _("Name"))
+        self.m_search_list.InsertColumn(1, _("Search"))
+        self.m_search_list.InsertColumn(2, _("Type"))
         wx.GetApp().Yield()
 
     def on_delete(self, event):

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-07-28 22:24+MDT\n"
+"POT-Creation-Date: 2013-07-29 11:40+MDT\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,5 +31,223 @@ msgstr ""
 
 #: _gui/about_dialog.py:48 _gui/about_dialog.py:51
 msgid "Contact"
+msgstr ""
+
+#: _gui/generic_dialogs.py:13
+msgid "Cancel"
+msgstr ""
+
+#: _gui/generic_dialogs.py:13
+msgid "Okay"
+msgstr ""
+
+#: _gui/generic_dialogs.py:13
+msgid "Yes or no?"
+msgstr ""
+
+#: _gui/generic_dialogs.py:21
+msgid "INFO"
+msgstr ""
+
+#: _gui/generic_dialogs.py:29
+msgid "ERROR"
+msgstr ""
+
+#: _gui/generic_dialogs.py:37
+msgid "WARNING"
+msgstr ""
+
+#: _gui/load_search_dialog.py:191
+msgid "Name"
+msgstr ""
+
+#: _gui/load_search_dialog.py:192 _gui/rummage_dialog.py:73
+msgid "Search"
+msgstr ""
+
+#: _gui/load_search_dialog.py:193
+msgid "Type"
+msgstr ""
+
+#: _gui/open_editor.py:31
+msgid "No editor is currently set!"
+msgstr ""
+
+#: _gui/result_panels.py:222 _gui/result_panels.py:323
+msgid "File"
+msgstr ""
+
+#: _gui/result_panels.py:223
+msgid "Size"
+msgstr ""
+
+#: _gui/result_panels.py:224 _gui/result_panels.py:325
+msgid "Matches"
+msgstr ""
+
+#: _gui/result_panels.py:225
+msgid "Path"
+msgstr ""
+
+#: _gui/result_panels.py:226
+msgid "Encoding"
+msgstr ""
+
+#: _gui/result_panels.py:227
+msgid "Modified"
+msgstr ""
+
+#: _gui/result_panels.py:228
+msgid "Created"
+msgstr ""
+
+#: _gui/result_panels.py:324
+msgid "Line"
+msgstr ""
+
+#: _gui/result_panels.py:326
+msgid "Context"
+msgstr ""
+
+#: _gui/rummage_dialog.py:72
+msgid "Stop"
+msgstr ""
+
+#: _gui/rummage_dialog.py:74
+msgid "Aborting"
+msgstr ""
+
+#: _gui/rummage_dialog.py:217
+msgid "%01.2f seconds"
+msgstr ""
+
+#: _gui/rummage_dialog.py:345
+msgid "Select directory to rummage"
+msgstr ""
+
+#: _gui/rummage_dialog.py:405
+msgid "Files"
+msgstr ""
+
+#: _gui/rummage_dialog.py:406
+msgid "Content"
+msgstr ""
+
+#: _gui/rummage_dialog.py:575
+msgid "There is no search to save!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:652
+msgid "Please enter a valid search regex!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:655
+msgid "Please enter a valid search!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:662
+msgid "Please enter a valid file pattern!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:666
+msgid "Please enter a valid exlcude directory regex!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:669
+msgid "Please enter a valid search path!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:675
+msgid "Please enter a valid size!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:680
+msgid "Please enter a modified date!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:685
+msgid "Please enter a created date!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:736
+msgid "Searching: 0/0 0%% Matches: 0"
+msgstr ""
+
+#: _gui/rummage_dialog.py:941 _gui/rummage_dialog.py:962
+msgid "Searching: %d/%d %d%% Matches: %d Benchmark: %s"
+msgstr ""
+
+#: _gui/rummage_dialog.py:953
+msgid "Search Aborted"
+msgstr ""
+
+#: _gui/rummage_dialog.py:954 _gui/rummage_dialog.py:975
+msgid ""
+"\n"
+"%d matches found!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:974
+msgid "Search Completed"
+msgstr ""
+
+#: _gui/rummage_dialog.py:987
+msgid "errors"
+msgstr ""
+
+#: _gui/rummage_dialog.py:988
+msgid ""
+"%d errors\n"
+"See log for details."
+msgstr ""
+
+#: _gui/rummage_dialog.py:989
+msgid "View Log"
+msgstr ""
+
+#: _gui/rummage_dialog.py:993
+msgid ""
+"Cound not process %s:\n"
+"%s"
+msgstr ""
+
+#: _gui/rummage_dialog.py:994
+msgid "file"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1061
+msgid "Searching: %d/%d %d%% Matches: %d"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1123
+msgid "Invalid Regular Expression!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1168 _gui/rummage_dialog.py:1186
+msgid "There is nothing to export!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1170 _gui/rummage_dialog.py:1188
+msgid "Export to..."
+msgstr ""
+
+#: _gui/save_search_dialog.py:79
+msgid "Please give the search a name!"
+msgstr ""
+
+#: _gui/settings.py:72
+msgid "Failed to load settings file!"
+msgstr ""
+
+#: _gui/settings.py:498
+msgid "Failed to save settings file!"
+msgstr ""
+
+#: _gui/settings.py:515
+msgid "Failed to save cache file!"
+msgstr ""
+
+#: _gui/settings_dialog.py:22
+msgid "%d Records"
 msgstr ""
 
