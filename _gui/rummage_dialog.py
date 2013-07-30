@@ -62,6 +62,16 @@ _ERRORS = []
 _ABORT = False
 _RUNTIME = None
 
+SIZE_ANY = _("any")
+SIZE_GT = _("greater than")
+SIZE_EQ = _("equal to")
+SIZE_LT = _("less than")
+TIME_ANY = _("on any")
+TIME_GT = _("after")
+TIME_EQ = _("on")
+TIME_LT = _("before")
+
+
 LIMIT_COMPARE = {
     0: "any",
     1: "gt",
@@ -69,9 +79,44 @@ LIMIT_COMPARE = {
     3: "lt"
 }
 
+SIZE_LIMIT_I18N = {
+    SIZE_ANY: "any",
+    SIZE_GT: "greater than",
+    SIZE_EQ: "equal to",
+    SIZE_LT: "less than"
+}
+
+TIME_LIMIT_I18N = {
+    TIME_ANY: "on any",
+    TIME_GT: "after",
+    TIME_EQ: "on",
+    TIME_LT: "before"
+}
+
 SEARCH_BTN_STOP = _("Stop")
 SEARCH_BTN_SEARCH = _("Search")
 SEARCH_BTN_ABORT = _("Aborting")
+
+
+def eng_to_i18n(string, map):
+    """
+    Convert english to i18n
+    """
+
+    i18n = None
+    for k, v in map.items():
+        if v == string:
+            i18n = k
+            break
+    return i18n
+
+
+def i18n_to_eng(string, map):
+    """
+    Convert i18n to english
+    """
+
+    return map.get(string, None)
 
 
 def get_flags(args):
@@ -412,11 +457,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_progressbar.SetRange(100)
         self.m_progressbar.SetValue(0)
 
+        self.localize()
+
         # Setup the inputs history and replace
         # placeholder objects with actual objecs
         self.setup_inputs()
-
-        self.localize()
 
         # Pick optimal size
         self.optimize_size(True)
@@ -459,6 +504,18 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_export_csv_menuitem.SetItemLabel(_("CSV"))
         self.m_about_menuitem.SetItemLabel(_("&About Rummage"))
         self.m_issues_menuitem.SetItemLabel(_("Help and Support"))
+
+        self.m_logic_choice.Clear()
+        for x in [SIZE_ANY, SIZE_GT, SIZE_EQ, SIZE_LT]:
+            self.m_logic_choice.Append(x)
+
+        self.m_modified_choice.Clear()
+        for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
+            self.m_modified_choice.Append(x)
+
+        self.m_created_choice.Clear()
+        for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
+            self.m_created_choice.Append(x)
         self.Fit()
 
     def on_textctrl_selectall(self, event):
@@ -504,7 +561,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
 
-        self.m_logic_choice.SetStringSelection(Settings.get_search_setting("size_compare_string", "any"))
+        self.m_logic_choice.SetStringSelection(
+            eng_to_i18n(
+                Settings.get_search_setting("size_compare_string", "any"),
+                SIZE_LIMIT_I18N
+            )
+        )
         self.m_size_text.SetValue(Settings.get_search_setting("size_limit_string", "1000"))
 
         self.m_case_checkbox.SetValue(not Settings.get_search_setting("ignore_case_toggle", False))
@@ -517,8 +579,18 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
 
-        self.m_modified_choice.SetStringSelection(Settings.get_search_setting("modified_compare_string", "on any"))
-        self.m_created_choice.SetStringSelection(Settings.get_search_setting("created_compare_string", "on any"))
+        self.m_modified_choice.SetStringSelection(
+            eng_to_i18n(
+                Settings.get_search_setting("modified_compare_string", "on any"),
+                TIME_LIMIT_I18N
+            )
+        )
+        self.m_created_choice.SetStringSelection(
+            eng_to_i18n(
+                Settings.get_search_setting("created_compare_string", "on any"),
+                TIME_LIMIT_I18N
+            )
+        )
 
         # GUI is built with WxFormBuilder, but it isn't easy to fill in custom objects.
         # So place holder objects are added for the sake of planning the gui, and then they
@@ -908,20 +980,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("count_only_toggle", self.args.count_only)
         ]
 
+        eng_size = i18n_to_eng(self.m_logic_choice.GetStringSelection(), SIZE_LIMIT_I18N)
+        eng_mod = i18n_to_eng(self.m_modified_choice.GetStringSelection(), TIME_LIMIT_I18N)
+        eng_cre = i18n_to_eng(self.m_created_choice.GetStringSelection(), TIME_LIMIT_I18N)
         strings = [
-            ("size_compare_string", self.m_logic_choice.GetStringSelection()),
-            ("modified_compare_string", self.m_modified_choice.GetStringSelection()),
-            ("created_compare_string", self.m_created_choice.GetStringSelection())
+            ("size_compare_string", eng_size),
+            ("modified_compare_string", eng_mod),
+            ("created_compare_string", eng_cre)
         ]
 
-        if self.m_logic_choice.GetStringSelection() != "any":
+        if eng_size != "any":
             strings += [("size_limit_string", self.m_size_text.GetValue())]
-        if self.m_modified_choice.GetStringSelection() != "on any":
+        if eng_mod != "on any":
             strings += [
                 ("modified_date_string", self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")),
                 ("modified_time_string", self.m_modified_time_picker.GetValue())
             ]
-        if self.m_created_choice.GetStringSelection() != "on any":
+        if eng_cre != "on any":
             strings += [
                 ("created_date_string", self.m_created_date_picker.GetValue().Format("%m/%d/%Y")),
                 ("created_time_string", self.m_created_time_picker.GetValue())
