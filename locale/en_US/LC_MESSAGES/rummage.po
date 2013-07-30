@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-07-29 20:25+MDT\n"
+"POT-Creation-Date: 2013-07-29 20:33+MDT\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -288,6 +288,30 @@ msgstr ""
 
 #: _gui/rummage_dialog.py:450
 msgid "Load Search"
+msgstr ""
+
+#: _gui/rummage_dialog.py:454
+msgid "&Preferences"
+msgstr ""
+
+#: _gui/rummage_dialog.py:455
+msgid "&Exit"
+msgstr ""
+
+#: _gui/rummage_dialog.py:457
+msgid "HTML"
+msgstr ""
+
+#: _gui/rummage_dialog.py:458
+msgid "CSV"
+msgstr ""
+
+#: _gui/rummage_dialog.py:459
+msgid "&About Rummage"
+msgstr ""
+
+#: _gui/rummage_dialog.py:460
+msgid "Help and Support"
 msgstr ""
 
 #: _gui/rummage_dialog.py:614
