@@ -3,8 +3,14 @@ import sys
 from os.path import dirname, basename, abspath, exists, join
 from os import chdir, mkdir, walk
 import argparse
-import re
 import codecs
+
+if sys.platform.startswith('win'):
+    _PLATFORM = "windows"
+elif sys.platform == "darwin":
+    _PLATFORM = "osx"
+else:
+    _PLATFORM = "linux"
 
 
 def localize(args):
@@ -25,7 +31,7 @@ def localize(args):
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        shell=False
+        shell=(True if _PLATFORM == "windows" else False)
     )
 
     print "Generating messages.po..."
@@ -60,7 +66,7 @@ def localize(args):
                         ],
                         stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT,
-                        shell=False
+                        shell=(True if _PLATFORM == "windows" else False)
                     )
 
                     print "Compiling %s/%s/%s..." % (basename(dirname(base)), basename(base), "rummage.po")

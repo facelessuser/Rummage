@@ -20,6 +20,13 @@ from _icons.glass import glass
 
 from _lib.localization import get as _
 
+SEARCH_REGEX = _("Regex")
+SEARCH_LITERAL= _("Text")
+SEARCH_TYPE = {
+    SEARCH_LITERAL: "Text",
+    SEARCH_REGEX: "Regex"
+}
+
 
 class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
     def setup(self, c):
@@ -144,6 +151,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.m_delete_button.SetLabel(_("Remove"))
         self.m_load_button.SetLabel(_("Load"))
         self.m_cancel_button.SetLabel(_("Cancel"))
+        self.Fit()
 
     def load_searches(self):
         """
@@ -152,7 +160,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
 
         count = 0
         for x in Settings.get_search():
-            search_type = "Regex" if x[2] else "Text"
+            search_type = SEARCH_REGEX if x[2] else SEARCH_LITERAL
             self.m_search_list.InsertStringItem(count, x[0])
             self.m_search_list.SetStringItem(count, 1, x[1])
             self.m_search_list.SetStringItem(count, 2, search_type)
@@ -174,7 +182,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
             return
         idx = self.m_search_list.GetItemData(item)
         self.search = self.m_search_list.get_map_item(idx, col=1)
-        self.is_regex = self.m_search_list.get_map_item(idx, col=2) == "Regex"
+        self.is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(idx, col=2)] == "Regex"
         self.Close()
 
     def get_search(self):

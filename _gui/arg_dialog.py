@@ -50,6 +50,7 @@ class ArgDialog(gui.ArgDialog):
         self.SetTitle(_("Edit Argument"))
         self.m_apply_button.SetLabel(_("Apply"))
         self.m_cancel_button.SetLabel(_("Cancel"))
+        self.Fit()
 
     def set_keybindings(self, keybindings):
         """
