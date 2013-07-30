@@ -448,6 +448,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_regex_test_button.SetLabel(_("Test Regex"))
         self.m_save_search_button.SetLabel(_("Save Search"))
         self.m_load_search_button.SetLabel(_("Load Search"))
+        self.m_grep_notebook.SetPageText(0, _("Search"))
         # self.m_file_menu.SetLabel(_("File"))
         # self.m_help_menu.SetLabel(_("Help"))
         # self.m_preferences_menuitem.SetLabel(_("&Preferences"))
