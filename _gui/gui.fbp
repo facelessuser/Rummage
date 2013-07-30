@@ -24,7 +24,7 @@
         <property name="skip_python_events">1</property>
         <property name="use_enum">0</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Frame" expanded="0">
+        <object class="Frame" expanded="1">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg">wxSYS_COLOUR_BTNFACE</property>
@@ -390,24 +390,6 @@
                                                                         <property name="permission">none</property>
                                                                         <property name="rows">0</property>
                                                                         <property name="vgap">0</property>
-                                                                        <object class="sizeritem" expanded="0">
-                                                                            <property name="border">5</property>
-                                                                            <property name="flag">wxEXPAND</property>
-                                                                            <property name="proportion">0</property>
-                                                                            <object class="wxFlexGridSizer" expanded="0">
-                                                                                <property name="cols">2</property>
-                                                                                <property name="flexible_direction">wxBOTH</property>
-                                                                                <property name="growablecols">0</property>
-                                                                                <property name="growablerows"></property>
-                                                                                <property name="hgap">0</property>
-                                                                                <property name="minimum_size"></property>
-                                                                                <property name="name">fgSizer121</property>
-                                                                                <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_SPECIFIED</property>
-                                                                                <property name="permission">none</property>
-                                                                                <property name="rows">0</property>
-                                                                                <property name="vgap">0</property>
-                                                                            </object>
-                                                                        </object>
                                                                         <object class="sizeritem" expanded="0">
                                                                             <property name="border">5</property>
                                                                             <property name="flag">wxEXPAND</property>
@@ -5091,7 +5073,7 @@
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
             </object>
-            <object class="wxMenuBar" expanded="0">
+            <object class="wxMenuBar" expanded="1">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="context_menu">1</property>
@@ -5136,7 +5118,7 @@
                 <event name="OnSetFocus"></event>
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">File</property>
                     <property name="name">m_file_menu</property>
                     <property name="permission">protected</property>
@@ -5148,7 +5130,7 @@
                         <property name="id">wxID_PREFERENCES</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">&amp;Preferences</property>
-                        <property name="name">m_preferences</property>
+                        <property name="name">m_preferences_menuitem</property>
                         <property name="permission">none</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
@@ -5210,7 +5192,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">Help</property>
                     <property name="name">m_help_menu</property>
                     <property name="permission">protected</property>
@@ -7976,7 +7958,7 @@
                                                             <property name="gripper">0</property>
                                                             <property name="hidden">0</property>
                                                             <property name="id">wxID_ANY</property>
-                                                            <property name="label">Del</property>
+                                                            <property name="label">Delete</property>
                                                             <property name="max_size"></property>
                                                             <property name="maximize_button">0</property>
                                                             <property name="maximum_size"></property>
@@ -8241,7 +8223,7 @@
                                                             <property name="minimize_button">0</property>
                                                             <property name="minimum_size"></property>
                                                             <property name="moveable">1</property>
-                                                            <property name="name">m_upp_button</property>
+                                                            <property name="name">m_up_button</property>
                                                             <property name="pane_border">1</property>
                                                             <property name="pane_position"></property>
                                                             <property name="pane_size"></property>

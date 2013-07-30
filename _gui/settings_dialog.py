@@ -63,12 +63,37 @@ class SettingsDialog(gui.SettingsDialog):
         if locale is None:
             locale = "en_US"
         self.m_lang_choice.SetStringSelection(locale)
+
+        self.localize()
+
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+    def localize(self):
+        """
+        Localize dialog
+        """
+
+        self.SetTitle(_("Preferences"))
+        main_sizer = self.m_settings_panel.GetSizer()
+        main_sizer.GetItem(0).GetSizer().GetStaticBox().SetLabel(_("Editor"))
+        main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(_("General"))
+        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Notifications"))
+        main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(_("History"))
+        self.m_single_checkbox.SetLabel(_("Single Instance (applies to new instances)"))
+        self.m_debug_checkbox.SetLabel(_("Enable debug level"))
+        self.m_visual_alert_checkbox.SetLabel(_("Notification popup"))
+        self.m_audio_alert_checkbox.SetLabel(_("Alert Sound"))
+        self.m_language_label.SetLabel(_("Language (restart required)"))
+        self.m_editor_button.SetLabel(_("change"))
+        self.m_debug_button.SetLabel(_("Show Log"))
+        self.m_history_clear_button.SetLabel(_("Clear"))
+        self.m_close_button.SetLabel(_("Close"))
+        self.Fit()
 
     def history_cleared(self):
         """

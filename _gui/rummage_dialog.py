@@ -416,10 +416,48 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # placeholder objects with actual objecs
         self.setup_inputs()
 
+        self.localize()
+
         # Pick optimal size
         self.optimize_size(True)
 
         self.init_search_path(start_path)
+
+    def localize(self):
+        self.m_search_panel.GetSizer().GetStaticBox().SetLabel(_("Search"))
+        self.m_limiter_panel.GetSizer().GetStaticBox().SetLabel(_("Limit Search"))
+        self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
+        self.m_searchin_label.SetLabel(_("Where"))
+        self.m_searchfor_label.SetLabel(_("What"))
+        self.m_size_is_label.SetLabel(_("Size is"))
+        self.m_modified_label.SetLabel(_("Modified"))
+        self.m_created_label.SetLabel(_("Created"))
+        self.m_exclude_label.SetLabel(_("Exclude folders"))
+        self.m_filematch_label.SetLabel(_("Files which match"))
+        self.m_regex_search_checkbox.SetLabel(_("Search with regex"))
+        self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
+        self.m_dotmatch_checkbox.SetLabel(_("Dot matches newline"))
+        self.m_utf8_checkbox.SetLabel(_("Treat all as UTF-8"))
+        self.m_boolean_checkbox.SetLabel(_("Boolean match"))
+        self.m_count_only_checkbox.SetLabel(_("Count only"))
+        self.m_subfolder_checkbox.SetLabel(_("Include subfolders"))
+        self.m_hidden_checkbox.SetLabel(_("Include hidden"))
+        self.m_binary_checkbox.SetLabel(_("Include binary files"))
+        self.m_dirregex_checkbox.SetLabel(_("Regex"))
+        self.m_fileregex_checkbox.SetLabel(_("Regex"))
+        self.m_regex_test_button.SetLabel(_("Test Regex"))
+        self.m_save_search_button.SetLabel(_("Save Search"))
+        self.m_load_search_button.SetLabel(_("Load Search"))
+        # self.m_file_menu.SetLabel(_("File"))
+        # self.m_help_menu.SetLabel(_("Help"))
+        # self.m_preferences_menuitem.SetLabel(_("&Preferences"))
+        # self.m_quit_menuitem.SetLabel(_("&Exit"))
+        # self.m_export_submenuitem.SetLabel(_("Export"))
+        # self.m_export_html_menuitem.SetLabel(_("HTML"))
+        # self.m_export_csv_menuitem.SetLabel(_("CSV"))
+        # self.m_about_menuitem.SetLabel(_("&About Rummage"))
+        # self.m_issues_menuitem.SetLabel(_("Help and Support"))
+        self.Fit()
 
     def on_textctrl_selectall(self, event):
         """

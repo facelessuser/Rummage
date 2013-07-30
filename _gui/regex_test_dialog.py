@@ -61,6 +61,10 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.SetMinSize(self.GetSize())
 
     def localize(self):
+        """
+        Localize dialog
+        """
+
         self.SetTitle(_("Regex Tester"))
         self.m_use_regex_button.SetLabel(_("Use"))
         self.m_close_button.SetLabel(_("Close"))
