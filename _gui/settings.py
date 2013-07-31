@@ -103,7 +103,7 @@ class Settings(object):
     @classmethod
     def get_languages(cls):
         """
-        Return langauges
+        Return languages
         """
 
         languages = []
