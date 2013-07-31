@@ -1,5 +1,5 @@
 from time import ctime
-from os.path import join
+from os import startfile
 import codecs
 import sys
 import subprocess
@@ -86,6 +86,7 @@ def export_result_content_list(res, csv):
 def export(export_csv, search, regex_search, result_list, result_content_list):
 
     with codecs.open(export_csv, "w", encoding="utf-8") as csv:
+        csv.write(u'\uFEFF')
         search_expression = "%s,%s\n\n" % (csv_encode(_("Regex Search") if regex_search else _("Literal Search")), csv_encode(search))
         csv.write(search_expression)
         export_result_list(result_list, csv)
@@ -94,7 +95,7 @@ def export(export_csv, search, regex_search, result_list, result_content_list):
     if _PLATFORM == "osx":
         subprocess.Popen(['open', csv.name])
     elif _PLATFORM == "windows":
-        os.startfile(csv.name)
+        startfile(csv.name)
     else:
         try:
             # Maybe...?

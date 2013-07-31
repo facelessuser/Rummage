@@ -12,8 +12,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 import wx
 import sys
+
 import _gui.gui as gui
 from _gui.arg_dialog import ArgDialog
+
+from _lib.localization import get as _
 
 
 class EditorDialog(gui.EditorDialog):
@@ -67,7 +70,6 @@ class EditorDialog(gui.EditorDialog):
         main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(_("Application"))
         main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Arguments"))
         self.Fit()
-
 
     def set_keybindings(self, keybindings):
         """

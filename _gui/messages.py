@@ -28,7 +28,7 @@ DEFAULT_ICON_SIZE = 64
 DEFAULT_TEXT_MIN_SIZE = 250
 DEFAULT_TEXT_MAX_SIZE = 500
 
-HAS_CAPTION = re.compile(r"([^\r\n]+)(?:\r?\n){2,}(.*)", re.DOTALL|re.UNICODE)
+HAS_CAPTION = re.compile(r"([^\r\n]+)(?:\r?\n){2,}(.*)", re.DOTALL | re.UNICODE)
 
 
 # Icons by Isaac Muse
@@ -473,7 +473,6 @@ class MessageIcon (namedtuple('MessageIcon', ['bitmap', 'width', 'height'], verb
     pass
 
 
-
 ###########################################################################
 ## Class Messages
 ###########################################################################
@@ -522,7 +521,7 @@ class Messages (wx.Dialog):
         self.m_message_panel.SetSizer(fg_panel_sizer)
         self.m_message_panel.Layout()
         fg_panel_sizer.Fit(self.m_message_panel)
-        b_dialog_sizer.Add(self.m_message_panel, 1, wx.EXPAND |wx.ALL, 5)
+        b_dialog_sizer.Add(self.m_message_panel, 1, wx.EXPAND | wx.ALL, 5)
 
         self.SetSizer(b_dialog_sizer)
         self.Layout()
@@ -601,11 +600,11 @@ class Messages (wx.Dialog):
             else:
                 self.m_caption_text.Wrap(-1)
 
-            fg_text_sizer.Add(self.m_caption_text, 1, wx.ALL|wx.EXPAND, 5)
-            fg_text_sizer.Add(self.m_message_text, 1, wx.ALL|wx.EXPAND, 5)
+            fg_text_sizer.Add(self.m_caption_text, 1, wx.ALL | wx.EXPAND, 5)
+            fg_text_sizer.Add(self.m_message_text, 1, wx.ALL | wx.EXPAND, 5)
             fg_message_sizer.Add(fg_text_sizer, 1, wx.EXPAND, 5)
         else:
-            fg_message_sizer.Add(self.m_message_text, 1, wx.ALL|wx.EXPAND, 5)
+            fg_message_sizer.Add(self.m_message_text, 1, wx.ALL | wx.EXPAND, 5)
 
         fg_panel_sizer.Add(fg_message_sizer, 1, wx.EXPAND, 5)
 
@@ -675,6 +674,7 @@ def filepickermsg(msg, wildcard, save=False):
     dlg.Destroy()
     return select
 
+
 def dirpickermsg(msg, default_path=""):
     """
     Directory picker
@@ -692,7 +692,8 @@ def dirpickermsg(msg, default_path=""):
     dlg.Destroy()
     return select
 
-def promptmsg(question, caption = 'PROMPT', bitmap=None, yes="Okay", no="Cancel"):
+
+def promptmsg(question, caption='PROMPT', bitmap=None, yes="Okay", no="Cancel"):
     """
     Prompt with "yes" "no" type object
     """

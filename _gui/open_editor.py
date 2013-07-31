@@ -13,7 +13,7 @@ import subprocess
 import sys
 
 from _gui.settings import Settings
-from _gui.custom_app import debug, debug_struct, info, error
+from _gui.custom_app import debug, error
 from _gui.generic_dialogs import errormsg
 
 from _lib.localization import get as _

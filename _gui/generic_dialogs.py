@@ -10,6 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import _gui.messages as messages
 from _lib.localization import get as _
 
+
 def yesno(question, title=_('Yes or no?'), bitmap=None, yes=_("Okay"), no=_("Cancel")):
     """
     Wrapper for the prompt dialog

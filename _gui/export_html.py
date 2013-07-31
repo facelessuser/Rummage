@@ -12,6 +12,7 @@ from _icons.glass import glass
 from sorttable.sorttable import sorttable as SORT_JS
 
 from _lib.localization import get as _
+from _lib.localization import get_current_domain
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -166,6 +167,8 @@ HTML_HEADER = \
 '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+<META HTTP-EQUIV="Content-Language" Content="%(lang)s">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <link rel="icon" type"image/png" href="data:image/png;base64,%(icon)s"/>
 <title>%(title)s</title>
 <style type="text/css">
@@ -309,6 +312,7 @@ BODY_END = \
 </html>
 '''
 
+
 def html_encode(text):
     # Format text to HTML
     encode_table = {
@@ -389,7 +393,8 @@ def export(export_html, search, regex_search, result_list, result_content_list):
                 "morejs": LOAD_TAB,
                 "css": CSS_HTML,
                 "icon": base64.b64encode(glass.GetData()),
-                "title": TITLE
+                "title": TITLE,
+                "lang": get_current_domain()
             }
         )
         html.write(BODY_START % {"icon": base64.b64encode(rum_64.GetData())})

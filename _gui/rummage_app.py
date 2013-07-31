@@ -13,12 +13,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import wx
 from os.path import abspath, normpath
 
-from _gui.settings import Settings
 from _gui.custom_app import PipeApp
 from _gui.platform_window_focus import platform_window_focus
 from _gui.custom_app import *
 from _gui.rummage_dialog import RummageFrame
-from _gui.regex_test_dialog import RegexTestDialog
 
 wx.Log.EnableLogging(False)
 

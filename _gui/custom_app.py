@@ -29,7 +29,8 @@ else:
     _PLATFORM = "linux"
 
 if _PLATFORM == "windows":
-    import win32pipe, win32file
+    import win32pipe
+    import win32file
 
 PipeEvent, EVT_PIPE_ARGS = wx.lib.newevent.NewEvent()
 
@@ -55,13 +56,13 @@ class GuiLog(wx.PyOnDemandOutputWindow):
         """
 
         self.frame = wx.Frame(self.parent, -1, self.title, self.pos, self.size, style=wx.DEFAULT_FRAME_STYLE)
-        self.text  = wx.TextCtrl(self.frame, -1, "", style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH)
+        self.text = wx.TextCtrl(self.frame, -1, "", style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH)
         self.text.AppendText(st)
         self.frame.Show(True)
         self.frame.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
         # Create debug keybinding to open debug console
-        debugid= wx.NewId()
+        debugid = wx.NewId()
         self.frame.Bind(wx.EVT_MENU, self.debug_close, id=debugid)
         mod = wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL
         accel_tbl = wx.AcceleratorTable(
@@ -112,7 +113,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
         if self.frame is not None:
             self.frame.Destroy()
         self.frame = None
-        self.text  = None
+        self.text = None
         self.parent = None
         if get_debug_console():
             set_debug_console(False)
@@ -190,7 +191,8 @@ class CustomApp(wx.App):
         """
         Cleanup instance check
         """
-        if self.instance != None:
+
+        if self.instance is not None:
             del self.instance
 
 

@@ -153,7 +153,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.SortListItems(col=0, ascending=1)
         self.init_column_size()
 
-    def SortItems(self,sorter=cmp):
+    def SortItems(self, sorter=cmp):
         """
         Sort items
         """
@@ -188,7 +188,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
             return self.attr1
         return -1
 
-    def OnGetItemImage (self, item):
+    def OnGetItemImage(self, item):
         """
         Override method to get the image for the given item
         """
@@ -417,7 +417,7 @@ class FileResultPanel(wx.Panel):
         super(FileResultPanel, self).__init__(parent)
         self.list = obj(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.list, 1, wx.ALL|wx.EXPAND, 5)
+        sizer.Add(self.list, 1, wx.ALL | wx.EXPAND, 5)
         self.SetSizer(sizer)
         self.Layout()
 

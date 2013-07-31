@@ -21,7 +21,7 @@ from _icons.glass import glass
 from _lib.localization import get as _
 
 SEARCH_REGEX = _("Regex")
-SEARCH_LITERAL= _("Text")
+SEARCH_LITERAL = _("Text")
 SEARCH_TYPE = {
     SEARCH_LITERAL: "Text",
     SEARCH_REGEX: "Regex"

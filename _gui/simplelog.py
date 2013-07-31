@@ -18,6 +18,8 @@ WARNING = 30
 ERROR = 40
 CRITICAL = 50
 
+global_log = None
+
 
 class Log(object):
     def __init__(self, filename=None, format="%(message)s", level=ERROR, filemode="w"):

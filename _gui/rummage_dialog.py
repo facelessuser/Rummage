@@ -15,10 +15,9 @@ import wx
 import sys
 import threading
 import traceback
-import calendar
 import webbrowser
-from time import time, sleep, ctime, mktime, strptime, gmtime
-from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile, expanduser
+from time import time
+from os.path import abspath, exists, basename, dirname, normpath, isdir, isfile, expanduser
 import wx.lib.masked as masked
 import wx.lib.newevent
 import version
@@ -34,12 +33,11 @@ import _gui.export_csv as export_csv
 from _gui.settings import Settings, _PLATFORM
 from _gui.generic_dialogs import *
 from _gui.custom_app import DebugFrameExtender
-from _gui.custom_app import get_debug_mode
-from _gui.custom_app import debug, debug_struct, info, error
+from _gui.custom_app import debug, error
 from _gui.custom_statusbar import extend_sb, extend
 from _gui.regex_test_dialog import RegexTestDialog
 from _gui.autocomplete_combo import AutoCompleteCombo
-from _gui.load_search_dialog import LoadSearchDialog, glass
+from _gui.load_search_dialog import LoadSearchDialog
 from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
 from _gui.about_dialog import AboutDialog
@@ -126,7 +124,7 @@ def get_flags(args):
 
     flags = 0
 
-    if args.regexfilepattern != None:
+    if args.regexfilepattern is not None:
         flags |= pygrep.FILE_REGEX_MATCH
 
     if not args.regexp:
@@ -151,7 +149,7 @@ def not_none(item, alt=None):
     Return item if not None, else return the alternate
     """
 
-    return item if item != None else alt
+    return item if item is not None else alt
 
 
 def replace_with_genericdatepicker(obj, key):
@@ -882,8 +880,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_grep_notebook.DeletePage(1)
         self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
         self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
-        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, "Files", False)
-        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
+        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, _("Files"), False)
+        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, _("Content"), False)
 
         # Run search thread
         self.thread.start()
@@ -1285,13 +1283,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         html_file = filepickermsg(_("Export to..."), "*.html", True)
         if html_file is None:
             return
-        export_html.export(
-            html_file,
-            self.args.pattern,
-            self.args.regexp,
-            self.m_result_file_panel.list.itemDataMap,
-            self.m_result_content_panel.list.itemDataMap
-        )
+        try:
+            export_html.export(
+                html_file,
+                self.args.pattern,
+                self.args.regexp,
+                self.m_result_file_panel.list.itemDataMap,
+                self.m_result_content_panel.list.itemDataMap
+            )
+        except:
+            error(traceback.format_exc())
+            errormsg(_("There was a problem exporting the HTML!  See the log for more info."))
 
     def on_export_csv(self, event):
         if (
@@ -1303,13 +1305,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         csv_file = filepickermsg(_("Export to..."), "*.csv", True)
         if csv_file is None:
             return
-        export_csv.export(
-            csv_file,
-            self.args.pattern,
-            self.args.regexp,
-            self.m_result_file_panel.list.itemDataMap,
-            self.m_result_content_panel.list.itemDataMap
-        )
+        try:
+            export_csv.export(
+                csv_file,
+                self.args.pattern,
+                self.args.regexp,
+                self.m_result_file_panel.list.itemDataMap,
+                self.m_result_content_panel.list.itemDataMap
+            )
+        except:
+            error(traceback.format_exc())
+            errormsg(_("There was a problem exporting the CSV!  See the log for more info."))
 
     def on_issues(self, event):
         """
