@@ -11,6 +11,8 @@ from _icons.glass import glass
 
 from sorttable.sorttable import sorttable as SORT_JS
 
+from _lib.localization import get as _
+
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
 elif sys.platform == "darwin":
@@ -158,12 +160,14 @@ div.main {
 
 '''
 
+TITLE = _("Rummage Results")
+
 HTML_HEADER = \
 '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 <link rel="icon" type"image/png" href="data:image/png;base64,%(icon)s"/>
-<title>Rummage Results</title>
+<title>%(title)s</title>
 <style type="text/css">
 %(css)s
 </style>
@@ -190,15 +194,23 @@ RESULT_ROW = \
 RESULT_TABLE_HEADER = \
 '''
 <tr>
-<th>File</th>
-<th>Size</th>
-<th>Matches</th>
-<th>Path</th>
-<th>Encoding</th>
-<th>Modified</th>
-<th>Created</th>
+<th>%(file)s</th>
+<th>%(size)s</th>
+<th>%(matches)s</th>
+<th>%(path)s</th>
+<th>%(encoding)s</th>
+<th>%(modified)s</th>
+<th>%(created)s</th>
 </tr>
-'''
+''' % {
+    "file": "File",
+    "size": "Size",
+    "matches": "Matches",
+    "path": "Path",
+    "encoding": "Encoding",
+    "modified": "Modified",
+    "created": "Created"
+}
 
 RESULT_CONTENT_ROW = \
 '''
@@ -213,18 +225,26 @@ RESULT_CONTENT_ROW = \
 RESULT_CONTENT_TABLE_HEADER = \
 '''
 <tr>
-<th>File</th>
-<th>Line</th>
-<th>Matches</th>
-<th>Context</th>
+<th>%(file)s</th>
+<th>%(line)s</th>
+<th>%(matches)s</th>
+<th>%(context)s</th>
 </tr>
-'''
+''' % {
+    "file": _("File"),
+    "line": _("Line"),
+    "matches": _("Matches"),
+    "context": _("Context")
+}
+
+FILES = _("Files")
+CONTENT = _("Content")
 
 TABS_START = \
 '''
 <div id="bar">
-<a id="tabbutton1" href="javascript:select_tab(1)">Files</a>
-<a id="tabbutton2" href="javascript:select_tab(2)">Content</a>
+<a id="tabbutton1" href="javascript:select_tab(1)">%(file_tab)s</a>
+<a id="tabbutton2" href="javascript:select_tab(2)">%(content_tab)s</a>
 </div>
 
 <div class="main">
@@ -233,15 +253,19 @@ TABS_START = \
 TABS_START_SINGLE = \
 '''
 <div id="bar">
-<a id="tabbutton1" href="javascript:select_tab(1)">Files</a>
+<a id="tabbutton1" href="javascript:select_tab(1)">%(file_tab)s</a>
 </div>
 
 <div class="main">
 '''
 
+SEARCH_LABEL_REGEX = _("Regex search:")
+
+SEARCH_LABEL_LITERAL = _("Literal search:")
+
 TABS_END = \
 '''
-<label id="search_label">%(type)s search: %(search)s</label>
+<label id="search_label">%(label)s %(search)s</label>
 </div>
 '''
 
@@ -364,17 +388,23 @@ def export(export_html, search, regex_search, result_list, result_content_list):
                 "js": SORT_JS,
                 "morejs": LOAD_TAB,
                 "css": CSS_HTML,
-                "icon": base64.b64encode(glass.GetData())
+                "icon": base64.b64encode(glass.GetData()),
+                "title": TITLE
             }
         )
         html.write(BODY_START % {"icon": base64.b64encode(rum_64.GetData())})
-        html.write(TABS_START if len(result_content_list) else TABS_START_SINGLE)
+        html.write(
+            (TABS_START if len(result_content_list) else TABS_START_SINGLE) % {
+                "file_tab": FILES,
+                "content_tab": CONTENT
+            }
+        )
         export_result_list(result_list, html)
         export_result_content_list(result_content_list, html)
         html.write(
             TABS_END % {
                 "search": html_encode(search),
-                "type": "Regex" if regex_search else "Literal"
+                "label": SEARCH_LABEL_REGEX if regex_search else SEARCH_LABEL_LITERAL
             }
         )
         html.write(TAB_INIT)
