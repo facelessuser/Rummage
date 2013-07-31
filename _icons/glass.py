@@ -1,4 +1,3 @@
-import wx
 from wx.lib.embeddedimage import PyEmbeddedImage
 
 glass = PyEmbeddedImage(

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import sys
-from os.path import exists, dirname, abspath, join
+from os.path import dirname, abspath, join
 from os import path, mkdir, chdir
 import shutil
 import argparse
@@ -75,17 +75,17 @@ def parse_settings(args, obj):
     if not path.exists(obj.script):
         print >> sys.stderr, "Could not find %s!" % obj.script
         err = True
-    elif args.icon != None and not path.exists(args.icon):
+    elif args.icon is not None and not path.exists(args.icon):
         print >> sys.stderr, "Could not find %s!" % obj.icon
         err = True
-    elif obj.pyinstaller_script == None or not path.exists(obj.pyinstaller_script):
+    elif obj.pyinstaller_script is None or not path.exists(obj.pyinstaller_script):
         print >> sys.stderr, "Could not find pyinstaller.py!"
         err |= True
 
     if not path.exists(obj.out_dir):
         err |= create_dir(obj.out_dir)
     elif not path.isdir(obj.out_dir):
-        print >> sys.stderr, "%s is not a directory!" % output_directory
+        print >> sys.stderr, "%s is not a directory!" % obj.out_dir
         err |= True
 
     # Get executable name to build
@@ -197,6 +197,7 @@ def build(obj):
     print output[0]
 
     return err
+
 
 def main():
     """

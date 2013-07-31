@@ -13,8 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import version
 import sys
 import argparse
-import traceback
-from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
+from os.path import abspath, dirname, join
 
 from _gui.settings import Settings
 Settings.load_settings()

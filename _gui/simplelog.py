@@ -18,6 +18,7 @@ WARNING = 30
 ERROR = 40
 CRITICAL = 50
 
+
 class Log(object):
     def __init__(self, filename=None, format="%(message)s", level=ERROR, filemode="w"):
         """
@@ -27,7 +28,7 @@ class Log(object):
         self._lock = threading.Lock()
         if filemode == "w":
             with codecs.open(filename, "w", "utf-8") as f:
-                pass
+                f.write("")
         self.filename = filename
         self.level = level
         self.format = format

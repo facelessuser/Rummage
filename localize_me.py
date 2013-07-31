@@ -1,7 +1,7 @@
 import subprocess
 import sys
 from os.path import dirname, basename, abspath, exists, join
-from os import chdir, mkdir, walk
+from os import mkdir, walk
 import argparse
 import codecs
 
@@ -19,11 +19,11 @@ def localize(args):
     locale_pth = "locale"
     search_pth = join("_gui", "*.py")
     cmd = [
-       pygettext,
-       "-na",
-       "-o",
-       join(locale_pth, "messages.po"),
-       search_pth
+        pygettext,
+        "-na",
+        "-o",
+        join(locale_pth, "messages.po"),
+        search_pth
     ]
 
     # Setup pygettext call
@@ -61,8 +61,8 @@ def localize(args):
                     # Setup pygettext call
                     process = subprocess.Popen(
                         [
-                           msgfmt,
-                           source_file
+                            msgfmt,
+                            source_file
                         ],
                         stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT,

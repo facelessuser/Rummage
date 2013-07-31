@@ -13,13 +13,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 import threading
 import sys
-import re
 from os import walk
 from fnmatch import fnmatch
-from os.path import isdir, join, abspath, basename, getsize
+from os.path import isdir, join, abspath, getsize
 from time import sleep, ctime
 from collections import namedtuple
-import struct
 import traceback
 import codecs
 
@@ -165,7 +163,6 @@ class _FileSearch(object):
         Format binary data in a friendly way. Display only ASCII.
         """
 
-        def_struct = lambda content: struct.Struct("=" + ("B" * len(content))).unpack(content)
         return content.translate(HEX_TX_TABLE)
 
     def __get_lines(self, content, m, line_ending, binary=False):
@@ -268,7 +265,7 @@ class _FileSearch(object):
                     line_ending = self.__get_line_ending(file_content)
 
             # Have we exceeded the maximum desired matches?
-            if max_count != None:
+            if max_count is not None:
                 if max_count == 0:
                     break
                 else:
@@ -283,21 +280,21 @@ class _FileSearch(object):
                 lines, match, context = self.__get_lines(file_content, m, line_ending, binary)
 
                 yield MatchRecord(
-                    file_content.count(line_ending, 0, m.start()) + 1,    # lineno
-                    self.__get_col(file_content, m.start(), line_ending), # colno
-                    match,                                                # Postion of match
-                    lines,                                                # Line(s) in which match is found
-                    line_ending,                                          # Line ending for file
-                    context                                               # Number of lines shown before and after matched line(s)
+                    file_content.count(line_ending, 0, m.start()) + 1,     # lineno
+                    self.__get_col(file_content, m.start(), line_ending),  # colno
+                    match,                                                 # Postion of match
+                    lines,                                                 # Line(s) in which match is found
+                    line_ending,                                           # Line ending for file
+                    context                                                # Number of lines shown before and after matched line(s)
                 )
             else:
                 yield MatchRecord(
-                    0,                                                    # lineno
-                    0,                                                    # colno
-                    (m.start(), m.end()),                                 # Postion of match
-                    None,                                                 # Line(s) in which match is found
-                    None,                                                 # Line ending for file
-                    (0, 0)                                                # Number of lines shown before and after matched line(s)
+                    0,                                                     # lineno
+                    0,                                                     # colno
+                    (m.start(), m.end()),                                  # Postion of match
+                    None,                                                  # Line(s) in which match is found
+                    None,                                                  # Line ending for file
+                    (0, 0)                                                 # Number of lines shown before and after matched line(s)
                 )
 
             if self.boolean:
@@ -399,9 +396,9 @@ class _DirWalker(object):
 
         try:
             valid = False
-            if self.file_pattern != None and not self.__is_hidden(join(base, name)):
+            if self.file_pattern is not None and not self.__is_hidden(join(base, name)):
                 if self.file_regex_match:
-                    valid = True if self.file_pattern.match(name) != None else False
+                    valid = True if self.file_pattern.match(name) is not None else False
                 else:
                     matched = False
                     exclude = False
@@ -435,9 +432,9 @@ class _DirWalker(object):
                 valid = False
             elif self.__is_hidden(join(base, name)):
                 valid = False
-            elif self.folder_exclude != None:
+            elif self.folder_exclude is not None:
                 if self.dir_regex_match:
-                    valid = False if self.folder_exclude.match(name) != None else True
+                    valid = False if self.folder_exclude.match(name) is not None else True
                 else:
                     matched = False
                     exclude = False
@@ -541,7 +538,7 @@ class Grep(object):
         """
 
         pattern = None
-        if folder_exclude != None:
+        if folder_exclude is not None:
             pattern = ure.compile(folder_exclude, ure.IGNORECASE) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
         return pattern
 
@@ -551,7 +548,7 @@ class Grep(object):
         """
 
         pattern = None
-        if file_pattern != None:
+        if file_pattern is not None:
             pattern = ure.compile(file_pattern, ure.IGNORECASE) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
@@ -659,7 +656,6 @@ class Grep(object):
 
         return file_info, content, error
 
-
     def __get_next_file(self):
         """
         Get the next file from the file crawler results
@@ -714,15 +710,15 @@ class Grep(object):
                         self.records += 1
                         yield result
 
-                        if max_count != None and isinstance(result, MatchRecord):
+                        if max_count is not None and isinstance(result, MatchRecord):
                             max_count -= 1
 
                         if self.kill:
                             break
-                except GeneratorExit as e:
+                except GeneratorExit:
                     pass
 
-                if max_count != None and max_count == 0:
+                if max_count is not None and max_count == 0:
                     break
 
     def single_file_read(self, file_name, max_count):
@@ -750,7 +746,7 @@ class Grep(object):
 
                     if self.kill:
                         break
-            except GeneratorExit as e:
+            except GeneratorExit:
                 pass
 
     def buffer_read(self, target_buffer, max_count):
@@ -773,13 +769,13 @@ class Grep(object):
             yield FileRecord(file_info, False, error)
         elif file_info is not None or content is not None:
             try:
-                for  result in self.search.search(file_info, content, max_count, False):
+                for result in self.search.search(file_info, content, max_count, False):
                     self.records += 1
                     yield result
 
                     if self.kill:
                         break
-            except GeneratorExit as e:
+            except GeneratorExit:
                 pass
 
     def find(self):
@@ -788,7 +784,7 @@ class Grep(object):
         If given a file directly, it will search the file only.
         Return the results of each file via a generator.
         """
-        max_count = int(self.max) if self.max != None else None
+        max_count = int(self.max) if self.max is not None else None
 
         if self.thread is not None:
             for result in self.multi_file_read(max_count):

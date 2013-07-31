@@ -19,7 +19,7 @@ import _lib.notify as notify
 import _lib.localization as localization
 from _lib.localization import get as _
 
-from _gui.custom_app import debug, debug_struct, info, error
+from _gui.custom_app import debug, debug_struct, error
 from _gui.custom_app import init_app_log, set_debug_mode
 from _gui.generic_dialogs import *
 
@@ -42,6 +42,7 @@ NOTIFY_STYLES = {
     "windows": ["native", "growl"],
     "linux": ["native"]
 }
+
 
 class Settings(object):
     filename = None
@@ -163,7 +164,7 @@ class Settings(object):
         old_cache = cls.cache_time
         cls.get_times()
         try:
-            changed =  old_settings != cls.settings_time or old_cache != cls.cache_time
+            changed = old_settings != cls.settings_time or old_cache != cls.cache_time
         except:
             error("Could not compare timestamp of file!")
             changed = False
@@ -461,7 +462,7 @@ class Settings(object):
         cls.save_cache()
 
     @classmethod
-    def get_history_record_count(cls, history_types = []):
+    def get_history_record_count(cls, history_types=[]):
         """
         Get number of history items saved
         """
