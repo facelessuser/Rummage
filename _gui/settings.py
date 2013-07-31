@@ -98,6 +98,7 @@ class Settings(object):
         """
 
         cls.settings["locale"] = language
+        cls.save_settings()
 
     @classmethod
     def get_languages(cls):

@@ -1,74 +1,62 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR ORGANIZATION
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-07-31 06:49+MDT\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: ENCODING\n"
-"Generated-By: pygettext.py 1.5\n"
-
 
 #: _gui/about_dialog.py:28
 msgid "About"
-msgstr ""
+msgstr "О нас"
 
 #: _gui/about_dialog.py:35
 msgid "Version: %s %s"
-msgstr ""
+msgstr "Версия: %s %s"
 
 #: _gui/about_dialog.py:38
 msgid ""
 "Developers(s):\n"
 "%s"
 msgstr ""
+"Разработчик(и):\n"
+"%s"
 
 #: _gui/about_dialog.py:48 _gui/about_dialog.py:51
 msgid "Contact"
-msgstr ""
+msgstr "Связаться"
 
 #: _gui/arg_dialog.py:50
 msgid "Edit Argument"
-msgstr ""
+msgstr "Изменение параметра"
 
 #: _gui/arg_dialog.py:51 _gui/editor_dialog.py:62
 msgid "Apply"
-msgstr ""
+msgstr "Готово"
 
 #: _gui/arg_dialog.py:52 _gui/editor_dialog.py:63 _gui/generic_dialogs.py:13
 #: _gui/load_search_dialog.py:153 _gui/save_search_dialog.py:53
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 
 #: _gui/editor_dialog.py:56
 msgid "Configure Editor"
-msgstr ""
+msgstr "Настроить редактор"
 
 #: _gui/editor_dialog.py:57
 msgid "Add"
-msgstr ""
+msgstr "Добавить"
 
 #: _gui/editor_dialog.py:58
 msgid "Delete"
-msgstr ""
+msgstr "Удалить"
 
 #: _gui/editor_dialog.py:59
 msgid "Edit"
-msgstr ""
+msgstr "Редактировать"
 
 #: _gui/editor_dialog.py:60
 msgid "Up"
-msgstr ""
+msgstr "Выше"
 
 #: _gui/editor_dialog.py:61
 msgid "Down"
-msgstr ""
+msgstr "Ниже"
 
 #: _gui/editor_dialog.py:64
 msgid ""
@@ -76,6 +64,9 @@ msgid ""
 "\n"
 "Use {$file}, {$line}, and {$col} syntax to specify the file, line, and column respectively."
 msgstr ""
+"Выберите нужное приложение и задайте передаваеме ему аргументы.\n"
+"\n"
+"Аргументы подставляются вместо {$file}, {$line}, и {$col} и обозначают соотвественно файл, номер строки и номер столбца."
 
 #: _gui/editor_dialog.py:67
 msgid "Application"
@@ -83,286 +74,286 @@ msgstr ""
 
 #: _gui/editor_dialog.py:68
 msgid "Arguments"
-msgstr ""
+msgstr "Параметры"
 
 #: _gui/export_csv.py:32 _gui/export_csv.py:38 _gui/export_html.py:206
 #: _gui/export_html.py:234 _gui/result_panels.py:222 _gui/result_panels.py:323
 #: _gui/rummage_dialog.py:499
 msgid "File"
-msgstr ""
+msgstr "Файл"
 
 #: _gui/export_csv.py:32 _gui/export_csv.py:38 _gui/export_html.py:208
 #: _gui/export_html.py:236 _gui/result_panels.py:224 _gui/result_panels.py:325
 msgid "Matches"
-msgstr ""
+msgstr "Найдено"
 
 #: _gui/export_csv.py:32 _gui/export_html.py:207 _gui/result_panels.py:223
 msgid "Size"
-msgstr ""
+msgstr "Размер"
 
 #: _gui/export_csv.py:32 _gui/export_html.py:209 _gui/result_panels.py:225
 msgid "Path"
-msgstr ""
+msgstr "Директория"
 
 #: _gui/export_csv.py:32 _gui/export_html.py:210 _gui/result_panels.py:226
 msgid "Encoding"
-msgstr ""
+msgstr "Кодировка"
 
 #: _gui/export_csv.py:32 _gui/export_html.py:211 _gui/result_panels.py:227
 #: _gui/rummage_dialog.py:478
 msgid "Modified"
-msgstr ""
+msgstr "Изменен"
 
 #: _gui/export_csv.py:32 _gui/export_html.py:212 _gui/result_panels.py:228
 #: _gui/rummage_dialog.py:479
 msgid "Created"
-msgstr ""
+msgstr "Создан"
 
 #: _gui/export_csv.py:38 _gui/export_html.py:235 _gui/result_panels.py:324
 msgid "Line"
-msgstr ""
+msgstr "Номер строки"
 
 #: _gui/export_csv.py:38 _gui/export_html.py:237 _gui/result_panels.py:326
 msgid "Context"
-msgstr ""
+msgstr "Контекст"
 
 #: _gui/export_csv.py:89
 msgid "Literal Search"
-msgstr ""
+msgstr "Обычный поиск"
 
 #: _gui/export_csv.py:89
 msgid "Regex Search"
-msgstr ""
+msgstr "Поиск регулярным выражением"
 
 #: _gui/export_html.py:163
 msgid "Rummage Results"
-msgstr ""
+msgstr "Результаты работы Rummage"
 
 #: _gui/export_html.py:240 _gui/rummage_dialog.py:450
 msgid "Files"
-msgstr ""
+msgstr "Файлы"
 
 #: _gui/export_html.py:241 _gui/rummage_dialog.py:451
 msgid "Content"
-msgstr ""
+msgstr "Содержимое"
 
 #: _gui/export_html.py:262
 msgid "Regex search:"
-msgstr ""
+msgstr "Поиск регулярным выражением:"
 
 #: _gui/export_html.py:264
 msgid "Literal search:"
-msgstr ""
+msgstr "Обычный поиск:"
 
 #: _gui/generic_dialogs.py:13
 msgid "Okay"
-msgstr ""
+msgstr "Угу"
 
 #: _gui/generic_dialogs.py:13
 msgid "Yes or no?"
-msgstr ""
+msgstr "Да или нет?"
 
 #: _gui/generic_dialogs.py:21
 msgid "INFO"
-msgstr ""
+msgstr "Информация"
 
 #: _gui/generic_dialogs.py:29
 msgid "ERROR"
-msgstr ""
+msgstr "Ошибка"
 
 #: _gui/generic_dialogs.py:37
 msgid "WARNING"
-msgstr ""
+msgstr "Предупреждение"
 
 #: _gui/load_search_dialog.py:23 _gui/rummage_dialog.py:491
 #: _gui/rummage_dialog.py:492
 msgid "Regex"
-msgstr ""
+msgstr "Регулярное выражение"
 
 #: _gui/load_search_dialog.py:24 _gui/regex_test_dialog.py:73
 msgid "Text"
-msgstr ""
+msgstr "Текст"
 
 #: _gui/load_search_dialog.py:150
 msgid "Searches"
-msgstr ""
+msgstr "Поиски"
 
 #: _gui/load_search_dialog.py:151
 msgid "Remove"
-msgstr ""
+msgstr "Удалить"
 
 #: _gui/load_search_dialog.py:152
 msgid "Load"
-msgstr ""
+msgstr "Загрузить"
 
 #: _gui/load_search_dialog.py:211 _gui/save_search_dialog.py:54
 msgid "Name"
-msgstr ""
+msgstr "Имя файла"
 
 #: _gui/load_search_dialog.py:212 _gui/rummage_dialog.py:97
 #: _gui/rummage_dialog.py:472 _gui/rummage_dialog.py:496
 msgid "Search"
-msgstr ""
+msgstr "Поиск"
 
 #: _gui/load_search_dialog.py:213
 msgid "Type"
-msgstr ""
+msgstr "Тип"
 
 #: _gui/open_editor.py:31
 msgid "No editor is currently set!"
-msgstr ""
+msgstr "Не выбран предпочитаемый редактор файлов!"
 
 #: _gui/regex_test_dialog.py:68
 msgid "Regex Tester"
-msgstr ""
+msgstr "Тестирование регулярного выражения"
 
 #: _gui/regex_test_dialog.py:69
 msgid "Use"
-msgstr ""
+msgstr "Использовать"
 
 #: _gui/regex_test_dialog.py:70 _gui/settings_dialog.py:95
 msgid "Close"
-msgstr ""
+msgstr "Закрыть"
 
 #: _gui/regex_test_dialog.py:71 _gui/rummage_dialog.py:483
 msgid "Search case-sensitive"
-msgstr ""
+msgstr "Поиск регистрозависимый"
 
 #: _gui/regex_test_dialog.py:72 _gui/rummage_dialog.py:484
 msgid "Dot matches newline"
-msgstr ""
+msgstr "Точка обозначает завершение строки"
 
 #: _gui/regex_test_dialog.py:74
 msgid "Regex Input"
-msgstr ""
+msgstr "Регулярное выражение"
 
 #: _gui/rummage_dialog.py:65
 msgid "any"
-msgstr ""
+msgstr "любой"
 
 #: _gui/rummage_dialog.py:66
 msgid "greater than"
-msgstr ""
+msgstr "больше чем"
 
 #: _gui/rummage_dialog.py:67
 msgid "equal to"
-msgstr ""
+msgstr "равно"
 
 #: _gui/rummage_dialog.py:68
 msgid "less than"
-msgstr ""
+msgstr "меньше чем"
 
 #: _gui/rummage_dialog.py:69
 msgid "on any"
-msgstr ""
+msgstr "любой"
 
 #: _gui/rummage_dialog.py:70
 msgid "after"
-msgstr ""
+msgstr "после"
 
 #: _gui/rummage_dialog.py:71
 msgid "on"
-msgstr ""
+msgstr "в"
 
 #: _gui/rummage_dialog.py:72
 msgid "before"
-msgstr ""
+msgstr "до"
 
 #: _gui/rummage_dialog.py:96
 msgid "Stop"
-msgstr ""
+msgstr "Стоп"
 
 #: _gui/rummage_dialog.py:98
 msgid "Aborting"
-msgstr ""
+msgstr "Отменяется..."
 
 #: _gui/rummage_dialog.py:262
 msgid "%01.2f seconds"
-msgstr ""
+msgstr "%01.2f секунд"
 
 #: _gui/rummage_dialog.py:390
 msgid "Select directory to rummage"
-msgstr ""
+msgstr "Выбрать директорию"
 
 #: _gui/rummage_dialog.py:473
 msgid "Limit Search"
-msgstr ""
+msgstr "Ограничить поиск"
 
 #: _gui/rummage_dialog.py:475
 msgid "Where"
-msgstr ""
+msgstr "Где"
 
 #: _gui/rummage_dialog.py:476
 msgid "What"
-msgstr ""
+msgstr "Что"
 
 #: _gui/rummage_dialog.py:477
 msgid "Size is"
-msgstr ""
+msgstr "Размер файла"
 
 #: _gui/rummage_dialog.py:480
 msgid "Exclude folders"
-msgstr ""
+msgstr "Не искать в директориях"
 
 #: _gui/rummage_dialog.py:481
 msgid "Files which match"
-msgstr ""
+msgstr "Найденные файлы"
 
 #: _gui/rummage_dialog.py:482
 msgid "Search with regex"
-msgstr ""
+msgstr "Поиск регулярным выражением"
 
 #: _gui/rummage_dialog.py:485
 msgid "Treat all as UTF-8"
-msgstr ""
+msgstr "Все в UTF-8"
 
 #: _gui/rummage_dialog.py:486
 msgid "Boolean match"
-msgstr ""
+msgstr "Булев поиск"
 
 #: _gui/rummage_dialog.py:487
 msgid "Count only"
-msgstr ""
+msgstr "Только подсчет количества"
 
 #: _gui/rummage_dialog.py:488
 msgid "Include subfolders"
-msgstr ""
+msgstr "Рекурсивно просматривать каталоги"
 
 #: _gui/rummage_dialog.py:489
 msgid "Include hidden"
-msgstr ""
+msgstr "Искать в скрытых файлах"
 
 #: _gui/rummage_dialog.py:490
 msgid "Include binary files"
-msgstr ""
+msgstr "Искать в бинарных файлах"
 
 #: _gui/rummage_dialog.py:493
 msgid "Test Regex"
-msgstr ""
+msgstr "Протестировать регулярное выражение"
 
 #: _gui/rummage_dialog.py:494 _gui/save_search_dialog.py:51
 msgid "Save Search"
-msgstr ""
+msgstr "Сохранить результаты поиска"
 
 #: _gui/rummage_dialog.py:495
 msgid "Load Search"
-msgstr ""
+msgstr "Загрузить результаты поиска"
 
 #: _gui/rummage_dialog.py:498
 msgid "Export"
-msgstr ""
+msgstr "Экспорт"
 
 #: _gui/rummage_dialog.py:500
 msgid "Help"
-msgstr ""
+msgstr "Справка"
 
 #: _gui/rummage_dialog.py:501
 msgid "&Preferences"
-msgstr ""
+msgstr "&Настройки"
 
 #: _gui/rummage_dialog.py:502
 msgid "&Exit"
-msgstr ""
+msgstr "&Выход"
 
 #: _gui/rummage_dialog.py:503
 msgid "HTML"
@@ -374,183 +365,189 @@ msgstr ""
 
 #: _gui/rummage_dialog.py:505
 msgid "&About Rummage"
-msgstr ""
+msgstr "О Rummage"
 
 #: _gui/rummage_dialog.py:506
 msgid "Help and Support"
-msgstr ""
+msgstr "Справка и поддержка"
 
 #: _gui/rummage_dialog.py:687
 msgid "There is no search to save!"
-msgstr ""
+msgstr "Нет результатов для сохранения!"
 
 #: _gui/rummage_dialog.py:764
 msgid "Please enter a valid search regex!"
-msgstr ""
+msgstr "Введите корректное регулярное выражение!"
 
 #: _gui/rummage_dialog.py:767
 msgid "Please enter a valid search!"
-msgstr ""
+msgstr "Введите корректный поисковы запрос!"
 
 #: _gui/rummage_dialog.py:774
 msgid "Please enter a valid file pattern!"
-msgstr ""
+msgstr "Введите коррекный паттерн по файлу!"
 
 #: _gui/rummage_dialog.py:778
 msgid "Please enter a valid exlcude directory regex!"
-msgstr ""
+msgstr "Введите корректное регулярное выражение для директорий!"
 
 #: _gui/rummage_dialog.py:781
 msgid "Please enter a valid search path!"
-msgstr ""
+msgstr "Введите корректную директрию поиска!"
 
 #: _gui/rummage_dialog.py:787
 msgid "Please enter a valid size!"
-msgstr ""
+msgstr "Введите корректный размер файла!"
 
 #: _gui/rummage_dialog.py:792
 msgid "Please enter a modified date!"
-msgstr ""
+msgstr "Введите дату изменения!"
 
 #: _gui/rummage_dialog.py:797
 msgid "Please enter a created date!"
-msgstr ""
+msgstr "Введите дату создания!"
 
 #: _gui/rummage_dialog.py:848
 msgid "Searching: 0/0 0%% Matches: 0"
-msgstr ""
+msgstr "Поиск: 0/0 0%% Найдено: 0"
 
 #: _gui/rummage_dialog.py:1056 _gui/rummage_dialog.py:1077
 msgid "Searching: %d/%d %d%% Matches: %d Benchmark: %s"
-msgstr ""
+msgstr "Поиск: %d/%d %d%% Найдено: %d Производительность: %s"
 
 #: _gui/rummage_dialog.py:1068
 msgid "Search Aborted"
-msgstr ""
+msgstr "Поиск отменен"
 
 #: _gui/rummage_dialog.py:1069 _gui/rummage_dialog.py:1090
 msgid ""
 "\n"
 "%d matches found!"
 msgstr ""
+"\n"
+"найдено: %d результатов!"
 
 #: _gui/rummage_dialog.py:1089
 msgid "Search Completed"
-msgstr ""
+msgstr "Поиск завершен"
 
 #: _gui/rummage_dialog.py:1102
 msgid "errors"
-msgstr ""
+msgstr "ошибки"
 
 #: _gui/rummage_dialog.py:1103
 msgid ""
 "%d errors\n"
 "See log for details."
 msgstr ""
+"ошибок: %d\n"
+"См. лог."
 
 #: _gui/rummage_dialog.py:1104
 msgid "View Log"
-msgstr ""
+msgstr "Смотреть лог"
 
 #: _gui/rummage_dialog.py:1108
 msgid ""
 "Cound not process %s:\n"
 "%s"
 msgstr ""
+"Не удается обработать %s:\n"
+"%s"
 
 #: _gui/rummage_dialog.py:1109
 msgid "file"
-msgstr ""
+msgstr "файл"
 
 #: _gui/rummage_dialog.py:1176
-msgid "Searching: %d/%d %d%% Matches: %d"
+msgid "Поиск: %d/%d %d%% Найдено: %d"
 msgstr ""
 
 #: _gui/rummage_dialog.py:1238
 msgid "Invalid Regular Expression!"
-msgstr ""
+msgstr "Некорректное регулярное выражение"
 
 #: _gui/rummage_dialog.py:1283 _gui/rummage_dialog.py:1301
 msgid "There is nothing to export!"
-msgstr ""
+msgstr "Нет ничего на экспорт"
 
 #: _gui/rummage_dialog.py:1285 _gui/rummage_dialog.py:1303
 msgid "Export to..."
-msgstr ""
+msgstr "Сохранить в..."
 
 #: _gui/save_search_dialog.py:52
 msgid "Save"
-msgstr ""
+msgstr "Сохранить"
 
 #: _gui/save_search_dialog.py:88
 msgid "Please give the search a name!"
-msgstr ""
+msgstr "Задайте название поиска!"
 
 #: _gui/settings.py:72
 msgid "Failed to load settings file!"
-msgstr ""
+msgstr "Не удалось загрузить файл настроек!"
 
 #: _gui/settings.py:498
 msgid "Failed to save settings file!"
-msgstr ""
+msgstr "Не удалось сохранить файл настроек!"
 
 #: _gui/settings.py:515
 msgid "Failed to save cache file!"
-msgstr ""
+msgstr "Не удалось сохранить файл кеша!"
 
 #: _gui/settings_dialog.py:22
 msgid "%d Records"
-msgstr ""
+msgstr "Записей: %d"
 
 #: _gui/settings_dialog.py:81
 msgid "Preferences"
-msgstr ""
+msgstr "Настройки"
 
 #: _gui/settings_dialog.py:83
 msgid "Editor"
-msgstr ""
+msgstr "Редактор"
 
 #: _gui/settings_dialog.py:84
 msgid "General"
-msgstr ""
+msgstr "Общие"
 
 #: _gui/settings_dialog.py:85
 msgid "Notifications"
-msgstr ""
+msgstr "Уведомления"
 
 #: _gui/settings_dialog.py:86
 msgid "History"
-msgstr ""
+msgstr "История"
 
 #: _gui/settings_dialog.py:87
 msgid "Single Instance (applies to new instances)"
-msgstr ""
+msgstr "Один экземпляр (работает только при последующих запусках)"
 
 #: _gui/settings_dialog.py:88
 msgid "Enable debug level"
-msgstr ""
+msgstr "Уровень отладки"
 
 #: _gui/settings_dialog.py:89
 msgid "Notification popup"
-msgstr ""
+msgstr "Всплывающие уведомления"
 
 #: _gui/settings_dialog.py:90
 msgid "Alert Sound"
-msgstr ""
+msgstr "Звук предупреждения"
 
 #: _gui/settings_dialog.py:91
 msgid "Language (restart required)"
-msgstr ""
+msgstr "Язык (понадобится перезапуск программы)"
 
 #: _gui/settings_dialog.py:92
 msgid "change"
-msgstr ""
+msgstr "изменить"
 
 #: _gui/settings_dialog.py:93
 msgid "Show Log"
-msgstr ""
+msgstr "Показать лог"
 
 #: _gui/settings_dialog.py:94
 msgid "Clear"
-msgstr ""
+msgstr "Очистить"
 

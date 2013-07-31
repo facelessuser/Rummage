@@ -173,7 +173,7 @@ class SettingsDialog(gui.SettingsDialog):
         if stdiowin is not None:
             platform_window_focus(stdiowin.frame)
 
-    def on_language(cls, event):
+    def on_language(self, event):
         """
         Set selected on_language
         """

@@ -17,6 +17,8 @@ import traceback
 from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile
 
 from _gui.settings import Settings
+Settings.load_settings()
+
 from _gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
 
 
@@ -39,7 +41,6 @@ def gui_main(script):
     Configure environment, start the app, and launch the appropriate frame
     """
 
-    Settings.load_settings()
     args = parse_arguments()
     if args.show_log:
         set_debug_mode(True)
