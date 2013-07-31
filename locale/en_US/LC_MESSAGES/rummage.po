@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-07-30 19:24+MDT\n"
+"POT-Creation-Date: 2013-07-30 20:17+MDT\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,34 +85,36 @@ msgstr ""
 msgid "Arguments"
 msgstr ""
 
-#: _gui/export_csv.py:32 _gui/export_csv.py:38 _gui/export_html.py:234
-#: _gui/result_panels.py:222 _gui/result_panels.py:323
+#: _gui/export_csv.py:32 _gui/export_csv.py:38 _gui/export_html.py:206
+#: _gui/export_html.py:234 _gui/result_panels.py:222 _gui/result_panels.py:323
 #: _gui/rummage_dialog.py:499
 msgid "File"
 msgstr ""
 
-#: _gui/export_csv.py:32 _gui/export_csv.py:38 _gui/export_html.py:236
-#: _gui/result_panels.py:224 _gui/result_panels.py:325
+#: _gui/export_csv.py:32 _gui/export_csv.py:38 _gui/export_html.py:208
+#: _gui/export_html.py:236 _gui/result_panels.py:224 _gui/result_panels.py:325
 msgid "Matches"
 msgstr ""
 
-#: _gui/export_csv.py:32 _gui/result_panels.py:223
+#: _gui/export_csv.py:32 _gui/export_html.py:207 _gui/result_panels.py:223
 msgid "Size"
 msgstr ""
 
-#: _gui/export_csv.py:32 _gui/result_panels.py:225
+#: _gui/export_csv.py:32 _gui/export_html.py:209 _gui/result_panels.py:225
 msgid "Path"
 msgstr ""
 
-#: _gui/export_csv.py:32 _gui/result_panels.py:226
+#: _gui/export_csv.py:32 _gui/export_html.py:210 _gui/result_panels.py:226
 msgid "Encoding"
 msgstr ""
 
-#: _gui/export_csv.py:32 _gui/result_panels.py:227 _gui/rummage_dialog.py:478
+#: _gui/export_csv.py:32 _gui/export_html.py:211 _gui/result_panels.py:227
+#: _gui/rummage_dialog.py:478
 msgid "Modified"
 msgstr ""
 
-#: _gui/export_csv.py:32 _gui/result_panels.py:228 _gui/rummage_dialog.py:479
+#: _gui/export_csv.py:32 _gui/export_html.py:212 _gui/result_panels.py:228
+#: _gui/rummage_dialog.py:479
 msgid "Created"
 msgstr ""
 

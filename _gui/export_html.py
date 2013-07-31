@@ -203,13 +203,13 @@ RESULT_TABLE_HEADER = \
 <th>%(created)s</th>
 </tr>
 ''' % {
-    "file": "File",
-    "size": "Size",
-    "matches": "Matches",
-    "path": "Path",
-    "encoding": "Encoding",
-    "modified": "Modified",
-    "created": "Created"
+    "file": _("File"),
+    "size": _("Size"),
+    "matches": _("Matches"),
+    "path": _("Path"),
+    "encoding": _("Encoding"),
+    "modified": _("Modified"),
+    "created": _("Created")
 }
 
 RESULT_CONTENT_ROW = \
