@@ -20,6 +20,9 @@ def csv_encode(text):
     Format text for CSV
     """
 
+    if isinstance(text, unicode):
+        text = text.encode("utf-8")
+
     encode_table = {
         '"':  '""',
         '\n': '',

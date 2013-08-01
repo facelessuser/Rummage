@@ -23,7 +23,13 @@ else:
 
 
 def html_encode(text):
-    # Format text to HTML
+    """
+    Format text for HTML
+    """
+
+    if isinstance(text, unicode):
+        text = text.encode("utf-8")
+
     encode_table = {
         '&':  '&amp;',
         '>':  '&gt;',
