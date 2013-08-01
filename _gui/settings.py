@@ -82,11 +82,32 @@ class Settings(object):
         cls.init_notify(True)
 
     @classmethod
+    def get_hide_limit(cls):
+        """
+        Get hide limit setting
+        """
+
+        cls.reload_settings()
+        return cls.settings.get("hide_limit", False)
+
+    @classmethod
+    def set_hide_limit(cls, hide):
+        """
+        Set hide limit setting
+        """
+
+        cls.reload_settings()
+        cls.settings["hide_limit"] = hide
+        cls.save_settings()
+
+
+    @classmethod
     def get_language(cls):
         """
         Get locale language
         """
 
+        cls.reload_settings()
         locale = cls.settings.get("locale", "en_US")
         if locale == "en_US" and not exists(join(cls.config_folder, "locale", "en_US")):
             locale = None
@@ -98,6 +119,7 @@ class Settings(object):
         Set locale language
         """
 
+        cls.reload_settings()
         cls.settings["locale"] = language
         cls.save_settings()
 

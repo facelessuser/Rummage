@@ -1,5 +1,4 @@
 from time import ctime
-from os import startfile
 import codecs
 import sys
 import subprocess
@@ -12,9 +11,15 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
+if _PLATFORM == "windows":
+    from os import startfile
+
 
 def csv_encode(text):
-    # Format text to HTML
+    """
+    Format text for CSV
+    """
+
     encode_table = {
         '"':  '""',
         '\n': '',

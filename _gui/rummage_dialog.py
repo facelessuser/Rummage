@@ -402,6 +402,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         super(RummageFrame, self).__init__(parent)
 
+        self.hide_limit_panel = False
+
         if _PLATFORM == "linux":
             self.m_progressbar.SetInitialSize(wx.Size(-1, 5))
             self.m_progressbar.GetContainingSizer().Layout()
@@ -463,6 +465,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Pick optimal size
         self.optimize_size(True)
+        if Settings.get_hide_limit():
+            self.hide_limit_panel = True
+            self.limit_panel_hide()
 
         self.init_search_path(start_path)
 
@@ -495,11 +500,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         exportid = self.m_menu.FindMenuItem("File", "Export")
         self.m_menu.SetLabel(exportid, _("Export"))
         self.m_menu.SetMenuLabel(0, _("File"))
-        self.m_menu.SetMenuLabel(1, _("Help"))
+        self.m_menu.SetMenuLabel(1, _("View"))
+        self.m_menu.SetMenuLabel(2, _("Help"))
         self.m_preferences_menuitem.SetItemLabel(_("&Preferences"))
         self.m_quit_menuitem.SetItemLabel(_("&Exit"))
         self.m_export_html_menuitem.SetItemLabel(_("HTML"))
         self.m_export_csv_menuitem.SetItemLabel(_("CSV"))
+        self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
         self.m_about_menuitem.SetItemLabel(_("&About Rummage"))
         self.m_issues_menuitem.SetItemLabel(_("Help and Support"))
 
@@ -536,7 +543,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_searchin_text.safe_set_value(abspath(normpath(start_path)))
         self.m_searchfor_textbox.GetTextCtrl().SetFocus()
 
-    def optimize_size(self, first_time=False):
+    def optimize_size(self, first_time=False, height_only=False):
         """
         Optimally resize window
         """
@@ -545,10 +552,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
-        if first_time or offset > 0:
+        if first_time or offset > 0 or height_only:
             self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         if first_time:
             self.SetMinSize(self.GetSize())
+        elif height_only:
+            min_size = self.GetMinSize()
+            self.SetMinSize(wx.Size(min_size[0], mainframe[1] + offset + 15))
         self.Refresh()
 
     def setup_inputs(self):
@@ -701,23 +711,45 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_searchfor_textbox.SetValue(search)
             self.m_regex_search_checkbox.SetValue(regex_search)
 
+    def limit_panel_toggle(self):
+        """
+        Show/Hide limit panel
+        """
+
+        if not self.hide_limit_panel:
+            pth = self.m_searchin_text.GetValue()
+            if isfile(pth):
+                self.m_limiter_panel.Hide()
+                self.m_limiter_panel.GetContainingSizer().Layout()
+                self.optimize_size()
+            else:
+                self.m_limiter_panel.Show()
+                self.m_limiter_panel.Fit()
+                self.m_limiter_panel.GetSizer().Layout()
+                self.m_limiter_panel.GetContainingSizer().Layout()
+                self.m_settings_panel.GetSizer().Layout()
+                self.optimize_size()
+        else:
+            self.m_limiter_panel.Hide()
+            self.m_limiter_panel.GetContainingSizer().Layout()
+            self.optimize_size()
+
+    def limit_panel_hide(self):
+        """
+        Hide the limit panel
+        """
+
+        self.limit_panel_toggle()
+        self.optimize_size(height_only=True)
+
     def check_searchin(self):
         """
         Determine if search in input is a file or not, and hide/show elements accordingly
         """
 
+        self.limit_panel_toggle()
+
         pth = self.m_searchin_text.GetValue()
-        if isfile(pth):
-            self.m_limiter_panel.Hide()
-            self.m_limiter_panel.GetContainingSizer().Layout()
-            self.optimize_size()
-        else:
-            self.m_limiter_panel.Show()
-            self.m_limiter_panel.Fit()
-            self.m_limiter_panel.GetSizer().Layout()
-            self.m_limiter_panel.GetContainingSizer().Layout()
-            self.m_settings_panel.GetSizer().Layout()
-            self.optimize_size()
         if not self.searchin_update:
             if isdir(pth):
                 self.m_searchin_dir_picker.SetPath(pth)
@@ -1274,6 +1306,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.tester.Show()
 
     def on_export_html(self, event):
+        """
+        Export to HTML
+        """
+
         if (
             len(self.m_result_file_panel.list.itemDataMap) == 0 and
             len(self.m_result_content_panel.list.itemDataMap) == 0
@@ -1296,6 +1332,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             errormsg(_("There was a problem exporting the HTML!  See the log for more info."))
 
     def on_export_csv(self, event):
+        """
+        Export to CSV
+        """
+
         if (
             len(self.m_result_file_panel.list.itemDataMap) == 0 and
             len(self.m_result_content_panel.list.itemDataMap) == 0
@@ -1316,6 +1356,19 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         except:
             error(traceback.format_exc())
             errormsg(_("There was a problem exporting the CSV!  See the log for more info."))
+
+    def on_hide_limit(self, event):
+        """
+        Hide limit panel
+        """
+
+        self.hide_limit_panel = not self.hide_limit_panel
+        self.limit_panel_hide()
+        Settings.set_hide_limit(self.hide_limit_panel)
+        if self.hide_limit_panel:
+            self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
+        else:
+            self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
 
     def on_issues(self, event):
         """
