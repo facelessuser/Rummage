@@ -468,6 +468,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if Settings.get_hide_limit():
             self.hide_limit_panel = True
             self.limit_panel_hide()
+            self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
 
         self.init_search_path(start_path)
 
