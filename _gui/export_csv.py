@@ -28,7 +28,12 @@ def csv_encode(text):
 
     return '"%s"' % ''.join(
         encode_table.get(c, c) for c in text
-    )
+    ).decode("utf-8")
+
+
+REGEX_SEARCH = csv_encode(_("Regex Search"))
+
+LITERAL_SEARCH = csv_encode(_("Literal Search"))
 
 
 RESULT_ROW = '%(file)s,%(size)s,%(matches)s,%(path)s,%(encoding)s,%(modified)s,%(created)s\n'
@@ -92,7 +97,7 @@ def export(export_csv, search, regex_search, result_list, result_content_list):
 
     with codecs.open(export_csv, "w", encoding="utf-8") as csv:
         csv.write(u'\uFEFF')
-        search_expression = "%s,%s\n\n" % (csv_encode(_("Regex Search") if regex_search else _("Literal Search")), csv_encode(search))
+        search_expression = "%s,%s\n\n" % ((REGEX_SEARCH if regex_search else LITERAL_SEARCH), csv_encode(search))
         csv.write(search_expression)
         export_result_list(result_list, csv)
         export_result_content_list(result_content_list, csv)

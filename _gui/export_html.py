@@ -22,6 +22,26 @@ else:
     _PLATFORM = "linux"
 
 
+def html_encode(text):
+    # Format text to HTML
+    encode_table = {
+        '&':  '&amp;',
+        '>':  '&gt;',
+        '<':  '&lt;',
+        '\t': ' ' * 4,
+        '\n': '',
+        '\r': ''
+    }
+
+    return re.sub(
+        r'(?!\s($|\S))\s',
+        '&nbsp;',
+        ''.join(
+            encode_table.get(c, c) for c in text
+        ).decode("utf-8").encode('ascii', 'xmlcharrefreplace')
+    )
+
+
 CSS_HTML = \
 '''
 body {
@@ -161,7 +181,7 @@ div.main {
 
 '''
 
-TITLE = _("Rummage Results")
+TITLE = html_encode(_("Rummage Results"))
 
 HTML_HEADER = \
 '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -206,13 +226,13 @@ RESULT_TABLE_HEADER = \
 <th>%(created)s</th>
 </tr>
 ''' % {
-    "file": _("File"),
-    "size": _("Size"),
-    "matches": _("Matches"),
-    "path": _("Path"),
-    "encoding": _("Encoding"),
-    "modified": _("Modified"),
-    "created": _("Created")
+    "file": html_encode(_("File")),
+    "size": html_encode(_("Size")),
+    "matches": html_encode(_("Matches")),
+    "path": html_encode(_("Path")),
+    "encoding": html_encode(_("Encoding")),
+    "modified": html_encode(_("Modified")),
+    "created": html_encode(_("Created"))
 }
 
 RESULT_CONTENT_ROW = \
@@ -234,14 +254,14 @@ RESULT_CONTENT_TABLE_HEADER = \
 <th>%(context)s</th>
 </tr>
 ''' % {
-    "file": _("File"),
-    "line": _("Line"),
-    "matches": _("Matches"),
-    "context": _("Context")
+    "file": html_encode(_("File")),
+    "line": html_encode(_("Line")),
+    "matches": html_encode(_("Matches")),
+    "context": html_encode(_("Context"))
 }
 
-FILES = _("Files")
-CONTENT = _("Content")
+FILES = html_encode(_("Files"))
+CONTENT = html_encode(_("Content"))
 
 TABS_START = \
 '''
@@ -262,9 +282,9 @@ TABS_START_SINGLE = \
 <div class="main">
 '''
 
-SEARCH_LABEL_REGEX = _("Regex search:")
+SEARCH_LABEL_REGEX = html_encode(_("Regex search:"))
 
-SEARCH_LABEL_LITERAL = _("Literal search:")
+SEARCH_LABEL_LITERAL = html_encode(_("Literal search:"))
 
 TABS_END = \
 '''
@@ -311,26 +331,6 @@ BODY_END = \
 </body>
 </html>
 '''
-
-
-def html_encode(text):
-    # Format text to HTML
-    encode_table = {
-        '&':  '&amp;',
-        '>':  '&gt;',
-        '<':  '&lt;',
-        '\t': ' ' * 4,
-        '\n': '',
-        '\r': ''
-    }
-
-    return re.sub(
-        r'(?!\s($|\S))\s',
-        '&nbsp;',
-        ''.join(
-            encode_table.get(c, c) for c in text
-        ).encode('ascii', 'xmlcharrefreplace')
-    )
 
 
 def export_result_list(res, html):
