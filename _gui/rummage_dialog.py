@@ -534,7 +534,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         is_ac_combo = isinstance(obj, AutoCompleteCombo)
         is_date_picker = isinstance(obj, wx.GenericDatePickerCtrl)
         is_button = isinstance(obj, wx.Button)
-        debug(obj is self.m_searchfor_textbox)
         if (
             (
                 is_ac_combo and not obj.IsPopupShown() or
@@ -542,8 +541,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ) and
             self.m_grep_notebook.GetSelection() == 0
         ):
-            if self.m_search_button.GetLabel() not in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
-                self.start_search()
+            self.start_search()
+        elif is_button:
+            wx.PostEvent(
+                obj.GetEventHandler(),
+                wx.PyCommandEvent(wx.EVT_BUTTON.typeId, obj.GetId())
+            )
+
         event.Skip()
 
     def on_textctrl_selectall(self, event):
@@ -657,9 +661,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if _PLATFORM != "osx":
             self.m_searchin_text.MoveBeforeInTabOrder(self.m_searchin_dir_picker)
             self.m_searchfor_textbox.MoveBeforeInTabOrder(self.m_regex_search_checkbox)
-            self.m_modified_date_picker.MoveAfterInTabOrder(self.m_size_text)
+            self.m_modified_choice.MoveAfterInTabOrder(self.m_size_text)
+            self.m_modified_date_picker.MoveAfterInTabOrder(self.m_modified_choice)
             self.m_modified_time_picker.MoveAfterInTabOrder(self.m_modified_date_picker)
-            self.m_created_date_picker.MoveAfterInTabOrder(self.m_modified_time_picker)
+            self.m_created_choice.MoveAfterInTabOrder(self.m_modified_time_picker)
+            self.m_created_date_picker.MoveAfterInTabOrder(self.m_created_choice)
             self.m_created_time_picker.MoveAfterInTabOrder(self.m_created_date_picker)
             self.m_exclude_textbox.MoveBeforeInTabOrder(self.m_dirregex_checkbox)
             self.m_filematch_textbox.MoveBeforeInTabOrder(self.m_fileregex_checkbox)
