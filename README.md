@@ -3,75 +3,14 @@ Rummage
 
 Rummage is a GUI for grep like searches in python.  It was inspired by the tool I use in windows called GrepWin found here: http://stefanstools.sourceforge.net/grepWin.html.  I mainly used the tool for searches, and I wanted a similar tool in OSX...so I wrote Rummage.  The feel is loosely based off of GrepWin, though currently it has no replace options (not sure if/when I will add replace).  It is written in Python; therefore, it will be slower on searches than it would be if the searching were written in C (maybe down the line).  The big reason I wrote this is so I can build a similar tool on both OSX, Windows, and/or Linux (though I haven't yet tested Linux).
 
-The regex used is based off of the Python regex engine `re` (http://docs.python.org/2/library/re.html), with a wrapper that also allows you to do some unicode stuff like this `[\p{Ll}\p{Lu}]` and `\p{Ll}\p{Lu}`.  So keep this in mind if not all regex you know is recognized (but most functional regex should).
+Please see the [Wiki](https://github.com/facelessuser/Rummage/wiki/Rummage-Documentation) for documentation.
+
+For help and support, or to see what is planned next, see the the [Issues](https://github.com/facelessuser/Rummage/issues?state=open) page.
 
 Screenshots
 =======
 
 <img src="http://dl.dropboxusercontent.com/u/342698/Rummage/rummage_osx.png" border="0">
-
-Usage
-=======
-
-Rummage is pretty easy to use:
-
-- select your directory to search (you can also enter a file name):
-- configure search options and search limiting options
-- press search
-
-You can search in regex or literal.
-
-"Files which match" and "Exclude dirs" settings can be configured with regex or wildcard searches. When using wildcard searches, you can add entries that are separated with `|` to have multiple entires. You can add wildcard entries that start with `-` to do the opposite: `*.*|-*.txt` would search all files, but exclude txt files.
-
-Rummage will keep a history of your last congiuration between sessions.  It will also keep a history of the last 20 configurations of search, file search, etc.
-
-Rummage can generally search ASCII, UTF8, UTF16 (poor detection without BOM), UTF32 with BOM (haven't really tested this), Latin-1, and maybe cp1252 (Assuming it can rule out Latin-1), and it will search for ASCII strings in binary files if binary file option is enabled.
-
-Rummage has the ability to save and load commonly used regex.  It also has a simple regex tester to help you sort out complicated regex.
-
-It displays results in two ways:
-
-- Files: Lists the files with matches and some of the file attributes.  Double clicking an entry will open the file at the first match instance in your editor (if you have configured Rummage to use your editor).
-- Content: Lists the line numbers on which the match was found, number of matches on line, and the content of said line.  Double clicking will open the match at the line in your editor (if you have configured Rummage to use your editor).
-
-
-Building
-=======
-
-## OSX
-Requirements:
-
-- Update OSX python to at least 2.7.3 (Built in OSX python seems incomplete and did not work with pyinstaller...at least when I intially tried.  Upgrading doesn't hurt).  I think I just downloaded the Python 2.7.3 dmg installed and changed the PATH to point to the new version of python (Don't quite remember now).
-- Install wxpython 2.9.4.0 from: http://downloads.sourceforge.net/wxpython/wxPython2.9-osx-2.9.4.0-cocoa-py2.7.dmg
-- Download this repo
-- Place pyinstaller 2.0 repo inside the rummage repo: https://github.com/pyinstaller/pyinstaller
-
-Build:
-
-Run build with the python you are using `python build.py -c Rummage`
-
-## Windows
-Requirements:
-
-- Use Python version 2.7.3.1 or hopefully later (If using portable python, use 2.7.3.1 only.  Pyinstaller seems to not work with later versions.)
-- Must have wxpython 2.9.4.0 (Portable python comes with a slightly older 2.9.X verison, but it seems compatible)
-- Must have PyWin32
-
-Build:
-
-Run build with the python you are using `python build.py -c Rummage`
-
-## Linux
-Requirements:
-
--Coming soon...
-
-Binaries will be in the `dist` folder in your project.
-
-Planned Enhancements
-=======
-
-See Issues
 
 License
 =======
