@@ -20,9 +20,6 @@ def csv_encode(text):
     Format text for CSV
     """
 
-    if isinstance(text, unicode):
-        text = text.encode("utf-8")
-
     encode_table = {
         '"':  '""',
         '\n': '',
@@ -31,7 +28,7 @@ def csv_encode(text):
 
     return '"%s"' % ''.join(
         encode_table.get(c, c) for c in text
-    ).decode("utf-8")
+    )
 
 
 REGEX_SEARCH = csv_encode(_("Regex Search"))

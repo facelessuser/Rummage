@@ -27,9 +27,6 @@ def html_encode(text):
     Format text for HTML
     """
 
-    if isinstance(text, unicode):
-        text = text.encode("utf-8")
-
     encode_table = {
         '&':  '&amp;',
         '>':  '&gt;',
@@ -44,7 +41,7 @@ def html_encode(text):
         '&nbsp;',
         ''.join(
             encode_table.get(c, c) for c in text
-        ).decode("utf-8").encode('ascii', 'xmlcharrefreplace')
+        ).encode('ascii', 'xmlcharrefreplace')
     )
 
 

@@ -5,6 +5,12 @@ _ = None
 current_domain = None
 
 
+def unicode_gettext(l, text):
+    if l is not None:
+        text = l.gettext(text)
+    return text.decode("utf-8") if not isinstance(text, unicode) else text
+
+
 def setup(domain, pth, language=None):
     """
     Setup a language
@@ -17,7 +23,7 @@ def setup(domain, pth, language=None):
         try:
             lang = gettext.translation(domain, pth, languages=[language])
             lang.install(unicode=True)
-            _ = lambda t: lang.ugettext(t)
+            _ = lambda t: unicode_gettext(lang, t)
             current_domain = domain
         except:
             _default_setup()
@@ -34,7 +40,7 @@ def _default_setup():
     global lang
     global current_domain
     lang = None
-    _ = lambda t: t
+    _ = lambda t: unicode_gettext(None, t)
     current_domain = "en_US"
 
 

@@ -420,11 +420,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args = GrepArgs()
         self.thread = None
 
-        [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
-
         # Setup debugging
         self.set_keybindings(
-            [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)],
+            [
+                (wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
+                (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
+            ],
             debug_event=self.on_debug_console
         )
 
@@ -523,6 +524,27 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
             self.m_created_choice.Append(x)
         self.Fit()
+
+    def on_enter_key(self, event):
+        """
+        Search on enter
+        """
+
+        obj = self.FindFocus()
+        is_ac_combo = isinstance(obj, AutoCompleteCombo)
+        is_date_picker = isinstance(obj, wx.GenericDatePickerCtrl)
+        is_button = isinstance(obj, wx.Button)
+        debug(obj is self.m_searchfor_textbox)
+        if (
+            (
+                is_ac_combo and not obj.IsPopupShown() or
+                (not is_ac_combo and not is_date_picker and not is_button)
+            ) and
+            self.m_grep_notebook.GetSelection() == 0
+        ):
+            if self.m_search_button.GetLabel() not in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
+                self.start_search()
+        event.Skip()
 
     def on_textctrl_selectall(self, event):
         """
@@ -760,6 +782,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def on_search_click(self, event):
         """
+        Search button click
+        """
+
+        self.start_search()
+        event.Skip()
+
+    def start_search(self):
+        """
         Initiate search or stop search depending on search state
         """
 
@@ -780,7 +810,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if not self.validate_search_inputs():
                 self.do_search()
             self.debounce_search = False
-        event.Skip()
 
     def validate_search_inputs(self):
         """
@@ -808,25 +837,28 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if self.validate_regex(self.m_exclude_textbox.Value):
                 msg = _("Please enter a valid exlcude directory regex!")
                 fail = True
-        if not exists(self.m_searchin_text.GetValue()):
+        if not fail and not exists(self.m_searchin_text.GetValue()):
             msg = _("Please enter a valid search path!")
             fail = True
         if (
+            not fail and
             self.m_logic_choice.GetStringSelection() != "any" and
             re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
         ):
             msg = _("Please enter a valid size!")
             fail = True
-        try:
-            self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
-        except:
-            msg = _("Please enter a modified date!")
-            fail = True
-        try:
-            self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
-        except:
-            msg = _("Please enter a created date!")
-            fail = True
+        if not fail:
+            try:
+                self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+            except:
+                msg = _("Please enter a modified date!")
+                fail = True
+        if not fail:
+            try:
+                self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
+            except:
+                msg = _("Please enter a created date!")
+                fail = True
         if fail:
             errormsg(msg)
         return fail
