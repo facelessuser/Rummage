@@ -510,6 +510,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_export_csv_menuitem.SetItemLabel(_("CSV"))
         self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
         self.m_about_menuitem.SetItemLabel(_("&About Rummage"))
+        self.m_documentation_menuitem.SetItemLabel(_("Documentation"))
         self.m_issues_menuitem.SetItemLabel(_("Help and Support"))
 
         self.m_logic_choice.Clear()
@@ -1408,6 +1409,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
         else:
             self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
+
+    def on_documentation(self, event):
+        """
+        Open documentation site
+        """
+
+        webbrowser.open_new_tab(version.manual)
 
     def on_issues(self, event):
         """
