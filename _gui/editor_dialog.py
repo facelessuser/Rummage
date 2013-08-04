@@ -12,8 +12,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 import wx
 import sys
+
 import _gui.gui as gui
 from _gui.arg_dialog import ArgDialog
+
+from _lib.localization import get as _
 
 
 class EditorDialog(gui.EditorDialog):
@@ -38,6 +41,8 @@ class EditorDialog(gui.EditorDialog):
             for x in range(1, len(editor)):
                 self.m_arg_list.Append(editor[x])
 
+        self.localize()
+
         # Ensure good size for frame
         best = self.m_editor_panel.GetBestSize()
         current = self.m_editor_panel.GetSize()
@@ -45,6 +50,26 @@ class EditorDialog(gui.EditorDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+    def localize(self):
+        """
+        Localize dialog
+        """
+
+        self.SetTitle(_("Configure Editor"))
+        self.m_add_arg_button.SetLabel(_("Add"))
+        self.m_remove_arg_button.SetLabel(_("Delete"))
+        self.m_edit_button.SetLabel(_("Edit"))
+        self.m_up_button.SetLabel(_("Up"))
+        self.m_down_button.SetLabel(_("Down"))
+        self.m_apply_button.SetLabel(_("Apply"))
+        self.m_cancel_button.SetLabel(_("Cancel"))
+        self.m_instructions_label.SetLabel(_("Select the application and then set the arguments.\n\nUse {$file}, {$line}, and {$col} syntax to specify the file, line, and column respectively."))
+        self.m_instructions_label.Wrap(325)
+        main_sizer = self.m_arg_text.GetParent().GetSizer()
+        main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(_("Application"))
+        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Arguments"))
+        self.Fit()
 
     def set_keybindings(self, keybindings):
         """

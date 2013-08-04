@@ -1,0 +1,582 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2013-08-03 09:28+MDT\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: _gui/about_dialog.py:28
+msgid "About"
+msgstr ""
+
+#: _gui/about_dialog.py:35
+msgid "Version: %s %s"
+msgstr ""
+
+#: _gui/about_dialog.py:38
+msgid ""
+"Developers(s):\n"
+"%s"
+msgstr ""
+
+#: _gui/about_dialog.py:48 _gui/about_dialog.py:51
+msgid "Contact"
+msgstr ""
+
+#: _gui/arg_dialog.py:51
+msgid "Edit Argument"
+msgstr ""
+
+#: _gui/arg_dialog.py:52 _gui/editor_dialog.py:65
+msgid "Apply"
+msgstr ""
+
+#: _gui/arg_dialog.py:53 _gui/editor_dialog.py:66 _gui/generic_dialogs.py:14
+#: _gui/load_search_dialog.py:153 _gui/save_search_dialog.py:53
+msgid "Cancel"
+msgstr ""
+
+#: _gui/editor_dialog.py:59
+msgid "Configure Editor"
+msgstr ""
+
+#: _gui/editor_dialog.py:60
+msgid "Add"
+msgstr ""
+
+#: _gui/editor_dialog.py:61
+msgid "Delete"
+msgstr ""
+
+#: _gui/editor_dialog.py:62
+msgid "Edit"
+msgstr ""
+
+#: _gui/editor_dialog.py:63
+msgid "Up"
+msgstr ""
+
+#: _gui/editor_dialog.py:64
+msgid "Down"
+msgstr ""
+
+#: _gui/editor_dialog.py:67
+msgid ""
+"Select the application and then set the arguments.\n"
+"\n"
+"Use {$file}, {$line}, and {$col} syntax to specify the file, line, and column respectively."
+msgstr ""
+
+#: _gui/editor_dialog.py:70
+msgid "Application"
+msgstr ""
+
+#: _gui/editor_dialog.py:71
+msgid "Arguments"
+msgstr ""
+
+#: _gui/export_csv.py:34
+msgid "Regex Search"
+msgstr ""
+
+#: _gui/export_csv.py:36
+msgid "Literal Search"
+msgstr ""
+
+#: _gui/export_csv.py:42 _gui/export_csv.py:48 _gui/export_html.py:232
+#: _gui/export_html.py:260 _gui/result_panels.py:222 _gui/result_panels.py:323
+#: _gui/rummage_dialog.py:504
+msgid "File"
+msgstr ""
+
+#: _gui/export_csv.py:42 _gui/export_csv.py:48 _gui/export_html.py:234
+#: _gui/export_html.py:262 _gui/result_panels.py:224 _gui/result_panels.py:325
+msgid "Matches"
+msgstr ""
+
+#: _gui/export_csv.py:42 _gui/export_html.py:233 _gui/result_panels.py:223
+msgid "Size"
+msgstr ""
+
+#: _gui/export_csv.py:42 _gui/export_html.py:235 _gui/result_panels.py:225
+msgid "Path"
+msgstr ""
+
+#: _gui/export_csv.py:42 _gui/export_html.py:236 _gui/result_panels.py:226
+msgid "Encoding"
+msgstr ""
+
+#: _gui/export_csv.py:42 _gui/export_html.py:237 _gui/result_panels.py:227
+#: _gui/rummage_dialog.py:483
+msgid "Modified"
+msgstr ""
+
+#: _gui/export_csv.py:42 _gui/export_html.py:238 _gui/result_panels.py:228
+#: _gui/rummage_dialog.py:484
+msgid "Created"
+msgstr ""
+
+#: _gui/export_csv.py:48 _gui/export_html.py:261 _gui/result_panels.py:324
+msgid "Line"
+msgstr ""
+
+#: _gui/export_csv.py:48 _gui/export_html.py:263 _gui/result_panels.py:326
+msgid "Context"
+msgstr ""
+
+#: _gui/export_html.py:187
+msgid "Rummage Results"
+msgstr ""
+
+#: _gui/export_html.py:266 _gui/rummage_dialog.py:451
+#: _gui/rummage_dialog.py:955
+msgid "Files"
+msgstr ""
+
+#: _gui/export_html.py:267 _gui/rummage_dialog.py:452
+#: _gui/rummage_dialog.py:956
+msgid "Content"
+msgstr ""
+
+#: _gui/export_html.py:288
+msgid "Regex search:"
+msgstr ""
+
+#: _gui/export_html.py:290
+msgid "Literal search:"
+msgstr ""
+
+#: _gui/generic_dialogs.py:14
+msgid "Okay"
+msgstr ""
+
+#: _gui/generic_dialogs.py:14
+msgid "Yes or no?"
+msgstr ""
+
+#: _gui/generic_dialogs.py:22
+msgid "INFO"
+msgstr ""
+
+#: _gui/generic_dialogs.py:30
+msgid "ERROR"
+msgstr ""
+
+#: _gui/generic_dialogs.py:38
+msgid "WARNING"
+msgstr ""
+
+#: _gui/load_search_dialog.py:23 _gui/rummage_dialog.py:496
+#: _gui/rummage_dialog.py:497
+msgid "Regex"
+msgstr ""
+
+#: _gui/load_search_dialog.py:24 _gui/regex_test_dialog.py:73
+msgid "Text"
+msgstr ""
+
+#: _gui/load_search_dialog.py:150
+msgid "Searches"
+msgstr ""
+
+#: _gui/load_search_dialog.py:151
+msgid "Remove"
+msgstr ""
+
+#: _gui/load_search_dialog.py:152
+msgid "Load"
+msgstr ""
+
+#: _gui/load_search_dialog.py:211 _gui/save_search_dialog.py:54
+msgid "Name"
+msgstr ""
+
+#: _gui/load_search_dialog.py:212 _gui/rummage_dialog.py:95
+#: _gui/rummage_dialog.py:477 _gui/rummage_dialog.py:501
+msgid "Search"
+msgstr ""
+
+#: _gui/load_search_dialog.py:213
+msgid "Type"
+msgstr ""
+
+#: _gui/open_editor.py:31
+msgid "No editor is currently set!"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:68
+msgid "Regex Tester"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:69
+msgid "Use"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:70 _gui/settings_dialog.py:95
+msgid "Close"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:71 _gui/rummage_dialog.py:488
+msgid "Search case-sensitive"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:72 _gui/rummage_dialog.py:489
+msgid "Dot matches newline"
+msgstr ""
+
+#: _gui/regex_test_dialog.py:74
+msgid "Regex Input"
+msgstr ""
+
+#: _gui/rummage_dialog.py:63
+msgid "any"
+msgstr ""
+
+#: _gui/rummage_dialog.py:64
+msgid "greater than"
+msgstr ""
+
+#: _gui/rummage_dialog.py:65
+msgid "equal to"
+msgstr ""
+
+#: _gui/rummage_dialog.py:66
+msgid "less than"
+msgstr ""
+
+#: _gui/rummage_dialog.py:67
+msgid "on any"
+msgstr ""
+
+#: _gui/rummage_dialog.py:68
+msgid "after"
+msgstr ""
+
+#: _gui/rummage_dialog.py:69
+msgid "on"
+msgstr ""
+
+#: _gui/rummage_dialog.py:70
+msgid "before"
+msgstr ""
+
+#: _gui/rummage_dialog.py:94
+msgid "Stop"
+msgstr ""
+
+#: _gui/rummage_dialog.py:96
+msgid "Aborting"
+msgstr ""
+
+#: _gui/rummage_dialog.py:260
+msgid "%01.2f seconds"
+msgstr ""
+
+#: _gui/rummage_dialog.py:388
+msgid "Select directory to rummage"
+msgstr ""
+
+#: _gui/rummage_dialog.py:472 _gui/rummage_dialog.py:1409
+msgid "Show Limit Search Panel"
+msgstr ""
+
+#: _gui/rummage_dialog.py:478
+msgid "Limit Search"
+msgstr ""
+
+#: _gui/rummage_dialog.py:480
+msgid "Where"
+msgstr ""
+
+#: _gui/rummage_dialog.py:481
+msgid "What"
+msgstr ""
+
+#: _gui/rummage_dialog.py:482
+msgid "Size is"
+msgstr ""
+
+#: _gui/rummage_dialog.py:485
+msgid "Exclude folders"
+msgstr ""
+
+#: _gui/rummage_dialog.py:486
+msgid "Files which match"
+msgstr ""
+
+#: _gui/rummage_dialog.py:487
+msgid "Search with regex"
+msgstr ""
+
+#: _gui/rummage_dialog.py:490
+msgid "Treat all as UTF-8"
+msgstr ""
+
+#: _gui/rummage_dialog.py:491
+msgid "Boolean match"
+msgstr ""
+
+#: _gui/rummage_dialog.py:492
+msgid "Count only"
+msgstr ""
+
+#: _gui/rummage_dialog.py:493
+msgid "Include subfolders"
+msgstr ""
+
+#: _gui/rummage_dialog.py:494
+msgid "Include hidden"
+msgstr ""
+
+#: _gui/rummage_dialog.py:495
+msgid "Include binary files"
+msgstr ""
+
+#: _gui/rummage_dialog.py:498
+msgid "Test Regex"
+msgstr ""
+
+#: _gui/rummage_dialog.py:499 _gui/save_search_dialog.py:51
+msgid "Save Search"
+msgstr ""
+
+#: _gui/rummage_dialog.py:500
+msgid "Load Search"
+msgstr ""
+
+#: _gui/rummage_dialog.py:503
+msgid "Export"
+msgstr ""
+
+#: _gui/rummage_dialog.py:505
+msgid "View"
+msgstr ""
+
+#: _gui/rummage_dialog.py:506
+msgid "Help"
+msgstr ""
+
+#: _gui/rummage_dialog.py:507
+msgid "&Preferences"
+msgstr ""
+
+#: _gui/rummage_dialog.py:508
+msgid "&Exit"
+msgstr ""
+
+#: _gui/rummage_dialog.py:509
+msgid "HTML"
+msgstr ""
+
+#: _gui/rummage_dialog.py:510
+msgid "CSV"
+msgstr ""
+
+#: _gui/rummage_dialog.py:511 _gui/rummage_dialog.py:1411
+msgid "Hide Limit Search Panel"
+msgstr ""
+
+#: _gui/rummage_dialog.py:512
+msgid "&About Rummage"
+msgstr ""
+
+#: _gui/rummage_dialog.py:513
+msgid "Documentation"
+msgstr ""
+
+#: _gui/rummage_dialog.py:514
+msgid "Help and Support"
+msgstr ""
+
+#: _gui/rummage_dialog.py:725
+msgid "There is no search to save!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:831
+msgid "Please enter a valid search regex!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:834
+msgid "Please enter a valid search!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:841
+msgid "Please enter a valid file pattern!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:845
+msgid "Please enter a valid exlcude directory regex!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:848
+msgid "Please enter a valid search path!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:855
+msgid "Please enter a valid size!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:861
+msgid "Please enter a modified date!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:867
+msgid "Please enter a created date!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:918
+msgid "Searching: 0/0 0%% Matches: 0"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1126 _gui/rummage_dialog.py:1147
+msgid "Searching: %d/%d %d%% Matches: %d Benchmark: %s"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1138
+msgid "Search Aborted"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1139 _gui/rummage_dialog.py:1160
+msgid ""
+"\n"
+"%d matches found!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1159
+msgid "Search Completed"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1172
+msgid "errors"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1173
+msgid ""
+"%d errors\n"
+"See log for details."
+msgstr ""
+
+#: _gui/rummage_dialog.py:1174
+msgid "View Log"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1178
+msgid ""
+"Cound not process %s:\n"
+"%s"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1179
+msgid "file"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1246
+msgid "Searching: %d/%d %d%% Matches: %d"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1308
+msgid "Invalid Regular Expression!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1357 _gui/rummage_dialog.py:1383
+msgid "There is nothing to export!"
+msgstr ""
+
+#: _gui/rummage_dialog.py:1359 _gui/rummage_dialog.py:1385
+msgid "Export to..."
+msgstr ""
+
+#: _gui/rummage_dialog.py:1372
+msgid "There was a problem exporting the HTML!  See the log for more info."
+msgstr ""
+
+#: _gui/rummage_dialog.py:1398
+msgid "There was a problem exporting the CSV!  See the log for more info."
+msgstr ""
+
+#: _gui/save_search_dialog.py:52
+msgid "Save"
+msgstr ""
+
+#: _gui/save_search_dialog.py:88
+msgid "Please give the search a name!"
+msgstr ""
+
+#: _gui/settings.py:73
+msgid "Failed to load settings file!"
+msgstr ""
+
+#: _gui/settings.py:522
+msgid "Failed to save settings file!"
+msgstr ""
+
+#: _gui/settings.py:539
+msgid "Failed to save cache file!"
+msgstr ""
+
+#: _gui/settings_dialog.py:22
+msgid "%d Records"
+msgstr ""
+
+#: _gui/settings_dialog.py:81
+msgid "Preferences"
+msgstr ""
+
+#: _gui/settings_dialog.py:83
+msgid "Editor"
+msgstr ""
+
+#: _gui/settings_dialog.py:84
+msgid "General"
+msgstr ""
+
+#: _gui/settings_dialog.py:85
+msgid "Notifications"
+msgstr ""
+
+#: _gui/settings_dialog.py:86
+msgid "History"
+msgstr ""
+
+#: _gui/settings_dialog.py:87
+msgid "Single Instance (applies to new instances)"
+msgstr ""
+
+#: _gui/settings_dialog.py:88
+msgid "Enable debug level"
+msgstr ""
+
+#: _gui/settings_dialog.py:89
+msgid "Notification popup"
+msgstr ""
+
+#: _gui/settings_dialog.py:90
+msgid "Alert Sound"
+msgstr ""
+
+#: _gui/settings_dialog.py:91
+msgid "Language (restart required)"
+msgstr ""
+
+#: _gui/settings_dialog.py:92
+msgid "change"
+msgstr ""
+
+#: _gui/settings_dialog.py:93
+msgid "Show Log"
+msgstr ""
+
+#: _gui/settings_dialog.py:94
+msgid "Clear"
+msgstr ""
+

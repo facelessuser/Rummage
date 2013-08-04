@@ -17,6 +17,8 @@ from os.path import normpath, join
 
 from _gui.open_editor import open_editor
 
+from _lib.localization import get as _
+
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
 USE_SAMPLE_SIZE = True
@@ -125,7 +127,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         if self.size_sample or not USE_SAMPLE_SIZE:
             for x in range(0, self.column_count):
                 text = self.get_item_text(idx, x, True)
-                lw, _, _, _ = self.dc.GetFullTextExtent(text)
+                lw, lh, d, e = self.dc.GetFullTextExtent(text)
                 width = lw + 30
                 if width > self.widest_cell[x]:
                     self.widest_cell[x] = width
@@ -151,7 +153,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.SortListItems(col=0, ascending=1)
         self.init_column_size()
 
-    def SortItems(self,sorter=cmp):
+    def SortItems(self, sorter=cmp):
         """
         Sort items
         """
@@ -186,7 +188,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
             return self.attr1
         return -1
 
-    def OnGetItemImage (self, item):
+    def OnGetItemImage(self, item):
         """
         Override method to get the image for the given item
         """
@@ -214,7 +216,18 @@ class ResultFileList(ResultList):
         Init ResultFileList object
         """
 
-        super(ResultFileList, self).__init__(parent, ["File", "Size", "Matches", "Path", "Encoding", "Modified", "Created"])
+        super(ResultFileList, self).__init__(
+            parent,
+            [
+                _("File"),
+                _("Size"),
+                _("Matches"),
+                _("Path"),
+                _("Encoding"),
+                _("Modified"),
+                _("Created")
+            ]
+        )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
@@ -277,7 +290,7 @@ class ResultFileList(ResultList):
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
             text = self.get_item_text(idx, 2, True)
-            lw, _, _, _ = self.dc.GetFullTextExtent(text)
+            lw, lh, d, e = self.dc.GetFullTextExtent(text)
             width = lw + 30
             if width > self.widest_cell[2]:
                 self.widest_cell[2] = width
@@ -304,7 +317,15 @@ class ResultContentList(ResultList):
         Init ResultContentFileList object
         """
 
-        super(ResultContentList, self).__init__(parent, ["File", "Line", "Matches", "Context"])
+        super(ResultContentList, self).__init__(
+            parent,
+            [
+                _("File"),
+                _("Line"),
+                _("Matches"),
+                _("Context")
+            ]
+        )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
@@ -357,7 +378,7 @@ class ResultContentList(ResultList):
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
             text = self.get_item_text(idx, 2, True)
-            lw, _, _, _ = self.dc.GetFullTextExtent(text)
+            lw, lh, d, e = self.dc.GetFullTextExtent(text)
             width = lw + 30
             if width > self.widest_cell[2]:
                 self.widest_cell[2] = width
@@ -396,7 +417,7 @@ class FileResultPanel(wx.Panel):
         super(FileResultPanel, self).__init__(parent)
         self.list = obj(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.list, 1, wx.ALL|wx.EXPAND, 5)
+        sizer.Add(self.list, 1, wx.ALL | wx.EXPAND, 5)
         self.SetSizer(sizer)
         self.Layout()
 

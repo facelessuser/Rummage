@@ -10,16 +10,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import codecs
 import json
 import sys
-from os import mkdir
-from os.path import expanduser, exists, join, getmtime
+from os import mkdir, listdir
+from os.path import expanduser, exists, join, getmtime, isdir
 import traceback
 
 from _lib.file_strip.json import sanitize_json
 import _lib.notify as notify
+import _lib.localization as localization
+from _lib.localization import get as _
 
-from _gui.custom_app import debug, debug_struct, info, error
+from _gui.custom_app import debug, debug_struct, error
 from _gui.custom_app import init_app_log, set_debug_mode
 from _gui.generic_dialogs import *
+
 from _icons.rum_ico import rum_64, rum_tray
 
 if sys.platform.startswith('win'):
@@ -39,6 +42,7 @@ NOTIFY_STYLES = {
     "windows": ["native", "growl"],
     "linux": ["native"]
 }
+
 
 class Settings(object):
     filename = None
@@ -66,14 +70,75 @@ class Settings(object):
             except:
                 e = traceback.format_exc()
                 try:
-                    errormsg("Failed to load settings file!\n\n%s" % str(e))
+                    errormsg(_("Failed to load settings file!"))
+                    error(e)
                 except:
-                    print("Failed to load settings file!\n\n%s" % str(e))
+                    print(str(e))
         if cls.get_debug():
             set_debug_mode(True)
+        localization.setup('rummage', join(cls.config_folder, "locale"), cls.get_language())
         debug_struct(cls.settings)
         debug_struct(cls.cache)
         cls.init_notify(True)
+
+    @classmethod
+    def get_hide_limit(cls):
+        """
+        Get hide limit setting
+        """
+
+        cls.reload_settings()
+        return cls.settings.get("hide_limit", False)
+
+    @classmethod
+    def set_hide_limit(cls, hide):
+        """
+        Set hide limit setting
+        """
+
+        cls.reload_settings()
+        cls.settings["hide_limit"] = hide
+        cls.save_settings()
+
+
+    @classmethod
+    def get_language(cls):
+        """
+        Get locale language
+        """
+
+        cls.reload_settings()
+        locale = cls.settings.get("locale", "en_US")
+        if locale == "en_US" and not exists(join(cls.config_folder, "locale", "en_US")):
+            locale = None
+        return locale
+
+    @classmethod
+    def set_language(cls, language):
+        """
+        Set locale language
+        """
+
+        cls.reload_settings()
+        cls.settings["locale"] = language
+        cls.save_settings()
+
+    @classmethod
+    def get_languages(cls):
+        """
+        Return languages
+        """
+
+        languages = []
+        base = join(cls.config_folder, "locale")
+        if exists(base):
+            for file_obj in listdir(base):
+                if isdir(join(base, file_obj)):
+                    languages.append(file_obj)
+        if len(languages) == 0 or "en_US" not in languages:
+            languages.append("en_US")
+        languages.sort()
+        return languages
 
     @classmethod
     def get_debug(cls):
@@ -121,7 +186,7 @@ class Settings(object):
         old_cache = cls.cache_time
         cls.get_times()
         try:
-            changed =  old_settings != cls.settings_time or old_cache != cls.cache_time
+            changed = old_settings != cls.settings_time or old_cache != cls.cache_time
         except:
             error("Could not compare timestamp of file!")
             changed = False
@@ -419,7 +484,7 @@ class Settings(object):
         cls.save_cache()
 
     @classmethod
-    def get_history_record_count(cls, history_types = []):
+    def get_history_record_count(cls, history_types=[]):
         """
         Get number of history items saved
         """
@@ -454,9 +519,10 @@ class Settings(object):
         except:
             e = traceback.format_exc()
             try:
-                errormsg("Failed to save settings file!\n\n%s" % str(e))
+                errormsg(_("Failed to save settings file!"))
+                error(e)
             except:
-                print("Failed to save settings file!\n\n%s" % str(e))
+                print(str(e))
 
     @classmethod
     def save_cache(cls):
@@ -470,6 +536,7 @@ class Settings(object):
         except:
             e = traceback.format_exc()
             try:
-                errormsg("Failed to save cache file!\n\n%s" % str(e))
+                errormsg(_("Failed to save cache file!"))
+                error(e)
             except:
-                print("Failed to save cache file!\n\n%s" % str(e))
+                print(str(e))

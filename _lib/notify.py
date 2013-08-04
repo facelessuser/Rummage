@@ -50,6 +50,7 @@ if _PLATFORM == "osx":
     NSSound = c_void_p(objc.objc_getClass('NSSound'))
     NSAutoreleasePool = c_void_p(objc.objc_getClass('NSAutoreleasePool'))
 
+
 def _nsstring(string):
     """
     Return an NSString object
@@ -86,7 +87,7 @@ def play_alert(sound=None):
         if exists('/usr/share/sounds/gnome/default/alerts/glass.ogg'):
             subprocess.call(['/usr/bin/canberra-gtk-play', '-f', '/usr/share/sounds/gnome/default/alerts/glass.ogg'])
         else:
-            subprocess.call(['/usr/bin/canberra-gtk-play','--id','bell'])
+            subprocess.call(['/usr/bin/canberra-gtk-play', '--id', 'bell'])
 
 
 ###################################
@@ -94,6 +95,7 @@ def play_alert(sound=None):
 ###################################
 NOTIFY_OSD_ICON = None
 NOTIFY_OSD = None
+
 
 def notify_osd_fallback(title, message, sound, fallback):
     """
@@ -162,6 +164,7 @@ GROWL_ENABLED = False
 GROWL = None
 NOTIFY_GROWL = None
 
+
 def notify_growl_fallback(note_type, title, description, sound, fallback):
         """
         Growl failed to register so create a growl notify that simply
@@ -184,12 +187,12 @@ if _PLATFORM in ["windows", "osx"]:
 
             try:
                 GROWL.notify(
-                    noteType = note_type,
-                    title = title,
-                    description = description,
+                    noteType=note_type,
+                    title=title,
+                    description=description,
                     icon=GROWL_ICON,
-                    sticky = False,
-                    priority = 1
+                    sticky=False,
+                    priority=1
                 )
 
                 if sound:
@@ -217,9 +220,9 @@ def setup_notify_growl(app_name):
     try:
         # Init growl object
         GROWL = gntp.notifier.GrowlNotifier(
-            applicationName = app_name,
-            notifications = ["Info", "Warning", "Error"],
-            defaultNotifications = ["Info", "Warning", "Error"]
+            applicationName=app_name,
+            notifications=["Info", "Warning", "Error"],
+            defaultNotifications=["Info", "Warning", "Error"]
         )
 
         GROWL.register()
@@ -254,10 +257,12 @@ def has_growl():
 NOTIFY_WIN_ICON = None
 NOTIFY_WIN = None
 
+
 class WinNotifyLevel(object):
     ICON_INFORMATION = 0x01
     ICON_WARNING = 0x02
     ICON_ERROR = 0x04
+
 
 def notify_win_fallback(title, message, sound, icon, fallback):
     """
@@ -273,8 +278,6 @@ if _PLATFORM == "windows":
         from win32api import *
         from win32gui import *
         import win32con
-        import struct
-        import time
 
         class NotifyWin(object):
             def __init__(self, app_name, icon, tooltip=None):
@@ -285,7 +288,7 @@ if _PLATFORM == "windows":
 
                 message_map = {
                     win32con.WM_DESTROY: self.OnDestroy,
-                    win32con.WM_USER + 20 : self.OnTaskbarNotify,
+                    win32con.WM_USER + 20: self.OnTaskbarNotify,
                 }
 
                 self.tooltip = tooltip
@@ -295,7 +298,7 @@ if _PLATFORM == "windows":
                 wc = WNDCLASS()
                 self.hinst = wc.hInstance = GetModuleHandle(None)
                 wc.lpszClassName = app_name
-                wc.lpfnWndProc = message_map # could also specify a wndproc.
+                wc.lpfnWndProc = message_map  # could also specify a wndproc.
                 self.class_atom = RegisterClass(wc)
 
                 # Create the Window.
@@ -350,7 +353,6 @@ if _PLATFORM == "windows":
                     icon_level |= NIIF_WARNING
                 elif icon & WinNotifyLevel.ICON_ERROR:
                     icon_level |= NIIF_ERROR
-                flags = NIF_ICON | NIF_MESSAGE | NIF_TIP
                 self.show_icon()
                 Shell_NotifyIcon(
                     NIM_MODIFY,

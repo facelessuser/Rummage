@@ -11,8 +11,8 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import wx
-import sys
-from wx.combo import ComboPopup, ComboCtrl
+from wx.combo import ComboCtrl
+
 
 class AutoCompleteCombo(ComboCtrl):
     def __init__(self, parent, choices=[], load_last=False, changed_callback=None):
@@ -57,14 +57,14 @@ class AutoCompleteCombo(ComboCtrl):
         Tab forward to the next object
         """
 
-        self.Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsForward)
+        self.Navigate(wx.NavigationKeyEvent.FromTab | wx.NavigationKeyEvent.IsForward)
 
     def tab_back(self):
         """
         Tab backwards to the previous object
         """
 
-        self.Navigate(wx.NavigationKeyEvent.FromTab|wx.NavigationKeyEvent.IsBackward)
+        self.Navigate(wx.NavigationKeyEvent.FromTab | wx.NavigationKeyEvent.IsBackward)
 
     def update_choices(self, items, load_last=False):
         """
@@ -178,7 +178,7 @@ class AutoCompleteCombo(ComboCtrl):
             tc = self.GetTextCtrl()
             value = tc.GetValue()
             found_items = []
-            for choice in sorted(self.choices) :
+            for choice in sorted(self.choices):
                 if choice.startswith(value):
                     found_items.append(choice)
                     found = True
@@ -207,6 +207,7 @@ class AutoCompleteCombo(ComboCtrl):
             self.changed_callback()
         if not found:
             event.Skip()
+
 
 class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def __init__(self, parent, txt_ctrl):
@@ -284,13 +285,13 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         Select item on hover
         """
 
-        item, _ = self.HitTest(event.GetPosition())
+        item, flags = self.HitTest(event.GetPosition())
         if item >= 0:
             self.Select(item)
 
     def next_item(self):
         """
-        Select next item 
+        Select next item
         """
 
         curitem = self.GetFirstSelected()
@@ -318,7 +319,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         Select item and dismiss popup on left mouse click
         """
 
-        item, _ = self.HitTest(event.GetPosition())
+        item, flags = self.HitTest(event.GetPosition())
         if item >= 0:
             self.waiting_value = item
         wx.CallAfter(self.Dismiss)
