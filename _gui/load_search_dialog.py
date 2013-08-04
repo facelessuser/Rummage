@@ -18,6 +18,15 @@ import _gui.gui as gui
 from _gui.result_panels import up_arrow, down_arrow
 from _icons.glass import glass
 
+from _lib.localization import get as _
+
+SEARCH_REGEX = _("Regex")
+SEARCH_LITERAL = _("Text")
+SEARCH_TYPE = {
+    SEARCH_LITERAL: "Text",
+    SEARCH_REGEX: "Regex"
+}
+
 
 class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
     def setup(self, c):
@@ -121,6 +130,8 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.reset_table()
         extend_list(self.m_search_list, 3)
 
+        self.localize()
+
         best = self.m_load_panel.GetBestSize()
         current = self.m_load_panel.GetSize()
         offset = best[1] - current[1]
@@ -131,6 +142,17 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.load_searches()
         self.m_search_list.SetFocus()
 
+    def localize(self):
+        """
+        Localize dialog
+        """
+
+        self.SetTitle(_("Searches"))
+        self.m_delete_button.SetLabel(_("Remove"))
+        self.m_load_button.SetLabel(_("Load"))
+        self.m_cancel_button.SetLabel(_("Cancel"))
+        self.Fit()
+
     def load_searches(self):
         """
         Populate list with search entries
@@ -138,7 +160,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
 
         count = 0
         for x in Settings.get_search():
-            search_type = "Regex" if x[2] else "Text"
+            search_type = SEARCH_REGEX if x[2] else SEARCH_LITERAL
             self.m_search_list.InsertStringItem(count, x[0])
             self.m_search_list.SetStringItem(count, 1, x[1])
             self.m_search_list.SetStringItem(count, 2, search_type)
@@ -160,7 +182,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
             return
         idx = self.m_search_list.GetItemData(item)
         self.search = self.m_search_list.get_map_item(idx, col=1)
-        self.is_regex = self.m_search_list.get_map_item(idx, col=2) == "Regex"
+        self.is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(idx, col=2)] == "Regex"
         self.Close()
 
     def get_search(self):
@@ -186,9 +208,9 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         """
 
         self.m_search_list.ClearAll()
-        self.m_search_list.InsertColumn(0, "Name")
-        self.m_search_list.InsertColumn(1, "Search")
-        self.m_search_list.InsertColumn(2, "Type")
+        self.m_search_list.InsertColumn(0, _("Name"))
+        self.m_search_list.InsertColumn(1, _("Search"))
+        self.m_search_list.InsertColumn(2, _("Type"))
         wx.GetApp().Yield()
 
     def on_delete(self, event):

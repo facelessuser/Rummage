@@ -15,10 +15,9 @@ import wx
 import sys
 import threading
 import traceback
-import calendar
 import webbrowser
-from time import time, sleep, ctime, mktime, strptime, gmtime
-from os.path import abspath, exists, basename, dirname, join, normpath, isdir, isfile, expanduser
+from time import time
+from os.path import abspath, exists, basename, dirname, normpath, isdir, isfile, expanduser
 import wx.lib.masked as masked
 import wx.lib.newevent
 import version
@@ -26,6 +25,7 @@ import version
 import _lib.pygrep as pygrep
 from _lib.epoch_timestamp import local_time_to_epoch_timestamp
 import _lib.notify as notify
+from _lib.localization import get as _
 
 import _gui.gui as gui
 import _gui.export_html as export_html
@@ -33,12 +33,11 @@ import _gui.export_csv as export_csv
 from _gui.settings import Settings, _PLATFORM
 from _gui.generic_dialogs import *
 from _gui.custom_app import DebugFrameExtender
-from _gui.custom_app import get_debug_mode
-from _gui.custom_app import debug, debug_struct, info, error
+from _gui.custom_app import debug, error
 from _gui.custom_statusbar import extend_sb, extend
 from _gui.regex_test_dialog import RegexTestDialog
 from _gui.autocomplete_combo import AutoCompleteCombo
-from _gui.load_search_dialog import LoadSearchDialog, glass
+from _gui.load_search_dialog import LoadSearchDialog
 from _gui.save_search_dialog import SaveSearchDialog
 from _gui.settings_dialog import SettingsDialog
 from _gui.about_dialog import AboutDialog
@@ -60,12 +59,62 @@ _RECORDS = 0
 _ERRORS = []
 _ABORT = False
 _RUNTIME = None
+
+SIZE_ANY = _("any")
+SIZE_GT = _("greater than")
+SIZE_EQ = _("equal to")
+SIZE_LT = _("less than")
+TIME_ANY = _("on any")
+TIME_GT = _("after")
+TIME_EQ = _("on")
+TIME_LT = _("before")
+
+
 LIMIT_COMPARE = {
     0: "any",
     1: "gt",
     2: "eq",
     3: "lt"
 }
+
+SIZE_LIMIT_I18N = {
+    SIZE_ANY: "any",
+    SIZE_GT: "greater than",
+    SIZE_EQ: "equal to",
+    SIZE_LT: "less than"
+}
+
+TIME_LIMIT_I18N = {
+    TIME_ANY: "on any",
+    TIME_GT: "after",
+    TIME_EQ: "on",
+    TIME_LT: "before"
+}
+
+SEARCH_BTN_STOP = _("Stop")
+SEARCH_BTN_SEARCH = _("Search")
+SEARCH_BTN_ABORT = _("Aborting")
+
+
+def eng_to_i18n(string, map):
+    """
+    Convert english to i18n
+    """
+
+    i18n = None
+    for k, v in map.items():
+        if v == string:
+            i18n = k
+            break
+    return i18n
+
+
+def i18n_to_eng(string, map):
+    """
+    Convert i18n to english
+    """
+
+    return map.get(string, None)
 
 
 def get_flags(args):
@@ -75,7 +124,7 @@ def get_flags(args):
 
     flags = 0
 
-    if args.regexfilepattern != None:
+    if args.regexfilepattern is not None:
         flags |= pygrep.FILE_REGEX_MATCH
 
     if not args.regexp:
@@ -100,7 +149,7 @@ def not_none(item, alt=None):
     Return item if not None, else return the alternate
     """
 
-    return item if item != None else alt
+    return item if item is not None else alt
 
 
 def replace_with_genericdatepicker(obj, key):
@@ -204,11 +253,11 @@ def threaded_grep(
         )
         grep.run()
     except:
-        print(str(traceback.format_exc()))
+        error(traceback.format_exc())
         pass
     bench = time() - start
     with _LOCK:
-        _RUNTIME = "%01.2f seconds" % bench
+        _RUNTIME = _("%01.2f seconds") % bench
         _RUNNING = False
 
 
@@ -336,7 +385,7 @@ class DirPickButton(object):
         directory = self.GetPath()
         if directory is None or not exists(directory) or not isdir(directory):
             directory = expanduser("~")
-        directory = dirpickermsg("Select directory to rummage", directory)
+        directory = dirpickermsg(_("Select directory to rummage"), directory)
         if directory is None or directory == "":
             directory = None
         self.SetPath(directory)
@@ -352,6 +401,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """
 
         super(RummageFrame, self).__init__(parent)
+
+        self.hide_limit_panel = False
 
         if _PLATFORM == "linux":
             self.m_progressbar.SetInitialSize(wx.Size(-1, 5))
@@ -369,11 +420,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args = GrepArgs()
         self.thread = None
 
-        [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
-
         # Setup debugging
         self.set_keybindings(
-            [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)],
+            [
+                (wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
+                (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
+            ],
             debug_event=self.on_debug_console
         )
 
@@ -396,8 +448,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_grep_notebook.DeletePage(1)
         self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
         self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
-        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, "Files", False)
-        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
+        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, _("Files"), False)
+        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, _("Content"), False)
         self.m_result_file_panel.load_table()
         self.m_result_content_panel.load_table()
         self.m_grep_notebook.SetSelection(0)
@@ -406,14 +458,98 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_progressbar.SetRange(100)
         self.m_progressbar.SetValue(0)
 
+        self.localize()
+
         # Setup the inputs history and replace
         # placeholder objects with actual objecs
         self.setup_inputs()
 
         # Pick optimal size
         self.optimize_size(True)
+        if Settings.get_hide_limit():
+            self.hide_limit_panel = True
+            self.limit_panel_hide()
+            self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
 
         self.init_search_path(start_path)
+
+    def localize(self):
+        self.m_search_panel.GetSizer().GetStaticBox().SetLabel(_("Search"))
+        self.m_limiter_panel.GetSizer().GetStaticBox().SetLabel(_("Limit Search"))
+        self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
+        self.m_searchin_label.SetLabel(_("Where"))
+        self.m_searchfor_label.SetLabel(_("What"))
+        self.m_size_is_label.SetLabel(_("Size is"))
+        self.m_modified_label.SetLabel(_("Modified"))
+        self.m_created_label.SetLabel(_("Created"))
+        self.m_exclude_label.SetLabel(_("Exclude folders"))
+        self.m_filematch_label.SetLabel(_("Files which match"))
+        self.m_regex_search_checkbox.SetLabel(_("Search with regex"))
+        self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
+        self.m_dotmatch_checkbox.SetLabel(_("Dot matches newline"))
+        self.m_utf8_checkbox.SetLabel(_("Treat all as UTF-8"))
+        self.m_boolean_checkbox.SetLabel(_("Boolean match"))
+        self.m_count_only_checkbox.SetLabel(_("Count only"))
+        self.m_subfolder_checkbox.SetLabel(_("Include subfolders"))
+        self.m_hidden_checkbox.SetLabel(_("Include hidden"))
+        self.m_binary_checkbox.SetLabel(_("Include binary files"))
+        self.m_dirregex_checkbox.SetLabel(_("Regex"))
+        self.m_fileregex_checkbox.SetLabel(_("Regex"))
+        self.m_regex_test_button.SetLabel(_("Test Regex"))
+        self.m_save_search_button.SetLabel(_("Save Search"))
+        self.m_load_search_button.SetLabel(_("Load Search"))
+        self.m_grep_notebook.SetPageText(0, _("Search"))
+        exportid = self.m_menu.FindMenuItem("File", "Export")
+        self.m_menu.SetLabel(exportid, _("Export"))
+        self.m_menu.SetMenuLabel(0, _("File"))
+        self.m_menu.SetMenuLabel(1, _("View"))
+        self.m_menu.SetMenuLabel(2, _("Help"))
+        self.m_preferences_menuitem.SetItemLabel(_("&Preferences"))
+        self.m_quit_menuitem.SetItemLabel(_("&Exit"))
+        self.m_export_html_menuitem.SetItemLabel(_("HTML"))
+        self.m_export_csv_menuitem.SetItemLabel(_("CSV"))
+        self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
+        self.m_about_menuitem.SetItemLabel(_("&About Rummage"))
+        self.m_documentation_menuitem.SetItemLabel(_("Documentation"))
+        self.m_issues_menuitem.SetItemLabel(_("Help and Support"))
+
+        self.m_logic_choice.Clear()
+        for x in [SIZE_ANY, SIZE_GT, SIZE_EQ, SIZE_LT]:
+            self.m_logic_choice.Append(x)
+
+        self.m_modified_choice.Clear()
+        for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
+            self.m_modified_choice.Append(x)
+
+        self.m_created_choice.Clear()
+        for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
+            self.m_created_choice.Append(x)
+        self.Fit()
+
+    def on_enter_key(self, event):
+        """
+        Search on enter
+        """
+
+        obj = self.FindFocus()
+        is_ac_combo = isinstance(obj, AutoCompleteCombo)
+        is_date_picker = isinstance(obj, wx.GenericDatePickerCtrl)
+        is_button = isinstance(obj, wx.Button)
+        if (
+            (
+                is_ac_combo and not obj.IsPopupShown() or
+                (not is_ac_combo and not is_date_picker and not is_button)
+            ) and
+            self.m_grep_notebook.GetSelection() == 0
+        ):
+            self.start_search()
+        elif is_button:
+            wx.PostEvent(
+                obj.GetEventHandler(),
+                wx.PyCommandEvent(wx.EVT_BUTTON.typeId, obj.GetId())
+            )
+
+        event.Skip()
 
     def on_textctrl_selectall(self, event):
         """
@@ -435,7 +571,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_searchin_text.safe_set_value(abspath(normpath(start_path)))
         self.m_searchfor_textbox.GetTextCtrl().SetFocus()
 
-    def optimize_size(self, first_time=False):
+    def optimize_size(self, first_time=False, height_only=False):
         """
         Optimally resize window
         """
@@ -444,10 +580,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
-        if first_time or offset > 0:
+        if first_time or offset > 0 or height_only:
             self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         if first_time:
             self.SetMinSize(self.GetSize())
+        elif height_only:
+            min_size = self.GetMinSize()
+            self.SetMinSize(wx.Size(min_size[0], mainframe[1] + offset + 15))
         self.Refresh()
 
     def setup_inputs(self):
@@ -458,7 +597,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
 
-        self.m_logic_choice.SetStringSelection(Settings.get_search_setting("size_compare_string", "any"))
+        self.m_logic_choice.SetStringSelection(
+            eng_to_i18n(
+                Settings.get_search_setting("size_compare_string", "any"),
+                SIZE_LIMIT_I18N
+            )
+        )
         self.m_size_text.SetValue(Settings.get_search_setting("size_limit_string", "1000"))
 
         self.m_case_checkbox.SetValue(not Settings.get_search_setting("ignore_case_toggle", False))
@@ -471,8 +615,18 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
 
-        self.m_modified_choice.SetStringSelection(Settings.get_search_setting("modified_compare_string", "on any"))
-        self.m_created_choice.SetStringSelection(Settings.get_search_setting("created_compare_string", "on any"))
+        self.m_modified_choice.SetStringSelection(
+            eng_to_i18n(
+                Settings.get_search_setting("modified_compare_string", "on any"),
+                TIME_LIMIT_I18N
+            )
+        )
+        self.m_created_choice.SetStringSelection(
+            eng_to_i18n(
+                Settings.get_search_setting("created_compare_string", "on any"),
+                TIME_LIMIT_I18N
+            )
+        )
 
         # GUI is built with WxFormBuilder, but it isn't easy to fill in custom objects.
         # So place holder objects are added for the sake of planning the gui, and then they
@@ -508,9 +662,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if _PLATFORM != "osx":
             self.m_searchin_text.MoveBeforeInTabOrder(self.m_searchin_dir_picker)
             self.m_searchfor_textbox.MoveBeforeInTabOrder(self.m_regex_search_checkbox)
-            self.m_modified_date_picker.MoveAfterInTabOrder(self.m_size_text)
+            self.m_modified_choice.MoveAfterInTabOrder(self.m_size_text)
+            self.m_modified_date_picker.MoveAfterInTabOrder(self.m_modified_choice)
             self.m_modified_time_picker.MoveAfterInTabOrder(self.m_modified_date_picker)
-            self.m_created_date_picker.MoveAfterInTabOrder(self.m_modified_time_picker)
+            self.m_created_choice.MoveAfterInTabOrder(self.m_modified_time_picker)
+            self.m_created_date_picker.MoveAfterInTabOrder(self.m_created_choice)
             self.m_created_time_picker.MoveAfterInTabOrder(self.m_created_date_picker)
             self.m_exclude_textbox.MoveBeforeInTabOrder(self.m_dirregex_checkbox)
             self.m_filematch_textbox.MoveBeforeInTabOrder(self.m_fileregex_checkbox)
@@ -566,7 +722,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         search = self.m_searchfor_textbox.GetValue()
         if search == "":
-            errormsg("There is no search to save!")
+            errormsg(_("There is no search to save!"))
             return
         dlg = SaveSearchDialog(self, search, self.m_regex_search_checkbox.GetValue())
         dlg.ShowModal()
@@ -585,23 +741,45 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_searchfor_textbox.SetValue(search)
             self.m_regex_search_checkbox.SetValue(regex_search)
 
+    def limit_panel_toggle(self):
+        """
+        Show/Hide limit panel
+        """
+
+        if not self.hide_limit_panel:
+            pth = self.m_searchin_text.GetValue()
+            if isfile(pth):
+                self.m_limiter_panel.Hide()
+                self.m_limiter_panel.GetContainingSizer().Layout()
+                self.optimize_size()
+            else:
+                self.m_limiter_panel.Show()
+                self.m_limiter_panel.Fit()
+                self.m_limiter_panel.GetSizer().Layout()
+                self.m_limiter_panel.GetContainingSizer().Layout()
+                self.m_settings_panel.GetSizer().Layout()
+                self.optimize_size()
+        else:
+            self.m_limiter_panel.Hide()
+            self.m_limiter_panel.GetContainingSizer().Layout()
+            self.optimize_size()
+
+    def limit_panel_hide(self):
+        """
+        Hide the limit panel
+        """
+
+        self.limit_panel_toggle()
+        self.optimize_size(height_only=True)
+
     def check_searchin(self):
         """
         Determine if search in input is a file or not, and hide/show elements accordingly
         """
 
+        self.limit_panel_toggle()
+
         pth = self.m_searchin_text.GetValue()
-        if isfile(pth):
-            self.m_limiter_panel.Hide()
-            self.m_limiter_panel.GetContainingSizer().Layout()
-            self.optimize_size()
-        else:
-            self.m_limiter_panel.Show()
-            self.m_limiter_panel.Fit()
-            self.m_limiter_panel.GetSizer().Layout()
-            self.m_limiter_panel.GetContainingSizer().Layout()
-            self.m_settings_panel.GetSizer().Layout()
-            self.optimize_size()
         if not self.searchin_update:
             if isdir(pth):
                 self.m_searchin_dir_picker.SetPath(pth)
@@ -611,6 +789,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def on_search_click(self, event):
         """
+        Search button click
+        """
+
+        self.start_search()
+        event.Skip()
+
+    def start_search(self):
+        """
         Initiate search or stop search depending on search state
         """
 
@@ -618,9 +804,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if self.debounce_search:
                 return
         self.debounce_search = True
-        if self.m_search_button.GetLabel() in ["Stop", "Aborting"]:
+        if self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
             if self.thread is not None:
-                self.m_search_button.SetLabel("Aborting")
+                self.m_search_button.SetLabel(SEARCH_BTN_ABORT)
                 global _ABORT
                 with _LOCK:
                     _ABORT = True
@@ -631,7 +817,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if not self.validate_search_inputs():
                 self.do_search()
             self.debounce_search = False
-        event.Skip()
 
     def validate_search_inputs(self):
         """
@@ -643,41 +828,44 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         msg = ""
         if self.m_regex_search_checkbox.GetValue():
             if self.m_searchfor_textbox.GetValue() == "" or self.validate_search_regex():
-                msg = "Please enter a valid search regex!"
+                msg = _("Please enter a valid search regex!")
                 fail = True
         elif self.m_searchfor_textbox.GetValue() == "":
-            msg = "Please enter a valid search!"
+            msg = _("Please enter a valid search!")
             fail = True
         if not fail and self.m_fileregex_checkbox.GetValue():
             if self.m_filematch_textbox.GetValue().strip() == "" or self.validate_regex(self.m_filematch_textbox.Value):
                 msg = "Please enter a valid file regex!"
                 fail = True
         elif self.m_filematch_textbox.GetValue().strip() == "":
-            msg = "Please enter a valid file pattern!"
+            msg = _("Please enter a valid file pattern!")
             fail = True
         if not fail and self.m_dirregex_checkbox.GetValue():
             if self.validate_regex(self.m_exclude_textbox.Value):
-                msg = "Please enter a valid exlcude directory regex!"
+                msg = _("Please enter a valid exlcude directory regex!")
                 fail = True
-        if not exists(self.m_searchin_text.GetValue()):
-            msg = "Please enter a valid search path!"
+        if not fail and not exists(self.m_searchin_text.GetValue()):
+            msg = _("Please enter a valid search path!")
             fail = True
         if (
+            not fail and
             self.m_logic_choice.GetStringSelection() != "any" and
             re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
         ):
-            msg = "Please enter a valid size!"
+            msg = _("Please enter a valid size!")
             fail = True
-        try:
-            self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
-        except:
-            msg = "Please enter a modified date!"
-            fail = True
-        try:
-            self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
-        except:
-            msg = "Please enter a created date!"
-            fail = True
+        if not fail:
+            try:
+                self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+            except:
+                msg = _("Please enter a modified date!")
+                fail = True
+        if not fail:
+            try:
+                self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
+            except:
+                msg = _("Please enter a created date!")
+                fail = True
         if fail:
             errormsg(msg)
         return fail
@@ -724,10 +912,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.remove_icon("errors")
 
         # Change button to stop search
-        self.m_search_button.SetLabel("Stop")
+        self.m_search_button.SetLabel(SEARCH_BTN_STOP)
 
         # Init search status
-        self.m_statusbar.set_status("Searching: 0/0 0%% Matches: 0")
+        self.m_statusbar.set_status(_("Searching: 0/0 0%% Matches: 0"))
 
         # Setup arguments
         self.set_arguments()
@@ -764,8 +952,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_grep_notebook.DeletePage(1)
         self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
         self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
-        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, "Files", False)
-        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, "Content", False)
+        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, _("Files"), False)
+        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, _("Content"), False)
 
         # Run search thread
         self.thread.start()
@@ -862,20 +1050,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("count_only_toggle", self.args.count_only)
         ]
 
+        eng_size = i18n_to_eng(self.m_logic_choice.GetStringSelection(), SIZE_LIMIT_I18N)
+        eng_mod = i18n_to_eng(self.m_modified_choice.GetStringSelection(), TIME_LIMIT_I18N)
+        eng_cre = i18n_to_eng(self.m_created_choice.GetStringSelection(), TIME_LIMIT_I18N)
         strings = [
-            ("size_compare_string", self.m_logic_choice.GetStringSelection()),
-            ("modified_compare_string", self.m_modified_choice.GetStringSelection()),
-            ("created_compare_string", self.m_created_choice.GetStringSelection())
+            ("size_compare_string", eng_size),
+            ("modified_compare_string", eng_mod),
+            ("created_compare_string", eng_cre)
         ]
 
-        if self.m_logic_choice.GetStringSelection() != "any":
+        if eng_size != "any":
             strings += [("size_limit_string", self.m_size_text.GetValue())]
-        if self.m_modified_choice.GetStringSelection() != "on any":
+        if eng_mod != "on any":
             strings += [
                 ("modified_date_string", self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")),
                 ("modified_time_string", self.m_modified_time_picker.GetValue())
             ]
-        if self.m_created_choice.GetStringSelection() != "on any":
+        if eng_cre != "on any":
             strings += [
                 ("created_date_string", self.m_created_date_picker.GetValue().Format("%m/%d/%Y")),
                 ("created_time_string", self.m_created_time_picker.GetValue())
@@ -929,10 +1120,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     benchmark = _RUNTIME
 
                 self.stop_update_timer()
-                self.m_search_button.SetLabel("Search")
+                self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
                 if self.kill:
                     self.m_statusbar.set_status(
-                        "Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (
+                        _("Searching: %d/%d %d%% Matches: %d Benchmark: %s") % (
                             completed,
                             completed,
                             100,
@@ -944,8 +1135,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_progressbar.SetValue(completed)
                     if Settings.get_notify():
                         notify.error(
-                            "Search Aborted",
-                            "\n%d matches found!" % (count2 - self.non_match_record),
+                            _("Search Aborted"),
+                            _("\n%d matches found!") % (count2 - self.non_match_record),
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -953,7 +1144,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.kill = False
                 else:
                     self.m_statusbar.set_status(
-                        "Searching: %d/%d %d%% Matches: %d Benchmark: %s" % (
+                        _("Searching: %d/%d %d%% Matches: %d Benchmark: %s") % (
                             completed,
                             completed,
                             100,
@@ -965,8 +1156,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_progressbar.SetValue(100)
                     if Settings.get_notify():
                         notify.info(
-                            "Search Completed",
-                            "\n%d matches found!" % (count2 - self.non_match_record),
+                            _("Search Completed"),
+                            _("\n%d matches found!") % (count2 - self.non_match_record),
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -978,14 +1169,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         graphic.Rescale(16, 16)
                         image = wx.BitmapFromImage(graphic)
                         self.m_statusbar.set_icon(
-                            "errors", image,
-                            msg="%d errors\nSee log for details." % self.error_count,
-                            context=[("View Log", lambda e: self.open_debug_console())]
+                            _("errors"), image,
+                            msg=_("%d errors\nSee log for details.") % self.error_count,
+                            context=[(_("View Log"), lambda e: self.open_debug_console())]
                         )
                         for e in _ERRORS:
                             error(
-                                "Cound not process %s:\n%s" % (
-                                    unicode(e.info.name) if e.info is not None else "file", e.error
+                                _("Cound not process %s:\n%s") % (
+                                    unicode(e.info.name) if e.info is not None else _("file"), e.error
                                 )
                             )
                         _ERRORS = []
@@ -1052,7 +1243,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if p_value != done:
             self.m_progressbar.SetValue(actually_done)
         self.m_statusbar.set_status(
-            "Searching: %d/%d %d%% Matches: %d" % (
+            _("Searching: %d/%d %d%% Matches: %d") % (
                 actually_done, total,
                 int(float(actually_done)/float(total) * 100),
                 (count2 - self.non_match_record)
@@ -1114,7 +1305,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             re.compile(pattern, flags)
             return False
         except:
-            errormsg("Invalid Regular Expression!")
+            errormsg(_("Invalid Regular Expression!"))
+            error(traceback.format_exc())
             return True
 
     def on_debug_console(self, event):
@@ -1154,40 +1346,76 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.tester.Show()
 
     def on_export_html(self, event):
+        """
+        Export to HTML
+        """
+
         if (
             len(self.m_result_file_panel.list.itemDataMap) == 0 and
             len(self.m_result_content_panel.list.itemDataMap) == 0
         ):
-            errormsg("There is nothing to export!")
+            errormsg(_("There is nothing to export!"))
             return
-        html_file = filepickermsg("Export to...", "*.html", True)
+        html_file = filepickermsg(_("Export to..."), "*.html", True)
         if html_file is None:
             return
-        export_html.export(
-            html_file,
-            self.args.pattern,
-            self.args.regexp,
-            self.m_result_file_panel.list.itemDataMap,
-            self.m_result_content_panel.list.itemDataMap
-        )
+        try:
+            export_html.export(
+                html_file,
+                self.args.pattern,
+                self.args.regexp,
+                self.m_result_file_panel.list.itemDataMap,
+                self.m_result_content_panel.list.itemDataMap
+            )
+        except:
+            error(traceback.format_exc())
+            errormsg(_("There was a problem exporting the HTML!  See the log for more info."))
 
     def on_export_csv(self, event):
+        """
+        Export to CSV
+        """
+
         if (
             len(self.m_result_file_panel.list.itemDataMap) == 0 and
             len(self.m_result_content_panel.list.itemDataMap) == 0
         ):
-            errormsg("There is nothing to export!")
+            errormsg(_("There is nothing to export!"))
             return
-        csv_file = filepickermsg("Export to...", "*.csv", True)
+        csv_file = filepickermsg(_("Export to..."), "*.csv", True)
         if csv_file is None:
             return
-        export_csv.export(
-            csv_file,
-            self.args.pattern,
-            self.args.regexp,
-            self.m_result_file_panel.list.itemDataMap,
-            self.m_result_content_panel.list.itemDataMap
-        )
+        try:
+            export_csv.export(
+                csv_file,
+                self.args.pattern,
+                self.args.regexp,
+                self.m_result_file_panel.list.itemDataMap,
+                self.m_result_content_panel.list.itemDataMap
+            )
+        except:
+            error(traceback.format_exc())
+            errormsg(_("There was a problem exporting the CSV!  See the log for more info."))
+
+    def on_hide_limit(self, event):
+        """
+        Hide limit panel
+        """
+
+        self.hide_limit_panel = not self.hide_limit_panel
+        self.limit_panel_hide()
+        Settings.set_hide_limit(self.hide_limit_panel)
+        if self.hide_limit_panel:
+            self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
+        else:
+            self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
+
+    def on_documentation(self, event):
+        """
+        Open documentation site
+        """
+
+        webbrowser.open_new_tab(version.manual)
 
     def on_issues(self, event):
         """

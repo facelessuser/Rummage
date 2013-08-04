@@ -11,12 +11,38 @@ from _icons.glass import glass
 
 from sorttable.sorttable import sorttable as SORT_JS
 
+from _lib.localization import get as _
+from _lib.localization import get_current_domain
+
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
 elif sys.platform == "darwin":
     _PLATFORM = "osx"
 else:
     _PLATFORM = "linux"
+
+
+def html_encode(text):
+    """
+    Format text for HTML
+    """
+
+    encode_table = {
+        '&':  '&amp;',
+        '>':  '&gt;',
+        '<':  '&lt;',
+        '\t': ' ' * 4,
+        '\n': '',
+        '\r': ''
+    }
+
+    return re.sub(
+        r'(?!\s($|\S))\s',
+        '&nbsp;',
+        ''.join(
+            encode_table.get(c, c) for c in text
+        ).encode('ascii', 'xmlcharrefreplace')
+    )
 
 
 CSS_HTML = \
@@ -158,12 +184,16 @@ div.main {
 
 '''
 
+TITLE = html_encode(_("Rummage Results"))
+
 HTML_HEADER = \
 '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+<META HTTP-EQUIV="Content-Language" Content="%(lang)s">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <link rel="icon" type"image/png" href="data:image/png;base64,%(icon)s"/>
-<title>Rummage Results</title>
+<title>%(title)s</title>
 <style type="text/css">
 %(css)s
 </style>
@@ -190,15 +220,23 @@ RESULT_ROW = \
 RESULT_TABLE_HEADER = \
 '''
 <tr>
-<th>File</th>
-<th>Size</th>
-<th>Matches</th>
-<th>Path</th>
-<th>Encoding</th>
-<th>Modified</th>
-<th>Created</th>
+<th>%(file)s</th>
+<th>%(size)s</th>
+<th>%(matches)s</th>
+<th>%(path)s</th>
+<th>%(encoding)s</th>
+<th>%(modified)s</th>
+<th>%(created)s</th>
 </tr>
-'''
+''' % {
+    "file": html_encode(_("File")),
+    "size": html_encode(_("Size")),
+    "matches": html_encode(_("Matches")),
+    "path": html_encode(_("Path")),
+    "encoding": html_encode(_("Encoding")),
+    "modified": html_encode(_("Modified")),
+    "created": html_encode(_("Created"))
+}
 
 RESULT_CONTENT_ROW = \
 '''
@@ -213,18 +251,26 @@ RESULT_CONTENT_ROW = \
 RESULT_CONTENT_TABLE_HEADER = \
 '''
 <tr>
-<th>File</th>
-<th>Line</th>
-<th>Matches</th>
-<th>Context</th>
+<th>%(file)s</th>
+<th>%(line)s</th>
+<th>%(matches)s</th>
+<th>%(context)s</th>
 </tr>
-'''
+''' % {
+    "file": html_encode(_("File")),
+    "line": html_encode(_("Line")),
+    "matches": html_encode(_("Matches")),
+    "context": html_encode(_("Context"))
+}
+
+FILES = html_encode(_("Files"))
+CONTENT = html_encode(_("Content"))
 
 TABS_START = \
 '''
 <div id="bar">
-<a id="tabbutton1" href="javascript:select_tab(1)">Files</a>
-<a id="tabbutton2" href="javascript:select_tab(2)">Content</a>
+<a id="tabbutton1" href="javascript:select_tab(1)">%(file_tab)s</a>
+<a id="tabbutton2" href="javascript:select_tab(2)">%(content_tab)s</a>
 </div>
 
 <div class="main">
@@ -233,15 +279,19 @@ TABS_START = \
 TABS_START_SINGLE = \
 '''
 <div id="bar">
-<a id="tabbutton1" href="javascript:select_tab(1)">Files</a>
+<a id="tabbutton1" href="javascript:select_tab(1)">%(file_tab)s</a>
 </div>
 
 <div class="main">
 '''
 
+SEARCH_LABEL_REGEX = html_encode(_("Regex search:"))
+
+SEARCH_LABEL_LITERAL = html_encode(_("Literal search:"))
+
 TABS_END = \
 '''
-<label id="search_label">%(type)s search: %(search)s</label>
+<label id="search_label">%(label)s %(search)s</label>
 </div>
 '''
 
@@ -284,25 +334,6 @@ BODY_END = \
 </body>
 </html>
 '''
-
-def html_encode(text):
-    # Format text to HTML
-    encode_table = {
-        '&':  '&amp;',
-        '>':  '&gt;',
-        '<':  '&lt;',
-        '\t': ' ' * 4,
-        '\n': '',
-        '\r': ''
-    }
-
-    return re.sub(
-        r'(?!\s($|\S))\s',
-        '&nbsp;',
-        ''.join(
-            encode_table.get(c, c) for c in text
-        ).encode('ascii', 'xmlcharrefreplace')
-    )
 
 
 def export_result_list(res, html):
@@ -364,17 +395,24 @@ def export(export_html, search, regex_search, result_list, result_content_list):
                 "js": SORT_JS,
                 "morejs": LOAD_TAB,
                 "css": CSS_HTML,
-                "icon": base64.b64encode(glass.GetData())
+                "icon": base64.b64encode(glass.GetData()),
+                "title": TITLE,
+                "lang": get_current_domain()
             }
         )
         html.write(BODY_START % {"icon": base64.b64encode(rum_64.GetData())})
-        html.write(TABS_START if len(result_content_list) else TABS_START_SINGLE)
+        html.write(
+            (TABS_START if len(result_content_list) else TABS_START_SINGLE) % {
+                "file_tab": FILES,
+                "content_tab": CONTENT
+            }
+        )
         export_result_list(result_list, html)
         export_result_content_list(result_content_list, html)
         html.write(
             TABS_END % {
                 "search": html_encode(search),
-                "type": "Regex" if regex_search else "Literal"
+                "label": SEARCH_LABEL_REGEX if regex_search else SEARCH_LABEL_LITERAL
             }
         )
         html.write(TAB_INIT)

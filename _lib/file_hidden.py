@@ -12,10 +12,6 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
-if _PLATFORM == "osx":
-    import Foundation
-elif _PLATFORM == "windows":
-    import ctypes
 
 _OSX_FOUNDATION_NOT_LOADED = 0
 _OSX_USE_FOUNDATION = 1
@@ -90,7 +86,7 @@ if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
         kCFURLIsHiddenKey = ctypes.c_void_p.in_dll(cf, 'kCFURLIsHiddenKey')
 
         @contextlib.contextmanager
-        def cfreleasing(stuff):
+        def cfreleasing(objects):
             """
             Releasing Foundation objects
             """
@@ -100,7 +96,6 @@ if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
             finally:
                 for obj in objects:
                     cf.CFRelease(obj)
-
 
         def is_osx_hidden(path):
             """

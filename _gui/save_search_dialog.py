@@ -17,6 +17,8 @@ import _gui.gui as gui
 from _gui.settings import Settings
 from _gui.generic_dialogs import errormsg
 
+from _lib.localization import get as _
+
 
 class SaveSearchDialog(gui.SaveSearchDialog):
     def __init__(self, parent, search, is_regex):
@@ -34,6 +36,8 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.search = search
         self.is_regex = is_regex
 
+        self.localize()
+
         # Ensure good sizing for dialog
         best = self.m_save_panel.GetBestSize()
         current = self.m_save_panel.GetSize()
@@ -42,6 +46,13 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
         self.m_name_text.SetFocus()
+
+    def localize(self):
+        self.SetTitle(_("Save Search"))
+        self.m_apply_button.SetLabel(_("Save"))
+        self.m_cancel_button.SetLabel(_("Cancel"))
+        self.m_name_label.SetLabel(_("Name"))
+        self.Fit()
 
     def set_keybindings(self, keybindings):
         """
@@ -74,7 +85,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
 
         value = self.m_name_text.GetValue()
         if value == "":
-            errormsg("Please give the search a name!")
+            errormsg(_("Please give the search a name!"))
             return
 
         Settings.add_search(value, self.search, self.is_regex)

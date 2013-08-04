@@ -1,8 +1,8 @@
 from time import ctime
-from os.path import join
 import codecs
 import sys
 import subprocess
+from _lib.localization import get as _
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -11,30 +11,41 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
-
-RESULT_ROW = u'''"%(file)s","%(size)s","%(matches)s","%(path)s","%(encoding)s","%(modified)s","%(created)s"\n'''
-
-
-RESULT_TABLE_HEADER = u'''File,Size,Matches,Path,Encoding,Modified,Created\n'''
-
-
-RESULT_CONTENT_ROW = '''"%(file)s","%(line)s","%(matches)s","%(context)s"\n'''
-
-
-RESULT_CONTENT_TABLE_HEADER = '''File,Line,Matches,Context\n'''
+if _PLATFORM == "windows":
+    from os import startfile
 
 
 def csv_encode(text):
-    # Format text to HTML
+    """
+    Format text for CSV
+    """
+
     encode_table = {
         '"':  '""',
         '\n': '',
         '\r': ''
     }
 
-    return ''.join(
+    return '"%s"' % ''.join(
         encode_table.get(c, c) for c in text
     )
+
+
+REGEX_SEARCH = csv_encode(_("Regex Search"))
+
+LITERAL_SEARCH = csv_encode(_("Literal Search"))
+
+
+RESULT_ROW = '%(file)s,%(size)s,%(matches)s,%(path)s,%(encoding)s,%(modified)s,%(created)s\n'
+
+
+RESULT_TABLE_HEADER = ','.join([csv_encode(x) for x in [_('File'), _('Size'), _('Matches'), _('Path'), _('Encoding'), _('Modified'), _('Created')]]) + "\n"
+
+
+RESULT_CONTENT_ROW = '%(file)s,%(line)s,%(matches)s,%(context)s\n'
+
+
+RESULT_CONTENT_TABLE_HEADER = ','.join([csv_encode(x) for x in [_('File'), _('Line'), _('Matches'), _('Context')]]) + "\n"
 
 
 def export_result_list(res, csv):
@@ -85,7 +96,8 @@ def export_result_content_list(res, csv):
 def export(export_csv, search, regex_search, result_list, result_content_list):
 
     with codecs.open(export_csv, "w", encoding="utf-8") as csv:
-        search_expression = "Regex Search, %s\n\n" % csv_encode(search) if regex_search else "Literal Search, %s\n\n" % csv_encode(search)
+        csv.write(u'\uFEFF')
+        search_expression = "%s,%s\n\n" % ((REGEX_SEARCH if regex_search else LITERAL_SEARCH), csv_encode(search))
         csv.write(search_expression)
         export_result_list(result_list, csv)
         export_result_content_list(result_content_list, csv)
@@ -93,7 +105,7 @@ def export(export_csv, search, regex_search, result_list, result_content_list):
     if _PLATFORM == "osx":
         subprocess.Popen(['open', csv.name])
     elif _PLATFORM == "windows":
-        os.startfile(csv.name)
+        startfile(csv.name)
     else:
         try:
             # Maybe...?

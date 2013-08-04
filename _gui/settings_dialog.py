@@ -16,6 +16,11 @@ from _gui.settings import Settings
 from _gui.editor_dialog import EditorDialog
 from _gui.platform_window_focus import platform_window_focus
 
+from _lib.localization import get as _
+
+
+RECORDS = _("%d Records")
+
 
 class SettingsDialog(gui.SettingsDialog):
     def __init__(self, parent):
@@ -40,7 +45,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.editor = Settings.get_editor()
         self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
-        self.m_history_label.SetLabel("%d Records" % history_records)
+        self.m_history_label.SetLabel(RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
         self.m_debug_checkbox.SetValue(Settings.get_debug())
 
@@ -51,6 +56,15 @@ class SettingsDialog(gui.SettingsDialog):
         for a in self.alert_methods:
             self.m_notify_choice.Append(a)
         self.m_notify_choice.SetStringSelection(Settings.get_notify_method())
+        self.m_lang_choice.Clear()
+        for l in Settings.get_languages():
+            self.m_lang_choice.Append(l)
+        locale = Settings.get_language()
+        if locale is None:
+            locale = "en_US"
+        self.m_lang_choice.SetStringSelection(locale)
+
+        self.localize()
 
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
@@ -58,6 +72,28 @@ class SettingsDialog(gui.SettingsDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+    def localize(self):
+        """
+        Localize dialog
+        """
+
+        self.SetTitle(_("Preferences"))
+        main_sizer = self.m_settings_panel.GetSizer()
+        main_sizer.GetItem(0).GetSizer().GetStaticBox().SetLabel(_("Editor"))
+        main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(_("General"))
+        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Notifications"))
+        main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(_("History"))
+        self.m_single_checkbox.SetLabel(_("Single Instance (applies to new instances)"))
+        self.m_debug_checkbox.SetLabel(_("Enable debug level"))
+        self.m_visual_alert_checkbox.SetLabel(_("Notification popup"))
+        self.m_audio_alert_checkbox.SetLabel(_("Alert Sound"))
+        self.m_language_label.SetLabel(_("Language (restart required)"))
+        self.m_editor_button.SetLabel(_("change"))
+        self.m_debug_button.SetLabel(_("Show Log"))
+        self.m_history_clear_button.SetLabel(_("Clear"))
+        self.m_close_button.SetLabel(_("Close"))
+        self.Fit()
 
     def history_cleared(self):
         """
@@ -86,7 +122,7 @@ class SettingsDialog(gui.SettingsDialog):
 
         Settings.clear_history_records(self.history_types)
         self.history_records_cleared = True
-        self.m_history_label.SetLabel("0 Records")
+        self.m_history_label.SetLabel(RECORDS % 0)
         self.m_history_clear_button.Enable(False)
 
     def on_notify_choice(self, event):
@@ -136,6 +172,15 @@ class SettingsDialog(gui.SettingsDialog):
         stdiowin = wx.GetApp().stdioWin
         if stdiowin is not None:
             platform_window_focus(stdiowin.frame)
+
+    def on_language(self, event):
+        """
+        Set selected on_language
+        """
+
+        value = self.m_lang_choice.GetStringSelection()
+        Settings.set_language(value)
+        event.Skip()
 
     def on_cancel(self, event):
         """
