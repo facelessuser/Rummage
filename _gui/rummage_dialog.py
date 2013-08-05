@@ -580,13 +580,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
-        if first_time or offset > 0 or height_only:
-            self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
-        if first_time:
-            self.SetMinSize(self.GetSize())
+        if (first_time or offset > 0) and not height_only:
+            sz = wx.Size(mainframe[0], mainframe[1] + offset + 15)
+            if first_time:
+                self.SetMinSize(sz)
+            self.SetSize(sz)
         elif height_only:
             min_size = self.GetMinSize()
             self.SetMinSize(wx.Size(min_size[0], mainframe[1] + offset + 15))
+            self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.Refresh()
 
     def setup_inputs(self):
