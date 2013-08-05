@@ -276,6 +276,10 @@ msgstr "%01.2f секунд"
 msgid "Select directory to rummage"
 msgstr "Выбрать директорию"
 
+#: _gui/rummage_dialog.py:472 _gui/rummage_dialog.py:1409
+msgid "Show Limit Search Panel"
+msgstr "Скрыть расширенные настройки"
+
 #: _gui/rummage_dialog.py:473
 msgid "Limit Search"
 msgstr "Ограничить поиск"
@@ -344,6 +348,10 @@ msgstr "Загрузить результаты поиска"
 msgid "Export"
 msgstr "Экспорт"
 
+#: _gui/rummage_dialog.py:505
+msgid "View"
+msgstr "Вид"
+
 #: _gui/rummage_dialog.py:500
 msgid "Help"
 msgstr "Справка"
@@ -363,6 +371,10 @@ msgstr ""
 #: _gui/rummage_dialog.py:504
 msgid "CSV"
 msgstr ""
+
+#: _gui/rummage_dialog.py:511 _gui/rummage_dialog.py:1411
+msgid "Hide Limit Search Panel"
+msgstr "Скрыть расширенные настройки"
 
 #: _gui/rummage_dialog.py:505
 msgid "&About Rummage"
