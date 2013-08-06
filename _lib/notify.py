@@ -226,8 +226,7 @@ def setup_notify_growl(app_name):
         )
 
         GROWL.register()
-    except Exception as e:
-        print str(e)
+    except:
         GROWL = None
 
     if GROWL is not None:
