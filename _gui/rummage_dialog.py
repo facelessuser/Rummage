@@ -406,8 +406,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if _PLATFORM == "linux":
             self.m_progressbar.SetInitialSize(wx.Size(-1, 5))
-            self.m_progressbar.GetContainingSizer().Layout()
-            self.Fit()
 
         self.SetIcon(rum_64.GetIcon())
 
@@ -576,6 +574,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         Optimally resize window
         """
 
+        if _PLATFORM == "linux":
+            self.GetSizer().Layout()
+            self.Fit()
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
@@ -587,8 +588,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.SetSize(sz)
         elif height_only:
             min_size = self.GetMinSize()
-            self.SetMinSize(wx.Size(min_size[0], mainframe[1] + offset + 15))
-            self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+            if _PLATFORM == "linux" and not self.hide_limit_panel:
+                self.SetMinSize(wx.Size(min_size[0], mainframe[1]))
+                self.SetSize(wx.Size(mainframe[0], mainframe[1]))
+            else:
+                self.SetMinSize(wx.Size(min_size[0], mainframe[1] + offset + 15))
+                self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.Refresh()
 
     def setup_inputs(self):
