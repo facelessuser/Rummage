@@ -98,7 +98,7 @@ table.sortable tbody tr:nth-child(2n) td {
   background: #eeeeee;
 }
 table.sortable tbody tr:nth-child(2n+1) td {
-  background: #fffffff;
+  background: #ffffff;
 }
 /* Tab Bar */
 #bar a{
