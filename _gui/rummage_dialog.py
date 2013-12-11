@@ -922,7 +922,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_search_button.SetLabel(SEARCH_BTN_STOP)
 
         # Init search status
-        self.m_statusbar.set_status(_("Searching: 0/0 0%% Matches: 0"))
+        self.m_statusbar.set_status(_("Searching: 0/0 0% Matches: 0"))
 
         # Setup arguments
         self.set_arguments()
@@ -1118,6 +1118,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     results = _RESULTS[0:records - count2]
                     _RESULTS = _RESULTS[records - count2:len(_RESULTS)]
                 count1, count2 = self.update_table(count1, count2, completed, total, *results)
+            else:
+                self.m_statusbar.set_status(
+                    _("Searching: %d/%d %d%% Matches: %d") % (
+                        completed,
+                        total,
+                        int(float(completed)/float(total) * 100),
+                        (count2 - self.non_match_record)
+                    )
+                )
+                self.m_progressbar.SetRange(total)
+                self.m_progressbar.SetValue(completed)
             self.current_table_idx[0] = count1
             self.current_table_idx[1] = count2
 
