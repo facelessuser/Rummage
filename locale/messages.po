@@ -435,7 +435,7 @@ msgid "Please enter a created date!"
 msgstr ""
 
 #: _gui/rummage_dialog.py:918
-msgid "Searching: 0/0 0%% Matches: 0"
+msgid "Searching: 0/0 0% Matches: 0"
 msgstr ""
 
 #: _gui/rummage_dialog.py:1126 _gui/rummage_dialog.py:1147
@@ -579,4 +579,3 @@ msgstr ""
 #: _gui/settings_dialog.py:94
 msgid "Clear"
 msgstr ""
-

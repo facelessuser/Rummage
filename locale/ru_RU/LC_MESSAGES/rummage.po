@@ -421,8 +421,8 @@ msgid "Please enter a created date!"
 msgstr "Введите дату создания!"
 
 #: _gui/rummage_dialog.py:848
-msgid "Searching: 0/0 0%% Matches: 0"
-msgstr "Поиск: 0/0 0%% Найдено: 0"
+msgid "Searching: 0/0 0% Matches: 0"
+msgstr "Поиск: 0/0 0% Найдено: 0"
 
 #: _gui/rummage_dialog.py:1056 _gui/rummage_dialog.py:1077
 msgid "Searching: %d/%d %d%% Matches: %d Benchmark: %s"
