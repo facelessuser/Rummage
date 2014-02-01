@@ -11,6 +11,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+from __future__ import unicode_literals
 import threading
 import sys
 from os import walk
@@ -233,14 +234,53 @@ class _FileSearch(object):
             col += 1
         return col
 
+    def __get_row(self, start, line_map):
+        """
+        Get line number where result is found in file
+        """
+
+        # Binary Search
+        mn = 0
+        mx = len(line_map) - 1
+        if mx == -1 or start <= line_map[mn]:
+            return mn + 1
+
+        if start > line_map[-1]:
+            return mx + 2
+
+        while mx - mn != 1:
+            idx = mn + ((mx - mn) >> 1)
+            if start > line_map[idx]:
+                mn = idx
+            else:
+                mx = idx
+
+        return mx + 1
+
+        # # Linear Search
+        # line = 1
+        # for x in line_map:
+        #     if start > x:
+        #         line += 1
+        #     else:
+        #         break
+        # return line
+
     def __get_line_ending(self, file_content):
         """
         Get the line ending for the file content by
         scanning for and evaluating the first new line occurance.
         """
 
-        ending = LINE_ENDINGS.search(file_content)
-        return "\r" if ending is not None and ending.group(2) else "\n"
+        line_map = []
+        ending = None
+        for m in LINE_ENDINGS.finditer(file_content):
+            if ending is None:
+                ending = "\r" if m.group(2) else "\n"
+            line_map.append(m.end())
+        return "\n" if ending is None else ending, line_map
+        # ending = LINE_ENDINGS.search(file_content)
+        # return "\r" if ending is not None and ending.group(2) else "\n"
 
     def __findall(self, file_content):
         """
@@ -256,13 +296,14 @@ class _FileSearch(object):
         """
 
         line_ending = None
-
+        line_map = []
         file_record_sent = False
 
         for m in self.__findall(file_content):
             if not self.boolean and not self.count_only:
                 if line_ending is None:
-                    line_ending = self.__get_line_ending(file_content)
+                    # line_ending = self.__get_line_ending(file_content)
+                    line_ending, line_map = self.__get_line_ending(file_content)
 
             # Have we exceeded the maximum desired matches?
             if max_count is not None:
@@ -280,7 +321,8 @@ class _FileSearch(object):
                 lines, match, context = self.__get_lines(file_content, m, line_ending, binary)
 
                 yield MatchRecord(
-                    file_content.count(line_ending, 0, m.start()) + 1,     # lineno
+                    # file_content.count(line_ending, 0, m.start()) + 1,     # lineno
+                    self.__get_row(m.start(), line_map),                   # lineno
                     self.__get_col(file_content, m.start(), line_ending),  # colno
                     match,                                                 # Postion of match
                     lines,                                                 # Line(s) in which match is found
@@ -706,8 +748,10 @@ class Grep(object):
                 # Parse the given file
                 try:
                     for result in self.search.search(file_info, content, max_count, self.is_binary):
-                        # Report additional file info
-                        self.records += 1
+                        if result is not None:
+                            # Report additional file info
+                            self.records += 1
+
                         yield result
 
                         if max_count is not None and isinstance(result, MatchRecord):
@@ -741,7 +785,8 @@ class Grep(object):
         elif file_info is not None or content is not None:
             try:
                 for result in self.search.search(file_info, content, max_count, self.is_binary):
-                    self.records += 1
+                    if result is not None:
+                        self.records += 1
                     yield result
 
                     if self.kill:
@@ -770,7 +815,8 @@ class Grep(object):
         elif file_info is not None or content is not None:
             try:
                 for result in self.search.search(file_info, content, max_count, False):
-                    self.records += 1
+                    if result is not None:
+                        self.records += 1
                     yield result
 
                     if self.kill:

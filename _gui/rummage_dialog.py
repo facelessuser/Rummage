@@ -280,14 +280,17 @@ class GrepThread(object):
         global _TOTAL
         global _RECORDS
         global _ERRORS
-        _RESULTS = []
-        _COMPLETED = 0
-        _TOTAL = 0
-        _RECORDS = 0
-        _ERRORS = []
+        with _LOCK:
+            _RESULTS = []
+            _COMPLETED = 0
+            _TOTAL = 0
+            _RECORDS = 0
+            _ERRORS = []
         no_results = 0
         for f in self.grep.find():
-            if (
+            if f is None:
+                pass
+            elif (
                 (isinstance(f, pygrep.FileRecord) and f.match) or
                 isinstance(f, pygrep.MatchRecord)
             ):
@@ -1123,7 +1126,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     _("Searching: %d/%d %d%% Matches: %d") % (
                         completed,
                         total,
-                        int(float(completed)/float(total) * 100),
+                        int(float(completed)/float(total) * 100) if total != 0 else 0,
                         (count2 - self.non_match_record)
                     )
                 )
@@ -1263,7 +1266,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.set_status(
             _("Searching: %d/%d %d%% Matches: %d") % (
                 actually_done, total,
-                int(float(actually_done)/float(total) * 100),
+                int(float(actually_done)/float(total) * 100) if total != 0 else 0,
                 (count2 - self.non_match_record)
             ) if total != 0 else (0, 0, 0)
         )
