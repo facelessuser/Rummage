@@ -396,7 +396,7 @@ class ResultContentList(ResultList):
                 self.widest_cell[2] = width
 
     def set_match(self, obj):
-        item_id = "%d:%d:%d" % (obj.info.id, obj.match.lineno, obj.match.colno)
+        item_id = "%d:%d" % (obj.info.id, obj.match.lineno)
         if item_id in self.itemDataMap:
             self.increment_match_count(item_id)
         else:
