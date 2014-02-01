@@ -290,10 +290,7 @@ class GrepThread(object):
         for f in self.grep.find():
             if f is None:
                 pass
-            elif (
-                (isinstance(f, pygrep.FileRecord) and f.match) or
-                isinstance(f, pygrep.MatchRecord)
-            ):
+            elif isinstance(f, pygrep.FileRecord) and f.match is not None:
                 with _LOCK:
                     _RESULTS.append(f)
             elif isinstance(f, pygrep.FileRecord) and f.error is not None:
@@ -953,11 +950,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread.setDaemon(True)
 
         # Reset result tables
-        self.current_table_idx = [0, 0]
-        self.content_table_offset = 0
-        self.non_match_record = 0
-        self.create_file_entry = False
-        self.last_line = None
+        self.count = 0
         self.m_grep_notebook.DeletePage(2)
         self.m_grep_notebook.DeletePage(1)
         self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
@@ -1114,26 +1107,24 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 completed = _COMPLETED
                 total = _TOTAL
                 records = _RECORDS
-            count1 = self.current_table_idx[0]
-            count2 = self.current_table_idx[1]
-            if records > count2:
+            count = self.count
+            if records > count:
                 with _LOCK:
-                    results = _RESULTS[0:records - count2]
-                    _RESULTS = _RESULTS[records - count2:len(_RESULTS)]
-                count1, count2 = self.update_table(count1, count2, completed, total, *results)
+                    results = _RESULTS[0:records - count]
+                    _RESULTS = _RESULTS[records - count:len(_RESULTS)]
+                count = self.update_table(count, completed, total, *results)
             else:
                 self.m_statusbar.set_status(
                     _("Searching: %d/%d %d%% Matches: %d") % (
                         completed,
                         total,
                         int(float(completed)/float(total) * 100) if total != 0 else 0,
-                        (count2 - self.non_match_record)
+                        count
                     )
                 )
                 self.m_progressbar.SetRange(total)
                 self.m_progressbar.SetValue(completed)
-            self.current_table_idx[0] = count1
-            self.current_table_idx[1] = count2
+            self.count = count
 
             # Run is finished or has been terminated
             if not running:
@@ -1148,7 +1139,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                             completed,
                             completed,
                             100,
-                            (count2 - self.non_match_record),
+                            count,
                             benchmark
                         )
                     )
@@ -1157,7 +1148,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     if Settings.get_notify():
                         notify.error(
                             _("Search Aborted"),
-                            _("\n%d matches found!") % (count2 - self.non_match_record),
+                            _("\n%d matches found!") % count,
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -1169,7 +1160,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                             completed,
                             completed,
                             100,
-                            (count2 - self.non_match_record),
+                            count,
                             benchmark
                         )
                     )
@@ -1178,7 +1169,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     if Settings.get_notify():
                         notify.info(
                             _("Search Completed"),
-                            _("\n%d matches found!") % (count2 - self.non_match_record),
+                            _("\n%d matches found!") % count,
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -1209,7 +1200,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.checking = False
         event.Skip()
 
-    def update_table(self, count, count2, done, total, *results):
+    def update_table(self, count, done, total, *results):
         """
         Update the result lists with current search results
         """
@@ -1218,46 +1209,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         p_value = self.m_progressbar.GetValue()
         actually_done = done - 1 if done > 0 else 0
         for f in results:
-            if isinstance(f, pygrep.FileRecord):
-                self.non_match_record += 1
-                self.file_info = f.info
-                self.create_file_entry = True
-                count2 += 1
-                self.last_line = None
-            else:
-                if self.create_file_entry:
-                    self.m_result_file_panel.set_item_map(
-                        count, basename(self.file_info.name), float(self.file_info.size.strip("KB")), 1,
-                        dirname(self.file_info.name), self.file_info.encoding, self.file_info.modified,
-                        self.file_info.created, f.lineno, f.colno
-                    )
-                    count += 1
-                    self.create_file_entry = False
-                else:
-                    self.m_result_file_panel.increment_match_count(count - 1)
+            self.m_result_file_panel.set_match(f)
+            if self.args.count_only or self.args.boolean:
+                count += 1
+                continue
 
-                if self.args.count_only or self.args.boolean:
-                    count2 += 1
-                    self.content_table_offset += 1
-                    continue
-
-                lineno = f.lineno
-                if self.last_line is not None and lineno == self.last_line:
-                    self.m_result_content_panel.increment_match_count(
-                        count2 - self.content_table_offset - self.non_match_record - 1
-                    )
-                    self.content_table_offset += 1
-                    count2 += 1
-                else:
-                    self.m_result_content_panel.set_item_map(
-                        count2 - self.content_table_offset - self.non_match_record,
-                        (basename(self.file_info.name), dirname(self.file_info.name)),
-                        lineno, 1,
-                        f.lines.replace("\r", "").split("\n")[0],
-                        count - 1,  f.colno, self.file_info.encoding
-                    )
-                    self.last_line = lineno
-                    count2 += 1
+            self.m_result_content_panel.set_match(f)
+            count += 1
 
         if p_range != total:
             self.m_progressbar.SetRange(total)
@@ -1267,11 +1225,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             _("Searching: %d/%d %d%% Matches: %d") % (
                 actually_done, total,
                 int(float(actually_done)/float(total) * 100) if total != 0 else 0,
-                (count2 - self.non_match_record)
+                count
             ) if total != 0 else (0, 0, 0)
         )
         wx.GetApp().Yield()
-        return count, count2
+        return count
 
     def on_regex_search_toggle(self, event):
         """

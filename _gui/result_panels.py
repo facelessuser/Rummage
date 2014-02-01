@@ -13,7 +13,7 @@ from time import ctime
 import wx
 import wx.lib.mixins.listctrl as listmix
 from wx.lib.embeddedimage import PyEmbeddedImage
-from os.path import normpath, join
+from os.path import normpath, join, basename, dirname
 
 from _gui.open_editor import open_editor
 
@@ -233,6 +233,18 @@ class ResultFileList(ResultList):
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
 
+    def set_match(self, obj):
+        item_id = "%d" % obj.info.id
+        if item_id in self.itemDataMap:
+            self.increment_match_count(item_id)
+        else:
+            self.set_item_map(
+                item_id,
+                basename(obj.info.name), float(obj.info.size.strip("KB")), 1,
+                dirname(obj.info.name), obj.info.encoding, obj.info.modified,
+                obj.info.created, obj.match.lineno, obj.match.colno
+            )
+
     def on_enter_window(self, event):
         """
         Reset last moused over item tracker on mouse entering the window
@@ -383,6 +395,19 @@ class ResultContentList(ResultList):
             if width > self.widest_cell[2]:
                 self.widest_cell[2] = width
 
+    def set_match(self, obj):
+        item_id = "%d:%d:%d" % (obj.info.id, obj.match.lineno, obj.match.colno)
+        if item_id in self.itemDataMap:
+            self.increment_match_count(item_id)
+        else:
+            self.set_item_map(
+                item_id,
+                (basename(obj.info.name), dirname(obj.info.name)),
+                obj.match.lineno, 1,
+                obj.match.lines.replace("\r", "").split("\n")[0],
+                "%d" % obj.info.id, obj.match.colno, obj.info.encoding
+            )
+
     def OnGetItemImage(self, item):
         """
         Override method to get the image for the given item
@@ -420,6 +445,9 @@ class FileResultPanel(wx.Panel):
         sizer.Add(self.list, 1, wx.ALL | wx.EXPAND, 5)
         self.SetSizer(sizer)
         self.Layout()
+
+    def set_match(self, obj):
+        self.list.set_match(obj)
 
     def increment_match_count(self, idx):
         """

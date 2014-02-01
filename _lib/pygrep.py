@@ -257,15 +257,6 @@ class _FileSearch(object):
 
         return mx + 1
 
-        # # Linear Search
-        # line = 1
-        # for x in line_map:
-        #     if start > x:
-        #         line += 1
-        #     else:
-        #         break
-        # return line
-
     def __get_line_ending(self, file_content):
         """
         Get the line ending for the file content by
@@ -279,8 +270,6 @@ class _FileSearch(object):
                 ending = "\r" if m.group(2) else "\n"
             line_map.append(m.end())
         return "\n" if ending is None else ending, line_map
-        # ending = LINE_ENDINGS.search(file_content)
-        # return "\r" if ending is not None and ending.group(2) else "\n"
 
     def __findall(self, file_content):
         """
@@ -312,38 +301,43 @@ class _FileSearch(object):
                 else:
                     max_count -= 1
 
-            if not file_record_sent:
-                file_record_sent = True
-                yield FileRecord(target, True, None)
-
             if not self.boolean and not self.count_only:
+                file_record_sent = True
                 # Get context etc.
                 lines, match, context = self.__get_lines(file_content, m, line_ending, binary)
 
-                yield MatchRecord(
-                    # file_content.count(line_ending, 0, m.start()) + 1,     # lineno
-                    self.__get_row(m.start(), line_map),                   # lineno
-                    self.__get_col(file_content, m.start(), line_ending),  # colno
-                    match,                                                 # Postion of match
-                    lines,                                                 # Line(s) in which match is found
-                    line_ending,                                           # Line ending for file
-                    context                                                # Number of lines shown before and after matched line(s)
+                yield FileRecord(
+                    target,
+                    MatchRecord(
+                        self.__get_row(m.start(), line_map),                   # lineno
+                        self.__get_col(file_content, m.start(), line_ending),  # colno
+                        match,                                                 # Postion of match
+                        lines,                                                 # Line(s) in which match is found
+                        line_ending,                                           # Line ending for file
+                        context                                                # Number of lines shown before and after matched line(s)
+                    ),
+                    None
                 )
             else:
-                yield MatchRecord(
-                    0,                                                     # lineno
-                    0,                                                     # colno
-                    (m.start(), m.end()),                                  # Postion of match
-                    None,                                                  # Line(s) in which match is found
-                    None,                                                  # Line ending for file
-                    (0, 0)                                                 # Number of lines shown before and after matched line(s)
+                file_record_sent = True
+                yield FileRecord(
+                    target,
+                    MatchRecord(
+                        0,                                                     # lineno
+                        0,                                                     # colno
+                        (m.start(), m.end()),                                  # Postion of match
+                        None,                                                  # Line(s) in which match is found
+                        None,                                                  # Line ending for file
+                        (0, 0)                                                 # Number of lines shown before and after matched line(s)
+                    ),
+                    None
                 )
 
             if self.boolean:
                 break
 
         if not file_record_sent:
-            yield FileRecord(target, False, None)
+            yield FileRecord(target, None, None)
 
 
 class _DirWalker(object):
@@ -738,7 +732,7 @@ class Grep(object):
 
             if error is not None:
                 # Unable to read
-                yield FileRecord(file_info, False, error)
+                yield FileRecord(file_info, None, error)
             elif file_info is None:
                 # No file; quit
                 break
@@ -781,7 +775,7 @@ class Grep(object):
 
         if error is not None:
             # Unable to read
-            yield FileRecord(file_info, False, error)
+            yield FileRecord(file_info, None, error)
         elif file_info is not None or content is not None:
             try:
                 for result in self.search.search(file_info, content, max_count, self.is_binary):
@@ -811,7 +805,7 @@ class Grep(object):
 
         if error is not None:
             # Unable to read
-            yield FileRecord(file_info, False, error)
+            yield FileRecord(file_info, None, error)
         elif file_info is not None or content is not None:
             try:
                 for result in self.search.search(file_info, content, max_count, False):
