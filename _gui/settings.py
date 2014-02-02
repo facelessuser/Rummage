@@ -38,9 +38,9 @@ LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
 NOTIFY_STYLES = {
-    "osx": ["growl"],
-    "windows": ["native", "growl"],
-    "linux": ["native", "growl"]
+    "osx": ["default", "growl"],
+    "windows": ["default", "growl"],
+    "linux": ["default", "growl"]
 }
 
 
@@ -406,7 +406,7 @@ class Settings(object):
                 icon,
                 (
                     "/Library/Ruby/Gems/2.0.0/gems/terminal-notifier-1.5.1/bin/terminal-notifier",
-                    "com.facelessuser.rummage"
+                    None
                 )
         )
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
@@ -446,7 +446,7 @@ class Settings(object):
 
         cls.reload_settings()
         method = cls.settings.get("notify_method", NOTIFY_STYLES[_PLATFORM][0])
-        if method is None or method == "wxpython" or method not in NOTIFY_STYLES[_PLATFORM]:
+        if method is None or method == "native" or method not in NOTIFY_STYLES[_PLATFORM]:
             method = NOTIFY_STYLES[_PLATFORM][0]
         return method
 
@@ -456,10 +456,10 @@ class Settings(object):
         Set notification style
         """
 
-        if notify_method not in ["native", "default", "growl"]:
+        if notify_method not in ["native", "growl"]:
             notify_method = NOTIFY_STYLES[_PLATFORM][0]
-        if notify_method in ["default", "native"]:
-            notify_method = "wxpython"
+        if notify_method in ["native"]:
+            notify_method = "native"
         cls.reload_settings()
         cls.settings["notify_method"] = notify_method
         cls.save_settings()
