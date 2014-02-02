@@ -380,9 +380,35 @@ class Settings(object):
         Setup growl notification
         """
 
+        pth = cls.get_config_folder()
+        png = join(pth, "Rummage-notify.png")
+        icon = join(pth, "Rummage-notify.ico")
+
+        try:
+            if not exists(png):
+                with open(png, "wb") as f:
+                    f.write(rum_64.GetData())
+        except:
+            png = None
+
+        try:
+            if not exists(icon):
+                with open(icon, "wb") as f:
+                    f.write(rum_tray.GetData())
+        except:
+            icon = None
+
         # Set up notifications
         if first_time:
-            notify.setup_notifications("Rummage", rum_64.GetData(), rum_tray.GetData(), cls.get_config_folder())
+            notify.setup_notifications(
+                "Rummage",
+                png,
+                icon,
+                (
+                    "/Library/Ruby/Gems/2.0.0/gems/terminal-notifier-1.5.1/bin/terminal-notifier",
+                    "com.facelessuser.rummage"
+                )
+        )
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
 
     @classmethod
