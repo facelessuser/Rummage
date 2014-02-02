@@ -13,7 +13,7 @@ __all__ = ["get_notify", "alert", "setup", "windows_icons"]
 
 class Options(object):
     notify = None
-    instance
+    instance = None
 
 
 def alert(sound=None):
@@ -226,10 +226,9 @@ def setup(app_name, icon, *args):
         assert(icon is not None and exists(icon))
     except:
         icon = None
-        pass
 
     if NotifyWin is not None:
-        Options.instance = NotifyWin(app_name + "Taskbar", icon, app_name)
+        Options.instance = WindowsNotify(app_name + "Taskbar", icon, app_name)
         Options.notify = NotifyWin
 
 
