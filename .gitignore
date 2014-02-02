@@ -42,4 +42,6 @@ nosetests.xml
 
 *.spec
 
+Output/*
+
 pyinstaller
