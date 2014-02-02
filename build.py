@@ -217,11 +217,11 @@ def main():
         args = Args("Rummage.py", inputs.name, True, inputs.clean, ".exe", abspath("_icons\\rummage.ico"), inputs.portable)
     else:
         args = Args(
-            "Rummage.py", inputs.name, True, inputs.clean, "",
-            imports=[
-                "gobject", "glib", "glib._glib", "glib.option", "object.constants",
-                "gobject._gobject", "gobject.propertyhelper", "gtk", "gtk._gtk"
-            ]
+            "Rummage.py", inputs.name, True, inputs.clean, ""
+            # imports=[
+            #     "gobject", "glib", "glib._glib", "glib.option", "object.constants",
+            #     "gobject._gobject", "gobject.propertyhelper", "gtk", "gtk._gtk"
+            # ]
         )
 
     # Parse options

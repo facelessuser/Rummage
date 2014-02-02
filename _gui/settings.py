@@ -40,7 +40,7 @@ FIFO = "rummage.fifo"
 NOTIFY_STYLES = {
     "osx": ["growl"],
     "windows": ["native", "growl"],
-    "linux": ["native"]
+    "linux": ["native", "growl"]
 }
 
 
