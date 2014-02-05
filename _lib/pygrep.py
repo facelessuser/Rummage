@@ -13,10 +13,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 from __future__ import unicode_literals
 import threading
+import Queue
 import sys
 from os import walk
 from fnmatch import fnmatch
-from os.path import isdir, join, abspath, getsize
+from os.path import isdir, isfile, join, abspath, getsize
 from time import sleep, ctime
 from collections import namedtuple
 import traceback
@@ -27,7 +28,6 @@ import _lib.text_decode as text_decode
 from _lib.file_times import getmtime, getctime
 from _lib.file_hidden import is_hidden
 
-
 LITERAL = 1
 IGNORECASE = 2
 DOTALL = 4
@@ -36,6 +36,19 @@ FILE_REGEX_MATCH = 16
 DIR_REGEX_MATCH = 32
 BUFFER_INPUT = 64
 
+# There doesn't appear to be a real advantage when using multiple threads.
+# It will bascially take the same amount of time because of GIL (not really parallel; switches back and forth).
+# So a file that is taking a long time with multiple threads, will take even longer,
+# but other threads can complete in that time.  You will get matches out of order as well since it is switching
+# between search threads.
+#
+# Essentially, with one thread, a file taking a long time will block, but multi-threads will allow other files to
+# complete while the lengthy file finishes.  But in the end, single and mult-threaded take about the same time.
+# in that time.  Its kind of a wash.
+#
+# Multiprocessing is an alternative, but Rummage currently pushes too much data through the queue; it bogs down
+# the queue since it has to serialized the data and pipe it through to the other process.  Performance it bad.
+_NUM_THREADS = 1
 _LOCK = threading.Lock()
 _FILES = []
 _RUNNING = False
@@ -49,8 +62,15 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
-LINE_ENDINGS = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
-HEX_TX_TABLE = ("." * 32) + "".join(chr(c) for c in xrange(32, 127)) + ("." * 129)
+
+def set_threads(number):
+    """
+    Set number of threads to use
+    """
+
+    global _NUM_THREADS
+    if not _RUNNING and 0 < number < 4:
+        _NUM_THREADS = number
 
 
 def threaded_walker(
@@ -139,6 +159,8 @@ class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines'
 
 
 class _FileSearch(object):
+    hex_tx_table = ("." * 32) + "".join(chr(c) for c in xrange(32, 127)) + ("." * 129)
+
     def __init__(self, pattern, flags, context, truncate_lines, boolean, count_only):
         """
         Init the file search object
@@ -159,12 +181,80 @@ class _FileSearch(object):
         self.pattern = _literal_pattern(pattern, self.ignorecase) if self.literal else _re_pattern(pattern, self.ignorecase, self.dotall)
         self.find_method = self.pattern.finditer
 
+    def __decode_file(self, filename):
+        """
+        Calls file encode guesser and decodes file if possible
+        """
+
+        bfr, self.current_encoding = text_decode.guess(filename, False)
+        if self.current_encoding == "BIN":
+            self.is_binary = True
+        return bfr
+
+    def __read_file(self, file_name):
+        """
+        Open the file in the best guessed encoding for search.
+        Guesses by elimination
+        Currently opens:
+            UTF32 if BOM present
+            UTF16 if BOM present or if only one null found in file
+            UTF8 if it contains no bad UTF8 char sequences or includes UTF8 BOM
+            LATIN-1 if not a file above and contains no NULLs, and no invalid LATIN-1 chars
+            CP1252 if not above and does not contain NULLs
+        """
+
+        content = None
+        self.current_encoding = "BIN"
+        self.is_binary = False
+
+        # Force UTF for all
+        if self.all_utf8:
+            self.current_encoding = "UTF8"
+            with codecs.open(file_name, encoding="utf-8-sig", errors="replace") as f:
+                content = f.read()
+                return content
+
+        # Guess encoding and decode file
+        return self.__decode_file(file_name)
+
+    def __get_file_info(self, filename, size, m_time, c_time, content=None):
+        """
+        Create file info record
+        """
+
+        string_buffer = content is not None
+        error = None
+        file_info = None
+
+        try:
+            if content is None:
+                content = self.__read_file(filename)
+                if content is None:
+                    raise GrepException("Could not read %s" % filename)
+        except:
+            error = str(traceback.format_exc())
+
+        try:
+            file_info = FileInfo(
+                self.idx,
+                filename,
+                "%.2fKB" % (float(size) / 1024.0),
+                m_time,
+                c_time,
+                self.current_encoding if not string_buffer else "--"
+            )
+        except:
+            if error is None:
+                error = str(traceback.format_exc())
+
+        return file_info, content, error
+
     def __tx_bin(self, content):
         """
         Format binary data in a friendly way. Display only ASCII.
         """
 
-        return content.translate(HEX_TX_TABLE)
+        return content.translate(self.hex_tx_table)
 
     def __get_lines(self, content, m, line_ending, binary=False):
         """
@@ -265,7 +355,8 @@ class _FileSearch(object):
 
         line_map = []
         ending = None
-        for m in LINE_ENDINGS.finditer(file_content):
+        line_ending = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
+        for m in line_ending.finditer(file_content):
             if ending is None:
                 ending = "\r" if m.group(2) else "\n"
             line_map.append(m.end())
@@ -278,66 +369,113 @@ class _FileSearch(object):
 
         for m in self.find_method(file_content):
             yield m
+            if _ABORT:
+                break
 
-    def search(self, target, file_content, max_count=None, binary=False):
+    def search(self, file_obj, file_id, queue, max_count=None, all_utf8=False, process_binary=False, file_content=None):
         """
         Search target file or buffer returning a generator of results.
         """
 
-        line_ending = None
-        line_map = []
-        file_record_sent = False
+        try:
+            self.idx = file_id
+            self.all_utf8 = all_utf8
+            self.is_binary = False
 
-        for m in self.__findall(file_content):
-            if not self.boolean and not self.count_only:
-                if line_ending is None:
-                    # line_ending = self.__get_line_ending(file_content)
-                    line_ending, line_map = self.__get_line_ending(file_content)
+            target, file_content, error = self.__get_file_info(file_obj[0], file_obj[1], file_obj[2], file_obj[3], file_content)
 
-            # Have we exceeded the maximum desired matches?
-            if max_count is not None:
-                if max_count == 0:
-                    break
+            if error is not None:
+                # Unable to read
+                queue.put(FileRecord(target, None, error))
+                return
+            elif target is None or (file_content is None or (self.is_binary and not process_binary)):
+                # No file or shouldn't process binary; quit
+                return
+
+            line_ending = None
+            line_map = []
+            file_record_sent = False
+
+            for m in self.__findall(file_content):
+                if not self.boolean and not self.count_only:
+                    if line_ending is None:
+                        line_ending, line_map = self.__get_line_ending(file_content)
+
+                if not self.boolean and not self.count_only:
+                    file_record_sent = True
+                    # Get context etc.
+                    lines, match, context = self.__get_lines(file_content, m, line_ending, self.is_binary)
+
+                    queue.put(
+                        FileRecord(
+                            target,
+                            MatchRecord(
+                                self.__get_row(m.start(), line_map),                   # lineno
+                                self.__get_col(file_content, m.start(), line_ending),  # colno
+                                match,                                                 # Postion of match
+                                lines,                                                 # Line(s) in which match is found
+                                line_ending,                                           # Line ending for file
+                                context                                                # Number of lines shown before and after matched line(s)
+                            ),
+                            None
+                        )
+                    )
                 else:
+                    file_record_sent = True
+                    queue.put(
+                        FileRecord(
+                            target,
+                            MatchRecord(
+                                0,                                                     # lineno
+                                0,                                                     # colno
+                                (m.start(), m.end()),                                  # Postion of match
+                                None,                                                  # Line(s) in which match is found
+                                None,                                                  # Line ending for file
+                                (0, 0)                                                 # Number of lines shown before and after matched line(s)
+                            ),
+                            None
+                        )
+                    )
+
+                if self.boolean:
+                    break
+
+                # Have we exceeded the maximum desired matches?
+                if max_count is not None:
                     max_count -= 1
 
-            if not self.boolean and not self.count_only:
-                file_record_sent = True
-                # Get context etc.
-                lines, match, context = self.__get_lines(file_content, m, line_ending, binary)
+                    if max_count == 0:
+                        break
 
-                yield FileRecord(
-                    target,
-                    MatchRecord(
-                        self.__get_row(m.start(), line_map),                   # lineno
-                        self.__get_col(file_content, m.start(), line_ending),  # colno
-                        match,                                                 # Postion of match
-                        lines,                                                 # Line(s) in which match is found
-                        line_ending,                                           # Line ending for file
-                        context                                                # Number of lines shown before and after matched line(s)
-                    ),
-                    None
-                )
-            else:
-                file_record_sent = True
-                yield FileRecord(
-                    target,
-                    MatchRecord(
-                        0,                                                     # lineno
-                        0,                                                     # colno
-                        (m.start(), m.end()),                                  # Postion of match
-                        None,                                                  # Line(s) in which match is found
-                        None,                                                  # Line ending for file
-                        (0, 0)                                                 # Number of lines shown before and after matched line(s)
-                    ),
-                    None
-                )
+            if not file_record_sent:
+                queue.put(FileRecord(target, None, None))
+        except:
+            queue.put(FileRecord(target, None, str(traceback.format_exc())))
 
-            if self.boolean:
-                break
 
-        if not file_record_sent:
-            yield FileRecord(target, None, None)
+def file_search(params, file_obj, file_id, queue, max_count=None, all_utf8=False, process_binary=False, file_content=None):
+    """
+    Start a thread for a file search
+    """
+    fs = _FileSearch(
+        params.pattern, params.flags, params.context,
+        params.truncate_lines, params.boolean, params.count_only
+    )
+    fs.search(file_obj, file_id, queue, max_count, all_utf8, process_binary, file_content)
+
+
+class SearchParams(object):
+    def __init__(self, pattern, flags, context, truncate_lines, boolean, count_only):
+        """
+        Search parameters
+        """
+
+        self.pattern = pattern
+        self.flags = flags
+        self.context = context
+        self.truncate_lines = truncate_lines
+        self.boolean = boolean
+        self.count_only = count_only
 
 
 class _DirWalker(object):
@@ -504,7 +642,7 @@ class _DirWalker(object):
 
             # Seach files if they were found
             if len(files):
-                # Only search files in that are in the inlcude rules
+                # Only search files that are in the inlcude rules
                 for f in [(name, self.current_size, self.modified_time, self.created_time) for name in files[:] if self.__valid_file(base, name)]:
                     with _LOCK:
                         _FILES.append((join(base, f[0]), f[1], f[2], f[3]))
@@ -528,6 +666,7 @@ class Grep(object):
         Initialize Grep object.
         """
 
+        global _FILES
         global _RUNNING
         global _ABORT
         with _LOCK:
@@ -536,22 +675,22 @@ class Grep(object):
             if _RUNNING:
                 raise GrepException("Grep process already running!")
 
-        self.search = _FileSearch(pattern, flags, context, truncate_lines, boolean, count_only)
+        self.search_params = SearchParams(pattern, flags, context, truncate_lines, boolean, count_only)
         self.buffer_input = bool(flags & BUFFER_INPUT)
         self.all_utf8 = all_utf8
         self.current_encoding = None
         self.idx = -1
         self.records = -1
+        self.max = int(max_count) if max_count is not None else None
         self.target = abspath(target) if not self.buffer_input else target
-        self.max = max_count
         self.process_binary = text
         file_regex_match = bool(flags & FILE_REGEX_MATCH)
         dir_regex_match = bool(flags & DIR_REGEX_MATCH)
         self.kill = False
-        self.thread = None
+        self.path_walker = None
         self.is_binary = False
         if not self.buffer_input and isdir(self.target):
-            self.thread = threading.Thread(
+            self.path_walker = threading.Thread(
                 target=threaded_walker,
                 args=(
                     self.target,
@@ -566,7 +705,30 @@ class Grep(object):
                     created
                 )
             )
-            self.thread.setDaemon(True)
+            self.path_walker.setDaemon(True)
+        elif not self.buffer_input and isfile(self.target):
+            with _LOCK:
+                _FILES = [
+                    (
+                        self.target,
+                        getsize(self.target),
+                        getmtime(self.target),
+                        getctime(self.target)
+                    )
+                ]
+        elif self.buffer_input:
+            with _LOCK:
+                _FILES = [
+                    (
+                        "buffer input",
+                        len(self.target),
+                        ctime(),
+                        ctime()
+                    )
+                ]
+        else:
+            with _LOCK:
+                _FILES = []
 
     def __get_dir_pattern(self, folder_exclude, dir_regex_match):
         """
@@ -588,49 +750,13 @@ class Grep(object):
             pattern = ure.compile(file_pattern, ure.IGNORECASE) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
-    def __decode_file(self, filename):
-        """
-        Calls file encode guesser and decodes file if possible
-        """
-
-        bfr, self.current_encoding = text_decode.guess(filename, False)
-        if self.current_encoding == "BIN":
-            self.is_binary = True
-        return bfr
-
-    def __read_file(self, file_name):
-        """
-        Open the file in the best guessed encoding for search.
-        Guesses by elimination
-        Currently opens:
-            UTF32 if BOM present
-            UTF16 if BOM present or if only one null found in file
-            UTF8 if it contains no bad UTF8 char sequences or includes UTF8 BOM
-            LATIN-1 if not a file above and contains no NULLs, and no invalid LATIN-1 chars
-            CP1252 if not above and does not contain NULLs
-        """
-
-        content = None
-        self.current_encoding = "BIN"
-        self.is_binary = False
-
-        # Force UTF for all
-        if self.all_utf8:
-            self.current_encoding = "UTF8"
-            with codecs.open(file_name, encoding="utf-8-sig", errors="replace") as f:
-                content = f.read()
-                return content
-
-        # Guess encoding and decode file
-        return self.__decode_file(file_name)
-
     def get_status(self):
         """
         Return number of files searched out
         of current number of files crawled
         """
 
-        if self.thread is not None:
+        if self.path_walker is not None:
             return self.idx + 1 if self.idx != -1 else 0, len(_FILES), self.records + 1 if self.records != -1 else 0
         else:
             return 1, 1, self.records + 1 if self.records != -1 else 0
@@ -651,7 +777,7 @@ class Grep(object):
         """
 
         global _STARTED
-        self.thread.start()
+        self.path_walker.start()
 
         # Try to wait in case the
         # "is running" check happens too quick
@@ -660,163 +786,134 @@ class Grep(object):
         with _LOCK:
             _STARTED = False
 
-    def __get_file_info(self, filename, size, m_time, c_time, content=None):
-        """
-        Create file info record
-        """
-
-        string_buffer = content is not None
-        error = None
-        file_info = None
-
-        try:
-            if content is None:
-                content = self.__read_file(filename)
-                if content is None:
-                    raise GrepException("Could not read %s" % filename)
-        except:
-            error = str(traceback.format_exc())
-
-        try:
-            file_info = FileInfo(
-                self.idx,
-                filename,
-                "%.2fKB" % (float(size) / 1024.0),
-                m_time,
-                c_time,
-                self.current_encoding if not string_buffer else "--"
-            )
-        except:
-            if error is None:
-                error = str(traceback.format_exc())
-
-        return file_info, content, error
-
     def __get_next_file(self):
         """
         Get the next file from the file crawler results
         """
 
         file_info = None
-        error = None
-        content = None
         while file_info is None:
             if _RUNNING:
                 if len(_FILES) - 1 > self.idx:
                     self.idx += 1
-                    info = _FILES[self.idx]
-                    file_info, content, error = self.__get_file_info(info[0], info[1], info[2], info[3])
-                else:
-                    sleep(0.1)
+                    file_info = _FILES[self.idx]
             else:
                 if len(_FILES) - 1 > self.idx and not self.kill:
                     self.idx += 1
-                    info = _FILES[self.idx]
-                    file_info, content, error = self.__get_file_info(info[0], info[1], info[2], info[3])
+                    file_info = _FILES[self.idx]
                 else:
                     break
-        return file_info, content, error
+        return file_info
 
-    def multi_file_read(self, max_count):
+    def open_thread_slot(self, threads):
+        """
+        Find the first open thread slot
+        """
+
+        idx = -1
+        for x in range(0, len(threads)):
+            if threads[x] is None or not threads[x].is_alive():
+                idx = x
+                break
+        return idx
+
+    def busy_thread(self, threads):
+        """
+        Are any of the threads busy?  Return the first index.
+        """
+
+        idx = -1
+        for x in range(0, len(threads)):
+            if threads[x] is not None and threads[x].is_alive():
+                idx = x
+                break
+        return idx
+
+    def drain_records(self):
+        """
+        Grab all current records
+        """
+
+        for x in range(0, self.queue.qsize()):
+            if self.max is not None and self.max == 0:
+                break
+            record = self.queue.get()
+            if record.error is None:
+                self.records += 1
+                if self.max is not None and record.match is not None:
+                    self.max -= 1
+                yield record
+
+    def file_read(self, content_buffer=None):
         """
         Perform search on on files in a directory
         """
 
-        self.idx = -1
+        # Start path walking thread if searching a path
+        if self.path_walker is not None:
+            self.__wait_for_thread()
 
-        self.__wait_for_thread()
+        self.idx = -1
+        self.queue = Queue.Queue()
+        threads = [None] * _NUM_THREADS
+        file_info = []
 
         # Wait for when a file is available
         while True:
-            file_info, content, error = self.__get_next_file()
-
-            if error is not None:
-                # Unable to read
-                yield FileRecord(file_info, None, error)
-            elif file_info is None:
-                # No file; quit
+            if self.kill:
                 break
-            elif content is None or (self.is_binary and not self.process_binary):
-                continue
-            else:
-                # Parse the given file
-                try:
-                    for result in self.search.search(file_info, content, max_count, self.is_binary):
-                        if result is not None:
-                            # Report additional file info
-                            self.records += 1
 
-                        yield result
-
-                        if max_count is not None and isinstance(result, MatchRecord):
-                            max_count -= 1
-
-                        if self.kill:
-                            break
-                except GeneratorExit:
-                    pass
-
-                if max_count is not None and max_count == 0:
+            # Acquire the maximum number of files to search (if available)
+            acquire = _NUM_THREADS - len(file_info)
+            for x in range(0, acquire):
+                obj = self.__get_next_file()
+                if obj is not None:
+                    file_info.append(obj)
+                else:
                     break
 
-    def single_file_read(self, file_name, max_count):
-        """
-        Perform search on a single file
-        """
+            # No more files to search
+            if len(file_info) == 0:
+                break
 
-        self.idx = 0
+            # Start a search thread(s)
+            idx = self.open_thread_slot(threads)
+            while idx != -1 and len(file_info):
+                threads[idx] = threading.Thread(
+                    target=file_search,
+                    args=(
+                        self.search_params,
+                        file_info.pop(0),
+                        self.idx,
+                        self.queue,
+                        self.max,
+                        self.all_utf8,
+                        self.process_binary,
+                        content_buffer
+                    )
+                )
+                threads[idx].daemon = True
+                threads[idx].start()
+                idx = self.open_thread_slot(threads)
 
-        file_info, content, error = self.__get_file_info(
-            file_name,
-            getsize(file_name),
-            getmtime(file_name),
-            getctime(file_name)
-        )
+            # Grab recently finished records
+            for record in self.drain_records():
+                yield record
 
-        if error is not None:
-            # Unable to read
-            yield FileRecord(file_info, None, error)
-        elif file_info is not None or content is not None:
-            try:
-                for result in self.search.search(file_info, content, max_count, self.is_binary):
-                    if result is not None:
-                        self.records += 1
-                    yield result
+            if self.max is not None and self.max == 0:
+                self.abort()
+                break
 
-                    if self.kill:
-                        break
-            except GeneratorExit:
-                pass
+        # Wait for processes to finish
+        while self.busy_thread(threads) != -1:
+            pass
 
-    def buffer_read(self, target_buffer, max_count):
-        """
-        Perform search on an input buffer
-        """
+        # Clean out remaining records
+        for record in self.drain_records():
+            yield record
 
-        self.idx = 0
-
-        file_info, content, error = self.__get_file_info(
-            "buffer input",
-            len(target_buffer),
-            ctime(),
-            ctime(),
-            content=target_buffer
-        )
-
-        if error is not None:
-            # Unable to read
-            yield FileRecord(file_info, None, error)
-        elif file_info is not None or content is not None:
-            try:
-                for result in self.search.search(file_info, content, max_count, False):
-                    if result is not None:
-                        self.records += 1
-                    yield result
-
-                    if self.kill:
-                        break
-            except GeneratorExit:
-                pass
+        threads = []
+        self.queue = None
 
     def find(self):
         """
@@ -824,14 +921,6 @@ class Grep(object):
         If given a file directly, it will search the file only.
         Return the results of each file via a generator.
         """
-        max_count = int(self.max) if self.max is not None else None
 
-        if self.thread is not None:
-            for result in self.multi_file_read(max_count):
-                yield result
-        elif self.buffer_input:
-            for result in self.buffer_read(self.target, max_count):
-                yield result
-        else:
-            for result in self.single_file_read(self.target, max_count):
-                yield result
+        for result in self.file_read(self.target if self.buffer_input else None):
+            yield result

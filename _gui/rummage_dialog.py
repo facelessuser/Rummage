@@ -49,6 +49,8 @@ from _icons.rum_ico import rum_64
 
 DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
 
+pygrep.set_threads(2)
+
 
 _LOCK = threading.Lock()
 _RUNNING = False

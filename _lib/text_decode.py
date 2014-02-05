@@ -22,85 +22,68 @@ UTF16 = 3
 UTF32 = 4
 LATIN1 = 5
 CP1252 = 6
-encoding_map = {
-    ASCII: ("ascii", "ASCII"),
-    UTF8: ("utf-8-sig", "UTF8"),
-    UTF16: ("utf-16", "UTF16"),
-    UTF16: ("utf-32", "UTF32"),
-    LATIN1: ("latin-1", "LATIN-1"),
-    CP1252: ("cp1252", "CP1252"),
-    BINARY: (None, "BIN")
-}
 
-BAD_LATIN = re.compile(
-    b'''
-    [\x80-\x9F]  # Invalid LATIN-1 Chars
-    '''
+GOOD_ASCII = \
+b'''
+\A[\x09\x0A\x0D\x20-\x7E]*\Z  # ASCII (minus control chars not commonly used)
+'''
+
+GOOD_UTF8 = \
+b'''
+\A(
+    [\x09\x0A\x0D\x20-\x7E]           | # ASCII
+    [\xC2-\xDF][\x80-\xBF]            | # non-overlong 2-byte
+    \xE0[\xA0-\xBF][\x80-\xBF]        | # excluding overlongs
+    [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} | # straight 3-byte
+    \xED[\x80-\x9F][\x80-\xBF]        | # excluding surrogates
+    \xF0[\x90-\xBF][\x80-\xBF]{2}     | # planes 1-3
+    [\xF1-\xF3][\x80-\xBF]{3}         | # planes 4-15
+    \xF4[\x80-\x8F][\x80-\xBF]{2}       # plane 16
+)*\Z
+'''
+
+BAD_ASCII = \
+b'''
+(
+    [\x00-\x08] |  # ASCII Control Chars
+    [\x0B\x0C]  |  # ASCII Control Chars
+    [\x0E-\x1F] |  # ASCII Control Chars
+    [\x7F-\xFF]    # Invalid ASCII Chars
 )
+'''
 
-BAD_ASCII = re.compile(
-    b'''
-    (
-        [\x00-\x08] |  # ASCII Control Chars
-        [\x0B\x0C]  |  # ASCII Control Chars
-        [\x0E-\x1F] |  # ASCII Control Chars
-        [\x7F-\xFF]    # Invalid ASCII Chars
-    )
-    ''',
-    re.VERBOSE
+BAD_UTF8 = \
+b'''
+[\xE0-\xEF].{0,1}([^\x80-\xBF]|$) |
+[\xF0-\xF7].{0,2}([^\x80-\xBF]|$) |
+[\xF8-\xFB].{0,3}([^\x80-\xBF]|$) |
+[\xFC-\xFD].{0,4}([^\x80-\xBF]|$) |
+[\xFE-\xFE].{0,5}([^\x80-\xBF]|$) |
+[\x00-\x7F][\x80-\xBF]            |
+[\xC0-\xDF].[\x80-\xBF]           |
+[\xE0-\xEF]..[\x80-\xBF]          |
+[\xF0-\xF7]...[\x80-\xBF]         |
+[\xF8-\xFB]....[\x80-\xBF]        |
+[\xFC-\xFD].....[\x80-\xBF]       |
+[\xFE-\xFE]......[\x80-\xBF]      |
+^[\x80-\xBF]
+'''
+
+BAD_LATIN = \
+b'''
+[\x80-\x9F]  # Invalid LATIN-1 Chars
+'''
+
+UTF_BOM = \
+b'''
+^(?:(%s)|(%s|%s)(%s|%s))[\x00-\xFF]*
+''' % (
+    codecs.BOM_UTF8,
+    codecs.BOM_UTF32_BE,
+    codecs.BOM_UTF32_LE,
+    codecs.BOM_UTF16_BE,
+    codecs.BOM_UTF16_LE
 )
-
-BAD_UTF8 = re.compile(
-    b'''
-    [\xE0-\xEF].{0,1}([^\x80-\xBF]|$) |
-    [\xF0-\xF7].{0,2}([^\x80-\xBF]|$) |
-    [\xF8-\xFB].{0,3}([^\x80-\xBF]|$) |
-    [\xFC-\xFD].{0,4}([^\x80-\xBF]|$) |
-    [\xFE-\xFE].{0,5}([^\x80-\xBF]|$) |
-    [\x00-\x7F][\x80-\xBF]            |
-    [\xC0-\xDF].[\x80-\xBF]           |
-    [\xE0-\xEF]..[\x80-\xBF]          |
-    [\xF0-\xF7]...[\x80-\xBF]         |
-    [\xF8-\xFB]....[\x80-\xBF]        |
-    [\xFC-\xFD].....[\x80-\xBF]       |
-    [\xFE-\xFE]......[\x80-\xBF]      |
-    ^[\x80-\xBF]
-    ''',
-    re.VERBOSE
-)
-
-GOOD_ASCII = re.compile(
-    b'''
-    \A[\x09\x0A\x0D\x20-\x7E]*\Z  # ASCII (minus control chars not commonly used)
-    ''',
-    re.VERBOSE
-)
-
-GOOD_UTF8 = re.compile(
-    b'''
-    \A(
-        [\x09\x0A\x0D\x20-\x7E]           | # ASCII
-        [\xC2-\xDF][\x80-\xBF]            | # non-overlong 2-byte
-        \xE0[\xA0-\xBF][\x80-\xBF]        | # excluding overlongs
-        [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} | # straight 3-byte
-        \xED[\x80-\x9F][\x80-\xBF]        | # excluding surrogates
-        \xF0[\x90-\xBF][\x80-\xBF]{2}     | # planes 1-3
-        [\xF1-\xF3][\x80-\xBF]{3}         | # planes 4-15
-        \xF4[\x80-\x8F][\x80-\xBF]{2}       # plane 16
-    )*\Z
-    ''',
-    re.VERBOSE
-)
-
-UTF_BOM = re.compile(
-    b"^(?:(" + codecs.BOM_UTF8 + b")|" +
-    b"(" + codecs.BOM_UTF32_BE + b"|" + codecs.BOM_UTF32_LE + b")" +
-    b"(" + codecs.BOM_UTF16_BE + b"|" + codecs.BOM_UTF16_LE + b"))[\x00-\xFF]*"
-)
-
-ANY_NULL_CHECK = re.compile(b"(\x00\x00+)|(\x00)")
-
-DOUBLE_NULL_CHECK = re.compile(b"\x00{2}")
 
 
 def __has_null(content):
@@ -109,14 +92,17 @@ def __has_null(content):
     Return two kinds of checks: single null and consecutive nulls
     """
 
+    any_null_check = re.compile(b"(\x00\x00+)|(\x00)")
+    double_null_check = re.compile(b"\x00{2}")
+
     is_null = False
     is_multi_null = False
-    m = ANY_NULL_CHECK.search(content)
+    m = any_null_check.search(content)
     if m is not None:
         is_null = True
         is_multi_null = m.group(1) is not None
     if is_null and not is_multi_null:
-        is_multi_null = DOUBLE_NULL_CHECK.search(content[m.end(1):]) is not None
+        is_multi_null = double_null_check.search(content[m.end(1):]) is not None
     return is_null, is_multi_null
 
 
@@ -125,9 +111,11 @@ def __has_bom(content):
     Check for UTF8, UTF16, and UTF32 BOMS
     """
 
+    utf_bom = re.compile(UTF_BOM, re.VERBOSE)
+
     bom = None
     length = len(content)
-    m = UTF_BOM.match(content[:(4 if length >= 4 else length)])
+    m = utf_bom.match(content[:(4 if length >= 4 else length)])
     if m is not None:
         if m.group(1):
             bom = UTF8
@@ -142,6 +130,20 @@ def guess(filename, use_ascii=True):
     """
     Guess the encoding and decode the content of the file
     """
+
+    encoding_map = {
+        ASCII: ("ascii", "ASCII"),
+        UTF8: ("utf-8-sig", "UTF8"),
+        UTF16: ("utf-16", "UTF16"),
+        UTF16: ("utf-32", "UTF32"),
+        LATIN1: ("latin-1", "LATIN-1"),
+        CP1252: ("cp1252", "CP1252"),
+        BINARY: (None, "BIN")
+    }
+
+    bad_latin = re.compile(BAD_LATIN, re.VERBOSE)
+    bad_ascii = re.compile(BAD_ASCII, re.VERBOSE)
+    bad_utf8 = re.compile(BAD_UTF8, re.VERBOSE)
 
     content = None
     encoding = None
@@ -162,13 +164,13 @@ def guess(filename, use_ascii=True):
                 encoding = BINARY
             elif not single:
                 # if use_ascii is True, then validate and use ascii encoding
-                if use_ascii and BAD_ASCII.search(content) is None:
+                if use_ascii and bad_ascii.search(content) is None:
                     # No invalid ascii chars
                     encoding = ASCII
-                if BAD_UTF8.search(content) is None:
+                if bad_utf8.search(content) is None:
                     # No invalid utf8 char sequences
                     encoding = UTF8
-                elif BAD_LATIN.search(content) is None:
+                elif bad_latin.search(content) is None:
                     # No bad latin chars (I think)
                     encoding = LATIN1
                 else:
