@@ -1182,7 +1182,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         image = wx.BitmapFromImage(graphic)
                         self.m_statusbar.set_icon(
                             _("errors"), image,
-                            msg=_("%d errors\nSee log for details.") % self.error_count,
+                            msg=_("%d errors\nSee log for details.") % error_count,
                             context=[(_("View Log"), lambda e: self.open_debug_console())]
                         )
                         for e in _ERRORS:
