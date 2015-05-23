@@ -16,7 +16,7 @@ PY3 = sys.version_info >= (3, 0)
 if PY3:
     unicode_str = str
 else:
-    unicode_str = unicode  # flake8: noqa
+    unicode_str = unicode  # noqa
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -132,7 +132,6 @@ class BuildVars(object):
             print(s)
         print('')
 
-
     def print_all_vars(self):
         """Print all the variables."""
 
@@ -201,19 +200,18 @@ class Args(object):
 
     """Argument object."""
 
-    def __init__(
-        self, script, name, gui, clean, ext,
-        icon=None, portable=False
-    ):
+    def __init__(self, script, name, **kwargs):
         """Build arguments."""
 
-        self.gui = bool(gui)
+        icon = kwargs.get('icon', None)
+
+        self.gui = bool(kwargs.get('gui', False))
         self.name = name
-        self.clean = bool(clean)
+        self.clean = bool(kwargs.get('clean', False))
         self.icon = abspath(icon) if icon is not None else icon
         self.script = script
-        self.extension = ext
-        self.portable = portable
+        self.extension = kwargs.get('ext', '')
+        self.portable = kwargs.get('portable', False)
 
 
 class BuildParams(object):
@@ -366,22 +364,29 @@ def main():
     parser.add_argument('--version', action='version', version='%(prog)s 1.0.0')
     parser.add_argument('--clean', '-c', action='store_true', default=False, help='Clean build before re-building.')
     parser.add_argument('--gui', '-g', action='store_true', default=True, help='GUI app')
-    parser.add_argument('--portable', '-p', action='store_true', default=False, help='Build with portable python (windows)')
+    parser.add_argument(
+        '--portable', '-p',
+        action='store_true', default=False,
+        help='Build with portable python (windows)'
+    )
     # parser.add_argument('--icon', '-i', default=None, nargs="?", help='App icon')
     parser.add_argument('--script', default="Rummage.py", help='Main script')
     parser.add_argument('--name', default="Rummage", help='Name of app')
     inputs = parser.parse_args()
     if _PLATFORM == "windows":
         args = Args(
-            inputs.script, inputs.name, inputs.gui, inputs.clean, ".exe", path.abspath("_icons\\rummage.ico"), inputs.portable
+            inputs.script, inputs.name, gui=inputs.gui, clean=inputs.clean,
+            ext=".exe", icon=path.abspath("_icons\\rummage.ico"), portable=inputs.portable
         )
     elif _PLATFORM == "osx":
         args = Args(
-            inputs.script, inputs.name, inputs.gui, inputs.clean, '', path.abspath("_icons/rummage.icns")
+            inputs.script, inputs.name, gui=inputs.gui, clean=inputs.clean,
+            ext='', icon=path.abspath("_icons/rummage.icns")
         )
     else:
         args = Args(
-            inputs.script, inputs.name, inputs.gui, inputs.clean, '', inputs.icon
+            inputs.script, inputs.name, gui=inputs.gui, clean=inputs.clean,
+            ext='', icon=inputs.icon
             # imports=[
             #     "gobject", "glib", "glib._glib", "glib.option", "object.constants",
             #     "gobject._gobject", "gobject.propertyhelper", "gtk", "gtk._gtk"
