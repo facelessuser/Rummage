@@ -55,7 +55,7 @@ def _test(fn):
 
 
 if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
-    #Fallback to use ctypes to call the ObjC library CoreFoundation for OSX is_hidden
+    # Fallback to use ctypes to call the ObjC library CoreFoundation for OSX is_hidden
 
     # http://stackoverflow.com/questions/284115/cross-platform-hidden-file-detection
     try:

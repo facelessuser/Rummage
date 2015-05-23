@@ -207,7 +207,6 @@ try:
             self.hide_icon()
             PostQuitMessage(0)
 
-
     @staticmethod
     def NotifyWin(title, msg, sound, icon, fallback):
         Options.instance.show_notification(title, msg, sound, icon, fallback)

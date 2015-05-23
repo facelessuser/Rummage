@@ -23,13 +23,11 @@ UTF32 = 4
 LATIN1 = 5
 CP1252 = 6
 
-GOOD_ASCII = \
-b'''
+GOOD_ASCII = b'''
 \A[\x09\x0A\x0D\x20-\x7E]*\Z  # ASCII (minus control chars not commonly used)
 '''
 
-GOOD_UTF8 = \
-b'''
+GOOD_UTF8 = b'''
 \A(
     [\x09\x0A\x0D\x20-\x7E]           | # ASCII
     [\xC2-\xDF][\x80-\xBF]            | # non-overlong 2-byte
@@ -42,8 +40,7 @@ b'''
 )*\Z
 '''
 
-BAD_ASCII = \
-b'''
+BAD_ASCII = b'''
 (
     [\x00-\x08] |  # ASCII Control Chars
     [\x0B\x0C]  |  # ASCII Control Chars
@@ -52,8 +49,7 @@ b'''
 )
 '''
 
-BAD_UTF8 = \
-b'''
+BAD_UTF8 = b'''
 [\xE0-\xEF].{0,1}([^\x80-\xBF]|$) |
 [\xF0-\xF7].{0,2}([^\x80-\xBF]|$) |
 [\xF8-\xFB].{0,3}([^\x80-\xBF]|$) |
@@ -69,13 +65,11 @@ b'''
 ^[\x80-\xBF]
 '''
 
-BAD_LATIN = \
-b'''
+BAD_LATIN = b'''
 [\x80-\x9F]  # Invalid LATIN-1 Chars
 '''
 
-UTF_BOM = \
-b'''
+UTF_BOM = b'''
 ^(?:(%s)|(%s|%s)(%s|%s))[\x00-\xFF]*
 ''' % (
     codecs.BOM_UTF8,

@@ -28,9 +28,9 @@ def html_encode(text):
     """
 
     encode_table = {
-        '&':  '&amp;',
-        '>':  '&gt;',
-        '<':  '&lt;',
+        '&': '&amp;',
+        '>': '&gt;',
+        '<': '&lt;',
         '\t': ' ' * 4,
         '\n': '',
         '\r': ''
@@ -45,8 +45,7 @@ def html_encode(text):
     )
 
 
-CSS_HTML = \
-'''
+CSS_HTML = '''
 body {
     padding: 0;
     margin: 0;
@@ -186,8 +185,7 @@ div.main {
 
 TITLE = html_encode(_("Rummage Results"))
 
-HTML_HEADER = \
-'''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+HTML_HEADER = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 <META HTTP-EQUIV="Content-Language" Content="%(lang)s">
@@ -204,8 +202,7 @@ HTML_HEADER = \
 </head>
 '''
 
-RESULT_ROW = \
-'''
+RESULT_ROW = '''
 <tr>
 <td>%(file)s</td>
 <td sorttable_customkey="%(size_sort)s">%(size)s</td>
@@ -217,8 +214,7 @@ RESULT_ROW = \
 </tr>
 '''
 
-RESULT_TABLE_HEADER = \
-'''
+RESULT_TABLE_HEADER = '''
 <tr>
 <th>%(file)s</th>
 <th>%(size)s</th>
@@ -238,8 +234,7 @@ RESULT_TABLE_HEADER = \
     "created": html_encode(_("Created"))
 }
 
-RESULT_CONTENT_ROW = \
-'''
+RESULT_CONTENT_ROW = '''
 <tr>
 <td sorttable_customkey="%(file_sort)s">%(file)s</td>
 <td>%(line)s</td>
@@ -248,8 +243,7 @@ RESULT_CONTENT_ROW = \
 </tr>
 '''
 
-RESULT_CONTENT_TABLE_HEADER = \
-'''
+RESULT_CONTENT_TABLE_HEADER = '''
 <tr>
 <th>%(file)s</th>
 <th>%(line)s</th>
@@ -266,8 +260,7 @@ RESULT_CONTENT_TABLE_HEADER = \
 FILES = html_encode(_("Files"))
 CONTENT = html_encode(_("Content"))
 
-TABS_START = \
-'''
+TABS_START = '''
 <div id="bar">
 <a id="tabbutton1" href="javascript:select_tab(1)">%(file_tab)s</a>
 <a id="tabbutton2" href="javascript:select_tab(2)">%(content_tab)s</a>
@@ -276,8 +269,7 @@ TABS_START = \
 <div class="main">
 '''
 
-TABS_START_SINGLE = \
-'''
+TABS_START_SINGLE = '''
 <div id="bar">
 <a id="tabbutton1" href="javascript:select_tab(1)">%(file_tab)s</a>
 </div>
@@ -289,14 +281,12 @@ SEARCH_LABEL_REGEX = html_encode(_("Regex search:"))
 
 SEARCH_LABEL_LITERAL = html_encode(_("Literal search:"))
 
-TABS_END = \
-'''
+TABS_END = '''
 <label id="search_label">%(label)s %(search)s</label>
 </div>
 '''
 
-LOAD_TAB = \
-'''
+LOAD_TAB = '''
 <script type="text/javascript">
 function select_tab(num) {
     var load_id = "tab" + num.toString();
@@ -316,21 +306,18 @@ function select_tab(num) {
 </script>
 '''
 
-TAB_INIT = \
-'''
+TAB_INIT = '''
 <script type="text/javascript">
 select_tab(1)
 </script>
 '''
 
-BODY_START = \
-'''
+BODY_START = '''
 <body>
 <h1 id="title"><img src="data:image/bmp;base64,%(icon)s"/>Rummage Results</h1>
 '''
 
-BODY_END = \
-'''
+BODY_END = '''
 </body>
 </html>
 '''

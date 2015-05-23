@@ -100,7 +100,6 @@ class Settings(object):
         cls.settings["hide_limit"] = hide
         cls.save_settings()
 
-
     @classmethod
     def get_language(cls):
         """
@@ -408,7 +407,7 @@ class Settings(object):
                     "/Library/Ruby/Gems/2.0.0/gems/terminal-notifier-1.5.1/bin/terminal-notifier",
                     None
                 )
-        )
+            )
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
 
     @classmethod

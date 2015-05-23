@@ -13,7 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import sublime_plugin
 import sublime
 import subprocess
-from os.path import exists, abspath, normpath, isdir, dirname
+from os.path import exists
 
 NO_RUMMAGE = 0
 NO_TARGET = 1

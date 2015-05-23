@@ -144,7 +144,7 @@ Info = PyEmbeddedImage(
     "TAIYBfBcf2hwUcg9ALbHK9tLua+4xV6Nx96L19FLaAgGfVTA/n6H31UFvJC55TexiP8D8pWE"
     "ZW17eYUAAAAASUVORK5CYII=")
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 Warn = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAA"
     "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYJBhcTFYymgQAAAB1pVFh0Q29tbWVudAAA"
@@ -252,7 +252,7 @@ Warn = PyEmbeddedImage(
     "EMAyANMA9vYPDS4KuQvAljiy3ZT7jFvs2XjtvngTUUK9YrE5U7uv3+HnVQFPZW79aSzi/wAw"
     "z36GQFrk1QAAAABJRU5ErkJggg==")
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 Error = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAA"
     "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYJBhYF+EMikQAAAB1pVFh0Q29tbWVudAAA"
@@ -356,7 +356,7 @@ Error = PyEmbeddedImage(
     "oDlYjOQlm5aAUVo74WIbfvfb9y+K4Oftf4OzvEIALwMwH0A3gHYAwdxVOGIAEwDG7Gi0gPui"
     "a+yleLUunlmWEM8PKgvAuX6H31UAns3c5jexiP8DSZJIhg4rsGIAAAAASUVORK5CYII=")
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 Prompt = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAA"
     "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYJBhY51yxeFgAAAB1pVFh0Q29tbWVudAAA"
@@ -474,7 +474,7 @@ class MessageIcon (namedtuple('MessageIcon', ['bitmap', 'width', 'height'], verb
 
 
 ###########################################################################
-## Class Messages
+# Class Messages
 ###########################################################################
 class Messages (wx.Dialog):
     def __init__(self, parent, text, title=wx.EmptyString, style=INFO, bitmap=None, yes="Okay", no="Cancel"):

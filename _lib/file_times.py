@@ -12,11 +12,9 @@ else:
 if _PLATFORM == "osx":
     from ctypes import *
 
-
     # http://stackoverflow.com/questions/946967/get-file-creation-time-with-python-on-mac
     class struct_timespec(Structure):
         _fields_ = [('tv_sec', c_long), ('tv_nsec', c_long)]
-
 
     class struct_stat64(Structure):
         _fields_ = [
@@ -33,7 +31,6 @@ if _PLATFORM == "osx":
             ('st_birthtimespec', struct_timespec),
             ('dont_care', c_uint64 * 8)
         ]
-
 
     libc = CDLL('libc.dylib')
     stat64 = libc.stat64
@@ -52,7 +49,6 @@ if _PLATFORM == "osx":
 
 else:
     from os.path import getctime as get_creation_time
-
 
     def getctime(pth):
         """

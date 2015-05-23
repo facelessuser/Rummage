@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-sorttable = \
-ur'''
+sorttable = ur'''
 /*
   SortTable
   version 2

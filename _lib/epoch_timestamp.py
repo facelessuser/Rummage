@@ -40,7 +40,7 @@ def totimestamp(dt, epoch=EPOCH):
     """
 
     td = dt - epoch
-    return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 1e6
+    return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10 ** 6) / 1e6
 
 
 def local_time_to_epoch_timestamp(date, time):

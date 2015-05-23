@@ -1,3 +1,4 @@
+from __future__ import print_function
 import subprocess
 import sys
 from os.path import dirname, basename, abspath, exists, join
@@ -34,11 +35,11 @@ def localize(args):
         shell=(True if _PLATFORM == "windows" else False)
     )
 
-    print "Generating messages.po..."
+    print("Generating messages.po...")
     output = process.communicate()
     if process.returncode:
         print >> sys.stderr, "Generation failed!"
-        print output[0]
+        print(output[0])
         return 1
 
     en_US = join(locale_pth, "en_US")
@@ -69,11 +70,11 @@ def localize(args):
                         shell=(True if _PLATFORM == "windows" else False)
                     )
 
-                    print "Compiling %s/%s/%s..." % (basename(dirname(base)), basename(base), "rummage.po")
+                    print("Compiling %s/%s/%s..." % (basename(dirname(base)), basename(base), "rummage.po"))
                     output = process.communicate()
                     if process.returncode:
                         print >> sys.stderr, "Compilation failed!"
-                        print output[0]
+                        print(output[0])
                         return 1
 
     return 0

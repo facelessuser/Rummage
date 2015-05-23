@@ -17,7 +17,7 @@ import threading
 import traceback
 import webbrowser
 from time import time
-from os.path import abspath, exists, basename, dirname, normpath, isdir, isfile, expanduser
+from os.path import abspath, exists, dirname, normpath, isdir, isfile, expanduser
 import wx.lib.masked as masked
 import wx.lib.newevent
 import version
@@ -1120,7 +1120,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     _("Searching: %d/%d %d%% Matches: %d") % (
                         completed,
                         total,
-                        int(float(completed)/float(total) * 100) if total != 0 else 0,
+                        int(float(completed) / float(total) * 100) if total != 0 else 0,
                         count
                     )
                 )
@@ -1226,7 +1226,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.set_status(
             _("Searching: %d/%d %d%% Matches: %d") % (
                 actually_done, total,
-                int(float(actually_done)/float(total) * 100) if total != 0 else 0,
+                int(float(actually_done) / float(total) * 100) if total != 0 else 0,
                 count
             ) if total != 0 else (0, 0, 0)
         )

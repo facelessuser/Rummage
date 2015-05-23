@@ -21,7 +21,7 @@ def csv_encode(text):
     """
 
     encode_table = {
-        '"':  '""',
+        '"': '""',
         '\n': '',
         '\r': ''
     }
