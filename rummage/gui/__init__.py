@@ -1,0 +1,1 @@
+"""Rummage GUI."""

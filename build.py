@@ -370,18 +370,18 @@ def main():
         help='Build with portable python (windows)'
     )
     # parser.add_argument('--icon', '-i', default=None, nargs="?", help='App icon')
-    parser.add_argument('--script', default="Rummage.py", help='Main script')
+    parser.add_argument('--script', default="cli.py", help='Main script')
     parser.add_argument('--name', default="Rummage", help='Name of app')
     inputs = parser.parse_args()
     if _PLATFORM == "windows":
         args = Args(
             inputs.script, inputs.name, gui=inputs.gui, clean=inputs.clean,
-            ext=".exe", icon=path.abspath("_icons\\rummage.ico"), portable=inputs.portable
+            ext=".exe", icon=path.abspath("rummage\\icons\\rummage.ico"), portable=inputs.portable
         )
     elif _PLATFORM == "osx":
         args = Args(
             inputs.script, inputs.name, gui=inputs.gui, clean=inputs.clean,
-            ext='', icon=path.abspath("_icons/rummage.icns")
+            ext='', icon=path.abspath("rummage/icons/rummage.icns")
         )
     else:
         args = Args(
