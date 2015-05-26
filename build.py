@@ -90,9 +90,9 @@ class BuildVars(object):
                     if f != "__init__.py" and f.endswith('.py'):
                         self.hidden_imports.append('.'.join([pkg.fullname, f]))
             else:
-                handle_egg(pkg.archive)
+                self.handle_egg(pkg.archive)
 
-    def handle_egg(archive):
+    def handle_egg(self, archive):
         """Handle an egg import."""
 
         def is_egg(archive):
