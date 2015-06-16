@@ -19,7 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 DEALINGS IN THE SOFTWARE.
 """
 import wx
-import version
+from .. import version
 from . import gui
 from ..icons.rum_ico import rum_64
 from ..lib.localization import get as _

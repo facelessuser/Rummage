@@ -28,7 +28,7 @@ from time import time
 from os.path import abspath, exists, dirname, normpath, isdir, isfile, expanduser
 import wx.lib.masked as masked
 import wx.lib.newevent
-import version
+from .. import  version
 from ..lib import pygrep
 from ..lib.epoch_timestamp import local_time_to_epoch_timestamp
 from ..lib import notify

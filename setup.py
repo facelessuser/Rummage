@@ -26,8 +26,8 @@ setup(
     ],
     zip_safe=False,
     entry_points={
-        'console_scripts': [
-            'Rummage=rummage.rummage:cli'
+        'gui_scripts': [
+            'rummage=rummage.cli:main'
         ]
     },
     license='MIT License',
