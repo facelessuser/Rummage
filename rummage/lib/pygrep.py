@@ -132,17 +132,17 @@ class GrepException(Exception):
     """Grep exception."""
 
 
-class FileInfo(namedtuple('FileInfo', ['id', 'name', 'size', 'modified', 'created', 'encoding'], verbose=False)):
+class FileInfo(namedtuple('FileInfo', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
 
     """Class for tracking file info."""
 
 
-class FileRecord(namedtuple('FileRecord', ['info', 'match', 'error'], verbose=False)):
+class FileRecord(namedtuple('FileRecord', ['info', 'match', 'error'])):
 
     """A record that reports file info, matching status, and errors."""
 
 
-class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines', 'ending', 'context'], verbose=False)):
+class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines', 'ending', 'context'])):
 
     """A record that contains match info, lineno content, context, etc."""
 

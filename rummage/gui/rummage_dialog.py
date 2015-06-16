@@ -251,6 +251,9 @@ def threaded_grep(
 
 
 class GrepThread(object):
+
+    """Threaded grep."""
+
     def __init__(self, grep):
         """Set up grep thread with the pygrep object."""
 
@@ -258,8 +261,9 @@ class GrepThread(object):
 
     def run(self):
         """
-        Run the grep search and store the results in a global array
-        Also, store general statistics as well
+        Run the grep search and store the results in a global array.
+
+        Also, store general statistics as well.
         """
         global _ABORT
         global _RESULTS
@@ -275,19 +279,16 @@ class GrepThread(object):
             _ERRORS = []
         no_results = 0
         for f in self.grep.find():
-            if f is None:
-                pass
-            elif isinstance(f, pygrep.FileRecord) and f.match is not None:
-                _RESULTS.append(f)
-            elif isinstance(f, pygrep.FileRecord) and f.error is not None:
-                with _LOCK:
-                    _ERRORS.append(f)
-                    no_results += 1
-            else:
-                no_results += 1
             with _LOCK:
+                if f.match is not None:
+                    _RESULTS.append(f)
+                else:
+                    no_results += 1
+                    if f.error is not None:
+                        _ERRORS.append(f)
                 _COMPLETED, _TOTAL, _RECORDS = self.grep.get_status()
                 _RECORDS -= no_results
+
             if _ABORT:
                 self.grep.abort()
                 _ABORT = False
@@ -295,6 +296,9 @@ class GrepThread(object):
 
 
 class GrepArgs(object):
+
+    """Grep argument object."""
+
     def __init__(self):
         """Default the grep args on instatiation."""
 
@@ -322,6 +326,9 @@ class GrepArgs(object):
 
 
 class DirPickButton(object):
+
+    """Directory pick button."""
+
     def GetPath(self):
         """Get current directory path."""
 
@@ -352,6 +359,7 @@ class DirPickButton(object):
     def on_dir_pick(self, event):
         """
         When a new directory is picked, validate it, and set it if it is good.
+
         Call the DirChangeEvent to do any desired callback as well.
         """
 
@@ -368,6 +376,9 @@ class DirPickButton(object):
 
 
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
+
+    """Rummage Frame."""
+
     def __init__(self, parent, script_path, start_path, open_debug=False):
         """Init the RummageFrame object."""
 
@@ -443,6 +454,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.init_search_path(start_path)
 
     def localize(self):
+        """Localize."""
+
         self.m_search_panel.GetSizer().GetStaticBox().SetLabel(_("Search"))
         self.m_limiter_panel.GetSizer().GetStaticBox().SetLabel(_("Limit Search"))
         self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
@@ -613,6 +626,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_created_time_picker, self.m_created_spin, "created_time_string"
         )
 
+        # m_searchin_text replacement causes "Error in sys.excepthook:"
+        # not sure why only it causes this.
         self.m_searchin_text = replace_with_autocomplete(
             self.m_searchin_text, "target", changed_callback=self.on_searchin_changed
         )
@@ -955,8 +970,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def save_history(self):
         """
-        Save the current configuration of the search for the next time the app is opened
-        Save a history of search directory, regex, folders, and excludes as well for use again in the future
+        Save the current configuration of the search for the next time the app is opened.
+
+        Save a history of search directory, regex, folders, and excludes as well for use again in the future.
         """
 
         history = [
@@ -1042,7 +1058,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if records > count:
                 with _LOCK:
                     results = _RESULTS[0:records - count]
-                    _RESULTS = _RESULTS[records - count:len(_RESULTS)]
+                    del _RESULTS[0:records - count]
                 count = self.update_table(count, completed, total, *results)
             else:
                 self.m_statusbar.set_status(
@@ -1105,23 +1121,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     elif Settings.get_alert():
                         notify.play_alert()
                 with _LOCK:
-                    error_count = len(_ERRORS)
-                    if error_count:
-                        graphic = error_icon.GetImage()
-                        graphic.Rescale(16, 16)
-                        image = wx.BitmapFromImage(graphic)
-                        self.m_statusbar.set_icon(
-                            _("errors"), image,
-                            msg=_("%d errors\nSee log for details.") % error_count,
-                            context=[(_("View Log"), lambda e: self.open_debug_console())]
-                        )
-                        for e in _ERRORS:
-                            error(
-                                _("Cound not process %s:\n%s") % (
-                                    unicode(e.info.name) if e.info is not None else _("file"), e.error
-                                )
+                    errors = _ERRORS[:]
+                    del _ERRORS[:]
+                if errors:
+                    graphic = error_icon.GetImage()
+                    graphic.Rescale(16, 16)
+                    image = wx.BitmapFromImage(graphic)
+                    self.m_statusbar.set_icon(
+                        _("errors"), image,
+                        msg=_("%d errors\nSee log for details.") % len(errors),
+                        context=[(_("View Log"), lambda e: self.open_debug_console())]
+                    )
+                    for e in errors:
+                        error(
+                            _("Cound not process %s:\n%s") % (
+                                unicode(e.info.name) if e.info is not None else _("file"), e.error
                             )
-                        _ERRORS = []
+                        )
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
                 self.m_grep_notebook.SetSelection(1)
@@ -1212,10 +1228,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.toggle_debug_console()
 
     def on_close(self, event):
-        """
-        Ensure thread is stopped,
-        and ensure tester window, debug console is closed
-        """
+        """Ensure thread is stopped, and ensure tester window, debug console is closed."""
+
         if self.thread is not None:
             self.thread.abort = True
         if self.tester is not None:

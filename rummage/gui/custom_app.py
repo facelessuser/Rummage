@@ -326,7 +326,7 @@ class PipeApp(CustomApp):
         return arguments
 
     def receive_arg_pipe(self):
-        """Starts the pipe listenr thread."""
+        """Starts the pipe listener thread."""
 
         self.active_pipe = True
         self.pipe_thread = ArgPipeThread(self, self.pipe_name)
@@ -351,6 +351,9 @@ class PipeApp(CustomApp):
 
 
 class DebugFrameExtender(object):
+
+    """Extend frame with debugger."""
+
     def set_keybindings(self, keybindings=[], debug_event=None):
         """Method to easily set key bindings.  Also sets up debug keybindings and events."""
 
@@ -421,7 +424,7 @@ def _log_struct(obj, log_func, label="Object"):
 
 
 def json_fmt(obj):
-    """Formats dict as JSON."""
+    """Format dict as JSON."""
 
     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
 
