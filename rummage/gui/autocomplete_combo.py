@@ -1,5 +1,5 @@
 """
-AutoCompleteCombo
+AutoCompleteCombo.
 
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>

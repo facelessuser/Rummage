@@ -27,9 +27,8 @@ from ..lib.localization import get as _
 
 
 def open_editor(filename, line, col):
-    """
-    Open editor with the optional filename, line, and col parameters
-    """
+
+    """Open editor with the optional filename, line, and col parameters."""
 
     returncode = None
 

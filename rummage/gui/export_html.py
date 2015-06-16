@@ -9,7 +9,7 @@ import subprocess
 import sys
 from ..icons.rum_ico import rum_64
 from ..icons.glass import glass
-from ..sorttable.sorttable import sorttable as SORT_JS
+from ..sorttable.sorttable import sorttable
 from ..lib.localization import get as _
 from ..lib.localization import get_current_domain
 
@@ -178,7 +178,7 @@ div.main {
     padding-bottom: 50px;
 }
 
-'''
+'''  # noqa
 
 TITLE = html_encode(_("Rummage Results"))
 
@@ -381,7 +381,7 @@ def export(export_html, search, regex_search, result_list, result_content_list):
     with codecs.open(export_html, "w", encoding="utf-8") as html:
         html.write(
             HTML_HEADER % {
-                "js": SORT_JS,
+                "js": sorttable,
                 "morejs": LOAD_TAB,
                 "css": CSS_HTML,
                 "icon": base64.b64encode(glass.GetData()),

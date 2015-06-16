@@ -1,15 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-Messages
+Messages.
+
 https://gist.github.com/facelessuser/5749982
 
 Licensed under MIT
-Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
 """
 import wx
 import re
@@ -469,8 +479,8 @@ Prompt = PyEmbeddedImage(
     "vM5evElWMrG3g5AAeLnf4d8rAK9kbv3XWMS/AAoVdu6wYO1vAAAAAElFTkSuQmCC")
 
 
-class MessageIcon (namedtuple('MessageIcon', ['bitmap', 'width', 'height'], verbose=False)):
-    pass
+class MessageIcon (namedtuple('MessageIcon', ['bitmap', 'width', 'height'])):
+    """Message icon named tuple."""
 
 
 ###########################################################################
@@ -478,9 +488,7 @@ class MessageIcon (namedtuple('MessageIcon', ['bitmap', 'width', 'height'], verb
 ###########################################################################
 class Messages (wx.Dialog):
     def __init__(self, parent, text, title=wx.EmptyString, style=INFO, bitmap=None, yes="Okay", no="Cancel"):
-        """
-        Init Messages object
-        """
+        """Init Messages object."""
 
         m = HAS_CAPTION.match(text)
         if m is not None:
@@ -492,7 +500,10 @@ class Messages (wx.Dialog):
 
         self.answer = wx.ID_CANCEL if style == PROMPT else wx.ID_OK
 
-        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title=title, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(
+            self, parent, id=wx.ID_ANY, title=title, pos=wx.DefaultPosition,
+            size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE
+        )
 
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
         b_dialog_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -532,9 +543,7 @@ class Messages (wx.Dialog):
         self.m_accept_button.SetFocus()
 
     def _setup_buttons(self, fg_button_row_sizer, style, yes, no):
-        """
-        Setup the appropriate buttons for the dialog
-        """
+        """Setup the appropriate buttons for the dialog."""
 
         fg_button_sizer = wx.FlexGridSizer(0, 2, 0, 0) if style == PROMPT else wx.FlexGridSizer(0, 1, 0, 0)
         fg_button_sizer.SetFlexibleDirection(wx.BOTH)
@@ -552,9 +561,7 @@ class Messages (wx.Dialog):
         fg_button_row_sizer.Add(fg_button_sizer, 1, wx.EXPAND, 5)
 
     def _setup_message(self, fg_panel_sizer, msg, caption, style, bitmap):
-        """
-        Setup the message
-        """
+        """Setup the message."""
 
         bm = self._get_bitmap(style, bitmap)
 
@@ -569,7 +576,9 @@ class Messages (wx.Dialog):
         fg_message_sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
         if bm is not None:
-            self.m_bitmap = wx.StaticBitmap(self.m_message_panel, wx.ID_ANY, bm.bitmap, wx.DefaultPosition, wx.Size(bm.width, bm.height), 0)
+            self.m_bitmap = wx.StaticBitmap(
+                self.m_message_panel, wx.ID_ANY, bm.bitmap, wx.DefaultPosition, wx.Size(bm.width, bm.height), 0
+            )
             fg_message_sizer.Add(self.m_bitmap, 0, wx.ALL, 5)
 
         self.m_message_text = wx.StaticText(self.m_message_panel, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0)
@@ -587,7 +596,9 @@ class Messages (wx.Dialog):
             fg_text_sizer.AddGrowableRow(1)
             fg_text_sizer.SetFlexibleDirection(wx.BOTH)
             fg_text_sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
-            self.m_caption_text = wx.StaticText(self.m_message_panel, wx.ID_ANY, caption, wx.DefaultPosition, wx.DefaultSize, 0)
+            self.m_caption_text = wx.StaticText(
+                self.m_message_panel, wx.ID_ANY, caption, wx.DefaultPosition, wx.DefaultSize, 0
+            )
             font = self.m_caption_text.GetFont()
             font.SetWeight(wx.FONTWEIGHT_BOLD)
             self.m_caption_text.SetFont(font)
@@ -609,9 +620,7 @@ class Messages (wx.Dialog):
         fg_panel_sizer.Add(fg_message_sizer, 1, wx.EXPAND, 5)
 
     def _get_bitmap(self, style, bitmap):
-        """
-        Get the appropriate icon
-        """
+        """Get the appropriate icon."""
 
         icon = None
 
@@ -629,38 +638,30 @@ class Messages (wx.Dialog):
         return icon
 
     def __del__(self):
-        pass
+        """Delete."""
 
     def on_char_hook(self, event):
-        """
-        Cancel on escape
-        """
+        """Cancel on escape."""
 
         if event.GetKeyCode() == wx.WXK_ESCAPE:
             self.answer = wx.ID_CANCEL
             self.EndModal(self.answer)
 
     def on_cancel(self, event):
-        """
-        Set cancel status
-        """
+        """Set cancel status."""
 
         self.answer = wx.ID_CANCEL
         self.EndModal(self.answer)
 
     def on_accept(self, event):
-        """
-        Set OK status
-        """
+        """Set OK status."""
 
         self.answer = wx.ID_OK
         self.EndModal(self.answer)
 
 
 def filepickermsg(msg, wildcard, save=False):
-    """
-    File picker
-    """
+    """File picker."""
 
     select = None
     style = wx.OPEN | wx.FILE_MUST_EXIST if not save else wx.SAVE | wx.OVERWRITE_PROMPT
@@ -676,9 +677,7 @@ def filepickermsg(msg, wildcard, save=False):
 
 
 def dirpickermsg(msg, default_path=""):
-    """
-    Directory picker
-    """
+    """Directory picker."""
 
     select = None
     style = wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
@@ -694,9 +693,7 @@ def dirpickermsg(msg, default_path=""):
 
 
 def promptmsg(question, caption='PROMPT', bitmap=None, yes="Okay", no="Cancel"):
-    """
-    Prompt with "yes" "no" type object
-    """
+    """Prompt with "yes" "no" type object."""
 
     dlg = Messages(None, question, caption, style=PROMPT, yes=yes, no=no, bitmap=bitmap)
     result = dlg.ShowModal() == wx.ID_OK
@@ -705,9 +702,7 @@ def promptmsg(question, caption='PROMPT', bitmap=None, yes="Okay", no="Cancel"):
 
 
 def infomsg(msg, title="INFO", bitmap=None):
-    """
-    Info message
-    """
+    """Info message."""
 
     dlg = Messages(None, msg, title, style=INFO, bitmap=bitmap)
     dlg.ShowModal()
@@ -715,9 +710,7 @@ def infomsg(msg, title="INFO", bitmap=None):
 
 
 def errormsg(msg, title="ERROR", bitmap=None):
-    """
-    Error message
-    """
+    """Error message."""
 
     dlg = Messages(None, msg, title, style=ERROR, bitmap=bitmap)
     dlg.ShowModal()
@@ -725,9 +718,7 @@ def errormsg(msg, title="ERROR", bitmap=None):
 
 
 def warnmsg(msg, title="WARNING", bitmap=None):
-    """
-    Warning message
-    """
+    """Warning message."""
 
     dlg = Messages(None, msg, title, style=WARN, bitmap=bitmap)
     dlg.ShowModal()

@@ -1,17 +1,25 @@
 """
-Custom App
+Custom App.
+
 https://gist.github.com/facelessuser/5750404
 
 Licensed under MIT
-Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions
+of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 """
-
 import wx
 import simplelog
 import sys
@@ -42,18 +50,14 @@ DEBUG_CONSOLE = False
 
 class GuiLog(wx.PyOnDemandOutputWindow):
     def __init__(self, title="Debug Console"):
-        """
-        Init the PyOnDemandOutputWindow object
-        """
+        """Init the PyOnDemandOutputWindow object."""
 
         # wx.PyOnDemandOutputWindow is old class style
         # Cannot use super with old class styles
         wx.PyOnDemandOutputWindow.__init__(self, title)
 
     def CreateOutputWindow(self, st):
-        """
-        Create the logging console
-        """
+        """Create the logging console."""
 
         self.frame = wx.Frame(self.parent, -1, self.title, self.pos, self.size, style=wx.DEFAULT_FRAME_STYLE)
         self.text = wx.TextCtrl(self.frame, -1, "", style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH)
@@ -71,16 +75,12 @@ class GuiLog(wx.PyOnDemandOutputWindow):
         self.frame.SetAcceleratorTable(accel_tbl)
 
     def debug_close(self, event):
-        """
-        Close debug frame
-        """
+        """Close debug frame."""
 
         self.frame.Close()
 
     def write(self, text, echo=True):
-        """
-        Write to log, and if console is open, echo to it as well
-        """
+        """Write to log, and if console is open, echo to it as well."""
 
         if self.frame is None:
             if not wx.Thread_IsMain():
@@ -106,9 +106,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
                     self.text.AppendText(text)
 
     def OnCloseWindow(self, event):
-        """
-        Close logging console
-        """
+        """Close logging console."""
 
         if self.frame is not None:
             self.frame.Destroy()
@@ -124,7 +122,8 @@ class GuiLog(wx.PyOnDemandOutputWindow):
 class CustomApp(wx.App):
     def __init__(self, *args, **kwargs):
         """
-        Init the custom app
+        Init the custom app.
+
         Provide two new inputs:
             single_instance_name: this creates an instance id with the name given
                                   this will allow you to check if this is the only
@@ -142,9 +141,7 @@ class CustomApp(wx.App):
         super(CustomApp, self).__init__(*args, **kwargs)
 
     def custom_init(self, *args, **kwargs):
-        """
-        Parse for new inputs and store them because they must be removed
-        """
+        """Parse for new inputs and store them because they must be removed."""
 
         self.single_instance = None
         self.init_callback = None
@@ -156,9 +153,7 @@ class CustomApp(wx.App):
             self.init_callback = callback
 
     def ensure_single_instance(self, name):
-        """
-        Check to see if this is the only instance
-        """
+        """Check to see if this is the only instance."""
 
         self.name = "%s-%s" % (self.single_instance, wx.GetUserId())
         self.instance = wx.SingleInstanceChecker(self.name)
@@ -168,15 +163,15 @@ class CustomApp(wx.App):
         return True
 
     def is_instance_okay(self):
-        """
-        Returns whether this is the only instance
-        """
+        """Returns whether this is the only instance."""
 
         return self.instance_okay
 
     def OnInit(self):
         """
-        Execute callback if instance is okay.  Store instance check variable.
+        Execute callback if instance is okay.
+
+        Store instance check variable.
         """
 
         self.instance_okay = True
@@ -188,9 +183,7 @@ class CustomApp(wx.App):
         return True
 
     def OnExit(self):
-        """
-        Cleanup instance check
-        """
+        """Cleanup instance check."""
 
         if self.instance is not None:
             del self.instance
@@ -198,17 +191,13 @@ class CustomApp(wx.App):
 
 class ArgPipeThread(object):
     def __init__(self, app, pipe_name):
-        """
-        Init pipe thread variables
-        """
+        """Init pipe thread variables."""
 
         self.app = app
         self.pipe_name = pipe_name
 
     def Start(self):
-        """
-        Start listening to the pipe
-        """
+        """Start listening to the pipe."""
 
         self.check_pipe = True
         self.running = True
@@ -217,12 +206,13 @@ class ArgPipeThread(object):
     def Stop(self):
         """
         Stop listening to the pipe.
+
         Send a new line to kick the listener out from waiting.
         """
 
         self.check_pipe = False
         if _PLATFORM == "windows":
-            fileHandle = win32file.CreateFile(
+            file_handle = win32file.CreateFile(
                 self.pipe_name,
                 win32file.GENERIC_READ | win32file.GENERIC_WRITE,
                 0, None,
@@ -230,23 +220,19 @@ class ArgPipeThread(object):
                 0, None
             )
             data = '\n'
-            win32file.WriteFile(fileHandle, data)
-            win32file.CloseHandle(fileHandle)
+            win32file.WriteFile(file_handle, data)
+            win32file.CloseHandle(file_handle)
         else:
             with open(self.pipe_name, "w") as pipeout:
                 pipeout.write('\n')
 
     def IsRunning(self):
-        """
-        Returns if the thread is still busy
-        """
+        """Returns if the thread is still busy."""
 
         return self.running
 
     def Run(self):
-        """
-        The actual thread listening loop
-        """
+        """The actual thread listening loop."""
 
         if _PLATFORM == "windows":
             data = ""
@@ -286,9 +272,7 @@ class ArgPipeThread(object):
 
 class PipeApp(CustomApp):
     def __init__(self, *args, **kwargs):
-        """
-        Parse pipe args
-        """
+        """Parse pipe args."""
 
         self.active_pipe = False
         self.pipe_thread = None
@@ -299,7 +283,8 @@ class PipeApp(CustomApp):
 
     def OnInit(self):
         """
-        If this is the first instance, start the pipe listener
+        Check if this is the first instance, and if so, start the pipe listener.
+
         If not, send the current args to the pipe to be read
         by the first instance.
         """
@@ -315,9 +300,7 @@ class PipeApp(CustomApp):
         return True
 
     def send_arg_pipe(self):
-        """
-        Send the current arguments down the pipe
-        """
+        """Send the current arguments down the pipe."""
 
         if len(sys.argv) > 1:
             if _PLATFORM == "windows":
@@ -338,25 +321,19 @@ class PipeApp(CustomApp):
                     pipeout.write('|'.join(args) + '\n')
 
     def process_args(self, arguments):
-        """
-        This is a method that can be overridden to parse the args
-        """
+        """This is a method that can be overridden to parse the args."""
 
         return arguments
 
     def receive_arg_pipe(self):
-        """
-        Starts the pipe listenr thread
-        """
+        """Starts the pipe listenr thread."""
 
         self.active_pipe = True
         self.pipe_thread = ArgPipeThread(self, self.pipe_name)
         self.pipe_thread.Start()
 
     def OnExit(self):
-        """
-        Stop the thread if needed
-        """
+        """Stop the thread if needed."""
 
         if self.active_pipe:
             wx.Yield()
@@ -368,18 +345,14 @@ class PipeApp(CustomApp):
         super(PipeApp, self).OnExit()
 
     def on_pipe_args(self, event):
-        """
-        An overridable event for when pipe arguments are received
-        """
+        """An overridable event for when pipe arguments are received."""
 
         event.Skip()
 
 
 class DebugFrameExtender(object):
     def set_keybindings(self, keybindings=[], debug_event=None):
-        """
-        Method to easily set key bindings.  Also sets up debug keybindings and events.
-        """
+        """Method to easily set key bindings.  Also sets up debug keybindings and events."""
 
         # Create keybinding to open debug console, bind debug console to ctrl/cmd + ` depending on platform
         # if an event is passed in.
@@ -398,9 +371,7 @@ class DebugFrameExtender(object):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
 
     def open_debug_console(self):
-        """
-        Open the debug console
-        """
+        """Open the debug console."""
 
         set_debug_console(True)
         # echo out log to console
@@ -412,10 +383,7 @@ class DebugFrameExtender(object):
         debug("**Debug Console Opened**")
 
     def toggle_debug_console(self):
-        """
-        Open up the debug console if closed
-        or close if opened.
-        """
+        """Open up the debug console if closed or close if opened."""
 
         set_debug_console(not get_debug_console())
         if get_debug_console():
@@ -433,6 +401,7 @@ class DebugFrameExtender(object):
     def close_debug_console(self):
         """
         On close, ensure that console is closes.
+
         Also, make sure echo is off in case logging
         occurs after App closing.
         """
@@ -446,114 +415,86 @@ class DebugFrameExtender(object):
 
 
 def _log_struct(obj, log_func, label="Object"):
-    """
-    Base logger to log a dict in pretty print format
-    """
+    """Base logger to log a dict in pretty print format."""
 
     log_func(obj, format="%(loglevel)s: " + label + ": %(message)s\n", fmt=json_fmt)
 
 
 def json_fmt(obj):
-    """
-    Formats dict as JSON
-    """
+    """Formats dict as JSON."""
 
     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def gui_log(msg):
-    """
-    Logger used in the GUI frames
-    """
+    """Logger used in the GUI frames."""
 
     log._log(msg, echo=False)
 
 
 def debug(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
-    """
-    Debug level log
-    """
+    """Debug level log."""
 
     if get_debug_mode():
         log.debug(msg, echo=echo, format=format, fmt=fmt)
 
 
 def info(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
-    """
-    Info level log
-    """
+    """Info level log."""
 
     log.info(msg, echo=echo, format=format, fmt=fmt)
 
 
 def critical(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
-    """
-    Critical level log
-    """
+    """Critical level log."""
 
     log.critical(msg, echo=echo, format=format, fmt=fmt)
 
 
 def warning(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
-    """
-    Warning level log
-    """
+    """Warning level log."""
 
     log.warning(msg, echo=echo, format=format, fmt=fmt)
 
 
 def error(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
-    """
-    Error level log
-    """
+    """Error level log."""
 
     log.error(msg, echo=echo, format=format, fmt=fmt)
 
 
 def debug_struct(obj, label="Object"):
-    """
-    Debug level dict log
-    """
+    """Debug level dict log."""
 
     _log_struct(obj, debug, label)
 
 
 def info_struct(obj, label="Object"):
-    """
-    Info level dict log
-    """
+    """Info level dict log."""
 
     _log_struct(obj, info, label)
 
 
 def critical_struct(obj, label="Object"):
-    """
-    Critical level dict log
-    """
+    """Critical level dict log."""
 
     _log_struct(obj, critical, label)
 
 
 def warning_struct(obj, label="Object"):
-    """
-    Warning level dict log
-    """
+    """Warning level dict log."""
 
     _log_struct(obj, warning, label)
 
 
 def error_struct(obj, label="Object"):
-    """
-    Error level dict log
-    """
+    """Error level dict log."""
 
     _log_struct(obj, error, label)
 
 
 def init_app_log(name, level=simplelog.ERROR):
-    """
-    Init the app log
-    """
+    """Init the app log."""
 
     global log
     global last_level
@@ -564,9 +505,7 @@ def init_app_log(name, level=simplelog.ERROR):
 
 
 def set_debug_mode(value):
-    """
-    Set whether the app is in debug mode
-    """
+    """Set whether the app is in debug mode."""
 
     global DEBUG_MODE
     global last_level
@@ -583,25 +522,19 @@ def set_debug_mode(value):
 
 
 def set_debug_console(value):
-    """
-    Set debug console enable
-    """
+    """Set debug console enable."""
 
     global DEBUG_CONSOLE
     DEBUG_CONSOLE = bool(value)
 
 
 def get_debug_mode():
-    """
-    Get the debug mode
-    """
+    """Get the debug mode."""
 
     return DEBUG_MODE
 
 
 def get_debug_console():
-    """
-    Get debug console mode
-    """
+    """Get debug console mode."""
 
     return DEBUG_CONSOLE

@@ -1,5 +1,5 @@
 """
-Rummage Dialog
+Rummage Dialog.
 
 Licensed under MIT
 Copyright (c) 2011 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -278,8 +278,7 @@ class GrepThread(object):
             if f is None:
                 pass
             elif isinstance(f, pygrep.FileRecord) and f.match is not None:
-                with _LOCK:
-                    _RESULTS.append(f)
+                _RESULTS.append(f)
             elif isinstance(f, pygrep.FileRecord) and f.error is not None:
                 with _LOCK:
                     _ERRORS.append(f)
@@ -291,8 +290,7 @@ class GrepThread(object):
                 _RECORDS -= no_results
             if _ABORT:
                 self.grep.abort()
-                with _LOCK:
-                    _ABORT = False
+                _ABORT = False
                 break
 
 
@@ -601,8 +599,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # GUI is built with WxFormBuilder, but it isn't easy to fill in custom objects.
         # So place holder objects are added for the sake of planning the gui, and then they
         # are replaced here with the actual objects.
-        self.m_modified_date_picker = replace_with_genericdatepicker(self.m_modified_date_picker, "modified_date_string")
-        self.m_created_date_picker = replace_with_genericdatepicker(self.m_created_date_picker, "created_date_string")
+        self.m_modified_date_picker = replace_with_genericdatepicker(
+            self.m_modified_date_picker, "modified_date_string"
+        )
+        self.m_created_date_picker = replace_with_genericdatepicker(
+            self.m_created_date_picker, "created_date_string"
+        )
 
         self.m_modified_time_picker = replace_with_timepicker(
             self.m_modified_time_picker, self.m_modified_spin, "modified_time_string"
@@ -750,16 +752,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def start_search(self):
         """Initiate search or stop search depending on search state."""
 
-        with _LOCK:
-            if self.debounce_search:
-                return
+        if self.debounce_search:
+            return
         self.debounce_search = True
         if self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
             if self.thread is not None:
                 self.m_search_button.SetLabel(SEARCH_BTN_ABORT)
                 global _ABORT
-                with _LOCK:
-                    _ABORT = True
+                _ABORT = True
                 self.kill = True
             else:
                 self.stop_update_timer()
@@ -966,7 +966,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if isdir(self.args.target):
             history += [
-                ("regex_folder_exclude", self.args.directory_exclude) if self.m_dirregex_checkbox.GetValue() else ("folder_exclude", self.args.directory_exclude),
+                (
+                    "regex_folder_exclude", self.args.directory_exclude
+                ) if self.m_dirregex_checkbox.GetValue() else ("folder_exclude", self.args.directory_exclude),
                 ("regex_file_search", self.args.regexfilepattern),
                 ("file_search", self.args.filepattern)
             ]
@@ -1057,8 +1059,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
             # Run is finished or has been terminated
             if not running:
-                with _LOCK:
-                    benchmark = _RUNTIME
+                benchmark = _RUNTIME
 
                 self.stop_update_timer()
                 self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)

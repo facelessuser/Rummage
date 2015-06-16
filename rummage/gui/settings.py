@@ -51,6 +51,9 @@ NOTIFY_STYLES = {
 
 
 class Settings(object):
+
+    """Handle settings."""
+
     filename = None
     allow_save = True
 
@@ -71,12 +74,12 @@ class Settings(object):
                     cls.settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
                 with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
                     cls.cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
-            except:
+            except Exception:
                 e = traceback.format_exc()
                 try:
                     errormsg(_("Failed to load settings file!"))
                     error(e)
-                except:
+                except Exception:
                     print(str(e))
         if cls.get_debug():
             set_debug_mode(True)
@@ -172,7 +175,7 @@ class Settings(object):
         cls.get_times()
         try:
             changed = old_settings != cls.settings_time or old_cache != cls.cache_time
-        except:
+        except Exception:
             error("Could not compare timestamp of file!")
             changed = False
         return changed
@@ -345,14 +348,14 @@ class Settings(object):
             if not exists(png):
                 with open(png, "wb") as f:
                     f.write(rum_64.GetData())
-        except:
+        except Exception:
             png = None
 
         try:
             if not exists(icon):
                 with open(icon, "wb") as f:
                     f.write(rum_tray.GetData())
-        except:
+        except Exception:
             icon = None
 
         # Set up notifications
@@ -479,12 +482,12 @@ class Settings(object):
         try:
             with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(cls.settings, sort_keys=True, indent=4, separators=(',', ': ')))
-        except:
+        except Exception:
             e = traceback.format_exc()
             try:
                 errormsg(_("Failed to save settings file!"))
                 error(e)
-            except:
+            except Exception:
                 print(str(e))
 
     @classmethod
@@ -494,10 +497,10 @@ class Settings(object):
         try:
             with codecs.open(cls.cache_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(cls.cache, sort_keys=True, indent=4, separators=(',', ': ')))
-        except:
+        except Exception:
             e = traceback.format_exc()
             try:
                 errormsg(_("Failed to save cache file!"))
                 error(e)
-            except:
+            except Exception:
                 print(str(e))

@@ -67,10 +67,16 @@ bin = PyEmbeddedImage(
 
 
 class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
+
+    """Result list."""
+
     def __init__(self, parent, columns):
         """Init the base class ResultList object."""
 
-        super(ResultList, self).__init__(parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_VIRTUAL)
+        super(ResultList, self).__init__(
+            parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
+            style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_VIRTUAL
+        )
         self.column_count = len(columns)
         self.headers = columns
         self.itemDataMap = {}
@@ -387,7 +393,9 @@ class ResultContentList(ResultList):
             line = self.GetItem(item, col=1).GetText()
             file_row = self.get_map_item(item, col=4)
             col = str(self.get_map_item(item, col=5))
-            path = self.GetParent().GetParent().GetParent().m_result_file_panel.list.get_map_item(file_row, col=3, abs=True)
+            path = self.GetParent().GetParent().GetParent().m_result_file_panel.list.get_map_item(
+                file_row, col=3, abs=True
+            )
             open_editor(join(normpath(path), filename), line, col)
         event.Skip()
 

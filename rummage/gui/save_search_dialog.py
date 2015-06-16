@@ -28,6 +28,9 @@ from ..lib.localization import get as _
 
 
 class SaveSearchDialog(gui.SaveSearchDialog):
+
+    """Save search dialog."""
+
     def __init__(self, parent, search, is_regex):
         """Init SaveSearchDialog object."""
 
@@ -53,6 +56,8 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.m_name_text.SetFocus()
 
     def localize(self):
+        """Localize the dialog."""
+
         self.SetTitle(_("Save Search"))
         self.m_apply_button.SetLabel(_("Save"))
         self.m_cancel_button.SetLabel(_("Cancel"))

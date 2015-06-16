@@ -36,10 +36,11 @@ SEARCH_TYPE = {
 
 
 class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
+
+    """Mixin Sort List."""
+
     def setup(self, c):
-        """
-        Init MixinSortList object
-        """
+        """Init MixinSortList object."""
 
         self.column_count = c
         self.itemDataMap = {}
@@ -52,60 +53,44 @@ class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
         listmix.ListRowHighlighter.__init__(self, (0xEE, 0xEE, 0xEE))
 
     def reset_item_map(self):
-        """
-        Reset the item map
-        """
+        """Reset the item map."""
 
         self.itemDataMap = {}
 
     def set_item_map(self, idx, *args):
-        """
-        Add entry to item map
-        """
+        """Add entry to item map."""
 
         self.itemDataMap[idx] = tuple([a for a in args])
 
     def init_sort(self):
-        """
-        Do the intial sort
-        """
+        """Do the intial sort."""
 
         self.SortListItems(col=0, ascending=1)
         self.RefreshRows()
 
     def GetListCtrl(self):
-        """
-        Return ListCtrl object (self)
-        """
+        """Return ListCtrl object (self)."""
 
         return self
 
     def GetSortImages(self):
-        """
-        Return the sort arrows for the header
-        """
+        """Return the sort arrows for the header."""
 
         return self.sort_down, self.sort_up
 
     def get_map_item(self, idx, col=0):
-        """
-        Get map element from mapping entry
-        """
+        """Get map element from mapping entry."""
 
         return self.itemDataMap[idx][col]
 
     def OnSortOrderChanged(self):
-        """
-        Refresh the rows on sort
-        """
+        """Refresh the rows on sort."""
 
         self.RefreshRows()
 
 
 def extend(instance, extension):
-    """
-    Extend object with extension class
-    """
+    """Extend object with extension class."""
 
     instance.__class__ = type(
         '%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
@@ -115,19 +100,18 @@ def extend(instance, extension):
 
 
 def extend_list(l, c):
-    """
-    Extend list with with special sorting class.
-    """
+    """Extend list with with special sorting class."""
 
     extend(l, MixinSortList)
     l.setup(c)
 
 
 class LoadSearchDialog(gui.LoadSearchDialog):
+
+    """Load search dialog."""
+
     def __init__(self, parent):
-        """
-        Init LoadSearchDialog
-        """
+        """Init LoadSearchDialog."""
 
         super(LoadSearchDialog, self).__init__(parent)
 
@@ -150,9 +134,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.m_search_list.SetFocus()
 
     def localize(self):
-        """
-        Localize dialog
-        """
+        """Localize dialog."""
 
         self.SetTitle(_("Searches"))
         self.m_delete_button.SetLabel(_("Remove"))
@@ -161,9 +143,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.Fit()
 
     def load_searches(self):
-        """
-        Populate list with search entries
-        """
+        """Populate list with search entries."""
 
         count = 0
         for x in Settings.get_search():
@@ -180,9 +160,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.m_search_list.init_sort()
 
     def on_load(self, event):
-        """
-        Select the search entry for use
-        """
+        """Select the search entry for use."""
 
         item = self.m_search_list.GetFirstSelected()
         if item == -1:
@@ -193,16 +171,12 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.Close()
 
     def get_search(self):
-        """
-        Get the selected search entry
-        """
+        """Get the selected search entry."""
 
         return self.search, self.is_regex
 
     def column_resize(self, obj, count, minimum=100):
-        """
-        Resize columns
-        """
+        """Resize columns."""
 
         for i in range(0, count):
             obj.SetColumnWidth(i, wx.LIST_AUTOSIZE)
@@ -210,9 +184,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
                 obj.SetColumnWidth(i, minimum)
 
     def reset_table(self):
-        """
-        Clear and reset the list
-        """
+        """Clear and reset the list."""
 
         self.m_search_list.ClearAll()
         self.m_search_list.InsertColumn(0, _("Name"))
@@ -221,9 +193,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         wx.GetApp().Yield()
 
     def on_delete(self, event):
-        """
-        Delete search entry
-        """
+        """Delete search entry."""
 
         item = self.m_search_list.GetFirstSelected()
         if item == -1:
@@ -235,7 +205,6 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.load_searches()
 
     def on_cancel(self, event):
-        """
-        Close dialog
-        """
+        """Close dialog."""
+
         self.Close()

@@ -28,6 +28,9 @@ from ..lib.localization import get as _
 
 
 class RegexTestDialog(gui.RegexTestDialog):
+
+    """Regex test dialog."""
+
     def __init__(self, parent, is_case, is_dot, text="", stand_alone=False):
         """Init Regex Test Dialog object."""
 
@@ -169,7 +172,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
             try:
                 test = ure.compile(self.m_regex_text.GetValue(), flags)
-            except:
+            except Exception:
                 self.testing = False
                 return
 
@@ -189,9 +192,9 @@ class RegexTestDialog(gui.RegexTestDialog):
                             m.end(0),
                             wx.TextAttr(colBack=wx.Colour(0xFF, 0xCC, 0x00))
                         )
-                    except:
+                    except Exception:
                         pass
-            except:
+            except Exception:
                 print(str(traceback.format_exc()))
                 pass
             self.testing = False
