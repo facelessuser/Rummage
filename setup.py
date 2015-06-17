@@ -30,6 +30,9 @@ setup(
             'rummage=rummage.rummage:cli'
         ]
     },
+    package_data={
+        'rummage.data': ['*.css', '*.js']
+    },
     license='MIT License',
     classifiers=[
         'Development Status :: 5 - Production/Stable',

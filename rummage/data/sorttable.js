@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-sorttable = ur'''
 /*
   SortTable
   version 2
@@ -494,4 +492,3 @@ var forEach = function(object, block, context) {
         resolve.forEach(object, block, context);
     }
 };
-'''

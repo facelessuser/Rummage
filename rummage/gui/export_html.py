@@ -1,17 +1,19 @@
 """Export HTML."""
+from __future__ import unicode_literals
 import webbrowser
 import re
 from time import ctime
-from os.path import join
+import os
 import codecs
 import base64
+import json
 import subprocess
 import sys
 from ..icons.rum_ico import rum_64
 from ..icons.glass import glass
-from ..sorttable.sorttable import sorttable
 from ..lib.localization import get as _
 from ..lib.localization import get_current_domain
+from .. import data
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -40,145 +42,6 @@ def html_encode(text):
             encode_table.get(c, c) for c in text
         ).encode('ascii', 'xmlcharrefreplace')
     )
-
-
-CSS_HTML = '''
-body {
-    padding: 0;
-    margin: 0;
-    height: auto;
-    background: #28343b;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAIAAAC2BqGFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QcaAhwIBNjPuwAAAn1JREFUeNrt3E1qw0AMhuGpKKUEArlVz9Ab9PiBQCili24CJsGxNfr5Nn1nPRLiYRhLJs7Lx+fXKFq/P99Dsg7HU1Wq6+WsqdlQFqzXt3dDWaBcc6JR3lUugEbZo5yFRtmpnIJG2a8ch0Z5SjkIjfKscgQa5YDyNDTKMeU5aJTDyhPQKGeUvdAoJ5Vd0CjnlfehUS5R3oFGuUp5CxrlQuWn0CjXKq9Do1yuvAKNcofyIzTKTcp30Cj3KS/QKLcq36BR7lYeYxjKAuVR+AMalLdnbENZoKw40Sgrrg6UFXc0yoqHIcqKrgNlRXuHsqKPRlkxsKCsmAxRVozgKCvedaDs2WYoC5Sz0Cj7NxvKAuU4NMqzIYayQDkCjXIs0FAWKM9Bo5wJN5QFyl5olPNJDGWB8j40ylWpDGWB8hY0yrW1GcoC5XVolDsqNJQFyo/QKPfVaSgLlBdolLurNZQ13zwYypqaDWXBOhxPhrJAueZEo7yrXACNskc5C42yUzkFjbJfOQ6N8pRyEBrlWeUINMoB5WlolGPKc9Aoh5UnoFHOKHuhUU4qu6BRzivvQ6NcorwDjXKV8hY0yoXKT6FRrlVeh0a5XHkFGuUO5UdolJuU76BR7lNeoFFuVb5Bo9ytPMYwlAXKQ/bfpP9c+Xo5G8oCZcWJRllxdaCsuKNRVjwMUVZ0HSgr2juUFX00yoqBBWXFZIiyYgRHWfGuA2XPNkNZoJyFRtm/2VAWKMehUZ4NMZQFyhFolGOBhrJAeQ4a5Uy4oSxQ9kKjnE9iKAuU96FRrkplKAuUt6BRrq3NUBYor0Oj3FGhoSxQfoRGua9OQ1mgvECj3F2toaz55uEPVbjSBFmfMz0AAAAASUVORK5CYII=');
-    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
-    text-align: center;
-}
-h1 {
-    position: relative;
-    top: 0;
-    margin-top: 0;
-    padding-top: 50px;
-    color: white;
-    text-shadow: 2px 2px #333333;
-}
-#search_label {
-    color: white;
-}
-img {
-    padding: 0;
-    border: 0;
-    vertical-align: middle;
-    width:32px;
-    height: auto;
-}
-/* Sortable tables */
-table.sortable thead {
-    background-color:#2b5b72; /* Old browsers */
-    background: -moz-linear-gradient(top,  #c5deea 0%, #397997 31%, #2b5b72 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c5deea), color-stop(31%,#397997), color-stop(100%,#2b5b72)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #c5deea 0%,#397997 31%,#2b5b72 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #c5deea 0%,#397997 31%,#2b5b72 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #c5deea 0%,#397997 31%,#2b5b72 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #c5deea 0%,#397997 31%,#2b5b72 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c5deea', endColorstr='#2b5b72',GradientType=0 ); /* IE6-9 */
-    padding-top: 5px;
-    padding-bottom: 5px;
-    text-shadow: 2px 2px #333333;
-    color:#eeeeee;
-    font-weight: bold;
-    cursor: default;
-}
-table.sortable {
-    background: #ffffff;
-}
-table.sortable tbody tr:nth-child(2n) td {
-  background: #eeeeee;
-}
-table.sortable tbody tr:nth-child(2n+1) td {
-  background: #ffffff;
-}
-/* Tab Bar */
-#bar a{
-    margin: 0px;
-    padding-top:5px;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 5px;
-    color:#eeeeee;
-    text-decoration:none;
-    font-weight:bold;
-    -moz-border-radius-topright: 10px;
-    border-top-right-radius: 10px;
-    -moz-border-radius-topleft: 10px;
-    border-top-left-radius: 10px;
-    border-bottom: 5px;
-    text-shadow: 2px 2px #333333;
-    background:#397997; /* Old browsers */
-    background: -moz-linear-gradient(top,  #ffffff 1%, #6597ae 5%, #397997 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#ffffff), color-stop(5%,#6597ae), color-stop(100%,#397997)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #ffffff 1%,#6597ae 5%,#397997 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #ffffff 1%,#6597ae 5%,#397997 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #ffffff 1%,#6597ae 5%,#397997 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #ffffff 1%,#6597ae 5%,#397997 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#397997',GradientType=0 ); /* IE6-9 */
-    -moz-box-shadow: 3px 3px 4px #444;
-    -webkit-box-shadow: 3px 3px 4px #444;
-    box-shadow: 3px 3px 4px #444;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444')";
-    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444');
-}
-#bar a.unselected {
-    background: #2b5b72; /* Old browsers */
-    background: -moz-linear-gradient(top,  #ffffff 1%, #397997 5%, #2b5b72 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#ffffff), color-stop(5%,#397997), color-stop(100%,#2b5b72)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #ffffff 1%,#397997 5%,#2b5b72 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #ffffff 1%,#397997 5%,#2b5b72 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #ffffff 1%,#397997 5%,#2b5b72 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #ffffff 1%,#397997 5%,#2b5b72 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#2b5b72',GradientType=0 ); /* IE6-9 */
-}
-#bar a:hover{
-    color:#ccffff;
-}
-table {
-    position: relative;
-    z-index: 99;
-    font-size: small;
-    border: 8px solid #397997;
-    text-align: left;
-    margin: auto;
-    border-collapse: separate;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    border-spacing:0;
-    -moz-box-shadow: 3px 3px 4px #444;
-    -webkit-box-shadow: 3px 3px 4px #444;
-    box-shadow: 3px 3px 4px #444;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444')";
-    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444');
-}
-table td, table th {
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-dif.tab_hidden:after {
-    visibility: hidden;
-}
-
-div.tab_hidden {
-    display: none;
-}
-div#bar {
-    margin: auto;
-}
-div.main {
-    zoom: 1;
-    padding-bottom: 50px;
-}
-
-'''  # noqa
 
 TITLE = html_encode(_("Rummage Results"))
 
@@ -323,15 +186,13 @@ BODY_END = '''
 def export_result_list(res, html):
     """Export result list."""
 
-    length = len(res)
-    if length == 0:
+    if len(res) == 0:
         return
     html.write('<div id="tab1">')
     html.write('<table class="sortable">')
     html.write(RESULT_TABLE_HEADER)
 
-    for x in range(0, length):
-        item = res[x]
+    for item in res.values():
         html.write(
             RESULT_ROW % {
                 "file": html_encode(item[0]),
@@ -353,18 +214,16 @@ def export_result_list(res, html):
 def export_result_content_list(res, html):
     """Export result content list."""
 
-    length = len(res)
-    if length == 0:
+    if len(res) == 0:
         return
     html.write('<div id="tab2"">')
     html.write('<table class="sortable">')
     html.write(RESULT_CONTENT_TABLE_HEADER)
 
-    for x in range(0, length):
-        item = res[x]
+    for item in res.values():
         html.write(
             RESULT_CONTENT_ROW % {
-                "file_sort": html_encode(join(item[0][1], item[0][0])),
+                "file_sort": html_encode(os.path.join(item[0][1], item[0][0])),
                 "file": html_encode(item[0][0]),
                 "line": str(item[1]),
                 "matches": str(item[2]),
@@ -375,15 +234,54 @@ def export_result_content_list(res, html):
     html.write('</div>')
 
 
+def open_in_browser(name):
+    """Auto open HTML."""
+
+    if _PLATFORM == "osx":
+        web_handler = None
+        try:
+            launch_services = os.path.expanduser(
+                '~/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist'
+            )
+            if not os.path.exists(launch_services):
+                launch_services = os.path.expanduser('~/Library/Preferences/com.apple.LaunchServices.plist')
+            with open(launch_services, "rb") as f:
+                content = f.read()
+            args = ["plutil", "-convert", "json", "-o", "-", "--", "-"]
+            p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            p.stdin.write(content)
+            out = p.communicate()[0]
+            plist = json.loads(unicode(out))
+            for handler in plist['LSHandlers']:
+                if handler.get('LSHandlerURLScheme', '') == "http":
+                    web_handler = handler.get('LSHandlerRoleAll', None)
+                    break
+        except Exception:
+            pass
+        if web_handler is not None:
+            subprocess.Popen(['open', '-b', web_handler, name])
+        else:
+            subprocess.Popen(['open', name])
+    elif _PLATFORM == "windows":
+        webbrowser.open(name, new=2)
+    else:
+        try:
+            # Maybe...?
+            subprocess.Popen(['xdg-open', name])
+        except OSError:
+            webbrowser.open(name, new=2)
+            # Well we gave it our best...
+
+
 def export(export_html, search, regex_search, result_list, result_content_list):
     """Export the results as HTML."""
 
     with codecs.open(export_html, "w", encoding="utf-8") as html:
         html.write(
             HTML_HEADER % {
-                "js": sorttable,
+                "js": data.get_file('sorttable.js'),
                 "morejs": LOAD_TAB,
-                "css": CSS_HTML,
+                "css": data.get_file('results.css'),
                 "icon": base64.b64encode(glass.GetData()),
                 "title": TITLE,
                 "lang": get_current_domain()
@@ -407,14 +305,4 @@ def export(export_html, search, regex_search, result_list, result_content_list):
         html.write(TAB_INIT)
         html.write(BODY_END)
 
-    if _PLATFORM == "osx":
-        subprocess.Popen(['open', html.name])
-    elif _PLATFORM == "windows":
-        webbrowser.open(html.name, new=2)
-    else:
-        try:
-            # Maybe...?
-            subprocess.Popen(['xdg-open', html.name])
-        except OSError:
-            # Well we gave it our best...
-            pass
+    open_in_browser(html.name)
