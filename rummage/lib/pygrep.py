@@ -151,7 +151,7 @@ class _FileSearch(object):
 
     """Search for files."""
 
-    hex_tx_table = ("." * 32) + "".join(chr(c) for c in xrange(32, 127)) + ("." * 129)
+    hex_tx_table = ("." * 32) + "".join(chr(c) for c in range(32, 127)) + ("." * 129)
 
     def __init__(self, pattern, flags, context, truncate_lines, boolean, count_only):
         """Init the file search object."""
@@ -168,11 +168,14 @@ class _FileSearch(object):
             self.context = context
 
         # Prepare search
-        self.pattern = _literal_pattern(pattern, self.ignorecase) if self.literal else _re_pattern(pattern, self.ignorecase, self.dotall)
+        if self.literal:
+            self.pattern = _literal_pattern(pattern, self.ignorecase)
+        else:
+            self.pattern = _re_pattern(pattern, self.ignorecase, self.dotall)
         self.find_method = self.pattern.finditer
 
     def __decode_file(self, filename):
-        """Calls file encode guesser and decodes file if possible."""
+        """Call file encode guesser and decodes file if possible."""
 
         bfr, self.current_encoding = text_decode.guess(filename, False)
         if self.current_encoding == "BIN":
@@ -542,7 +545,7 @@ class _DirWalker(object):
         return size_okay
 
     def __valid_file(self, base, name):
-        """Returns whether a file can be searched."""
+        """Return whether a file can be searched."""
 
         try:
             valid = False
@@ -572,7 +575,7 @@ class _DirWalker(object):
         return valid
 
     def __valid_folder(self, base, name):
-        """Returns whether a folder can be searched."""
+        """Return whether a folder can be searched."""
 
         valid = True
         try:
