@@ -1,4 +1,6 @@
 """
+Handles settings.
+
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 
@@ -262,7 +264,9 @@ class Settings(object):
         if isinstance(editor, dict):
             editor = editor.get(_PLATFORM, [])
 
-        return [arg.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col)) for arg in editor]
+        return [
+            arg.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col)) for arg in editor
+        ]
 
     @classmethod
     def set_editor(cls, editor):

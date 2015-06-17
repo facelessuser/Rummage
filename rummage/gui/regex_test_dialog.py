@@ -99,6 +99,8 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.regex_timer.Stop()
 
     def regex_event(self, event):
+        """Event for regex."""
+
         if self.regex_event_code == 0:
             if not self.testing:
                 self.test_regex()
@@ -111,7 +113,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             event.Skip()
 
     def set_keybindings(self, keybindings):
-        """Sets keybindings for frame."""
+        """Set keybindings for frame."""
 
         tbl = []
         for binding in keybindings:
@@ -153,6 +155,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     def test_regex(self):
         """Test and highlight search results in content buffer."""
+
         if not self.testing:
             self.testing = True
             if self.m_regex_text.GetValue() == "":
@@ -200,10 +203,14 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.testing = False
 
     def regex_start_event(self, event):
+        """Regex start event."""
+
         self.regex_event_code += 1
         event.Skip()
 
     def on_test_changed(self, event):
+        """On test change event."""
+
         if not self.testing:
             self.regex_start_event(event)
         else:

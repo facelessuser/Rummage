@@ -342,8 +342,6 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         You can use self.GetCombo if needed to get to the ComboCtrl instance.
         """
 
-        pass
-
     def Create(self, parent):
         """
         Create the popup child control.

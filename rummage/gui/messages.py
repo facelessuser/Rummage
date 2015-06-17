@@ -479,14 +479,14 @@ Prompt = PyEmbeddedImage(
     "vM5evElWMrG3g5AAeLnf4d8rAK9kbv3XWMS/AAoVdu6wYO1vAAAAAElFTkSuQmCC")
 
 
-class MessageIcon (namedtuple('MessageIcon', ['bitmap', 'width', 'height'])):
+class MessageIcon(namedtuple('MessageIcon', ['bitmap', 'width', 'height'])):
     """Message icon named tuple."""
 
 
 ###########################################################################
 # Class Messages
 ###########################################################################
-class Messages (wx.Dialog):
+class Messages(wx.Dialog):
     def __init__(self, parent, text, title=wx.EmptyString, style=INFO, bitmap=None, yes="Okay", no="Cancel"):
         """Init Messages object."""
 

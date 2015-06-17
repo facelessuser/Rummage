@@ -15,7 +15,7 @@ if _is_osx:
 
 
 def platform_window_focus(frame):
-    """Focus the window frame."""
+    """Set focus to the window frame."""
 
     # General window raising
     if frame.IsIconized():
@@ -27,9 +27,9 @@ def platform_window_focus(frame):
     # OSX specific extra to ensure raise
     if _is_osx:
         try:
-            NSApplication = ctypes.c_void_p(objc.objc_getClass('NSApplication'))
-            NSApp = ctypes.c_void_p(objc.objc_msgSend(NSApplication, objc.sel_registerName('sharedApplication')))
-            objc.objc_msgSend(NSApp, objc.sel_registerName('activateIgnoringOtherApps:'), True)
+            nsapplication = ctypes.c_void_p(objc.objc_getClass('NSApplication'))
+            nsapp = ctypes.c_void_p(objc.objc_msgSend(nsapplication, objc.sel_registerName('sharedApplication')))
+            objc.objc_msgSend(nsapp, objc.sel_registerName('activateIgnoringOtherApps:'), True)
         except:
             # Failed to bring window to top in OSX
             pass
