@@ -21,7 +21,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 DEALINGS IN THE SOFTWARE.
 """
 import wx
-import wx.lib.agw.supertooltip as STT
+import wx.lib.agw.supertooltip
 from collections import OrderedDict
 import sys
 
@@ -31,6 +31,35 @@ elif sys.platform == "darwin":
     _PLATFORM = "osx"
 else:
     _PLATFORM = "linux"
+
+
+def monkey_patch():
+    """
+    Monkey patch Supertooltips.
+
+    Remove once WxPython gets its crap together.
+    """
+
+    import inspect
+    import re
+    target_line = re.compile(r'([ ]{8})(maxWidth = max\(bmpWidth\+\(textWidth\+self._spacing\*3\), maxWidth\)\n)')
+    tt_source = inspect.getsourcelines(wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint)[0]
+    count = 0
+    found = False
+    for line in tt_source:
+        if not found:
+            m = target_line.match(line)
+            if m:
+                tt_source[count] = m.group(0)
+                found = True
+                count += 1
+                continue
+        tt_source[count] = line[4:]
+        count += 1
+    exec(''.join(tt_source))
+    wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint = OnPaint
+
+monkey_patch()
 
 
 class ContextMenu(wx.Menu):
@@ -63,7 +92,7 @@ class ContextMenu(wx.Menu):
         event.Skip()
 
 
-class ToolTip(STT.SuperToolTip):
+class ToolTip(wx.lib.agw.supertooltip.SuperToolTip):
     def __init__(self, target, message, header="", style="Office 2007 Blue", start_delay=.1):
         """
         Attach the defined tooltip to the target
