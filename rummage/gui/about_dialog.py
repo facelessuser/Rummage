@@ -61,3 +61,4 @@ class AboutDialog(gui.AboutDialog):
             self.m_dev_toggle.SetLabel(_("Contact") + " >>")
             self.m_developers_label.Hide()
         self.Fit()
+        self.Refresh()
