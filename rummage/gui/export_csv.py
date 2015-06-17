@@ -1,4 +1,5 @@
 """Export CSV."""
+from __future__ import unicode_literals
 from time import ctime
 import codecs
 import sys
@@ -54,14 +55,12 @@ RESULT_CONTENT_TABLE_HEADER = ','.join(
 def export_result_list(res, csv):
     """Export result list."""
 
-    length = len(res)
-    if length == 0:
+    if len(res) == 0:
         return
 
     csv.write(RESULT_TABLE_HEADER)
 
-    for x in range(0, length):
-        item = res[x]
+    for item in res.values():
         csv.write(
             RESULT_ROW % {
                 "file": csv_encode(item[0]),
@@ -80,14 +79,12 @@ def export_result_list(res, csv):
 def export_result_content_list(res, csv):
     """Export result content list."""
 
-    length = len(res)
-    if length == 0:
+    if len(res) == 0:
         return
 
     csv.write(RESULT_CONTENT_TABLE_HEADER)
 
-    for x in range(0, length):
-        item = res[x]
+    for item in res.values():
         csv.write(
             RESULT_CONTENT_ROW % {
                 "file": csv_encode(item[0][0]),
@@ -104,7 +101,7 @@ def export(export_csv, search, regex_search, result_list, result_content_list):
     """Export results to CSV."""
 
     with codecs.open(export_csv, "w", encoding="utf-8") as csv:
-        csv.write(u'\uFEFF')
+        csv.write('\uFEFF')
         search_expression = "%s,%s\n\n" % ((REGEX_SEARCH if regex_search else LITERAL_SEARCH), csv_encode(search))
         csv.write(search_expression)
         export_result_list(result_list, csv)
