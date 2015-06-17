@@ -1,6 +1,5 @@
 """Platform window focus."""
 import ctypes
-import ctypes.util
 import sys
 
 _is_osx = sys.platform == "darwin"

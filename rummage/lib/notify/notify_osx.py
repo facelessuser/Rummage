@@ -7,39 +7,38 @@ License: MIT
 import subprocess
 import traceback
 from os.path import exists
-from ctypes import *
-import ctypes.util as util
+import ctypes
 
 __all__ = ("get_notify", "alert", "setup")
 
-appkit = cdll.LoadLibrary(util.find_library('AppKit'))
-cf = cdll.LoadLibrary(util.find_library('CoreFoundation'))
-objc = cdll.LoadLibrary(util.find_library('objc'))
+appkit = ctypes.cdll.LoadLibrary(ctypes.util.find_library('AppKit'))
+cf = ctypes.cdll.LoadLibrary(ctypes.util.find_library('CoreFoundation'))
+objc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('objc'))
 
 kCFStringEncodingUTF8 = 0x08000100
 
-cf.CFStringCreateWithCString.restype = c_void_p
-cf.CFStringCreateWithCString.argtypes = [c_void_p, c_char_p, c_uint32]
+cf.CFStringCreateWithCString.restype = ctypes.c_void_p
+cf.CFStringCreateWithCString.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32]
 
-objc.objc_getClass.restype = c_void_p
-objc.sel_registerName.restype = c_void_p
-objc.objc_msgSend.restype = c_void_p
-objc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+objc.objc_getClass.restype = ctypes.c_void_p
+objc.sel_registerName.restype = ctypes.c_void_p
+objc.objc_msgSend.restype = ctypes.c_void_p
+objc.objc_msgSend.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
 
-NSSound = c_void_p(objc.objc_getClass('NSSound'))
-NSAutoreleasePool = c_void_p(objc.objc_getClass('NSAutoreleasePool'))
+NSSound = ctypes.c_void_p(objc.objc_getClass('NSSound'))
+NSAutoreleasePool = ctypes.c_void_p(objc.objc_getClass('NSAutoreleasePool'))
 
 
 def _nsstring(string):
     """Return an NSString object."""
 
-    return c_void_p(cf.CFStringCreateWithCString(None, string.encode('utf8'), kCFStringEncodingUTF8))
+    return ctypes.c_void_p(cf.CFStringCreateWithCString(None, string.encode('utf8'), kCFStringEncodingUTF8))
 
 
 def _callmethod(obj, method, *args, **kwargs):
     """ObjC method call."""
 
-    cast_return = kwargs.get("cast_return", c_void_p)
+    cast_return = kwargs.get("cast_return", ctypes.c_void_p)
     return cast_return(objc.objc_msgSend(obj, objc.sel_registerName(method), *args))
 
 
