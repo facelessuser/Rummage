@@ -20,14 +20,15 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-import wx
+
+import json
+import os
 import simplelog
 import sys
-import json
-import wx.lib.newevent
-import os
 import thread
 import time
+import wx
+import wx.lib.newevent
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -49,6 +50,9 @@ DEBUG_CONSOLE = False
 
 
 class GuiLog(wx.PyOnDemandOutputWindow):
+
+    """GUI logging."""
+
     def __init__(self, title="Debug Console"):
         """Init the PyOnDemandOutputWindow object."""
 
@@ -56,7 +60,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
         # Cannot use super with old class styles
         wx.PyOnDemandOutputWindow.__init__(self, title)
 
-    def CreateOutputWindow(self, st):
+    def CreateOutputWindow(self, st):  # noqa
         """Create the logging console."""
 
         self.frame = wx.Frame(self.parent, -1, self.title, self.pos, self.size, style=wx.DEFAULT_FRAME_STYLE)
@@ -105,7 +109,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
                 if get_debug_console():
                     self.text.AppendText(text)
 
-    def OnCloseWindow(self, event):
+    def OnCloseWindow(self, event):  # noqa
         """Close logging console."""
 
         if self.frame is not None:
@@ -120,6 +124,9 @@ class GuiLog(wx.PyOnDemandOutputWindow):
 
 
 class CustomApp(wx.App):
+
+    """Custom app that adds a number of features."""
+
     def __init__(self, *args, **kwargs):
         """
         Init the custom app.
@@ -163,11 +170,11 @@ class CustomApp(wx.App):
         return True
 
     def is_instance_okay(self):
-        """Returns whether this is the only instance."""
+        """Return whether this is the only instance."""
 
         return self.instance_okay
 
-    def OnInit(self):
+    def OnInit(self):  # noqa
         """
         Execute callback if instance is okay.
 
@@ -182,7 +189,7 @@ class CustomApp(wx.App):
             self.init_callback()
         return True
 
-    def OnExit(self):
+    def OnExit(self):  # noqa
         """Cleanup instance check."""
 
         if self.instance is not None:
@@ -190,20 +197,23 @@ class CustomApp(wx.App):
 
 
 class ArgPipeThread(object):
+
+    """Argument pipe thread for receiving arguments from another instance."""
+
     def __init__(self, app, pipe_name):
         """Init pipe thread variables."""
 
         self.app = app
         self.pipe_name = pipe_name
 
-    def Start(self):
+    def Start(self):  # noqa
         """Start listening to the pipe."""
 
         self.check_pipe = True
         self.running = True
         thread.start_new_thread(self.Run, ())
 
-    def Stop(self):
+    def Stop(self):  # noqa
         """
         Stop listening to the pipe.
 
@@ -226,12 +236,12 @@ class ArgPipeThread(object):
             with open(self.pipe_name, "w") as pipeout:
                 pipeout.write('\n')
 
-    def IsRunning(self):
+    def IsRunning(self):  # noqa
         """Returns if the thread is still busy."""
 
         return self.running
 
-    def Run(self):
+    def Run(self):  # noqa
         """The actual thread listening loop."""
 
         if _PLATFORM == "windows":
@@ -271,6 +281,9 @@ class ArgPipeThread(object):
 
 
 class PipeApp(CustomApp):
+
+    """Pip app variant that allows the app to be sent data via a pipe."""
+
     def __init__(self, *args, **kwargs):
         """Parse pipe args."""
 
@@ -281,7 +294,7 @@ class PipeApp(CustomApp):
             del kwargs["pipe_name"]
         super(PipeApp, self).__init__(*args, **kwargs)
 
-    def OnInit(self):
+    def OnInit(self):  # noqa
         """
         Check if this is the first instance, and if so, start the pipe listener.
 
@@ -305,7 +318,7 @@ class PipeApp(CustomApp):
         if len(sys.argv) > 1:
             if _PLATFORM == "windows":
                 args = self.process_args(sys.argv[1:])
-                fileHandle = win32file.CreateFile(
+                file_handle = win32file.CreateFile(
                     self.pipe_name,
                     win32file.GENERIC_READ | win32file.GENERIC_WRITE,
                     0, None,
@@ -313,26 +326,26 @@ class PipeApp(CustomApp):
                     0, None
                 )
                 data = '|'.join(args) + '\n'
-                win32file.WriteFile(fileHandle, data)
-                win32file.CloseHandle(fileHandle)
+                win32file.WriteFile(file_handle, data)
+                win32file.CloseHandle(file_handle)
             else:
                 with open(self.pipe_name, "w") as pipeout:
                     args = self.process_args(sys.argv[1:])
                     pipeout.write('|'.join(args) + '\n')
 
     def process_args(self, arguments):
-        """This is a method that can be overridden to parse the args."""
+        """Noop, but can be overriden to process the args."""
 
         return arguments
 
     def receive_arg_pipe(self):
-        """Starts the pipe listener thread."""
+        """Start the pipe listenr thread."""
 
         self.active_pipe = True
         self.pipe_thread = ArgPipeThread(self, self.pipe_name)
         self.pipe_thread.Start()
 
-    def OnExit(self):
+    def OnExit(self):  # noqa
         """Stop the thread if needed."""
 
         if self.active_pipe:
@@ -355,7 +368,11 @@ class DebugFrameExtender(object):
     """Extend frame with debugger."""
 
     def set_keybindings(self, keybindings=[], debug_event=None):
-        """Method to easily set key bindings.  Also sets up debug keybindings and events."""
+        """
+        Method to easily set key bindings.
+
+        Also sets up debug keybindings and events.
+        """
 
         # Create keybinding to open debug console, bind debug console to ctrl/cmd + ` depending on platform
         # if an event is passed in.
@@ -424,7 +441,7 @@ def _log_struct(obj, log_func, label="Object"):
 
 
 def json_fmt(obj):
-    """Format dict as JSON."""
+    """Format the dict as JSON."""
 
     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
 
