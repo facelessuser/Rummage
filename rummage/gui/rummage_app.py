@@ -19,7 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 import wx
-from os.path import abspath, normpath
+import os
 from .custom_app import PipeApp
 from .platform_window_focus import platform_window_focus
 from .custom_app import *
@@ -60,6 +60,9 @@ class RummageApp(PipeApp):
                     except StopIteration:
                         break
             if filename is not None:
+                cwd = os.getcwdu()
+                filename = cwd
+            if filename:
                 frame.m_searchin_text.safe_set_value(filename)
                 frame.m_grep_notebook.SetSelection(0)
                 frame.m_searchfor_textbox.GetTextCtrl().SetFocus()
@@ -74,12 +77,12 @@ class RummageApp(PipeApp):
             args.append(a)
             if a == "-s":
                 try:
-                    args.append(abspath(normpath(argv.next())))
+                    args.append(os.path.abspath(os.path.normpath(argv.next())))
                 except StopIteration:
                     break
         return args
 
-    def MacReopenApp(self):
+    def MacReopenApp(self):  # noqa
         """Ensure that app will be unminimized in OSX on dock icon click."""
 
         frame = self.GetTopWindow()

@@ -25,10 +25,10 @@ import threading
 import traceback
 import webbrowser
 from time import time
-from os.path import abspath, exists, dirname, normpath, isdir, isfile, expanduser
+import os
 import wx.lib.masked as masked
 import wx.lib.newevent
-from .. import  version
+from .. import version
 from ..lib import pygrep
 from ..lib.epoch_timestamp import local_time_to_epoch_timestamp
 from ..lib import notify
@@ -337,13 +337,13 @@ class DirPickButton(object):
     def SetPath(self, directory):
         """Set the current directory path."""
 
-        if directory is not None and exists(directory) and isdir(directory):
+        if directory is not None and os.path.exists(directory) and os.path.isdir(directory):
             self.directory = directory
 
     def dir_init(self, default_path=None, dir_change_evt=None):
         """Init the DirPickButton."""
 
-        self.directory = expanduser("~")
+        self.directory = os.path.expanduser("~")
         self.Bind(wx.EVT_BUTTON, self.on_dir_pick)
         self.Bind(EVT_DIR_CHANGE, self.on_dir_change)
         self.SetPath(default_path)
@@ -364,8 +364,8 @@ class DirPickButton(object):
         """
 
         directory = self.GetPath()
-        if directory is None or not exists(directory) or not isdir(directory):
-            directory = expanduser("~")
+        if directory is None or not os.path.exists(directory) or not os.path.isdir(directory):
+            directory = os.path.expanduser("~")
         directory = dirpickermsg(_("Select directory to rummage"), directory)
         if directory is None or directory == "":
             directory = None
@@ -399,6 +399,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.script_path = script_path
         self.args = GrepArgs()
         self.thread = None
+        if start_path is None:
+            cwd = os.getcwdu()
+            start_path = cwd
 
         # Setup debugging
         self.set_keybindings(
@@ -543,8 +546,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Initialize the search path input."""
 
         # Init search path with passed in path
-        if start_path and exists(start_path):
-            self.m_searchin_text.safe_set_value(abspath(normpath(start_path)))
+        if start_path and os.path.exists(start_path):
+            self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
         self.m_searchfor_textbox.GetTextCtrl().SetFocus()
 
     def optimize_size(self, first_time=False, height_only=False):
@@ -685,7 +688,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if not self.searchin_update:
             pth = event.directory
-            if pth is not None and exists(pth):
+            if pth is not None and os.path.exists(pth):
                 self.searchin_update = True
                 self.m_searchin_text.safe_set_value(pth)
                 self.searchin_update = False
@@ -723,7 +726,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if not self.hide_limit_panel:
             pth = self.m_searchin_text.GetValue()
-            if isfile(pth):
+            if os.path.isfile(pth):
                 self.m_limiter_panel.Hide()
                 self.m_limiter_panel.GetContainingSizer().Layout()
                 self.optimize_size()
@@ -752,10 +755,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         pth = self.m_searchin_text.GetValue()
         if not self.searchin_update:
-            if isdir(pth):
+            if os.path.isdir(pth):
                 self.m_searchin_dir_picker.SetPath(pth)
-            elif isfile(pth):
-                self.m_searchin_dir_picker.SetPath(dirname(pth))
+            elif os.path.isfile(pth):
+                self.m_searchin_dir_picker.SetPath(os.path.dirname(pth))
             self.searchin_update = False
 
     def on_search_click(self, event):
@@ -807,7 +810,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if self.validate_regex(self.m_exclude_textbox.Value):
                 msg = _("Please enter a valid exlcude directory regex!")
                 fail = True
-        if not fail and not exists(self.m_searchin_text.GetValue()):
+        if not fail and not os.path.exists(self.m_searchin_text.GetValue()):
             msg = _("Please enter a valid search path!")
             fail = True
         if (
@@ -929,7 +932,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args.boolean = self.m_boolean_checkbox.GetValue()
 
         # Limit Options
-        if isdir(self.args.target):
+        if os.path.isdir(self.args.target):
             self.args.show_hidden = self.m_hidden_checkbox.GetValue()
             if self.m_fileregex_checkbox.GetValue():
                 self.args.regexfilepattern = self.m_filematch_textbox.Value
@@ -980,7 +983,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("regex_search", self.args.pattern) if self.args.regexp else ("literal_search", self.args.pattern)
         ]
 
-        if isdir(self.args.target):
+        if os.path.isdir(self.args.target):
             history += [
                 (
                     "regex_folder_exclude", self.args.directory_exclude

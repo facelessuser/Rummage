@@ -68,10 +68,5 @@ def main(script):
 def cli():
     """Command line interface."""
 
-    if sys.platform == "darwin" and len(sys.argv) > 1 and sys.argv[1].startswith("-psn"):
-        script_path = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", "..", "..")
-        del sys.argv[1]
-    else:
-        script_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-
+    script_path = os.path.dirname(os.path.abspath(sys.argv[0]))
     sys.exit(main(script_path))
