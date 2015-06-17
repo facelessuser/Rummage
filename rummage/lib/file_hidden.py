@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """File hidden."""
+from __future__ import unicode_literals
 import contextlib
 import ctypes
 from os.path import expanduser, basename

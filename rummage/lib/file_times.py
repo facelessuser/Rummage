@@ -1,4 +1,5 @@
 """File times."""
+from __future__ import unicode_literals
 import sys
 from os.path import getmtime as get_modified_time
 

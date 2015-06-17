@@ -8,9 +8,16 @@ with the unicode characters in that category.
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 """
+from __future__ import unicode_literals
 import re
 import unicodedata
 import sys
+from os.path import exists, join
+from os import unlink
+try:
+    import cpickle as pickle
+except Exception:
+    import pickle
 
 PY3 = sys.version_info[0] >= 3
 uchr = chr if PY3 else unichr  # noqa

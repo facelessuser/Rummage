@@ -4,6 +4,7 @@ File Strip.
 Licensed under MIT
 Copyright (c) 2012 Isaac Muse <isaacmuse@gmail.com>
 """
+from __future__ import unicode_literals
 import re
 
 LINE_PRESERVE = re.compile(r"\r?\n", re.MULTILINE)
