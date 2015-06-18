@@ -44,9 +44,9 @@ class AutoCompleteCombo(ComboCtrl):
         self.SetPopupControl(self.list)
 
         # Key bindings and events for the object
+        self.Bind(wx.EVT_CHAR, self.on_char)
         self.Bind(wx.EVT_KEY_UP, self.on_key_up)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
-        self.Bind(wx.EVT_CHAR, self.on_char)
         self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
         self.Bind(wx.EVT_TEXT, self.on_text_change)
         try:
@@ -115,9 +115,7 @@ class AutoCompleteCombo(ComboCtrl):
         """
 
         key = event.GetKeyCode()
-        if key in [wx.WXK_DELETE, wx.WXK_BACK]:
-            self.update_semaphore = True
-        elif key == wx.WXK_TAB:
+        if key == wx.WXK_TAB:
             if event.ShiftDown():
                 self.tab_back()
             else:
@@ -133,19 +131,11 @@ class AutoCompleteCombo(ComboCtrl):
 
         key = event.GetKeyCode()
         if key == wx.WXK_DOWN:
-            if self.IsPopupShown():
-                self.list.next_item()
-                return
-            else:
-                self.Popup()
-                self.pick_item()
+            self.Popup()
+            self.pick_item()
         elif key == wx.WXK_UP:
-            if self.IsPopupShown():
-                self.list.prev_item()
-                return
-            else:
-                self.Popup()
-                self.pick_item()
+            self.Popup()
+            self.pick_item()
         event.Skip()
 
     def pick_item(self):
@@ -159,9 +149,8 @@ class AutoCompleteCombo(ComboCtrl):
         """Swallow up and down arrow event if popup shown."""
 
         key = event.GetKeyCode()
-        if key == wx.WXK_DOWN or key == wx.WXK_UP:
-            if self.IsPopupShown():
-                return
+        if key in [wx.WXK_DELETE, wx.WXK_BACK]:
+            self.update_semaphore = True
         event.Skip()
 
     def safe_set_value(self, text):
@@ -220,6 +209,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
         self.txt_ctrl = txt_ctrl
         self.waiting_value = -1
         self.parent = parent
+        self.popup_shown = False
         # Since we are using multiple inheritance, and don't know yet
         # which window is to be the parent, we'll do 2-phase create of
         # the ListCtrl instead, and call its Create method later in
@@ -317,6 +307,14 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
             if curitem != -1:
                 self.waiting_value = curitem
             wx.CallAfter(self.Dismiss)
+        elif key == wx.WXK_DOWN:
+            if self.popup_shown:
+                self.next_item()
+                return
+        elif key == wx.WXK_UP:
+            if self.popup_shown:
+                self.prev_item()
+                return
         event.Skip()
 
     def resize_dropdown(self):
@@ -372,10 +370,10 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
 
     def OnPopup(self):
         """Called immediately after the popup is shown."""
-
+        self.popup_shown = True
         wx.combo.ComboPopup.OnPopup(self)
 
     def OnDismiss(self):
         """Called when popup is dismissed."""
-
+        self.popup_shown = False
         wx.combo.ComboPopup.OnDismiss(self)
