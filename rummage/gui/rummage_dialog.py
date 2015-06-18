@@ -37,7 +37,7 @@ from . import gui
 from . import export_html
 from . import export_csv
 from .settings import Settings, _PLATFORM
-from .generic_dialogs import *
+from .generic_dialogs import errormsg
 from .custom_app import DebugFrameExtender
 from .custom_app import debug, error
 from .custom_statusbar import extend_sb, extend
@@ -719,7 +719,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         dlg.Destroy()
         if search is not None and is_regex is not None:
             self.m_searchfor_textbox.SetValue(search)
-            self.m_regex_search_checkbox.SetValue(regex_search)
+            self.m_regex_search_checkbox.SetValue(is_regex)
 
     def limit_panel_toggle(self):
         """Show/Hide limit panel."""

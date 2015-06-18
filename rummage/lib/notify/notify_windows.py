@@ -47,12 +47,15 @@ def notify_win_fallback(title, message, sound, icon, fallback):
 
     fallback(title, message, sound)
 
-
 try:
-    from win32api import *
-    from win32gui import *
+    import win32api
+    import win32gui
     import win32con
+    native_win_support = True
+except:
+    native_win_support = False
 
+if native_win_support:
     class WindowsNotify(object):
 
         """Windows notification class."""
@@ -77,15 +80,15 @@ try:
             self.visible = False
 
             # Register window class
-            wc = WNDCLASS()
-            self.hinst = wc.hInstance = GetModuleHandle(None)
+            wc = win32gui.WNDCLASS()
+            self.hinst = wc.hInstance = win32api.GetModuleHandle(None)
             wc.lpszClassName = app_name
             wc.lpfnWndProc = message_map  # could also specify a wndproc.
             if WindowsNotify.atom_name is not None:
                 self._destroy_window()
-                UnregisterClass(WindowsNotify.atom_name, None)
+                win32gui.UnregisterClass(WindowsNotify.atom_name, None)
                 WindowsNotify.atom_name = None
-            self.class_atom = RegisterClass(wc)
+            self.class_atom = win32gui.RegisterClass(wc)
             WindowsNotify.atom_name = self.class_atom
 
             self._create_window()
@@ -101,18 +104,18 @@ try:
             """
 
             if WindowsNotify.taskbar_icon is not None:
-                DestroyIcon(WindowsNotify.taskbar_icon)
+                win32gui.DestroyIcon(WindowsNotify.taskbar_icon)
                 WindowsNotify.taskbar_icon = None
 
             icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
             try:
-                hicon = LoadImage(
+                hicon = win32gui.LoadImage(
                     self.hinst, icon,
                     win32con.IMAGE_ICON,
                     0, 0, icon_flags
                 )
             except Exception:
-                hicon = LoadIcon(0, win32con.IDI_APPLICATION)
+                hicon = win32gui.LoadIcon(0, win32con.IDI_APPLICATION)
             WindowsNotify.taskbar_icon = hicon
 
             return hicon
@@ -134,19 +137,19 @@ try:
             """Create the Window."""
 
             style = win32con.WS_OVERLAPPED | win32con.WS_SYSMENU
-            self.hwnd = CreateWindow(
+            self.hwnd = win32gui.CreateWindow(
                 self.class_atom, "Taskbar", style,
                 0, 0, win32con.CW_USEDEFAULT, win32con.CW_USEDEFAULT,
                 0, 0, self.hinst, None
             )
             WindowsNotify.window_handle = self.hwnd
-            UpdateWindow(self.hwnd)
+            win32gui.UpdateWindow(self.hwnd)
 
         def _destroy_window(self):
             """Destroy the window."""
 
             if WindowsNotify.window_handle:
-                DestroyWindow(WindowsNotify.window_handle)
+                win32gui.DestroyWindow(WindowsNotify.window_handle)
                 WindowsNotify.window_handle = None
                 self.hwnd = None
 
@@ -155,16 +158,16 @@ try:
 
             icon_level = 0
             if icon & WinNotifyLevel.ICON_INFORMATION:
-                icon_level |= NIIF_INFO
+                icon_level |= win32gui.NIIF_INFO
             elif icon & WinNotifyLevel.ICON_WARNING:
-                icon_level |= NIIF_WARNING
+                icon_level |= win32gui.NIIF_WARNING
             elif icon & WinNotifyLevel.ICON_ERROR:
-                icon_level |= NIIF_ERROR
+                icon_level |= win32gui.NIIF_ERROR
             self.show_icon()
-            Shell_NotifyIcon(
-                NIM_MODIFY,
+            win32gui.Shell_NotifyIcon(
+                win32gui.NIM_MODIFY,
                 (
-                    self.hwnd, 0, NIF_INFO, win32con.WM_USER + 20,
+                    self.hwnd, 0, win32gui.NIF_INFO, win32con.WM_USER + 20,
                     self.hicon, "Balloon tooltip", msg, 200, title,
                     icon_level
                 )
@@ -183,15 +186,15 @@ try:
         def show_icon(self):
             """Display the taskbar icon."""
 
-            flags = NIF_ICON | NIF_MESSAGE
+            flags = win32gui.NIF_ICON | win32gui.NIF_MESSAGE
             if self.tooltip is not None:
-                flags |= NIF_TIP
+                flags |= win32gui.NIF_TIP
                 nid = (self.hwnd, 0, flags, win32con.WM_USER + 20, self.hicon, self.tooltip)
             else:
                 nid = (self.hwnd, 0, flags, win32con.WM_USER + 20, self.hicon)
             if self.visible:
                 self.hide_icon()
-            Shell_NotifyIcon(NIM_ADD, nid)
+            win32gui.Shell_NotifyIcon(win32gui.NIM_ADD, nid)
             self.visible = True
 
         def hide_icon(self):
@@ -199,14 +202,14 @@ try:
 
             if self.visible:
                 nid = (self.hwnd, 0)
-                Shell_NotifyIcon(NIM_DELETE, nid)
+                win32gui.Shell_NotifyIcon(win32gui.NIM_DELETE, nid)
             self.visible = False
 
         def OnDestroy(self, hwnd, msg, wparam, lparam):
             """Remove icon and notification."""
 
             self.hide_icon()
-            PostQuitMessage(0)
+            win32gui.PostQuitMessage(0)
 
     @staticmethod
     def NotifyWin(title, msg, sound, icon, fallback):
@@ -214,7 +217,7 @@ try:
 
         Options.instance.show_notification(title, msg, sound, icon, fallback)
 
-except Exception:
+else:
     NotifyWin = None
     print("no win notify")
 

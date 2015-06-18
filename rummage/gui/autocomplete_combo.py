@@ -335,7 +335,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
 
     def Init(self):
         """
-        This is called immediately after construction finishes.
+        Called immediately after construction finishes.
 
         You can use self.GetCombo if needed to get to the ComboCtrl instance.
         """
