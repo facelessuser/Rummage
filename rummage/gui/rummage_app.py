@@ -1,5 +1,5 @@
 """
-Rummage App
+Rummage App.
 
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -20,11 +20,14 @@ IN THE SOFTWARE.
 """
 import wx
 import os
-from .custom_app import PipeApp
 from .platform_window_focus import platform_window_focus
-from .custom_app import *
+from .custom_app import PipeApp, set_debug_mode
 from .rummage_dialog import RummageFrame
 from .regex_test_dialog import RegexTestDialog
+
+__all__ = (
+    'set_debug_mode', 'RummageApp', 'RummageFrame', 'RegexTestDialog'
+)
 
 wx.Log.EnableLogging(False)
 
