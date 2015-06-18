@@ -21,49 +21,14 @@ IN THE SOFTWARE.
 from time import ctime
 import wx
 import wx.lib.mixins.listctrl as listmix
-from wx.lib.embeddedimage import PyEmbeddedImage
 from os.path import normpath, join, basename, dirname
 from .open_editor import open_editor
 from ..lib.localization import get as _
+from .. import data
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
 USE_SAMPLE_SIZE = True
-
-up_arrow = PyEmbeddedImage(
-    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-    "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYcDzITlWnqRAAAACZpVFh0Q29tbWVudAAA"
-    "AAAAQ3JlYXRlZCB3aXRoIEdJTVAgb24gYSBNYWOV5F9bAAAA6klEQVQ4y2NgGAXM+CSdnZ29"
-    "lJSUZikpKb2+f//+bWxqmPBolv7161fe06dP3zEwMOQ6OztLE+0CZ2dn5p8/f3a/f/9ejJWV"
-    "lfPbt28sLCwsuqqqqtvu37//n6ALvn37lv7u3TtFZmZmBlFRUZiYIgMDQyJBFxgZGVl8+/Yt"
-    "l4WFhRmmmZubm+HFixdMf/780dXR0Tl///79l1hdsGrVKvHfv39XsbGxMSorK6MYrKioyMDC"
-    "wsL48ePHOmdnZ26YOAuyouvXr5c6ODhwc3FxMbCxsTHw8fFhhjoTE8+2bdvyGRgY2kYTMZUA"
-    "AElBSjR/j22+AAAAAElFTkSuQmCC")
-
-down_arrow = PyEmbeddedImage(
-    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-    "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYcDzAUOTsdZQAAACZpVFh0Q29tbWVudAAA"
-    "AAAAQ3JlYXRlZCB3aXRoIEdJTVAgb24gYSBNYWOV5F9bAAABIklEQVQ4y+2Sv0uFUBTHz33v"
-    "KnIfqZGgIgg6NLk0tARtzu//aYuGlmpobm1sCu54l4SWoNlBuA0paEtqgb/otvTCeq+3tEVn"
-    "O+f7+X6X7wH4n18PGi9BEJx6nreT5/mkaRro+37JIIRoHce5YYwdAwDgsVhV1UkYhhdRFG0U"
-    "RQGSJH0xE0LAdd2XOI7PF7fpGCjL8tV13SdZlvcRQqht209N13UwDEMkSXLAGHtcGfABPkiS"
-    "tEkI2RZCoK7rQFEUIIS8pWl6xRijY34pgHMuTNO8wxjvaZq2pSgKWJYFdV0nTdMccc7F2oBF"
-    "iG3b97PZbK6qaltV1WQYhkNKaf6dnf5UD+e89n0fYYx3syw7o5TeruLwuo4ty7oEgGvG2PMf"
-    "fuV31ftuS80saUMAAAAASUVORK5CYII=")
-
-doc = PyEmbeddedImage(
-    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAABEQkJjY2P///93"
-    "ZMrLAAAAAXRSTlMAQObYZgAAAClJREFUCFtjYEAFjKEhQOL/XSDx6r4DkHUVSLzaD2L9B7FW"
-    "42OFhjoAAPlQF/qFKDe3AAAAAElFTkSuQmCC")
-
-bin = PyEmbeddedImage(
-    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAA"
-    "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QcMDhMnVPkfCgAAAN9JREFUOMvVkiEOg0AQ"
-    "RT8NAkHQXICM5QyUWs6Aw3ENToAnQaMJaalEgWUTuATgMExVmybdpVT2u5nZ/TOTecDfS3sP"
-    "fM/jvce3+13bdfM9j2V65mUNTr+Me63rjyn1o58v57M0rx/trDKSrtD3PbquAwBs24Y4jpEk"
-    "idT8w2AcRwRBgLIsAQBRFMG2bTRNgzzPv6/gOA7CMHzFbdsiTVMURYGqqvDzFQzDwDRNWJYF"
-    "pmniKwdCCCYiJiIehoGzLGPXdZmIWAjBu7CpQJrnmdd1lcJ06IyWZSlr+lFgVHoAn0+KFv99"
-    "5sIAAAAASUVORK5CYII=")
 
 
 class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
@@ -90,10 +55,10 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.last_idx_sized = -1
 
         self.images = wx.ImageList(16, 16)
-        self.doc = self.images.Add(doc.GetBitmap())
-        self.bin = self.images.Add(bin.GetBitmap())
-        self.sort_up = self.images.Add(up_arrow.GetBitmap())
-        self.sort_down = self.images.Add(down_arrow.GetBitmap())
+        self.doc = self.images.Add(data.get_image('doc.png').GetBitmap())
+        self.bin = self.images.Add(data.get_image('binary.png').GetBitmap())
+        self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
+        self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def resize_last_column(self):

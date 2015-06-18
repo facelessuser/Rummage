@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 LONG_DESC = '''
 Rummage is a GUI tool for searching through folders and fle content.
-It is built with wxPython 2.9.4 and requires Python 2.7.
+It is built with wxPython 3.0.0+ and requires Python 2.7.
 
 The project repo is found at:
 https://github.com/facelessuser/Rummage.
@@ -20,7 +20,7 @@ setup(
     author='Isaac Muse',
     author_email='Isaac.Muse [at] gmail.com',
     url='https://github.com/facelessuser/Rummage',
-    packages=find_packages(exclude=['pyinstaller*']),
+    packages=find_packages(exclude=[]),
     install_requires=[
         "gntp>=1.0.2"
     ],
@@ -31,7 +31,7 @@ setup(
         ]
     },
     package_data={
-        'rummage.data': ['*.css', '*.js']
+        'rummage.data': ['*.css', '*.js', '*.png', '*.ico', '*.icns']
     },
     license='MIT License',
     classifiers=[

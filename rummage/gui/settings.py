@@ -30,8 +30,8 @@ from ..lib import localization
 from ..lib.localization import get as _
 from .custom_app import debug, debug_struct, error
 from .custom_app import init_app_log, set_debug_mode
-from .generic_dialogs import *
-from ..icons.rum_ico import rum_64, rum_tray
+from . generic_dialogs import errormsg
+from .. import data
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -351,14 +351,14 @@ class Settings(object):
         try:
             if not exists(png):
                 with open(png, "wb") as f:
-                    f.write(rum_64.GetData())
+                    f.write(data.get_image('rummage_64.png').GetData())
         except Exception:
             png = None
 
         try:
             if not exists(icon):
                 with open(icon, "wb") as f:
-                    f.write(rum_tray.GetData())
+                    f.write(data.get_image('rummage_tray.ico').GetData())
         except Exception:
             icon = None
 

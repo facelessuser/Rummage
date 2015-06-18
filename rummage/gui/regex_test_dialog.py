@@ -22,9 +22,9 @@ import wx
 import traceback
 import sys
 from . import gui
-from ..icons.rum_ico import rum_64
 from ..lib import ure
 from ..lib.localization import get as _
+from .. import data
 
 
 class RegexTestDialog(gui.RegexTestDialog):
@@ -35,7 +35,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
-        self.SetIcon(rum_64.GetIcon())
+        self.SetIcon(data.get_image('rummage_64.png').GetIcon())
         self.parent = parent
 
         # Ensure OS selectall shortcut works in text inputs

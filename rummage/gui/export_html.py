@@ -9,8 +9,6 @@ import base64
 import json
 import subprocess
 import sys
-from ..icons.rum_ico import rum_64
-from ..icons.glass import glass
 from ..lib.localization import get as _
 from ..lib.localization import get_current_domain
 from .. import data
@@ -281,13 +279,13 @@ def export(export_html, search, regex_search, result_list, result_content_list):
             HTML_HEADER % {
                 "js": data.get_file('sorttable.js'),
                 "morejs": LOAD_TAB,
-                "css": data.get_file('results.css'),
-                "icon": base64.b64encode(glass.GetData()),
+                "css": data.get_file('results.css').replace('{{bg}}', data.get_image('bg_fade.png', b64=True), 1),
+                "icon": base64.b64encode(data.get_image('glass.png').GetData()),
                 "title": TITLE,
                 "lang": get_current_domain()
             }
         )
-        html.write(BODY_START % {"icon": base64.b64encode(rum_64.GetData())})
+        html.write(BODY_START % {"icon": base64.b64encode(data.get_image('rummage_64.png').GetData())})
         html.write(
             (TABS_START if len(result_content_list) else TABS_START_SINGLE) % {
                 "file_tab": FILES,

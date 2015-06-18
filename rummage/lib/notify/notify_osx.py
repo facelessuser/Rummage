@@ -8,6 +8,7 @@ import subprocess
 import traceback
 from os.path import exists
 import ctypes
+import ctypes.util
 
 __all__ = ("get_notify", "alert", "setup")
 

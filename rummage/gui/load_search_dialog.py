@@ -23,9 +23,8 @@ import wx.lib.mixins.listctrl as listmix
 
 from .settings import Settings
 from . import gui
-from .result_panels import up_arrow, down_arrow
-from ..icons.glass import glass
 from ..lib.localization import get as _
+from .. import data
 
 SEARCH_REGEX = _("Regex")
 SEARCH_LITERAL = _("Text")
@@ -45,9 +44,9 @@ class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
         self.column_count = c
         self.itemDataMap = {}
         self.images = wx.ImageList(16, 16)
-        self.glass = self.images.Add(glass.GetBitmap())
-        self.sort_up = self.images.Add(up_arrow.GetBitmap())
-        self.sort_down = self.images.Add(down_arrow.GetBitmap())
+        self.glass = self.images.Add(data.get_image('glass.png').GetBitmap())
+        self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
+        self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
         listmix.ColumnSorterMixin.__init__(self, self.column_count)
         listmix.ListRowHighlighter.__init__(self, (0xEE, 0xEE, 0xEE))

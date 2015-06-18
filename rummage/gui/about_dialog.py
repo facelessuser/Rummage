@@ -21,8 +21,8 @@ DEALINGS IN THE SOFTWARE.
 import wx
 from .. import version
 from . import gui
-from ..icons.rum_ico import rum_64
 from ..lib.localization import get as _
+from .. import data
 
 
 class AboutDialog(gui.AboutDialog):
@@ -37,7 +37,11 @@ class AboutDialog(gui.AboutDialog):
         self.SetTitle(_("About"))
 
         self.m_bitmap = wx.StaticBitmap(
-            self.m_about_panel, wx.ID_ANY, rum_64.GetBitmap(), wx.DefaultPosition, wx.Size(64, 64), 0
+            self.m_about_panel,
+            wx.ID_ANY,
+            data.get_image('rummage_64.png').GetBitmap(),
+            wx.DefaultPosition,
+            wx.Size(64, 64), 0
         )
         self.m_app_label.SetLabel(version.app)
         self.m_version_label.SetLabel(

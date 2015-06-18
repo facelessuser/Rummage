@@ -50,7 +50,7 @@ from .about_dialog import AboutDialog
 from .result_panels import FileResultPanel, ResultFileList, ResultContentList
 from .messages import dirpickermsg, filepickermsg
 from .messages import Error as error_icon
-from ..icons.rum_ico import rum_64
+from .. import data
 
 DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
 
@@ -389,7 +389,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if _PLATFORM == "linux":
             self.m_progressbar.SetInitialSize(wx.Size(-1, 5))
 
-        self.SetIcon(rum_64.GetIcon())
+        self.SetIcon(data.get_image('rummage_64.png').GetIcon())
 
         self.debounce_search = False
         self.searchin_update = False
