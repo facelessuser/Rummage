@@ -26,7 +26,6 @@ import re
 from collections import namedtuple
 from wx.lib.embeddedimage import PyEmbeddedImage
 
-
 # Styles
 INFO = 0
 PROMPT = 1
@@ -42,7 +41,7 @@ HAS_CAPTION = re.compile(r"([^\r\n]+)(?:\r?\n){2,}(.*)", re.DOTALL | re.UNICODE)
 
 
 # Icons by Isaac Muse
-Info = PyEmbeddedImage(
+info_icon = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAA"
     "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYJBhYecibrfQAAAB1pVFh0Q29tbWVudAAA"
     "AAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAWc0lEQVR42u1bebBkVXn/feece7tfvzfvzZsN"
@@ -155,7 +154,7 @@ Info = PyEmbeddedImage(
     "ZW17eYUAAAAASUVORK5CYII=")
 
 # ----------------------------------------------------------------------
-Warn = PyEmbeddedImage(
+warn_icon = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAA"
     "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYJBhcTFYymgQAAAB1pVFh0Q29tbWVudAAA"
     "AAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAVZ0lEQVR42u1ba7BlRXX+1ure+5xz75175wW+"
@@ -263,7 +262,7 @@ Warn = PyEmbeddedImage(
     "z36GQFrk1QAAAABJRU5ErkJggg==")
 
 # ----------------------------------------------------------------------
-Error = PyEmbeddedImage(
+error_icon = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAA"
     "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYJBhYF+EMikQAAAB1pVFh0Q29tbWVudAAA"
     "AAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAUrklEQVR42u1beZAcV33+3tHdM7sze2nRSiuv"
@@ -367,7 +366,7 @@ Error = PyEmbeddedImage(
     "a+yleLUunlmWEM8PKgvAuX6H31UAns3c5jexiP8DSZJIhg4rsGIAAAAASUVORK5CYII=")
 
 # ----------------------------------------------------------------------
-Prompt = PyEmbeddedImage(
+prompt_icon = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAA"
     "CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QYJBhY51yxeFgAAAB1pVFh0Q29tbWVudAAA"
     "AAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAWXElEQVR42u17a7Bl1VXuN8aca+3HOadPv0Ea"
@@ -480,6 +479,7 @@ Prompt = PyEmbeddedImage(
 
 
 class MessageIcon(namedtuple('MessageIcon', ['bitmap', 'width', 'height'])):
+
     """Message icon named tuple."""
 
 
@@ -487,6 +487,9 @@ class MessageIcon(namedtuple('MessageIcon', ['bitmap', 'width', 'height'])):
 # Class Messages
 ###########################################################################
 class Messages(wx.Dialog):
+
+    """Simple message dialog."""
+
     def __init__(self, parent, text, title=wx.EmptyString, style=INFO, bitmap=None, yes="Okay", no="Cancel"):
         """Init Messages object."""
 
@@ -627,13 +630,13 @@ class Messages(wx.Dialog):
         if bitmap is not None:
             icon = bitmap
         elif style == ERROR:
-            icon = MessageIcon(Error.GetBitmap(), DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
+            icon = MessageIcon(error_icon.GetBitmap(), DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
         elif style == WARN:
-            icon = MessageIcon(Warn.GetBitmap(), DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
+            icon = MessageIcon(warn_icon.GetBitmap(), DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
         elif style == PROMPT:
-            icon = MessageIcon(Prompt.GetBitmap(), DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
+            icon = MessageIcon(prompt_icon.GetBitmap(), DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
         elif style == INFO:
-            icon = MessageIcon(Info.GetBitmap(), DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
+            icon = MessageIcon(info_icon.GetBitmap(), DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
 
         return icon
 

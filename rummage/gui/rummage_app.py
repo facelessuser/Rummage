@@ -39,7 +39,7 @@ class RummageApp(PipeApp):
     def __init__(self, *args, **kwargs):
         """Init RummageApp object."""
 
-        super(RummageApp, self).__init__(*args, **kwargs)
+        PipeApp.__init__(self, *args, **kwargs)
 
     def on_pipe_args(self, event):
         """

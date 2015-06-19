@@ -1,0 +1,12 @@
+language: python
+env:
+  - TOXENV=py27-unittests
+install:
+  - pip install tox
+  # - pip install codecov
+  # - pip install coveralls
+script:
+  - tox
+# after_success:
+#   - coveralls
+#   - codecov

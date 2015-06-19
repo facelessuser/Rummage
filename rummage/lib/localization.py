@@ -17,7 +17,6 @@ def _(text):
 def setup(domain, pth, language=None):
     """Setup a language."""
 
-    global _
     global lang
     global current_domain
     if language is not None:
@@ -25,7 +24,7 @@ def setup(domain, pth, language=None):
             lang = gettext.translation(domain, pth, languages=[language])
             lang.install(unicode=True)
             current_domain = domain
-        except:
+        except Exception:
             _default_setup()
     else:
         _default_setup()
@@ -34,7 +33,6 @@ def setup(domain, pth, language=None):
 def _default_setup():
     """Default configuration (just pass the string back)."""
 
-    global _
     global lang
     global current_domain
     lang = None

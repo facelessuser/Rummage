@@ -15,7 +15,7 @@ import sys
 from os.path import exists, join
 from os import unlink
 try:
-    import cpickle as pickle
+    import cpickle as pickle  # noqa
 except Exception:
     import pickle
 

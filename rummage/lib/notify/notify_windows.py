@@ -52,7 +52,7 @@ try:
     import win32gui
     import win32con
     native_win_support = True
-except:
+except Exception:
     native_win_support = False
 
 if native_win_support:

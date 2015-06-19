@@ -145,7 +145,7 @@ class CustomApp(wx.App):
             del kwargs["single_instance_name"]
         if "callback" in kwargs:
             del kwargs["callback"]
-        super(CustomApp, self).__init__(*args, **kwargs)
+        wx.App.__init__(self, *args, **kwargs)
 
     def custom_init(self, *args, **kwargs):
         """Parse for new inputs and store them because they must be removed."""
@@ -292,7 +292,7 @@ class PipeApp(CustomApp):
         self.pipe_name = kwargs.get("pipe_name", None)
         if "pipe_name" in kwargs:
             del kwargs["pipe_name"]
-        super(PipeApp, self).__init__(*args, **kwargs)
+        CustomApp.__init__(self, *args, **kwargs)
 
     def OnInit(self):  # noqa
         """
@@ -302,7 +302,7 @@ class PipeApp(CustomApp):
         by the first instance.
         """
 
-        super(PipeApp, self).OnInit()
+        CustomApp.OnInit(self)
         self.Bind(EVT_PIPE_ARGS, self.on_pipe_args)
         if self.pipe_name is not None:
             if self.is_instance_okay():
@@ -355,7 +355,7 @@ class PipeApp(CustomApp):
             while running:
                 running = self.pipe_thread.IsRunning()
                 time.sleep(0.1)
-        super(PipeApp, self).OnExit()
+        CustomApp.OnExit(self)
 
     def on_pipe_args(self, event):
         """An overridable event for when pipe arguments are received."""
@@ -437,7 +437,7 @@ class DebugFrameExtender(object):
 def _log_struct(obj, log_func, label="Object"):
     """Base logger to log a dict in pretty print format."""
 
-    log_func(obj, format="%(loglevel)s: " + label + ": %(message)s\n", fmt=json_fmt)
+    log_func(obj, log_fmt="%(loglevel)s: " + label + ": %(message)s\n", msg_fmt=json_fmt)
 
 
 def json_fmt(obj):
@@ -452,35 +452,35 @@ def gui_log(msg):
     log._log(msg, echo=False)
 
 
-def debug(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
+def debug(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
     """Debug level log."""
 
     if get_debug_mode():
-        log.debug(msg, echo=echo, format=format, fmt=fmt)
+        log.debug(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
 
 
-def info(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
+def info(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
     """Info level log."""
 
-    log.info(msg, echo=echo, format=format, fmt=fmt)
+    log.info(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
 
 
-def critical(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
+def critical(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
     """Critical level log."""
 
-    log.critical(msg, echo=echo, format=format, fmt=fmt)
+    log.critical(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
 
 
-def warning(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
+def warning(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
     """Warning level log."""
 
-    log.warning(msg, echo=echo, format=format, fmt=fmt)
+    log.warning(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
 
 
-def error(msg, echo=True, format="%(loglevel)s: %(message)s\n", fmt=None):
+def error(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
     """Error level log."""
 
-    log.error(msg, echo=echo, format=format, fmt=fmt)
+    log.error(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
 
 
 def debug_struct(obj, label="Object"):

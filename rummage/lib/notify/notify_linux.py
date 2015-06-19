@@ -67,7 +67,6 @@ except Exception:
 def setup_notify_osd(app_name):
     """Setup Notify OSD."""
 
-    global notify_osd_call
     if notify_osd_call is not None:
         Options.app_name = app_name
         Options.notify = notify_osd_call
@@ -76,7 +75,6 @@ def setup_notify_osd(app_name):
 def setup(app_name, icon, *args):
     """Setup."""
 
-    global notify_osd_call
     Options.icon = None
 
     try:

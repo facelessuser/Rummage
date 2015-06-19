@@ -166,7 +166,6 @@ class Settings(object):
         except Exception as e:
             debug(e)
             error("Could not get timestamp of file!")
-            pass
 
     @classmethod
     def changed(cls):

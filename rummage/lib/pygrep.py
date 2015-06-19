@@ -97,7 +97,7 @@ def threaded_walker(
         walker.run()
     except Exception:
         print(str(traceback.format_exc()))
-        pass
+
     _RUNNING = False
 
 
@@ -647,7 +647,6 @@ class Grep(object):
         """Initialize Grep object."""
 
         global _FILES
-        global _RUNNING
         global _ABORT
         if not _RUNNING and _ABORT:
             _ABORT = False
@@ -796,7 +795,8 @@ class Grep(object):
     def drain_records(self):
         """Grab all current records."""
 
-        for x in range(0, self.queue.qsize()):
+        size = self.queue.qsize()
+        while size:
             if self.max is not None and self.max == 0:
                 break
             record = self.queue.get()
@@ -805,6 +805,7 @@ class Grep(object):
                 if self.max is not None and record.match is not None:
                     self.max -= 1
                 yield record
+            size -= 1
 
     def file_read(self, content_buffer=None):
         """Perform search on on files in a directory."""
@@ -825,12 +826,13 @@ class Grep(object):
 
             # Acquire the maximum number of files to search (if available)
             acquire = _NUM_THREADS - len(file_info)
-            for x in range(0, acquire):
+            while acquire:
                 obj = self.__get_next_file()
                 if obj is not None:
                     file_info.append(obj)
                 else:
                     break
+                acquire -= 1
 
             # No more files to search
             if len(file_info) == 0:

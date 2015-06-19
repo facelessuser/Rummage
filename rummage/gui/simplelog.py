@@ -35,7 +35,7 @@ class Log(object):
 
     """Log."""
 
-    def __init__(self, filename=None, format="%(message)s", level=ERROR, filemode="w"):
+    def __init__(self, filename=None, fmt="%(message)s", level=ERROR, filemode="w"):
         """Init Log object."""
 
         self._lock = threading.Lock()
@@ -44,7 +44,7 @@ class Log(object):
                 f.write("")
         self.filename = filename
         self.level = level
-        self.format = format
+        self.format = fmt
         self.save_to_file = self.filename is not None
         self.echo = not self.save_to_file
 
@@ -66,43 +66,43 @@ class Log(object):
 
         return self.level
 
-    def formatter(self, lvl, format, msg, fmt=None):
+    def formatter(self, lvl, log_fmt, msg, msg_fmt=None):
         """Special formatters for log message."""
 
-        return format % {
+        return log_fmt % {
             "loglevel": lvl,
-            "message": unicode(msg if fmt is None else fmt(msg))
+            "message": unicode(msg if msg_fmt is None else msg_fmt(msg))
         }
 
-    def debug(self, msg, format="%(loglevel)s: %(message)s\n", echo=True, fmt=None):
+    def debug(self, msg, log_fmt="%(loglevel)s: %(message)s\n", echo=True, msg_fmt=None):
         """Debug level logging."""
 
         if self.level <= DEBUG:
-            self._log(self.formatter("DEBUG", format, msg, fmt), echo)
+            self._log(self.formatter("DEBUG", log_fmt, msg, msg_fmt), echo)
 
-    def info(self, msg, format="%(loglevel)s: %(message)s\n", echo=True, fmt=None):
+    def info(self, msg, log_fmt="%(loglevel)s: %(message)s\n", echo=True, msg_fmt=None):
         """Info level logging."""
 
         if self.level <= INFO:
-            self._log(self.formatter("INFO", format, msg, fmt), echo)
+            self._log(self.formatter("INFO", log_fmt, msg, msg_fmt), echo)
 
-    def warning(self, msg, format="%(loglevel)s: %(message)s\n", echo=True, fmt=None):
+    def warning(self, msg, log_fmt="%(loglevel)s: %(message)s\n", echo=True, msg_fmt=None):
         """Warning level logging."""
 
         if self.level <= WARNING:
-            self._log(self.formatter("WARNING", format, msg, fmt), echo)
+            self._log(self.formatter("WARNING", log_fmt, msg, msg_fmt), echo)
 
-    def error(self, msg, format="%(loglevel)s: %(message)s\n", echo=True, fmt=None):
+    def error(self, msg, log_fmt="%(loglevel)s: %(message)s\n", echo=True, msg_fmt=None):
         """Error level logging."""
 
         if self.level <= ERROR:
-            self._log(self.formatter("ERROR", format, msg, fmt), echo)
+            self._log(self.formatter("ERROR", log_fmt, msg, msg_fmt), echo)
 
-    def critical(self, msg, format="%(loglevel)s: %(message)s\n", echo=True, fmt=None):
+    def critical(self, msg, log_fmt="%(loglevel)s: %(message)s\n", echo=True, msg_fmt=None):
         """Critical level logging."""
 
         if self.level <= CRITICAL:
-            self._log(self.formater("CRITICAL", format, msg, fmt), echo)
+            self._log(self.formater("CRITICAL", log_fmt, msg, msg_fmt), echo)
 
     def _log(self, msg, echo=True):
         """Base logger."""
@@ -122,7 +122,7 @@ class Log(object):
             try:
                 with codecs.open(self.filename, "r", "utf-8") as f:
                     txt = f.read()
-            except:
+            except Exception:
                 pass
         return txt
 

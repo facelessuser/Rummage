@@ -6,8 +6,7 @@ License: MIT
 """
 from __future__ import absolute_import
 import sys
-
-__all__ = ("info", "warning", "error", "setup_notifications", "enable_growl", "has_growl")
+from .notify_growl import get_growl, enable_growl, growl_enabled, setup_growl, has_growl
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -17,13 +16,13 @@ else:
     _PLATFORM = "linux"
 
 if _PLATFORM == "windows":
-    from .notify_windows import *
-if _PLATFORM == "osx":
-    from .notify_osx import *
-if _PLATFORM == "linux":
-    from .notify_linux import *
+    from .notify_windows import get_notify, alert, setup, windows_icons
+elif _PLATFORM == "osx":
+    from .notify_osx import get_notify, alert, setup
+elif _PLATFORM == "linux":
+    from .notify_linux import get_notify, alert, setup
 
-from .notify_growl import *
+__all__ = ("info", "warning", "error", "setup_notifications", "enable_growl", "has_growl")
 
 
 ###################################

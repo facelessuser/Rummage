@@ -1,5 +1,5 @@
 """
-Open Editor
+Open Editor.
 
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -27,7 +27,6 @@ from ..lib.localization import get as _
 
 
 def open_editor(filename, line, col):
-
     """Open editor with the optional filename, line, and col parameters."""
 
     returncode = None

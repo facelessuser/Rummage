@@ -73,7 +73,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         if total_width < self.GetSize()[0] - 20:
             self.SetColumnWidth(self.column_count - 1, last_width + self.GetSize()[0] - total_width)
 
-    def init_column_size(self, minimum=MINIMUM_COL_SIZE):
+    def init_column_size(self):
         """Setup the initial column size."""
 
         for i in range(0, self.column_count):
@@ -102,10 +102,10 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
             self.last_idx_sized = idx
             self.size_sample -= 1
 
-    def get_map_item(self, idx, col=0, abs=False):
+    def get_map_item(self, idx, col=0, absolute=False):
         """Get attribute in in item map entry and the given index."""
 
-        return self.itemDataMap[self.itemIndexMap[idx] if not abs else idx][col]
+        return self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col]
 
     def load_list(self):
         """Load the list of items from the item map."""
@@ -132,10 +132,10 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
         return self.get_item_text(item, col)
 
-    def get_item_text(self, idx, col, abs=False):
+    def get_item_text(self, idx, col, absolute=False):
         """Return the text for the given item and col."""
 
-        return unicode(self.itemDataMap[self.itemIndexMap[idx] if not abs else idx][col])
+        return unicode(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
 
     def OnGetItemAttr(self, item):
         """Override method to get attributes for the cells in the given item."""
@@ -217,10 +217,10 @@ class ResultFileList(ResultList):
             self.GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
-    def get_item_text(self, item, col, abs=False):
+    def get_item_text(self, item, col, absolute=False):
         """Return the text for the given item and col."""
 
-        if not abs:
+        if not absolute:
             item = self.itemIndexMap[item]
         if col == 1:
             return u'%.2fKB' % self.itemDataMap[item][col]
@@ -304,10 +304,10 @@ class ResultContentList(ResultList):
             self.GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
-    def get_item_text(self, item, col, abs=False):
+    def get_item_text(self, item, col, absolute=False):
         """Return the text for the given item and col."""
 
-        if not abs:
+        if not absolute:
             item = self.itemIndexMap[item]
         if col == 0:
             return unicode(self.itemDataMap[item][col][0])
@@ -330,6 +330,8 @@ class ResultContentList(ResultList):
                 self.widest_cell[2] = width
 
     def set_match(self, obj):
+        """Set the match."""
+
         item_id = "%d:%d" % (obj.info.id, obj.match.lineno)
         if item_id in self.itemDataMap:
             self.increment_match_count(item_id)
@@ -359,7 +361,7 @@ class ResultContentList(ResultList):
             file_row = self.get_map_item(item, col=4)
             col = str(self.get_map_item(item, col=5))
             path = self.GetParent().GetParent().GetParent().m_result_file_panel.list.get_map_item(
-                file_row, col=3, abs=True
+                file_row, col=3, absolute=True
             )
             open_editor(join(normpath(path), filename), line, col)
         event.Skip()

@@ -30,6 +30,6 @@ def platform_window_focus(frame):
             nsapplication = ctypes.c_void_p(objc.objc_getClass('NSApplication'))
             nsapp = ctypes.c_void_p(objc.objc_msgSend(nsapplication, objc.sel_registerName('sharedApplication')))
             objc.objc_msgSend(nsapp, objc.sel_registerName('activateIgnoringOtherApps:'), True)
-        except:
+        except Exception:
             # Failed to bring window to top in OSX
             pass

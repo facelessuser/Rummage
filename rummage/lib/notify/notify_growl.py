@@ -82,7 +82,6 @@ def setup_growl(app_name, icon, alert_function):
     """Setup growl."""
 
     global alert
-    global notify_growl_call
     Options.icon = None
 
     alert = alert_function

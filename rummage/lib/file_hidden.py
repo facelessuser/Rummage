@@ -140,7 +140,6 @@ def is_hidden(path):
 
 
 if __name__ == '__main__':
-    import sys
     for arg in sys.argv[1:]:
         filename = expanduser(arg)
         print('{}: {}'.format(filename, is_hidden(filename)))

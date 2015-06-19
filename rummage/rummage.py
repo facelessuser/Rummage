@@ -19,10 +19,10 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-from . import version
 import sys
 import argparse
 import os
+from . import version
 from .gui.settings import Settings
 
 Settings.load_settings()  # noqa
@@ -33,9 +33,9 @@ from .gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTest
 def parse_arguments():
     """Parse the arguments."""
 
-    parser = argparse.ArgumentParser(prog=version.app, description='A python grep like tool.')
+    parser = argparse.ArgumentParser(prog=version.__app__, description='A python grep like tool.')
     # Flag arguments
-    parser.add_argument('--version', action='version', version=('%(prog)s ' + version.version))
+    parser.add_argument('--version', action='version', version=('%(prog)s ' + version.__version__))
     parser.add_argument('--show_log', '-l', action='store_true', default=False, help="Open log on startup")
     parser.add_argument('--searchpath', '-s', nargs=1, default=None, help="Path to search.")
     parser.add_argument('--regextool', '-r', action='store_true', default=False, help="Open just the regex tester.")

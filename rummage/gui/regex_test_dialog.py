@@ -199,7 +199,6 @@ class RegexTestDialog(gui.RegexTestDialog):
                         pass
             except Exception:
                 print(str(traceback.format_exc()))
-                pass
             self.testing = False
 
     def regex_start_event(self, event):

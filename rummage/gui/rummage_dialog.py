@@ -49,7 +49,7 @@ from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .result_panels import FileResultPanel, ResultFileList, ResultContentList
 from .messages import dirpickermsg, filepickermsg
-from .messages import Error as error_icon
+from .messages import error_icon
 from .. import data
 
 DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
@@ -103,21 +103,21 @@ SEARCH_BTN_SEARCH = _("Search")
 SEARCH_BTN_ABORT = _("Aborting")
 
 
-def eng_to_i18n(string, map):
+def eng_to_i18n(string, mapping):
     """Convert english to i18n."""
 
     i18n = None
-    for k, v in map.items():
+    for k, v in mapping.items():
         if v == string:
             i18n = k
             break
     return i18n
 
 
-def i18n_to_eng(string, map):
+def i18n_to_eng(string, mapping):
     """Convert i18n to english."""
 
-    return map.get(string, None)
+    return mapping.get(string, None)
 
 
 def get_flags(args):
@@ -241,9 +241,9 @@ def threaded_grep(
             )
         )
         grep.run()
-    except:
+    except Exception:
         error(traceback.format_exc())
-        pass
+
     bench = time() - start
     with _LOCK:
         _RUNTIME = _("%01.2f seconds") % bench
@@ -823,13 +823,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if not fail:
             try:
                 self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
-            except:
+            except Exception:
                 msg = _("Please enter a modified date!")
                 fail = True
         if not fail:
             try:
                 self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
-            except:
+            except Exception:
                 msg = _("Please enter a created date!")
                 fail = True
         if fail:
@@ -1047,8 +1047,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def check_updates(self, event):
         """Check if updates to the result lists can be done."""
 
-        global _RESULTS
-        global _ERRORS
         debug("Processing current results")
         if not self.checking:
             self.checking = True
@@ -1220,7 +1218,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         try:
             re.compile(pattern, flags)
             return False
-        except:
+        except Exception:
             errormsg(_("Invalid Regular Expression!"))
             error(traceback.format_exc())
             return True
@@ -1238,7 +1236,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if self.tester is not None:
             try:
                 self.tester.Close()
-            except:
+            except Exception:
                 pass
         self.close_debug_console()
         event.Skip()
@@ -1275,7 +1273,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_result_file_panel.list.itemDataMap,
                 self.m_result_content_panel.list.itemDataMap
             )
-        except:
+        except Exception:
             error(traceback.format_exc())
             errormsg(_("There was a problem exporting the HTML!  See the log for more info."))
 
@@ -1299,7 +1297,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_result_file_panel.list.itemDataMap,
                 self.m_result_content_panel.list.itemDataMap
             )
-        except:
+        except Exception:
             error(traceback.format_exc())
             errormsg(_("There was a problem exporting the CSV!  See the log for more info."))
 
