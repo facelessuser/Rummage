@@ -24,7 +24,7 @@ import sys
 from . import gui
 from .settings import Settings
 from .generic_dialogs import errormsg
-from ..localization import get as _
+from ..localization import _
 
 
 class SaveSearchDialog(gui.SaveSearchDialog):

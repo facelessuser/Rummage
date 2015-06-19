@@ -39,12 +39,6 @@ def _default_setup():
     current_domain = "en_US"
 
 
-def get(t):
-    """Get the translated string."""
-
-    return _(t)
-
-
 def get_current_domain():
     """Get the current domain."""
 

@@ -23,7 +23,7 @@ import wx.lib.mixins.listctrl as listmix
 
 from .settings import Settings
 from . import gui
-from ..localization import get as _
+from ..localization import _
 from .. import data
 
 SEARCH_REGEX = _("Regex")

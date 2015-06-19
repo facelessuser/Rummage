@@ -32,7 +32,7 @@ from .. import version
 from .. import pygrep
 from ..epoch_timestamp import local_time_to_epoch_timestamp
 from .. import notify
-from ..localization import get as _
+from ..localization import _
 from . import gui
 from . import export_html
 from . import export_csv

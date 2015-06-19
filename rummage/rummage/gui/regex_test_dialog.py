@@ -23,7 +23,7 @@ import traceback
 import sys
 from . import gui
 from .. import ure
-from ..localization import get as _
+from ..localization import _
 from .. import data
 
 

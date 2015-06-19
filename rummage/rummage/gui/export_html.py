@@ -9,7 +9,7 @@ import base64
 import json
 import subprocess
 import sys
-from ..localization import get as _
+from ..localization import _
 from ..localization import get_current_domain
 from .. import data
 

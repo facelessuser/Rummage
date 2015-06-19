@@ -20,7 +20,7 @@ DEALINGS IN THE SOFTWARE.
 """
 import wx
 from . import gui
-from ..localization import get as _
+from ..localization import _
 from .. import version
 from .. import data
 

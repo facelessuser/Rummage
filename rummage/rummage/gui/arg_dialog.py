@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 import wx
 import sys
 from . import gui
-from ..localization import get as _
+from ..localization import _
 
 
 class ArgDialog(gui.ArgDialog):

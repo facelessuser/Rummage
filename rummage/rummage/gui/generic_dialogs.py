@@ -19,7 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from . import messages
-from ..localization import get as _
+from ..localization import _
 
 
 def yesno(question, title=_('Yes or no?'), bitmap=None, yes=_("Okay"), no=_("Cancel")):

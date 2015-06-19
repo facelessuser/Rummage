@@ -27,7 +27,7 @@ import traceback
 from ..file_strip.json import sanitize_json
 from .. import notify
 from .. import localization
-from ..localization import get as _
+from ..localization import _
 from .custom_app import debug, debug_struct, error
 from .custom_app import init_app_log, set_debug_mode
 from . generic_dialogs import errormsg
