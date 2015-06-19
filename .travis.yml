@@ -1,6 +1,6 @@
 language: python
 env:
-  - TOXENV=py27-unittests
+  - TOXENV=lint
 install:
   - pip install tox
   # - pip install codecov
