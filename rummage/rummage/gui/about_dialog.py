@@ -19,9 +19,9 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 DEALINGS IN THE SOFTWARE.
 """
 import wx
-from .. import version
 from . import gui
-from ..lib.localization import get as _
+from ..localization import get as _
+from .. import version
 from .. import data
 
 

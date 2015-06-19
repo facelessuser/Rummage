@@ -27,11 +27,11 @@ setup(
     zip_safe=False,
     entry_points={
         'gui_scripts': [
-            'rummage=rummage.rummage:cli'
+            'rummage=rummage.__main__:main'
         ]
     },
     package_data={
-        'rummage.data': ['*.css', '*.js', '*.png', '*.ico', '*.icns']
+        'rummage.rummage.data': ['*.css', '*.js', '*.png', '*.ico', '*.icns']
     },
     license='MIT License',
     classifiers=[

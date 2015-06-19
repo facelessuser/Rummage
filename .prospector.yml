@@ -2,11 +2,12 @@ strictness: medium
 doc-warnings: true
 test-warnings: false
 max-line-length: 120
-ignore-patterns:
+ignore-paths:
   - docs
   - docs_theme
-  - gui/gui.py
-  - extra/*
+  - extra
+ignore-patterns:
+  - 'rummage(?:\\|/)rummage(?:\\|/)gui(?:\\|/)gui\.py$'
 pep257:
   disable:
     - D202

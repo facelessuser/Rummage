@@ -23,7 +23,7 @@ import sys
 from .settings import Settings
 from .custom_app import debug, error
 from .generic_dialogs import errormsg
-from ..lib.localization import get as _
+from ..localization import get as _
 
 
 def open_editor(filename, line, col):

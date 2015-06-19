@@ -19,15 +19,11 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import sys
 import argparse
-import os
-from . import version
-from .gui.settings import Settings
-
-Settings.load_settings()  # noqa
-
-from .gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
+import sys
+from rummage.gui.settings import Settings
+from rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
+from rummage import version
 
 
 def parse_arguments():
@@ -42,8 +38,10 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def main(script):
+def run():
     """Configure environment, start the app, and launch the appropriate frame."""
+
+    Settings.load_settings()
 
     args = parse_arguments()
     if args.show_log:
@@ -59,15 +57,18 @@ def main(script):
             RegexTestDialog(None, False, False, stand_alone=True).Show()
         else:
             RummageFrame(
-                None, script,
+                None,
                 args.searchpath[0] if args.searchpath is not None else None,
                 open_debug=args.show_log
             ).Show()
     app.MainLoop()
 
 
-def cli():
-    """Command line interface."""
+def main():
+    """Main entry point."""
 
-    script_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-    sys.exit(main(script_path))
+    sys.exit(run())
+
+
+if __name__ == "__main__":
+    main()

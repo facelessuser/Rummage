@@ -4,7 +4,7 @@ from time import ctime
 import codecs
 import sys
 import subprocess
-from ..lib.localization import get as _
+from ..localization import get as _
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"

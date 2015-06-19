@@ -22,7 +22,7 @@ import wx
 import sys
 from . import gui
 from .arg_dialog import ArgDialog
-from ..lib.localization import get as _
+from ..localization import get as _
 
 
 class EditorDialog(gui.EditorDialog):

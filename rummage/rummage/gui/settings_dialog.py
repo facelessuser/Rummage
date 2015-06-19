@@ -23,7 +23,7 @@ from . import gui
 from .settings import Settings
 from .editor_dialog import EditorDialog
 from .platform_window_focus import platform_window_focus
-from ..lib.localization import get as _
+from ..localization import get as _
 
 RECORDS = _("%d Records")
 

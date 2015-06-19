@@ -23,7 +23,7 @@ import wx
 import wx.lib.mixins.listctrl as listmix
 from os.path import normpath, join, basename, dirname
 from .open_editor import open_editor
-from ..lib.localization import get as _
+from ..localization import get as _
 from .. import data
 
 MINIMUM_COL_SIZE = 100

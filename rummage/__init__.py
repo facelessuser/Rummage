@@ -1,1 +1,1 @@
-"""Rummage, a grep like gui tool."""
+"""Rummage app."""

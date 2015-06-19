@@ -22,8 +22,8 @@ import wx
 import traceback
 import sys
 from . import gui
-from ..lib import ure
-from ..lib.localization import get as _
+from .. import ure
+from ..localization import get as _
 from .. import data
 
 

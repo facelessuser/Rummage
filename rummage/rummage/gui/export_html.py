@@ -9,8 +9,8 @@ import base64
 import json
 import subprocess
 import sys
-from ..lib.localization import get as _
-from ..lib.localization import get_current_domain
+from ..localization import get as _
+from ..localization import get_current_domain
 from .. import data
 
 if sys.platform.startswith('win'):
