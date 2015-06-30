@@ -22,13 +22,13 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import codecs
 import mmap
+import os
 import re
 import shutil
 import sys
 import traceback
 from collections import namedtuple
 from fnmatch import fnmatch
-from os import walk
 from os.path import isdir, isfile, join, abspath, getsize
 from time import ctime
 from . import text_decode
@@ -175,14 +175,22 @@ class RummageFileContent(object):
         self.size = size
         self.encoding = encoding
         self.file_obj = None
-        self.file_content = file_content
-        self.string_buffer = file_content is not None
+        self.string_buffer = file_content
         self.file_map = None
 
     def __enter__(self):
         """Return content of either a memory map file or string."""
 
-        return self.file_content if self.string_buffer else self._read_file()
+        try:
+            return self.string_buffer if self.string_buffer else self._read_file()
+        except Exception:
+            if self.encoding.encode != "bin":
+                if self.file_obj is not None:
+                    self.file_obj.close()
+                self.encoding = text_decode.Encoding("bin", None)
+                self._read_bin()
+                return self.file_map
+            raise
 
     def __exit__(self, *args):
         """Close file obj and memory map object if open."""
@@ -192,26 +200,28 @@ class RummageFileContent(object):
         if self.file_obj is not None:
             self.file_obj.close()
 
+    def _read_bin(self):
+        self.file_obj = open(self.name, "rb")
+        if self.size != '0.00KB':
+            self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)
+
     def _read_file(self):
         """Read the file in."""
 
-        if self.encoding is not None:
-            if self.encoding.encode == "bin":
-                self.file_obj = open(self.name, "rb")
-            else:
-                enc = self.encoding.encode
-                if enc == 'utf-8':
-                    enc = 'utf-8-sig'
-                elif enc.startswith('utf-16'):
-                    enc = 'utf-16'
-                elif enc.startswith('utf-32'):
-                    enc = 'utf-32'
-                self.file_obj = codecs.open(self.name, 'r', encoding=enc)
+        if self.encoding.encode == "bin":
+            self.file_obj = open(self.name, "rb")
             if self.size != '0.00KB':
                 self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)
-            else:
-                self.file_content = self.file_obj.read()
-        return self.file_content if self.file_content is not None else self.file_map
+        else:
+            enc = self.encoding.encode
+            if enc == 'utf-8':
+                enc = 'utf-8-sig'
+            elif enc.startswith('utf-16'):
+                enc = 'utf-16'
+            elif enc.startswith('utf-32'):
+                enc = 'utf-32'
+            self.file_obj = codecs.open(self.name, 'r', encoding=enc)
+        return self.file_obj.read() if self.file_map is None else self.file_map
 
 
 class _FileSearch(object):
@@ -541,37 +551,48 @@ class _FileSearch(object):
         if not self.is_binary or self.process_binary:
 
             try:
-                with RummageFileContent(
+                rum_content = RummageFileContent(
                     file_info.name, file_info.size, self.current_encoding, self.file_content
-                ) as rum_file:
-                    offset = 0
+                )
+                with rum_content as rum_buff:
+                    skip = False
+                    if self.is_binary is False and rum_content.encoding.encode == "bin":
+                        self.is_binary = True
+                        self.current_encoding = rum_content.encoding
+                        if not self.process_binary:
+                            skip = True
+                        file_info = file_info._replace(encoding=self.current_encoding)
 
-                    for m in self._findall(rum_file):
-                        text.append(rum_file[offset:m.start(0)])
-                        text.append(
-                            self.expand(m) if self.expand is not None else m.expand(self.replace)
-                        )
-                        offset = m.end(0)
 
-                        yield FileRecord(
-                            file_info,
-                            MatchRecord(
-                                0,                     # lineno
-                                0,                     # colno
-                                (m.start(), m.end()),  # Postion of match
-                                None,                  # Line(s) in which match is found
-                                None,                  # Line ending for file
-                                (0, 0)                 # Number of lines shown before and after matched line(s)
-                            ),
-                            None
-                        )
+                    if not skip:
+                        offset = 0
 
-                        if self.kill:
-                            break
+                        for m in self._findall(rum_buff):
+                            text.append(rum_buff[offset:m.start(0)])
+                            text.append(
+                                self.expand(m) if self.expand is not None else m.expand(self.replace)
+                            )
+                            offset = m.end(0)
+
+                            yield FileRecord(
+                                file_info,
+                                MatchRecord(
+                                    0,                     # lineno
+                                    0,                     # colno
+                                    (m.start(), m.end()),  # Postion of match
+                                    None,                  # Line(s) in which match is found
+                                    None,                  # Line ending for file
+                                    (0, 0)                 # Number of lines shown before and after matched line(s)
+                                ),
+                                None
+                            )
+
+                            if self.kill:
+                                break
 
                     # Grab the rest of the file if we found things to replace.
                     if not self.kill and text:
-                        text.append(rum_file[offset:])
+                        text.append(rum_buff[offset:])
 
                 if not self.kill and text:
                     if self.file_content:
@@ -601,62 +622,73 @@ class _FileSearch(object):
         if not self.is_binary or self.process_binary:
 
             try:
-                with RummageFileContent(
+                rum_content = RummageFileContent(
                     file_info.name, file_info.size, self.current_encoding, self.file_content
-                ) as rum_file:
-                    line_ending = None
-                    line_map = []
-                    file_record_sent = False
+                )
+                with rum_content as rum_buff:
 
-                    for m in self._findall(rum_file):
-                        if line_ending is None and not self.boolean and not self.count_only and not self.is_binary:
-                            line_ending, line_map = self._get_line_ending(rum_file)
+                    skip = False
+                    if self.is_binary is False and rum_content.encoding.encode == "bin":
+                        self.is_binary = True
+                        self.current_encoding = rum_content.encoding
+                        if not self.process_binary:
+                            skip = True
+                        file_info = file_info._replace(encoding=self.current_encoding)
 
-                        if not self.boolean and not self.count_only:
-                            # Get line related context.
-                            if self.is_binary:
-                                lines, match, context, row, col = self._get_binary_context(
-                                    rum_file, m
-                                )
+                    if not skip:
+                        line_ending = None
+                        line_map = []
+                        file_record_sent = False
+
+                        for m in self._findall(rum_buff):
+                            if line_ending is None and not self.boolean and not self.count_only and not self.is_binary:
+                                line_ending, line_map = self._get_line_ending(rum_buff)
+
+                            if not self.boolean and not self.count_only:
+                                # Get line related context.
+                                if self.is_binary:
+                                    lines, match, context, row, col = self._get_binary_context(
+                                        rum_buff, m
+                                    )
+                                else:
+                                    lines, match, context, row, col = self._get_line_context(
+                                        rum_buff, m, line_map
+                                    )
                             else:
-                                lines, match, context, row, col = self._get_line_context(
-                                    rum_file, m, line_map
-                                )
-                        else:
-                            row = 0
-                            col = 0
-                            match = (m.start(), m.end())
-                            lines = None
-                            line_ending = None
-                            context = (0, 0)
+                                row = 0
+                                col = 0
+                                match = (m.start(), m.end())
+                                lines = None
+                                line_ending = None
+                                context = (0, 0)
 
-                        file_record_sent = True
+                            file_record_sent = True
 
-                        yield FileRecord(
-                            file_info,
-                            MatchRecord(
-                                row,                     # lineno
-                                col,                     # colno
-                                match,                   # Postion of match
-                                lines,                   # Line(s) in which match is found
-                                line_ending,             # Line ending for file
-                                context                  # Number of lines shown before and after matched line(s)
-                            ),
-                            None
-                        )
+                            yield FileRecord(
+                                file_info,
+                                MatchRecord(
+                                    row,                     # lineno
+                                    col,                     # colno
+                                    match,                   # Postion of match
+                                    lines,                   # Line(s) in which match is found
+                                    line_ending,             # Line ending for file
+                                    context                  # Number of lines shown before and after matched line(s)
+                                ),
+                                None
+                            )
 
-                        if self.boolean:
-                            break
-
-                        # Have we exceeded the maximum desired matches?
-                        if self.max_count is not None:
-                            self.max_count -= 1
-
-                            if self.max_count == 0:
+                            if self.boolean:
                                 break
 
-                        if self.kill:
-                            break
+                            # Have we exceeded the maximum desired matches?
+                            if self.max_count is not None:
+                                self.max_count -= 1
+
+                                if self.max_count == 0:
+                                    break
+
+                            if self.kill:
+                                break
 
                 if not file_record_sent:
                     yield FileRecord(file_info, None, None)
@@ -859,7 +891,7 @@ class _DirWalker(object):
     def walk(self):
         """Start search for valid files."""
 
-        for base, dirs, files in walk(self.dir):
+        for base, dirs, files in os.walk(self.dir):
             # Remove child folders based on exclude rules
             for name in dirs[:]:
                 if not self._valid_folder(base, name):
