@@ -32,7 +32,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     """Regex test dialog."""
 
-    def __init__(self, parent, is_case, is_dot, text="", stand_alone=False):
+    def __init__(self, parent, is_case, is_dot, text="", replace="", stand_alone=False):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
@@ -53,6 +53,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.start_regex_timer()
 
         self.m_regex_text.SetValue(text)
+        self.m_replace_text.SetValue(replace)
 
         self.localize()
 
@@ -150,6 +151,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Copy regex to parent Rummage Dialog search input."""
 
         self.parent.m_searchfor_textbox.SetValue(self.m_regex_text.GetValue())
+        self.parent.m_replace_textbox.SetValue(self.m_replace_text.GetValue())
         self.parent.m_regex_search_checkbox.SetValue(True)
         self.Close()
 

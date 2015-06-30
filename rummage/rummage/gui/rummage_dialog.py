@@ -1413,7 +1413,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self,
             self.m_case_checkbox.GetValue(),
             self.m_dotmatch_checkbox.GetValue(),
-            self.m_searchfor_textbox.GetValue()
+            self.m_searchfor_textbox.GetValue(),
+            self.m_replace_textbox.GetValue()
         )
         self.tester.Show()
 
