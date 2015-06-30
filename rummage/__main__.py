@@ -41,9 +41,10 @@ def parse_arguments():
 def run():
     """Configure environment, start the app, and launch the appropriate frame."""
 
-    Settings.load_settings()
-
     args = parse_arguments()
+
+    Settings.load_settings(args.debug)
+
     if args.debug:
         set_debug_mode(True)
 

@@ -59,11 +59,13 @@ class Settings(object):
 
     filename = None
     allow_save = True
+    debug = False
 
     @classmethod
-    def load_settings(cls):
+    def load_settings(cls, debug_mode):
         """Load the settings."""
 
+        cls.debug = debug_mode
         cls.settings_file, cls.cache_file, log, uni_props = cls.get_settings_files()
         init_app_log(log)
         backrefs.set_cache_directory(uni_props)
@@ -86,7 +88,7 @@ class Settings(object):
                     error(e)
                 except Exception:
                     print(str(e))
-        if cls.get_debug():
+        if cls.debug:
             set_debug_mode(True)
         localization.setup('rummage', join(cls.config_folder, "locale"), cls.get_language())
         debug_struct(cls.settings)
@@ -140,13 +142,6 @@ class Settings(object):
             languages.append("en_US")
         languages.sort()
         return languages
-
-    @classmethod
-    def get_debug(cls):
-        """Get debug level setting."""
-
-        cls.reload_settings()
-        return cls.settings.get("debug", False)
 
     @classmethod
     def set_debug(cls, enable):
