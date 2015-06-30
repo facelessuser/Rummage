@@ -40,6 +40,7 @@ PY3 = (3, 0) <= sys.version_info < (4, 0)
 
 if PY3:
     binary_type = bytes  # noqa
+    string_type = str  # noqa
 
     def to_ascii_bytes(string):
         """Convert unicode to ascii byte string."""
@@ -47,6 +48,7 @@ if PY3:
         return bytes(string, 'ascii')
 else:
     binary_type = str  # noqa
+    string_type = basestring  # noqa
 
     def to_ascii_bytes(string):
         """Convert unicode to ascii byte string."""
@@ -61,7 +63,7 @@ FILE_REGEX_MATCH = 16
 DIR_REGEX_MATCH = 32
 BUFFER_INPUT = 64
 
-TRUNCATE_LENGTH = 256
+TRUNCATE_LENGTH = 120
 
 ABORT = False
 _PROCESS = False
@@ -215,8 +217,6 @@ class _FileSearch(object):
 
     """Search for files."""
 
-    hex_tx_table = ("." * 32) + "".join(chr(c) for c in range(32, 127)) + ("." * 129)
-
     def __init__(self, args, file_obj, file_id, max_count, file_content):
         """Init the file search object."""
 
@@ -227,6 +227,7 @@ class _FileSearch(object):
         self.count_only = bool(args.count_only)
         self.truncate_lines = args.truncate_lines
         self.backup = args.backup
+        self.backup_ext = '.%s' % args.backup_ext
         self.bom = None
         if self.truncate_lines:
             self.context = (0, 0)
@@ -246,12 +247,51 @@ class _FileSearch(object):
         self.is_binary = False
         self.current_encoding = None
 
-    def _tx_bin(self, content):
-        """Format binary data in a friendly way. Display only ASCII."""
+    def _get_binary_context(self, content, m):
+        """Get context info for binary file."""
 
-        return content.translate(self.hex_tx_table)
+        row = 0
+        col = 0
+        before = 0
+        after = 0
+        start = m.start()
+        end = m.end()
+        eof = len(content) - 1
 
-    def _get_line_context(self, content, m, line_map, binary=False):
+        match_len = m.end() - m.start()
+        overage = (TRUNCATE_LENGTH - match_len) / 2
+        if overage > 0:
+            start = m.start() - overage
+            end = m.end() + overage
+        if start < 0:
+            start = 0
+        if end > eof:
+            end = eof
+
+        match_start = m.start() - start
+        match_end = match_start + m.end() - m.start()
+
+        if self.truncate_lines:
+            length = end - start
+            if length > TRUNCATE_LENGTH:
+                end = start + TRUNCATE_LENGTH
+                length = TRUNCATE_LENGTH
+
+            # Recalculate relative match start and end
+            if match_start > length:
+                match_start = length
+            if match_end > length:
+                match_end = TRUNCATE_LENGTH
+
+        return (
+            content[start:end],
+            (match_start, match_end),
+            (before, after),
+            row,
+            col
+        )
+
+    def _get_line_context(self, content, m, line_map):
         """Get context info about the line."""
 
         before, after = self.context
@@ -310,7 +350,7 @@ class _FileSearch(object):
         # and how many lines of context before and after,
         # and the row and colum of match start.
         return (
-            content[start:end] if not binary else self._tx_bin(content[start:end]),
+            content[start:end],
             (match_start, match_end),
             (before, after),
             row,
@@ -407,7 +447,7 @@ class _FileSearch(object):
         """Update the file content."""
 
         if self.backup:
-            backup = file_name + '.rum-bak'
+            backup = file_name + self.backup_ext
             shutil.copy2(file_name, backup)
 
         if encoding.bom:
@@ -444,7 +484,10 @@ class _FileSearch(object):
                 self.current_encoding = text_decode.Encoding('bin', None)
                 self.is_binary = False
                 if self.encoding is not None:
-                    if self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
+                    if self.encoding == 'bin':
+                        self.current_encoding = text_decode.Encoding(self.encoding, None)
+                        self.is_binary = True
+                    elif self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
                         bom = text_decode.inspect_bom(file_obj.name)
                         if bom and bom.encode.startswith(self.encoding):
                             self.current_encoding = bom
@@ -563,16 +606,19 @@ class _FileSearch(object):
                     file_record_sent = False
 
                     for m in self._findall(rum_file):
-                        if not self.boolean and not self.count_only:
-                            if line_ending is None:
-                                line_ending, line_map = self._get_line_ending(rum_file)
+                        if line_ending is None and not self.boolean and not self.count_only and not self.is_binary:
+                            line_ending, line_map = self._get_line_ending(rum_file)
 
                         if not self.boolean and not self.count_only:
-                            file_record_sent = True
                             # Get line related context.
-                            lines, match, context, row, col = self._get_line_context(
-                                rum_file, m, line_map, self.is_binary
-                            )
+                            if self.is_binary:
+                                lines, match, context, row, col = self._get_binary_context(
+                                    rum_file, m
+                                )
+                            else:
+                                lines, match, context, row, col = self._get_line_context(
+                                    rum_file, m, line_map
+                                )
                         else:
                             row = 0
                             col = 0
@@ -580,6 +626,8 @@ class _FileSearch(object):
                             lines = None
                             line_ending = None
                             context = (0, 0)
+
+                        file_record_sent = True
 
                         yield FileRecord(
                             file_info,
@@ -643,6 +691,7 @@ class SearchParams(object):
         self.backup = True
         self.encoding = None
         self.process_binary = False
+        self.backup_ext = 'bak'
 
 
 class _DirWalker(object):
@@ -652,7 +701,7 @@ class _DirWalker(object):
     def __init__(
         self, directory, file_pattern, file_regex_match,
         folder_exclude, dir_regex_match, recursive,
-        show_hidden, size, modified, created
+        show_hidden, size, modified, created, backup_ext
     ):
         """Init the directory walker object."""
 
@@ -666,6 +715,10 @@ class _DirWalker(object):
         self.folder_exclude = folder_exclude
         self.recursive = recursive
         self.show_hidden = show_hidden
+        self.backup_ext = None
+        ext = '.%s' % backup_ext if backup_ext else None
+        if ext is not None:
+            self.backup_ext = ext.lower() if _PLATFORM == "windows" else ext
 
     def _is_hidden(self, path):
         """Check if file is hidden."""
@@ -722,12 +775,25 @@ class _DirWalker(object):
             size_okay = self._compare_value(self.size, self.current_size)
         return size_okay
 
+    def _is_backup(self, name):
+        """Check if file is a pygrep backup."""
+
+        is_backup = False
+        if self.backup_ext is not None:
+            if _PLATFORM == "windows":
+                if name.lower().endswith(self.backup_ext):
+                    is_backup = True
+            elif name.endswith(self.backup_ext):
+                is_backup = True
+        return is_backup
+
+
     def _valid_file(self, base, name):
         """Return whether a file can be searched."""
 
         try:
             valid = False
-            if self.file_pattern is not None and not self._is_hidden(join(base, name)):
+            if self.file_pattern is not None and not self._is_hidden(join(base, name)) and not self._is_backup(name):
                 if self.file_regex_match:
                     valid = True if self.file_pattern.match(name) is not None else False
                 else:
@@ -836,7 +902,7 @@ class Grep(object):
         show_hidden=False, encoding=None, size=None,
         modified=None, created=None, text=False, truncate_lines=False,
         boolean=False, count_only=False, replace=None,
-        backup=False
+        backup=False, backup_ext='bak'
     ):
         """Initialize Grep object."""
 
@@ -861,6 +927,7 @@ class Grep(object):
         self.search_params.backup = backup
         self.search_params.encoding = self._verify_encoding(encoding) if encoding is not None else None
         self.search_params.process_binary = text
+        self.search_params.backup_ext = backup_ext if backup_ext and isinstance(backup_ext, string_type) else 'bak'
 
         self.buffer_input = bool(flags & BUFFER_INPUT)
         self.current_encoding = None
@@ -886,7 +953,8 @@ class Grep(object):
                 show_hidden,
                 size,
                 modified,
-                created
+                created,
+                self.search_params.backup_ext if backup else None
             )
         elif not self.buffer_input and isfile(self.target):
             self.files.append(

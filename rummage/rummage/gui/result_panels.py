@@ -268,6 +268,8 @@ class ResultContentList(ResultList):
 
     """ResultContentList."""
 
+    hex_tx_table = ("." * 32) + "".join(chr(c) for c in range(32, 127)) + ("." * 129)
+
     def __init__(self, parent):
         """Init ResultContentFileList object."""
 
@@ -303,6 +305,14 @@ class ResultContentList(ResultList):
                 self.last_moused = (actual_item, join(pth[1], pth[0]))
             self.GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
+
+    def _tx_bin(self, content):
+        """Format binary data in a friendly way. Display only ASCII."""
+
+        if not isinstance(content, unicode):
+            return unicode(content.__repr__()[1:-1])
+        else:
+            return unicode(content)
 
     def get_item_text(self, item, col, absolute=False):
         """Return the text for the given item and col."""
@@ -340,7 +350,7 @@ class ResultContentList(ResultList):
                 item_id,
                 (basename(obj.info.name), dirname(obj.info.name)),
                 obj.match.lineno, 1,
-                obj.match.lines.replace("\r", "").split("\n")[0],
+                self._tx_bin(obj.match.lines).replace("\r", "").split("\n")[0],
                 "%d" % obj.info.id, obj.match.colno, obj.info.encoding
             )
 

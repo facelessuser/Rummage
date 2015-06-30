@@ -433,6 +433,7 @@ class GrepArgs(object):
         self.backup = True
         self.replace = None
         self.force_encode = None
+        self.backup_ext = None
 
 
 class DirPickButton(object):
@@ -1066,6 +1067,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args.count_only = self.m_count_only_checkbox.GetValue()
         self.args.boolean = self.m_boolean_checkbox.GetValue()
         self.args.backup = self.m_backup_checkbox.GetValue()
+        self.args.backup_ext = 'rum-bak'
         self.args.recursive = self.m_subfolder_checkbox.GetValue()
         self.args.pattern = self.m_searchfor_textbox.Value
         self.args.replace = self.m_replace_textbox.Value if replace else None
