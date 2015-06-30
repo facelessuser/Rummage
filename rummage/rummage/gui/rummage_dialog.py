@@ -298,7 +298,8 @@ class GrepThread(threading.Thread):
             count_only=args.count_only,
             boolean=args.boolean,
             replace=args.replace,
-            backup=args.backup
+            backup=args.backup,
+            backup_ext=args.backup_ext
         )
 
         threading.Thread.__init__(self)
