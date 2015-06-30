@@ -115,10 +115,11 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         super(LoadSearchDialog, self).__init__(parent)
 
         self.search = None
+        self.replace = None
         self.is_regex = None
 
         self.reset_table()
-        extend_list(self.m_search_list, 3)
+        extend_list(self.m_search_list, 4)
 
         self.localize()
 
@@ -146,13 +147,18 @@ class LoadSearchDialog(gui.LoadSearchDialog):
 
         count = 0
         for x in Settings.get_search():
-            search_type = SEARCH_REGEX if x[2] else SEARCH_LITERAL
+            # TODO: Added with replace feature
+            # remove some time in the future.
+            if len(x) == 3:
+                x.insert(2, '')
+            search_type = SEARCH_REGEX if x[3] else SEARCH_LITERAL
             self.m_search_list.InsertStringItem(count, x[0])
             self.m_search_list.SetStringItem(count, 1, x[1])
-            self.m_search_list.SetStringItem(count, 2, search_type)
+            self.m_search_list.SetStringItem(count, 2, x[2])
+            self.m_search_list.SetStringItem(count, 3, search_type)
             self.m_search_list.SetItemData(count, count)
             self.m_search_list.SetItemImage(count, 0)
-            self.m_search_list.set_item_map(count, x[0], x[1], search_type)
+            self.m_search_list.set_item_map(count, x[0], x[1], x[2], search_type)
             count += 1
         if count:
             self.column_resize(self.m_search_list, count)
@@ -166,13 +172,14 @@ class LoadSearchDialog(gui.LoadSearchDialog):
             return
         idx = self.m_search_list.GetItemData(item)
         self.search = self.m_search_list.get_map_item(idx, col=1)
-        self.is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(idx, col=2)] == "Regex"
+        self.replace = self.m_search_list.get_map_item(idx, col=2)
+        self.is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(idx, col=3)] == "Regex"
         self.Close()
 
     def get_search(self):
         """Get the selected search entry."""
 
-        return self.search, self.is_regex
+        return self.search, self.replace, self.is_regex
 
     def column_resize(self, obj, count, minimum=100):
         """Resize columns."""
@@ -188,7 +195,8 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.m_search_list.ClearAll()
         self.m_search_list.InsertColumn(0, _("Name"))
         self.m_search_list.InsertColumn(1, _("Search"))
-        self.m_search_list.InsertColumn(2, _("Type"))
+        self.m_search_list.InsertColumn(2, _("Replace"))
+        self.m_search_list.InsertColumn(3, _("Type"))
         wx.GetApp().Yield()
 
     def on_delete(self, event):

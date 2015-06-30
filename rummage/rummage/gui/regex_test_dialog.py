@@ -20,9 +20,10 @@ IN THE SOFTWARE.
 """
 import wx
 import traceback
+import re
 import sys
 from . import gui
-from .. import ure
+from .. import backrefs
 from ..localization import _
 from .. import data
 
@@ -77,7 +78,11 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
         self.m_dot_checkbox.SetLabel(_("Dot matches newline"))
         self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(_("Text"))
-        self.m_regex_text.GetContainingSizer().GetStaticBox().SetLabel(_("Regex Input"))
+        self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(_("Replace"))
+        main_sizer = self.m_tester_panel.GetSizer()
+        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Regex Input"))
+        self.m_find_label.SetLabel(_("Find"))
+        self.m_replace_label.SetLabel(_("Replace"))
         self.Fit()
 
     def init_regex_timer(self):
@@ -169,18 +174,27 @@ class RegexTestDialog(gui.RegexTestDialog):
 
             flags = 0
             if not self.m_case_checkbox.GetValue():
-                flags |= ure.IGNORECASE
+                flags |= re.IGNORECASE
             if self.m_dot_checkbox:
-                flags |= ure.DOTALL
+                flags |= re.DOTALL
 
             try:
-                test = ure.compile(self.m_regex_text.GetValue(), flags)
+                test = backrefs.compile_search(self.m_regex_text.GetValue(), flags | re.UNICODE)
             except Exception:
                 self.testing = False
                 return
 
+            replace_test = None
+            try:
+                rpattern = self.m_replace_text.GetValue()
+                if rpattern:
+                    replace_test = backrefs.compile_replace(test, self.m_replace_text.GetValue())
+            except Exception:
+                pass
+
             try:
                 text = self.m_test_text.GetValue()
+
                 # Reset Colors
                 self.m_test_text.SetStyle(
                     0,
@@ -188,15 +202,25 @@ class RegexTestDialog(gui.RegexTestDialog):
                     wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
                 )
 
+                new_text = []
+                offset = 0
                 for m in test.finditer(text):
                     try:
-                        self.m_test_text.SetStyle(
-                            m.start(0),
-                            m.end(0),
-                            wx.TextAttr(colBack=wx.Colour(0xFF, 0xCC, 0x00))
-                        )
+                        if replace_test:
+                            new_text.append(text[offset:m.start(0)])
+                            new_text.append(replace_test(m))
+                            offset = m.end(0)
                     except Exception:
-                        pass
+                        replace_test = None
+                    self.m_test_text.SetStyle(
+                        m.start(0),
+                        m.end(0),
+                        wx.TextAttr(colBack=wx.Colour(0xFF, 0xCC, 0x00))
+                    )
+                if replace_test:
+                    new_text.append(text[offset:])
+                self.m_test_replace_text.SetValue(''.join(new_text))
+
             except Exception:
                 print(str(traceback.format_exc()))
             self.testing = False
@@ -214,6 +238,8 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.regex_start_event(event)
         else:
             event.Skip()
+
+    on_replace_changed = regex_start_event
 
     on_regex_changed = regex_start_event
 

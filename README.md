@@ -11,8 +11,12 @@ Please see the [Wiki](https://github.com/facelessuser/Rummage/wiki/Rummage-Docum
 
 For help and support, or to see what is planned next, see the the [Issues](https://github.com/facelessuser/Rummage/issues?state=open) page.
 
-Screenshots
-=======
+## Note on Replacing
+Rummage will back up a file when replacing in `<your file name>.rum-bak`.  If the copy fails, it shouldn't replace.  You can disable backups if you like, but know there are greater risks associated with this.  Replace should work without issues, but remember, this is free software, and things can go wrong.  If you disable backups, there is a greater risk if something goes wrong.  Even with backups, something *could* go wrong.  I am not responsible for files corrupted or lost.  You have been warned.
+
+Large files, really large files, can possibly cause an issue and may error out as, currently, the entire file will be read into memory for a replace.  Depending on your pattern on just searches, a lot can also be read into memory.  If you are doing really large files, know that it may error out or get really slow.  Remember this is done in Python, if you are doing massive GB files, maybe you are using the wrong tool for the job.
+
+## Screenshots
 
 <img src="http://dl.dropboxusercontent.com/u/342698/Rummage/rummage_osx.png" border="0">
 

@@ -58,7 +58,7 @@ if wx.VERSION > (2, 9, 4) and wx.VERSION < (3, 0, 3):
         exec(''.join(tt_source))
         wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint = OnPaint  # noqa
 
-        monkey_patch()
+    monkey_patch()
 
 
 class ContextMenu(wx.Menu):
@@ -194,13 +194,18 @@ class IconTrayExtension(object):
 
         x_offset = 0
         if resize:
-            if _PLATFORM == "osx":
+            if _PLATFORM in "osx":
+                # OSX must increment by 10
                 self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 10])
             elif _PLATFORM == "windows":
-                # In wxPython 2.9, the first icon inserted changes the size, additional icons don't
-                self.SetStatusWidths([-1, (len(self.sb_icons) - 1) * 20 + 1])
+                # In at least wxPython 2.9+, the first icon inserted changes the size, additional icons don't.
+                # I've only tested >= 2.9.
+                if len(self.sb_icons):
+                    self.SetStatusWidths([-1, (len(self.sb_icons) - 1) * 20 + 1])
+                else:
+                    self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 1])
             else:
-                # Linux? Haven't tested yet.
+                # Linux? Should be fine with 1, but haven't tested yet.
                 self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 1])
         rect = self.GetFieldRect(1)
         for v in self.sb_icons.values():

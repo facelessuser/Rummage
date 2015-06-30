@@ -22,7 +22,8 @@ setup(
     url='https://github.com/facelessuser/Rummage',
     packages=find_packages(exclude=[]),
     install_requires=[
-        "gntp>=1.0.2"
+        "gntp>=1.0.2",
+        "chardet>=2.3.0"
     ],
     zip_safe=False,
     entry_points={

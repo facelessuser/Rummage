@@ -37,7 +37,7 @@ from . import gui
 from . import export_html
 from . import export_csv
 from .settings import Settings, _PLATFORM
-from .generic_dialogs import errormsg
+from .generic_dialogs import errormsg, yesno
 from .custom_app import DebugFrameExtender
 from .custom_app import debug, error
 from .custom_statusbar import extend_sb, extend
@@ -54,18 +54,14 @@ from .. import data
 
 DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
 
-pygrep.set_threads(2)
-
 
 _LOCK = threading.Lock()
-_RUNNING = False
 _RESULTS = []
 _COMPLETED = 0
 _TOTAL = 0
 _RECORDS = 0
 _ERRORS = []
 _ABORT = False
-_RUNTIME = None
 
 SIZE_ANY = _("any")
 SIZE_GT = _("greater than")
@@ -84,6 +80,99 @@ LIMIT_COMPARE = {
     3: "lt"
 }
 
+ENCODINGS = [
+    "ASCII",
+    "BIG5",
+    "BIG5-HKSCS",
+    "BIN",
+    "CP037",
+    "CP154",
+    "CP424",
+    "CP437",
+    "CP500",
+    "CP720",
+    "CP737",
+    "CP775",
+    "CP850",
+    "CP852",
+    "CP855",
+    "CP856",
+    "CP857",
+    "CP858",
+    "CP860",
+    "CP861",
+    "CP862",
+    "CP863",
+    "CP864",
+    "CP865",
+    "CP866",
+    "CP869",
+    "CP874",
+    "CP875",
+    "CP949",
+    "CP950",
+    "CP1006",
+    "CP1026",
+    "CP1140",
+    "EUC-JP",
+    "EUC-JIS-2004",
+    "EUC-JISX0213",
+    "EUC-KR",
+    "GB2312",
+    "GBK",
+    "GB18030",
+    "HZ",
+    "ISO-2022-JP",
+    "ISO-2022-JP-1",
+    "ISO-2022-JP-2",
+    "ISO-2022-JP-2004",
+    "ISO-2022-JP-3",
+    "ISO-2022-JP-ext",
+    "ISO-2022-KR",
+    "ISO-8859-2",
+    "ISO-8859-3",
+    "ISO-8859-4",
+    "ISO-8859-5",
+    "ISO-8859-6",
+    "ISO-8859-7",
+    "ISO-8859-8",
+    "ISO-8859-9",
+    "ISO-8859-10",
+    "ISO-8859-13",
+    "ISO-8859-14",
+    "ISO-8859-15",
+    "ISO-8859-16",
+    "JOHAB",
+    "KOI8-R",
+    "KOI8-U",
+    "LATIN-1",
+    "MAC-CYRILLIC",
+    "MAC-GREEK",
+    "MAC-ICELAND",
+    "MAC-LATIN2",
+    "MAC-ROMAN",
+    "MAC-TURKISH",
+    "MS-KANJI",
+    "SHIFT-JIS",
+    "SHIFT-JIS-2004",
+    "SHIFT-JISX0213",
+    "UTF-32-BE",
+    "UTF-32-LE",
+    "UTF-16-BE",
+    "UTF-16-LE",
+    "UTF-7",
+    "UTF-8",
+    "WINDOWS-1250",
+    "WINDOWS-1251",
+    "WINDOWS-1252",
+    "WINDOWS-1253",
+    "WINDOWS-1254",
+    "WINDOWS-1255",
+    "WINDOWS-1256",
+    "WINDOWS-1257",
+    "WINDOWS-1258"
+]
+
 SIZE_LIMIT_I18N = {
     SIZE_ANY: "any",
     SIZE_GT: "greater than",
@@ -101,6 +190,7 @@ TIME_LIMIT_I18N = {
 SEARCH_BTN_STOP = _("Stop")
 SEARCH_BTN_SEARCH = _("Search")
 SEARCH_BTN_ABORT = _("Aborting")
+REPLACE_BTN_REPLACE = _("Replace")
 
 
 def eng_to_i18n(string, mapping):
@@ -118,37 +208,6 @@ def i18n_to_eng(string, mapping):
     """Convert i18n to english."""
 
     return mapping.get(string, None)
-
-
-def get_flags(args):
-    """Determine pygrep flags from GrepArgs."""
-
-    flags = 0
-
-    if args.regexfilepattern is not None:
-        flags |= pygrep.FILE_REGEX_MATCH
-
-    if not args.regexp:
-        flags |= pygrep.LITERAL
-    elif args.dotall:
-        flags |= pygrep.DOTALL
-
-    if args.ignore_case:
-        flags |= pygrep.IGNORECASE
-
-    if args.recursive:
-        flags |= pygrep.RECURSIVE
-
-    if args.regexdirpattern:
-        flags |= pygrep.DIR_REGEX_MATCH
-
-    return flags
-
-
-def not_none(item, alt=None):
-    """Return item if not None, else return the alternate."""
-
-    return item if item is not None else alt
 
 
 def replace_with_genericdatepicker(obj, key):
@@ -186,9 +245,11 @@ def replace_with_timepicker(obj, spin, key):
     return time_picker
 
 
-def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None, default=[]):
+def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None, default=None):
     """Replace object with AutoCompleteCombo object."""
 
+    if default is None:
+        default = []
     choices = Settings.get_search_setting(key, default)
     if choices == [] and choices != default:
         choices = default
@@ -199,72 +260,102 @@ def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None, 
     return auto_complete
 
 
-def update_autocomplete(obj, key, load_last=False, default=[]):
+def update_autocomplete(obj, key, load_last=False, default=None):
     """Convienance function for updating the AutoCompleteCombo choices."""
 
+    if default is None:
+        default = []
     choices = Settings.get_search_setting(key, default)
     if choices == [] and choices != default:
         choices = default
     obj.update_choices(choices, load_last)
 
 
-def threaded_grep(
-    target, pattern, file_pattern, folder_exclude,
-    flags, show_hidden, all_utf8, size, modified,
-    created, text, count_only, boolean
-):
-    """Threaded pygrep launcher to search desired files."""
-
-    global _RUNNING
-    global _RUNTIME
-    with _LOCK:
-        _RUNTIME = ""
-        _RUNNING = True
-    start = time()
-    try:
-        grep = GrepThread(
-            pygrep.Grep(
-                target=target,
-                pattern=pattern,
-                file_pattern=file_pattern,
-                folder_exclude=folder_exclude,
-                flags=flags,
-                show_hidden=show_hidden,
-                all_utf8=all_utf8,
-                modified=modified,
-                created=created,
-                size=size,
-                text=text,
-                truncate_lines=True,
-                count_only=count_only,
-                boolean=boolean
-            )
-        )
-        grep.run()
-    except Exception:
-        error(traceback.format_exc())
-
-    bench = time() - start
-    with _LOCK:
-        _RUNTIME = _("%01.2f seconds") % bench
-        _RUNNING = False
-
-
-class GrepThread(object):
+class GrepThread(threading.Thread):
 
     """Threaded grep."""
 
-    def __init__(self, grep):
+    def __init__(self, args):
         """Set up grep thread with the pygrep object."""
 
-        self.grep = grep
+        self.runtime = ""
+        self.no_results = 0
+        self.running = False
 
-    def run(self):
-        """
-        Run the grep search and store the results in a global array.
+        self.grep = pygrep.Grep(
+            target=args.target,
+            pattern=args.pattern,
+            file_pattern=self.not_none(args.regexfilepattern, alt=self.not_none(args.filepattern)),
+            folder_exclude=self.not_none(args.directory_exclude),
+            flags=self.get_flags(args),
+            show_hidden=args.show_hidden,
+            encoding=args.force_encode,
+            modified=args.modified_compare,
+            created=args.created_compare,
+            size=args.size_compare,
+            text=args.text,
+            truncate_lines=True,
+            count_only=args.count_only,
+            boolean=args.boolean,
+            replace=args.replace,
+            backup=args.backup
+        )
 
-        Also, store general statistics as well.
-        """
+        threading.Thread.__init__(self)
+
+    def not_none(self, item, alt=None):
+        """Return item if not None, else return the alternate."""
+
+        return item if item is not None else alt
+
+    def get_flags(self, args):
+        """Determine pygrep flags from GrepArgs."""
+
+        flags = 0
+
+        if args.regexfilepattern is not None:
+            flags |= pygrep.FILE_REGEX_MATCH
+
+        if not args.regexp:
+            flags |= pygrep.LITERAL
+        elif args.dotall:
+            flags |= pygrep.DOTALL
+
+        if args.ignore_case:
+            flags |= pygrep.IGNORECASE
+
+        if args.recursive:
+            flags |= pygrep.RECURSIVE
+
+        if args.regexdirpattern:
+            flags |= pygrep.DIR_REGEX_MATCH
+
+        return flags
+
+    def kill(self):
+        """Abort grep thread."""
+
+        pygrep.ABORT = True
+
+    def update_status(self):
+        """Update status."""
+
+        global _COMPLETED
+        global _TOTAL
+        global _RECORDS
+
+        with _LOCK:
+            _COMPLETED, _TOTAL, _RECORDS = self.grep.get_status()
+            _RECORDS -= self.no_results
+
+    def done(self):
+        """Check if thread is done running."""
+
+        return not self.running
+
+    def payload(self):
+        """Execute the grep command and gather results."""
+
         global _ABORT
         global _RESULTS
         global _COMPLETED
@@ -277,22 +368,38 @@ class GrepThread(object):
             _TOTAL = 0
             _RECORDS = 0
             _ERRORS = []
-        no_results = 0
         for f in self.grep.find():
             with _LOCK:
                 if f.match is not None:
                     _RESULTS.append(f)
                 else:
-                    no_results += 1
+                    self.no_results += 1
                     if f.error is not None:
                         _ERRORS.append(f)
-                _COMPLETED, _TOTAL, _RECORDS = self.grep.get_status()
-                _RECORDS -= no_results
+            self.update_status()
+            wx.GetApp().WakeUpIdle()
 
             if _ABORT:
-                self.grep.abort()
+                self.kill()
                 _ABORT = False
-                break
+
+    def run(self):
+        """Start the grep thread benchmark the time."""
+
+        self.running = True
+        start = time()
+
+        try:
+            self.payload()
+        except Exception:
+            error(traceback.format_exc())
+
+        bench = time() - start
+        runtime = _("%01.2f seconds") % bench
+
+        self.runtime = runtime
+        self.running = False
+        self.update_status()
 
 
 class GrepArgs(object):
@@ -323,6 +430,9 @@ class GrepArgs(object):
         self.created_compare = None
         self.count_only = False
         self.boolean = False
+        self.backup = True
+        self.replace = None
+        self.force_encode = None
 
 
 class DirPickButton(object):
@@ -379,7 +489,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     """Rummage Frame."""
 
-    def __init__(self, parent, start_path, open_debug=False):
+    def __init__(self, parent, start_path, debug_mode=False):
         """Init the RummageFrame object."""
 
         super(RummageFrame, self).__init__(parent)
@@ -398,6 +508,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.kill = False
         self.args = GrepArgs()
         self.thread = None
+        self.allow_update = False
         if start_path is None:
             cwd = os.getcwdu()
             start_path = cwd
@@ -408,14 +519,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 (wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
                 (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
             ],
-            debug_event=self.on_debug_console
+            debug_event=(self.on_debug_console if debug_mode else None)
         )
 
-        if open_debug:
+        if debug_mode:
             self.open_debug_console()
 
-        # Setup search timer
-        self.init_update_timer()
+        # Update status on when idle
+        self.Bind(wx.EVT_IDLE, self.on_idle)
 
         # Extend the statusbar
         extend_sb(self.m_statusbar)
@@ -461,8 +572,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_search_panel.GetSizer().GetStaticBox().SetLabel(_("Search"))
         self.m_limiter_panel.GetSizer().GetStaticBox().SetLabel(_("Limit Search"))
         self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
+        self.m_replace_button.SetLabel(REPLACE_BTN_REPLACE)
         self.m_searchin_label.SetLabel(_("Where"))
         self.m_searchfor_label.SetLabel(_("What"))
+        self.m_replace_label.SetLabel(_("Replace"))
         self.m_size_is_label.SetLabel(_("Size is"))
         self.m_modified_label.SetLabel(_("Modified"))
         self.m_created_label.SetLabel(_("Created"))
@@ -471,7 +584,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_regex_search_checkbox.SetLabel(_("Search with regex"))
         self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
         self.m_dotmatch_checkbox.SetLabel(_("Dot matches newline"))
-        self.m_utf8_checkbox.SetLabel(_("Treat all as UTF-8"))
+        self.m_backup_checkbox.SetLabel(_("Create backups"))
+        self.m_force_encode_checkbox.SetLabel(_("Force"))
+        self.m_force_encode_choice.Clear()
+        for x in ENCODINGS:
+            self.m_force_encode_choice.Append(x)
+        self.m_force_encode_choice.SetSelection(0)
         self.m_boolean_checkbox.SetLabel(_("Boolean match"))
         self.m_count_only_checkbox.SetLabel(_("Count only"))
         self.m_subfolder_checkbox.SetLabel(_("Include subfolders"))
@@ -590,9 +708,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.m_case_checkbox.SetValue(not Settings.get_search_setting("ignore_case_toggle", False))
         self.m_dotmatch_checkbox.SetValue(Settings.get_search_setting("dotall_toggle", False))
-        self.m_utf8_checkbox.SetValue(Settings.get_search_setting("utf8_toggle", False))
+        self.m_force_encode_checkbox.SetValue(Settings.get_search_setting("force_encode_toggle", False))
+        encode_val = Settings.get_search_setting("force_encode", "ASCII")
+        index = self.m_force_encode_choice.FindString(encode_val)
+        if index != wx.NOT_FOUND:
+            self.m_force_encode_choice.SetSelection(index)
         self.m_boolean_checkbox.SetValue(Settings.get_search_setting("boolean_toggle", False))
         self.m_count_only_checkbox.SetValue(Settings.get_search_setting("count_only_toggle", False))
+        self.m_backup_checkbox.SetValue(Settings.get_search_setting("backup_toggle", True))
 
         self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
@@ -636,6 +759,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_searchfor_textbox = replace_with_autocomplete(
             self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
         )
+        self.m_replace_textbox = replace_with_autocomplete(
+            self.m_replace_textbox, "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
+        )
         self.m_exclude_textbox = replace_with_autocomplete(
             self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
         )
@@ -650,7 +776,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Fix it in platforms where it matters.
         if _PLATFORM != "osx":
             self.m_searchin_text.MoveBeforeInTabOrder(self.m_searchin_dir_picker)
-            self.m_searchfor_textbox.MoveBeforeInTabOrder(self.m_regex_search_checkbox)
+            self.m_searchfor_textbox.MoveBeforeInTabOrder(self.m_replace_textbox)
+            self.m_replace_textbox.MoveBeforeInTabOrder(self.m_regex_search_checkbox)
             self.m_modified_choice.MoveAfterInTabOrder(self.m_size_text)
             self.m_modified_date_picker.MoveAfterInTabOrder(self.m_modified_choice)
             self.m_modified_time_picker.MoveAfterInTabOrder(self.m_modified_date_picker)
@@ -669,7 +796,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             update_autocomplete(self.m_searchin_text, "target")
             update_autocomplete(
                 self.m_searchfor_textbox,
-                "regex_search" if self.m_regex_search_checkbox.GetValue() else "search"
+                "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
+            )
+            update_autocomplete(
+                self.m_replace_textbox,
+                "regex_replace" if self.m_regex_search_checkbox.GetValuie() else "literal_replace"
             )
             update_autocomplete(
                 self.m_exclude_textbox,
@@ -705,7 +836,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if search == "":
             errormsg(_("There is no search to save!"))
             return
-        dlg = SaveSearchDialog(self, search, self.m_regex_search_checkbox.GetValue())
+        dlg = SaveSearchDialog(
+            self,
+            search,
+            self.m_replace_textbox.GetValue(),
+            self.m_regex_search_checkbox.GetValue()
+        )
         dlg.ShowModal()
         dlg.Destroy()
 
@@ -714,10 +850,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         dlg = LoadSearchDialog(self)
         dlg.ShowModal()
-        search, is_regex = dlg.get_search()
+        search, replace, is_regex = dlg.get_search()
         dlg.Destroy()
-        if search is not None and is_regex is not None:
+        if search is not None and is_regex is not None and replace is not None:
             self.m_searchfor_textbox.SetValue(search)
+            self.m_replace_textbox.SetValue(replace)
             self.m_regex_search_checkbox.SetValue(is_regex)
 
     def limit_panel_toggle(self):
@@ -766,24 +903,51 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.start_search()
         event.Skip()
 
-    def start_search(self):
-        """Initiate search or stop search depending on search state."""
+    def on_replace_click(self, event):
+        """Replace button click."""
 
+        message = [_("Are you sure you want to replace all instances?")]
+        if not self.m_backup_checkbox.GetValue():
+            message.append(_("Backups are currently disabled."))
+
+        if yesno(' '.join(message)):
+            self.start_search(replace=True)
+        event.Skip()
+
+    def start_search(self, replace=False):
+        """Initiate search or stop search depending on search state."""
+        global _ABORT
         if self.debounce_search:
             return
         self.debounce_search = True
-        if self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
-            if self.thread is not None:
-                self.m_search_button.SetLabel(SEARCH_BTN_ABORT)
-                global _ABORT
-                _ABORT = True
-                self.kill = True
+        if replace:
+            if self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
+                if self.thread is not None:
+                    self.m_replace_button.SetLabel(SEARCH_BTN_ABORT)
+                    _ABORT = True
+                    self.kill = True
+                    self.thread.kill()
+                else:
+                    # TODO: do I need this?
+                    self.allow_update = False
             else:
-                self.stop_update_timer()
+                if not self.validate_search_inputs():
+                    self.do_search(replace=True)
+                self.debounce_search = False
         else:
-            if not self.validate_search_inputs():
-                self.do_search()
-            self.debounce_search = False
+            if self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
+                if self.thread is not None:
+                    self.m_search_button.SetLabel(SEARCH_BTN_ABORT)
+                    _ABORT = True
+                    self.kill = True
+                    self.thread.kill()
+                else:
+                    # TODO: do I need this?
+                    self.allow_update = False
+            else:
+                if not self.validate_search_inputs():
+                    self.do_search()
+                self.debounce_search = False
 
     def validate_search_inputs(self):
         """Validate the search inputs."""
@@ -791,71 +955,56 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         debug("validate")
         fail = False
         msg = ""
-        if self.m_regex_search_checkbox.GetValue():
-            if self.m_searchfor_textbox.GetValue() == "" or self.validate_search_regex():
-                msg = _("Please enter a valid search regex!")
-                fail = True
-        elif self.m_searchfor_textbox.GetValue() == "":
-            msg = _("Please enter a valid search!")
-            fail = True
-        if not fail and self.m_fileregex_checkbox.GetValue():
-            if self.m_filematch_textbox.GetValue().strip() == "" or self.validate_regex(self.m_filematch_textbox.Value):
-                msg = "Please enter a valid file regex!"
-                fail = True
-        elif self.m_filematch_textbox.GetValue().strip() == "":
-            msg = _("Please enter a valid file pattern!")
-            fail = True
-        if not fail and self.m_dirregex_checkbox.GetValue():
-            if self.validate_regex(self.m_exclude_textbox.Value):
-                msg = _("Please enter a valid exlcude directory regex!")
-                fail = True
         if not fail and not os.path.exists(self.m_searchin_text.GetValue()):
             msg = _("Please enter a valid search path!")
             fail = True
-        if (
-            not fail and
-            self.m_logic_choice.GetStringSelection() != "any" and
-            re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
-        ):
-            msg = _("Please enter a valid size!")
+        if not fail and self.m_regex_search_checkbox.GetValue():
+            if self.m_searchfor_textbox.GetValue() == "" or self.validate_search_regex():
+                msg = _("Please enter a valid search regex!")
+                fail = True
+        elif not fail and self.m_searchfor_textbox.GetValue() == "":
+            msg = _("Please enter a valid search!")
             fail = True
-        if not fail:
-            try:
-                self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
-            except Exception:
-                msg = _("Please enter a modified date!")
+
+        if not fail and not os.path.isfile(self.m_searchin_text.GetValue()):
+            if not fail and self.m_fileregex_checkbox.GetValue():
+                if (
+                    self.m_filematch_textbox.GetValue().strip() == "" or
+                    self.validate_regex(self.m_filematch_textbox.Value)
+                ):
+                    msg = "Please enter a valid file regex!"
+                    fail = True
+            elif not fail and self.m_filematch_textbox.GetValue().strip() == "":
+                msg = _("Please enter a valid file pattern!")
                 fail = True
-        if not fail:
-            try:
-                self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
-            except Exception:
-                msg = _("Please enter a created date!")
+            if not fail and self.m_dirregex_checkbox.GetValue():
+                if self.validate_regex(self.m_exclude_textbox.Value):
+                    msg = _("Please enter a valid exlcude directory regex!")
+                    fail = True
+            if (
+                not fail and
+                self.m_logic_choice.GetStringSelection() != "any" and
+                re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
+            ):
+                msg = _("Please enter a valid size!")
                 fail = True
+            if not fail:
+                try:
+                    self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+                except Exception:
+                    msg = _("Please enter a modified date!")
+                    fail = True
+            if not fail:
+                try:
+                    self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
+                except Exception:
+                    msg = _("Please enter a created date!")
+                    fail = True
         if fail:
             errormsg(msg)
         return fail
 
-    def init_update_timer(self):
-        """Init the update Timer object]."""
-
-        self.update_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.check_updates, self.update_timer)
-
-    def start_update_timer(self):
-        """Start update timer."""
-
-        if not self.update_timer.IsRunning():
-            self.update_timer.Start(2000)
-            debug("Grep timer started")
-
-    def stop_update_timer(self):
-        """Stop update timer."""
-
-        if self.update_timer.IsRunning():
-            self.update_timer.Stop()
-            debug("Grep timer stopped")
-
-    def do_search(self):
+    def do_search(self, replace=False):
         """Start the search."""
 
         self.thread = None
@@ -869,34 +1018,22 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.remove_icon("errors")
 
         # Change button to stop search
-        self.m_search_button.SetLabel(SEARCH_BTN_STOP)
+        if replace:
+            self.m_replace_button.SetLabel(SEARCH_BTN_STOP)
+            self.m_search_button.Enable(False)
+        else:
+            self.m_search_button.SetLabel(SEARCH_BTN_STOP)
+            self.m_replace_button.Enable(False)
 
         # Init search status
         self.m_statusbar.set_status(_("Searching: 0/0 0% Matches: 0"))
 
         # Setup arguments
-        self.set_arguments()
-        self.save_history()
+        self.set_arguments(replace)
+        self.save_history(replace)
 
         # Setup search thread
-        self.thread = threading.Thread(
-            target=threaded_grep,
-            args=(
-                self.args.target,
-                self.args.pattern,
-                not_none(self.args.regexfilepattern, alt=not_none(self.args.filepattern)),
-                not_none(self.args.directory_exclude),
-                get_flags(self.args),
-                self.args.show_hidden,
-                self.args.all_utf8,
-                self.args.size_compare,
-                self.args.modified_compare,
-                self.args.created_compare,
-                self.args.text,
-                self.args.count_only,
-                self.args.boolean
-            )
-        )
+        self.thread = GrepThread(self.args)
         self.thread.setDaemon(True)
 
         # Reset result tables
@@ -910,9 +1047,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Run search thread
         self.thread.start()
-        self.start_update_timer()
+        self.allow_update = True
 
-    def set_arguments(self):
+    def set_arguments(self, replace):
         """Set the search arguments."""
 
         self.args.reset()
@@ -920,15 +1057,19 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args.target = self.m_searchin_text.GetValue()
 
         # Search Options
+        self.args.regexp = self.m_regex_search_checkbox.GetValue()
         self.args.ignore_case = not self.m_case_checkbox.GetValue()
         self.args.dotall = self.m_dotmatch_checkbox.GetValue()
-        self.args.regexp = self.m_regex_search_checkbox.GetValue()
-        self.args.recursive = self.m_subfolder_checkbox.GetValue()
-        self.args.all_utf8 = self.m_utf8_checkbox.GetValue()
-        self.args.pattern = self.m_searchfor_textbox.Value
-        self.args.text = self.m_binary_checkbox.GetValue()
+        self.args.force_encode = None
+        if self.m_force_encode_checkbox.GetValue():
+            self.args.force_encode = self.m_force_encode_choice.GetStringSelection()
         self.args.count_only = self.m_count_only_checkbox.GetValue()
         self.args.boolean = self.m_boolean_checkbox.GetValue()
+        self.args.backup = self.m_backup_checkbox.GetValue()
+        self.args.recursive = self.m_subfolder_checkbox.GetValue()
+        self.args.pattern = self.m_searchfor_textbox.Value
+        self.args.replace = self.m_replace_textbox.Value if replace else None
+        self.args.text = self.m_binary_checkbox.GetValue()
 
         # Limit Options
         if os.path.isdir(self.args.target):
@@ -970,7 +1111,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         debug(self.args.target)
 
-    def save_history(self):
+    def save_history(self, replace):
         """
         Save the current configuration of the search for the next time the app is opened.
 
@@ -979,8 +1120,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         history = [
             ("target", self.args.target),
-            ("regex_search", self.args.pattern) if self.args.regexp else ("literal_search", self.args.pattern)
+            ("regex_search", self.args.pattern) if self.args.regexp else ("literal_search", self.args.pattern),
+            ("regex_replace", self.args.replace) if self.args.regexp else ("literal_replace", self.args.replace)
         ]
+
+        if replace:
+            history.append(
+                ("regex_replace", self.args.replace) if self.args.regexp else ("literal_replace", self.args.replace)
+            )
 
         if os.path.isdir(self.args.target):
             history += [
@@ -995,7 +1142,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("regex_toggle", self.args.regexp),
             ("ignore_case_toggle", self.args.ignore_case),
             ("dotall_toggle", self.args.dotall),
-            ("utf8_toggle", self.args.all_utf8),
+            ("backup_toggle", self.args.backup),
+            ("force_encode_toggle", self.args.force_encode is not None),
             ("recursive_toggle", self.args.recursive),
             ("hidden_toggle", self.args.show_hidden),
             ("binary_toggle", self.args.text),
@@ -1012,6 +1160,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("modified_compare_string", eng_mod),
             ("created_compare_string", eng_cre)
         ]
+
+        strings.append(("force_encode", self.m_force_encode_choice.GetStringSelection()))
 
         if eng_size != "any":
             strings += [("size_limit_string", self.m_size_text.GetValue())]
@@ -1032,8 +1182,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         update_autocomplete(self.m_searchin_text, "target")
         update_autocomplete(
             self.m_searchfor_textbox,
-            "regex_search" if self.m_regex_search_checkbox.GetValue() else "search"
+            "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
         )
+        if replace:
+            update_autocomplete(
+                self.m_replace_textbox,
+                "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
+            )
         update_autocomplete(
             self.m_exclude_textbox,
             "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
@@ -1043,19 +1198,25 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search"
         )
 
-    def check_updates(self, event):
+    def on_idle(self, event):
+        """On idle event."""
+
+        self.check_updates()
+        event.Skip()
+
+    def check_updates(self):
         """Check if updates to the result lists can be done."""
 
-        debug("Processing current results")
-        if not self.checking:
+        if not self.checking and self.allow_update:
+            is_complete = self.thread.done()
+            debug("Processing current results")
             self.checking = True
             with _LOCK:
-                running = _RUNNING
                 completed = _COMPLETED
                 total = _TOTAL
                 records = _RECORDS
             count = self.count
-            if records > count:
+            if records > count or not is_complete:
                 with _LOCK:
                     results = _RESULTS[0:records - count]
                     del _RESULTS[0:records - count]
@@ -1069,28 +1230,29 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         count
                     )
                 )
-                self.m_progressbar.SetRange(total)
+                self.m_progressbar.SetRange(total if total else 100)
                 self.m_progressbar.SetValue(completed)
             self.count = count
 
             # Run is finished or has been terminated
-            if not running:
-                benchmark = _RUNTIME
-
-                self.stop_update_timer()
+            if is_complete:
+                benchmark = self.thread.runtime
                 self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
+                self.m_replace_button.SetLabel(REPLACE_BTN_REPLACE)
+                self.m_search_button.Enable(True)
+                self.m_replace_button.Enable(True)
                 if self.kill:
                     self.m_statusbar.set_status(
                         _("Searching: %d/%d %d%% Matches: %d Benchmark: %s") % (
                             completed,
-                            completed,
-                            100,
+                            total,
+                            int(float(completed) / float(total) * 100) if total != 0 else 0,
                             count,
                             benchmark
                         )
                     )
                     self.m_progressbar.SetRange(completed)
-                    self.m_progressbar.SetValue(completed)
+                    self.m_progressbar.SetValue(total)
                     if Settings.get_notify():
                         notify.error(
                             _("Search Aborted"),
@@ -1104,7 +1266,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_statusbar.set_status(
                         _("Searching: %d/%d %d%% Matches: %d Benchmark: %s") % (
                             completed,
-                            completed,
+                            total,
                             100,
                             count,
                             benchmark
@@ -1141,10 +1303,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
                 self.m_grep_notebook.SetSelection(1)
-                wx.GetApp().Yield()
                 self.debounce_search = False
+                self.allow_update = False
             self.checking = False
-        event.Skip()
 
     def update_table(self, count, done, total, *results):
         """Update the result lists with current search results."""
@@ -1154,25 +1315,27 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         actually_done = done - 1 if done > 0 else 0
         for f in results:
             self.m_result_file_panel.set_match(f)
-            if self.args.count_only or self.args.boolean:
+            if self.args.count_only or self.args.boolean or self.args.replace is not None:
                 count += 1
                 continue
 
             self.m_result_content_panel.set_match(f)
             count += 1
 
-        if p_range != total:
-            self.m_progressbar.SetRange(total)
-        if p_value != done:
-            self.m_progressbar.SetValue(actually_done)
+        if total != 0:
+            if p_range != total:
+                self.m_progressbar.SetRange(total)
+            if p_value != done:
+                self.m_progressbar.SetValue(actually_done)
         self.m_statusbar.set_status(
             _("Searching: %d/%d %d%% Matches: %d") % (
-                actually_done, total,
-                int(float(actually_done) / float(total) * 100) if total != 0 else 0,
-                count
-            ) if total != 0 else (0, 0, 0)
+                (
+                    actually_done, total,
+                    int(float(actually_done) / float(total) * 100) if total != 0 else 0,
+                    count
+                ) if total != 0 else (0, 0, 0, 0)
+            )
         )
-        wx.GetApp().Yield()
         return count
 
     def on_regex_search_toggle(self, event):
@@ -1180,8 +1343,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if self.m_regex_search_checkbox.GetValue():
             update_autocomplete(self.m_searchfor_textbox, "regex_search")
+            update_autocomplete(self.m_replace_textbox, "regex_replace")
         else:
             update_autocomplete(self.m_searchfor_textbox, "literal_search")
+            update_autocomplete(self.m_replace_textbox, "literal_replace")
         event.Skip()
 
     def on_fileregex_toggle(self, event):

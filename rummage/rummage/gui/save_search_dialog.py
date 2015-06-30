@@ -31,7 +31,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
 
     """Save search dialog."""
 
-    def __init__(self, parent, search, is_regex):
+    def __init__(self, parent, search, replace, is_regex):
         """Init SaveSearchDialog object."""
 
         super(SaveSearchDialog, self).__init__(parent)
@@ -42,6 +42,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         )
 
         self.search = search
+        self.replace = replace
         self.is_regex = is_regex
 
         self.localize()
@@ -92,7 +93,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
             errormsg(_("Please give the search a name!"))
             return
 
-        Settings.add_search(value, self.search, self.is_regex)
+        Settings.add_search(value, self.search, self.replace, self.is_regex)
         self.Close()
 
     def on_cancel(self, event):

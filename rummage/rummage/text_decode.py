@@ -18,68 +18,26 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-# import traceback
 from __future__ import unicode_literals
+import chardet
 import codecs
-import sys
+import contextlib
+import mmap
+import os
 import re
+import sys
+import functools
+# import traceback
+from chardet.universaldetector import UniversalDetector
+from collections import namedtuple
 
-BINARY = 0
-ASCII = 1
-UTF8 = 2
-UTF16 = 3
-UTF32 = 4
-LATIN1 = 5
-CP1252 = 6
+MIN_CONFIDENCE = 0.5
 
-GOOD_ASCII = b'''
-\A[\x09\x0A\x0D\x20-\x7E]*\Z  # ASCII (minus control chars not commonly used)
-'''
-
-GOOD_UTF8 = b'''
-\A(
-    [\x09\x0A\x0D\x20-\x7E]           | # ASCII
-    [\xC2-\xDF][\x80-\xBF]            | # non-overlong 2-byte
-    \xE0[\xA0-\xBF][\x80-\xBF]        | # excluding overlongs
-    [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} | # straight 3-byte
-    \xED[\x80-\x9F][\x80-\xBF]        | # excluding surrogates
-    \xF0[\x90-\xBF][\x80-\xBF]{2}     | # planes 1-3
-    [\xF1-\xF3][\x80-\xBF]{3}         | # planes 4-15
-    \xF4[\x80-\x8F][\x80-\xBF]{2}       # plane 16
-)*\Z
-'''
-
-BAD_ASCII = b'''
-(
-    [\x00-\x08] |  # ASCII Control Chars
-    [\x0B\x0C]  |  # ASCII Control Chars
-    [\x0E-\x1F] |  # ASCII Control Chars
-    [\x7F-\xFF]    # Invalid ASCII Chars
-)
-'''
-
-BAD_UTF8 = b'''
-[\xE0-\xEF].{0,1}([^\x80-\xBF]|$) |
-[\xF0-\xF7].{0,2}([^\x80-\xBF]|$) |
-[\xF8-\xFB].{0,3}([^\x80-\xBF]|$) |
-[\xFC-\xFD].{0,4}([^\x80-\xBF]|$) |
-[\xFE-\xFE].{0,5}([^\x80-\xBF]|$) |
-[\x00-\x7F][\x80-\xBF]            |
-[\xC0-\xDF].[\x80-\xBF]           |
-[\xE0-\xEF]..[\x80-\xBF]          |
-[\xF0-\xF7]...[\x80-\xBF]         |
-[\xF8-\xFB]....[\x80-\xBF]        |
-[\xFC-\xFD].....[\x80-\xBF]       |
-[\xFE-\xFE]......[\x80-\xBF]      |
-^[\x80-\xBF]
-'''
-
-BAD_LATIN = b'''
-[\x80-\x9F]  # Invalid LATIN-1 Chars
-'''
+CONFIDENCE_MAP = {
+}
 
 UTF_BOM = b'''
-^(?:(%s)|(%s|%s)(%s|%s))[\x00-\xFF]*
+^(?:(%s)|(?:(%s)|(%s))(?:(%s)|(%s)))[\x00-\xFF]*
 ''' % (
     codecs.BOM_UTF8,
     codecs.BOM_UTF32_BE,
@@ -88,26 +46,97 @@ UTF_BOM = b'''
     codecs.BOM_UTF16_LE
 )
 
+py_encode = re.compile(
+    r'^[^\r\n]*?coding[:=]\s*([-\w.]+)|[^\r\n]*?\r?\n[^\r\n]*?coding[:=]\s*([-\w.]+)'
+)
 
-def _has_null(content):
+
+class Encoding(namedtuple('Encoding', ['encode', 'bom'])):
+
+    """BOM object."""
+
+
+if chardet.__version__ == "2.3.0":  # pragma: no cover
+    class DetectEncoding(UniversalDetector):
+
+        """Stop Hungarian from being picked until chardet can fix this."""
+
+        def close(self):
+            """If encoding is hungarian, deny it; if a prober included is hungarian, deny it."""
+
+            if self.done:
+                enc = self.result["encoding"]  # noqa
+                if enc is not None and enc == "ISO-8859-2":
+                    self.result = None
+            count = -1
+            for prober in self._mCharSetProbers:
+                count += 1
+                if not prober:
+                    continue
+                if prober.get_charset_name() == "ISO-8859-2":
+                    self._mCharSetProbers[count] = None
+
+            result = UniversalDetector.close(self)
+            return result
+else:  # pragma: no cover
+    DetectEncoding = UniversalDetector
+
+
+def verify_encode(file_obj, encoding, blocks=1, chunk_size=4096):
     """
-    Check if has null.
+    Iterate through the file chunking the data into blocks and decoding them.
 
-    Return two kinds of checks: single null and consecutive nulls
+    Here we can adjust how the size of blocks and how many to validate. By default,
+    we are just going to check the first 4K block.
     """
 
-    any_null_check = re.compile(b"(\x00\x00+)|(\x00)")
-    double_null_check = re.compile(b"\x00{2}")
+    good = True
+    file_obj.seek(0)
+    binary_chunks = iter(functools.partial(file_obj.read, chunk_size), b"")
+    try:
+        for unicode_chunk in codecs.iterdecode(binary_chunks, encoding):  # noqa
+            if blocks:
+                blocks -= 1
+            else:
+                break
+    except Exception:
+        good = False
+    return good
 
-    is_null = False
-    is_multi_null = False
-    m = any_null_check.search(content)
-    if m is not None:
-        is_null = True
-        is_multi_null = m.group(1) is not None
-    if is_null and not is_multi_null:
-        is_multi_null = double_null_check.search(content[m.end(1):]) is not None
-    return is_null, is_multi_null
+
+def _has_py_encode(content):  # pragma: no cover
+    """Check python encoding."""
+
+    encode = None
+
+    m = py_encode.match(content)
+    if m:
+        if m.group(1):
+            enc = m.group(1)
+        elif m.group(2):
+            enc = m.group(2)
+        try:
+            codecs.getencoder(enc)
+            encode = Encoding(enc, None)
+        except LookupError:
+            pass
+    # We could assume ascii for python files, but maybe
+    # it is better to not simply assume even though that is what
+    # Python will do.  I guess we are assuming if extension matches,
+    # it is without a doubt encoded for use with python, but that may not be
+    # the case.
+    if encode is None:
+        Encoding('ascii', None)
+    return encode
+
+
+def _special_encode_check(content, ext):
+    """Check special file type encoding."""
+
+    encode = None
+    if ext in ('.py', '.pyw'):
+        encode = _has_py_encode(content)
+    return encode
 
 
 def _has_bom(content):
@@ -116,83 +145,86 @@ def _has_bom(content):
     utf_bom = re.compile(UTF_BOM, re.VERBOSE)
 
     bom = None
-    length = len(content)
-    m = utf_bom.match(content[:(4 if length >= 4 else length)])
+    m = utf_bom.match(content)
     if m is not None:
         if m.group(1):
-            bom = UTF8
+            bom = Encoding('utf-8', codecs.BOM_UTF8)
         elif m.group(2):
-            bom = UTF32
+            bom = Encoding('utf-32-be', codecs.BOM_UTF32_BE)
         elif m.group(3):
-            bom = UTF16
+            bom = Encoding('utf-32-le', codecs.BOM_UTF32_LE)
+        elif m.group(4):
+            bom = Encoding('utf-16-be', codecs.BOM_UTF16_BE)
+        elif m.group(5):
+            bom = Encoding('utf-16-le', codecs.BOM_UTF16_LE)
     return bom
 
 
-def guess(filename, use_ascii=True):
-    """Guess the encoding and decode the content of the file."""
+def _detect_encoding(f, ext):
+    """Guess using chardet and using memory map."""
 
-    encoding_map = {
-        ASCII: ("ascii", "ASCII"),
-        UTF8: ("utf-8-sig", "UTF8"),
-        UTF16: ("utf-16", "UTF16"),
-        UTF16: ("utf-32", "UTF32"),
-        LATIN1: ("latin-1", "LATIN-1"),
-        CP1252: ("cp1252", "CP1252"),
-        BINARY: (None, "BIN")
-    }
+    encoding = None
+    with contextlib.closing(mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)) as m:
+        encoding = _has_bom(m.read(4))
+        m.seek(0)
+        if encoding is None:
+            encoding = _special_encode_check(m, ext)
+        if encoding is None:
+            detector = DetectEncoding()
+            m.seek(0)
+            for chunk in iter(functools.partial(f.read, 4096), b""):
+                detector.feed(chunk)
+                if detector.done:
+                    break
+            detector.close()
+            enc = detector.result['encoding']
+            conf = detector.result['confidence']
+            if enc is not None and conf >= CONFIDENCE_MAP.get(enc, MIN_CONFIDENCE):
+                encoding = Encoding(
+                    detector.result['encoding'],
+                    None
+                )
+            else:
+                encoding = Encoding('bin', None)
+    return encoding
 
-    bad_latin = re.compile(BAD_LATIN, re.VERBOSE)
-    bad_ascii = re.compile(BAD_ASCII, re.VERBOSE)
-    bad_utf8 = re.compile(BAD_UTF8, re.VERBOSE)
 
-    content = None
+def inspect_bom(filename):
+    """Inspect file for bom."""
+
     encoding = None
     try:
         with open(filename, "rb") as f:
-            content = f.read()
+            encoding = _has_bom(f.read(4))
     except Exception:
+        # print(traceback.format_exc())
         pass
-    if content is not None:
-        bom = _has_bom(content)
-        if bom is not None:
-            encoding = bom
-        else:
-            single, multi = _has_null(content)
-            if multi:
-                # Consecutive nulls found
-                # (Maybe we could try UTF32 if only two or three consecutive nulls found?)
-                encoding = BINARY
-            elif not single:
-                # if use_ascii is True, then validate and use ascii encoding
-                if use_ascii and bad_ascii.search(content) is None:
-                    # No invalid ascii chars
-                    encoding = ASCII
-                if bad_utf8.search(content) is None:
-                    # No invalid utf8 char sequences
-                    encoding = UTF8
-                elif bad_latin.search(content) is None:
-                    # No bad latin chars (I think)
-                    encoding = LATIN1
-                else:
-                    # Well we tried everything else
-                    encoding = CP1252
-            elif single:
-                # There were no consecutive nulls,
-                # so let's give this a try
-                encoding = UTF16
+    return encoding
 
-    if encoding is not None:
-        # Try and decode
-        enc, name = encoding_map[encoding]
-        try:
-            return unicode(content, enc), name
-        except Exception:
-            pass
+
+def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096):
+    """Guess the encoding and decode the content of the file."""
+
+    encoding = None
+
+    try:
+        ext = os.path.splitext(filename)[1].lower()
+        with open(filename, "rb") as f:
+            if os.fstat(f.fileno()).st_size == 0:
+                encoding = Encoding('ascii', None)
+            encoding = _detect_encoding(f, ext)
+
+            if verify and encoding.encode != 'bin':
+                if not verify_encode(f, encoding.encode, verify_blocks, verify_block_size):
+                    encoding = Encoding('bin', None)
+    except Exception:
+        # print(traceback.format_exc())
+        pass
 
     # Gave it our best shot, just return binary
-    return content, encoding_map[BINARY][1]
+    return encoding
 
 
 if __name__ == "__main__":
     print("Guessing encoding for %s" % sys.argv[1])
-    print(guess(sys.argv[1])[1])
+    print(guess(sys.argv[1]))

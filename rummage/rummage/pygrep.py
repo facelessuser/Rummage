@@ -19,20 +19,39 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import threading
-import Queue
+import codecs
+import mmap
+import re
+import shutil
 import sys
-from os import walk
+import traceback
+from collections import namedtuple
 from fnmatch import fnmatch
+from os import walk
 from os.path import isdir, isfile, join, abspath, getsize
 from time import ctime
-from collections import namedtuple
-import traceback
-import codecs
-from . import ure
 from . import text_decode
+from . import backrefs
 from .file_times import getmtime, getctime
 from .file_hidden import is_hidden
+from collections import deque
+
+PY3 = (3, 0) <= sys.version_info < (4, 0)
+
+if PY3:
+    binary_type = bytes  # noqa
+
+    def to_ascii_bytes(string):
+        """Convert unicode to ascii byte string."""
+
+        return bytes(string, 'ascii')
+else:
+    binary_type = str  # noqa
+
+    def to_ascii_bytes(string):
+        """Convert unicode to ascii byte string."""
+
+        return bytes(string)
 
 LITERAL = 1
 IGNORECASE = 2
@@ -42,24 +61,10 @@ FILE_REGEX_MATCH = 16
 DIR_REGEX_MATCH = 32
 BUFFER_INPUT = 64
 
-# There doesn't appear to be a real advantage when using multiple threads.
-# It will bascially take the same amount of time because of GIL (not really parallel; switches back and forth).
-# So a file that is taking a long time with multiple threads, will take even longer,
-# but other threads can complete in that time.  You will get matches out of order as well since it is switching
-# between search threads.
-#
-# Essentially, with one thread, a file taking a long time will block, but multi-threads will allow other files to
-# complete while the lengthy file finishes.  But in the end, single and mult-threaded take about the same time.
-# Its kind of a wash.
-#
-# Multiprocessing is an alternative, but Rummage currently pushes too much data through the queue; it bogs down
-# the queue since it has to serialize the data and pipe it through to the other process.  Performance is bad.
-_NUM_THREADS = 1
-_LOCK = threading.Lock()
-_FILES = []
-_RUNNING = False
-_STARTED = False
-_ABORT = False
+TRUNCATE_LENGTH = 256
+
+ABORT = False
+_PROCESS = False
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -68,68 +73,73 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
+U32 = (
+    'u32', 'utf32', 'utf_32'
+)
 
-def set_threads(number):
-    """Set number of threads to use."""
+U32BE = (
+    'utf-32be', 'utf_32_be'
+)
 
-    global _NUM_THREADS
-    if not _RUNNING and 0 < number < 4:
-        _NUM_THREADS = number
+U32LE = (
+    'utf-32le', 'utf_32_le'
+)
 
+U16 = (
+    'u16', 'utf16', 'utf_16'
+)
 
-def threaded_walker(
-    directory, file_pattern, file_regex_match,
-    folder_exclude, dir_regex_match, recursive,
-    show_hidden, size, modified, created
-):
-    """Peform threaded search."""
+U16BE = (
+    'utf-16be', 'utf_16_be'
+)
 
-    global _RUNNING
-    global _STARTED
-    _RUNNING = True
-    _STARTED = True
-    try:
-        walker = _DirWalker(
-            directory, file_pattern, file_regex_match,
-            folder_exclude, dir_regex_match, recursive,
-            show_hidden, size, modified, created
-        )
-        walker.run()
-    except Exception:
-        print(str(traceback.format_exc()))
+U16LE = (
+    'utf-16le', 'utf_16_le'
+)
 
-    _RUNNING = False
+U8 = (
+    'u8', 'utf', 'utf8', 'utf_8', 'utf_8_sig', 'utf-8-sig'
+)
 
 
-def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
+def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True, binary=False):
     """Prepare regex search pattern flags."""
 
-    flags = ure.UNICODE
+    flags = 0
     if multiline:
-        flags |= ure.MULTILINE
+        flags |= re.MULTILINE if binary else re.MULTILINE
     if ignorecase:
-        flags |= ure.IGNORECASE
+        flags |= re.IGNORECASE if binary else re.IGNORECASE
     if dotall:
-        flags |= ure.DOTALL
-    return ure.compile(pattern, flags)
+        flags |= re.DOTALL if binary else re.DOTALL
+    if not binary:
+        flags |= re.UNICODE
+    return backrefs.compile_search(pattern, flags)
 
 
-def _literal_pattern(pattern, ignorecase=False, dotall=False, multiline=True):
+def _literal_pattern(pattern, ignorecase=False, dotall=False, multiline=True, binary=False):
     """Prepare literal search pattern flags."""
 
-    flags = ure.UNICODE
+    flags = 0
     if multiline:
-        flags |= ure.MULTILINE
+        flags |= re.MULTILINE if binary else re.MULTILINE
     if ignorecase:
-        flags |= ure.IGNORECASE
+        flags |= re.IGNORECASE if binary else re.IGNORECASE
     if dotall:
-        flags |= ure.DOTALL
-    return ure.compile(ure.escape(pattern), flags)
+        flags |= re.DOTALL if binary else re.DOTALL
+    if not binary:
+        flags |= re.UNICODE
+    return re.compile(re.escape(pattern), flags)
 
 
 class GrepException(Exception):
 
     """Grep exception."""
+
+
+class FileAttr(namedtuple('FileAttr', ['name', 'size', 'modified', 'created'])):
+
+    """File Attributes."""
 
 
 class FileInfo(namedtuple('FileInfo', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
@@ -147,168 +157,167 @@ class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines'
     """A record that contains match info, lineno content, context, etc."""
 
 
+class BufferReplaceRecord(namedtuple('BufferReplaceRecord', ['content', 'error'])):
+
+    """A record with the string buffer replacements."""
+
+
+class RummageFileContent(object):
+
+    """Either return a string or memory map file object."""
+
+    def __init__(self, name, size, encoding, file_content=None):
+        """Initialize."""
+        self.name = name
+        self.size = size
+        self.encoding = encoding
+        self.file_obj = None
+        self.file_content = file_content
+        self.string_buffer = file_content is not None
+        self.file_map = None
+
+    def __enter__(self):
+        """Return content of either a memory map file or string."""
+
+        return self.file_content if self.string_buffer else self._read_file()
+
+    def __exit__(self, *args):
+        """Close file obj and memory map object if open."""
+
+        if self.file_map is not None:
+            self.file_map.close()
+        if self.file_obj is not None:
+            self.file_obj.close()
+
+    def _read_file(self):
+        """Read the file in."""
+
+        if self.encoding is not None:
+            if self.encoding.encode == "bin":
+                self.file_obj = open(self.name, "rb")
+            else:
+                enc = self.encoding.encode
+                if enc == 'utf-8':
+                    enc = 'utf-8-sig'
+                elif enc.startswith('utf-16'):
+                    enc = 'utf-16'
+                elif enc.startswith('utf-32'):
+                    enc = 'utf-32'
+                self.file_obj = codecs.open(self.name, 'r', encoding=enc)
+            if self.size != '0.00KB':
+                self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)
+            else:
+                self.file_content = self.file_obj.read()
+        return self.file_content if self.file_content is not None else self.file_map
+
+
 class _FileSearch(object):
 
     """Search for files."""
 
     hex_tx_table = ("." * 32) + "".join(chr(c) for c in range(32, 127)) + ("." * 129)
 
-    def __init__(self, pattern, flags, context, truncate_lines, boolean, count_only):
+    def __init__(self, args, file_obj, file_id, max_count, file_content):
         """Init the file search object."""
 
-        self.literal = bool(flags & LITERAL)
-        self.ignorecase = bool(flags & IGNORECASE)
-        self.dotall = bool(flags & DOTALL)
-        self.boolean = bool(boolean)
-        self.count_only = bool(count_only)
-        self.truncate_lines = truncate_lines
+        self.literal = bool(args.flags & LITERAL)
+        self.ignorecase = bool(args.flags & IGNORECASE)
+        self.dotall = bool(args.flags & DOTALL)
+        self.boolean = bool(args.boolean)
+        self.count_only = bool(args.count_only)
+        self.truncate_lines = args.truncate_lines
+        self.backup = args.backup
+        self.bom = None
         if self.truncate_lines:
             self.context = (0, 0)
         else:
-            self.context = context
+            self.context = args.context
 
         # Prepare search
-        if self.literal:
-            self.pattern = _literal_pattern(pattern, self.ignorecase)
-        else:
-            self.pattern = _re_pattern(pattern, self.ignorecase, self.dotall)
-        self.find_method = self.pattern.finditer
-
-    def __decode_file(self, filename):
-        """Call file encode guesser and decodes file if possible."""
-
-        bfr, self.current_encoding = text_decode.guess(filename, False)
-        if self.current_encoding == "BIN":
-            self.is_binary = True
-        return bfr
-
-    def __read_file(self, file_name):
-        """
-        Open the file in the best guessed encoding for search.
-
-        Guesses by elimination
-        Currently opens:
-            UTF32 if BOM present
-            UTF16 if BOM present or if only one null found in file
-            UTF8 if it contains no bad UTF8 char sequences or includes UTF8 BOM
-            LATIN-1 if not a file above and contains no NULLs, and no invalid LATIN-1 chars
-            CP1252 if not above and does not contain NULLs
-        """
-
-        content = None
-        self.current_encoding = "BIN"
+        self.pattern = args.pattern
+        self.replace = args.replace
+        self.expand = None
+        self.idx = file_id
+        self.file_obj = file_obj
+        self.max_count = max_count
+        self.encoding = args.encoding if args.encoding is not None else None
+        self.process_binary = args.process_binary
+        self.file_content = file_content
         self.is_binary = False
+        self.current_encoding = None
 
-        # Force UTF for all
-        if self.all_utf8:
-            self.current_encoding = "UTF8"
-            with codecs.open(file_name, encoding="utf-8-sig", errors="replace") as f:
-                content = f.read()
-                return content
-
-        # Guess encoding and decode file
-        return self.__decode_file(file_name)
-
-    def __get_file_info(self, filename, size, m_time, c_time, content=None):
-        """Create file info record."""
-
-        string_buffer = content is not None
-        error = None
-        file_info = None
-
-        try:
-            if content is None:
-                content = self.__read_file(filename)
-                if content is None:
-                    raise GrepException("Could not read %s" % filename)
-        except Exception:
-            error = str(traceback.format_exc())
-
-        try:
-            file_info = FileInfo(
-                self.idx,
-                filename,
-                "%.2fKB" % (float(size) / 1024.0),
-                m_time,
-                c_time,
-                self.current_encoding if not string_buffer else "--"
-            )
-        except Exception:
-            if error is None:
-                error = str(traceback.format_exc())
-
-        return file_info, content, error
-
-    def __tx_bin(self, content):
+    def _tx_bin(self, content):
         """Format binary data in a friendly way. Display only ASCII."""
 
         return content.translate(self.hex_tx_table)
 
-    def __get_lines(self, content, m, line_ending, binary=False):
-        """Return the full line(s) of code of the found region."""
+    def _get_line_context(self, content, m, line_map, binary=False):
+        """Get context info about the line."""
 
-        start = m.start()
-        end = m.end()
-        bfr_end = len(content) - 1
-        before = 0
-        after = 0
+        before, after = self.context
+        row = self._get_row(m.start(), line_map)
+        col = m.start() + 1
+        idx = row - 1
+        lines = len(line_map) - 1
+        start = 0
+        end = len(content) - 1
 
-        # Get the start of the context
-        while start > 0:
-            if content[start - 1] != line_ending:
-                start -= 1
-            elif before >= self.context[0]:
-                break
-            else:
-                before += 1
-                start -= 1
+        # 1 index back gives us the start of this line
+        # 2 gives us the start of the next
+        start_idx = idx - before - 1
+        end_idx = idx + after
 
-        # Get the end of the context
-        while end < bfr_end:
-            if content[end] != line_ending:
-                end += 1
-            elif after >= self.context[1]:
-                break
-            else:
-                after += 1
-                end += 1
+        # On buffer boundary we may not be able to get
+        # all of a files requested lines, as we will be beyond
+        # map's index.  Set index to None, as it is invalid,
+        # and recalculate actual before.
+        if start_idx < 0:
+            before -= start_idx + 1
+            start_idx = None
 
-        # Make the match start and end relative to the context snippet
+        # Extended beyond map's end
+        if lines < end_idx:
+            after -= end_idx - lines
+            end_idx = None
+
+        # Calculate column of cursor and actual start and end of context
+        if lines != -1:
+            col_start = idx - 1
+            col = m.start() - line_map[col_start] if col_start >= 0 else m.start() + 1
+            if start_idx is not None:
+                start = line_map[start_idx] + 1
+            if end_idx is not None:
+                end = line_map[end_idx]
+
+        # Make the match start and match end relative to the context snippet
         match_start = m.start() - start
         match_end = match_start + m.end() - m.start()
 
         # Truncate long lines if desired
         if self.truncate_lines:
             length = end - start
-            if length > 256:
-                end = start + 256
-                length = 256
+            if length > TRUNCATE_LENGTH:
+                end = start + TRUNCATE_LENGTH
+                length = TRUNCATE_LENGTH
 
             # Recalculate relative match start and end
             if match_start > length:
                 match_start = length
             if match_end > length:
-                match_end = 256
+                match_end = TRUNCATE_LENGTH
 
         # Return the context snippet, where the match occurs,
-        # and how many lines of context before and after
+        # and how many lines of context before and after,
+        # and the row and colum of match start.
         return (
-            content[start:end] if not binary else self.__tx_bin(content[start:end]),
+            content[start:end] if not binary else self._tx_bin(content[start:end]),
             (match_start, match_end),
-            (before, after)
+            (before, after),
+            row,
+            col
         )
 
-    def __get_col(self, content, absolute_col, line_ending):
-        """Get column of where result is found in file."""
-
-        col = 1
-        for x in reversed(range(0, absolute_col)):
-            if content[x] == line_ending:
-                break
-            col += 1
-        return col
-
-    def __get_row(self, start, line_map):
+    def _get_row(self, start, line_map):
         """Get line number where result is found in file."""
 
         # Binary Search
@@ -329,88 +338,177 @@ class _FileSearch(object):
 
         return mx + 1
 
-    def __get_line_ending(self, file_content):
+    def _get_line_ending(self, file_content):
         """Get the line ending for the file content by scanning for and evaluating the first new line occurance."""
 
+        if self.is_binary:
+            nl = b'\n'
+            cr = b'\r'
+        else:
+            nl = '\n'
+            cr = '\r'
         line_map = []
         ending = None
-        line_ending = ure.compile(r"(?:(\r\n)|(\r)|(\n))")
-        for m in line_ending.finditer(file_content):
-            if ending is None:
-                ending = "\r" if m.group(2) else "\n"
-            line_map.append(m.end())
-        return "\n" if ending is None else ending, line_map
+        offset = 0
+        last_offset = None
+        for c in file_content:
+            if last_offset is not None and (c == nl or c == cr):
+                if last_offset + 1 == offset and c == nl:
+                    ending = c
+                    line_map.append(offset)
+                else:
+                    line_map.append(last_offset)
+                    if c == ending:
+                        line_map.append(offset)
+                last_offset = None
+            elif ending is None and (c == nl or c == cr):
+                ending = c
+                if ending == cr:
+                    last_offset = offset
+                else:
+                    line_map.append(offset)
+            elif c == ending:
+                line_map.append(offset)
+            offset += 1
+        if last_offset is not None:
+            line_map.append(last_offset)
+        return nl if ending is None else ending, line_map
 
-    def __findall(self, file_content):
+    def _findall(self, file_content):
         """Find all occurences of search pattern in file."""
 
-        for m in self.find_method(file_content):
-            yield m
-            if _ABORT:
-                break
+        replace = None
+        pattern = None
 
-    def search(
-        self, file_obj, file_id, queue, max_count=None, all_utf8=False,
-        process_binary=False, file_content=None
-    ):
-        """Search target file or buffer returning a generator of results."""
+        if self.is_binary:
+            pattern = to_ascii_bytes(self.pattern)
+            if self.replace is not None:
+                replace = to_ascii_bytes(self.replace)
+        else:
+            pattern = self.pattern
+            replace = self.replace
 
-        try:
-            self.idx = file_id
-            self.all_utf8 = all_utf8
-            self.is_binary = False
+        if pattern is not None:
+            if self.literal:
+                pattern = _literal_pattern(pattern, self.ignorecase, binary=self.is_binary)
+            else:
+                pattern = _re_pattern(pattern, self.ignorecase, self.dotall, binary=self.is_binary)
+            if replace is not None and not self.literal:
+                self.expand = backrefs.compile_replace(pattern, self.replace)
+            else:
+                self.expand = None
 
-            target, file_content, error = self.__get_file_info(
-                file_obj[0], file_obj[1], file_obj[2], file_obj[3], file_content
-            )
+            for m in pattern.finditer(file_content):
+                yield m
+                if self.kill:
+                    break
 
-            if error is not None:
-                # Unable to read
-                queue.put(FileRecord(target, None, error))
-                return
-            elif target is None or (file_content is None or (self.is_binary and not process_binary)):
-                # No file or shouldn't process binary; quit
-                return
+    def _update_file(self, file_name, content, encoding):
+        """Update the file content."""
 
-            line_ending = None
-            line_map = []
-            file_record_sent = False
+        if self.backup:
+            backup = file_name + '.rum-bak'
+            shutil.copy2(file_name, backup)
 
-            for m in self.__findall(file_content):
-                if not self.boolean and not self.count_only:
-                    if line_ending is None:
-                        line_ending, line_map = self.__get_line_ending(file_content)
+        if encoding.bom:
+            # Write the bomb first, then write in utf format out in the specified order.
+            with open(file_name, 'wb') as f:
+                f.write(encoding.bom)
+            with codecs.open(file_name, 'a', encoding=encoding.encode) as f:
+                while content:
+                    f.write(content.popleft())
+        elif encoding.encode == 'bin':
+            # Write bin file.
+            with open(file_name, 'wb') as f:
+                while content:
+                    f.write(content.popleft())
+        else:
+            # If a user is adding unicode to ascii,
+            # we write ascii files out as utf-8 to keep it from failing.
+            # We choose utf-8 because it is compatible with ASCII,
+            # but we could just as easily have choosen Latin-1 or CP1252.
+            enc = encoding.encode
+            with codecs.open(file_name, 'w', encoding=('utf-8' if enc == 'ascii' else enc)) as f:
+                while content:
+                    f.write(content.popleft())
 
-                if not self.boolean and not self.count_only:
-                    file_record_sent = True
-                    # Get context etc.
-                    lines, match, context = self.__get_lines(file_content, m, line_ending, self.is_binary)
+    def _get_file_info(self, file_obj):
+        """Create file info record."""
 
-                    queue.put(
-                        FileRecord(
-                            target,
-                            MatchRecord(
-                                self.__get_row(
-                                    m.start(), line_map  # lineno
-                                ),
-                                self.__get_col(          # colno
-                                    file_content,
-                                    m.start(),
-                                    line_ending
-                                ),
-                                match,                   # Postion of match
-                                lines,                   # Line(s) in which match is found
-                                line_ending,             # Line ending for file
-                                context                  # Number of lines shown before and after matched line(s)
-                            ),
-                            None
-                        )
-                    )
+        error = None
+        file_info = None
+        string_buffer = self.file_content is not None
+
+        if not string_buffer:
+            try:
+                self.current_encoding = text_decode.Encoding('bin', None)
+                self.is_binary = False
+                if self.encoding is not None:
+                    if self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
+                        bom = text_decode.inspect_bom(file_obj.name)
+                        if bom and bom.encode.startswith(self.encoding):
+                            self.current_encoding = bom
+                        else:
+                            self.current_encoding = text_decode.Encoding(self.encoding, None)
+                    else:
+                        self.current_encoding = text_decode.Encoding(self.encoding, None)
                 else:
-                    file_record_sent = True
-                    queue.put(
-                        FileRecord(
-                            target,
+                    # Guess encoding and decode file
+                    encoding = text_decode.guess(file_obj.name, verify=True, verify_block_size=1024)
+                    if encoding is not None:
+                        if encoding.encode == "bin":
+                            self.is_binary = True
+                        self.current_encoding = encoding
+            except Exception:
+                error = str(traceback.format_exc())
+        elif isinstance(self.file_content, binary_type):
+            self.is_binary = True
+
+        file_info = FileInfo(
+            self.idx,
+            file_obj.name,
+            "%.2fKB" % (float(file_obj.size) / 1024.0),
+            file_obj.modified,
+            file_obj.created,
+            self.current_encoding.encode.upper() if not string_buffer else "--"
+        )
+
+        return file_info, error
+
+    @property
+    def kill(self):
+        """Kill process."""
+
+        return ABORT
+
+    def search_and_replace(self):
+        """Search and replace."""
+
+        text = deque()
+
+        file_info, error = self._get_file_info(self.file_obj)
+        if error is not None:
+            if self.file_content:
+                yield BufferReplaceRecord(None, error)
+            else:
+                yield FileRecord(file_info, None, error)
+        if not self.is_binary or self.process_binary:
+
+            try:
+                with RummageFileContent(
+                    file_info.name, file_info.size, self.current_encoding, self.file_content
+                ) as rum_file:
+                    offset = 0
+
+                    for m in self._findall(rum_file):
+                        text.append(rum_file[offset:m.start(0)])
+                        text.append(
+                            self.expand(m) if self.expand is not None else m.expand(self.replace)
+                        )
+                        offset = m.end(0)
+
+                        yield FileRecord(
+                            file_info,
                             MatchRecord(
                                 0,                     # lineno
                                 0,                     # colno
@@ -421,49 +519,130 @@ class _FileSearch(object):
                             ),
                             None
                         )
-                    )
 
-                if self.boolean:
-                    break
+                        if self.kill:
+                            break
 
-                # Have we exceeded the maximum desired matches?
-                if max_count is not None:
-                    max_count -= 1
+                    # Grab the rest of the file if we found things to replace.
+                    if not self.kill and text:
+                        text.append(rum_file[offset:])
 
-                    if max_count == 0:
-                        break
+                if not self.kill and text:
+                    if self.file_content:
+                        yield BufferReplaceRecord((b'' if self.is_binary else '').join(text), None)
+                    else:
+                        self._update_file(
+                            file_info.name, text, self.current_encoding
+                        )
+                else:
+                    if self.file_content:
+                        yield BufferReplaceRecord(None, None)
+                    else:
+                        yield FileRecord(file_info, None, None)
 
-            if not file_record_sent:
-                queue.put(FileRecord(target, None, None))
+            except Exception:
+                if self.file_content:
+                    yield BufferReplaceRecord(None, str(traceback.format_exc()))
+                else:
+                    yield FileRecord(file_info, None, str(traceback.format_exc()))
+
+    def search(self):
+        """Search target file or buffer returning a generator of results."""
+
+        file_info, error = self._get_file_info(self.file_obj)
+        if error is not None:
+            yield FileRecord(file_info, None, error)
+        if not self.is_binary or self.process_binary:
+
+            try:
+                with RummageFileContent(
+                    file_info.name, file_info.size, self.current_encoding, self.file_content
+                ) as rum_file:
+                    line_ending = None
+                    line_map = []
+                    file_record_sent = False
+
+                    for m in self._findall(rum_file):
+                        if not self.boolean and not self.count_only:
+                            if line_ending is None:
+                                line_ending, line_map = self._get_line_ending(rum_file)
+
+                        if not self.boolean and not self.count_only:
+                            file_record_sent = True
+                            # Get line related context.
+                            lines, match, context, row, col = self._get_line_context(
+                                rum_file, m, line_map, self.is_binary
+                            )
+                        else:
+                            row = 0
+                            col = 0
+                            match = (m.start(), m.end())
+                            lines = None
+                            line_ending = None
+                            context = (0, 0)
+
+                        yield FileRecord(
+                            file_info,
+                            MatchRecord(
+                                row,                     # lineno
+                                col,                     # colno
+                                match,                   # Postion of match
+                                lines,                   # Line(s) in which match is found
+                                line_ending,             # Line ending for file
+                                context                  # Number of lines shown before and after matched line(s)
+                            ),
+                            None
+                        )
+
+                        if self.boolean:
+                            break
+
+                        # Have we exceeded the maximum desired matches?
+                        if self.max_count is not None:
+                            self.max_count -= 1
+
+                            if self.max_count == 0:
+                                break
+
+                        if self.kill:
+                            break
+
+                if not file_record_sent:
+                    yield FileRecord(file_info, None, None)
+            except Exception:
+                yield FileRecord(file_info, None, str(traceback.format_exc()))
+
+    def run(self):
+        """Start the file search thread."""
+
+        try:
+            if self.replace is not None:
+                for rec in self.search_and_replace():
+                    yield rec
+            else:
+                for rec in self.search():
+                    yield rec
         except Exception:
-            queue.put(FileRecord(target, None, str(traceback.format_exc())))
-
-
-def file_search(
-    params, file_obj, file_id, queue, max_count=None,
-    all_utf8=False, process_binary=False, file_content=None
-):
-    """Start a thread for a file search."""
-    fs = _FileSearch(
-        params.pattern, params.flags, params.context,
-        params.truncate_lines, params.boolean, params.count_only
-    )
-    fs.search(file_obj, file_id, queue, max_count, all_utf8, process_binary, file_content)
+            print(str(traceback.format_exc()))
 
 
 class SearchParams(object):
 
     """Search parameter object."""
 
-    def __init__(self, pattern, flags, context, truncate_lines, boolean, count_only):
+    def __init__(self):
         """Search parameters."""
 
-        self.pattern = pattern
-        self.flags = flags
-        self.context = context
-        self.truncate_lines = truncate_lines
-        self.boolean = boolean
-        self.count_only = count_only
+        self.pattern = None
+        self.flags = 0
+        self.context = 0
+        self.truncate_lines = False
+        self.boolean = False
+        self.count_only = False
+        self.replace = None
+        self.backup = True
+        self.encoding = None
+        self.process_binary = False
 
 
 class _DirWalker(object):
@@ -487,16 +666,15 @@ class _DirWalker(object):
         self.folder_exclude = folder_exclude
         self.recursive = recursive
         self.show_hidden = show_hidden
-        self.files = []
 
-    def __is_hidden(self, path):
+    def _is_hidden(self, path):
         """Check if file is hidden."""
 
         if not self.show_hidden:
             return is_hidden(path)
         return False
 
-    def __compare_value(self, limit_check, current):
+    def _compare_value(self, limit_check, current):
         """Compare file attribute against limits."""
 
         value_okay = False
@@ -513,7 +691,7 @@ class _DirWalker(object):
                 value_okay = True
         return value_okay
 
-    def __is_times_okay(self, pth):
+    def _is_times_okay(self, pth):
         """Verify file times meet requirements."""
 
         times_okay = False
@@ -524,16 +702,16 @@ class _DirWalker(object):
         if self.modified is None:
             mod_okay = True
         else:
-            mod_okay = self.__compare_value(self.modified, self.modified_time)
+            mod_okay = self._compare_value(self.modified, self.modified_time)
         if self.created is None:
             cre_okay = True
         else:
-            cre_okay = self.__compare_value(self.created, self.created_time)
+            cre_okay = self._compare_value(self.created, self.created_time)
         if mod_okay and cre_okay:
             times_okay = True
         return times_okay
 
-    def __is_size_okay(self, pth):
+    def _is_size_okay(self, pth):
         """Verify file size meets requirements."""
 
         size_okay = False
@@ -541,15 +719,15 @@ class _DirWalker(object):
         if self.size is None:
             size_okay = True
         else:
-            size_okay = self.__compare_value(self.size, self.current_size)
+            size_okay = self._compare_value(self.size, self.current_size)
         return size_okay
 
-    def __valid_file(self, base, name):
+    def _valid_file(self, base, name):
         """Return whether a file can be searched."""
 
         try:
             valid = False
-            if self.file_pattern is not None and not self.__is_hidden(join(base, name)):
+            if self.file_pattern is not None and not self._is_hidden(join(base, name)):
                 if self.file_regex_match:
                     valid = True if self.file_pattern.match(name) is not None else False
                 else:
@@ -567,21 +745,21 @@ class _DirWalker(object):
                     elif matched:
                         valid = True
                 if valid:
-                    valid = self.__is_size_okay(join(base, name))
+                    valid = self._is_size_okay(join(base, name))
                 if valid:
-                    valid = self.__is_times_okay(join(base, name))
+                    valid = self._is_times_okay(join(base, name))
         except Exception:
             valid = False
         return valid
 
-    def __valid_folder(self, base, name):
+    def _valid_folder(self, base, name):
         """Return whether a folder can be searched."""
 
         valid = True
         try:
             if not self.recursive:
                 valid = False
-            elif self.__is_hidden(join(base, name)):
+            elif self._is_hidden(join(base, name)):
                 valid = False
             elif self.folder_exclude is not None:
                 if self.dir_regex_match:
@@ -604,33 +782,48 @@ class _DirWalker(object):
             valid = False
         return valid
 
-    def run(self):
+    @property
+    def kill(self):
+        """Abort process."""
+
+        return ABORT
+
+    def walk(self):
         """Start search for valid files."""
 
-        global _FILES
-        global _ABORT
-        with _LOCK:
-            _FILES = []
         for base, dirs, files in walk(self.dir):
             # Remove child folders based on exclude rules
             for name in dirs[:]:
-                if not self.__valid_folder(base, name):
+                if not self._valid_folder(base, name):
                     dirs.remove(name)
-                if _ABORT:
+                if self.kill:
                     break
 
             # Seach files if they were found
             if len(files):
                 # Only search files that are in the inlcude rules
-                for name in files[:]:
-                    if self.__valid_file(base, name):
-                        with _LOCK:
-                            _FILES.append((join(base, name), self.current_size, self.modified_time, self.created_time))
-                    if _ABORT:
+                for name in files:
+                    if self._valid_file(base, name):
+                        yield FileAttr(
+                            join(base, name),
+                            self.current_size,
+                            self.modified_time,
+                            self.created_time
+                        )
+
+                    if self.kill:
                         break
-            if _ABORT:
-                _ABORT = False
+            if self.kill:
                 break
+
+    def run(self):
+        """Run the directory walker."""
+
+        try:
+            for f in self.walk():
+                yield f
+        except Exception:
+            print(str(traceback.format_exc()))
 
 
 class Grep(object):
@@ -640,22 +833,36 @@ class Grep(object):
     def __init__(
         self, target, pattern, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None,
-        show_hidden=False, all_utf8=False, size=None,
+        show_hidden=False, encoding=None, size=None,
         modified=None, created=None, text=False, truncate_lines=False,
-        boolean=False, count_only=False
+        boolean=False, count_only=False, replace=None,
+        backup=False
     ):
         """Initialize Grep object."""
 
-        global _FILES
-        global _ABORT
-        if not _RUNNING and _ABORT:
-            _ABORT = False
-        if _RUNNING:
+        global _PROCESS
+        global ABORT
+        if _PROCESS and _PROCESS.alive:
+            ABORT = True
             raise GrepException("Grep process already running!")
+        else:
+            ABORT = False
+            _PROCESS = self
 
-        self.search_params = SearchParams(pattern, flags, context, truncate_lines, boolean, count_only)
+        self.alive = False
+        self.search_params = SearchParams()
+        self.search_params.pattern = pattern
+        self.search_params.flags = flags
+        self.search_params.context = context
+        self.search_params.truncate_lines = truncate_lines
+        self.search_params.boolean = boolean
+        self.search_params.count_only = count_only
+        self.search_params.replace = replace
+        self.search_params.backup = backup
+        self.search_params.encoding = self._verify_encoding(encoding) if encoding is not None else None
+        self.search_params.process_binary = text
+
         self.buffer_input = bool(flags & BUFFER_INPUT)
-        self.all_utf8 = all_utf8
         self.current_encoding = None
         self.idx = -1
         self.records = -1
@@ -664,218 +871,173 @@ class Grep(object):
         self.process_binary = text
         file_regex_match = bool(flags & FILE_REGEX_MATCH)
         dir_regex_match = bool(flags & DIR_REGEX_MATCH)
-        self.kill = False
         self.path_walker = None
         self.is_binary = False
+        self.files = deque()
+        self.queue = deque()
         if not self.buffer_input and isdir(self.target):
-            self.path_walker = threading.Thread(
-                target=threaded_walker,
-                args=(
+            self.path_walker = _DirWalker(
+                self.target,
+                self._get_file_pattern(file_pattern, file_regex_match),
+                file_regex_match,
+                self._get_dir_pattern(folder_exclude, dir_regex_match),
+                dir_regex_match,
+                bool(flags & RECURSIVE),
+                show_hidden,
+                size,
+                modified,
+                created
+            )
+        elif not self.buffer_input and isfile(self.target):
+            self.files.append(
+                FileAttr(
                     self.target,
-                    self.__get_file_pattern(file_pattern, file_regex_match),
-                    file_regex_match,
-                    self.__get_dir_pattern(folder_exclude, dir_regex_match),
-                    dir_regex_match,
-                    bool(flags & RECURSIVE),
-                    show_hidden,
-                    size,
-                    modified,
-                    created
+                    getsize(self.target),
+                    getmtime(self.target),
+                    getctime(self.target)
                 )
             )
-            self.path_walker.setDaemon(True)
-        elif not self.buffer_input and isfile(self.target):
-            with _LOCK:
-                _FILES = [
-                    (
-                        self.target,
-                        getsize(self.target),
-                        getmtime(self.target),
-                        getctime(self.target)
-                    )
-                ]
         elif self.buffer_input:
-            with _LOCK:
-                _FILES = [
-                    (
-                        "buffer input",
-                        len(self.target),
-                        ctime(),
-                        ctime()
-                    )
-                ]
-        else:
-            with _LOCK:
-                _FILES = []
+            self.files.append(
+                FileAttr(
+                    "buffer input",
+                    len(self.target),
+                    ctime(),
+                    ctime()
+                )
+            )
 
-    def __get_dir_pattern(self, folder_exclude, dir_regex_match):
+    def _verify_encoding(self, encoding):
+        """Verify the encoding is okay."""
+
+        enc = encoding.lower()
+        # Normalize UTFx encodings as we detect order and boms later.
+        if encoding in U8:
+            enc = 'utf-8'
+        elif encoding in U16:
+            enc = 'utf-16'
+        elif encoding in U16BE:
+            enc = 'utf-16-be'
+        elif encoding in U16LE:
+            enc = 'utf-16-le'
+        elif encoding in U32:
+            enc = 'utf-32'
+        elif encoding in U32BE:
+            enc = 'utf-32-be'
+        elif encoding in U32LE:
+            enc = 'utf-32-le'
+
+        if enc != 'bin':
+            codecs.lookup(enc)
+
+        return enc
+
+    def _get_dir_pattern(self, folder_exclude, dir_regex_match):
         """Compile or format the directory exclusion pattern."""
 
         pattern = None
         if folder_exclude is not None:
-            pattern = ure.compile(
-                folder_exclude, ure.IGNORECASE
+            pattern = backrefs.compile_search(
+                folder_exclude, re.IGNORECASE
             ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
         return pattern
 
-    def __get_file_pattern(self, file_pattern, file_regex_match):
+    def _get_file_pattern(self, file_pattern, file_regex_match):
         """Compile or format the file pattern."""
 
         pattern = None
         if file_pattern is not None:
-            pattern = ure.compile(
-                file_pattern, ure.IGNORECASE
+            pattern = backrefs.compile_search(
+                file_pattern, re.IGNORECASE
             ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
     def get_status(self):
         """Return number of files searched out of current number of files crawled."""
+        return self.idx + 1, self.idx + 1 + len(self.files), self.records + 1
 
-        if self.path_walker is not None:
-            return self.idx + 1 if self.idx != -1 else 0, len(_FILES), self.records + 1 if self.records != -1 else 0
-        else:
-            return 1, 1, self.records + 1 if self.records != -1 else 0
+    @property
+    def kill(self):
+        """Kill process."""
 
-    def abort(self):
-        """Abort the search."""
+        return ABORT
 
-        global _ABORT
-        _ABORT = True
-        self.kill = True
-
-    def __wait_for_thread(self):
-        """Wait for thread to start."""
-
-        global _STARTED
-        self.path_walker.start()
-
-        # Try to wait in case the
-        # "is running" check happens too quick
-        while not _STARTED:
-            pass
-        _STARTED = False
-
-    def __get_next_file(self):
+    def _get_next_file(self):
         """Get the next file from the file crawler results."""
 
-        file_info = None
-        while file_info is None:
-            if _RUNNING:
-                if len(_FILES) - 1 > self.idx:
-                    self.idx += 1
-                    file_info = _FILES[self.idx]
-            else:
-                if len(_FILES) - 1 > self.idx and not self.kill:
-                    self.idx += 1
-                    file_info = _FILES[self.idx]
-                else:
-                    break
+        file_info = self.files.popleft() if self.path_walker is None else None
+        if file_info is None:
+            if not self.kill:
+                self.idx += 1
+                file_info = self.files.popleft()
+        else:
+            self.idx += 1
+
         return file_info
 
-    def open_thread_slot(self, threads):
-        """Find the first open thread slot."""
-
-        idx = -1
-        for x in range(0, len(threads)):
-            if threads[x] is None or not threads[x].is_alive():
-                idx = x
-                break
-        return idx
-
-    def busy_thread(self, threads):
-        """Are any of the threads busy?  Return the first index."""
-
-        idx = -1
-        for x in range(0, len(threads)):
-            if threads[x] is not None and threads[x].is_alive():
-                idx = x
-                break
-        return idx
-
-    def drain_records(self):
+    def _drain_records(self):
         """Grab all current records."""
 
-        size = self.queue.qsize()
-        while size:
-            if self.max is not None and self.max == 0:
-                break
-            record = self.queue.get()
+        while len(self.queue) and (self.max is None or self.max != 0):
+            record = self.queue.popleft()
             if record.error is None:
                 self.records += 1
                 if self.max is not None and record.match is not None:
                     self.max -= 1
-                yield record
-            size -= 1
-
-    def file_read(self, content_buffer=None):
-        """Perform search on on files in a directory."""
-
-        # Start path walking thread if searching a path
-        if self.path_walker is not None:
-            self.__wait_for_thread()
-
-        self.idx = -1
-        self.queue = Queue.Queue()
-        threads = [None] * _NUM_THREADS
-        file_info = []
-
-        # Wait for when a file is available
-        while True:
-            if self.kill:
-                break
-
-            # Acquire the maximum number of files to search (if available)
-            acquire = _NUM_THREADS - len(file_info)
-            while acquire:
-                obj = self.__get_next_file()
-                if obj is not None:
-                    file_info.append(obj)
-                else:
-                    break
-                acquire -= 1
-
-            # No more files to search
-            if len(file_info) == 0:
-                break
-
-            # Start a search thread(s)
-            idx = self.open_thread_slot(threads)
-            while idx != -1 and len(file_info):
-                threads[idx] = threading.Thread(
-                    target=file_search,
-                    args=(
-                        self.search_params,
-                        file_info.pop(0),
-                        self.idx,
-                        self.queue,
-                        self.max,
-                        self.all_utf8,
-                        self.process_binary,
-                        content_buffer
-                    )
-                )
-                threads[idx].daemon = True
-                threads[idx].start()
-                idx = self.open_thread_slot(threads)
-
-            # Grab recently finished records
-            for record in self.drain_records():
-                yield record
-
-            if self.max is not None and self.max == 0:
-                self.abort()
-                break
-
-        # Wait for processes to finish
-        while self.busy_thread(threads) != -1:
-            pass
-
-        # Clean out remaining records
-        for record in self.drain_records():
             yield record
 
-        threads = []
-        self.queue = None
+    def search_file(self, content_buffer=None):
+        """Search file."""
+
+        global ABORT
+
+        file_info = self._get_next_file()
+        if file_info is not None:
+
+            self.searcher = _FileSearch(
+                self.search_params,
+                file_info,
+                self.idx,
+                self.max,
+                content_buffer
+            )
+            for rec in self.searcher.run():
+                if rec.error is None:
+                    self.records += 1
+                    if self.max is not None and rec.match is not None:
+                        self.max -= 1
+                yield rec
+
+                if self.max is not None and self.max == 0:
+                    ABORT = True
+
+    def walk_files(self):
+        """Single threaded run."""
+
+        folder_limit = 100
+
+        for f in self.path_walker.run():
+            self.files.append(f)
+
+            if self.kill:
+                self.files.clear()
+
+            # Search 50 for every 100
+            if len(self.files) >= folder_limit:
+
+                for x in range(0, 50):
+
+                    for rec in self.search_file():
+                        yield rec
+
+        # Clear files if kill was signalled.
+        if self.kill:
+            self.files.clear()
+
+        # Finish searching the rest
+        while self.files and not self.kill:
+            for rec in self.search_file():
+                yield rec
 
     def find(self):
         """
@@ -885,5 +1047,13 @@ class Grep(object):
         Return the results of each file via a generator.
         """
 
-        for result in self.file_read(self.target if self.buffer_input else None):
-            yield result
+        self.alive = True
+        self.idx = -1
+
+        if len(self.files):
+            for result in self.search_file(self.target if self.buffer_input else None):
+                yield result
+        else:
+            for result in self.walk_files():
+                yield result
+        self.alive = False

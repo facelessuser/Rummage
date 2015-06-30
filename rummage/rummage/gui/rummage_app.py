@@ -62,7 +62,7 @@ class RummageApp(PipeApp):
                         break
                     except StopIteration:
                         break
-            if filename is not None:
+            if filename is None:
                 cwd = os.getcwdu()
                 filename = cwd
             if filename:

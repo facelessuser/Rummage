@@ -22,7 +22,6 @@ import wx
 from . import gui
 from .settings import Settings
 from .editor_dialog import EditorDialog
-from .platform_window_focus import platform_window_focus
 from ..localization import _
 
 RECORDS = _("%d Records")
@@ -54,7 +53,6 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
         self.m_history_label.SetLabel(RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
-        self.m_debug_checkbox.SetValue(Settings.get_debug())
 
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
@@ -90,12 +88,10 @@ class SettingsDialog(gui.SettingsDialog):
         main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Notifications"))
         main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(_("History"))
         self.m_single_checkbox.SetLabel(_("Single Instance (applies to new instances)"))
-        self.m_debug_checkbox.SetLabel(_("Enable debug level"))
         self.m_visual_alert_checkbox.SetLabel(_("Notification popup"))
         self.m_audio_alert_checkbox.SetLabel(_("Alert Sound"))
         self.m_language_label.SetLabel(_("Language (restart required)"))
         self.m_editor_button.SetLabel(_("change"))
-        self.m_debug_button.SetLabel(_("Show Log"))
         self.m_history_clear_button.SetLabel(_("Clear"))
         self.m_close_button.SetLabel(_("Close"))
         self.Fit()
@@ -146,19 +142,6 @@ class SettingsDialog(gui.SettingsDialog):
         """Update if single instance is used."""
 
         Settings.set_single_instance(self.m_single_checkbox.GetValue())
-
-    def on_debug_toggle(self, event):
-        """Update if debug logging is used."""
-
-        Settings.set_debug(self.m_debug_checkbox.GetValue())
-
-    def on_show_log(self, event):
-        """Show log."""
-
-        self.GetParent().open_debug_console()
-        stdiowin = wx.GetApp().stdioWin
-        if stdiowin is not None:
-            platform_window_focus(stdiowin.frame)
 
     def on_language(self, event):
         """Set selected on_language."""

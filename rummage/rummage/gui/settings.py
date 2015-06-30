@@ -32,6 +32,7 @@ from .custom_app import debug, debug_struct, error
 from .custom_app import init_app_log, set_debug_mode
 from . generic_dialogs import errormsg
 from .. import data
+from .. import backrefs
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -63,8 +64,10 @@ class Settings(object):
     def load_settings(cls):
         """Load the settings."""
 
-        cls.settings_file, cls.cache_file, log = cls.get_settings_files()
+        cls.settings_file, cls.cache_file, log, uni_props = cls.get_settings_files()
         init_app_log(log)
+        backrefs.set_cache_directory(uni_props)
+        backrefs.init_unicode()
         cls.settings = {}
         cls.cache = {}
         cls.settings_time = None
@@ -186,21 +189,27 @@ class Settings(object):
         """Get settings, cache, log, and fifo location."""
 
         if _PLATFORM == "windows":
-            folder = expanduser("~\\.rummage")
+            folder = expanduser("~\\.Rummage")
             if not exists(folder):
                 mkdir(folder)
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
+            unicode_props = folder
             cls.fifo = join(folder, '\\\\.\\pipe\\rummage')
             cls.config_folder = folder
         elif _PLATFORM == "osx":
-            folder = expanduser("~/Library/Application Support/Rummage")
+            old_folder = expanduser("~/Library/Application Support/Rummage")
+            folder = expanduser("~/.Rummage")
+            if exists(old_folder) and not exists(folder):
+                import shutil
+                shutil.move(old_folder, folder)
             if not exists(folder):
                 mkdir(folder)
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
+            unicode_props = folder
             cls.fifo = join(folder, FIFO)
             cls.config_folder = folder
         elif _PLATFORM == "linux":
@@ -210,16 +219,17 @@ class Settings(object):
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
+            unicode_props = folder
             cls.fifo = join(folder, FIFO)
             cls.config_folder = folder
         try:
-            for filename in [settings, cache]:
+            for filename in (settings, cache):
                 if not exists(filename):
                     with codecs.open(filename, "w", encoding="utf-8") as f:
                         f.write(json.dumps({}, sort_keys=True, indent=4, separators=(',', ': ')))
         except Exception:
             pass
-        return settings, cache, log
+        return settings, cache, log, unicode_props
 
     @classmethod
     def get_config_folder(cls):
@@ -291,12 +301,12 @@ class Settings(object):
         cls.save_settings()
 
     @classmethod
-    def add_search(cls, name, search, is_regex):
+    def add_search(cls, name, search, replace, is_regex):
         """Add saved search."""
 
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", [])
-        searches.append((name, search, is_regex))
+        searches.append((name, search, replace, is_regex))
         cls.settings["saved_searches"] = searches
         cls.save_settings()
 
