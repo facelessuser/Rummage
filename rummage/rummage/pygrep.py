@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Pygrep.
 
@@ -217,6 +218,8 @@ class _FileSearch(object):
 
     """Search for files."""
 
+    hex_tx_table = ("�" * 32) + "".join(chr(c) for c in range(32, 127)) + ("�" * 129)
+
     def __init__(self, args, file_obj, file_id, max_count, file_content):
         """Init the file search object."""
 
@@ -284,7 +287,7 @@ class _FileSearch(object):
                 match_end = TRUNCATE_LENGTH
 
         return (
-            content[start:end],
+            content[start:end].translate(self.hex_tx_table),
             (match_start, match_end),
             (before, after),
             row,
