@@ -569,13 +569,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def localize(self):
         """Localize."""
 
-        self.m_search_panel.GetSizer().GetStaticBox().SetLabel(_("Search"))
+        self.m_search_panel.GetSizer().GetStaticBox().SetLabel(_("Search and Replace"))
         self.m_limiter_panel.GetSizer().GetStaticBox().SetLabel(_("Limit Search"))
         self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
         self.m_replace_button.SetLabel(REPLACE_BTN_REPLACE)
-        self.m_searchin_label.SetLabel(_("Where"))
-        self.m_searchfor_label.SetLabel(_("What"))
-        self.m_replace_label.SetLabel(_("Replace"))
+        self.m_searchin_label.SetLabel(_("Search in"))
+        self.m_searchfor_label.SetLabel(_("Search for"))
+        self.m_replace_label.SetLabel(_("Replace with"))
         self.m_size_is_label.SetLabel(_("Size is"))
         self.m_modified_label.SetLabel(_("Modified"))
         self.m_created_label.SetLabel(_("Created"))
