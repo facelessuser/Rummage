@@ -790,7 +790,6 @@ class _DirWalker(object):
                 is_backup = True
         return is_backup
 
-
     def _valid_file(self, base, name):
         """Return whether a file can be searched."""
 
