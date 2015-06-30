@@ -287,7 +287,7 @@ class _FileSearch(object):
                 match_end = TRUNCATE_LENGTH
 
         return (
-            content[start:end].translate(self.hex_tx_table),
+            content[start:end].decode('ascii', errors='replace').translate(self.hex_tx_table),
             (match_start, match_end),
             (before, after),
             row,
