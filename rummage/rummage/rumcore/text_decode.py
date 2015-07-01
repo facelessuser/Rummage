@@ -39,15 +39,15 @@ CONFIDENCE_MAP = {
 RE_UTF_BOM = re.compile(
     b'^(?:(' +
     codecs.BOM_UTF8 +
-    b')|(?:(' +
+    b')[\x00-\xFF]{,2}|(' +
     codecs.BOM_UTF32_BE +
     b')|(' +
     codecs.BOM_UTF32_LE +
-    b'))(?:(' +
+    b')|(' +
     codecs.BOM_UTF16_BE +
     b')|(' +
     codecs.BOM_UTF16_LE +
-    b')))[\x00-\xFF]*'
+    b'))'
 )
 
 RE_PY_ENCODE = re.compile(
@@ -198,7 +198,7 @@ def inspect_bom(filename):
     try:
         with open(filename, "rb") as f:
             encoding = _has_bom(f.read(4))
-    except Exception:
+    except Exception:  # pragma: no cover
         # print(traceback.format_exc())
         pass
     return encoding
@@ -227,6 +227,6 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096):
     return encoding
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     print("Guessing encoding for %s" % sys.argv[1])
     print(guess(sys.argv[1]))
