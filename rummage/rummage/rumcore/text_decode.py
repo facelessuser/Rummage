@@ -108,7 +108,7 @@ def verify_encode(file_obj, encoding, blocks=1, chunk_size=4096):
     return good
 
 
-def _has_py_encode(content):  # pragma: no cover
+def _has_py_encode(content):
     """Check python encoding."""
 
     encode = None
