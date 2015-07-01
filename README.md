@@ -1,6 +1,6 @@
 [![Unix Build Status][travis-image]][travis-link]
 [![Code Health][landscape-image]][landscape-link]
-[![Coverage][codecov-image]][codecov-link]]
+[![Coverage][codecov-image]][codecov-link]
 [![Requirements Status][requires-image]][requires-link]
 ![License][license-image]
 Rummage
