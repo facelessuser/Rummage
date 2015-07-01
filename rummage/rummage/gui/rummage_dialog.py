@@ -755,7 +755,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_replace_textbox, "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
         )
         self.m_exclude_textbox = replace_with_autocomplete(
-            self.m_exclude_textbox, "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
+            self.m_exclude_textbox,
+            "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude",
+            load_last=True
         )
         self.m_filematch_textbox = replace_with_autocomplete(
             self.m_filematch_textbox,
