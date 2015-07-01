@@ -36,18 +36,22 @@ MIN_CONFIDENCE = 0.5
 CONFIDENCE_MAP = {
 }
 
-UTF_BOM = b'''
-^(?:(%s)|(?:(%s)|(%s))(?:(%s)|(%s)))[\x00-\xFF]*
-''' % (
-    codecs.BOM_UTF8,
-    codecs.BOM_UTF32_BE,
-    codecs.BOM_UTF32_LE,
-    codecs.BOM_UTF16_BE,
-    codecs.BOM_UTF16_LE
+RE_UTF_BOM = re.compile(
+    b'^(?:(' +
+    codecs.BOM_UTF8 +
+    b')|(?:(' +
+    codecs.BOM_UTF32_BE +
+    b')|(' +
+    codecs.BOM_UTF32_LE +
+    b'))(?:(' +
+    codecs.BOM_UTF16_BE +
+    b')|(' +
+    codecs.BOM_UTF16_LE +
+    b')))[\x00-\xFF]*'
 )
 
-py_encode = re.compile(
-    r'^[^\r\n]*?coding[:=]\s*([-\w.]+)|[^\r\n]*?\r?\n[^\r\n]*?coding[:=]\s*([-\w.]+)'
+RE_PY_ENCODE = re.compile(
+    br'^[^\r\n]*?coding[:=]\s*([-\w.]+)|[^\r\n]*?\r?\n[^\r\n]*?coding[:=]\s*([-\w.]+)'
 )
 
 
@@ -109,7 +113,7 @@ def _has_py_encode(content):  # pragma: no cover
 
     encode = None
 
-    m = py_encode.match(content)
+    m = RE_PY_ENCODE.match(content)
     if m:
         if m.group(1):
             enc = m.group(1)
@@ -142,10 +146,8 @@ def _special_encode_check(content, ext):
 def _has_bom(content):
     """Check for UTF8, UTF16, and UTF32 BOMS."""
 
-    utf_bom = re.compile(UTF_BOM, re.VERBOSE)
-
     bom = None
-    m = utf_bom.match(content)
+    m = RE_UTF_BOM.match(content)
     if m is not None:
         if m.group(1):
             bom = Encoding('utf-8', codecs.BOM_UTF8)

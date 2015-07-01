@@ -2,7 +2,7 @@
 """Test critic lib."""
 from __future__ import unicode_literals
 import unittest
-from rummage.rummage import backrefs
+from rummage.rummage.rumcore import backrefs
 import re
 import sys
 

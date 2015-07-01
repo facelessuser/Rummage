@@ -32,7 +32,7 @@ from .custom_app import debug, debug_struct, error
 from .custom_app import init_app_log, set_debug_mode
 from . generic_dialogs import errormsg
 from .. import data
-from .. import backrefs
+from ..rumcore import backrefs
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"

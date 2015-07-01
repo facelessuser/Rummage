@@ -23,7 +23,7 @@ import traceback
 import re
 import sys
 from . import gui
-from .. import backrefs
+from ..rumcore import backrefs
 from ..localization import _
 from .. import data
 

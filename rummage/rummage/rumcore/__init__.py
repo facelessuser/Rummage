@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Pygrep.
+RumCore.
 
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -66,6 +66,8 @@ BUFFER_INPUT = 64
 
 TRUNCATE_LENGTH = 120
 
+DEFAULT_BAK = 'rum-bak'
+
 ABORT = False
 _PROCESS = False
 
@@ -110,11 +112,11 @@ def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True, binary=
 
     flags = 0
     if multiline:
-        flags |= re.MULTILINE if binary else re.MULTILINE
+        flags |= re.MULTILINE
     if ignorecase:
-        flags |= re.IGNORECASE if binary else re.IGNORECASE
+        flags |= re.IGNORECASE
     if dotall:
-        flags |= re.DOTALL if binary else re.DOTALL
+        flags |= re.DOTALL
     if not binary:
         flags |= re.UNICODE
     return backrefs.compile_search(pattern, flags)
@@ -125,11 +127,11 @@ def _literal_pattern(pattern, ignorecase=False, dotall=False, multiline=True, bi
 
     flags = 0
     if multiline:
-        flags |= re.MULTILINE if binary else re.MULTILINE
+        flags |= re.MULTILINE
     if ignorecase:
-        flags |= re.IGNORECASE if binary else re.IGNORECASE
+        flags |= re.IGNORECASE
     if dotall:
-        flags |= re.DOTALL if binary else re.DOTALL
+        flags |= re.DOTALL
     if not binary:
         flags |= re.UNICODE
     return re.compile(re.escape(pattern), flags)
@@ -263,8 +265,8 @@ class _FileSearch(object):
     def _get_binary_context(self, content, m):
         """Get context info for binary file."""
 
-        row = 0
-        col = 0
+        row = 1
+        col = 1
         before = 0
         after = 0
         start = m.start()
@@ -563,7 +565,6 @@ class _FileSearch(object):
                             skip = True
                         file_info = file_info._replace(encoding=self.current_encoding)
 
-
                     if not skip:
                         offset = 0
 
@@ -655,8 +656,8 @@ class _FileSearch(object):
                                         rum_buff, m, line_map
                                     )
                             else:
-                                row = 0
-                                col = 0
+                                row = 1
+                                col = 1
                                 match = (m.start(), m.end())
                                 lines = None
                                 line_ending = None
@@ -726,7 +727,7 @@ class SearchParams(object):
         self.backup = True
         self.encoding = None
         self.process_binary = False
-        self.backup_ext = 'bak'
+        self.backup_ext = DEFAULT_BAK
 
 
 class _DirWalker(object):
@@ -811,7 +812,7 @@ class _DirWalker(object):
         return size_okay
 
     def _is_backup(self, name):
-        """Check if file is a pygrep backup."""
+        """Check if file is a rumcore backup."""
 
         is_backup = False
         if self.backup_ext is not None:
@@ -936,7 +937,7 @@ class Grep(object):
         show_hidden=False, encoding=None, size=None,
         modified=None, created=None, text=False, truncate_lines=False,
         boolean=False, count_only=False, replace=None,
-        backup=False, backup_ext='bak'
+        backup=False, backup_ext=DEFAULT_BAK
     ):
         """Initialize Grep object."""
 
@@ -961,7 +962,10 @@ class Grep(object):
         self.search_params.backup = backup
         self.search_params.encoding = self._verify_encoding(encoding) if encoding is not None else None
         self.search_params.process_binary = text
-        self.search_params.backup_ext = backup_ext if backup_ext and isinstance(backup_ext, string_type) else 'bak'
+        if backup_ext and isinstance(backup_ext, string_type):
+            self.search_params.backup_ext = backup_ext
+        else:
+            self.search_params.backup_ext = DEFAULT_BAK
 
         self.buffer_input = bool(flags & BUFFER_INPUT)
         self.current_encoding = None

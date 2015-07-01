@@ -29,7 +29,7 @@ import os
 import wx.lib.masked as masked
 import wx.lib.newevent
 from .. import version
-from .. import pygrep
+from .. import rumcore
 from ..epoch_timestamp import local_time_to_epoch_timestamp
 from .. import notify
 from ..localization import _
@@ -276,13 +276,13 @@ class GrepThread(threading.Thread):
     """Threaded grep."""
 
     def __init__(self, args):
-        """Set up grep thread with the pygrep object."""
+        """Set up grep thread with the rumcore object."""
 
         self.runtime = ""
         self.no_results = 0
         self.running = False
 
-        self.grep = pygrep.Grep(
+        self.grep = rumcore.Grep(
             target=args.target,
             pattern=args.pattern,
             file_pattern=self.not_none(args.regexfilepattern, alt=self.not_none(args.filepattern)),
@@ -310,33 +310,33 @@ class GrepThread(threading.Thread):
         return item if item is not None else alt
 
     def get_flags(self, args):
-        """Determine pygrep flags from GrepArgs."""
+        """Determine rumcore flags from GrepArgs."""
 
         flags = 0
 
         if args.regexfilepattern is not None:
-            flags |= pygrep.FILE_REGEX_MATCH
+            flags |= rumcore.FILE_REGEX_MATCH
 
         if not args.regexp:
-            flags |= pygrep.LITERAL
+            flags |= rumcore.LITERAL
         elif args.dotall:
-            flags |= pygrep.DOTALL
+            flags |= rumcore.DOTALL
 
         if args.ignore_case:
-            flags |= pygrep.IGNORECASE
+            flags |= rumcore.IGNORECASE
 
         if args.recursive:
-            flags |= pygrep.RECURSIVE
+            flags |= rumcore.RECURSIVE
 
         if args.regexdirpattern:
-            flags |= pygrep.DIR_REGEX_MATCH
+            flags |= rumcore.DIR_REGEX_MATCH
 
         return flags
 
     def kill(self):
         """Abort grep thread."""
 
-        pygrep.ABORT = True
+        rumcore.ABORT = True
 
     def update_status(self):
         """Update status."""
