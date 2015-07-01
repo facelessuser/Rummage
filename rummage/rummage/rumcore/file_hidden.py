@@ -30,8 +30,9 @@ if _PLATFORM == "windows":
     def is_win_hidden(path):
         """Check if hidden for Windows."""
 
+        f = basename(path)
         attrs = ctypes.windll.kernel32.GetFileAttributesW(path)
-        return attrs != -1 and bool(attrs & 2)
+        return (attrs != -1 and bool(attrs & 2)) or (f.startswith('.') and f != "..")
 else:
     is_win_hidden = platform_not_implemented
 
