@@ -118,3 +118,15 @@ class TestPyEncodingGuess(unittest.TestCase):
         encoding = text_decode.guess('tests/encodings/wrong_encode_string.py')
         self.assertEqual(encoding.encode, 'bin')
         self.assertEqual(encoding.bom, None)
+
+
+class TestSizeGuess(unittest.TestCase):
+
+    """Test Python file encoding based on special logic dependant on size."""
+
+    def test_zero_size(self):
+        """Test a file with zero size."""
+
+        encoding = text_decode.guess('tests/encodings/zero_size.txt')
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)

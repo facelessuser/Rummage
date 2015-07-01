@@ -116,9 +116,9 @@ def _has_py_encode(content):  # pragma: no cover
     m = RE_PY_ENCODE.match(content)
     if m:
         if m.group(1):
-            enc = m.group(1)
+            enc = m.group(1).decode('ascii')
         elif m.group(2):
-            enc = m.group(2)
+            enc = m.group(2).decode('ascii')
         try:
             codecs.getencoder(enc)
             encode = Encoding(enc, None)
@@ -171,7 +171,6 @@ def _detect_encoding(f, ext):
         m.seek(0)
         if encoding is None:
             encoding = _special_encode_check(m, ext)
-            print(encoding)
         if encoding is None:
             detector = DetectEncoding()
             m.seek(0)
@@ -215,7 +214,8 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096):
         with open(filename, "rb") as f:
             if os.fstat(f.fileno()).st_size == 0:
                 encoding = Encoding('ascii', None)
-            encoding = _detect_encoding(f, ext)
+            else:
+                encoding = _detect_encoding(f, ext)
 
             if verify and encoding.encode != 'bin':
                 if not verify_encode(f, encoding.encode, verify_blocks, verify_block_size):
