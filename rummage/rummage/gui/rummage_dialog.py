@@ -1491,4 +1491,3 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Close dialog."""
 
         self.Close()
-
