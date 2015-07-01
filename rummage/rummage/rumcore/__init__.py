@@ -203,6 +203,8 @@ class RummageFileContent(object):
             self.file_obj.close()
 
     def _read_bin(self):
+        """Setup binary file reading with mmap."""
+
         self.file_obj = open(self.name, "rb")
         if self.size != '0.00KB':
             self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)

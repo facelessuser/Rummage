@@ -78,3 +78,43 @@ class TestValidateEncoding(unittest.TestCase):
 
         with open('tests/encodings/utf32_be_bom.txt', 'rb') as f:
             self.assertFalse(text_decode.verify_encode(f, 'utf-32-le', chunk_size=4))
+
+
+class TestPyEncodingGuess(unittest.TestCase):
+
+    """Test Python file encoding guess."""
+
+    def test_py_default_ascii_file(self):
+        """Test default Python file."""
+
+        encoding = text_decode.guess('tests/encodings/ascii.py')
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+    def test_py_with_encode_string(self):
+        """Test Python file with encoding string."""
+
+        encoding = text_decode.guess('tests/encodings/encode_string.py')
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    def test_py_with_second_line_encode_string(self):
+        """Test Python file with second line encoding string."""
+
+        encoding = text_decode.guess('tests/encodings/second_line_encode_string.py')
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    def test_py_with_no_encode_string(self):
+        """Test Python file with no encode string, but non ASCII encoding."""
+
+        encoding = text_decode.guess('tests/encodings/no_encode_string.py')
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)
+
+    def test_py_with_wrong_encode_string(self):
+        """Test Python file with wrong encode string."""
+
+        encoding = text_decode.guess('tests/encodings/wrong_encode_string.py')
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)

@@ -130,7 +130,7 @@ def _has_py_encode(content):  # pragma: no cover
     # it is without a doubt encoded for use with python, but that may not be
     # the case.
     if encode is None:
-        Encoding('ascii', None)
+        encode = Encoding('ascii', None)
     return encode
 
 
@@ -171,6 +171,7 @@ def _detect_encoding(f, ext):
         m.seek(0)
         if encoding is None:
             encoding = _special_encode_check(m, ext)
+            print(encoding)
         if encoding is None:
             detector = DetectEncoding()
             m.seek(0)
@@ -219,7 +220,7 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096):
             if verify and encoding.encode != 'bin':
                 if not verify_encode(f, encoding.encode, verify_blocks, verify_block_size):
                     encoding = Encoding('bin', None)
-    except Exception:
+    except Exception:  # pragma: no cover
         # print(traceback.format_exc())
         pass
 
