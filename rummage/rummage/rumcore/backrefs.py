@@ -217,6 +217,7 @@ VERBOSE_TOKENS = 22
 NL = 23
 HASHTAG = 24
 RE_SEARCH_REF_VERBOSE = 25
+CHAR_REF = 26
 
 # Unicode string related references
 utokens = (
@@ -235,14 +236,23 @@ utokens = (
     "L",                             # LC_SPAN
     "c",                             # UC
     "C",                             # UC_SPAN
-    ('u', 'U', 'x'),                 # CHARS
-    ('\\x', '\\u', '\\U'),           # ESC_CHARS
+    (
+        'u', 'U', 'x', '0', '1',
+        '2', '3', '4', '5', '6',
+        '7'
+    ),                 # CHARS
+    (
+        '\\x', '\\u', '\\U', '\\0',
+        '\\1', '\\2', '\\3', '\\4',
+        '\\5', '\\6', '\\7'
+    ),                               # ESC_CHARS
     re.compile(                      # RE_SEARCH_REF
         r'''(?x)
         (\\)
         (
             [abfnrtvAbBdDsSwWZlLcCEQ] |
             %(uni_prop)s |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2} |
             u[0-9a-eA-F]{4} |
             U0{2}[01][0-9a-fA-F]{5}
@@ -250,6 +260,7 @@ utokens = (
         (
             [abfnrtvAbBdDsSwWZlLcCEQ] |
             %(uni_prop)s |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2} |
             u[0-9a-eA-F]{4} |
             U0{2}[01][0-9a-fA-F]{5}
@@ -261,12 +272,14 @@ utokens = (
         (\\)
         (
             [cClLE] |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2} |
             u[0-9a-eA-F]{4} |
             U0{2}[01][0-9a-fA-F]{5}
         )? |
         (
             [cClLE] |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2} |
             u[0-9a-eA-F]{4} |
             U0{2}[01][0-9a-fA-F]{5}
@@ -277,6 +290,7 @@ utokens = (
         r'''(?x)
         \\
         (?:
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2} |
             u[0-9a-eA-F]{4} |
             U0{2}[01][0-9a-fA-F]{5}
@@ -294,6 +308,7 @@ utokens = (
         (
             [# abfnrtvAbBdDsSwWZlLcCEQ] |
             %(uni_prop)s |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2} |
             u[0-9a-eA-F]{4} |
             U0{2}[01][0-9a-fA-F]{5}
@@ -301,12 +316,14 @@ utokens = (
         (
             [# abfnrtvAbBdDsSwWZlLcCEQ] |
             %(uni_prop)s |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2} |
             u[0-9a-eA-F]{4} |
             U0{2}[01][0-9a-fA-F]{5}
         )
         ''' % {"uni_prop": UPROP}
-    )
+    ),
+    ('x', 'u', 'U')                    # CHAR_REF
 )
 
 # Byte string related references
@@ -337,17 +354,26 @@ btokens = (
     b"L",                             # LC_SPAN
     b"c",                             # UC
     b"C",                             # UC_SPAN
-    (b'x',),                          # CHARS
-    (b'\\x',),                        # ESC_CHARS
+    (
+        b'x', b'0', b'1', b'2', b'3',
+        b'4', b'5', b'6', b'7'
+    ),                          # CHARS
+    (
+        b'\\x', b'\\0', b'\\1', b'\\2',
+        b'\\3', b'\\4', b'\\5', b'\\6',
+        b'\\7'
+    ),                                # ESC_CHARS
     re.compile(                       # RE_SEARCH_REF
         br'''(?x)
         (\\)
         (
             [abfnrtvAbBdDsSwWZlLcCEQ] |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2}
         )? |
         (
             [abfnrtvAbBdDsSwWZlLcCEQ] |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2}
         )
         '''
@@ -357,10 +383,12 @@ btokens = (
         (\\)
         (
             [cClLE] |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2}
         )? |
         (
             [cClLE] |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2}
         )
         '''
@@ -369,6 +397,7 @@ btokens = (
         br'''(?x)
         \\
         (?:
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2}
         )
         '''
@@ -383,14 +412,17 @@ btokens = (
         (\\)
         (
             [# abfnrtvAbBdDsSwWZlLcCEQ] |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2}
         )? |
         (
             [# abfnrtvAbBdDsSwWZlLcCEQ] |
+            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
             x[A-Fa-f0-9]{2}
         )
         '''
-    )
+    ),
+    (b'x')                 # CHAR_REF
 )
 
 
@@ -438,7 +470,7 @@ def get_unicode_category(prop):
     ) if p2 is None else _unicode_properties.get(p1, {}).get(p2, '')
 
 
-def write_unicode_props(cache_file):
+def write_unicode_props(cache_file):  # pragma: no cover
     """Write unicode properties out."""
 
     global _unicode_properties
@@ -462,7 +494,7 @@ def write_unicode_props(cache_file):
     _loaded = True
 
 
-def read_unicode_props(cache_file):
+def read_unicode_props(cache_file):  # pragma: no cover
     """Read the unicode props."""
 
     global _unicode_properties
@@ -499,7 +531,7 @@ def init_unicode():
     global _loaded
     global _unicode_properties
     if _use_cache is not None:
-        if not os.path.exists(_use_cache):
+        if not os.path.exists(_use_cache):  # pragma: no cover
             write_unicode_props(_use_cache)
         else:
             read_unicode_props(_use_cache)
@@ -507,6 +539,34 @@ def init_unicode():
         _unicode_properties = _build_unicode_property_table(_unicode_range)
 
     _loaded = True
+
+
+def convert_hex(c, case, is_binary, char_ref):
+    """Convert hex representation."""
+
+    attr = "lower" if case == LOWER else "upper"
+
+    if is_binary:
+        if c[1:2] in char_ref:
+            ordinal = int(c[2:], 16) + (0x20 if case == LOWER else -0x20)
+        else:
+            ordinal = int(c[1:], 8) + (0x20 if case == LOWER else -0x20)
+        if (case == UPPER and (0x41 <= ordinal <= 0x5a)) or (case == LOWER and (0x61 <= ordinal <= 0x7a)):
+            c = ("\\x%02x" % ordinal).encode('ascii')
+    else:
+        if c[1:2] in char_ref:
+            char = uchr(int(c[2:], 16))
+        else:
+            char = uchr(int(c[1:], 8))
+        value = ord(getattr(char, attr)())
+        if value <= 0xFF:
+            c = "\\x%02x" % value
+        elif value <= 0xFFFF:
+            c = "\\u%04x" % value
+        else:
+            c = "\\U%08x" % value
+
+    return c
 
 
 # Break apart template patterns into char tokens
@@ -744,6 +804,7 @@ class SearchTemplate(object):
         self.end = tokens[END]
         self.chars = tokens[CHARS]
         self.esc_chars = tokens[ESC_CHARS]
+        self.char_ref = tokens[CHAR_REF]
         self.uni_prop = tokens[UNI_PROP]
         self.lc = tokens[LC]
         self.lc_span = tokens[LC_SPAN]
@@ -777,25 +838,7 @@ class SearchTemplate(object):
     def convert_hex(self, c, case):
         """Convert hex representation."""
 
-        attr = "lower" if case == LOWER else "upper"
-
-        if self.binary:
-            ordinal = int(c[2:], 16) + (0x20 if case == LOWER else -0x20)
-            if case == UPPER and (0x41 <= ordinal <= 0x5a):
-                c = ("\\x%02x" % ordinal).encode('ascii')
-            elif case == LOWER and (0x61 <= ordinal <= 0x7a):
-                c = ("\\x%02x" % ordinal).encode('ascii')
-        else:
-            char = uchr(int(c[2:], 16))
-            value = ord(getattr(char, attr)())
-            if value <= 0xFF:
-                c = "\\x%02x" % value
-            elif value <= 0xFFFF:
-                c = "\\u%04x" % value
-            else:
-                c = "\\U%08x" % value
-
-        return c
+        return convert_hex(c, case, self.binary, self.char_ref)
 
     def find_char_groups(self, s):
         """Find character groups."""
@@ -954,15 +997,16 @@ class SearchTemplate(object):
         """
 
         quoted = [self.empty]
+        raw = []
         try:
             t = next(i)
-            raw = []
             while t != self.esc_end:
                 raw.append(t)
                 t = next(i)
-            quoted.extend([re.escape(self.empty.join(raw))])
         except StopIteration:
             pass
+        if len(raw):
+            quoted.extend([re.escape(self.empty.join(raw))])
         return quoted
 
     def in_group(self, index):
@@ -1042,6 +1086,7 @@ class ReplaceTemplateExpander(object):
         self.end = tokens[END]
         self.chars = tokens[CHARS]
         self.esc_chars = tokens[ESC_CHARS]
+        self.char_ref = tokens[CHAR_REF]
         self.lc = tokens[LC]
         self.lc_span = tokens[LC_SPAN]
         self.uc = tokens[UC]
@@ -1054,25 +1099,7 @@ class ReplaceTemplateExpander(object):
     def convert_hex(self, c, case):
         """Convert hex representation."""
 
-        attr = "lower" if case == LOWER else "upper"
-
-        if self.binary:
-            ordinal = int(c[2:], 16) + (0x20 if case == LOWER else -0x20)
-            if case == UPPER and (0x41 <= ordinal <= 0x5a):
-                c = b"\\x%02x" % ordinal
-            elif case == LOWER and (0x61 <= ordinal <= 0x7a):
-                c = b"\\x%02x" % ordinal
-        else:
-            char = uchr(int(c[2:], 16))
-            value = ord(getattr(char, attr)())
-            if value <= 0xFF:
-                c = "\\x%02x" % value
-            elif value <= 0xFFFF:
-                c = "\\u%04x" % value
-            else:
-                c = "\\U%08x" % value
-
-        return c
+        return convert_hex(c, case, self.binary, self.char_ref)
 
     def span_case(self, i, case):
         """Uppercase or lowercase the next range of characters until end marker is found."""

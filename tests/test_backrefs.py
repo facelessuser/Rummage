@@ -22,70 +22,90 @@ class TestSearchTemplate(unittest.TestCase):
         """Test uppercase."""
 
         result = backrefs.SearchTemplate(r'Testing \ccase!').apply()
-
         self.assertEqual(r'Testing Case!', result)
 
     def test_span_uppercase(self):
         """Test uppercase block."""
 
         result = backrefs.SearchTemplate(r'Testing \Ccase\E!').apply()
-
         self.assertEqual(r'Testing CASE!', result)
 
     def test_single_lowercase(self):
         """Test lowercase."""
 
         result = backrefs.SearchTemplate(r'Testing \lCASE!').apply()
-
         self.assertEqual(r'Testing cASE!', result)
 
     def test_span_lowercase(self):
         """Test lowercase block."""
 
         result = backrefs.SearchTemplate(r'Testing \LCASE\E!').apply()
-
         self.assertEqual(r'Testing case!', result)
+
+    def test_span_case_no_end(self):
+        r"""Test case where no \E is defined."""
+
+        result = backrefs.SearchTemplate(r'Testing \Ccase with no end!').apply()
+        self.assertEqual(r'Testing CASE WITH NO END!', result)
+
+    def test_single_case_at_end(self):
+        """Test case at end of string."""
+
+        result = backrefs.SearchTemplate(r'Testing single case at end\c').apply()
+        self.assertEqual(r'Testing single case at end', result)
 
     def test_quote(self):
         """Test quoting/escaping."""
 
         result = backrefs.SearchTemplate(r'Testing \Q(\s+[quote]*\s+)?\E!').apply()
-
         self.assertEqual(r'Testing %s!' % re.escape(r'(\s+[quote]*\s+)?'), result)
+
+    def test_normal_backrefs(self):
+        """Test normal builtin backrefs."""
+
+        result = backrefs.SearchTemplate(r'\a\b\f\n\r\t\v\A\b\B\d\D\s\S\w\W\Z\\').apply()
+        self.assertEqual(r'\a\b\f\n\r\t\v\A\b\B\d\D\s\S\w\W\Z\\', result)
 
     def test_nesting_case(self):
         """Test nesting upper and lower case."""
 
         result = backrefs.SearchTemplate(r'\c\ltesting \c\LTITLE\E \Cc\la\Ls\Ee\E!').apply()
-
         self.assertEqual(r'Testing Title CasE!', result)
+
+    def test_nesting_case2(self):
+        """Test nesting upper and lower case part 2."""
+
+        result = backrefs.SearchTemplate(r'\l\cTESTING reverse \l\Ctitle\E \LC\cA\CS\EE\E!').apply()
+        self.assertEqual(r'tESTING reverse tITLE cASe!', result)
 
     def test_quote_preserve(self):
         """Test scenario where first letter in quote was not preserved."""
 
         result = backrefs.SearchTemplate(r'Testing \c\l\Qpreserve quote\E!').apply()
-
         self.assertEqual(r'Testing %s!' % re.escape(r'preserve quote'), result)
+
+    def test_quote_no_end(self):
+        r"""Test quote where no \E is defined."""
+
+        result = backrefs.SearchTemplate(r'Testing \Q(quote) with no [end]!').apply()
+        self.assertEqual(r'Testing %s' % re.escape(r'(quote) with no [end]!'), result)
 
     def test_avoid_char_blocks(self):
         """Test that backrefs are ignored in character groups."""
 
         result = backrefs.SearchTemplate(r'Testing [\Cchar\E \lblock] \L[\QAVOIDANCE\E]\E!').apply()
-
         self.assertEqual(r'Testing [char block] [avoidance]!', result)
 
     def test_extraneous_end_char(self):
         r"""Test that stray '\E's get removed."""
 
         result = backrefs.SearchTemplate(r'Testing \Eextraneous end char\E!').apply()
-
         self.assertEqual(r'Testing extraneous end char!', result)
 
     def test_end_outside_block(self):
         """Test that a single upper/lowercase on end boundary terminates proper."""
 
         result = backrefs.SearchTemplate(r'Testing \Cabrupt end\c\E outside block!').apply()
-
         self.assertEqual(r'Testing ABRUPT END outside block!', result)
 
     def test_unicode_properties_capital(self):
@@ -130,17 +150,31 @@ class TestSearchTemplate(unittest.TestCase):
         m = pattern.match('exÁmple')
         self.assertTrue(m is not None)
 
-    def test_char_cases(self):
+    def test_hex_char_cases(self):
         r"""Backrefs should work on char escapes."""
 
         pattern = backrefs.compile_search(r'\c\x67\c\u0137\C\x67\u0137\E')
         m = pattern.match(r'GĶGĶ')
         self.assertTrue(m is not None)
 
-    def test_binary_char_cases(self):
-        r"""Backrefs should work on char escapes."""
+    def test_binary_char_hex_cases(self):
+        r"""Backrefs should work on hex char escapes."""
 
         pattern = backrefs.compile_search(br'\c\x67\l\x47\C\x47\x67\E')
+        m = pattern.match(br'GgGG')
+        self.assertTrue(m is not None)
+
+    def test_octal_char_cases(self):
+        r"""Backrefs should work on char escapes."""
+
+        pattern = backrefs.compile_search(r'\c\147\c\u0137\C\147\u0137\E')
+        m = pattern.match(r'GĶGĶ')
+        self.assertTrue(m is not None)
+
+    def test_binary_char_octal_cases(self):
+        r"""Backrefs should work on octal char escapes."""
+
+        pattern = backrefs.compile_search(br'\c\147\l\107\C\107\147\E')
         m = pattern.match(br'GgGG')
         self.assertTrue(m is not None)
 
@@ -157,6 +191,22 @@ class TestSearchTemplate(unittest.TestCase):
         pattern = backrefs.compile_search(br'\cg\lG\Cgg\E\LGG\E\Q()\E')
         m = pattern.match(br'GgGGgg()')
         self.assertTrue(m is not None)
+
+    def test_detect_verbose_string_after_single_case(self):
+        """Test verbose string flag directly after a single case backreference."""
+
+        pattern = backrefs.compile_search(
+            r'''(?x)
+            This is a \c# comment
+            '''
+        )
+
+        self.assertEqual(
+            pattern.pattern,
+            r'''(?x)
+            This is a # comment
+            '''
+        )
 
     def test_detect_verbose_string_flag(self):
         """Test verbose string flag (?x)."""
@@ -254,25 +304,33 @@ class TestReplaceTemplate(unittest.TestCase):
 
     """Test replace template."""
 
+    def test_get_replace_template_string(self):
+        """Test retrieval of the replace template original string."""
+
+        pattern = re.compile(r"(some)(.*?)(pattern)(!)")
+        template = backrefs.ReplaceTemplate(pattern, r'\c\1\2\C\3\E\4')
+
+        self.assertEqual(r'\c\1\2\C\3\E\4', template.get_base_template())
+
     def test_uppercase(self):
         """Test uppercase."""
 
         text = "this is a test for uppercase!"
         pattern = re.compile(r"(this)(.*?)(uppercase)(!)")
-        expand = backrefs.compile_replace(pattern, r'\c\1\2\C\3\E\4')
+        expand = backrefs.compile_replace(pattern, r'\c\1\2\C\3\E\4 \cnice.')
         results = expand(pattern.match(text))
 
-        self.assertEqual('This is a test for UPPERCASE!', results)
+        self.assertEqual('This is a test for UPPERCASE! Nice.', results)
 
     def test_lowercase(self):
         """Test lowercase."""
 
         text = "THIS is a test for LOWERCASE!"
         pattern = re.compile(r"(THIS)(.*?)(LOWERCASE)(!)")
-        expand = backrefs.compile_replace(pattern, r'\l\1\2\L\3\E\4')
+        expand = backrefs.compile_replace(pattern, r'\l\1\2\L\3\E\4 N\lIce.')
         results = expand(pattern.match(text))
 
-        self.assertEqual('tHIS is a test for lowercase!', results)
+        self.assertEqual('tHIS is a test for lowercase! Nice.', results)
 
     def test_mixed_nested(self):
         """
@@ -289,6 +347,32 @@ class TestReplaceTemplate(unittest.TestCase):
         results = expand(pattern.match(text))
 
         self.assertEqual('tHIS iS A TEST FOR Mixed and NESTED!', results)
+
+    def test_mixed_nested2(self):
+        """
+        Test mix of upper and lower case part 2 (reversed).
+
+            - sinlge case before block case
+            - single case inside of block case
+            - block case inside block case
+        """
+
+        text = "this is a test for mixed and nested!"
+        pattern = re.compile(r"(this )(.*?)(mixed and )(nested)(!)")
+        expand = backrefs.compile_replace(pattern, r'\c\L\1\c\2\C\l\3\E\4\E\5')
+        results = expand(pattern.match(text))
+
+        self.assertEqual('This Is a test for mIXED AND nested!', results)
+
+    def test_ignore_raw_char_in_case_span(self):
+        """Ignore quoted chars in case span."""
+
+        text = "This is a test for ignoring '\\x67' char in case span!"
+        pattern = re.compile(r"(This is a test for )(ignoring ')(\\x67' char )(.*?)(!)")
+        expand = backrefs.compile_replace(pattern, r'\1\C\2\3\E\4\5')
+        results = expand(pattern.match(text))
+
+        self.assertEqual('This is a test for IGNORING \'\\X67\' CHAR in case span!', results)
 
     def test_ignore_group(self):
         """Test that backrefs inserted by matching groups are passed over."""
