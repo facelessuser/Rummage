@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import unittest
 from rummage.rummage.rumcore import text_decode
 import codecs
+import mock
 
 
 class TestBom(unittest.TestCase):
@@ -119,6 +120,13 @@ class TestPyEncodingGuess(unittest.TestCase):
         self.assertEqual(encoding.encode, 'bin')
         self.assertEqual(encoding.bom, None)
 
+    def test_py_with_bad_encode_string(self):
+        """Test Python file with bad encode string."""
+
+        encoding = text_decode.guess('tests/encodings/bad_encoding.py')
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
 
 class TestSizeGuess(unittest.TestCase):
 
@@ -129,4 +137,49 @@ class TestSizeGuess(unittest.TestCase):
 
         encoding = text_decode.guess('tests/encodings/zero_size.txt')
         self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+
+class TestChardetGuess(unittest.TestCase):
+
+    """Test guessing with chardet."""
+
+    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    def test_confidence_pass_guess(self, mock_detect):
+        """Test result with an encoding with acceptable confidence."""
+
+        instance = mock_detect.return_value
+        instance.close.return_value = {"encoding": "utf-8", "confidence": 1.0}
+        encoding = text_decode.guess('tests/encodings/utf8.txt')
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    def test_confidence_fail_guess(self, mock_detect):
+        """Test result with an encoding with unacceptable confidence."""
+
+        instance = mock_detect.return_value
+        instance.close.return_value = {"encoding": "utf-8", "confidence": 0.4}
+        encoding = text_decode.guess('tests/encodings/utf8.txt')
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    def test_none_encoding_guess(self, mock_detect):
+        """Test result with an encoding that is None confidence."""
+
+        instance = mock_detect.return_value
+        instance.close.return_value = {"encoding": None, "confidence": 0.4}
+        encoding = text_decode.guess('tests/encodings/utf8.txt')
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    def test_none_guess(self, mock_detect):
+        """Test result with no encoding match."""
+
+        instance = mock_detect.return_value
+        instance.close.return_value = None
+        encoding = text_decode.guess('tests/encodings/utf8.txt')
+        self.assertEqual(encoding.encode, 'bin')
         self.assertEqual(encoding.bom, None)

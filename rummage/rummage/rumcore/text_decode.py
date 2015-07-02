@@ -172,18 +172,23 @@ def _detect_encoding(f, ext):
         if encoding is None:
             encoding = _special_encode_check(m, ext)
         if encoding is None:
+            enc = None
+            conf = None
             detector = DetectEncoding()
             m.seek(0)
             for chunk in iter(functools.partial(f.read, 4096), b""):
                 detector.feed(chunk)
                 if detector.done:
                     break
-            detector.close()
-            enc = detector.result['encoding']
-            conf = detector.result['confidence']
+            result = detector.close()
+
+            if result is not None:
+                enc = result['encoding']
+                conf = result['confidence']
+
             if enc is not None and conf >= CONFIDENCE_MAP.get(enc, MIN_CONFIDENCE):
                 encoding = Encoding(
-                    detector.result['encoding'],
+                    enc,
                     None
                 )
             else:
