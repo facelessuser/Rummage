@@ -194,136 +194,90 @@ p\{
 DEF_BACK_REF = 0
 REPLACE_TOKENS = 1
 SEARCH_TOKENS = 2
-EMPTY = 3
-LS_BRACKET = 4
-RS_BRACKET = 5
-B_SLASH = 6
-ESC_END = 7
-END = 8
-UNI_PROP = 9
+VERBOSE_TOKENS = 3
+EMPTY = 4
+LS_BRACKET = 5
+RS_BRACKET = 6
+B_SLASH = 7
+ESC_END = 8
+END = 9
 QUOTE = 10
 LC = 11
 LC_SPAN = 12
 UC = 13
 UC_SPAN = 14
-CHARS = 15
-ESC_CHARS = 16
-RE_SEARCH_REF = 17
-RE_REPLACE_REF = 18
-RE_CHAR_START = 19
-RE_IS_VERBOSE = 20
-VERBOSE_FLAG = 21
-VERBOSE_TOKENS = 22
-NL = 23
-HASHTAG = 24
-RE_SEARCH_REF_VERBOSE = 25
-CHAR_REF = 26
+HASHTAG = 15
+NL = 16
+UNI_PROP = 17
+ASCII_LOW_PROPS = 18
+ASCII_UPPER_PROPS = 19
+VERBOSE_FLAG = 20
+RE_SEARCH_REF = 21
+RE_SEARCH_REF_VERBOSE = 22
+RE_REPLACE_REF = 23
+RE_IS_VERBOSE = 24
 
 # Unicode string related references
 utokens = (
     set("abfnrtvAbBdDsSwWZuxg"),     # DEF_BACK_REF
     set("cCElL"),                    # REPLACE_TOKENS
     set("cCElLpQ"),                  # SEARCH_TOKENS
+    set("# "),                       # VERBOSE_TOKENS
     "",                              # EMPTY
     "[",                             # LS_BRACKET
     "]",                             # RS_BRACKET
     "\\",                            # B_SLASH
     "\\E",                           # ESC_END
     "E",                             # END
-    "p",                             # UNI_PROP
     "Q",                             # QUOTE
     "l",                             # LC
     "L",                             # LC_SPAN
     "c",                             # UC
     "C",                             # UC_SPAN
-    (
-        'u', 'U', 'x', '0', '1',
-        '2', '3', '4', '5', '6',
-        '7'
-    ),                 # CHARS
-    (
-        '\\x', '\\u', '\\U', '\\0',
-        '\\1', '\\2', '\\3', '\\4',
-        '\\5', '\\6', '\\7'
-    ),                               # ESC_CHARS
+    '#',                             # HASHTAG
+    '\n',                            # NL
+    "p",                             # UNI_PROP
+    'a-z',                           # ASCII_LOW_PROPS
+    'A-Z',                           # ASCII_UPPER_PROPS
+    'x',                             # VERBOSE_FLAG
     re.compile(                      # RE_SEARCH_REF
         r'''(?x)
-        (\\)
+        (\\)+
         (
-            [abfnrtvAbBdDsSwWZlLcCEQ] |
-            %(uni_prop)s |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2} |
-            u[0-9a-eA-F]{4} |
-            U0{2}[01][0-9a-fA-F]{5}
+            [lLcCEQ] |
+            %(uni_prop)s
         )? |
         (
-            [abfnrtvAbBdDsSwWZlLcCEQ] |
-            %(uni_prop)s |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2} |
-            u[0-9a-eA-F]{4} |
-            U0{2}[01][0-9a-fA-F]{5}
+            [lLcCEQ] |
+            %(uni_prop)s
         )
         ''' % {"uni_prop": UPROP}
     ),
-    re.compile(                      # RE_REPLACE_REF
-        r'''(?x)
-        (\\)
-        (
-            [cClLE] |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2} |
-            u[0-9a-eA-F]{4} |
-            U0{2}[01][0-9a-fA-F]{5}
-        )? |
-        (
-            [cClLE] |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2} |
-            u[0-9a-eA-F]{4} |
-            U0{2}[01][0-9a-fA-F]{5}
-        )
-        '''
-    ),
-    re.compile(                       # RE_CHAR_START
-        r'''(?x)
-        \\
-        (?:
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2} |
-            u[0-9a-eA-F]{4} |
-            U0{2}[01][0-9a-fA-F]{5}
-        )
-        '''
-    ),
-    re.compile(r'\(\?([iLmsux])\)'),  # RE_IS_VERBOSE
-    'x',                              # VERBOSE_FLAG
-    set("# "),                        # VERBOSE_TOKENS
-    '\n',                             # NL
-    '#',                              # HASHTAG
     re.compile(                       # RE_SEARCH_REF_VERBOSE
         r'''(?x)
-        (\\)
+        (\\)+
         (
-            [# abfnrtvAbBdDsSwWZlLcCEQ] |
-            %(uni_prop)s |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2} |
-            u[0-9a-eA-F]{4} |
-            U0{2}[01][0-9a-fA-F]{5}
+            [lLcCEQ#] |
+            %(uni_prop)s
         )? |
         (
-            [# abfnrtvAbBdDsSwWZlLcCEQ] |
-            %(uni_prop)s |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2} |
-            u[0-9a-eA-F]{4} |
-            U0{2}[01][0-9a-fA-F]{5}
+            [lLcCEQ#] |
+            %(uni_prop)s
         )
         ''' % {"uni_prop": UPROP}
     ),
-    ('x', 'u', 'U')                    # CHAR_REF
+    re.compile(                       # RE_REPLACE_REF
+        r'''(?x)
+        (\\)+
+        (
+            [cClLE]
+        )? |
+        (
+            [cClLE]
+        )
+        '''
+    ),
+    re.compile(r'\(\?([iLmsux])\)')   # RE_IS_VERBOSE
 )
 
 # Byte string related references
@@ -342,92 +296,63 @@ btokens = (
     set(                              # SEARCH_TOKENS
         [b"c", b"C", b"E", b"l", b"L", b"Q"]
     ),
+    set([b"#", b" "]),                # VERBOSE_TOKENS
     b"",                              # EMPTY
     b"[",                             # LS_BRACKET
     b"]",                             # RS_BRACKET
     b"\\",                            # B_SLASH
     b"\\E",                           # ESC_END
     b"E",                             # END
-    b"p",                             # UNI_PROP
     b"Q",                             # QUOTE
     b"l",                             # LC
     b"L",                             # LC_SPAN
     b"c",                             # UC
     b"C",                             # UC_SPAN
-    (
-        b'x', b'0', b'1', b'2', b'3',
-        b'4', b'5', b'6', b'7'
-    ),                          # CHARS
-    (
-        b'\\x', b'\\0', b'\\1', b'\\2',
-        b'\\3', b'\\4', b'\\5', b'\\6',
-        b'\\7'
-    ),                                # ESC_CHARS
+    b'#',                             # HASHTAG
+    b'\n',                            # NL
+    b"p",                             # UNI_PROP
+    b'a-z',                           # ASCII_LOW_PROPS
+    b'A-Z',                           # ASCII_UPPER_PROPS
+    b'x',                             # VERBOSE_FLAG
     re.compile(                       # RE_SEARCH_REF
         br'''(?x)
-        (\\)
+        (\\)+
         (
-            [abfnrtvAbBdDsSwWZlLcCEQ] |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2}
+            [lLcCEQ]
         )? |
         (
-            [abfnrtvAbBdDsSwWZlLcCEQ] |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2}
+            [lLcCEQ]
+        )
+        '''
+    ),
+    re.compile(                       # RE_SEARCH_REF_VERBOSE
+        br'''(?x)
+        (\\)+
+        (
+            [lLcCEQ#]
+        )? |
+        (
+            [lLcCEQ#]
         )
         '''
     ),
     re.compile(                       # RE_REPLACE_REF
         br'''(?x)
-        (\\)
+        (\\)+
         (
-            [cClLE] |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2}
+            [cClLE]
         )? |
         (
-            [cClLE] |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2}
+            [cClLE]
         )
         '''
     ),
-    re.compile(                        # RE_CHAR_START
-        br'''(?x)
-        \\
-        (?:
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2}
-        )
-        '''
-    ),
-    re.compile(br'\(\?([iLmsux])\)'),  # RE_IS_VERBOSE
-    b'x',                              # VERBOSE_FLAG
-    set([b"#", b" "]),                 # VERBOSE_TOKENS
-    b'\n',                             # NL
-    b'#',                              # HASHTAG
-    re.compile(                        # RE_SEARCH_REF_VERBOSE
-        br'''(?x)
-        (\\)
-        (
-            [# abfnrtvAbBdDsSwWZlLcCEQ] |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2}
-        )? |
-        (
-            [# abfnrtvAbBdDsSwWZlLcCEQ] |
-            (?:[0-3][0-7]{2}|[0-7]{1,2}) |
-            x[A-Fa-f0-9]{2}
-        )
-        '''
-    ),
-    (b'x')                 # CHAR_REF
+    re.compile(br'\(\?([iLmsux])\)')  # RE_IS_VERBOSE
 )
 
 
 # Unicode property table functions
-def set_cache_directory(pth, name=None):
+def set_cache_directory(pth, name=None):  # pragma: no cover
     """Set cache path."""
 
     if name is None:
@@ -530,8 +455,8 @@ def init_unicode():
 
     global _loaded
     global _unicode_properties
-    if _use_cache is not None:
-        if not os.path.exists(_use_cache):  # pragma: no cover
+    if _use_cache is not None:  # pragma: no cover
+        if not os.path.exists(_use_cache):
             write_unicode_props(_use_cache)
         else:
             read_unicode_props(_use_cache)
@@ -539,34 +464,6 @@ def init_unicode():
         _unicode_properties = _build_unicode_property_table(_unicode_range)
 
     _loaded = True
-
-
-def convert_hex(c, case, is_binary, char_ref):
-    """Convert hex representation."""
-
-    attr = "lower" if case == LOWER else "upper"
-
-    if is_binary:
-        if c[1:2] in char_ref:
-            ordinal = int(c[2:], 16) + (0x20 if case == LOWER else -0x20)
-        else:
-            ordinal = int(c[1:], 8) + (0x20 if case == LOWER else -0x20)
-        if (case == UPPER and (0x41 <= ordinal <= 0x5a)) or (case == LOWER and (0x61 <= ordinal <= 0x7a)):
-            c = ("\\x%02x" % ordinal).encode('ascii')
-    else:
-        if c[1:2] in char_ref:
-            char = uchr(int(c[2:], 16))
-        else:
-            char = uchr(int(c[1:], 8))
-        value = ord(getattr(char, attr)())
-        if value <= 0xFF:
-            c = "\\x%02x" % value
-        elif value <= 0xFFFF:
-            c = "\\u%04x" % value
-        else:
-            c = "\\U%08x" % value
-
-    return c
 
 
 # Break apart template patterns into char tokens
@@ -633,14 +530,14 @@ class ReplaceTokens(Tokens):
 
         if not self._in_boundary(self.index):
             char = self.string[self.index:self.index + 1]
+            print(self.string)
             if char == self.b_slash:
+                print(self.string[self.index + 1:self.boundary[0]])
                 m = self.re_replace_ref.match(self.string[self.index + 1:self.boundary[0]])
                 if m:
                     if m.group(1):
                         if m.group(2):
                             self.index += 1
-                        else:
-                            char += m.group(1)
                     else:
                         char += m.group(3)
         else:
@@ -649,6 +546,8 @@ class ReplaceTokens(Tokens):
         self.last = self.index
         self.index += len(char)
         self.current = char
+        print('---results----')
+        print(self.current)
         return self.current
 
 
@@ -697,7 +596,7 @@ class SearchTokens(Tokens):
                     if m.group(2):
                         self.index += 1
                     else:
-                        char += m.group(1)
+                        char += self.b_slash
                 else:
                     char += m.group(3)
 
@@ -736,7 +635,7 @@ class ReplaceTemplate(object):
 
     def __escape_template(self, template):
         """
-        Escape new backreferences.
+        Escape backreferences.
 
         Because the new backreferences are recognized by python
         we need to escape them so they come out okay.
@@ -747,13 +646,15 @@ class ReplaceTemplate(object):
         for c in iterstring(template):
             if c == self.b_slash:
                 slash_count += 1
-            elif c in self.__back_ref:
-                if slash_count != 0 and (slash_count % 2) == 0:
-                    new_template.append(self.b_slash)
-                slash_count = 0
-            else:
+            elif c != self.b_slash:
+                if slash_count > 1 and c in self.__back_ref:
+                    new_template.append(self.b_slash * (slash_count - 1))
                 slash_count = 0
             new_template.append(c)
+        if slash_count > 1:
+            # End of line slash
+            new_template.append(self.b_slash * (slash_count))
+            slash_count = 0
         return self.empty.join(new_template)
 
     def __add_back_references(self, args):
@@ -802,10 +703,9 @@ class SearchTemplate(object):
         self.rs_bracket = tokens[RS_BRACKET]
         self.esc_end = tokens[ESC_END]
         self.end = tokens[END]
-        self.chars = tokens[CHARS]
-        self.esc_chars = tokens[ESC_CHARS]
-        self.char_ref = tokens[CHAR_REF]
         self.uni_prop = tokens[UNI_PROP]
+        self.ascii_low_props = tokens[ASCII_LOW_PROPS]
+        self.ascii_upper_props = tokens[ASCII_UPPER_PROPS]
         self.lc = tokens[LC]
         self.lc_span = tokens[LC_SPAN]
         self.uc = tokens[UC]
@@ -823,7 +723,6 @@ class SearchTemplate(object):
         self.extended = []
         self.escaped = False
         self.groups = []
-        self.end_found = False
 
     def is_verbose(self, string, verbose):
         """Check if regex pattern is verbose."""
@@ -835,11 +734,6 @@ class SearchTemplate(object):
                 v = True
         return v
 
-    def convert_hex(self, c, case):
-        """Convert hex representation."""
-
-        return convert_hex(c, case, self.binary, self.char_ref)
-
     def find_char_groups(self, s):
         """Find character groups."""
 
@@ -848,7 +742,7 @@ class SearchTemplate(object):
         escaped = False
         found = False
         first = None
-        for c in s:
+        for c in iterstring(s):
             if c == self.b_slash:
                 escaped = not escaped
             elif escaped:
@@ -876,9 +770,20 @@ class SearchTemplate(object):
             v = get_unicode_category(props)
             if v is not None:
                 if not self.in_group(i.index - 1):
-                    v = "[" + v + "]"
+                    v = self.ls_bracket + v + self.rs_bracket
                 properties = [v]
         return properties
+
+    def ascii_props(self, i, case):
+        """Insert ascii (or unicode) case properties."""
+
+        if self.binary:
+            v = self.ascii_upper_props if case == UPPER else self.ascii_low_props
+            if not self.in_group(i.index - 1):
+                v = self.ls_bracket + v + self.rs_bracket
+            return [v]
+        else:
+            return self.unicode_props(i, 'Lu' if case == UPPER else 'Ll')
 
     def comments(self, i):
         """Handle comments in verbose patterns."""
@@ -894,119 +799,21 @@ class SearchTemplate(object):
             pass
         return parts
 
-    def span_case(self, i, case):
-        """Uppercase or lowercase the next range of characters until end marker is found."""
-
-        attr = "lower" if case == LOWER else "upper"
-        parts = []
-        try:
-            t = next(i)
-            while t != self.esc_end:
-                if len(t) > 1:
-                    c = t[1:]
-                    if c.startswith(self.uni_prop):
-                        parts.extend(self.unicode_props(i, c[2:-1]))
-                    elif c.startswith(self.chars):
-                        parts.append(self.convert_hex(t, case))
-                    elif c[0:1] in self.verbose_tokens:
-                        parts.append(t)
-                    elif self.in_group(i.index - 1):
-                        if c[0:1] not in self.search_tokens:
-                            parts.append(t)
-                    elif c == self.uc:
-                        parts.extend(self.single_case(i, UPPER))
-                    elif c == self.lc:
-                        parts.extend(self.single_case(i, LOWER))
-                    elif c == self.uc_span:
-                        parts.extend(self.span_case(i, UPPER))
-                    elif c == self.lc_span:
-                        parts.extend(self.span_case(i, LOWER))
-                    elif c == self.quote:
-                        parts.extend(self.quoted(i))
-                    else:
-                        parts.append(t)
-                elif self.verbose and t == self.hashtag and not self.in_group(i.index - 1):
-                    parts.append(t)
-                    parts.extend(self.comments(i))
-                else:
-                    parts.append(getattr(t, attr)())
-                if self.end_found:
-                    self.end_found = False
-                    break
-                t = next(i)
-        except StopIteration:
-            pass
-        return parts
-
-    def single_case(self, i, case):
-        """Uppercase the next character."""
-
-        attr = "lower" if case == LOWER else "upper"
-        parts = []
-        try:
-            t = next(i)
-            if len(t) > 1:
-                # Escaped char; just append.
-                c = t[1:]
-                chars = []
-                if c.startswith(self.uni_prop):
-                    parts.extend(self.unicode_props(i, c[2:-1]))
-                elif c == self.uc:
-                    chars = self.single_case(i, UPPER)
-                elif c == self.lc:
-                    chars = self.single_case(i, LOWER)
-                elif c == self.uc_span:
-                    chars = self.span_case(i, UPPER)
-                elif c == self.lc_span:
-                    chars = self.span_case(i, LOWER)
-                elif c == self.quote:
-                    parts.extend(self.quoted(i))
-                elif c == self.end:
-                    self.end_found = True
-                elif c.startswith(self.chars):
-                    parts.append(self.convert_hex(t, case))
-                else:
-                    parts.append(t)
-                if chars:
-                    first = chars[0]
-                    if first.startswith(self.esc_chars):
-                        chars[0] = self.convert_hex(first, case)
-                    else:
-                        chars[0] = getattr(chars[0][0:1], attr)() + chars[0][1:]
-                        parts.extend(chars)
-            elif self.verbose and t == self.hashtag and not self.in_group(i.index - 1):
-                parts.append(t)
-                parts.extend(self.comments(i))
-            else:
-                parts.append(getattr(t, attr)())
-        except StopIteration:
-            pass
-        return parts
-
     def quoted(self, i):
-        r"""
-        Handle quoted block.
+        r"""Handle quoted block."""
 
-        Always have an empty string entry at the beginning.
-        This will protect the first char in a scenario like:
-
-           \l\c\Qraw text\E
-
-        The first 'lower' will not see that the upper is returning
-        raw quoted text as the first entry.
-        """
-
-        quoted = [self.empty]
+        quoted = []
         raw = []
-        try:
-            t = next(i)
-            while t != self.esc_end:
-                raw.append(t)
+        if not self.in_group(i.index - 1):
+            try:
                 t = next(i)
-        except StopIteration:
-            pass
-        if len(raw):
-            quoted.extend([re.escape(self.empty.join(raw))])
+                while t != self.esc_end:
+                    raw.append(t)
+                    t = next(i)
+            except StopIteration:
+                pass
+            if len(raw):
+                quoted.extend([re.escape(self.empty.join(raw))])
         return quoted
 
     def in_group(self, index):
@@ -1028,9 +835,6 @@ class SearchTemplate(object):
         iter(i)
 
         for t in i:
-            if t is None:
-                break
-
             if len(t) > 1:
                 # handle our stuff
 
@@ -1038,21 +842,18 @@ class SearchTemplate(object):
 
                 if c.startswith(self.uni_prop):
                     self.extended.extend(self.unicode_props(i, c[2:-1]))
+                elif c == self.lc:
+                    self.extended.extend(self.ascii_props(i, LOWER))
+                elif c == self.lc_span:
+                    self.extended.extend(self.ascii_props(i, UPPER))
+                elif c == self.uc:
+                    self.extended.extend(self.ascii_props(i, UPPER))
+                elif c == self.uc_span:
+                    self.extended.extend(self.ascii_props(i, LOWER))
                 elif c[0:1] in self.verbose_tokens:
                     self.extended.append(t)
-                elif self.in_group(i.index - 1):
-                    if c[0:1] not in self.search_tokens:
-                        self.extended.append(t)
                 elif c == self.quote:
                     self.extended.extend(self.quoted(i))
-                elif c == self.lc:
-                    self.extended.extend(self.single_case(i, LOWER))
-                elif c == self.lc_span:
-                    self.extended.extend(self.span_case(i, LOWER))
-                elif c == self.uc:
-                    self.extended.extend(self.single_case(i, UPPER))
-                elif c == self.uc_span:
-                    self.extended.extend(self.span_case(i, UPPER))
                 elif c != self.end:
                     self.extended.append(t)
             elif self.verbose and t == self.hashtag and not self.in_group(i.index - 1):
@@ -1061,8 +862,6 @@ class SearchTemplate(object):
             else:
                 self.extended.append(t)
 
-            if self.end_found:
-                self.end_found = False
         return self.empty.join(self.extended)
 
 
@@ -1081,12 +880,8 @@ class ReplaceTemplateExpander(object):
 
         self.template = template
         self.empty = tokens[EMPTY]
-        self.re_char_start = tokens[RE_CHAR_START]
         self.esc_end = tokens[ESC_END]
         self.end = tokens[END]
-        self.chars = tokens[CHARS]
-        self.esc_chars = tokens[ESC_CHARS]
-        self.char_ref = tokens[CHAR_REF]
         self.lc = tokens[LC]
         self.lc_span = tokens[LC_SPAN]
         self.uc = tokens[UC]
@@ -1095,11 +890,6 @@ class ReplaceTemplateExpander(object):
         self.end_found = False
         self.parent_span = []
         self._expand_string(match)
-
-    def convert_hex(self, c, case):
-        """Convert hex representation."""
-
-        return convert_hex(c, case, self.binary, self.char_ref)
 
     def span_case(self, i, case):
         """Uppercase or lowercase the next range of characters until end marker is found."""
@@ -1111,17 +901,10 @@ class ReplaceTemplateExpander(object):
             in_boundary = i.in_boundary()
             while t != self.esc_end or in_boundary:
                 if in_boundary:
-                    # We don't touch raw hex/unicode format in groups.
-                    # Check if hex char and buffer the region so that when this
-                    # bubbles up the text will be preserved.
-                    if self.re_char_start.match(t):
-                        parts.append(self.empty)
                     parts.append(getattr(t, attr)())
                 elif len(t) > 1:
                     c = t[1:]
-                    if c.startswith(self.chars):
-                        parts.append(self.convert_hex(t, case))
-                    elif c == self.uc:
+                    if c == self.uc:
                         self.parent_span.append(case)
                         parts.extend(self.single_case(i, UPPER))
                         self.parent_span.pop()
@@ -1137,8 +920,6 @@ class ReplaceTemplateExpander(object):
                         self.parent_span.append(case)
                         parts.extend(self.span_case(i, LOWER))
                         self.parent_span.pop()
-                    else:
-                        parts.append(t)
                 else:
                     parts.append(getattr(t, attr)())
                 if self.end_found:
@@ -1159,11 +940,6 @@ class ReplaceTemplateExpander(object):
             t = next(i)
             in_boundary = i.in_boundary()
             if in_boundary:
-                # We don't touch raw hex/unicode format in groups.
-                # Check if hex char and buffer the region so that when this
-                # bubbles up the text will be preserved.
-                if self.re_char_start.match(t):
-                    parts.append(self.empty)
                 # Because this is a group the parent hasn't seen it yet,
                 # we need to first pass over it with the parent's conversion first
                 # then follow up with the single.
@@ -1184,17 +960,9 @@ class ReplaceTemplateExpander(object):
                     chars = self.span_case(i, LOWER)
                 elif c == self.end:
                     self.end_found = True
-                elif c.startswith(self.chars):
-                    parts.append(self.convert_hex(t, case))
-                else:
-                    parts.append(t)
                 if chars:
-                    first = chars[0]
-                    if first.startswith(self.esc_chars):
-                        chars[0] = self.convert_hex(first, case)
-                    else:
-                        chars[0] = getattr(chars[0][0:1], attr)() + chars[0][1:]
-                        parts.extend(chars)
+                    chars[0] = getattr(chars[0][0:1], attr)() + chars[0][1:]
+                    parts.extend(chars)
             else:
                 parts.append(getattr(t, attr)())
         except StopIteration:
@@ -1242,9 +1010,6 @@ class ReplaceTemplateExpander(object):
         iter(i)
         result = []
         for t in i:
-            if t is None:
-                break
-
             in_boundary = i.in_boundary()
 
             # Backreference has been found
@@ -1255,9 +1020,7 @@ class ReplaceTemplateExpander(object):
                 result.append(t)
             elif len(t) > 1:
                 c = t[1:]
-                if c == self.end:
-                    result.append(t)
-                elif c == self.lc:
+                if c == self.lc:
                     result.extend(self.single_case(i, LOWER))
                 elif c == self.lc_span:
                     result.extend(self.span_case(i, LOWER))
@@ -1265,8 +1028,9 @@ class ReplaceTemplateExpander(object):
                     result.extend(self.single_case(i, UPPER))
                 elif c == self.uc_span:
                     result.extend(self.span_case(i, UPPER))
-                else:
-                    result.append(t)
+                elif c == self.end:
+                    # This is here just as a reminder that \E is ignored
+                    pass
             else:
                 result.append(t)
 
