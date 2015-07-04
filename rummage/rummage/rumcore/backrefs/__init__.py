@@ -231,8 +231,8 @@ utokens = (
     "P",                             # INVERSE_UNI_PROP
     'a-z',                           # ASCII_LOW_PROPS
     'A-Z',                           # ASCII_UPPER_PROPS
-    '\u0000-\u0060\u007b-\u00ff',    # NEGATIVE_LOWER
-    '\u0000-\u0040\u005b-\u00ff',    # NEGATIVE_UPPER
+    '\u0000-\u0060\u007b-\u007f',    # NEGATIVE_LOWER
+    '\u0000-\u0040\u005b-\u007f',    # NEGATIVE_UPPER
     '^',                             # NEGATE
     'x',                             # VERBOSE_FLAG
     re.compile(                      # RE_SEARCH_REF
@@ -309,8 +309,8 @@ btokens = (
     b"P",                             # INVERSE_UNI_PROP
     b'a-z',                           # ASCII_LOW_PROPS
     b'A-Z',                           # ASCII_UPPER_PROPS
-    b'\x00-\x60\x7b-\xff',            # NEGATIVE_LOWER
-    b'\x00-\x40\x5b-\xff',             # NEGATIVE_UPPER
+    b'\x00-\x60\x7b-\x7f',            # NEGATIVE_LOWER
+    b'\x00-\x40\x5b-\x7f',            # NEGATIVE_UPPER
     b'^',                             # NEGATE
     b'x',                             # VERBOSE_FLAG
     re.compile(                       # RE_SEARCH_REF
