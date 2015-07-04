@@ -4,13 +4,21 @@ Backrefs.
 Add the ability to use the following backrefs with re:
 
     * \l             - Lowercase characters class (search)
-    * \L             - Inverse of lowercase character class (search)
     * \c             - Uppercase character class (search)
+    * \L             - Inverse of lowercase character class (search)
     * \C             - Inverse of uppercase character class (search)
     * \Q and \Q...\E - Escape/quote chars (search)
     * \c and \C...\E - Uppercase char or chars (replace)
     * \l and \L...\E - Lowercase char or chars (replace)
-    * \p{uL} and \p{Letter} and \p{Uppercase_Letter} - Unicode properties (search)
+    * \p{Lu} and \p{Letter} and \p{Uppercase_Letter} - Unicode properties (search)
+    * \P{Lu} adn \P{Letter} and \P{Uppercase_Letter} - Inverse Unicode properties (search)
+
+Note
+=========
+Only category or category with subcategory can be specifed for \p or \P.
+
+So the following is okay: r"[\p{Lu}\p{Ll}]" or r"[\p{L}]" etc.
+The following is **not** okay: r"[\p{Lul}]" or r"[\p{Lu Ll}]" etc.
 
 Compiling
 =========
@@ -150,7 +158,7 @@ unicode_property_map = {
 
 # Regex pattern for unicode properties
 UPROP = r'''
-p\{
+(?:p|P)\{
 (?:
     C(?:c|f|s|o|n)?|L(?:u|l|t|m|o|n)?|M(?:n|c|e|d)?|N(?:d|l|o|c|d)?|
     P(?:c|d|s|e|i|f|o)?|S(?:c|m|k|o)?|Z(?:p|s|l)?|
@@ -187,23 +195,24 @@ UC_SPAN = 14
 HASHTAG = 15
 NL = 16
 UNI_PROP = 17
-ASCII_LOW_PROPS = 18
-ASCII_UPPER_PROPS = 19
-VERBOSE_FLAG = 20
-RE_SEARCH_REF = 21
-RE_SEARCH_REF_VERBOSE = 22
-RE_REPLACE_REF = 23
-RE_IS_VERBOSE = 24
-NEGATE = 25
-NEGATIVE_LOWER = 26
-NEGATIVE_UPPER = 27
+INVERSE_UNI_PROP = 18
+ASCII_LOW_PROPS = 19
+ASCII_UPPER_PROPS = 20
+NEGATIVE_LOWER = 21
+NEGATIVE_UPPER = 22
+NEGATE = 23
+VERBOSE_FLAG = 24
+RE_SEARCH_REF = 25
+RE_SEARCH_REF_VERBOSE = 26
+RE_REPLACE_REF = 27
+RE_IS_VERBOSE = 28
 
 
 # Unicode string related references
 utokens = (
     set("abfnrtvAbBdDsSwWZuxg"),     # DEF_BACK_REF
     set("cCElL"),                    # REPLACE_TOKENS
-    set("cCElLpQ"),                  # SEARCH_TOKENS
+    set("cCElLpPQ"),                 # SEARCH_TOKENS
     set("# "),                       # VERBOSE_TOKENS
     "",                              # EMPTY
     "[",                             # LS_BRACKET
@@ -219,8 +228,12 @@ utokens = (
     '#',                             # HASHTAG
     '\n',                            # NL
     "p",                             # UNI_PROP
+    "P",                             # INVERSE_UNI_PROP
     'a-z',                           # ASCII_LOW_PROPS
     'A-Z',                           # ASCII_UPPER_PROPS
+    '\u0000-\u0060\u007b-\u00ff',    # NEGATIVE_LOWER
+    '\u0000-\u0040\u005b-\u00ff',    # NEGATIVE_UPPER
+    '^',                             # NEGATE
     'x',                             # VERBOSE_FLAG
     re.compile(                      # RE_SEARCH_REF
         r'''(?x)
@@ -259,10 +272,7 @@ utokens = (
         )
         '''
     ),
-    re.compile(r'\(\?([iLmsux])\)'),  # RE_IS_VERBOSE
-    '^',                              # NEGATE,
-    '\u0000-\u0060\u007b-\u00ff',     # NEGATIVE_LOWER
-    '\u0000-\u0040\u005b-\u00ff'      # NEGATIVE_UPPER
+    re.compile(r'\(\?([iLmsux])\)')   # RE_IS_VERBOSE
 )
 
 # Byte string related references
@@ -296,8 +306,12 @@ btokens = (
     b'#',                             # HASHTAG
     b'\n',                            # NL
     b"p",                             # UNI_PROP
+    b"P",                             # INVERSE_UNI_PROP
     b'a-z',                           # ASCII_LOW_PROPS
     b'A-Z',                           # ASCII_UPPER_PROPS
+    b'\x00-\x60\x7b-\xff',            # NEGATIVE_LOWER
+    b'\x00-\x40\x5b-\xff',             # NEGATIVE_UPPER
+    b'^',                             # NEGATE
     b'x',                             # VERBOSE_FLAG
     re.compile(                       # RE_SEARCH_REF
         br'''(?x)
@@ -334,10 +348,7 @@ btokens = (
     ),
     re.compile(                       # RE_IS_VERBOSE
         br'\(\?([iLmsux])\)'
-    ),
-    b'^',                             # NEGATE
-    b'\x00-\x60\x7b-\xff',            # NEGATIVE_LOWER
-    b'\x00-\x40\x5b-\xff'             # NEGATIVE_UPPER
+    )
 )
 
 
@@ -350,10 +361,8 @@ def get_unicode_category(prop, negate=False):
             [v for k, v in uniprops.unicode_properties.get(p1, {}).items() if not k.startswith('^')]
         ) if p2 is None else uniprops.unicode_properties.get(p1, {}).get(p2, '')
     else:
-        p1, p2 = (prop[0], prop[1]) if len(prop) > 1 else (prop[0], None)
-        return ''.join(
-            [v for k, v in uniprops.unicode_properties.get(p1, {}).items() if k.startswith('^')]
-        ) if p2 is None else uniprops.unicode_properties.get(p1, {}).get('^' + p2, '')
+        p1, p2 = (prop[0], prop[1]) if len(prop) > 1 else (prop[0], '')
+        return uniprops.unicode_properties.get(p1, {}).get('^' + p2, '')
 
 
 # Break apart template patterns into char tokens
@@ -594,6 +603,7 @@ class SearchTemplate(object):
         self.esc_end = tokens[ESC_END]
         self.end = tokens[END]
         self.uni_prop = tokens[UNI_PROP]
+        self.inverse_uni_prop = tokens[INVERSE_UNI_PROP]
         self.ascii_low_props = tokens[ASCII_LOW_PROPS]
         self.ascii_upper_props = tokens[ASCII_UPPER_PROPS]
         self.lc = tokens[LC]
@@ -746,6 +756,8 @@ class SearchTemplate(object):
 
                 if c.startswith(self.uni_prop):
                     self.extended.extend(self.unicode_props(i, c[2:-1]))
+                elif c.startswith(self.inverse_uni_prop):
+                    self.extended.extend(self.unicode_props(i, c[2:-1]), negate=True)
                 elif c == self.lc:
                     self.extended.extend(self.ascii_props(i, LOWER))
                 elif c == self.lc_span:
