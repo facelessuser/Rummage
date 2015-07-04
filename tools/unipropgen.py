@@ -77,13 +77,18 @@ def gen_properties(f, narrow=False):
             table[p[0]]['^' + p[1]] = []
         table[p[0]][p[1]].append(i)
 
+    # Create inverse of each category
     for k1, v1 in table.items():
+        inverse_category = set()
         for k2, v2 in v1.items():
             if not k2.startswith('^'):
-                table[k1]['^' + k2] = list(all_chars - set(v2))
+                s2 = set(v2)
+                inverse_category |= s2
+                table[k1]['^' + k2] = list(all_chars - s2)
+        table[k1]['^'] = list(all_chars - inverse_category)
 
-    # Join as one string
-    for v1 in table.values():
+    # Convert characters values to ranges
+    for k1, v1 in table.items():
         for k2, v2 in v1.items():
             v2.sort()
             last = None
@@ -96,25 +101,20 @@ def gen_properties(f, narrow=False):
                 elif i == last + 1:
                     last = i
                 elif first is not None:
-                    if first != last:
-                        v3.append('%s-%s' % (uniformat(first), uniformat(last)))
-                        first = None
-                        last = None
-                    else:
+                    if first == last:
                         v3.append(uniformat(first))
-                        first = None
-                        last = None
+                    else:
+                        v3.append("%s-%s" % (uniformat(first), uniformat(last)))
+                    first = None
+                    last = None
             if first is not None:
-                if first != last:
-                    v3.append('%s-%s' % (uniformat(first), uniformat(last)))
-                    first = None
-                    last = None
-                else:
+                if first == last:
                     v3.append(uniformat(first))
-                    first = None
-                    last = None
-
-            v1[k2] = ''.join(v3)
+                else:
+                    v3.append("%s-%s" % (uniformat(first), uniformat(last)))
+                first = None
+                last = None
+            table[k1][k2] = ''.join(v3)
 
     f.write('    unicode_properties = {\n')
     count = len(table) - 1
@@ -141,7 +141,6 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(prog='unipropgen', description='Generate a unicode property table.')
-    # Flag arguments
     parser.add_argument('--version', action='version', version="%(prog)s " + __version__)
     parser.add_argument('output', default=None, help='Output file.')
     args = parser.parse_args()
