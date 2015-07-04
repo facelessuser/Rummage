@@ -32,7 +32,6 @@ from .custom_app import debug, debug_struct, error
 from .custom_app import init_app_log, set_debug_mode
 from . generic_dialogs import errormsg
 from .. import data
-from ..rumcore import backrefs
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -68,8 +67,6 @@ class Settings(object):
         cls.debug = debug_mode
         cls.settings_file, cls.cache_file, log, uni_props = cls.get_settings_files()
         init_app_log(log)
-        backrefs.set_cache_directory(uni_props)
-        backrefs.init_unicode()
         cls.settings = {}
         cls.cache = {}
         cls.settings_time = None

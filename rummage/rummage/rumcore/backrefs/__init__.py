@@ -3,9 +3,13 @@ Backrefs.
 
 Add the ability to use the following backrefs with re:
 
-    * \c and \C...\E - Uppercase (search and replace)
-    * \l and \L...\E - Lowercase (search and replace)
-    * \Q and \Q...\E - Escape\quote (search)
+    * \l             - Lowercase characters class (search)
+    * \L             - Inverse of lowercase character class (search)
+    * \c             - Uppercase character class (search)
+    * \C             - Inverse of uppercase character class (search)
+    * \Q and \Q...\E - Escape/quote chars (search)
+    * \c and \C...\E - Uppercase char or chars (replace)
+    * \l and \L...\E - Lowercase char or chars (replace)
     * \p{uL} and \p{Letter} and \p{Uppercase_Letter} - Unicode properties (search)
 
 Compiling
@@ -32,12 +36,7 @@ import functools
 import re
 import sys
 import struct
-import unicodedata
-import os
-try:
-    import cpickle as pickle  # noqa
-except Exception:
-    import pickle
+from . import uniprops
 
 # Compatibility
 PY3 = sys.version_info >= (3, 0) and sys.version_info < (4, 0)
@@ -100,17 +99,6 @@ def uchr(i):
         return unichar(i)
     except ValueError:
         return struct.pack('i', i).decode('utf-32')
-
-
-# Unicode variables
-unicode_version = (1, 1, 0)
-_unicode_range = (0x0000, 0x10FFFF)
-_unicode_properties = None
-_unicode_version = None
-_loaded = False
-_default_cache_name = "unicode_properties.cache"
-if "_use_cache" not in globals():
-    _use_cache = None
 
 
 # Case upper or lower
@@ -216,6 +204,7 @@ RE_SEARCH_REF = 21
 RE_SEARCH_REF_VERBOSE = 22
 RE_REPLACE_REF = 23
 RE_IS_VERBOSE = 24
+NEGATE = 25
 
 # Unicode string related references
 utokens = (
@@ -277,7 +266,8 @@ utokens = (
         )
         '''
     ),
-    re.compile(r'\(\?([iLmsux])\)')   # RE_IS_VERBOSE
+    re.compile(r'\(\?([iLmsux])\)'),  # RE_IS_VERBOSE
+    '^'                               # NEGATE
 )
 
 # Byte string related references
@@ -347,123 +337,23 @@ btokens = (
         )
         '''
     ),
-    re.compile(br'\(\?([iLmsux])\)')  # RE_IS_VERBOSE
+    re.compile(                       # RE_IS_VERBOSE
+        br'\(\?([iLmsux])\)'
+    ),
+    b'^'                              # NEGATE
 )
 
 
-# Unicode property table functions
-def set_cache_directory(pth, name=None):  # pragma: no cover
-    """Set cache path."""
-
-    if name is None:
-        name = _default_cache_name
-
-    global _use_cache
-    if os.path.exists(pth):
-        _use_cache = os.path.join(pth, name)
-
-
-def _build_unicode_property_table(unicode_range):
-    """Build property table for unicode range."""
-
-    table = {}
-    p = None
-    for i in range(*unicode_range):
-        c = uchr(i)
-        p = unicodedata.category(c)
-
-        if p[0] not in table:
-            table[p[0]] = {}
-        if p[1] not in table[p[0]]:
-            table[p[0]][p[1]] = []
-        table[p[0]][p[1]].append(c)
-
-    # Join as one string
-    for v1 in table.values():
-        for k2, v2 in v1.items():
-            v1[k2] = ''.join(v2)
-
-    return table
-
-
-def get_unicode_category(prop):
+def get_unicode_category(prop, negate=False):
     """Retrieve the unicode category from the table."""
 
-    p1, p2 = (prop[0], prop[1]) if len(prop) > 1 else (prop[0], None)
-    return ''.join(
-        [x for x in _unicode_properties.get(p1, {}).values()]
-    ) if p2 is None else _unicode_properties.get(p1, {}).get(p2, '')
-
-
-def write_unicode_props(cache_file):  # pragma: no cover
-    """Write unicode properties out."""
-
-    global _unicode_properties
-    global _unicode_version
-    global _loaded
-
-    _unicode_properties = _build_unicode_property_table(_unicode_range)
-
-    try:
-        with open(cache_file, 'wb') as f:
-            pickle.dump(unicode_version, f)
-            pickle.dump(_unicode_properties, f)
-    except Exception:
-        # Let's not fail on attempt to remove
-        try:
-            if os.path.exists(cache_file):
-                os.unlink(cache_file)
-        except Exception:
-            pass
-    _unicode_version = unicode_version
-    _loaded = True
-
-
-def read_unicode_props(cache_file):  # pragma: no cover
-    """Read the unicode props."""
-
-    global _unicode_properties
-    global _loaded
-
-    update = False
-
-    try:
-        with open(_use_cache, 'rb') as f:
-            _unicode_version = pickle.load(f)
-            if _unicode_version == unicode_version:
-                _unicode_properties = pickle.load(f)
-            else:
-                update = True
-        if update:
-            write_unicode_props(cache_file)
-        else:
-            _loaded = True
-    except Exception:
-        # Let's not fail on attempt to remove
-        try:
-            if os.path.exists(_use_cache):
-                os.unlink(_use_cache)
-        except Exception:
-            pass
-        _unicode_properties = _build_unicode_property_table(_unicode_range)
-        _unicode_version = unicode_version
-        _loaded = True
-
-
-def init_unicode():
-    """Prepare unicode property tables and key pattern."""
-
-    global _loaded
-    global _unicode_properties
-    if _use_cache is not None:  # pragma: no cover
-        if not os.path.exists(_use_cache):
-            write_unicode_props(_use_cache)
-        else:
-            read_unicode_props(_use_cache)
+    if not negate:
+        p1, p2 = (prop[0], prop[1]) if len(prop) > 1 else (prop[0], None)
+        return ''.join(
+            [x for x in uniprops.unicode_properties.get(p1, {}).values()]
+        ) if p2 is None else uniprops.unicode_properties.get(p1, {}).get(p2, '')
     else:
-        _unicode_properties = _build_unicode_property_table(_unicode_range)
-
-    _loaded = True
+        return ''
 
 
 # Break apart template patterns into char tokens
@@ -711,6 +601,7 @@ class SearchTemplate(object):
         self.uc = tokens[UC]
         self.uc_span = tokens[UC_SPAN]
         self.quote = tokens[QUOTE]
+        self.negate = tokens[NEGATE]
         self.nl = tokens[NL]
         self.hashtag = tokens[HASHTAG]
         if self.verbose:
@@ -756,34 +647,47 @@ class SearchTemplate(object):
             pos += 1
         return groups
 
-    def unicode_props(self, i, props):
+    def unicode_props(self, i, props, negate=False):
         """Insert unicode properties."""
-
-        if not _loaded:
-            init_unicode()
 
         if len(props) > 2:
             props = unicode_property_map.get(props, None)
 
         properties = []
         if props is not None:
-            v = get_unicode_category(props)
-            if v is not None:
-                if not self.in_group(i.index - 1):
-                    v = self.ls_bracket + v + self.rs_bracket
-                properties = [v]
+            if not self.in_group(i.index - 1):
+                v = get_unicode_category(props)
+                if v is not None:
+                    if negate:
+                        v = self.ls_bracket + self.negate + v + self.rs_bracket
+                    else:
+                        v = self.ls_bracket + v + self.rs_bracket
+                    properties = [v]
+            else:
+                # TODO: get the actual inverse of upper and lower
+                if negate:
+                    props = 'Ll' if props == 'Lu' else 'Lu'
+                v = get_unicode_category(props)
+                if v is not None:
+                    properties = [v]
         return properties
 
-    def ascii_props(self, i, case):
+    def ascii_props(self, i, case, negate=False):
         """Insert ascii (or unicode) case properties."""
 
         if self.binary:
             v = self.ascii_upper_props if case == UPPER else self.ascii_low_props
             if not self.in_group(i.index - 1):
-                v = self.ls_bracket + v + self.rs_bracket
+                if negate:
+                    v = self.ls_bracket + self.negate + v + self.rs_bracket
+                else:
+                    v = self.ls_bracket + v + self.rs_bracket
+            elif negate:
+                # TODO: get the actual inverse
+                v = self.ascii_low_props if case == UPPER else self.ascii_upper_props
             return [v]
         else:
-            return self.unicode_props(i, 'Lu' if case == UPPER else 'Ll')
+            return self.unicode_props(i, 'Lu' if case == UPPER else 'Ll', negate)
 
     def comments(self, i):
         """Handle comments in verbose patterns."""
@@ -845,11 +749,11 @@ class SearchTemplate(object):
                 elif c == self.lc:
                     self.extended.extend(self.ascii_props(i, LOWER))
                 elif c == self.lc_span:
-                    self.extended.extend(self.ascii_props(i, UPPER))
+                    self.extended.extend(self.ascii_props(i, LOWER, negate=True))
                 elif c == self.uc:
                     self.extended.extend(self.ascii_props(i, UPPER))
                 elif c == self.uc_span:
-                    self.extended.extend(self.ascii_props(i, LOWER))
+                    self.extended.extend(self.ascii_props(i, UPPER, negate=True))
                 elif c[0:1] in self.verbose_tokens:
                     self.extended.append(t)
                 elif c == self.quote:
