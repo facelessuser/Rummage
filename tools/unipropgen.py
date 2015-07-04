@@ -63,8 +63,10 @@ def gen_properties(f, narrow=False):
         unicode_range = NARROW_RANGE
 
     table = {}
+    all_chars = set()
     p = None
-    for i in range(*unicode_range):
+    for i in range(unicode_range[0], unicode_range[1] + 1):
+        all_chars.add(i)
         c = uchr(i)
         p = unicodedata.category(c)
 
@@ -72,7 +74,13 @@ def gen_properties(f, narrow=False):
             table[p[0]] = {}
         if p[1] not in table[p[0]]:
             table[p[0]][p[1]] = []
+            table[p[0]]['^' + p[1]] = []
         table[p[0]][p[1]].append(i)
+
+    for k1, v1 in table.items():
+        for k2, v2 in v1.items():
+            if not k2.startswith('^'):
+                table[k1]['^' + k2] = list(all_chars - set(v2))
 
     # Join as one string
     for v1 in table.values():

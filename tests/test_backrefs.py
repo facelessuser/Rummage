@@ -136,6 +136,12 @@ class TestSearchTemplate(unittest.TestCase):
         result = backrefs.SearchTemplate(r'Testing [\Qchar\E block] [\Q(AVOIDANCE)\E]!').apply()
         self.assertEqual(r'Testing [char block] [(AVOIDANCE)]!', result)
 
+    def test_quote_avoid_with_right_square_bracket_first(self):
+        """Test that quote backrefs are ignored in character groups that have a right square bracket as first char."""
+
+        result = backrefs.SearchTemplate(r'Testing [^]\Qchar\E block] []\Q(AVOIDANCE)\E]!').apply()
+        self.assertEqual(r'Testing [^]char block] [](AVOIDANCE)]!', result)
+
     def test_extraneous_end_char(self):
         r"""Test that stray '\E's get removed."""
 

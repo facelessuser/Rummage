@@ -35,7 +35,6 @@ import sre_parse
 import functools
 import re
 import sys
-import struct
 from . import uniprops
 
 # Compatibility
@@ -90,15 +89,6 @@ else:
             """PY2 iterator compatible next."""
 
             return self.iternext()
-
-
-def uchr(i):
-    """Allow getting unicode character on narrow python builds."""
-
-    try:
-        return unichar(i)
-    except ValueError:
-        return struct.pack('i', i).decode('utf-32')
 
 
 # Case upper or lower
@@ -205,6 +195,9 @@ RE_SEARCH_REF_VERBOSE = 22
 RE_REPLACE_REF = 23
 RE_IS_VERBOSE = 24
 NEGATE = 25
+NEGATIVE_LOWER = 26
+NEGATIVE_UPPER = 27
+
 
 # Unicode string related references
 utokens = (
@@ -267,7 +260,9 @@ utokens = (
         '''
     ),
     re.compile(r'\(\?([iLmsux])\)'),  # RE_IS_VERBOSE
-    '^'                               # NEGATE
+    '^',                              # NEGATE,
+    '\u0000-\u0060\u007b-\u00ff',     # NEGATIVE_LOWER
+    '\u0000-\u0040\u005b-\u00ff'      # NEGATIVE_UPPER
 )
 
 # Byte string related references
@@ -340,7 +335,9 @@ btokens = (
     re.compile(                       # RE_IS_VERBOSE
         br'\(\?([iLmsux])\)'
     ),
-    b'^'                              # NEGATE
+    b'^',                             # NEGATE
+    b'\x00-\x60\x7b-\xff',            # NEGATIVE_LOWER
+    b'\x00-\x40\x5b-\xff'             # NEGATIVE_UPPER
 )
 
 
@@ -350,10 +347,13 @@ def get_unicode_category(prop, negate=False):
     if not negate:
         p1, p2 = (prop[0], prop[1]) if len(prop) > 1 else (prop[0], None)
         return ''.join(
-            [x for x in uniprops.unicode_properties.get(p1, {}).values()]
+            [v for k, v in uniprops.unicode_properties.get(p1, {}).items() if not k.startswith('^')]
         ) if p2 is None else uniprops.unicode_properties.get(p1, {}).get(p2, '')
     else:
-        return ''
+        p1, p2 = (prop[0], prop[1]) if len(prop) > 1 else (prop[0], None)
+        return ''.join(
+            [v for k, v in uniprops.unicode_properties.get(p1, {}).items() if k.startswith('^')]
+        ) if p2 is None else uniprops.unicode_properties.get(p1, {}).get('^' + p2, '')
 
 
 # Break apart template patterns into char tokens
@@ -602,6 +602,8 @@ class SearchTemplate(object):
         self.uc_span = tokens[UC_SPAN]
         self.quote = tokens[QUOTE]
         self.negate = tokens[NEGATE]
+        self.negative_upper = tokens[NEGATIVE_UPPER]
+        self.negative_lower = tokens[NEGATIVE_LOWER]
         self.nl = tokens[NL]
         self.hashtag = tokens[HASHTAG]
         if self.verbose:
@@ -641,6 +643,8 @@ class SearchTemplate(object):
             elif c == self.ls_bracket and not found:
                 found = True
                 first = pos
+            elif c == self.negate and found and (pos == first + 1):
+                first = pos
             elif c == self.rs_bracket and found and (pos != first + 1):
                 groups.append((first, pos))
                 found = False
@@ -664,10 +668,7 @@ class SearchTemplate(object):
                         v = self.ls_bracket + v + self.rs_bracket
                     properties = [v]
             else:
-                # TODO: get the actual inverse of upper and lower
-                if negate:
-                    props = 'Ll' if props == 'Lu' else 'Lu'
-                v = get_unicode_category(props)
+                v = get_unicode_category(props, negate)
                 if v is not None:
                     properties = [v]
         return properties
@@ -683,8 +684,7 @@ class SearchTemplate(object):
                 else:
                     v = self.ls_bracket + v + self.rs_bracket
             elif negate:
-                # TODO: get the actual inverse
-                v = self.ascii_low_props if case == UPPER else self.ascii_upper_props
+                v = self.negative_upper if case == UPPER else self.negative_lower
             return [v]
         else:
             return self.unicode_props(i, 'Lu' if case == UPPER else 'Ll', negate)
