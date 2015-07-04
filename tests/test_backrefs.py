@@ -261,6 +261,24 @@ class TestSearchTemplate(unittest.TestCase):
         m = pattern.match('exÁmple')
         self.assertTrue(m is not None)
 
+    def test_unicode_properties_inverse(self):
+        """Excercising inverse unicode properties."""
+
+        pattern = backrefs.compile_search(r'\P{Po}', re.UNICODE)
+        m = pattern.match(r'⁋')
+        self.assertTrue(m is None)
+        m = pattern.match(r'P')
+        self.assertTrue(m is not None)
+
+    def test_negated_unicode_properties_inverse(self):
+        """Excercising negated inverse unicode properties."""
+
+        pattern = backrefs.compile_search(r'[^\P{Po}]', re.UNICODE)
+        m = pattern.match(r'⁋')
+        self.assertTrue(m is not None)
+        m = pattern.match(r'P')
+        self.assertTrue(m is None)
+
     def test_binary_unicode_ignore(self):
         r"""Binary patterns should not process \p references."""
 

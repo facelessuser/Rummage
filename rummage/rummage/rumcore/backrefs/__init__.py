@@ -757,7 +757,7 @@ class SearchTemplate(object):
                 if c.startswith(self.uni_prop):
                     self.extended.extend(self.unicode_props(i, c[2:-1]))
                 elif c.startswith(self.inverse_uni_prop):
-                    self.extended.extend(self.unicode_props(i, c[2:-1]), negate=True)
+                    self.extended.extend(self.unicode_props(i, c[2:-1], negate=True))
                 elif c == self.lc:
                     self.extended.extend(self.ascii_props(i, LOWER))
                 elif c == self.lc_span:
