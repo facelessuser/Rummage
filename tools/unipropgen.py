@@ -44,9 +44,11 @@ def build_unicode_property_table(output):
     """Build and write out unicode property table."""
 
     with codecs.open(output, 'w', 'utf-8') as f:
-        f.write('"""Unicode Properties (autogen)."""\nfrom __future__ import unicode_literals\n')
-        f.write('import sys\n\nPY3 = sys.version_info >= (3, 0) and sys.version_info < (4, 0)\n')
-        f.write('NARROW = not PY3 and sys.maxunicode == 0xFFFF\n\n')
+        f.write(
+            '"""Unicode Properties (autogen)."""\nfrom __future__ import unicode_literals\n'
+            'import sys\n\n'
+            'NARROW = sys.maxunicode == 0xFFFF\n\n'
+        )
 
         f.write('if not NARROW:\n')
         gen_properties(f)
@@ -116,6 +118,7 @@ def gen_properties(f, narrow=False):
                 last = None
             table[k1][k2] = ''.join(v3)
 
+    # Write out the unicode properties
     f.write('    unicode_properties = {\n')
     count = len(table) - 1
     i = 0

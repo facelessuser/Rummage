@@ -2,8 +2,7 @@
 from __future__ import unicode_literals
 import sys
 
-PY3 = sys.version_info >= (3, 0) and sys.version_info < (4, 0)
-NARROW = not PY3 and sys.maxunicode == 0xFFFF
+NARROW = sys.maxunicode == 0xFFFF
 
 if not NARROW:
     unicode_properties = {
