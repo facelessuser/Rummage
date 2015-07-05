@@ -220,6 +220,15 @@ class TestSearchTemplate(unittest.TestCase):
         m = pattern.match('exÁmple')
         self.assertTrue(m is not None)
 
+    def test_unicode_shorthand_ascii_only(self):
+        """Ensure that when the unicode flag is not used, only ascii properties are used."""
+
+        pattern = backrefs.compile_search(r'ex\lmple')
+        m = pattern.match('exámple')
+        self.assertTrue(m is None)
+        m = pattern.match('example')
+        self.assertTrue(m is not None)
+
     def test_unicode_properties_capital(self):
         """
         Excercising that unicode properties are built correctly.

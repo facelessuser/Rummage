@@ -10,8 +10,8 @@ Add the ability to use the following backrefs with re:
     * \Q and \Q...\E - Escape/quote chars (search)
     * \c and \C...\E - Uppercase char or chars (replace)
     * \l and \L...\E - Lowercase char or chars (replace)
-    * \p{Lu} and \p{Letter} and \p{Uppercase_Letter} - Unicode properties (search)
-    * \P{Lu} adn \P{Letter} and \P{Uppercase_Letter} - Inverse Unicode properties (search)
+    * \p{Lu} and \p{Letter} and \p{Uppercase_Letter} - Unicode properties (search unicode)
+    * \P{Lu} adn \P{Letter} and \P{Uppercase_Letter} - Inverse Unicode properties (search unicode)
 
 Note
 =========
@@ -46,7 +46,7 @@ import sys
 from . import uniprops
 
 # Compatibility
-PY3 = sys.version_info >= (3, 0) and sys.version_info < (4, 0)
+PY3 = (3, 0) <= sys.version_info < (4, 0)
 
 if PY3:
     unichar = chr  # noqa
@@ -206,13 +206,15 @@ RE_SEARCH_REF = 25
 RE_SEARCH_REF_VERBOSE = 26
 RE_REPLACE_REF = 27
 RE_IS_VERBOSE = 28
+RE_SEARCH_REF_ASCII = 29
+RE_SEARCH_REF_ASCII_VERBOSE = 30
 
 
 # Unicode string related references
 utokens = (
     set("abfnrtvAbBdDsSwWZuxg"),     # DEF_BACK_REF
     set("cCElL"),                    # REPLACE_TOKENS
-    set("cCElLpPQ"),                 # SEARCH_TOKENS
+    set("cCElLQ"),                   # SEARCH_TOKENS
     set("# "),                       # VERBOSE_TOKENS
     "",                              # EMPTY
     "[",                             # LS_BRACKET
@@ -272,7 +274,29 @@ utokens = (
         )
         '''
     ),
-    re.compile(r'\(\?([iLmsux])\)')   # RE_IS_VERBOSE
+    re.compile(r'\(\?([iLmsux])\)'),   # RE_IS_VERBOSE
+    re.compile(                        # RE_SEARCH_REF_ASCII
+        r'''(?x)
+        (\\)+
+        (
+            [lLcCEQ]
+        )? |
+        (
+            [lLcCEQ]
+        )
+        '''
+    ),
+    re.compile(                         # RE_SEARCH_REF_ASCII_VERBOSE
+        r'''(?x)
+        (\\)+
+        (
+            [lLcCEQ#]
+        )? |
+        (
+            [lLcCEQ#]
+        )
+        '''
+    )
 )
 
 # Byte string related references
@@ -348,6 +372,28 @@ btokens = (
     ),
     re.compile(                       # RE_IS_VERBOSE
         br'\(\?([iLmsux])\)'
+    ),
+    re.compile(                       # RE_SEARCH_REF_ASCII
+        br'''(?x)
+        (\\)+
+        (
+            [lLcCEQ]
+        )? |
+        (
+            [lLcCEQ]
+        )
+        '''
+    ),
+    re.compile(                        # RE_SEARCH_REF_ASCII_VERBOSE
+        br'''(?x)
+        (\\)+
+        (
+            [lLcCEQ#]
+        )? |
+        (
+            [lLcCEQ#]
+        )
+        '''
     )
 )
 
@@ -454,7 +500,7 @@ class SearchTokens(Tokens):
 
     """Tokens."""
 
-    def __init__(self, string, verbose):
+    def __init__(self, string, verbose, re_unicode=False):
         """Initialize."""
 
         if isinstance(string, binary_type):
@@ -464,9 +510,9 @@ class SearchTokens(Tokens):
 
         self.string = string
         if verbose:
-            self.re_search_ref = tokens[RE_SEARCH_REF_VERBOSE]
+            self.re_search_ref = tokens[RE_SEARCH_REF_VERBOSE] if re_unicode else tokens[RE_SEARCH_REF_ASCII_VERBOSE]
         else:
-            self.re_search_ref = tokens[RE_SEARCH_REF]
+            self.re_search_ref = tokens[RE_SEARCH_REF] if re_unicode else tokens[RE_SEARCH_REF_ASCII]
         self.b_slash = tokens[B_SLASH]
         self.max_index = len(string) - 1
         self.index = 0
@@ -583,7 +629,7 @@ class SearchTemplate(object):
 
     """Search Template."""
 
-    def __init__(self, search, verbose=False):
+    def __init__(self, search, re_verbose=False, re_unicode=False):
         """Initialize."""
 
         if isinstance(search, binary_type):
@@ -595,7 +641,8 @@ class SearchTemplate(object):
 
         self.re_is_verbose = tokens[RE_IS_VERBOSE]
         self.verbose_flag = tokens[VERBOSE_FLAG]
-        self.verbose = self.is_verbose(search, verbose)
+        self.verbose = self.is_verbose(search, re_verbose)
+        self.unicode = re_unicode
         self.empty = tokens[EMPTY]
         self.b_slash = tokens[B_SLASH]
         self.ls_bracket = tokens[LS_BRACKET]
@@ -686,7 +733,10 @@ class SearchTemplate(object):
     def ascii_props(self, i, case, negate=False):
         """Insert ascii (or unicode) case properties."""
 
-        if self.binary:
+        # Use traditional ASCII upper/lower case unless:
+        #    1. The strings fed in are not binary
+        #    2. And the the unicode flag was used
+        if self.binary or not self.unicode:
             v = self.ascii_upper_props if case == UPPER else self.ascii_low_props
             if not self.in_group(i.index - 1):
                 if negate:
@@ -745,7 +795,7 @@ class SearchTemplate(object):
 
         self.groups = self.find_char_groups(self.search)
 
-        i = SearchTokens(self.search, self.verbose)
+        i = SearchTokens(self.search, self.verbose, self.unicode)
         iter(i)
 
         for t in i:
@@ -970,8 +1020,9 @@ def _expand(m, template=None):
 def compile_search(pattern, flags=0):
     """Compile with extended search references."""
 
-    verbose = re.VERBOSE & flags
-    temp = SearchTemplate(pattern, verbose).apply()
+    re_verbose = re.VERBOSE & flags
+    re_unicode = re.UNICODE & flags
+    temp = SearchTemplate(pattern, re_verbose, re_unicode).apply()
     return re.compile(temp, flags)
 
 
