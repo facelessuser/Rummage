@@ -311,6 +311,8 @@ class _FileSearch(object):
     def _get_line_context(self, content, m, line_map):
         """Get context info about the line."""
 
+        win_end = b'\r\n' if self.is_binary else '\r\n'
+
         before, after = self.context
         row = self._get_row(m.start(), line_map)
         col = m.start() + 1
@@ -341,6 +343,14 @@ class _FileSearch(object):
         if lines != -1:
             col_start = idx - 1
             col = m.start() - line_map[col_start] if col_start >= 0 else m.start() + 1
+            # \r\n combinations usually show up as one char in editors and displays.
+            # Decrement the column if we are at a line's end with one of these.
+            # We will verify any line to account for mixed line endings.
+            if (
+                line_map and m.start() == line_map[idx] and
+                m.start() != 0 and content[m.start() - 1: m.start() + 1] == win_end
+            ):
+                col -= 1
             if start_idx is not None:
                 start = line_map[start_idx] + 1
             if end_idx is not None:
