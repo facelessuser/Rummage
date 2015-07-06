@@ -727,13 +727,8 @@ class TestReplaceTemplate(unittest.TestCase):
             results
         )
 
-    def test_mixed_groups(self):
-        """
-        Test mix of upper and lower case with named groups.
-
-        Named groups will fail if compile_replace is given a string pattern instead of a compiled
-        pattern object.  It will still work with non-named groups, it is just a limitation.
-        """
+    def test_mixed_groups1(self):
+        """Test mix of upper and lower case with named groups and a string replace pattern."""
 
         text = "this is a test for named capture groups!"
         text_pattern = r"(?P<first>this )(?P<second>.*?)(?P<third>named capture )(?P<fourth>groups)(!)"
@@ -741,13 +736,28 @@ class TestReplaceTemplate(unittest.TestCase):
 
         # Will fail with AttributeError because non-compiled patterns can't be used to resolve
         # group names in replace template.
-        with self.assertRaises(AttributeError):
-            expand = backrefs.compile_replace(text_pattern, r'\l\C\g<first>\l\g<second>\L\c\g<third>\E\g<fourth>\E\5')
+        expand = backrefs.compile_replace(text_pattern, r'\l\C\g<first>\l\g<second>\L\c\g<third>\E\g<fourth>\E\5')
+        results = expand(pattern.match(text))
+        self.assertEqual('tHIS iS A TEST FOR Named capture GROUPS!', results)
+
+    def test_mixed_groups2(self):
+        """Test mix of upper and lower case with group indexes and a string replace pattern."""
+
+        text = "this is a test for named capture groups!"
+        text_pattern = r"(?P<first>this )(?P<second>.*?)(?P<third>named capture )(?P<fourth>groups)(!)"
+        pattern = re.compile(text_pattern)
 
         # This will pass because we do not need to resolve named groups.
         expand = backrefs.compile_replace(text_pattern, r'\l\C\g<1>\l\g<2>\L\c\g<3>\E\g<4>\E\5')
         results = expand(pattern.match(text))
         self.assertEqual('tHIS iS A TEST FOR Named capture GROUPS!', results)
+
+    def test_mixed_groups3(self):
+        """Test mix of upper and lower case with named groups and a compiled replace pattern."""
+
+        text = "this is a test for named capture groups!"
+        text_pattern = r"(?P<first>this )(?P<second>.*?)(?P<third>named capture )(?P<fourth>groups)(!)"
+        pattern = re.compile(text_pattern)
 
         # Now using compiled pattern, we can use named groups in replace template.
         expand = backrefs.compile_replace(pattern, r'\l\C\g<first>\l\g<second>\L\c\g<third>\E\g<fourth>\E\5')

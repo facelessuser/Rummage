@@ -33,13 +33,15 @@ replace = compile_replace(pattern, r'\1 some replace pattern')
 
 Usage
 =========
-text = pattern.sub(replace, 'sometext')
+Recommended to use compiling.  Assuming the above compiling:
+
+    text = pattern.sub(replace, 'sometext')
 
 --or--
 
-m = pattern.match('sometext')
-if m:
-    text = replace(m)  # similar to m.expand(template)
+    m = pattern.match('sometext')
+    if m:
+        text = replace(m)  # similar to m.expand(template)
 
 Licensed under MIT
 Copyright (c) 2011 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -121,6 +123,8 @@ X = re.X
 VERBOSE = re.VERBOSE
 escape = re.escape
 purge = re.purge
+
+RE_TYPE = type(re.compile('', 0))
 
 # Case upper or lower
 _UPPER = 0
@@ -977,25 +981,33 @@ class ReplaceTemplateExpander(object):
         return self.sep.join(result)
 
 
-def _expand(m, template=None):
-    """Expand with either the ReplaceTemplate or the user function, else return nothing."""
+def _apply_replace_backrefs(m, repl=None):
+    """Expand with either the ReplaceTemplate or the user function, compile on the fly, or return None."""
 
-    if template is not None:
-        if isinstance(template, ReplaceTemplate):
-            return ReplaceTemplateExpander(m, template).expand()
-        elif hasattr(template, '__call__'):
-            return template(m)
+    if repl is not None:
+        if hasattr(repl, '__call__'):
+            return repl(m)
+        elif isinstance(repl, ReplaceTemplate):
+            return ReplaceTemplateExpander(m, repl).expand()
+        elif isinstance(repl, (string_type, binary_type)):
+            return ReplaceTemplateExpander(m, ReplaceTemplate(m.re, repl)).expand()
 
 
-def compile_search(pattern, flags=0):
-    """Compile with extended search references."""
+def _apply_search_backrefs(pattern, flags=0):
+    """Apply the search backrefs to the search pattern."""
 
     if isinstance(pattern, (string_type, binary_type)):
         re_verbose = VERBOSE & flags
         re_unicode = UNICODE & flags
         pattern = SearchTemplate(pattern, re_verbose, re_unicode).apply()
 
-    return re.compile(pattern, flags)
+    return pattern
+
+
+def compile_search(pattern, flags=0):
+    """Compile with extended search references."""
+
+    return re.compile(_apply_search_backrefs(pattern, flags))
 
 
 def compile_replace(pattern, repl):
@@ -1003,9 +1015,59 @@ def compile_replace(pattern, repl):
 
     call = None
     if pattern is not None:
-        if hasattr(repl, '__call__'):
-            call = functools.partial(_expand, template=repl)
-        else:
-            template = ReplaceTemplate(pattern, repl)
-            call = functools.partial(_expand, template=template)
-    return _expand if call is None else call
+        if not hasattr(repl, '__call__') and isinstance(pattern, RE_TYPE):
+            repl = ReplaceTemplate(pattern, repl)
+        call = functools.partial(_apply_replace_backrefs, repl=repl)
+    return call
+
+
+# Convenience methods like re has, but slower due to overhead on each call.
+# It is recommended to use compile_search and compile_replace
+def expand(m, repl):
+    """Expand the string using the replace pattern or function."""
+
+    return _apply_replace_backrefs(m, repl)
+
+
+def search(pattern, string, flags=0):
+    """Search after applying backrefs."""
+
+    re.search(_apply_search_backrefs(pattern), string, flags)
+
+
+def match(pattern, string, flags=0):
+    """Match after applying backrefs."""
+
+    re.match(_apply_search_backrefs(pattern), string, flags)
+
+
+def split(pattern, string, maxsplit=0, flags=0):
+    """Split after applying backrefs."""
+
+    re.split(_apply_search_backrefs(pattern), string, maxsplit, flags)
+
+
+def findall(pattern, string, flags=0):
+    """Findall after applying backrefs."""
+
+    re.findall(_apply_search_backrefs(pattern), string, flags)
+
+
+def finditer(pattern, string, flags=0):
+    """Finditer after applying backrefs."""
+
+    re.finditer(_apply_search_backrefs(pattern), string, flags)
+
+
+def sub(pattern, repl, string, count=0, flags=0):
+    """Sub after applying backrefs."""
+
+    pattern = compile_search(pattern)
+    re.sub(pattern, compile_replace(pattern, repl), string, count, flags)
+
+
+def subn(pattern, repl, string, count=0, flags=0):
+    """Subn after applying backrefs."""
+
+    pattern = compile_search(pattern)
+    re.subn(pattern, compile_replace(pattern, repl), string, count, flags)
