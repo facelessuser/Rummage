@@ -1007,7 +1007,7 @@ def _apply_search_backrefs(pattern, flags=0):
 def compile_search(pattern, flags=0):
     """Compile with extended search references."""
 
-    return re.compile(_apply_search_backrefs(pattern, flags))
+    return re.compile(_apply_search_backrefs(pattern, flags), flags)
 
 
 def compile_replace(pattern, repl):
@@ -1032,42 +1032,42 @@ def expand(m, repl):
 def search(pattern, string, flags=0):
     """Search after applying backrefs."""
 
-    return re.search(_apply_search_backrefs(pattern), string, flags)
+    return re.search(_apply_search_backrefs(pattern, flags), string, flags)
 
 
 def match(pattern, string, flags=0):
     """Match after applying backrefs."""
 
-    return re.match(_apply_search_backrefs(pattern), string, flags)
+    return re.match(_apply_search_backrefs(pattern, flags), string, flags)
 
 
 def split(pattern, string, maxsplit=0, flags=0):
     """Split after applying backrefs."""
 
-    return re.split(_apply_search_backrefs(pattern), string, maxsplit, flags)
+    return re.split(_apply_search_backrefs(pattern, flags), string, maxsplit, flags)
 
 
 def findall(pattern, string, flags=0):
     """Findall after applying backrefs."""
 
-    return re.findall(_apply_search_backrefs(pattern), string, flags)
+    return re.findall(_apply_search_backrefs(pattern, flags), string, flags)
 
 
 def finditer(pattern, string, flags=0):
     """Finditer after applying backrefs."""
 
-    return re.finditer(_apply_search_backrefs(pattern), string, flags)
+    return re.finditer(_apply_search_backrefs(pattern, flags), string, flags)
 
 
 def sub(pattern, repl, string, count=0, flags=0):
     """Sub after applying backrefs."""
 
-    pattern = compile_search(pattern)
+    pattern = compile_search(pattern, flags)
     return re.sub(pattern, compile_replace(pattern, repl), string, count, flags)
 
 
 def subn(pattern, repl, string, count=0, flags=0):
     """Subn after applying backrefs."""
 
-    pattern = compile_search(pattern)
+    pattern = compile_search(pattern, flags)
     return re.subn(pattern, compile_replace(pattern, repl), string, count, flags)
