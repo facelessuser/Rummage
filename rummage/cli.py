@@ -20,13 +20,34 @@ DEALINGS IN THE SOFTWARE.
 """
 import argparse
 import os
+import re
 import sys
+from datetime import datetime
+from rummage import epoch_timestamp
 from rummage import rumcore
 from rummage import version
 
 BOOL_NONE = 0
 BOOL_MATCH = 1
 BOOL_UNMATCH = 2
+
+RE_DATE_TIME = re.compile(
+    r'''(?x)
+    (?P<symbol>[><])?(?:
+        (?P<date>(?P<month>0[1-9]|1[0-2])/(?P<day>0[1-9]|[1-2][0-9]|3[0-1])/(?P<year>[0-9]{4})) |
+        (?P<time>(?P<hour>[0][1-9]|1[0-9]|2[0-3]):(?P<min>[0-5][0-9]|60):(?P<sec>[0-5][0-9]|60))
+    )$
+    '''
+)
+
+RE_DATE_TIME_FULL = re.compile(
+    r'''(?x)
+    (?P<symbol>[><])?
+    (?P<date>(?P<month>0[1-9]|1[0-2])/(?P<day>0[1-9]|[1-2][0-9]|3[0-1])/(?P<year>[0-9]{4})) -
+    (?P<time>(?P<hour>[0][1-9]|1[0-9]|2[0-3]):(?P<min>[0-5][0-9]|60):(?P<sec>[0-5][0-9]|60))
+    $
+    '''
+)
 
 
 class RummageCli(object):
@@ -80,6 +101,58 @@ class RummageCli(object):
         else:
             size = None
 
+        if args.created is not None:
+            sym = 'eq'
+            m = RE_DATE_TIME.match(args.created)
+            if m is None:
+                m = RE_DATE_TIME_FULL.match(args.created)
+                if m is not None:
+                    if m.group('symbol'):
+                        sym = 'gt' if m.group('symbol') == '>' else 'lt'
+                    date = m.group('date')
+                    time = m.group('time')
+            else:
+                if m.group('symbol'):
+                    sym = 'gt' if m.group('symbol') == '>' else 'lt'
+                if m.group('date'):
+                    date = m.group('date')
+                    time = "00:00:00"
+                elif m.group('time'):
+                    time = m.group('time')
+                    today = datetime.today()
+                    date = "%02d/%02d/%04d" % (today.year, today.month, today.day)
+            if m is None:
+                raise ValueError("Time should be in the form: MM/DD/YYYY-HH:MM:SS (with optional < or > in front)")
+            created = (sym, epoch_timestamp.local_time_to_epoch_timestamp(date, time))
+        else:
+            created = None
+
+        if args.modified is not None:
+            sym = 'eq'
+            m = RE_DATE_TIME.match(args.modified)
+            if m is None:
+                m = RE_DATE_TIME_FULL.match(args.modified)
+                if m is not None:
+                    if m.group('symbol'):
+                        sym = 'gt' if m.group('symbol') == '>' else 'lt'
+                    date = m.group('date')
+                    time = m.group('time')
+            else:
+                if m.group('symbol'):
+                    sym = 'gt' if m.group('symbol') == '>' else 'lt'
+                if m.group('date'):
+                    date = m.group('date')
+                    time = "00:00:00"
+                elif m.group('time'):
+                    time = m.group('time')
+                    today = datetime.today()
+                    date = "%02d/%02d/%04d" % (today.year, today.month, today.day)
+            if m is None:
+                raise ValueError("Time should be in the form: MM/DD/YYYY-HH:MM:SS (with optional < or > in front)")
+            modified = (sym, rumcore.epoch_timestamp.local_time_to_epoch_timestamp(date, time))
+        else:
+            modified = None
+
         self.rummage = rumcore.Rummage(
             target=target,
             pattern=args.pattern,
@@ -94,10 +167,12 @@ class RummageCli(object):
             encoding=args.encoding_force,
             backup=True,
             size=size,
-            replace=args.substitute
+            created=created,
+            modified=modified,
+            replace=args.replace
         )
 
-        if args.substitute:
+        if args.replace:
             self.bool_match = BOOL_NONE
         elif args.files_with_matches:
             self.bool_match = BOOL_MATCH
@@ -107,7 +182,7 @@ class RummageCli(object):
             self.bool_match = BOOL_NONE
 
         self.no_filename = args.buffer or args.no_filename
-        self.count_only = args.count or args.substitute is not None
+        self.count_only = args.count or args.replace is not None
         self.show_lines = args.line_numbers
         self.only_matching = args.only_matching
 
@@ -308,7 +383,7 @@ def cli_main():
         help="Make the '.' special character in regex match any character at all, including a newline."
     )
     parser.add_argument(
-        "--substitute", "-s", metavar="PATTERN", default=None,
+        "--replace", "-r", metavar="PATTERN", default=None,
         help="Replace find with the specified pattern."
     )
 
@@ -343,15 +418,33 @@ def cli_main():
         help="File pattern to search."
     )
     parser.add_argument(
-        "--size-limit", '-S', metavar="LIMIT", default=None,
-        help="File size limit in KB: equal to '-S 1000', less than '-S <1000', or greater than '-S >1000'"
+        "--size-limit", '-z', metavar="LIMIT", default=None,
+        help="File size limit in KB: equal to '-z 1000', less than '-z <1000', or greater than '-z >1000'"
+    )
+    parser.add_argument(
+        "--created", '-C', metavar="DATETIME", default=None,
+        help=(
+            "Date time that is either in the format: MM/DD/YYYY-HH:MM:SS.  If desired, date can be omitted, and "
+            "'today' will be assumed.  If just the time is omitted, it will be replaced with '00:00:00'. "
+            "Time will need to match will need to match to be searched.  If '<' or '>' is placed in front, "
+            "time will need to be less than or greater than the respective time."
+        )
+    )
+    parser.add_argument(
+        "--modified", '-M', metavar="DATETIME", default=None,
+        help=(
+            "Date time that is either in the format: MM/DD/YYYY-HH:MM:SS.  If desired, date can be omitted, and "
+            "'today' will be assumed.  If just the time is omitted, it will be replaced with '00:00:00'. "
+            "Time will need to match will need to match to be searched.  If '<' or '>' is placed in front, "
+            "time will need to be less than or greater than the respective time."
+        )
     )
 
     # Context
     context_group = parser.add_mutually_exclusive_group()
     context_group.add_argument(
-        "--context", "-C", metavar="NUM,NUM", default=None,
-        help="Print number lines of context before and after. Before and after are separated by a comma: `-C 2,3` etc."
+        "--context", "-T", metavar="NUM,NUM", default=None,
+        help="Print number lines of context before and after. Before and after are separated by a comma: `-T 2,3` etc."
     )
     context_group.add_argument(
         "--truncate", "-t", action="store_true", default=False,
@@ -371,7 +464,7 @@ def cli_main():
 
     # Encoding
     parser.add_argument(
-        "--encoding-force", "-E", metavar="ENCODING", default=None,
+        "--encoding-force", "-e", metavar="ENCODING", default=None,
         help="Do not detect encoding, but force the specified encoding."
     )
 
@@ -384,7 +477,6 @@ def cli_main():
         "target", default=None,
         help="File, directory, or string buffer to search."
     )
-
 
     rumcl = RummageCli(parser.parse_args())
     rumcl.display_output()

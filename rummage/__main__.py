@@ -32,9 +32,9 @@ def parse_arguments():
     parser = argparse.ArgumentParser(prog=version.__app__, description='A python grep like tool.')
     # Flag arguments
     parser.add_argument('--version', action='version', version=('%(prog)s ' + version.__version__))
-    parser.add_argument('--debug', '-d', action='store_true', default=False, help=argparse.SUPPRESS)
-    parser.add_argument('--searchpath', '-s', nargs=1, default=None, help="Path to search.")
-    parser.add_argument('--regextool', '-r', action='store_true', default=False, help="Open just the regex tester.")
+    parser.add_argument('--debug', action='store_true', default=False, help=argparse.SUPPRESS)
+    parser.add_argument('--searchpath', '-s', default=None, help="Path to search.")
+    parser.add_argument('--regextool', action='store_true', default=False, help="Open just the regex tester.")
     return parser.parse_args()
 
 
@@ -59,7 +59,7 @@ def run():
         else:
             RummageFrame(
                 None,
-                args.searchpath[0] if args.searchpath is not None else None,
+                args.searchpath if args.searchpath is not None else None,
                 debug_mode=args.debug
             ).Show()
     app.MainLoop()
