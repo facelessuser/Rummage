@@ -19,11 +19,12 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
+from __future__ import absolute_import
 import argparse
 import sys
-from rummage.gui.settings import Settings
-from rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
-from rummage import version
+from .rummage.gui.settings import Settings
+from .rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
+from .rummage import version
 
 
 def parse_arguments():

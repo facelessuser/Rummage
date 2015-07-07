@@ -18,14 +18,19 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+from __future__ import unicode_literals
+from __future__ import absolute_import
 import argparse
 import os
 import re
 import sys
 from datetime import datetime
-from rummage import epoch_timestamp
-from rummage import rumcore
-from rummage import version
+from .rummage import epoch_timestamp
+from .rummage import rumcore
+from .rummage import version
+
+PY3 = (3, 0) <= sys.version_info < (4, 0)
+
 
 BOOL_NONE = 0
 BOOL_MATCH = 1
@@ -48,6 +53,13 @@ RE_DATE_TIME_FULL = re.compile(
     $
     '''
 )
+
+
+def pyout(value):
+    """Dump to stdout."""
+
+    # print(value)
+    print(value.encode(sys.stdout.encoding, errors='replace').decode(sys.stdout.encoding))
 
 
 class RummageCli(object):
@@ -167,6 +179,7 @@ class RummageCli(object):
             encoding=args.encoding_force,
             backup=True,
             size=size,
+            text=args.process_binary,
             created=created,
             modified=modified,
             replace=args.replace
@@ -225,9 +238,9 @@ class RummageCli(object):
         """Display the match."""
 
         if self.no_filename:
-            print("%s%s" % (("%d" % lineno) + separator if self.show_lines else "", line))
+            pyout("%s%s" % (("%d" % lineno) + separator if self.show_lines else "", line))
         else:
-            print("%s%s%s%s" % (file_name, separator, ("%d" % lineno) + separator if self.show_lines else "", line))
+            pyout("%s%s%s%s" % (file_name, separator, ("%d" % lineno) + separator if self.show_lines else "", line))
 
     def normal_output(self, f):
         """Normal output."""
@@ -237,17 +250,20 @@ class RummageCli(object):
             line_printed = False
             count = 0
             start_match = f.match.context[0]
-            end_match = self.count_lines(f.match.lines, f.match.ending) - f.match.context[1]
-            for line in f.match.lines.split(f.match.ending):
-                if (not line_printed and count == start_match) or (line_printed and count < end_match):
-                    self.display_match(f.info.name, lineno, line, ":")
-                    line_printed = True
-                else:
-                    self.display_match(f.info.name, lineno, line, "-")
-                count += 1
-                lineno += 1
-            if lineno - f.match.lineno > 1:
-                print("---")
+            if f.info.encoding == 'BIN':
+                self.display_match(f.info.name, f.match.lineno, f.match.lines, ':')
+            else:
+                end_match = self.count_lines(f.match.lines, f.match.ending) - f.match.context[1]
+                for line in f.match.lines.split(f.match.ending):
+                    if (not line_printed and count == start_match) or (line_printed and count < end_match):
+                        self.display_match(f.info.name, lineno, line, ":")
+                        line_printed = True
+                    else:
+                        self.display_match(f.info.name, lineno, line, "-")
+                    count += 1
+                    lineno += 1
+                if lineno - f.match.lineno > 1:
+                    pyout("---")
 
     def match_output(self, f):
         """Match output."""
@@ -255,11 +271,14 @@ class RummageCli(object):
         if f.match is not None:
             lineno = f.match.lineno
             content = f.match.lines[f.match.match[0]:f.match.match[1]]
-            for line in content.split(f.match.ending):
-                self.display_match(f.info.name, lineno, line, ":")
-                lineno += 1
-            if lineno - f.match.lineno > 1:
-                print("---")
+            if f.info.encoding == "BIN":
+                self.display_match(f.info.name, lineno, content, ":")
+            else:
+                for line in content.split(f.match.ending):
+                    self.display_match(f.info.name, lineno, line, ":")
+                    lineno += 1
+                if lineno - f.match.lineno > 1:
+                    pyout("---")
 
     def bool_output(self, f):
         """
@@ -269,9 +288,9 @@ class RummageCli(object):
         """
 
         if self.bool_match == BOOL_UNMATCH and f.match is None:
-            print(f.info.name)
+            pyout(f.info.name)
         elif self.bool_match == BOOL_MATCH and f.match is not None:
-            print(f.info.name)
+            pyout(f.info.name)
 
     def count_output(self, f):
         """Output for showing only the count."""
@@ -283,11 +302,11 @@ class RummageCli(object):
             elif self.no_filename or self.current_file == f.info.name:
                 self.count += 1
             else:
-                print("%s:%d" % (self.current_file, self.count))
+                pyout("%s:%d" % (self.current_file, self.count))
                 self.current_file = f.info.name
                 self.count = 1
         elif self.count:
-            print("%s:%d" % (self.current_file, self.count))
+            pyout("%s:%d" % (self.current_file, self.count))
             self.current_file = None
             self.count = 0
 
@@ -297,7 +316,7 @@ class RummageCli(object):
         if self.count:
             if self.no_filename:
                 self.current_file = ""
-            print("%s:%d" % (self.current_file, self.count))
+            pyout("%s:%d" % (self.current_file, self.count))
             self.current_file = None
             self.count = 0
 
@@ -316,11 +335,11 @@ class RummageCli(object):
                     self.normal_output(f)
             else:
                 self.errors = True
-                print("ERROR: %s" % f.error)
+                pyout("ERROR: %s" % f.error)
         self.count_flush()
 
 
-def cli_main():
+def main():
     """Main entry point."""
 
     # Setup arg parsing object
@@ -462,6 +481,12 @@ def cli_main():
         help="Show hidden files."
     )
 
+    # Binary
+    parser.add_argument(
+        "--process-binary", "-p", action="store_true", default=False,
+        help="Process binary files (or files recognized as binary) and show thier results."
+    )
+
     # Encoding
     parser.add_argument(
         "--encoding-force", "-e", metavar="ENCODING", default=None,
@@ -481,8 +506,8 @@ def cli_main():
     rumcl = RummageCli(parser.parse_args())
     rumcl.display_output()
 
-    return rumcl.errors
+    sys.exit(rumcl.errors)
 
 
 if __name__ == "__main__":
-    sys.exit(cli_main())
+    sys.exit(main())

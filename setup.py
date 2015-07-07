@@ -2,14 +2,35 @@
 # -*- coding: utf-8 -*-
 """Setup package."""
 from setuptools import setup, find_packages
+import sys
+
+PY3 = (3, 0) <= sys.version_info < (4, 0)
 
 LONG_DESC = '''
-Rummage is a GUI tool for searching through folders and fle content.
-It is built with wxPython 3.0.0+ and requires Python 2.7.
+Rummage is a CLI and GUI tool for searching through folders and fle content.
+It is built with wxPython 3.0.0+ and requires Python 2.7 or Python 3.0 for command line.
 
 The project repo is found at:
 https://github.com/facelessuser/Rummage.
 '''
+
+if PY3:
+    entry_points = {
+        'console_scripts': [
+            'rumcl=rummage.cli:main',
+            'rumcl%d.%d=rummage.cli:main' % sys.version_info[:2],
+        ]
+    }
+else:
+    entry_points = {
+        'gui_scripts': [
+            'rummage=rummage.__main__:main'
+        ],
+        'console_scripts': [
+            'rumcl=rummage.cli:main',
+            'rumcl%d.%d=rummage.cli:main' % sys.version_info[:2],
+        ]
+    }
 
 setup(
     name='Rummage',
@@ -26,11 +47,7 @@ setup(
         "chardet>=2.3.0"
     ],
     zip_safe=False,
-    entry_points={
-        'gui_scripts': [
-            'rummage=rummage.__main__:main'
-        ]
-    },
+    entry_points=entry_points,
     package_data={
         'rummage.rummage.data': ['*.css', '*.js', '*.png', '*.ico', '*.icns']
     },
