@@ -45,33 +45,55 @@ class RummageCli(object):
             target = args.target
 
         if args.context is not None:
-            context = (int(args.context), int(args.context))
+            try:
+                before, after = args.context.split(',')
+                context = (int(before), int(after))
+            except Exception:
+                raise ValueError("Context should be two numbers separated by a comma")
         else:
-            if args.before_context is None:
-                before = 0
-            if args.after_context is None:
-                after = 0
-            context = (int(before), int(after))
+            context = (0, 0)
 
-        if args.regexfilepattern is not None:
-            filepattern = args.regexfilepattern
-        elif args.filepattern is not None:
-            filepattern = args.filepattern
+        if args.regex_file_pattern is not None:
+            file_pattern = args.regex_file_pattern
+        elif args.file_pattern is not None:
+            file_pattern = args.file_pattern
         else:
-            filepattern = None
+            file_pattern = None
+
+        if args.regex_directory_exclude is not None:
+            directory_exclude = args.regex_directory_exclude
+        elif args.directory_exclude is not None:
+            directory_exclude = args.directory_exclude
+        else:
+            directory_exclude = None
+
+        if args.size_limit is not None:
+            try:
+                if args.size_limit.startswith('<'):
+                    size = ('lt', int(args.size_limit[1:]))
+                elif args.size_limit.startswith('>'):
+                    size = ('gt', int(args.size_limit[1:]))
+                else:
+                    size = ('eq', int(args.size_limit))
+            except Exception:
+                raise ValueError("Size should be in KB in the form: 1000, <1000, or >1000")
+        else:
+            size = None
 
         self.rummage = rumcore.Rummage(
             target=target,
             pattern=args.pattern,
-            file_pattern=filepattern,
-            folder_exclude=args.directory_exclude,
+            file_pattern=file_pattern,
+            folder_exclude=directory_exclude,
             context=context,
             max_count=int(args.max_count) if args.max_count is not None else None,
             flags=self.get_flags(args),
             boolean=args.files_with_matches or args.files_without_match,
             show_hidden=args.show_hidden,
-            truncate_lines=False,
+            truncate_lines=args.truncate,
+            encoding=args.encoding_force,
             backup=True,
+            size=size,
             replace=args.substitute
         )
 
@@ -86,7 +108,7 @@ class RummageCli(object):
 
         self.no_filename = args.buffer or args.no_filename
         self.count_only = args.count or args.substitute is not None
-        self.show_lines = args.line_number
+        self.show_lines = args.line_numbers
         self.only_matching = args.only_matching
 
         self.current_file = None
@@ -98,8 +120,11 @@ class RummageCli(object):
 
         flags = 0
 
-        if args.regexfilepattern is not None:
+        if args.regex_file_pattern is not None:
             flags |= rumcore.FILE_REGEX_MATCH
+
+        if args.regex_directory_exclude is not None:
+            flags |= rumcore.DIR_REGEX_MATCH
 
         if not args.regexp:
             flags |= rumcore.LITERAL
@@ -125,7 +150,7 @@ class RummageCli(object):
         """Display the match."""
 
         if self.no_filename:
-            print("%s%s%s" % (separator, ("%d" % lineno) + separator if self.show_lines else "", line))
+            print("%s%s" % (("%d" % lineno) + separator if self.show_lines else "", line))
         else:
             print("%s%s%s%s" % (file_name, separator, ("%d" % lineno) + separator if self.show_lines else "", line))
 
@@ -233,94 +258,121 @@ def cli_main():
         "--help", action="help",
         help="Show this help message and exit."
     )
-    parser.add_argument(
-        "--regexp", "-e", action="store_true", default=False,
-        help="Pattern is a regular expression."
-    )
-    parser.add_argument(
-        "--ignore_case", "-i", action="store_true", default=False,
-        help="Ignore case when performing search."
-    )
-    parser.add_argument(
-        "--dotall", "-d", action="store_true", default=False,
-        help="Make the '.' special character in regex match any character at all, including a newline."
-    )
-    parser.add_argument(
-        "--recursive", "-r", action="store_true", default=False,
-        help="Recursively search a directory tree."
-    )
-    parser.add_argument(
-        "--line_number", "-n", action="store_true", default=False,
-        help="Show line numbers."
-    )
-    parser.add_argument(
-        "--files_without_match", "-L", action="store_true", default=False,
+
+    # Result adjustments
+    result_group = parser.add_mutually_exclusive_group()
+    result_group.add_argument(
+        "--files-without-match", "-W", action="store_true", default=False,
         help='''
             Suppress normal output; instead print the name of each input
             file from which no output would normally have been printed.
             The scanning will stop on the first match.
         '''
     )
-    parser.add_argument(
-        "--files_with_matches", "-l", action="store_true", default=False,
+    result_group.add_argument(
+        "--files-with-matches", "-w", action="store_true", default=False,
         help='''
             Suppress normal output; instead print the name of each input
             file from which output would normally have been printed
             The scanning will stop on the first match.
         '''
     )
-    parser.add_argument(
-        "--only_matching", "-o", action="store_true", default=False,
-        help="Print number lines of trailing context."
-    )
-    parser.add_argument(
+    result_group.add_argument(
         "--count", "-c", action="store_true", default=False,
         help="Only show the match count in each file."
     )
-    parser.add_argument(
-        "--buffer", "-b", action="store_true", default=False,
-        help="Parse input parameter as a string buffer."
+    result_group.add_argument(
+        "--only-matching", "-o", action="store_true", default=False,
+        help="Only show the match; no context."
     )
     parser.add_argument(
-        "--no_filename", "-h", action="store_true", default=False,
-        help="Hide file name in output."
-    )
-    parser.add_argument(
-        "--directory_exclude", "-D", metavar="PATTERN", default=None,
-        help="Regex describing directory path(s) to exclude"
-    )
-    parser.add_argument(
-        "--max_count", "-m", metavar="NUM", default=None,
+        "--max-count", "-m", metavar="NUM", default=None,
         help="Max matches to find."
     )
     parser.add_argument(
-        "--after_context", "-A", metavar="NUM", default=None,
-        help="Print number lines of leading context."
-    )
-    parser.add_argument(
-        "--before_context", "-B", metavar="NUM", default=None,
-        help="Print number lines of trailing context."
-    )
-    parser.add_argument(
-        "--context", "-C", metavar="NUM", default=None,
-        help="Print number lines of context before and after."
-    )
-    parser.add_argument(
-        "--regexfilepattern", "-F", metavar="PATTERN", default=None,
-        help="Regex file pattern to search."
-    )
-    parser.add_argument(
-        "--filepattern", "-f", metavar="PATTERN", default="*",
-        help="File pattern to search."
-    )
-    parser.add_argument(
-        "--show_hidden", "-H", action="store_true", default=False,
-        help="Show hidden files."
+        "--line-numbers", "-n", action="store_true", default=False,
+        help="Show line numbers."
     )
 
+    # Search and replace
+    parser.add_argument(
+        "--regexp", "-x", action="store_true", default=False,
+        help="Pattern is a regular expression."
+    )
+    parser.add_argument(
+        "--ignore-case", "-i", action="store_true", default=False,
+        help="Ignore case when performing search."
+    )
+    parser.add_argument(
+        "--dotall", "-a", action="store_true", default=False,
+        help="Make the '.' special character in regex match any character at all, including a newline."
+    )
     parser.add_argument(
         "--substitute", "-s", metavar="PATTERN", default=None,
         help="Replace find with the specified pattern."
+    )
+
+    # Search modes
+    search_mode_group = parser.add_mutually_exclusive_group()
+    search_mode_group.add_argument(
+        "--recursive", "-R", action="store_true", default=False,
+        help="Recursively search a directory tree."
+    )
+    search_mode_group.add_argument(
+        "--buffer", "-b", action="store_true", default=False,
+        help="Parse input parameter as a string buffer."
+    )
+
+    # Limit search
+    dir_pattern_group = parser.add_mutually_exclusive_group()
+    dir_pattern_group.add_argument(
+        "--regex-directory-exclude", "-D", metavar="PATTERN", default=None,
+        help="Regex describing directory path(s) to exclude"
+    )
+    dir_pattern_group.add_argument(
+        "--directory-exclude", "-d", metavar="PATTERN", default=None,
+        help="File pattern describing directory path(s) to exclude"
+    )
+    file_pattern_group = parser.add_mutually_exclusive_group()
+    file_pattern_group.add_argument(
+        "--regex-file-pattern", "-F", metavar="PATTERN", default=None,
+        help="Regex file pattern to search."
+    )
+    file_pattern_group.add_argument(
+        "--file-pattern", "-f", metavar="PATTERN", default="*",
+        help="File pattern to search."
+    )
+    parser.add_argument(
+        "--size-limit", '-S', metavar="LIMIT", default=None,
+        help="File size limit in KB: equal to '-S 1000', less than '-S <1000', or greater than '-S >1000'"
+    )
+
+    # Context
+    context_group = parser.add_mutually_exclusive_group()
+    context_group.add_argument(
+        "--context", "-C", metavar="NUM,NUM", default=None,
+        help="Print number lines of context before and after. Before and after are separated by a comma: `-C 2,3` etc."
+    )
+    context_group.add_argument(
+        "--truncate", "-t", action="store_true", default=False,
+        help="Truncate the context result 120 chars and no additional context lines."
+    )
+
+    # Hide things
+    parser.add_argument(
+        "--no-filename", "-h", action="store_true", default=False,
+        help="Hide file name in output."
+    )
+
+    parser.add_argument(
+        "--show-hidden", "-H", action="store_true", default=False,
+        help="Show hidden files."
+    )
+
+    # Encoding
+    parser.add_argument(
+        "--encoding-force", "-E", metavar="ENCODING", default=None,
+        help="Do not detect encoding, but force the specified encoding."
     )
 
     # Positional arguments (must follow flag arguments)
@@ -328,11 +380,11 @@ def cli_main():
         "pattern", default=None,
         help="Search pattern"
     )
-
     parser.add_argument(
         "target", default=None,
         help="File, directory, or string buffer to search."
     )
+
 
     rumcl = RummageCli(parser.parse_args())
     rumcl.display_output()
