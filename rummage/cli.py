@@ -20,176 +20,204 @@ DEALINGS IN THE SOFTWARE.
 """
 import argparse
 import os
-from rummage import rumcore
 import sys
-__VERSION__ = "1.0.0"
+from rummage import rumcore
+from rummage import version
+
+BOOL_NONE = 0
+BOOL_MATCH = 1
+BOOL_UNMATCH = 2
 
 
-def count_lines(string, nl):
-    """Count lines of context."""
+class RummageCli(object):
 
-    return string.count(nl) + (1 if string[-1] != nl else 0)
+    """Rummage command line frontend."""
 
+    def __init__(self, args):
+        """Initialize."""
 
-def display_match(file_name, lineno, line, no_filename, show_lines, separator):
-    """Display the match."""
-
-    if no_filename:
-        print("%s%s%s" % (separator, ("%d" % lineno) + separator if show_lines else "", line))
-    else:
-        print("%s%s%s%s" % (file_name, separator, ("%d" % lineno) + separator if show_lines else "", line))
-
-
-def normal_output(f, no_filename, show_lines):
-    """Normal output."""
-
-    if f.match is not None:
-        # for r in f["results"]:
-        lineno = f.match.lineno - f.match.context[0]
-        line_printed = False
-        count = 0
-        start_match = f.match.context[0]
-        end_match = count_lines(f.match.lines, f.match.ending) - f.match.context[1]
-        for line in f.match.lines.split(f.match.ending):
-            if (not line_printed and count == start_match) or (line_printed and count < end_match):
-                display_match(f.info.name, lineno, line, no_filename, show_lines, ":")
-                line_printed = True
+        if not args.buffer:
+            if os.path.exists(args.target):
+                target = args.target
             else:
-                display_match(f.info.name, lineno, line, no_filename, show_lines, "-")
-            count += 1
-            lineno += 1
-        if lineno - f.match.lineno > 1:
-            print("---")
-
-
-# def match_output(f, no_filename, count_only, show_lines):
-#     if not count_only:
-#         for r in f["results"]:
-#             lineno = r["lineno"]
-#             content = r["lines"][r["match"][0]: r["match"][1]]
-#             for line in content.split("\n"):
-#                 display_match(f["name"], lineno, line, no_filename, show_lines, ":")
-#                 lineno += 1
-#             if lineno - r["lineno"] > 1:
-#                 print("---")
-#     else:
-#         count_output(f, no_filename)
-
-
-def display_output(grep, no_filename, count_only, show_lines, files_only, only_matching):
-    """Display output."""
-
-    current_file = None
-    count = 0
-    for f in grep.find():
-        if not f.error:
-            if files_only is not None:
-                # Show only file name.
-                # Can show files that have a match or file that don't.
-                if not files_only and f.match is None:
-                    print(f.info.name)
-                elif files_only and f.match is not None:
-                    print(f.info.name)
-            # elif only_matching:
-            #     match_output(f, no_filename, count_only, show_lines)
-            elif count_only:
-                if f.match is not None:
-                    if not no_filename and current_file is None:
-                        current_file = f.info.name
-                        count = 1
-                    elif no_filename or current_file == f.info.name:
-                        count += 1
-                    else:
-                        print("%s:%d" % (current_file, count))
-                        current_file = f.info.name
-                        count = 1
-                elif count:
-                    print("%s:%d" % (current_file, count))
-                    current_file = None
-                    count = 0
-            else:
-                normal_output(f, no_filename, show_lines)
+                raise ValueError("%s does not exist" % args.target)
         else:
-            print("ERROR: %s" % f.error)
-    if count:
-        if no_filename:
-            current_file = ""
-        print("%s:%d" % (current_file, count))
-        current_file = None
-        count = 0
+            target = args.target
 
+        if args.context is not None:
+            context = (int(args.context), int(args.context))
+        else:
+            if args.before_context is None:
+                before = 0
+            if args.after_context is None:
+                after = 0
+            context = (int(before), int(after))
 
-def get_flags(args):
-    """Get rummage flags."""
+        if args.regexfilepattern is not None:
+            filepattern = args.regexfilepattern
+        elif args.filepattern is not None:
+            filepattern = args.filepattern
+        else:
+            filepattern = None
 
-    flags = 0
+        self.rummage = rumcore.Rummage(
+            target=target,
+            pattern=args.pattern,
+            file_pattern=filepattern,
+            folder_exclude=args.directory_exclude,
+            context=context,
+            max_count=int(args.max_count) if args.max_count is not None else None,
+            flags=self.get_flags(args),
+            boolean=args.files_with_matches or args.files_without_match,
+            show_hidden=args.show_hidden,
+            truncate_lines=False,
+            backup=True,
+            replace=args.substitute
+        )
 
-    if args.regexfilepattern is not None:
-        flags |= rumcore.FILE_REGEX_MATCH
+        if args.substitute:
+            self.bool_match = BOOL_NONE
+        elif args.files_with_matches:
+            self.bool_match = BOOL_MATCH
+        elif args.files_without_match:
+            self.bool_match = BOOL_UNMATCH
+        else:
+            self.bool_match = BOOL_NONE
 
-    if not args.regexp:
-        flags |= rumcore.LITERAL
-    elif args.dotall:
-        flags |= rumcore.DOTALL
+        self.no_filename = args.buffer or args.no_filename
+        self.count_only = args.count or args.substitute is not None
+        self.show_lines = args.line_number
+        self.only_matching = args.only_matching
 
-    if args.ignore_case:
-        flags |= rumcore.IGNORECASE
+        self.current_file = None
+        self.count = 0
+        self.errors = False
 
-    if args.buffer:
-        flags |= rumcore.BUFFER_INPUT
-    elif args.recursive:
-        flags |= rumcore.RECURSIVE
+    def get_flags(self, args):
+        """Get rummage flags."""
 
-    return flags
+        flags = 0
 
+        if args.regexfilepattern is not None:
+            flags |= rumcore.FILE_REGEX_MATCH
 
-def not_none(item, alt=None, idx=None):
-    """Return item or indes of item, else return the alternate."""
+        if not args.regexp:
+            flags |= rumcore.LITERAL
+        elif args.dotall:
+            flags |= rumcore.DOTALL
 
-    return (item if idx is None else item[idx]) if item is not None else alt
+        if args.ignore_case:
+            flags |= rumcore.IGNORECASE
 
+        if args.buffer:
+            flags |= rumcore.BUFFER_INPUT
+        elif args.recursive:
+            flags |= rumcore.RECURSIVE
 
-def run(args):
-    """Run."""
+        return flags
 
-    target = None
+    def count_lines(self, string, nl):
+        """Count lines of context."""
 
-    target = args.target
-    if not args.buffer:
-        target = args.target
-        if not os.path.exists(target):
-            print("ERROR: %s does not exist" % target)
-            return 1
+        return string.count(nl) + (1 if string[-1] != nl else 0)
 
-    if args.context is not None:
-        context = (int(args.context[0]), int(args.context[0]))
-    else:
-        context = (int(not_none(args.before_context, alt=0, idx=0)), int(not_none(args.after_context, alt=0, idx=0)))
+    def display_match(self, file_name, lineno, line, separator):
+        """Display the match."""
 
-    grep = rumcore.Grep(
-        target=target,
-        pattern=args.pattern,
-        file_pattern=not_none(args.regexfilepattern, alt=not_none(args.filepattern, idx=0), idx=0),
-        folder_exclude=not_none(args.directory_exclude, idx=0),
-        context=context,
-        max_count=not_none(args.max_count, alt=None, idx=0),
-        flags=get_flags(args),
-        boolean=args.files_with_matches or args.files_without_match,
-        show_hidden=args.show_hidden,
-        truncate_lines=True,
-        backup=True
-    )
+        if self.no_filename:
+            print("%s%s%s" % (separator, ("%d" % lineno) + separator if self.show_lines else "", line))
+        else:
+            print("%s%s%s%s" % (file_name, separator, ("%d" % lineno) + separator if self.show_lines else "", line))
 
-    display_output(
-        grep,
-        (True if args.buffer else args.no_filename),
-        args.count,
-        args.line_number,
-        (False if args.files_with_matches else True if args.files_without_match else None),
-        args.only_matching
-    )
+    def normal_output(self, f):
+        """Normal output."""
 
-    return 0
+        if f.match is not None:
+            lineno = f.match.lineno - f.match.context[0]
+            line_printed = False
+            count = 0
+            start_match = f.match.context[0]
+            end_match = self.count_lines(f.match.lines, f.match.ending) - f.match.context[1]
+            for line in f.match.lines.split(f.match.ending):
+                if (not line_printed and count == start_match) or (line_printed and count < end_match):
+                    self.display_match(f.info.name, lineno, line, ":")
+                    line_printed = True
+                else:
+                    self.display_match(f.info.name, lineno, line, "-")
+                count += 1
+                lineno += 1
+            if lineno - f.match.lineno > 1:
+                print("---")
+
+    def match_output(self, f):
+        """Match output."""
+
+        if f.match is not None:
+            lineno = f.match.lineno
+            content = f.match.lines[f.match.match[0]:f.match.match[1]]
+            for line in content.split(f.match.ending):
+                self.display_match(f.info.name, lineno, line, ":")
+                lineno += 1
+            if lineno - f.match.lineno > 1:
+                print("---")
+
+    def bool_output(self, f):
+        """
+        Show only file name.
+
+        Can show files that have a match or file that don't.
+        """
+
+        if self.bool_match == BOOL_UNMATCH and f.match is None:
+            print(f.info.name)
+        elif self.bool_match == BOOL_MATCH and f.match is not None:
+            print(f.info.name)
+
+    def count_output(self, f):
+        """Output for showing only the count."""
+
+        if f.match is not None:
+            if not self.no_filename and self.current_file is None:
+                self.current_file = f.info.name
+                self.count = 1
+            elif self.no_filename or self.current_file == f.info.name:
+                self.count += 1
+            else:
+                print("%s:%d" % (self.current_file, self.count))
+                self.current_file = f.info.name
+                self.count = 1
+        elif self.count:
+            print("%s:%d" % (self.current_file, self.count))
+            self.current_file = None
+            self.count = 0
+
+    def count_flush(self):
+        """Flush remaining count entries."""
+
+        if self.count:
+            if self.no_filename:
+                self.current_file = ""
+            print("%s:%d" % (self.current_file, self.count))
+            self.current_file = None
+            self.count = 0
+
+    def display_output(self):
+        """Display output."""
+
+        for f in self.rummage.find():
+            if not f.error:
+                if self.bool_match != BOOL_NONE:
+                    self.bool_output(f)
+                elif self.count_only:
+                    self.count_output(f)
+                elif self.only_matching:
+                    self.match_output(f)
+                else:
+                    self.normal_output(f)
+            else:
+                self.errors = True
+                print("ERROR: %s" % f.error)
+        self.count_flush()
 
 
 def cli_main():
@@ -199,7 +227,7 @@ def cli_main():
     parser = argparse.ArgumentParser(prog="rumcl", description="Grep like file searcher.", add_help=False)
     # Flag arguments
     parser.add_argument(
-        "--version", action="version", version=("%(prog)s " + __VERSION__)
+        "--version", action="version", version=("%(prog)s " + version.__version__)
     )
     parser.add_argument(
         "--help", action="help",
@@ -258,31 +286,31 @@ def cli_main():
         help="Hide file name in output."
     )
     parser.add_argument(
-        "--directory_exclude", "-D", metavar="PATTERN", nargs=1, default=None,
+        "--directory_exclude", "-D", metavar="PATTERN", default=None,
         help="Regex describing directory path(s) to exclude"
     )
     parser.add_argument(
-        "--max_count", "-m", metavar="NUM", nargs=1, default=None,
+        "--max_count", "-m", metavar="NUM", default=None,
         help="Max matches to find."
     )
     parser.add_argument(
-        "--after_context", "-A", metavar="NUM", nargs=1, default=None,
+        "--after_context", "-A", metavar="NUM", default=None,
         help="Print number lines of leading context."
     )
     parser.add_argument(
-        "--before_context", "-B", metavar="NUM", nargs=1, default=None,
+        "--before_context", "-B", metavar="NUM", default=None,
         help="Print number lines of trailing context."
     )
     parser.add_argument(
-        "--context", "-C", metavar="NUM", nargs=1, default=None,
+        "--context", "-C", metavar="NUM", default=None,
         help="Print number lines of context before and after."
     )
     parser.add_argument(
-        "--regexfilepattern", "-F", metavar="PATTERN", nargs=1, default=None,
+        "--regexfilepattern", "-F", metavar="PATTERN", default=None,
         help="Regex file pattern to search."
     )
     parser.add_argument(
-        "--filepattern", "-f", metavar="PATTERN", nargs=1, default="*",
+        "--filepattern", "-f", metavar="PATTERN", default="*",
         help="File pattern to search."
     )
     parser.add_argument(
@@ -290,11 +318,26 @@ def cli_main():
         help="Show hidden files."
     )
 
+    parser.add_argument(
+        "--substitute", "-s", metavar="PATTERN", default=None,
+        help="Replace find with the specified pattern."
+    )
+
     # Positional arguments (must follow flag arguments)
-    parser.add_argument("pattern", default=None, help="Search pattern")
-    parser.add_argument("target", default=None, help="File, directory, or string buffer to search.")
-    # Parse arguments
-    return run(parser.parse_args())
+    parser.add_argument(
+        "pattern", default=None,
+        help="Search pattern"
+    )
+
+    parser.add_argument(
+        "target", default=None,
+        help="File, directory, or string buffer to search."
+    )
+
+    rumcl = RummageCli(parser.parse_args())
+    rumcl.display_output()
+
+    return rumcl.errors
 
 
 if __name__ == "__main__":

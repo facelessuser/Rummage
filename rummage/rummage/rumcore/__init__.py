@@ -137,9 +137,9 @@ def _literal_pattern(pattern, ignorecase=False, dotall=False, multiline=True, bi
     return re.compile(re.escape(pattern), flags)
 
 
-class GrepException(Exception):
+class RummageException(Exception):
 
-    """Grep exception."""
+    """Rummage exception."""
 
 
 class FileAttr(namedtuple('FileAttr', ['name', 'size', 'modified', 'created'])):
@@ -939,9 +939,9 @@ class _DirWalker(object):
             print(str(traceback.format_exc()))
 
 
-class Grep(object):
+class Rummage(object):
 
-    """Perform the grepping."""
+    """Perform the rummaging."""
 
     def __init__(
         self, target, pattern, file_pattern=None, folder_exclude=None,
@@ -951,13 +951,13 @@ class Grep(object):
         boolean=False, count_only=False, replace=None,
         backup=False, backup_ext=DEFAULT_BAK
     ):
-        """Initialize Grep object."""
+        """Initialize Rummage object."""
 
         global _PROCESS
         global ABORT
         if _PROCESS and _PROCESS.alive:
             ABORT = True
-            raise GrepException("Grep process already running!")
+            raise RummageException("Rummage process already running!")
         else:
             ABORT = False
             _PROCESS = self

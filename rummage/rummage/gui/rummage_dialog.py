@@ -271,18 +271,18 @@ def update_autocomplete(obj, key, load_last=False, default=None):
     obj.update_choices(choices, load_last)
 
 
-class GrepThread(threading.Thread):
+class RummageThread(threading.Thread):
 
-    """Threaded grep."""
+    """Threaded Rummage."""
 
     def __init__(self, args):
-        """Set up grep thread with the rumcore object."""
+        """Set up Rummage thread with the rumcore object."""
 
         self.runtime = ""
         self.no_results = 0
         self.running = False
 
-        self.grep = rumcore.Grep(
+        self.rummage = rumcore.Rummage(
             target=args.target,
             pattern=args.pattern,
             file_pattern=self.not_none(args.regexfilepattern, alt=self.not_none(args.filepattern)),
@@ -310,7 +310,7 @@ class GrepThread(threading.Thread):
         return item if item is not None else alt
 
     def get_flags(self, args):
-        """Determine rumcore flags from GrepArgs."""
+        """Determine rumcore flags from RummageArgs."""
 
         flags = 0
 
@@ -334,7 +334,7 @@ class GrepThread(threading.Thread):
         return flags
 
     def kill(self):
-        """Abort grep thread."""
+        """Abort Rummage thread."""
 
         rumcore.ABORT = True
 
@@ -346,7 +346,7 @@ class GrepThread(threading.Thread):
         global _RECORDS
 
         with _LOCK:
-            _COMPLETED, _TOTAL, _RECORDS = self.grep.get_status()
+            _COMPLETED, _TOTAL, _RECORDS = self.rummage.get_status()
             _RECORDS -= self.no_results
 
     def done(self):
@@ -355,7 +355,7 @@ class GrepThread(threading.Thread):
         return not self.running
 
     def payload(self):
-        """Execute the grep command and gather results."""
+        """Execute the rummage command and gather results."""
 
         global _ABORT
         global _RESULTS
@@ -369,7 +369,7 @@ class GrepThread(threading.Thread):
             _TOTAL = 0
             _RECORDS = 0
             _ERRORS = []
-        for f in self.grep.find():
+        for f in self.rummage.find():
             with _LOCK:
                 if f.match is not None:
                     _RESULTS.append(f)
@@ -385,7 +385,7 @@ class GrepThread(threading.Thread):
                 _ABORT = False
 
     def run(self):
-        """Start the grep thread benchmark the time."""
+        """Start the Rummage thread benchmark the time."""
 
         self.running = True
         start = time()
@@ -403,17 +403,17 @@ class GrepThread(threading.Thread):
         self.update_status()
 
 
-class GrepArgs(object):
+class RummageArgs(object):
 
-    """Grep argument object."""
+    """Rummage argument object."""
 
     def __init__(self):
-        """Default the grep args on instatiation."""
+        """Default the rummage args on instatiation."""
 
         self.reset()
 
     def reset(self):
-        """Reset grep args to defaults."""
+        """Reset rummage args to defaults."""
 
         self.regexp = False
         self.ignore_case = False
@@ -505,7 +505,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.tester = None
         self.checking = False
         self.kill = False
-        self.args = GrepArgs()
+        self.args = RummageArgs()
         self.thread = None
         self.allow_update = False
         if start_path is None:
@@ -1027,7 +1027,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.save_history(replace)
 
         # Setup search thread
-        self.thread = GrepThread(self.args)
+        self.thread = RummageThread(self.args)
         self.thread.setDaemon(True)
 
         # Reset result tables
