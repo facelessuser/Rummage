@@ -38,8 +38,13 @@ else:
     _PLATFORM = "linux"
 
 if _PLATFORM == "windows":
-    import win32pipe
-    import win32file
+    import ctypes
+    GENERIC_READ = 0x80000000
+    GENERIC_WRITE = 0x40000000
+    OPEN_EXISTING = 0x3
+    PIPE_ACCESS_DUPLEX = 0x3
+    PIPE_TYPE_MESSAGE = 0x4
+    PIPE_WAIT = 0x0
 
 PipeEvent, EVT_PIPE_ARGS = wx.lib.newevent.NewEvent()
 
@@ -222,16 +227,19 @@ class ArgPipeThread(object):
 
         self.check_pipe = False
         if _PLATFORM == "windows":
-            file_handle = win32file.CreateFile(
+            file_handle = ctypes.windll.kernel32.CreateFileA(
                 self.pipe_name,
-                win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                GENERIC_READ | GENERIC_WRITE,
                 0, None,
-                win32file.OPEN_EXISTING,
+                OPEN_EXISTING,
                 0, None
             )
             data = '\n'
-            win32file.WriteFile(file_handle, data)
-            win32file.CloseHandle(file_handle)
+            bytes_written = ctypes.c_ulong(0)
+            ctypes.windll.kernel32.WriteFile(
+                file_handle, ctypes.c_char_p(data), len(data), ctypes.byref(bytes_written), None
+            )
+            ctypes.windll.kernel32.CloseHandle(file_handle)
         else:
             with open(self.pipe_name, "w") as pipeout:
                 pipeout.write('\n')
@@ -246,23 +254,25 @@ class ArgPipeThread(object):
 
         if _PLATFORM == "windows":
             data = ""
-            p = win32pipe.CreateNamedPipe(
+            p = ctypes.windll.kernel32.CreateNamedPipeA(
                 self.pipe_name,
-                win32pipe.PIPE_ACCESS_DUPLEX,
-                win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_WAIT,
+                PIPE_ACCESS_DUPLEX,
+                PIPE_TYPE_MESSAGE | PIPE_WAIT,
                 1, 65536, 65536, 300, None
             )
             while self.check_pipe:
-                win32pipe.ConnectNamedPipe(p, None)
-                result = win32file.ReadFile(p, 4096)
-                if result[0] == 0:
-                    data += result[1].replace("\r", "")
+                ctypes.windll.kernel32.ConnectNamedPipe(p, None)
+                result = ctypes.create_string_buffer(4096)
+                bytes_read = ctypes.c_ulong(0)
+                success = ctypes.windll.kernel32.ReadFile(p, result, 4096, ctypes.byref(bytes_read), None)
+                if success:
+                    data += result.value.replace("\r", "")
                     if len(data) and data[-1] == "\n":
                         lines = data.rstrip("\n").split("\n")
                         evt = PipeEvent(data=lines[-1])
                         wx.PostEvent(self.app, evt)
                         data = ""
-                win32pipe.DisconnectNamedPipe(p)
+                ctypes.windll.kernel32.DisconnectNamedPipe(p)
                 time.sleep(0.2)
         else:
             if os.path.exists(self.pipe_name):
@@ -318,16 +328,19 @@ class PipeApp(CustomApp):
         if len(sys.argv) > 1:
             if _PLATFORM == "windows":
                 args = self.process_args(sys.argv[1:])
-                file_handle = win32file.CreateFile(
+                file_handle = ctypes.windll.kernel32.CreateFileA(
                     self.pipe_name,
-                    win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                    GENERIC_READ | GENERIC_WRITE,
                     0, None,
-                    win32file.OPEN_EXISTING,
+                    OPEN_EXISTING,
                     0, None
                 )
                 data = '|'.join(args) + '\n'
-                win32file.WriteFile(file_handle, data)
-                win32file.CloseHandle(file_handle)
+                bytes_written = ctypes.c_ulong(0)
+                ctypes.windll.kernel32.WriteFile(
+                    file_handle, ctypes.c_char_p(data), len(data), ctypes.byref(bytes_written), None
+                )
+                ctypes.windll.kernel32.CloseHandle(file_handle)
             else:
                 with open(self.pipe_name, "w") as pipeout:
                     args = self.process_args(sys.argv[1:])
