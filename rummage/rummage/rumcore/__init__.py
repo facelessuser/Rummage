@@ -232,7 +232,7 @@ class _FileSearch(object):
 
     """Search for files."""
 
-    hex_tx_table = ("�" * 32) + "".join(chr(c) for c in range(32, 127)) + ("�" * 129)
+    hex_tx_table = ("\ufffd" * 32) + "".join(chr(c) for c in range(32, 127)) + ("\ufffd" * 129)
 
     def __init__(self, args, file_obj, file_id, max_count, file_content):
         """Init the file search object."""
