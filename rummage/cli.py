@@ -58,7 +58,6 @@ RE_DATE_TIME_FULL = re.compile(
 def pyout(value):
     """Dump to stdout."""
 
-    # print(value)
     print(value.encode(sys.stdout.encoding, errors='replace').decode(sys.stdout.encoding))
 
 
