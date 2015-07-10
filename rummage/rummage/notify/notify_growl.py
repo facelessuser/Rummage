@@ -4,6 +4,7 @@ Notify Growl.
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
+from __future__ import unicode_literals
 import traceback
 from os.path import exists
 

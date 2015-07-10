@@ -4,13 +4,22 @@ Notify OSX.
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
+from __future__ import unicode_literals
 import subprocess
 import traceback
 from os.path import exists
 import ctypes
 import ctypes.util
+import sys
 
 __all__ = ("get_notify", "alert", "setup")
+
+PY3 = (3, 0) <= sys.version_info < (4, 0)
+
+if PY3:
+    binary_type = bytes  # noqa
+else:
+    binary_type = str
 
 appkit = ctypes.cdll.LoadLibrary(ctypes.util.find_library('AppKit'))
 cf = ctypes.cdll.LoadLibrary(ctypes.util.find_library('CoreFoundation'))
@@ -110,6 +119,12 @@ def setup(app_name, icon, *args):
     if len(args) and len(args[0]) == 2:
         term_notify = args[0][0]
         sender = args[0][1]
+
+        if term_notify is not None and isinstance(term_notify, binary_type):
+            term_notify = term_notify.decode('utf-8')
+
+        if sender is not None and isinstance(sender, binary_type):
+            sender = sender.decode('utf-8')
 
     Options.app_name = app_name
 
