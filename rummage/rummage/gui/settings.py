@@ -65,7 +65,7 @@ class Settings(object):
         """Load the settings."""
 
         cls.debug = debug_mode
-        cls.settings_file, cls.cache_file, log, uni_props = cls.get_settings_files()
+        cls.settings_file, cls.cache_file, log = cls.get_settings_files()
         init_app_log(log)
         cls.settings = {}
         cls.cache = {}
@@ -187,7 +187,6 @@ class Settings(object):
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
-            unicode_props = folder
             cls.fifo = join(folder, '\\\\.\\pipe\\rummage')
             cls.config_folder = folder
         elif _PLATFORM == "osx":
@@ -201,7 +200,6 @@ class Settings(object):
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
-            unicode_props = folder
             cls.fifo = join(folder, FIFO)
             cls.config_folder = folder
         elif _PLATFORM == "linux":
@@ -211,7 +209,6 @@ class Settings(object):
             settings = join(folder, SETTINGS_FILE)
             cache = join(folder, CACHE_FILE)
             log = join(folder, LOG_FILE)
-            unicode_props = folder
             cls.fifo = join(folder, FIFO)
             cls.config_folder = folder
         try:
@@ -221,7 +218,7 @@ class Settings(object):
                         f.write(json.dumps({}, sort_keys=True, indent=4, separators=(',', ': ')))
         except Exception:
             pass
-        return settings, cache, log, unicode_props
+        return settings, cache, log
 
     @classmethod
     def get_config_folder(cls):
