@@ -83,6 +83,9 @@ class RummageApp(PipeApp):
                     args.append(os.path.abspath(os.path.normpath(argv.next())))
                 except StopIteration:
                     break
+        if not args:
+            args.extend(['-s', os.getcwdu().encode('utf-8')])
+
         return args
 
     def MacReopenApp(self):  # noqa

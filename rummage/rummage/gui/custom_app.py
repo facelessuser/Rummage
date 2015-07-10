@@ -325,26 +325,25 @@ class PipeApp(CustomApp):
     def send_arg_pipe(self):
         """Send the current arguments down the pipe."""
 
-        if len(sys.argv) > 1:
-            if _PLATFORM == "windows":
+        if _PLATFORM == "windows":
+            args = self.process_args(sys.argv[1:])
+            file_handle = ctypes.windll.kernel32.CreateFileA(
+                self.pipe_name,
+                GENERIC_READ | GENERIC_WRITE,
+                0, None,
+                OPEN_EXISTING,
+                0, None
+            )
+            data = '|'.join(args) + '\n'
+            bytes_written = ctypes.c_ulong(0)
+            ctypes.windll.kernel32.WriteFile(
+                file_handle, ctypes.c_char_p(data), len(data), ctypes.byref(bytes_written), None
+            )
+            ctypes.windll.kernel32.CloseHandle(file_handle)
+        else:
+            with open(self.pipe_name, "w") as pipeout:
                 args = self.process_args(sys.argv[1:])
-                file_handle = ctypes.windll.kernel32.CreateFileA(
-                    self.pipe_name,
-                    GENERIC_READ | GENERIC_WRITE,
-                    0, None,
-                    OPEN_EXISTING,
-                    0, None
-                )
-                data = '|'.join(args) + '\n'
-                bytes_written = ctypes.c_ulong(0)
-                ctypes.windll.kernel32.WriteFile(
-                    file_handle, ctypes.c_char_p(data), len(data), ctypes.byref(bytes_written), None
-                )
-                ctypes.windll.kernel32.CloseHandle(file_handle)
-            else:
-                with open(self.pipe_name, "w") as pipeout:
-                    args = self.process_args(sys.argv[1:])
-                    pipeout.write('|'.join(args) + '\n')
+                pipeout.write('|'.join(args) + '\n')
 
     def process_args(self, arguments):
         """Noop, but can be overriden to process the args."""
