@@ -47,9 +47,10 @@ NIIF_ERROR = 3
 NIF_INFO = 16
 NIF_SHOWTIP = 0x80
 
-class WNDCLASSEX(ctypes.Structure):
 
-    """WNDCLASS structure."""
+class WndClassEx(ctypes.Structure):
+
+    """WNDCLASSEX structure."""
 
     _fields_ = [
         ("cbSize", ctypes.c_uint),
@@ -66,7 +67,8 @@ class WNDCLASSEX(ctypes.Structure):
         ("hIconSm", HANDLE)
     ]
 
-class NOTIFYICONDATA(ctypes.Structure):
+
+class NotifyIconData(ctypes.Structure):
 
     """NOTIFYICONDATA structure."""
 
@@ -88,11 +90,12 @@ class NOTIFYICONDATA(ctypes.Structure):
         ("hBalloonIcon", HANDLE),
     ]
 
-class NOTIFYICONDATA_V3(ctypes.Structure):
+
+class NotifyIconDataV3(ctypes.Structure):
 
     """NOTIFYICONDATA_V3 structure."""
 
-    _fields_ = NOTIFYICONDATA._fields_[:-1]  # noqa
+    _fields_ = NotifyIconData._fields_[:-1]  # noqa
 
 
 class Options(object):
@@ -158,14 +161,13 @@ class WindowsNotify(object):
                 return 0
             return hwnd
 
-
         self.tooltip = tooltip
         self.is_xp = platform.release().lower() == 'xp'
         self.visible = False
         self.app_name = app_name
 
         # Register window class
-        wc = WNDCLASSEX()
+        wc = WndClassEx()
         self.hinst = wc.hInstance = ctypes.windll.kernel32.GetModuleHandleW(None)
         wc.cbSize = ctypes.sizeof(wc)
         wc.lpszClassName = ctypes.c_wchar_p(app_name + "Taskbar")
@@ -258,7 +260,7 @@ class WindowsNotify(object):
         elif icon & WinNotifyLevel.ICON_ERROR:
             icon_level |= NIIF_ERROR
 
-        res = NOTIFYICONDATA_V3() if self.is_xp else NOTIFYICONDATA()
+        res = NotifyIconDataV3() if self.is_xp else NotifyIconData()
         res.cbSize = ctypes.sizeof(res)
         res.hWnd = self.hwnd
         res.uID = 0
@@ -286,7 +288,7 @@ class WindowsNotify(object):
         """Display the taskbar icon."""
 
         if not ctypes.windll.shell32.Shell_NotifyIconW(NIM_MODIFY, ctypes.byref(res)):
-            tres = NOTIFYICONDATA_V3() if self.is_xp else NOTIFYICONDATA()
+            tres = NotifyIconDataV3() if self.is_xp else NotifyIconData()
             tres.cbSize = ctypes.sizeof(res)
             tres.hWnd = self.hwnd
             tres.uID = 0
@@ -305,7 +307,7 @@ class WindowsNotify(object):
         """Hide icon."""
 
         if self.visible:
-            res = NOTIFYICONDATA_V3() if self.is_xp else NOTIFYICONDATA()
+            res = NotifyIconDataV3() if self.is_xp else NotifyIconData()
             res.cbSize = ctypes.sizeof(res)
             res.hWnd = self.hwnd
             res.uID = 0

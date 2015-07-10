@@ -116,7 +116,7 @@ def setup_notifications(app_name, png=None, icon=None, term_notify=(None, None))
     if isinstance(app_name, binary_type):
         app_name = app_name.decode('utf-8')
 
-    # setup_growl(app_name, png, alert)
+    setup_growl(app_name, png, alert)
     setup(
         app_name,
         icon if _PLATFORM == "windows" else png,
