@@ -26,6 +26,20 @@ from .rummage.gui.settings import Settings
 from .rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
 from .rummage import version
 
+PY3 = (3, 0) <= sys.version_info < (4, 0)
+CLI_ENCODING = sys.getfilesystemencoding()
+
+if PY3:
+    binary_type = bytes  # noqa
+else:
+    binary_type = str  # noqa
+
+
+def pyin(value):
+    """Read in stdin variables."""
+
+    return value.decode(CLI_ENCODING) if isinstance(value, binary_type) else value
+
 
 def parse_arguments():
     """Parse the arguments."""
@@ -34,8 +48,14 @@ def parse_arguments():
     # Flag arguments
     parser.add_argument('--version', action='version', version=('%(prog)s ' + version.__version__))
     parser.add_argument('--debug', action='store_true', default=False, help=argparse.SUPPRESS)
-    parser.add_argument('--searchpath', '-s', default=None, help="Path to search.")
-    parser.add_argument('--regextool', action='store_true', default=False, help="Open just the regex tester.")
+    parser.add_argument(
+        '--searchpath', '-s', default=None, type=pyin,
+        help="Path to search."
+    )
+    parser.add_argument(
+        '--regextool', action='store_true', default=False,
+        help="Open just the regex tester."
+    )
     return parser.parse_args()
 
 

@@ -20,7 +20,8 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-
+from __future__ import unicode_literals
+import codecs
 import json
 import os
 import simplelog
@@ -29,6 +30,13 @@ import thread
 import time
 import wx
 import wx.lib.newevent
+
+PY3 = (3, 0) <= sys.version_info < (4, 0)
+
+if PY3:
+    binary_type = bytes  # noqa
+else:
+    binary_type = str  # noqa
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -227,7 +235,7 @@ class ArgPipeThread(object):
 
         self.check_pipe = False
         if _PLATFORM == "windows":
-            file_handle = ctypes.windll.kernel32.CreateFileA(
+            file_handle = ctypes.windll.kernel32.CreateFileW(
                 self.pipe_name,
                 GENERIC_READ | GENERIC_WRITE,
                 0, None,
@@ -237,11 +245,11 @@ class ArgPipeThread(object):
             data = '\n'
             bytes_written = ctypes.c_ulong(0)
             ctypes.windll.kernel32.WriteFile(
-                file_handle, ctypes.c_char_p(data), len(data), ctypes.byref(bytes_written), None
+                file_handle, ctypes.c_wchar_p(data), len(data), ctypes.byref(bytes_written), None
             )
             ctypes.windll.kernel32.CloseHandle(file_handle)
         else:
-            with open(self.pipe_name, "w") as pipeout:
+            with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
                 pipeout.write('\n')
 
     def IsRunning(self):  # noqa
@@ -254,7 +262,7 @@ class ArgPipeThread(object):
 
         if _PLATFORM == "windows":
             data = ""
-            p = ctypes.windll.kernel32.CreateNamedPipeA(
+            p = ctypes.windll.kernel32.CreateNamedPipeW(
                 self.pipe_name,
                 PIPE_ACCESS_DUPLEX,
                 PIPE_TYPE_MESSAGE | PIPE_WAIT,
@@ -262,7 +270,7 @@ class ArgPipeThread(object):
             )
             while self.check_pipe:
                 ctypes.windll.kernel32.ConnectNamedPipe(p, None)
-                result = ctypes.create_string_buffer(4096)
+                result = ctypes.create_unicode_buffer(4096)
                 bytes_read = ctypes.c_ulong(0)
                 success = ctypes.windll.kernel32.ReadFile(p, result, 4096, ctypes.byref(bytes_read), None)
                 if success:
@@ -280,7 +288,7 @@ class ArgPipeThread(object):
             if not os.path.exists(self.pipe_name):
                 os.mkfifo(self.pipe_name)
 
-            with open(self.pipe_name, "r") as pipein:
+            with codecs.open(self.pipe_name, "r", 'utf-8') as pipein:
                 while self.check_pipe:
                     line = pipein.readline()[:-1]
                     if line != "":
@@ -322,12 +330,21 @@ class PipeApp(CustomApp):
                 return False
         return True
 
+    def get_sys_args(self):
+        """Get system args as unicode."""
+
+        args = []
+        encoding = sys.getfilesystemencoding()
+        for a in sys.argv[1:]:
+            args.append(a.decode(encoding) if isinstance(a, binary_type) else a)
+        return args
+
     def send_arg_pipe(self):
         """Send the current arguments down the pipe."""
-
+        argv = self.get_sys_args()
         if _PLATFORM == "windows":
-            args = self.process_args(sys.argv[1:])
-            file_handle = ctypes.windll.kernel32.CreateFileA(
+            args = self.process_args(argv)
+            file_handle = ctypes.windll.kernel32.CreateFileW(
                 self.pipe_name,
                 GENERIC_READ | GENERIC_WRITE,
                 0, None,
@@ -337,12 +354,12 @@ class PipeApp(CustomApp):
             data = '|'.join(args) + '\n'
             bytes_written = ctypes.c_ulong(0)
             ctypes.windll.kernel32.WriteFile(
-                file_handle, ctypes.c_char_p(data), len(data), ctypes.byref(bytes_written), None
+                file_handle, ctypes.c_wchar_p(data), len(data), ctypes.byref(bytes_written), None
             )
             ctypes.windll.kernel32.CloseHandle(file_handle)
         else:
-            with open(self.pipe_name, "w") as pipeout:
-                args = self.process_args(sys.argv[1:])
+            with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
+                args = self.process_args(argv)
                 pipeout.write('|'.join(args) + '\n')
 
     def process_args(self, arguments):

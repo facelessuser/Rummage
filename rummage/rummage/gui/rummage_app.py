@@ -18,6 +18,7 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
+from __future__ import unicode_literals
 import wx
 import os
 from .platform_window_focus import platform_window_focus
@@ -76,15 +77,17 @@ class RummageApp(PipeApp):
 
         argv = iter(arguments)
         args = []
+        path_arg_found = False
         for a in argv:
             args.append(a)
             if a == "-s":
                 try:
                     args.append(os.path.abspath(os.path.normpath(argv.next())))
+                    path_arg_found = True
                 except StopIteration:
                     break
-        if not args:
-            args.extend(['-s', os.getcwdu().encode('utf-8')])
+        if not path_arg_found:
+            args.extend(['-s', os.getcwdu()])
 
         return args
 
