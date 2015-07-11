@@ -19,6 +19,7 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+from __future__ import unicode_literals
 from collections import OrderedDict
 import sys
 import wx
@@ -256,7 +257,7 @@ def extend(instance, extension):
     """Extend instance with extension class."""
 
     instance.__class__ = type(
-        '%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
+        b'%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
         (instance.__class__, extension),
         {}
     )

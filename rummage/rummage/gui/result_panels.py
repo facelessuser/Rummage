@@ -18,6 +18,7 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
+from __future__ import unicode_literals
 from time import ctime
 import wx
 import wx.lib.mixins.listctrl as listmix
@@ -187,13 +188,13 @@ class ResultFileList(ResultList):
     def set_match(self, obj):
         """Set match."""
 
-        item_id = u"%d" % obj.info.id
+        item_id = "%d" % obj.info.id
         if item_id in self.itemDataMap:
             self.increment_match_count(item_id)
         else:
             self.set_item_map(
                 item_id,
-                basename(obj.info.name), float(obj.info.size.strip(u"KB")), 1,
+                basename(obj.info.name), float(obj.info.size.strip("KB")), 1,
                 dirname(obj.info.name), obj.info.encoding, obj.info.modified,
                 obj.info.created, obj.match.lineno, obj.match.colno
             )
@@ -223,7 +224,7 @@ class ResultFileList(ResultList):
         if not absolute:
             item = self.itemIndexMap[item]
         if col == 1:
-            return u'%.2fKB' % self.itemDataMap[item][col]
+            return '%.2fKB' % self.itemDataMap[item][col]
         elif col in [5, 6]:
             return ctime(self.itemDataMap[item][col])
         else:
@@ -233,7 +234,7 @@ class ResultFileList(ResultList):
         """Override method to get the image for the given item."""
 
         encoding = self.itemDataMap[self.itemIndexMap[item]][4]
-        return 1 if encoding == u"BIN" else 0
+        return 1 if encoding == "BIN" else 0
 
     def increment_match_count(self, idx):
         """Increment the match count of the given item."""
@@ -340,15 +341,15 @@ class ResultContentList(ResultList):
                 item_id,
                 (basename(obj.info.name), dirname(obj.info.name)),
                 obj.match.lineno, 1,
-                obj.match.lines.replace(u"\r", u"").split(u"\n")[0],
-                u"%d" % obj.info.id, obj.match.colno, obj.info.encoding
+                obj.match.lines.replace("\r", "").split("\n")[0],
+                "%d" % obj.info.id, obj.match.colno, obj.info.encoding
             )
 
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
 
         encoding = self.itemDataMap[self.itemIndexMap[item]][6]
-        return 1 if encoding == u"BIN" else 0
+        return 1 if encoding == "BIN" else 0
 
     def on_dclick(self, event):
         """Open file at in editor with optional line and column argument."""

@@ -38,7 +38,7 @@ def html_encode(text):
         '&nbsp;',
         ''.join(
             encode_table.get(c, c) for c in text
-        ).encode('ascii', 'xmlcharrefreplace')
+        ).encode('utf-8', 'xmlcharrefreplace')
     )
 
 TITLE = html_encode(_("Rummage Results"))
@@ -194,14 +194,14 @@ def export_result_list(res, html):
         html.write(
             RESULT_ROW % {
                 "file": html_encode(item[0]),
-                "size_sort": str(item[1]),
+                "size_sort": unicode(item[1]),
                 "size": '%.2fKB' % item[1],
-                "matches": str(item[2]),
+                "matches": unicode(item[2]),
                 "path": html_encode(item[3]),
                 "encoding": item[4],
-                "mod_sort": str(item[5]),
+                "mod_sort": unicode(item[5]),
                 "modified": ctime(item[5]),
-                "cre_sort": str(item[6]),
+                "cre_sort": unicode(item[6]),
                 "created": ctime(item[6])
             }
         )
@@ -223,8 +223,8 @@ def export_result_content_list(res, html):
             RESULT_CONTENT_ROW % {
                 "file_sort": html_encode(os.path.join(item[0][1], item[0][0])),
                 "file": html_encode(item[0][0]),
-                "line": str(item[1]),
-                "matches": str(item[2]),
+                "line": unicode(item[1]),
+                "matches": unicode(item[2]),
                 "context": html_encode(item[3])
             }
         )
