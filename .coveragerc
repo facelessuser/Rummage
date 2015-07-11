@@ -1,0 +1,7 @@
+[run]
+omit=
+    rummage/rummage/rumcore/backrefs/uniprops.py
+
+[report]
+omit=
+    rummage/rummage/rumcore/backrefs/uniprops.py
