@@ -59,7 +59,7 @@ RE_PY_ENCODE = re.compile(
 )
 
 RE_IS_BIN = re.compile(
-    br'\x00{3}'
+    br'\x00{2}'
 )
 
 RE_BAD_ASCII = re.compile(
