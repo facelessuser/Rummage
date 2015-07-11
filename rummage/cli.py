@@ -30,7 +30,12 @@ from .rummage import rumcore
 from .rummage import version
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
+CLI_ENCODING = sys.getfilesystemencoding()
 
+if PY3:
+    binary_type = bytes  # noqa
+else:
+    binary_type = str  # noqa
 
 BOOL_NONE = 0
 BOOL_MATCH = 1
@@ -58,7 +63,13 @@ RE_DATE_TIME_FULL = re.compile(
 def pyout(value):
     """Dump to stdout."""
 
-    print(value.encode(sys.stdout.encoding, errors='replace').decode(sys.stdout.encoding))
+    print(value.encode(CLI_ENCODING, errors='replace').decode(CLI_ENCODING))
+
+
+def pyin(value):
+    """Read in stdin variables."""
+
+    return value.decode(CLI_ENCODING) if isinstance(value, binary_type) else value
 
 
 class RummageCli(object):
@@ -379,7 +390,7 @@ def main():
         help="Only show the match; no context."
     )
     parser.add_argument(
-        "--max-count", "-m", metavar="NUM", default=None,
+        "--max-count", "-m", metavar="NUM", default=None, type=pyin,
         help="Max matches to find."
     )
     parser.add_argument(
@@ -401,7 +412,7 @@ def main():
         help="Make the '.' special character in regex match any character at all, including a newline."
     )
     parser.add_argument(
-        "--replace", "-r", metavar="PATTERN", default=None,
+        "--replace", "-r", metavar="PATTERN", default=None, type=pyin,
         help="Replace find with the specified pattern."
     )
 
@@ -419,28 +430,28 @@ def main():
     # Limit search
     dir_pattern_group = parser.add_mutually_exclusive_group()
     dir_pattern_group.add_argument(
-        "--regex-directory-exclude", "-D", metavar="PATTERN", default=None,
+        "--regex-directory-exclude", "-D", metavar="PATTERN", default=None, type=pyin,
         help="Regex describing directory path(s) to exclude"
     )
     dir_pattern_group.add_argument(
-        "--directory-exclude", "-d", metavar="PATTERN", default=None,
+        "--directory-exclude", "-d", metavar="PATTERN", default=None, type=pyin,
         help="File pattern describing directory path(s) to exclude"
     )
     file_pattern_group = parser.add_mutually_exclusive_group()
     file_pattern_group.add_argument(
-        "--regex-file-pattern", "-F", metavar="PATTERN", default=None,
+        "--regex-file-pattern", "-F", metavar="PATTERN", default=None, type=pyin,
         help="Regex file pattern to search."
     )
     file_pattern_group.add_argument(
-        "--file-pattern", "-f", metavar="PATTERN", default="*",
+        "--file-pattern", "-f", metavar="PATTERN", default="*", type=pyin,
         help="File pattern to search."
     )
     parser.add_argument(
-        "--size-limit", '-z', metavar="LIMIT", default=None,
+        "--size-limit", '-z', metavar="LIMIT", default=None, type=pyin,
         help="File size limit in KB: equal to '-z 1000', less than '-z <1000', or greater than '-z >1000'"
     )
     parser.add_argument(
-        "--created", '-C', metavar="DATETIME", default=None,
+        "--created", '-C', metavar="DATETIME", default=None, type=pyin,
         help=(
             "Date time that is either in the format: MM/DD/YYYY-HH:MM:SS.  If desired, date can be omitted, and "
             "'today' will be assumed.  If just the time is omitted, it will be replaced with '00:00:00'. "
@@ -449,7 +460,7 @@ def main():
         )
     )
     parser.add_argument(
-        "--modified", '-M', metavar="DATETIME", default=None,
+        "--modified", '-M', metavar="DATETIME", default=None, type=pyin,
         help=(
             "Date time that is either in the format: MM/DD/YYYY-HH:MM:SS.  If desired, date can be omitted, and "
             "'today' will be assumed.  If just the time is omitted, it will be replaced with '00:00:00'. "
@@ -461,7 +472,7 @@ def main():
     # Context
     context_group = parser.add_mutually_exclusive_group()
     context_group.add_argument(
-        "--context", "-T", metavar="NUM,NUM", default=None,
+        "--context", "-T", metavar="NUM,NUM", default=None, type=pyin,
         help="Print number lines of context before and after. Before and after are separated by a comma: `-T 2,3` etc."
     )
     context_group.add_argument(
@@ -488,17 +499,17 @@ def main():
 
     # Encoding
     parser.add_argument(
-        "--encoding-force", "-e", metavar="ENCODING", default=None,
+        "--encoding-force", "-e", metavar="ENCODING", default=None, type=pyin,
         help="Do not detect encoding, but force the specified encoding."
     )
 
     # Positional arguments (must follow flag arguments)
     parser.add_argument(
-        "pattern", default=None,
+        "pattern", default=None, type=pyin,
         help="Search pattern"
     )
     parser.add_argument(
-        "target", default=None,
+        "target", default=None, type=pyin,
         help="File, directory, or string buffer to search."
     )
 

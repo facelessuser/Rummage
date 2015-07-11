@@ -65,7 +65,7 @@ def export_result_list(res, csv):
             RESULT_ROW % {
                 "file": csv_encode(item[0]),
                 "size": csv_encode('%.2fKB' % item[1]),
-                "matches": csv_encode(str(item[2])),
+                "matches": csv_encode(unicode(item[2])),
                 "path": csv_encode(item[3]),
                 "encoding": csv_encode(item[4]),
                 "modified": csv_encode(ctime(item[5])),
@@ -88,8 +88,8 @@ def export_result_content_list(res, csv):
         csv.write(
             RESULT_CONTENT_ROW % {
                 "file": csv_encode(item[0][0]),
-                "line": csv_encode(str(item[1])),
-                "matches": csv_encode(str(item[2])),
+                "line": csv_encode(unicode(item[1])),
+                "matches": csv_encode(unicode(item[2])),
                 "context": csv_encode(item[3])
             }
         )
