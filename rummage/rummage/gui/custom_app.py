@@ -354,7 +354,7 @@ class PipeApp(CustomApp):
             data = '|'.join(args) + '\n'
             bytes_written = ctypes.c_ulong(0)
             ctypes.windll.kernel32.WriteFile(
-                file_handle, ctypes.c_wchar_p(data), len(data), ctypes.byref(bytes_written), None
+                file_handle, ctypes.c_wchar_p(data), len(data) * 2, ctypes.byref(bytes_written), None
             )
             ctypes.windll.kernel32.CloseHandle(file_handle)
         else:
