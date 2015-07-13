@@ -473,9 +473,15 @@ class _FileSearch(object):
         pattern = None
 
         if self.is_binary:
-            pattern = to_ascii_bytes(self.pattern)
+            try:
+                pattern = to_ascii_bytes(self.pattern)
+            except UnicodeEncodeError:
+                raise RummageException('Unicode chars in binary search pattern')
             if self.replace is not None:
-                replace = to_ascii_bytes(self.replace)
+                try:
+                    replace = to_ascii_bytes(self.replace)
+                except UnicodeEncodeError:
+                    raise RummageException('Unicode chars in binary replace pattern')
         else:
             pattern = self.pattern
             replace = self.replace
