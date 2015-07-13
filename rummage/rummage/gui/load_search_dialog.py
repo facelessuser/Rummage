@@ -93,7 +93,7 @@ def extend(instance, extension):
     """Extend object with extension class."""
 
     instance.__class__ = type(
-        '%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
+        b'%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
         (instance.__class__, extension),
         {}
     )
