@@ -46,6 +46,7 @@ from .regex_test_dialog import RegexTestDialog
 from .autocomplete_combo import AutoCompleteCombo
 from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
+from .search_error_dialog import SearchErrorDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .result_panels import FileResultPanel, ResultFileList, ResultContentList
@@ -372,10 +373,11 @@ class RummageThread(threading.Thread):
             _ERRORS = []
         for f in self.rummage.find():
             with _LOCK:
-                if f.match is not None:
+                if f.error is None and f.match is not None:
                     _RESULTS.append(f)
                 else:
-                    self.no_results += 1
+                    if isinstance(f, rumcore.FileRecord):
+                        self.no_results += 1
                     if f.error is not None:
                         _ERRORS.append(f)
             self.update_status()
@@ -501,6 +503,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.SetIcon(data.get_image('rummage_64.png').GetIcon())
 
+        self.error_dlg = None
         self.debounce_search = False
         self.searchin_update = False
         self.tester = None
@@ -1010,6 +1013,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.set_status("")
 
         # Remove errors icon in status bar
+        if self.error_dlg is not None:
+            self.error_dlg.Destroy()
+            self.error_dlg = None
         self.m_statusbar.remove_icon("errors")
 
         # Change button to stop search
@@ -1200,6 +1206,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.check_updates()
         event.Skip()
 
+    def on_error_click(self, event):
+        """Handle error icon click."""
+
+        event.Skip()
+        if self.error_dlg is not None:
+            self.error_dlg.ShowModal()
+
     def check_updates(self):
         """Check if updates to the result lists can be done."""
 
@@ -1285,17 +1298,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     graphic = error_icon.GetImage()
                     graphic.Rescale(16, 16)
                     image = wx.BitmapFromImage(graphic)
+                    self.error_dlg = SearchErrorDialog(self, errors)
                     self.m_statusbar.set_icon(
                         _("errors"), image,
-                        msg=_("%d errors\nSee log for details.") % len(errors),
-                        context=[(_("View Log"), lambda e: self.open_debug_console())]
+                        msg=_("%d errors\nClick to see errors.") % len(errors),
+                        click_left=self.on_error_click
+                        # context=[(_("View Log"), lambda e: self.open_debug_console())]
                     )
-                    for e in errors:
-                        error(
-                            _("Cound not process %s:\n%s") % (
-                                unicode(e.info.name) if e.info is not None else _("file"), e.error
-                            )
-                        )
+
                 self.m_result_file_panel.load_table()
                 self.m_result_content_panel.load_table()
                 self.m_grep_notebook.SetSelection(1)

@@ -26,7 +26,6 @@ import os
 import re
 import shutil
 import sys
-import traceback
 from collections import namedtuple
 from fnmatch import fnmatch
 from os.path import isdir, isfile, join, abspath, getsize
@@ -107,6 +106,24 @@ U8 = (
 )
 
 
+def get_exception():
+    """Capture exception and traceback separately."""
+
+    import traceback
+
+    # capture the exception before doing anything else
+    exc_type, exc_value, exc_tb = sys.exc_info()
+
+    try:
+        exc = ''.join(traceback.format_exception_only(exc_type, exc_value))
+        tb = ''.join(traceback.format_tb(exc_tb))
+    finally:
+        # Prevent circular reference.
+        del exc_tb
+
+    return (exc, tb)
+
+
 def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True, binary=False):
     """Prepare regex search pattern flags."""
 
@@ -142,14 +159,14 @@ class RummageException(Exception):
     """Rummage exception."""
 
 
-class FileAttr(namedtuple('FileAttr', ['name', 'size', 'modified', 'created'])):
+class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'size', 'modified', 'created', 'error'])):
 
     """File Attributes."""
 
 
-class FileInfo(namedtuple('FileInfo', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
+class FileInfoRecord(namedtuple('FileInfoRecord', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
 
-    """Class for tracking file info."""
+    """A record for tracking file info."""
 
 
 class FileRecord(namedtuple('FileRecord', ['info', 'match', 'error'])):
@@ -162,9 +179,14 @@ class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines'
     """A record that contains match info, lineno content, context, etc."""
 
 
-class BufferReplaceRecord(namedtuple('BufferReplaceRecord', ['content', 'error'])):
+class BufferRecord(namedtuple('BufferRecord', ['content', 'error'])):
 
     """A record with the string buffer replacements."""
+
+
+class ErrorRecord(namedtuple('ErrorRecord', ['error'])):
+
+    """A record for non-file related errors."""
 
 
 class RummageFileContent(object):
@@ -185,6 +207,9 @@ class RummageFileContent(object):
 
         try:
             return self.string_buffer if self.string_buffer else self._read_file()
+        except RummageException:
+            # Bubble up RummageExceptions
+            raise
         except Exception:
             if self.encoding.encode != "bin":
                 if self.file_obj is not None:
@@ -192,7 +217,6 @@ class RummageFileContent(object):
                 self.encoding = text_decode.Encoding("bin", None)
                 self._read_bin()
                 return self.file_map
-            raise
 
     def __exit__(self, *args):
         """Close file obj and memory map object if open."""
@@ -204,18 +228,19 @@ class RummageFileContent(object):
 
     def _read_bin(self):
         """Setup binary file reading with mmap."""
-
-        self.file_obj = open(self.name, "rb")
-        if self.size != '0.00KB':
-            self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)
+        try:
+            self.file_obj = open(self.name, "rb")
+            if self.size != '0.00KB':
+                self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)
+        except Exception:
+            # _read_bin has no other fallbacks, so we issue this if it fails.
+            raise RummageException("Could not access or read file.")
 
     def _read_file(self):
         """Read the file in."""
 
         if self.encoding.encode == "bin":
-            self.file_obj = open(self.name, "rb")
-            if self.size != '0.00KB':
-                self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)
+            self._read_bin()
         else:
             enc = self.encoding.encode
             if enc == 'utf-8':
@@ -530,11 +555,11 @@ class _FileSearch(object):
                             self.is_binary = True
                         self.current_encoding = encoding
             except Exception:
-                error = str(traceback.format_exc())
+                error = get_exception()
         elif isinstance(self.file_content, binary_type):
             self.is_binary = True
 
-        file_info = FileInfo(
+        file_info = FileInfoRecord(
             self.idx,
             file_obj.name,
             "%.2fKB" % (float(file_obj.size) / 1024.0),
@@ -559,7 +584,7 @@ class _FileSearch(object):
         file_info, error = self._get_file_info(self.file_obj)
         if error is not None:
             if self.file_content:
-                yield BufferReplaceRecord(None, error)
+                yield BufferRecord(None, error)
             else:
                 yield FileRecord(file_info, None, error)
         if not self.is_binary or self.process_binary:
@@ -609,22 +634,28 @@ class _FileSearch(object):
 
                 if not self.kill and text:
                     if self.file_content:
-                        yield BufferReplaceRecord((b'' if self.is_binary else '').join(text), None)
+                        yield BufferRecord((b'' if self.is_binary else '').join(text), None)
                     else:
                         self._update_file(
                             file_info.name, text, self.current_encoding
                         )
                 else:
                     if self.file_content:
-                        yield BufferReplaceRecord(None, None)
+                        yield BufferRecord(None, None)
                     else:
                         yield FileRecord(file_info, None, None)
 
             except Exception:
                 if self.file_content:
-                    yield BufferReplaceRecord(None, str(traceback.format_exc()))
+                    yield BufferRecord(
+                        None,
+                        get_exception()
+                    )
                 else:
-                    yield FileRecord(file_info, None, str(traceback.format_exc()))
+                    yield FileRecord(
+                        file_info, None,
+                        get_exception()
+                    )
 
     def search(self):
         """Search target file or buffer returning a generator of results."""
@@ -706,7 +737,10 @@ class _FileSearch(object):
                 if not file_record_sent:
                     yield FileRecord(file_info, None, None)
             except Exception:
-                yield FileRecord(file_info, None, str(traceback.format_exc()))
+                yield FileRecord(
+                    file_info, None,
+                    get_exception()
+                )
 
     def run(self):
         """Start the file search thread."""
@@ -719,7 +753,18 @@ class _FileSearch(object):
                 for rec in self.search():
                     yield rec
         except Exception:
-            print(str(traceback.format_exc()))
+            yield FileRecord(
+                FileInfoRecord(
+                    self.idx,
+                    self.file_obj.name,
+                    None,
+                    None,
+                    None,
+                    None
+                ),
+                None,
+                get_exception()
+            )
 
 
 class SearchParams(object):
@@ -838,61 +883,55 @@ class _DirWalker(object):
     def _valid_file(self, base, name):
         """Return whether a file can be searched."""
 
-        try:
-            valid = False
-            if self.file_pattern is not None and not self._is_hidden(join(base, name)) and not self._is_backup(name):
-                if self.file_regex_match:
-                    valid = True if self.file_pattern.match(name) is not None else False
-                else:
-                    matched = False
-                    exclude = False
-                    for p in self.file_pattern:
-                        if len(p) > 1 and p[0] == "-":
-                            if fnmatch(name.lower(), p[1:]):
-                                exclude = True
-                                break
-                        elif fnmatch(name.lower(), p):
-                            matched = True
-                    if exclude:
-                        valid = False
-                    elif matched:
-                        valid = True
-                if valid:
-                    valid = self._is_size_okay(join(base, name))
-                if valid:
-                    valid = self._is_times_okay(join(base, name))
-        except Exception:
-            valid = False
+        valid = False
+        if self.file_pattern is not None and not self._is_hidden(join(base, name)) and not self._is_backup(name):
+            if self.file_regex_match:
+                valid = True if self.file_pattern.match(name) is not None else False
+            else:
+                matched = False
+                exclude = False
+                for p in self.file_pattern:
+                    if len(p) > 1 and p[0] == "-":
+                        if fnmatch(name.lower(), p[1:]):
+                            exclude = True
+                            break
+                    elif fnmatch(name.lower(), p):
+                        matched = True
+                if exclude:
+                    valid = False
+                elif matched:
+                    valid = True
+            if valid:
+                valid = self._is_size_okay(join(base, name))
+            if valid:
+                valid = self._is_times_okay(join(base, name))
         return valid
 
     def _valid_folder(self, base, name):
         """Return whether a folder can be searched."""
 
         valid = True
-        try:
-            if not self.recursive:
-                valid = False
-            elif self._is_hidden(join(base, name)):
-                valid = False
-            elif self.folder_exclude is not None:
-                if self.dir_regex_match:
-                    valid = False if self.folder_exclude.match(name) is not None else True
-                else:
-                    matched = False
-                    exclude = False
-                    for p in self.folder_exclude:
-                        if len(p) > 1 and p[0] == "-":
-                            if fnmatch(name.lower(), p[1:]):
-                                matched = True
-                                break
-                        elif fnmatch(name.lower(), p):
-                            exclude = True
-                    if matched:
-                        valid = True
-                    elif exclude:
-                        valid = False
-        except Exception:
+        if not self.recursive:
             valid = False
+        elif self._is_hidden(join(base, name)):
+            valid = False
+        elif self.folder_exclude is not None:
+            if self.dir_regex_match:
+                valid = False if self.folder_exclude.match(name) is not None else True
+            else:
+                matched = False
+                exclude = False
+                for p in self.folder_exclude:
+                    if len(p) > 1 and p[0] == "-":
+                        if fnmatch(name.lower(), p[1:]):
+                            matched = True
+                            break
+                    elif fnmatch(name.lower(), p):
+                        exclude = True
+                if matched:
+                    valid = True
+                elif exclude:
+                    valid = False
         return valid
 
     @property
@@ -907,8 +946,18 @@ class _DirWalker(object):
         for base, dirs, files in os.walk(self.dir):
             # Remove child folders based on exclude rules
             for name in dirs[:]:
-                if not self._valid_folder(base, name):
+                try:
+                    if not self._valid_folder(base, name):
+                        dirs.remove(name)
+                except Exception:
                     dirs.remove(name)
+                    yield FileAttrRecord(
+                        join(base, name),
+                        None,
+                        None,
+                        None,
+                        get_exception()
+                    )
                 if self.kill:
                     break
 
@@ -916,12 +965,25 @@ class _DirWalker(object):
             if len(files):
                 # Only search files that are in the inlcude rules
                 for name in files:
-                    if self._valid_file(base, name):
-                        yield FileAttr(
+                    try:
+                        valid = self._valid_file(base, name)
+                    except Exception:
+                        valid = False
+                        yield FileAttrRecord(
+                            join(base, name),
+                            None,
+                            None,
+                            None,
+                            get_exception()
+                        )
+
+                    if valid:
+                        yield FileAttrRecord(
                             join(base, name),
                             self.current_size,
                             self.modified_time,
-                            self.created_time
+                            self.created_time,
+                            None
                         )
 
                     if self.kill:
@@ -936,7 +998,7 @@ class _DirWalker(object):
             for f in self.walk():
                 yield f
         except Exception:
-            print(str(traceback.format_exc()))
+            yield ErrorRecord(get_exception())
 
 
 class Rummage(object):
@@ -1008,7 +1070,7 @@ class Rummage(object):
             )
         elif not self.buffer_input and isfile(self.target):
             self.files.append(
-                FileAttr(
+                FileAttrRecord(
                     self.target,
                     getsize(self.target),
                     getmtime(self.target),
@@ -1017,7 +1079,7 @@ class Rummage(object):
             )
         elif self.buffer_input:
             self.files.append(
-                FileAttr(
+                FileAttrRecord(
                     "buffer input",
                     len(self.target),
                     ctime(),
@@ -1135,7 +1197,10 @@ class Rummage(object):
         folder_limit = 100
 
         for f in self.path_walker.run():
-            self.files.append(f)
+            if f.error is None:
+                self.files.append(f)
+            else:
+                yield f
 
             if self.kill:
                 self.files.clear()
