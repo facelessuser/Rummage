@@ -49,7 +49,6 @@ from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
-from .result_panels import FileResultPanel, ResultFileList, ResultContentList
 from .messages import dirpickermsg, filepickermsg
 from .messages import error_icon
 from .. import data
@@ -212,26 +211,19 @@ def i18n_to_eng(string, mapping):
     return mapping.get(string, None)
 
 
-def replace_with_genericdatepicker(obj, key):
+def set_default_time(obj, key):
     """Replace object with a GenericDatePickerCtrl."""
 
     d = Settings.get_search_setting(key, None)
-    dpc = wx.GenericDatePickerCtrl(
-        obj.GetParent(), style=wx.TAB_TRAVERSAL | wx.DP_DROPDOWN | wx.DP_SHOWCENTURY | wx.DP_ALLOWNONE
-    )
     if d is None:
         day = wx.DateTime()
         day.SetToCurrent()
-        dpc.SetValue(day)
+        obj.SetValue(day)
     else:
         day = wx.DateTime()
         saved_day = d.split("/")
         day.Set(int(saved_day[1]), int(saved_day[0]) - 1, int(saved_day[2]))
-        dpc.SetValue(day)
-    sz = obj.GetContainingSizer()
-    sz.Replace(obj, dpc)
-    obj.Destroy()
-    return dpc
+        obj.SetValue(day)
 
 
 def replace_with_timepicker(obj, spin, key):
@@ -540,14 +532,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_searchin_dir_picker.dir_init(dir_change_evt=self.on_dir_changed)
 
         # Replace result panel placeholders with new custom panels
-        self.m_grep_notebook.DeletePage(2)
-        self.m_grep_notebook.DeletePage(1)
-        self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
-        self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
-        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, _("Files"), False)
-        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, _("Content"), False)
-        self.m_result_file_panel.load_table()
-        self.m_result_content_panel.load_table()
+        self.m_result_file_list.load_list()
+        self.m_result_list.load_list()
         self.m_grep_notebook.SetSelection(0)
 
         # Set progress bar to 0
@@ -729,16 +715,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 TIME_LIMIT_I18N
             )
         )
+        set_default_time(self.m_modified_date_picker, "modified_date_string")
+        set_default_time(self.m_created_date_picker, "created_date_string")
 
         # GUI is built with WxFormBuilder, but it isn't easy to fill in custom objects.
         # So place holder objects are added for the sake of planning the gui, and then they
         # are replaced here with the actual objects.
-        self.m_modified_date_picker = replace_with_genericdatepicker(
-            self.m_modified_date_picker, "modified_date_string"
-        )
-        self.m_created_date_picker = replace_with_genericdatepicker(
-            self.m_created_date_picker, "created_date_string"
-        )
 
         self.m_modified_time_picker = replace_with_timepicker(
             self.m_modified_time_picker, self.m_modified_spin, "modified_time_string"
@@ -1039,12 +1021,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Reset result tables
         self.count = 0
-        self.m_grep_notebook.DeletePage(2)
-        self.m_grep_notebook.DeletePage(1)
-        self.m_result_file_panel = FileResultPanel(self.m_grep_notebook, ResultFileList)
-        self.m_result_content_panel = FileResultPanel(self.m_grep_notebook, ResultContentList)
-        self.m_grep_notebook.InsertPage(1, self.m_result_file_panel, _("Files"), False)
-        self.m_grep_notebook.InsertPage(2, self.m_result_content_panel, _("Content"), False)
+        self.m_result_file_list.reset_list()
+        self.m_result_list.reset_list()
 
         # Run search thread
         self.thread.start()
@@ -1306,8 +1284,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         # context=[(_("View Log"), lambda e: self.open_debug_console())]
                     )
 
-                self.m_result_file_panel.load_table()
-                self.m_result_content_panel.load_table()
+                self.m_result_file_list.load_list()
+                self.m_result_list.load_list()
                 self.m_grep_notebook.SetSelection(1)
                 self.debounce_search = False
                 self.allow_update = False
@@ -1320,12 +1298,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         p_value = self.m_progressbar.GetValue()
         actually_done = done - 1 if done > 0 else 0
         for f in results:
-            self.m_result_file_panel.set_match(f)
+            self.m_result_file_list.set_match(f)
             if self.args.count_only or self.args.boolean or self.args.replace is not None:
                 count += 1
                 continue
 
-            self.m_result_content_panel.set_match(f)
+            self.m_result_list.set_match(f)
             count += 1
 
         if total != 0:
@@ -1428,8 +1406,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Export to HTML."""
 
         if (
-            len(self.m_result_file_panel.list.itemDataMap) == 0 and
-            len(self.m_result_content_panel.list.itemDataMap) == 0
+            len(self.m_result_file_list.itemDataMap) == 0 and
+            len(self.m_result_list.itemDataMap) == 0
         ):
             errormsg(_("There is nothing to export!"))
             return
@@ -1441,8 +1419,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 html_file,
                 self.args.pattern,
                 self.args.regexp,
-                self.m_result_file_panel.list.itemDataMap,
-                self.m_result_content_panel.list.itemDataMap
+                self.m_result_file_list.itemDataMap,
+                self.m_result_list.itemDataMap
             )
         except Exception:
             error(traceback.format_exc())
@@ -1452,8 +1430,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Export to CSV."""
 
         if (
-            len(self.m_result_file_panel.list.itemDataMap) == 0 and
-            len(self.m_result_content_panel.list.itemDataMap) == 0
+            len(self.m_result_file_list.itemDataMap) == 0 and
+            len(self.m_result_list.itemDataMap) == 0
         ):
             errormsg(_("There is nothing to export!"))
             return
@@ -1465,8 +1443,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 csv_file,
                 self.args.pattern,
                 self.args.regexp,
-                self.m_result_file_panel.list.itemDataMap,
-                self.m_result_content_panel.list.itemDataMap
+                self.m_result_file_list.itemDataMap,
+                self.m_result_list.itemDataMap
             )
         except Exception:
             error(traceback.format_exc())

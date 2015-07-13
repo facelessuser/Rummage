@@ -20,62 +20,9 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-import wx.lib.mixins.listctrl as listmix
-
 from . import gui
 from ..localization import _
 from .custom_app import error
-from .messages import error_icon
-from .. import data
-from .result_panels import DynamicList
-
-
-def replace_list(obj):
-    """Replace list placeholder with our custom list object."""
-
-    l = ErrorList(obj.GetParent())
-    sz = obj.GetContainingSizer()
-    sz.Replace(obj, l)
-    obj.Destroy()
-
-    return l
-
-
-class ErrorList(DynamicList):
-
-    """Error list."""
-
-    def __init__(self, parent):
-        """Initialization."""
-
-        super(ErrorList, self).__init__(
-            parent,
-            [
-                _("Error"),
-                _("File Name")
-            ]
-        )
-
-    def create_image_list(self):
-        """Create image list."""
-
-        self.images = wx.ImageList(16, 16)
-        graphic = error_icon.GetImage()
-        graphic.Rescale(16, 16)
-        self.error_symbol = self.images.Add(wx.BitmapFromImage(graphic))
-        self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
-        self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
-        self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
-
-    def get_item_text(self, item, col, absolute=False):
-        """Return the text for the given item and col."""
-
-        if not absolute:
-            item = self.itemIndexMap[item]
-        if col == 0:
-            return self.itemDataMap[item][col][0]
-        else:
-            return self.itemDataMap[item][col]
 
 
 class SearchErrorDialog(gui.SearchErrorDialog):
@@ -95,7 +42,6 @@ class SearchErrorDialog(gui.SearchErrorDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
-        self.m_error_list = replace_list(self.m_error_list)
         self.load_errors(errors)
         self.m_error_list.SetFocus()
 

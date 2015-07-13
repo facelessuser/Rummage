@@ -1,5 +1,5 @@
 """
-Result Panels.
+Result lists.
 
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -21,141 +21,11 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 from time import ctime
 import wx
-import wx.lib.mixins.listctrl as listmix
 from os.path import normpath, join, basename, dirname
+from .dynamic_lists import DynamicList, USE_SAMPLE_SIZE
 from .open_editor import open_editor
 from ..localization import _
 from .. import data
-
-MINIMUM_COL_SIZE = 100
-COLUMN_SAMPLE_SIZE = 100
-USE_SAMPLE_SIZE = True
-
-
-class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
-
-    """Dynamic list."""
-
-    def __init__(self, parent, columns):
-        """Init the base class DynamicList object."""
-
-        super(DynamicList, self).__init__(
-            parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
-            style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_VIRTUAL
-        )
-        self.column_count = len(columns)
-        self.headers = columns
-        self.itemDataMap = {}
-        self.first_resize = True
-        self.size_sample = COLUMN_SAMPLE_SIZE
-        self.widest_cell = [MINIMUM_COL_SIZE] * self.column_count
-        self.attr1 = wx.ListItemAttr()
-        self.attr1.SetBackgroundColour(wx.Colour(0xEE, 0xEE, 0xEE))
-        self.dc = wx.ClientDC(self)
-        self.dc.SetFont(self.GetFont())
-        self.last_idx_sized = -1
-        self.create_image_list()
-
-    def resize_last_column(self):
-        """Resize the last column."""
-
-        total_width = 0
-        last_width = 0
-        for i in range(0, self.column_count):
-            total_width += self.GetColumnWidth(i)
-            if i == self.column_count - 1:
-                last_width = self.GetColumnWidth(i)
-        if total_width < self.GetSize()[0] - 20:
-            self.SetColumnWidth(self.column_count - 1, last_width + self.GetSize()[0] - total_width)
-
-    def init_column_size(self):
-        """Setup the initial column size."""
-
-        for i in range(0, self.column_count):
-            self.SetColumnWidth(i, self.widest_cell[i])
-        self.resize_last_column()
-        self.size_sample = 0
-
-    def get_column_count(self):
-        """Get column count."""
-
-        return self.column_count
-
-    def set_item_map(self, idx, *args):
-        """Set new entry in item map."""
-
-        self.itemDataMap[idx] = tuple([a for a in args])
-        # Sample the first "size_sample" to determine
-        # column width for when table first loads
-        if self.size_sample or not USE_SAMPLE_SIZE:
-            for x in range(0, self.column_count):
-                text = self.get_item_text(idx, x, True)
-                lw, lh, d, e = self.dc.GetFullTextExtent(text)
-                width = lw + 30
-                if width > self.widest_cell[x]:
-                    self.widest_cell[x] = width
-            self.last_idx_sized = idx
-            self.size_sample -= 1
-
-    def get_map_item(self, idx, col=0, absolute=False):
-        """Get attribute in in item map entry and the given index."""
-
-        return self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col]
-
-    def load_list(self):
-        """Load the list of items from the item map."""
-
-        for x in range(0, self.column_count):
-            self.InsertColumn(x, self.headers[x])
-        self.SetItemCount(len(self.itemDataMap))
-        listmix.ColumnSorterMixin.__init__(self, self.column_count)
-        self.SortListItems(col=0, ascending=1)
-        self.init_column_size()
-
-    def SortItems(self, sorter=None):
-        """Sort items."""
-
-        items = list(self.itemDataMap.keys())
-        if sorter is not None:
-            items.sort(sorter)
-        else:
-            items.sort()
-        self.itemIndexMap = items
-
-        # redraw the list
-        self.Refresh()
-
-    def OnGetItemText(self, item, col):
-        """Override method to return the text for the given item and col."""
-
-        return self.get_item_text(item, col)
-
-    def get_item_text(self, idx, col, absolute=False):
-        """Return the text for the given item and col."""
-
-        return unicode(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
-
-    def OnGetItemAttr(self, item):
-        """Override method to get attributes for the cells in the given item."""
-
-        if item % 2 == 0:
-            return self.attr1
-        return -1
-
-    def OnGetItemImage(self, item):
-        """Override method to get the image for the given item."""
-
-        return 0
-
-    def GetSortImages(self):
-        """Override method to provide sort images in column headers."""
-
-        return self.sort_down, self.sort_up
-
-    def GetListCtrl(self):
-        """Get ListCtrl object (self)."""
-
-        return self
 
 
 class ResultFileList(DynamicList):
@@ -380,48 +250,8 @@ class ResultContentList(DynamicList):
             line = self.GetItem(item, col=1).GetText()
             file_row = self.get_map_item(item, col=4)
             col = str(self.get_map_item(item, col=5))
-            path = self.GetParent().GetParent().GetParent().m_result_file_panel.list.get_map_item(
+            path = self.GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
                 file_row, col=3, absolute=True
             )
             open_editor(join(normpath(path), filename), line, col)
         event.Skip()
-
-
-class FileResultPanel(wx.Panel):
-
-    """FileResultPanel."""
-
-    def __init__(self, parent, obj):
-        """Init the FileResultPanel obj."""
-
-        super(FileResultPanel, self).__init__(parent)
-        self.list = obj(self)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.list, 1, wx.ALL | wx.EXPAND, 5)
-        self.SetSizer(sizer)
-        self.Layout()
-
-    def set_match(self, obj):
-        """Set match."""
-
-        self.list.set_match(obj)
-
-    def increment_match_count(self, idx):
-        """Increment the match count of the given item."""
-
-        self.list.increment_match_count(idx)
-
-    def set_item_map(self, idx, *args):
-        """Set the given item in the item map."""
-
-        self.list.set_item_map(idx, *args)
-
-    def get_map_item(self, idx, col=0):
-        """Get the given item in the item map."""
-
-        return self.list.get_map_item(idx, col)
-
-    def load_table(self):
-        """Load the list of items."""
-
-        self.list.load_list()
