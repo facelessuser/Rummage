@@ -25,6 +25,7 @@ import wx.lib.mixins.listctrl as listmix
 from . import gui
 from ..localization import _
 from .custom_app import error
+from .messages import error_icon
 from .. import data
 
 
@@ -38,7 +39,9 @@ class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
         self.column_count = 2
         self.itemDataMap = {}
         self.images = wx.ImageList(16, 16)
-        self.glass = self.images.Add(data.get_image('glass.png').GetBitmap())
+        graphic = error_icon.GetImage()
+        graphic.Rescale(16, 16)
+        self.error_symbol = self.images.Add(wx.BitmapFromImage(graphic))
         self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
         self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
@@ -141,28 +144,31 @@ class SearchErrorDialog(gui.SearchErrorDialog):
             error(
                 _("Cound not process %s:\n%s") % (name, e.error[1] + e.error[0])
             )
-            self.m_error_list.InsertStringItem(count, name)
-            self.m_error_list.SetStringItem(count, 1, e.error[0])
+            self.m_error_list.InsertStringItem(count, e.error[0])
+            self.m_error_list.SetStringItem(count, 1, name)
             self.m_error_list.SetItemData(count, count)
             self.m_error_list.SetItemImage(count, 0)
-            self.m_error_list.set_item_map(count, name, e.error[0])
+            self.m_error_list.set_item_map(count, e.error[0], name)
             count += 1
         if count:
             self.column_resize(self.m_error_list, count)
         self.m_error_list.init_sort()
 
-    def column_resize(self, obj, count, minimum=100):
+    def column_resize(self, obj, count, minimum=100, maximum=-1):
         """Resize columns."""
 
         for i in range(0, count):
             obj.SetColumnWidth(i, wx.LIST_AUTOSIZE)
-            if obj.GetColumnWidth(i) < minimum:
+            width = obj.GetColumnWidth(i)
+            if maximum != -1 and width > maximum:
+                obj.SetColumnWidth(i, maximum)
+            elif width < minimum:
                 obj.SetColumnWidth(i, minimum)
 
     def reset_table(self):
         """Clear and reset the list."""
 
         self.m_error_list.ClearAll()
-        self.m_error_list.InsertColumn(0, _("File Name"))
-        self.m_error_list.InsertColumn(1, _("Error"))
+        self.m_error_list.InsertColumn(0, _("Error"))
+        self.m_error_list.InsertColumn(1, _("File Name"))
         wx.GetApp().Yield()
