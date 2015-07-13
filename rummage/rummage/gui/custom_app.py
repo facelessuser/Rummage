@@ -250,7 +250,13 @@ class ArgPipeThread(object):
             ctypes.windll.kernel32.CloseHandle(file_handle)
         else:
             with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
-                pipeout.write('\n')
+                try:
+                    pipeout.write('\n')
+                except IOError:
+                    # It's okay if the pipe is broken, our goal is just to break the
+                    # wait loop for recieving pipe data.
+                    pass
+
 
     def IsRunning(self):  # noqa
         """Returns if the thread is still busy."""
