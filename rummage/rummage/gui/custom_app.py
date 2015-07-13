@@ -257,7 +257,6 @@ class ArgPipeThread(object):
                     # wait loop for recieving pipe data.
                     pass
 
-
     def IsRunning(self):  # noqa
         """Returns if the thread is still busy."""
 

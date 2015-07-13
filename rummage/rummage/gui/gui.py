@@ -9,7 +9,7 @@
 
 import wx
 import wx.xrc
-from .result_panels import ResultFileList
+from .result_lists import ResultFileList
 from .result_lists import ResultContentList
 from .search_error_list import ErrorList
 

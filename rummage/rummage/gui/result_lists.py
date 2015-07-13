@@ -52,7 +52,6 @@ class ResultFileList(DynamicList):
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
 
-
     def create_image_list(self):
         """Create the image list."""
 
@@ -62,7 +61,6 @@ class ResultFileList(DynamicList):
         self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
         self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
-
 
     def set_match(self, obj):
         """Set match."""
