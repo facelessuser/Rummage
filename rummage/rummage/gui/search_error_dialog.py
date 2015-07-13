@@ -27,17 +27,38 @@ from ..localization import _
 from .custom_app import error
 from .messages import error_icon
 from .. import data
+from .result_panels import DynamicList
 
 
-class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
+def replace_list(obj):
+    """Replace list placeholder with our custom list object."""
 
-    """Mixin Sort List."""
+    l = ErrorList(obj.GetParent())
+    sz = obj.GetContainingSizer()
+    sz.Replace(obj, l)
+    obj.Destroy()
 
-    def setup(self):
-        """Init MixinSortList object."""
+    return l
 
-        self.column_count = 2
-        self.itemDataMap = {}
+
+class ErrorList(DynamicList):
+
+    """Error list."""
+
+    def __init__(self, parent):
+        """Initialization."""
+
+        super(ErrorList, self).__init__(
+            parent,
+            [
+                _("Error"),
+                _("File Name")
+            ]
+        )
+
+    def create_image_list(self):
+        """Create image list."""
+
         self.images = wx.ImageList(16, 16)
         graphic = error_icon.GetImage()
         graphic.Rescale(16, 16)
@@ -45,61 +66,16 @@ class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
         self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
         self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
-        listmix.ColumnSorterMixin.__init__(self, self.column_count)
-        listmix.ListRowHighlighter.__init__(self, (0xEE, 0xEE, 0xEE))
 
-    def reset_item_map(self):
-        """Reset the item map."""
+    def get_item_text(self, item, col, absolute=False):
+        """Return the text for the given item and col."""
 
-        self.itemDataMap = {}
-
-    def set_item_map(self, idx, *args):
-        """Add entry to item map."""
-
-        self.itemDataMap[idx] = tuple([a for a in args])
-
-    def init_sort(self):
-        """Do the intial sort."""
-
-        self.SortListItems(col=0, ascending=1)
-        self.RefreshRows()
-
-    def GetListCtrl(self):
-        """Return ListCtrl object (self)."""
-
-        return self
-
-    def GetSortImages(self):
-        """Return the sort arrows for the header."""
-
-        return self.sort_down, self.sort_up
-
-    def get_map_item(self, idx, col=0):
-        """Get map element from mapping entry."""
-
-        return self.itemDataMap[idx][col]
-
-    def OnSortOrderChanged(self):
-        """Refresh the rows on sort."""
-
-        self.RefreshRows()
-
-
-def extend(instance, extension):
-    """Extend object with extension class."""
-
-    instance.__class__ = type(
-        b'%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
-        (instance.__class__, extension),
-        {}
-    )
-
-
-def extend_list(l):
-    """Extend list with with special sorting class."""
-
-    extend(l, MixinSortList)
-    l.setup()
+        if not absolute:
+            item = self.itemIndexMap[item]
+        if col == 0:
+            return self.itemDataMap[item][col][0]
+        else:
+            return self.itemDataMap[item][col]
 
 
 class SearchErrorDialog(gui.SearchErrorDialog):
@@ -111,9 +87,6 @@ class SearchErrorDialog(gui.SearchErrorDialog):
 
         super(SearchErrorDialog, self).__init__(parent)
 
-        self.reset_table()
-        extend_list(self.m_error_list)
-
         self.localize()
 
         best = self.m_error_panel.GetBestSize()
@@ -122,7 +95,7 @@ class SearchErrorDialog(gui.SearchErrorDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
-
+        self.m_error_list = replace_list(self.m_error_list)
         self.load_errors(errors)
         self.m_error_list.SetFocus()
 
@@ -144,31 +117,6 @@ class SearchErrorDialog(gui.SearchErrorDialog):
             error(
                 _("Cound not process %s:\n%s") % (name, e.error[1] + e.error[0])
             )
-            self.m_error_list.InsertStringItem(count, e.error[0])
-            self.m_error_list.SetStringItem(count, 1, name)
-            self.m_error_list.SetItemData(count, count)
-            self.m_error_list.SetItemImage(count, 0)
-            self.m_error_list.set_item_map(count, e.error[0], name)
+            self.m_error_list.set_item_map("%d" % count, e.error, name)
             count += 1
-        if count:
-            self.column_resize(self.m_error_list, count)
-        self.m_error_list.init_sort()
-
-    def column_resize(self, obj, count, minimum=100, maximum=-1):
-        """Resize columns."""
-
-        for i in range(0, count):
-            obj.SetColumnWidth(i, wx.LIST_AUTOSIZE)
-            width = obj.GetColumnWidth(i)
-            if maximum != -1 and width > maximum:
-                obj.SetColumnWidth(i, maximum)
-            elif width < minimum:
-                obj.SetColumnWidth(i, minimum)
-
-    def reset_table(self):
-        """Clear and reset the list."""
-
-        self.m_error_list.ClearAll()
-        self.m_error_list.InsertColumn(0, _("Error"))
-        self.m_error_list.InsertColumn(1, _("File Name"))
-        wx.GetApp().Yield()
+        self.m_error_list.load_list()

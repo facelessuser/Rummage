@@ -32,14 +32,14 @@ COLUMN_SAMPLE_SIZE = 100
 USE_SAMPLE_SIZE = True
 
 
-class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
+class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
-    """Result list."""
+    """Dynamic list."""
 
     def __init__(self, parent, columns):
-        """Init the base class ResultList object."""
+        """Init the base class DynamicList object."""
 
-        super(ResultList, self).__init__(
+        super(DynamicList, self).__init__(
             parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
             style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_VIRTUAL
         )
@@ -54,13 +54,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.dc = wx.ClientDC(self)
         self.dc.SetFont(self.GetFont())
         self.last_idx_sized = -1
-
-        self.images = wx.ImageList(16, 16)
-        self.doc = self.images.Add(data.get_image('doc.png').GetBitmap())
-        self.bin = self.images.Add(data.get_image('binary.png').GetBitmap())
-        self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
-        self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
-        self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
+        self.create_image_list()
 
     def resize_last_column(self):
         """Resize the last column."""
@@ -164,7 +158,7 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         return self
 
 
-class ResultFileList(ResultList):
+class ResultFileList(DynamicList):
 
     """ResultFileList."""
 
@@ -187,6 +181,18 @@ class ResultFileList(ResultList):
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
+
+
+    def create_image_list(self):
+        """Create the image list."""
+
+        self.images = wx.ImageList(16, 16)
+        self.doc = self.images.Add(data.get_image('doc.png').GetBitmap())
+        self.bin = self.images.Add(data.get_image('binary.png').GetBitmap())
+        self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
+        self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
+        self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
+
 
     def set_match(self, obj):
         """Set match."""
@@ -268,7 +274,7 @@ class ResultFileList(ResultList):
         event.Skip()
 
 
-class ResultContentList(ResultList):
+class ResultContentList(DynamicList):
 
     """ResultContentList."""
 
@@ -288,6 +294,16 @@ class ResultContentList(ResultList):
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
+
+    def create_image_list(self):
+        """Create the image list."""
+
+        self.images = wx.ImageList(16, 16)
+        self.doc = self.images.Add(data.get_image('doc.png').GetBitmap())
+        self.bin = self.images.Add(data.get_image('binary.png').GetBitmap())
+        self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
+        self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
+        self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def on_enter_window(self, event):
         """Reset last moused over item tracker on mouse entering the window."""
