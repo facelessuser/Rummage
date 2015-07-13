@@ -118,11 +118,14 @@ class ResultList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.SortListItems(col=0, ascending=1)
         self.init_column_size()
 
-    def SortItems(self, sorter=cmp):
+    def SortItems(self, sorter=None):
         """Sort items."""
 
         items = list(self.itemDataMap.keys())
-        items.sort(sorter)
+        if sorter is not None:
+            items.sort(sorter)
+        else:
+            items.sort()
         self.itemIndexMap = items
 
         # redraw the list
