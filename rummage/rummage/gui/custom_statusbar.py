@@ -167,7 +167,11 @@ class IconTrayExtension(object):
         if self.sb_icons[name].tooltip:
             self.sb_icons[name].tooltip.hide()
 
-    def set_icon(self, name, icon, msg=None, context=None):
+    def set_icon(
+        self, name, icon, msg=None, context=None,
+        click_right=None, click_left=None,
+        dclick_right=None, dclick_left=None
+    ):
         """
         Set the given icon in the tray.
 
@@ -180,8 +184,16 @@ class IconTrayExtension(object):
         self.sb_icons[name] = wx.StaticBitmap(self, bitmap=icon)
         if msg is not None:
             ToolTip(self.sb_icons[name], msg)
+        if click_left is not None:
+            self.sb_icons[name].Bind(wx.EVT_LEFT_DOWN, click_left)
         if context is not None:
             self.sb_icons[name].Bind(wx.EVT_RIGHT_DOWN, lambda e: self.show_menu(name, context))
+        elif click_right is not None:
+            self.sb_icons[name].Bind(wx.EVT_RIGHT_DOWN, click_right)
+        if dclick_left is not None:
+            self.sb_icons[name].Bind(wx.EVT_LEFT_DCLICK, dclick_left)
+        if dclick_right is not None:
+            self.sb_icons[name].Bind(wx.EVT_RIGHT_DCLICK, dclick_right)
         self.place_icons(resize=True)
 
     def show_menu(self, name, context):
