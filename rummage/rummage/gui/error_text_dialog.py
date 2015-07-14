@@ -19,7 +19,6 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import wx
 from . import gui
 from ..localization import _
 
@@ -34,7 +33,6 @@ class ErrorTextDialog(gui.ErrorTextDialog):
         super(ErrorTextDialog, self).__init__(parent)
         self.localize()
         self.m_error_textbox.SetValue(text)
-
 
     def localize(self):
         """Localize the dialog."""

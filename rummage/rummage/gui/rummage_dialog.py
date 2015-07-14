@@ -39,7 +39,7 @@ from . import export_csv
 from .settings import Settings
 from .generic_dialogs import errormsg, yesno
 from .custom_app import DebugFrameExtender
-from .custom_app import debug, error, _PLATFORM
+from .custom_app import debug, error
 from .custom_statusbar import extend_sb, extend
 from .regex_test_dialog import RegexTestDialog
 from .autocomplete_combo import AutoCompleteCombo
