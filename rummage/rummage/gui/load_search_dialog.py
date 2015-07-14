@@ -25,7 +25,6 @@ import wx.lib.mixins.listctrl as listmix
 from .settings import Settings
 from . import gui
 from ..localization import _
-from .. import data
 
 SEARCH_REGEX = _("Regex")
 SEARCH_LITERAL = _("Text")
@@ -33,77 +32,6 @@ SEARCH_TYPE = {
     SEARCH_LITERAL: "Text",
     SEARCH_REGEX: "Regex"
 }
-
-
-class MixinSortList(listmix.ColumnSorterMixin, listmix.ListRowHighlighter):
-
-    """Mixin Sort List."""
-
-    def setup(self, c):
-        """Init MixinSortList object."""
-
-        self.column_count = c
-        self.itemDataMap = {}
-        self.images = wx.ImageList(16, 16)
-        self.glass = self.images.Add(data.get_image('glass.png').GetBitmap())
-        self.sort_up = self.images.Add(data.get_image('su.png').GetBitmap())
-        self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
-        self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
-        listmix.ColumnSorterMixin.__init__(self, self.column_count)
-        listmix.ListRowHighlighter.__init__(self, (0xEE, 0xEE, 0xEE))
-
-    def reset_item_map(self):
-        """Reset the item map."""
-
-        self.itemDataMap = {}
-
-    def set_item_map(self, idx, *args):
-        """Add entry to item map."""
-
-        self.itemDataMap[idx] = tuple([a for a in args])
-
-    def init_sort(self):
-        """Do the intial sort."""
-
-        self.SortListItems(col=0, ascending=1)
-        self.RefreshRows()
-
-    def GetListCtrl(self):
-        """Return ListCtrl object (self)."""
-
-        return self
-
-    def GetSortImages(self):
-        """Return the sort arrows for the header."""
-
-        return self.sort_down, self.sort_up
-
-    def get_map_item(self, idx, col=0):
-        """Get map element from mapping entry."""
-
-        return self.itemDataMap[idx][col]
-
-    def OnSortOrderChanged(self):
-        """Refresh the rows on sort."""
-
-        self.RefreshRows()
-
-
-def extend(instance, extension):
-    """Extend object with extension class."""
-
-    instance.__class__ = type(
-        b'%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
-        (instance.__class__, extension),
-        {}
-    )
-
-
-def extend_list(l, c):
-    """Extend list with with special sorting class."""
-
-    extend(l, MixinSortList)
-    l.setup(c)
 
 
 class LoadSearchDialog(gui.LoadSearchDialog):
@@ -118,9 +46,6 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.search = None
         self.replace = None
         self.is_regex = None
-
-        self.reset_table()
-        extend_list(self.m_search_list, 4)
 
         self.localize()
 
@@ -150,20 +75,14 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         for x in Settings.get_search():
             # TODO: Added with replace feature
             # remove some time in the future.
+            # Also consider adding version number to properly upgrade
+            # saves.
             if len(x) == 3:
                 x.insert(2, '')
             search_type = SEARCH_REGEX if x[3] else SEARCH_LITERAL
-            self.m_search_list.InsertStringItem(count, x[0])
-            self.m_search_list.SetStringItem(count, 1, x[1])
-            self.m_search_list.SetStringItem(count, 2, x[2])
-            self.m_search_list.SetStringItem(count, 3, search_type)
-            self.m_search_list.SetItemData(count, count)
-            self.m_search_list.SetItemImage(count, 0)
             self.m_search_list.set_item_map(count, x[0], x[1], x[2], search_type)
             count += 1
-        if count:
-            self.column_resize(self.m_search_list, count)
-        self.m_search_list.init_sort()
+        self.m_search_list.load_list()
 
     def on_load(self, event):
         """Select the search entry for use."""
@@ -171,10 +90,9 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         item = self.m_search_list.GetFirstSelected()
         if item == -1:
             return
-        idx = self.m_search_list.GetItemData(item)
-        self.search = self.m_search_list.get_map_item(idx, col=1)
-        self.replace = self.m_search_list.get_map_item(idx, col=2)
-        self.is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(idx, col=3)] == "Regex"
+        self.search = self.m_search_list.get_map_item(item, col=1)
+        self.replace = self.m_search_list.get_map_item(item, col=2)
+        self.is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=3)] == "Regex"
         self.Close()
 
     def get_search(self):
@@ -182,34 +100,15 @@ class LoadSearchDialog(gui.LoadSearchDialog):
 
         return self.search, self.replace, self.is_regex
 
-    def column_resize(self, obj, count, minimum=100):
-        """Resize columns."""
-
-        for i in range(0, count):
-            obj.SetColumnWidth(i, wx.LIST_AUTOSIZE)
-            if obj.GetColumnWidth(i) < minimum:
-                obj.SetColumnWidth(i, minimum)
-
-    def reset_table(self):
-        """Clear and reset the list."""
-
-        self.m_search_list.ClearAll()
-        self.m_search_list.InsertColumn(0, _("Name"))
-        self.m_search_list.InsertColumn(1, _("Search"))
-        self.m_search_list.InsertColumn(2, _("Replace"))
-        self.m_search_list.InsertColumn(3, _("Type"))
-        wx.GetApp().Yield()
-
     def on_delete(self, event):
         """Delete search entry."""
 
         item = self.m_search_list.GetFirstSelected()
         if item == -1:
             return
-        idx = self.m_search_list.GetItemData(item)
+        idx = self.m_search_list.itemIndexMap[item]
         Settings.delete_search(idx)
-        self.m_search_list.reset_item_map()
-        self.reset_table()
+        self.m_search_list.reset_list()
         self.load_searches()
 
     def on_cancel(self, event):

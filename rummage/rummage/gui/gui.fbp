@@ -366,7 +366,7 @@
                                                             <event name="OnSetFocus"></event>
                                                             <event name="OnSize"></event>
                                                             <event name="OnUpdateUI"></event>
-                                                            <object class="wxStaticBoxSizer" expanded="0">
+                                                            <object class="wxStaticBoxSizer" expanded="1">
                                                                 <property name="id">wxID_ANY</property>
                                                                 <property name="label">Search and Replace</property>
                                                                 <property name="minimum_size"></property>
@@ -374,11 +374,11 @@
                                                                 <property name="orient">wxVERTICAL</property>
                                                                 <property name="permission">none</property>
                                                                 <event name="OnUpdateUI"></event>
-                                                                <object class="sizeritem" expanded="0">
+                                                                <object class="sizeritem" expanded="1">
                                                                     <property name="border">5</property>
                                                                     <property name="flag">wxEXPAND</property>
                                                                     <property name="proportion">1</property>
-                                                                    <object class="wxFlexGridSizer" expanded="0">
+                                                                    <object class="wxFlexGridSizer" expanded="1">
                                                                         <property name="cols">1</property>
                                                                         <property name="flexible_direction">wxBOTH</property>
                                                                         <property name="growablecols">0</property>
@@ -1869,11 +1869,11 @@
                                                                                 <event name="OnUpdateUI"></event>
                                                                             </object>
                                                                         </object>
-                                                                        <object class="sizeritem" expanded="0">
+                                                                        <object class="sizeritem" expanded="1">
                                                                             <property name="border">5</property>
                                                                             <property name="flag">wxEXPAND</property>
                                                                             <property name="proportion">1</property>
-                                                                            <object class="wxFlexGridSizer" expanded="0">
+                                                                            <object class="wxFlexGridSizer" expanded="1">
                                                                                 <property name="cols">4</property>
                                                                                 <property name="flexible_direction">wxBOTH</property>
                                                                                 <property name="growablecols">1</property>
@@ -2170,7 +2170,7 @@
                                                         <property name="border">5</property>
                                                         <property name="flag">wxEXPAND | wxALL</property>
                                                         <property name="proportion">1</property>
-                                                        <object class="wxPanel" expanded="0">
+                                                        <object class="wxPanel" expanded="1">
                                                             <property name="BottomDockable">1</property>
                                                             <property name="LeftDockable">1</property>
                                                             <property name="RightDockable">1</property>
@@ -2244,7 +2244,7 @@
                                                             <event name="OnSetFocus"></event>
                                                             <event name="OnSize"></event>
                                                             <event name="OnUpdateUI"></event>
-                                                            <object class="wxStaticBoxSizer" expanded="0">
+                                                            <object class="wxStaticBoxSizer" expanded="1">
                                                                 <property name="id">wxID_ANY</property>
                                                                 <property name="label">Limit Search</property>
                                                                 <property name="minimum_size"></property>
@@ -2252,11 +2252,11 @@
                                                                 <property name="orient">wxVERTICAL</property>
                                                                 <property name="permission">none</property>
                                                                 <event name="OnUpdateUI"></event>
-                                                                <object class="sizeritem" expanded="0">
+                                                                <object class="sizeritem" expanded="1">
                                                                     <property name="border">5</property>
                                                                     <property name="flag">wxEXPAND</property>
                                                                     <property name="proportion">1</property>
-                                                                    <object class="wxFlexGridSizer" expanded="0">
+                                                                    <object class="wxFlexGridSizer" expanded="1">
                                                                         <property name="cols">1</property>
                                                                         <property name="flexible_direction">wxBOTH</property>
                                                                         <property name="growablecols">0</property>
@@ -2268,11 +2268,11 @@
                                                                         <property name="permission">none</property>
                                                                         <property name="rows">0</property>
                                                                         <property name="vgap">0</property>
-                                                                        <object class="sizeritem" expanded="0">
+                                                                        <object class="sizeritem" expanded="1">
                                                                             <property name="border">5</property>
                                                                             <property name="flag">wxEXPAND</property>
                                                                             <property name="proportion">1</property>
-                                                                            <object class="wxFlexGridSizer" expanded="0">
+                                                                            <object class="wxFlexGridSizer" expanded="1">
                                                                                 <property name="cols">3</property>
                                                                                 <property name="flexible_direction">wxHORIZONTAL</property>
                                                                                 <property name="growablecols">2</property>
@@ -2284,11 +2284,11 @@
                                                                                 <property name="permission">none</property>
                                                                                 <property name="rows">0</property>
                                                                                 <property name="vgap">0</property>
-                                                                                <object class="sizeritem" expanded="0">
+                                                                                <object class="sizeritem" expanded="1">
                                                                                     <property name="border">5</property>
                                                                                     <property name="flag">wxEXPAND | wxALL</property>
                                                                                     <property name="proportion">1</property>
-                                                                                    <object class="wxPanel" expanded="0">
+                                                                                    <object class="wxPanel" expanded="1">
                                                                                         <property name="BottomDockable">1</property>
                                                                                         <property name="LeftDockable">1</property>
                                                                                         <property name="RightDockable">1</property>
@@ -2362,7 +2362,7 @@
                                                                                         <event name="OnSetFocus"></event>
                                                                                         <event name="OnSize"></event>
                                                                                         <event name="OnUpdateUI"></event>
-                                                                                        <object class="wxFlexGridSizer" expanded="0">
+                                                                                        <object class="wxFlexGridSizer" expanded="1">
                                                                                             <property name="cols">5</property>
                                                                                             <property name="flexible_direction">wxHORIZONTAL</property>
                                                                                             <property name="growablecols"></property>
@@ -3880,11 +3880,11 @@
                                                                                                             <event name="OnUpdateUI"></event>
                                                                                                         </object>
                                                                                                     </object>
-                                                                                                    <object class="sizeritem" expanded="1">
+                                                                                                    <object class="sizeritem" expanded="0">
                                                                                                         <property name="border">5</property>
                                                                                                         <property name="flag">wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND</property>
                                                                                                         <property name="proportion">1</property>
-                                                                                                        <object class="CustomControl" expanded="1">
+                                                                                                        <object class="CustomControl" expanded="0">
                                                                                                             <property name="BottomDockable">1</property>
                                                                                                             <property name="LeftDockable">1</property>
                                                                                                             <property name="RightDockable">1</property>
@@ -4136,11 +4136,11 @@
                                                                                                             <event name="OnUpdateUI"></event>
                                                                                                         </object>
                                                                                                     </object>
-                                                                                                    <object class="sizeritem" expanded="1">
+                                                                                                    <object class="sizeritem" expanded="0">
                                                                                                         <property name="border">5</property>
                                                                                                         <property name="flag">wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND</property>
                                                                                                         <property name="proportion">1</property>
-                                                                                                        <object class="CustomControl" expanded="1">
+                                                                                                        <object class="CustomControl" expanded="0">
                                                                                                             <property name="BottomDockable">1</property>
                                                                                                             <property name="LeftDockable">1</property>
                                                                                                             <property name="RightDockable">1</property>
@@ -4785,7 +4785,7 @@
                                                             <event name="OnUpdateUI"></event>
                                                         </object>
                                                     </object>
-                                                    <object class="sizeritem" expanded="1">
+                                                    <object class="sizeritem" expanded="0">
                                                         <property name="border">5</property>
                                                         <property name="flag">wxALL|wxEXPAND</property>
                                                         <property name="proportion">1</property>
@@ -5080,11 +5080,11 @@
                                         </object>
                                     </object>
                                 </object>
-                                <object class="notebookpage" expanded="1">
+                                <object class="notebookpage" expanded="0">
                                     <property name="bitmap"></property>
                                     <property name="label">Files</property>
                                     <property name="select">0</property>
-                                    <object class="wxPanel" expanded="1">
+                                    <object class="wxPanel" expanded="0">
                                         <property name="BottomDockable">1</property>
                                         <property name="LeftDockable">1</property>
                                         <property name="RightDockable">1</property>
@@ -5158,7 +5158,7 @@
                                         <event name="OnSetFocus"></event>
                                         <event name="OnSize"></event>
                                         <event name="OnUpdateUI"></event>
-                                        <object class="wxBoxSizer" expanded="1">
+                                        <object class="wxBoxSizer" expanded="0">
                                             <property name="minimum_size"></property>
                                             <property name="name">bSizer7</property>
                                             <property name="orient">wxVERTICAL</property>
@@ -5251,11 +5251,11 @@
                                         </object>
                                     </object>
                                 </object>
-                                <object class="notebookpage" expanded="1">
+                                <object class="notebookpage" expanded="0">
                                     <property name="bitmap"></property>
                                     <property name="label">Content</property>
                                     <property name="select">0</property>
-                                    <object class="wxPanel" expanded="1">
+                                    <object class="wxPanel" expanded="0">
                                         <property name="BottomDockable">1</property>
                                         <property name="LeftDockable">1</property>
                                         <property name="RightDockable">1</property>
@@ -5329,16 +5329,16 @@
                                         <event name="OnSetFocus"></event>
                                         <event name="OnSize"></event>
                                         <event name="OnUpdateUI"></event>
-                                        <object class="wxBoxSizer" expanded="1">
+                                        <object class="wxBoxSizer" expanded="0">
                                             <property name="minimum_size"></property>
                                             <property name="name">bSizer6</property>
                                             <property name="orient">wxVERTICAL</property>
                                             <property name="permission">none</property>
-                                            <object class="sizeritem" expanded="1">
+                                            <object class="sizeritem" expanded="0">
                                                 <property name="border">5</property>
                                                 <property name="flag">wxALL|wxEXPAND</property>
                                                 <property name="proportion">1</property>
-                                                <object class="CustomControl" expanded="1">
+                                                <object class="CustomControl" expanded="0">
                                                     <property name="BottomDockable">1</property>
                                                     <property name="LeftDockable">1</property>
                                                     <property name="RightDockable">1</property>
@@ -6985,7 +6985,7 @@
                                 <property name="border">5</property>
                                 <property name="flag">wxALL|wxEXPAND</property>
                                 <property name="proportion">1</property>
-                                <object class="wxListCtrl" expanded="0">
+                                <object class="CustomControl" expanded="0">
                                     <property name="BottomDockable">1</property>
                                     <property name="LeftDockable">1</property>
                                     <property name="RightDockable">1</property>
@@ -6999,9 +6999,12 @@
                                     <property name="caption"></property>
                                     <property name="caption_visible">1</property>
                                     <property name="center_pane">0</property>
+                                    <property name="class">wxListCtrl</property>
                                     <property name="close_button">1</property>
+                                    <property name="construction">self.m_search_list = SavedSearchList(self.m_load_panel)</property>
                                     <property name="context_help"></property>
                                     <property name="context_menu">1</property>
+                                    <property name="declaration"></property>
                                     <property name="default_pane">0</property>
                                     <property name="dock">Dock</property>
                                     <property name="dock_fixed">0</property>
@@ -7013,6 +7016,7 @@
                                     <property name="gripper">0</property>
                                     <property name="hidden">0</property>
                                     <property name="id">wxID_ANY</property>
+                                    <property name="include">from .load_search_list import SavedSearchList</property>
                                     <property name="max_size"></property>
                                     <property name="maximize_button">0</property>
                                     <property name="maximum_size"></property>
@@ -7028,16 +7032,12 @@
                                     <property name="pin_button">1</property>
                                     <property name="pos"></property>
                                     <property name="resize">Resizable</property>
+                                    <property name="settings"></property>
                                     <property name="show">1</property>
                                     <property name="size"></property>
-                                    <property name="style">wxLC_REPORT|wxLC_SINGLE_SEL</property>
                                     <property name="subclass"></property>
                                     <property name="toolbar_pane">0</property>
                                     <property name="tooltip"></property>
-                                    <property name="validator_data_type"></property>
-                                    <property name="validator_style">wxFILTER_NONE</property>
-                                    <property name="validator_type">wxDefaultValidator</property>
-                                    <property name="validator_variable"></property>
                                     <property name="window_extra_style"></property>
                                     <property name="window_name"></property>
                                     <property name="window_style"></property>
@@ -7051,26 +7051,6 @@
                                     <event name="OnLeftDClick"></event>
                                     <event name="OnLeftDown"></event>
                                     <event name="OnLeftUp"></event>
-                                    <event name="OnListBeginDrag"></event>
-                                    <event name="OnListBeginLabelEdit"></event>
-                                    <event name="OnListBeginRDrag"></event>
-                                    <event name="OnListCacheHint"></event>
-                                    <event name="OnListColBeginDrag"></event>
-                                    <event name="OnListColClick"></event>
-                                    <event name="OnListColDragging"></event>
-                                    <event name="OnListColEndDrag"></event>
-                                    <event name="OnListColRightClick"></event>
-                                    <event name="OnListDeleteAllItems"></event>
-                                    <event name="OnListDeleteItem"></event>
-                                    <event name="OnListEndLabelEdit"></event>
-                                    <event name="OnListInsertItem"></event>
-                                    <event name="OnListItemActivated"></event>
-                                    <event name="OnListItemDeselected"></event>
-                                    <event name="OnListItemFocused"></event>
-                                    <event name="OnListItemMiddleClick"></event>
-                                    <event name="OnListItemRightClick"></event>
-                                    <event name="OnListItemSelected"></event>
-                                    <event name="OnListKeyDown"></event>
                                     <event name="OnMiddleDClick"></event>
                                     <event name="OnMiddleDown"></event>
                                     <event name="OnMiddleUp"></event>
@@ -11779,16 +11759,16 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="0">
+            <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
                 <property name="name">bSizer13</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
-                <object class="sizeritem" expanded="0">
+                <object class="sizeritem" expanded="1">
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND | wxALL</property>
                     <property name="proportion">1</property>
-                    <object class="wxPanel" expanded="0">
+                    <object class="wxPanel" expanded="1">
                         <property name="BottomDockable">1</property>
                         <property name="LeftDockable">1</property>
                         <property name="RightDockable">1</property>
@@ -11862,7 +11842,7 @@
                         <event name="OnSetFocus"></event>
                         <event name="OnSize"></event>
                         <event name="OnUpdateUI"></event>
-                        <object class="wxFlexGridSizer" expanded="0">
+                        <object class="wxFlexGridSizer" expanded="1">
                             <property name="cols">1</property>
                             <property name="flexible_direction">wxBOTH</property>
                             <property name="growablecols">0</property>
