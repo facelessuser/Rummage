@@ -461,11 +461,18 @@ class RummageFrame ( wx.Frame ):
 		self.m_about_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ABOUT, u"&About Rummage", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_help_menu.AppendItem( self.m_about_menuitem )
 		
+		self.m_help_menu.AppendSeparator()
+		
 		self.m_documentation_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Documentation", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_help_menu.AppendItem( self.m_documentation_menuitem )
 		
 		self.m_issues_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Help and Support", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_help_menu.AppendItem( self.m_issues_menuitem )
+		
+		self.m_help_menu.AppendSeparator()
+		
+		self.m_log_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Open Log File", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_help_menu.AppendItem( self.m_log_menuitem )
 		
 		self.m_menu.Append( self.m_help_menu, u"Help" ) 
 		
@@ -492,6 +499,7 @@ class RummageFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.on_about, id = self.m_about_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_documentation, id = self.m_documentation_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_issues, id = self.m_issues_menuitem.GetId() )
+		self.Bind( wx.EVT_MENU, self.on_show_log_file, id = self.m_log_menuitem.GetId() )
 	
 	def __del__( self ):
 		pass
@@ -547,6 +555,9 @@ class RummageFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_issues( self, event ):
+		event.Skip()
+	
+	def on_show_log_file( self, event ):
 		event.Skip()
 	
 

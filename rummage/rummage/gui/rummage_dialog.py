@@ -39,7 +39,7 @@ from . import export_csv
 from .settings import Settings
 from .generic_dialogs import errormsg, yesno
 from .custom_app import DebugFrameExtender
-from .custom_app import debug, error
+from .custom_app import debug, error, _PLATFORM
 from .custom_statusbar import extend_sb, extend
 from .regex_test_dialog import RegexTestDialog
 from .autocomplete_combo import AutoCompleteCombo
@@ -592,6 +592,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_export_html_menuitem.SetItemLabel(_("HTML"))
         self.m_export_csv_menuitem.SetItemLabel(_("CSV"))
         self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
+        self.m_log_menuitem.SetItemLabel(_("Open Log File"))
         self.m_about_menuitem.SetItemLabel(_("&About Rummage"))
         self.m_documentation_menuitem.SetItemLabel(_("Documentation"))
         self.m_issues_menuitem.SetItemLabel(_("Help and Support"))
@@ -1426,6 +1427,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
         else:
             self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
+
+    def on_show_log_file(self, event):
+        """Show user files in explorer."""
+
+        from . import open_editor
+        from . import simplelog
+
+        try:
+            logfile = simplelog.get_global_log().filename
+        except Exception:
+            logfile = None
+
+        if logfile is None or not os.path.exists(logfile):
+            error(traceback.format_exc())
+            errormsg(_("Cannot find log file!"))
+        else:
+            open_editor.open_editor(logfile, 1, 1)
 
     def on_documentation(self, event):
         """Open documentation site."""
