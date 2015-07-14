@@ -646,7 +646,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Init search path with passed in path
         if start_path and os.path.exists(start_path):
             self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
-        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
+        # On at least OSX, WxPython is determined to focus something that doesn't make sense.
+        # We use a timeout call to delay are default focus to ensure it is done last.
+        wx.FutureCall(500, self.m_searchfor_textbox.GetTextCtrl().SetFocus)
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""
