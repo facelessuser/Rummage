@@ -23,6 +23,7 @@ import wx
 from . import gui
 from ..localization import _
 from .custom_app import error
+from .error_text_dialog import ErrorTextDialog
 
 
 class SearchErrorDialog(gui.SearchErrorDialog):
@@ -50,6 +51,13 @@ class SearchErrorDialog(gui.SearchErrorDialog):
 
         self.SetTitle(_("Errors"))
         self.Fit()
+
+    def show_error(self, text):
+        """Show full single error in dialog."""
+
+        dlg = ErrorTextDialog(self, text)
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def load_errors(self, errors):
         """Populate list with error entries."""

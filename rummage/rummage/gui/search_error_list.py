@@ -40,6 +40,8 @@ class ErrorList(DynamicList):
             ]
         )
 
+        self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
+
     def create_image_list(self):
         """Create image list."""
 
@@ -60,3 +62,14 @@ class ErrorList(DynamicList):
             return self.itemDataMap[item][col][0]
         else:
             return self.itemDataMap[item][col]
+
+    def on_dclick(self, event):
+        """Open file at in editor with optional line and column argument."""
+
+        pos = event.GetPosition()
+        item = self.HitTestSubItem(pos)[0]
+        if item != -1:
+            file_name = self.get_map_item(item, col=1)
+            full_error = ''.join(reversed(self.get_map_item(item, col=0)))
+            self.GetParent().GetParent().show_error("%s\n%s" % (file_name, full_error))
+        event.Skip()
