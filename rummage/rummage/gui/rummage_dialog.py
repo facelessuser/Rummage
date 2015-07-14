@@ -27,7 +27,6 @@ import traceback
 import webbrowser
 from time import time
 import os
-import wx.lib.masked as masked
 import wx.lib.newevent
 from .. import version
 from .. import rumcore
@@ -37,7 +36,7 @@ from ..localization import _
 from . import gui
 from . import export_html
 from . import export_csv
-from .settings import Settings, _PLATFORM
+from .settings import Settings
 from .generic_dialogs import errormsg, yesno
 from .custom_app import DebugFrameExtender
 from .custom_app import debug, error
@@ -212,7 +211,7 @@ def i18n_to_eng(string, mapping):
 
 
 def setup_datepicker(obj, key):
-    """Replace object with a GenericDatePickerCtrl."""
+    """Setup GenericDatePickerCtrl object."""
 
     d = Settings.get_search_setting(key, None)
     if d is None:
@@ -227,7 +226,7 @@ def setup_datepicker(obj, key):
 
 
 def setup_timepicker(obj, spin, key):
-    """Replace object with TimeCtrl object."""
+    """Setup time control object."""
 
     t = Settings.get_search_setting(key, wx.DateTime.Now().Format("%H:%M:%S"))
     obj.SetValue(t)
@@ -235,6 +234,8 @@ def setup_timepicker(obj, spin, key):
 
 
 def setup_autocomplete_combo(obj, key, load_last=False, changed_callback=None, default=None):
+    """Setup autocomplete object."""
+
     if default is None:
         default = []
     choices = Settings.get_search_setting(key, default)

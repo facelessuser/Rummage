@@ -20,7 +20,6 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-import wx.lib.mixins.listctrl as listmix
 
 from .settings import Settings
 from . import gui

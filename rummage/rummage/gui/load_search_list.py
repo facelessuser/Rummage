@@ -20,7 +20,6 @@ IN THE SOFTWARE.
 """
 import wx
 from .dynamic_lists import DynamicList
-from .messages import error_icon
 from ..localization import _
 from .. import data
 
