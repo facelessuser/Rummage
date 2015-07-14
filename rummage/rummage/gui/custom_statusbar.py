@@ -258,10 +258,15 @@ class CustomStatusBar(wx.StatusBar, CustomStatusExtension):
 
     """Custom status bar."""
 
-    def __init__(self, parent):
+    def __init__(self, parent, name):
         """Init the CustomStatusBar object."""
 
-        super(CustomStatusBar, self).__init__(parent)
+        super(CustomStatusBar, self).__init__(
+            parent,
+            id=wx.ID_ANY,
+            style=wx.STB_DEFAULT_STYLE,
+            name=name
+        )
         self.sb_setup()
 
 

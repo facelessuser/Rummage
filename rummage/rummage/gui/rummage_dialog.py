@@ -211,7 +211,7 @@ def i18n_to_eng(string, mapping):
     return mapping.get(string, None)
 
 
-def set_default_time(obj, key):
+def setup_datepicker(obj, key):
     """Replace object with a GenericDatePickerCtrl."""
 
     d = Settings.get_search_setting(key, None)
@@ -226,32 +226,23 @@ def set_default_time(obj, key):
         obj.SetValue(day)
 
 
-def replace_with_timepicker(obj, spin, key):
+def setup_timepicker(obj, spin, key):
     """Replace object with TimeCtrl object."""
 
     t = Settings.get_search_setting(key, wx.DateTime.Now().Format("%H:%M:%S"))
-    time_picker = masked.TimeCtrl(
-        obj.GetParent(), value=t, style=wx.TE_PROCESS_TAB, spinButton=spin, oob_color="white", fmt24hr=True
-    )
-    sz = obj.GetContainingSizer()
-    sz.Replace(obj, time_picker)
-    obj.Destroy()
-    return time_picker
+    obj.SetValue(t)
+    obj.BindSpinButton(spin)
 
 
-def replace_with_autocomplete(obj, key, load_last=False, changed_callback=None, default=None):
-    """Replace object with AutoCompleteCombo object."""
-
+def setup_autocomplete_combo(obj, key, load_last=False, changed_callback=None, default=None):
     if default is None:
         default = []
     choices = Settings.get_search_setting(key, default)
     if choices == [] and choices != default:
         choices = default
-    auto_complete = AutoCompleteCombo(obj.GetParent(), choices, load_last, changed_callback)
-    sz = obj.GetContainingSizer()
-    sz.Replace(obj, auto_complete)
-    obj.Destroy()
-    return auto_complete
+    if changed_callback is not None:
+        obj.set_changed_callback(changed_callback)
+    obj.update_choices(choices, load_last=load_last)
 
 
 def update_autocomplete(obj, key, load_last=False, default=None):
@@ -715,57 +706,29 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 TIME_LIMIT_I18N
             )
         )
-        set_default_time(self.m_modified_date_picker, "modified_date_string")
-        set_default_time(self.m_created_date_picker, "created_date_string")
 
-        # GUI is built with WxFormBuilder, but it isn't easy to fill in custom objects.
-        # So place holder objects are added for the sake of planning the gui, and then they
-        # are replaced here with the actual objects.
-
-        self.m_modified_time_picker = replace_with_timepicker(
-            self.m_modified_time_picker, self.m_modified_spin, "modified_time_string"
-        )
-        self.m_created_time_picker = replace_with_timepicker(
-            self.m_created_time_picker, self.m_created_spin, "created_time_string"
-        )
-
-        # m_searchin_text replacement causes "Error in sys.excepthook:"
-        # not sure why only it causes this.
-        self.m_searchin_text = replace_with_autocomplete(
-            self.m_searchin_text, "target", changed_callback=self.on_searchin_changed
-        )
-        self.m_searchfor_textbox = replace_with_autocomplete(
+        setup_datepicker(self.m_modified_date_picker, "modified_date_string")
+        setup_datepicker(self.m_created_date_picker, "created_date_string")
+        setup_timepicker(self.m_modified_time_picker, self.m_modified_spin, "modified_time_string")
+        setup_timepicker(self.m_created_time_picker, self.m_created_spin, "created_time_string")
+        setup_autocomplete_combo(self.m_searchin_text, "target", changed_callback=self.on_searchin_changed)
+        setup_autocomplete_combo(
             self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
         )
-        self.m_replace_textbox = replace_with_autocomplete(
+        setup_autocomplete_combo(
             self.m_replace_textbox, "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
         )
-        self.m_exclude_textbox = replace_with_autocomplete(
+        setup_autocomplete_combo(
             self.m_exclude_textbox,
             "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude",
             load_last=True
         )
-        self.m_filematch_textbox = replace_with_autocomplete(
+        setup_autocomplete_combo(
             self.m_filematch_textbox,
             "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search",
             load_last=True,
             default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
         )
-
-        # We caused some tab traversal chaos with the object replacement.
-        # Fix it in platforms where it matters.
-        if _PLATFORM != "osx":
-            self.m_searchin_text.MoveBeforeInTabOrder(self.m_searchin_dir_picker)
-            self.m_searchfor_textbox.MoveBeforeInTabOrder(self.m_replace_textbox)
-            self.m_replace_textbox.MoveBeforeInTabOrder(self.m_regex_search_checkbox)
-            self.m_modified_choice.MoveAfterInTabOrder(self.m_size_text)
-            self.m_modified_date_picker.MoveAfterInTabOrder(self.m_modified_choice)
-            self.m_modified_time_picker.MoveAfterInTabOrder(self.m_modified_date_picker)
-            self.m_created_choice.MoveAfterInTabOrder(self.m_modified_time_picker)
-            self.m_created_date_picker.MoveAfterInTabOrder(self.m_created_choice)
-            self.m_created_time_picker.MoveAfterInTabOrder(self.m_created_date_picker)
-            self.m_exclude_textbox.MoveBeforeInTabOrder(self.m_dirregex_checkbox)
-            self.m_filematch_textbox.MoveBeforeInTabOrder(self.m_fileregex_checkbox)
 
     def on_preferences(self, event):
         """Show settings dialog, and update history of AutoCompleteCombo if the history was cleared."""

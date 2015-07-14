@@ -58,6 +58,11 @@ class AutoCompleteCombo(ComboCtrl):
         # Add choices
         self.update_choices(choices, load_last)
 
+    def set_changed_callback(self, callback):
+        """Set changed callback."""
+
+        self.changed_callback = callback
+
     def on_focus(self, event):
         """Ensure the TextCtrl object takes the focus."""
 
