@@ -546,6 +546,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
 
         self.init_search_path(start_path)
+        # Only on OSX, WxPython is determined to focus something that doesn't make sense
+        # even though we call no focus events.  It apparently runs after we try and focus
+        # something on startup.  Trying to delay focus is problematic as we sometimes
+        # don't wait enough if other events get in the way.
+        # So we disable the window preventing all focus events, and THEN
+        # we use a timeout call to delay our default focus to ensure it is done last.
+        self.Enable(False)
+        wx.FutureCall(500, self.on_load)
 
     def localize(self):
         """Localize."""
@@ -647,9 +655,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Init search path with passed in path
         if start_path and os.path.exists(start_path):
             self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
-        # On at least OSX, WxPython is determined to focus something that doesn't make sense.
-        # We use a timeout call to delay our default focus to ensure it is done last.
-        wx.FutureCall(500, self.m_searchfor_textbox.GetTextCtrl().SetFocus)
+
+    def on_load(self):
+        """Re-enable window (stupid OSX workaround) and select the appropriate entry."""
+
+        self.Enable(True)
+        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
+        self.Refresh()
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""
