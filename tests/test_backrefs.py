@@ -319,6 +319,32 @@ class TestSearchTemplate(unittest.TestCase):
             '''
         )
 
+    def test_detect_complex_verbose_string_flag(self):
+        """Test complex verbose string flag (?x)."""
+
+        pattern = bre.compile_search(
+            r'''
+            (?ixu)
+            This is a # \Qcomment\E
+            This is not a \# \Qcomment\E
+            This is not a [#\ ] \Qcomment\E
+            This is not a [\#] \Qcomment\E
+            This\ is\ a # \Qcomment\E
+            '''
+        )
+
+        self.assertEqual(
+            pattern.pattern,
+            r'''
+            (?ixu)
+            This is a # \Qcomment\E
+            This is not a \# comment
+            This is not a [#\ ] comment
+            This is not a [\#] comment
+            This\ is\ a # \Qcomment\E
+            '''
+        )
+
     def test_verbose_comment_no_nl(self):
         """Test verbose comment with no newline."""
 

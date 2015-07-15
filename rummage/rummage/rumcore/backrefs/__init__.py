@@ -299,7 +299,7 @@ utokens = (
         )
         '''
     ),
-    re.compile(r'\(\?([iLmsux])\)')   # _RE_IS_VERBOSE
+    re.compile(r'\s*\(\?([iLmsux]+)\)')   # _RE_IS_VERBOSE
 )
 
 # Byte string related references
@@ -374,7 +374,7 @@ btokens = (
         '''
     ),
     re.compile(                       # _RE_IS_VERBOSE
-        br'\(\?([iLmsux])\)'
+        br'\s*\(\?([iLmsux]+)\)'
     )
 )
 
@@ -655,7 +655,7 @@ class SearchTemplate(object):
         v = verbose
         if not v:
             m = self._re_is_verbose.match(string.lstrip())
-            if m and m.group(1) == self._verbose_flag:
+            if m and self._verbose_flag in m.group(1):
                 v = True
         return v
 
