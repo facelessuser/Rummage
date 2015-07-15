@@ -103,6 +103,8 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.DeleteAllColumns()
         self.itemDataMap = {}
         self.SetItemCount(0)
+        self.size_sample = COLUMN_SAMPLE_SIZE
+        self.widest_cell = [MINIMUM_COL_SIZE] * self.column_count
         self.Refresh()
 
     def load_list(self):
