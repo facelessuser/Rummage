@@ -91,8 +91,15 @@ class AutoCompleteCombo(ComboCtrl):
         self.choices = items
         value = self.list.get_selected_text()
         self.list.clear()
+        if items and items[0] == "":
+            items = items[1:]
+            first_empty = True
+            if load_last:
+                value = ""
+        else:
+            first_empty = False
         self.list.append_items(items)
-        if load_last:
+        if load_last and not first_empty:
             idx = self.list.GetItemCount() - 1
             if idx != -1:
                 self.list.select_item(0)

@@ -434,13 +434,15 @@ class Settings(object):
         for i in history:
             key = i[0]
             value = i[1]
-            if value is None or value == "":
-                continue
+            if value is None:
+                value = ""
             values = cls.cache.get(key, [])
             if value in values:
                 values.remove(value)
+            if values and values[0] == "":
+                values.remove("")
             values.insert(0, value)
-            if len(values) > 20:
+            if len(values) > (20 if value != "" else 21):
                 del values[-1]
             cls.cache[key] = values
         for t in toggles:
