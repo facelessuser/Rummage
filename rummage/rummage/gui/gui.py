@@ -86,7 +86,7 @@ class RummageFrame ( wx.Frame ):
 		
 		self.m_replace_label = wx.StaticText( self.m_search_panel, wx.ID_ANY, u"Replace with", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_replace_label.Wrap( -1 )
-		fgSizer8.Add( self.m_replace_label, 0, wx.ALL, 5 )
+		fgSizer8.Add( self.m_replace_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 		
 		self.m_replace_textbox = AutoCompleteCombo(self.m_search_panel)
 		fgSizer8.Add( self.m_replace_textbox, 1, wx.ALL|wx.EXPAND, 5 )
