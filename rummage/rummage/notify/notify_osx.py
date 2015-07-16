@@ -12,7 +12,7 @@ import ctypes
 import ctypes.util
 import sys
 
-__all__ = ("get_notify", "alert", "setup")
+__all__ = ("get_notify", "alert", "setup", "destroy")
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 
@@ -60,6 +60,15 @@ class Options(object):
     sender = "com.apple.Terminal"
     terminal_notifier = None
     app_name = ""
+
+    @classmethod
+    def clear(cls):
+        """Clear."""
+
+        cls.notify = None
+        cls.sender = "com.apple.Terminal"
+        cls.terminal_notifier = None
+        cls.app_name = ""
 
 
 def alert(sound=None):
@@ -112,7 +121,6 @@ def notify_osx_call(title, message, sound, fallback):
 def setup(app_name, icon, *args):
     """Setup."""
 
-    global notify_osx_call
     term_notify = None
     sender = None
 
@@ -128,17 +136,21 @@ def setup(app_name, icon, *args):
 
     Options.app_name = app_name
 
-    if notify_osx_call is not None:
-        try:
-            assert(term_notify is not None and exists(term_notify))
-            Options.terminal_notifier = term_notify
-            if sender is not None:
-                Options.sender = sender
-        except Exception:
-            print(traceback.format_exc())
-            notify_osx_call = None
-    if notify_osx_call is not None:
+    try:
+        assert(term_notify is not None and exists(term_notify))
+        Options.terminal_notifier = term_notify
+        if sender is not None:
+            Options.sender = sender
         Options.notify = notify_osx_call
+    except Exception:
+        print(traceback.format_exc())
+
+
+def destroy():
+    """Destroy."""
+
+    Options.clear()
+    Options.notify = notify_osx_fallback
 
 
 def get_notify():

@@ -12,7 +12,7 @@ import ctypes.wintypes as wintypes
 import os
 import platform
 
-__all__ = ("get_notify", "alert", "setup", "windows_icons")
+__all__ = ("get_notify", "alert", "setup", "windows_icons", "destroy")
 
 if ctypes.sizeof(ctypes.c_long) == ctypes.sizeof(ctypes.c_void_p):
     WPARAM = ctypes.c_ulong
@@ -104,6 +104,13 @@ class Options(object):
 
     notify = None
     instance = None
+
+    @classmethod
+    def clear(cls):
+        """Clear."""
+
+        cls.notify = None
+        cls.instance = None
 
 
 def alert(sound=None):
@@ -322,6 +329,11 @@ class WindowsNotify(object):
 
         self.hide_icon()
 
+    def destroy(self):
+
+        self.hide_icon()
+        self._destroy_window()
+
 
 @staticmethod
 def NotifyWin(title, msg, sound, icon, fallback):
@@ -338,9 +350,18 @@ def setup(app_name, icon, *args):
     except Exception:
         icon = None
 
-    if NotifyWin is not None:
-        Options.instance = WindowsNotify(app_name, icon, app_name)
-        Options.notify = NotifyWin
+    Options.instance = WindowsNotify(app_name, icon, app_name)
+    Options.notify = NotifyWin
+
+
+def destroy():
+    """Destroy."""
+
+    if Options.instance is not None:
+        Options.instance.destroy()
+
+    Options.clear()
+    Options.notify = notify_win_fallback
 
 
 def get_notify():

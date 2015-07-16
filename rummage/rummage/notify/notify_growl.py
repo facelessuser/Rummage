@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 import traceback
 from os.path import exists
 
-__all__ = ("get_growl", "enable_growl", "growl_enabled", "setup_growl", "has_growl")
+__all__ = ("get_growl", "enable_growl", "growl_enabled", "setup_growl", "has_growl", "growl_destroy")
 
 
 class Options(object):
@@ -19,6 +19,15 @@ class Options(object):
     enabled = False
     growl = None
     notify = None
+
+    @classmethod
+    def clear(cls):
+        """Clear variables."""
+
+        cls.icon = None
+        cls.enabled = False
+        cls.growl = None
+        cls.notify = None
 
 
 def alert():
@@ -109,6 +118,13 @@ def setup_growl(app_name, icon, alert_function):
 
     if Options.growl is not None:
         Options.notify = notify_growl_call
+
+
+def growl_destroy():
+    """Clear the setup."""
+
+    Options.clear()
+    Options.notify = notify_growl_fallback
 
 
 def get_growl():

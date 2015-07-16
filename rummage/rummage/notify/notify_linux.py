@@ -8,7 +8,7 @@ import subprocess
 from os.path import exists
 import traceback
 
-__all__ = ("get_notify", "alert", "setup")
+__all__ = ("get_notify", "alert", "setup", "destroy")
 
 
 class Options(object):
@@ -18,6 +18,14 @@ class Options(object):
     icon = None
     notify = None
     app_name = ""
+
+    @classmethod
+    def clear(cls):
+        """Clear."""
+
+        cls.icon = None
+        cls.notify = None
+        cls.app_name = ""
 
 
 def alert(sound=None):
@@ -86,6 +94,13 @@ def setup(app_name, icon, *args):
     if notify_osd_call is not None:
         Options.app_name = app_name
         Options.notify = notify_osd_call
+
+
+def destroy():
+    """Destroy."""
+
+    Options.clear()
+    Options.notify = notify_osd_fallback
 
 
 def get_notify():

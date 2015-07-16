@@ -1365,6 +1365,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.tester.Close()
             except Exception:
                 pass
+        notify.destroy_notifications()
         self.close_debug_console()
         event.Skip()
 
