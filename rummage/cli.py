@@ -22,12 +22,12 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 import argparse
 import os
-import re
 import sys
 from datetime import datetime
 from .rummage import epoch_timestamp
 from .rummage import rumcore
 from .rummage import version
+from .rummage.rumcore import backrefs as bre
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 CLI_ENCODING = sys.getfilesystemencoding()
@@ -41,7 +41,7 @@ BOOL_NONE = 0
 BOOL_MATCH = 1
 BOOL_UNMATCH = 2
 
-RE_DATE_TIME = re.compile(
+RE_DATE_TIME = bre.compile_search(
     r'''(?x)
     (?P<symbol>[><])?(?:
         (?P<date>(?P<month>0[1-9]|1[0-2])/(?P<day>0[1-9]|[1-2][0-9]|3[0-1])/(?P<year>[0-9]{4})) |
@@ -50,7 +50,7 @@ RE_DATE_TIME = re.compile(
     '''
 )
 
-RE_DATE_TIME_FULL = re.compile(
+RE_DATE_TIME_FULL = bre.compile_search(
     r'''(?x)
     (?P<symbol>[><])?
     (?P<date>(?P<month>0[1-9]|1[0-2])/(?P<day>0[1-9]|[1-2][0-9]|3[0-1])/(?P<year>[0-9]{4})) -
@@ -175,6 +175,24 @@ class RummageCli(object):
         else:
             modified = None
 
+        flags = self.get_flags(args)
+        if args.regexp:
+            if (args.pattern == "" and args.replace) or self.validate_search_regex(args.pattern, flags):
+                raise ValueError("Invlaid regex search pattern")
+
+        elif args.pattern == "" and args.replace:
+            raise ValueError("Invlaid search pattern")
+
+        if args.regex_file_pattern:
+            if self.validate_regex(args.regex_file_pattern):
+                raise ValueError("Invalid regex file pattern")
+        elif not args.file_pattern:
+            raise ValueError("Invalid file pattern")
+
+        if args.regex_directory_exclude:
+            if self.validate_regex(args.regex_directory_exclude):
+                raise ValueError("Invalid regex directory exclude pattern")
+
         self.rummage = rumcore.Rummage(
             target=target,
             pattern=args.pattern,
@@ -204,6 +222,7 @@ class RummageCli(object):
         else:
             self.bool_match = BOOL_NONE
 
+        self.search_files = not args.pattern and not args.replace
         self.no_filename = args.buffer or args.no_filename
         self.count_only = args.count or args.replace is not None
         self.show_lines = args.line_numbers
@@ -213,10 +232,28 @@ class RummageCli(object):
         self.count = 0
         self.errors = False
 
+    def validate_search_regex(self, search, search_flags):
+        """Validate search regex."""
+
+        flags = bre.MULTILINE
+        if search_flags & rumcore.DOTALL:
+            flags |= bre.DOTALL
+        if search_flags & rumcore.IGNORECASE:
+            flags |= bre.IGNORECASE
+        return self.validate_regex(search, flags)
+
+    def validate_regex(self, pattern, flags=0):
+        """Validate regular expresion compiling."""
+        try:
+            bre.compile_search(pattern, flags)
+            return False
+        except Exception:
+            return True
+
     def get_flags(self, args):
         """Get rummage flags."""
 
-        flags = 0
+        flags = rumcore.MULTILINE
 
         if args.regex_file_pattern is not None:
             flags |= rumcore.FILE_REGEX_MATCH
@@ -334,18 +371,25 @@ class RummageCli(object):
         """Display output."""
 
         for f in self.rummage.find():
-            if not f.error:
-                if self.bool_match != BOOL_NONE:
-                    self.bool_output(f)
-                elif self.count_only:
-                    self.count_output(f)
-                elif self.only_matching:
-                    self.match_output(f)
+            if self.search_files:
+                if not f.error:
+                    pyout(f.name)
                 else:
-                    self.normal_output(f)
+                    self.errors = True
+                    pyout("ERROR: %s" % f.error)
             else:
-                self.errors = True
-                pyout("ERROR: %s" % f.error)
+                if not f.error:
+                    if self.bool_match != BOOL_NONE:
+                        self.bool_output(f)
+                    elif self.count_only:
+                        self.count_output(f)
+                    elif self.only_matching:
+                        self.match_output(f)
+                    else:
+                        self.normal_output(f)
+                else:
+                    self.errors = True
+                    pyout("ERROR: %s" % f.error)
         self.count_flush()
 
 
@@ -353,7 +397,7 @@ def main():
     """Main entry point."""
 
     # Setup arg parsing object
-    parser = argparse.ArgumentParser(prog="rumcl", description="Grep like file searcher.", add_help=False)
+    parser = argparse.ArgumentParser(prog="rumcl", description="Rummage CLI search and replace tool.", add_help=False)
     # Flag arguments
     parser.add_argument(
         "--version", action="version", version=("%(prog)s " + version.__version__)

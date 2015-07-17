@@ -19,7 +19,6 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import re
 import wx
 import sys
 import threading
@@ -30,6 +29,7 @@ import os
 import wx.lib.newevent
 from .. import version
 from .. import rumcore
+from ..rumcore import backrefs as bre
 from ..epoch_timestamp import local_time_to_epoch_timestamp
 from .. import notify
 from ..localization import _
@@ -944,7 +944,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if (
                 not fail and
                 self.m_logic_choice.GetStringSelection() != "any" and
-                re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
+                bre.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
             ):
                 msg = _("Please enter a valid size!")
                 fail = True
@@ -1334,17 +1334,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def validate_search_regex(self):
         """Validate search regex."""
 
-        flags = 0
+        flags = bre.MULTILINE
         if self.m_dotmatch_checkbox.GetValue():
-            flags |= re.DOTALL
+            flags |= bre.DOTALL
         if not self.m_case_checkbox.GetValue():
-            flags |= re.IGNORECASE
+            flags |= bre.IGNORECASE
         return self.validate_regex(self.m_searchfor_textbox.Value, flags)
 
     def validate_regex(self, pattern, flags=0):
         """Validate regular expresion compiling."""
         try:
-            re.compile(pattern, flags)
+            bre.compile_search(pattern, flags)
             return False
         except Exception:
             errormsg(_("Invalid Regular Expression!"))
