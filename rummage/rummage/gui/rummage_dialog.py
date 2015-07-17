@@ -267,6 +267,7 @@ class RummageThread(threading.Thread):
         self.runtime = ""
         self.no_results = 0
         self.running = False
+        self.file_search = not args.pattern
 
         self.rummage = rumcore.Rummage(
             target=args.target,
@@ -357,7 +358,7 @@ class RummageThread(threading.Thread):
             _ERRORS = []
         for f in self.rummage.find():
             with _LOCK:
-                if f.error is None and f.match is not None:
+                if f.error is None and (self.file_search or f.match is not None):
                     _RESULTS.append(f)
                 else:
                     if isinstance(f, rumcore.FileRecord):
@@ -890,7 +891,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     # TODO: do I need this?
                     self.allow_update = False
             else:
-                if not self.validate_search_inputs():
+                if not self.validate_search_inputs(True):
                     self.do_search(replace=True)
                 self.debounce_search = False
         else:
@@ -908,7 +909,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.do_search()
                 self.debounce_search = False
 
-    def validate_search_inputs(self):
+    def validate_search_inputs(self, replace=False):
         """Validate the search inputs."""
 
         debug("validate")
@@ -918,10 +919,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             msg = _("Please enter a valid search path!")
             fail = True
         if not fail and self.m_regex_search_checkbox.GetValue():
-            if self.m_searchfor_textbox.GetValue() == "" or self.validate_search_regex():
+            if (self.m_searchfor_textbox.GetValue() == "" and replace) or self.validate_search_regex():
                 msg = _("Please enter a valid search regex!")
                 fail = True
-        elif not fail and self.m_searchfor_textbox.GetValue() == "":
+        elif not fail and self.m_searchfor_textbox.GetValue() == "" and replace:
             msg = _("Please enter a valid search!")
             fail = True
 
@@ -1277,8 +1278,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         p_value = self.m_progressbar.GetValue()
         actually_done = done - 1 if done > 0 else 0
         for f in results:
-            self.m_result_file_list.set_match(f)
-            if self.args.count_only or self.args.boolean or self.args.replace is not None:
+            self.m_result_file_list.set_match(f, not self.args.pattern)
+            if self.args.count_only or self.args.boolean or self.args.replace is not None or not self.args.pattern:
                 count += 1
                 continue
 

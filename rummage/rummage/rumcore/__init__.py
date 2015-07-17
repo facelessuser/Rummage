@@ -1239,10 +1239,20 @@ class Rummage(object):
         self.alive = True
         self.idx = -1
 
-        if len(self.files):
-            for result in self.search_file(self.target if self.buffer_input else None):
-                yield result
+        if self.search_params.pattern:
+            if len(self.files):
+                for result in self.search_file(self.target if self.buffer_input else None):
+                    yield result
+            else:
+                for result in self.walk_files():
+                    yield result
         else:
-            for result in self.walk_files():
-                yield result
+            for f in self.path_walker.run():
+                self.idx += 1
+                self.records += 1
+                yield f
+
+                if self.kill:
+                    self.files.clear()
+
         self.alive = False

@@ -62,19 +62,27 @@ class ResultFileList(DynamicList):
         self.sort_down = self.images.Add(data.get_image('sd.png').GetBitmap())
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
 
-    def set_match(self, obj):
+    def set_match(self, obj, file_search=False):
         """Set match."""
 
-        item_id = "%d" % obj.info.id
-        if item_id in self.itemDataMap:
-            self.increment_match_count(item_id)
-        else:
+        if file_search:
             self.set_item_map(
-                item_id,
-                basename(obj.info.name), float(obj.info.size.strip("KB")), 1,
-                dirname(obj.info.name), obj.info.encoding, obj.info.modified,
-                obj.info.created, obj.match.lineno, obj.match.colno
+                obj.name,
+                basename(obj.name), float(obj.size) / 1024.0, 0,
+                dirname(obj.name), '', obj.modified,
+                obj.created, 1, 1
             )
+        else:
+            item_id = "%d" % obj.info.id
+            if item_id in self.itemDataMap:
+                self.increment_match_count(item_id)
+            else:
+                self.set_item_map(
+                    item_id,
+                    basename(obj.info.name), float(obj.info.size.strip("KB")), 1,
+                    dirname(obj.info.name), obj.info.encoding, obj.info.modified,
+                    obj.info.created, obj.match.lineno, obj.match.colno
+                )
 
     def on_enter_window(self, event):
         """Reset last moused over item tracker on mouse entering the window."""
