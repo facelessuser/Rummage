@@ -286,7 +286,8 @@ class RummageThread(threading.Thread):
             boolean=args.boolean,
             replace=args.replace,
             backup=args.backup,
-            backup_ext=args.backup_ext
+            backup_ext=args.backup_ext,
+            regex_support=args.regex_support
         )
 
         threading.Thread.__init__(self)
@@ -311,6 +312,8 @@ class RummageThread(threading.Thread):
 
         if args.unicode:
             flags |= rumcore.UNICODE
+        elif args.regex_support:
+            flags |= rumcore.ASCII
 
         if args.ignore_case:
             flags |= rumcore.IGNORECASE
@@ -320,6 +323,18 @@ class RummageThread(threading.Thread):
 
         if args.regexdirpattern:
             flags |= rumcore.DIR_REGEX_MATCH
+
+        if args.regex_support:
+            if args.fullcase:
+                flags |= rumcore.FULLCASE
+            if args.bestmatch:
+                flags |= rumcore.BESTMATCH
+            if args.enhancematch:
+                flags |= rumcore.ENHANCEMATCH
+            if args.word:
+                flags |= rumcore.WORD
+            if args.reverse:
+                flags |= rumcore.REVERSE
 
         return flags
 
@@ -427,6 +442,12 @@ class RummageArgs(object):
         self.replace = None
         self.force_encode = None
         self.backup_ext = None
+        self.fullcase = False
+        self.bestmatch = False
+        self.enhancematch = False
+        self.word = False
+        self.reverse = False
+        self.regex_support = False
 
 
 class DirPickButton(object):
@@ -587,6 +608,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_force_encode_choice.Clear()
         for x in ENCODINGS:
             self.m_force_encode_choice.Append(x)
+        self.m_fullcase_checkbox.SetLabel(_("Use fullcase"))
+        self.m_bestmatch_checkbox.SetLabel(_("Use bestmatch"))
+        self.m_enhancematch_checkbox.SetLabel(_("Use enhancematch"))
+        self.m_word_checkbox.SetLabel(_("Use word"))
+        self.m_reverse_checkbox.SetLabel(_("Reverse match"))
         self.m_subfolder_checkbox.SetLabel(_("Include subfolders"))
         self.m_hidden_checkbox.SetLabel(_("Include hidden"))
         self.m_binary_checkbox.SetLabel(_("Include binary files"))
@@ -622,6 +648,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_created_choice.Clear()
         for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
             self.m_created_choice.Append(x)
+
+        self.refresh_regex_options()
+
         self.Fit()
 
     def on_enter_key(self, event):
@@ -712,6 +741,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         index = self.m_force_encode_choice.FindString(encode_val)
         if index != wx.NOT_FOUND:
             self.m_force_encode_choice.SetSelection(index)
+        self.m_fullcase_checkbox.SetValue(Settings.get_search_setting("fullcase_toggle", False))
+        self.m_bestmatch_checkbox.SetValue(Settings.get_search_setting("bestmatch_toggle", False))
+        self.m_enhancematch_checkbox.SetValue(Settings.get_search_setting("enhancematch_toggle", False))
+        self.m_word_checkbox.SetValue(Settings.get_search_setting("word_toggle", False))
+        self.m_reverse_checkbox.SetValue(Settings.get_search_setting("reverse_toggle", False))
 
         self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
@@ -778,6 +812,26 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
             )
         dlg.Destroy()
+        self.refresh_regex_options()
+        self.m_search_panel.GetContainingSizer().Layout()
+        self.m_limiter_panel.GetContainingSizer().Layout()
+        self.optimize_size(height_only=True)
+
+    def refresh_regex_options(self):
+        """Refresh the regex module options."""
+
+        if Settings.get_regex_support():
+            self.m_fullcase_checkbox.Show()
+            self.m_word_checkbox.Show()
+            self.m_enhancematch_checkbox.Show()
+            self.m_bestmatch_checkbox.Show()
+            self.m_reverse_checkbox.Show()
+        else:
+            self.m_fullcase_checkbox.Hide()
+            self.m_word_checkbox.Hide()
+            self.m_enhancematch_checkbox.Hide()
+            self.m_bestmatch_checkbox.Hide()
+            self.m_reverse_checkbox.Hide()
 
     def on_dir_changed(self, event):
         """Event for when the directory changes in the DirPickButton."""
@@ -1022,11 +1076,18 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args.target = self.m_searchin_text.GetValue()
 
         # Search Options
+        self.args.regex_support = Settings.get_regex_support()
         self.args.regexp = self.m_regex_search_checkbox.GetValue()
         self.args.ignore_case = not self.m_case_checkbox.GetValue()
         self.args.dotall = self.m_dotmatch_checkbox.GetValue()
         self.args.unicode = self.m_unicode_checkbox.GetValue()
         self.args.count_only = self.m_count_only_checkbox.GetValue()
+        if self.args.regex_support:
+            self.args.fullcase = self.m_fullcase_checkbox.GetValue()
+            self.args.bestmatch = self.m_bestmatch_checkbox.GetValue()
+            self.args.enhancematch = self.m_enhancematch_checkbox.GetValue()
+            self.args.word = self.m_word_checkbox.GetValue()
+            self.args.reverse = self.m_reverse_checkbox.GetValue()
         self.args.boolean = self.m_boolean_checkbox.GetValue()
         self.args.backup = self.m_backup_checkbox.GetValue()
         self.args.force_encode = None
@@ -1117,7 +1178,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("binary_toggle", self.args.text),
             ("regex_file_toggle", self.m_fileregex_checkbox.GetValue()),
             ("boolean_toggle", self.args.boolean),
-            ("count_only_toggle", self.args.count_only)
+            ("count_only_toggle", self.args.count_only),
+            ("fullcase_toggle", self.args.fullcase),
+            ("bestmatch_toggle", self.args.bestmatch),
+            ("enhancematch_toggle", self.args.enhancematch),
+            ("word_toggle", self.args.word),
+            ("reverse_toggle", self.args.reverse)
         ]
 
         eng_size = i18n_to_eng(self.m_logic_choice.GetStringSelection(), SIZE_LIMIT_I18N)
@@ -1342,19 +1408,47 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def validate_search_regex(self):
         """Validate search regex."""
 
-        flags = bre.MULTILINE
-        if self.m_dotmatch_checkbox.GetValue():
-            flags |= bre.DOTALL
-        if not self.m_case_checkbox.GetValue():
-            flags |= bre.IGNORECASE
-        if self.m_unicode_checkbox.GetValue():
-            flags |= bre.UNICODE
+        if Settings.get_regex_support():
+            import regex
+            flags = regex.VERSION1 | regex.MULTILINE
+            if self.m_dotmatch_checkbox.GetValue():
+                flags |= regex.DOTALL
+            if not self.m_case_checkbox.GetValue():
+                flags |= regex.IGNORECASE
+            if self.m_unicode_checkbox.GetValue():
+                flags |= regex.UNICODE
+            else:
+                flags |= regex.ASCII
+            if self.m_fullcase_checkbox.GetValue():
+                flags |= rumcore.FULLCASE
+            if self.m_bestmatch_checkbox.GetValue():
+                flags |= rumcore.BESTMATCH
+            if self.m_enhancematch_checkbox.GetValue():
+                flags |= rumcore.ENHANCEMATCH
+            if self.m_word_checkbox.GetValue():
+                flags |= rumcore.WORD
+            if self.m_reverse_checkbox.GetValue():
+                flags |= rumcore.REVERSE
+        else:
+            flags = bre.MULTILINE
+            if self.m_dotmatch_checkbox.GetValue():
+                flags |= bre.DOTALL
+            if not self.m_case_checkbox.GetValue():
+                flags |= bre.IGNORECASE
+            if self.m_unicode_checkbox.GetValue():
+                flags |= bre.UNICODE
         return self.validate_regex(self.m_searchfor_textbox.Value, flags)
 
     def validate_regex(self, pattern, flags=0):
         """Validate regular expresion compiling."""
         try:
-            bre.compile_search(pattern, flags)
+            if Settings.get_regex_support():
+                import regex
+                if flags == 0:
+                    flags = regex.ASCII
+                regex.compile(pattern, flags)
+            else:
+                bre.compile_search(pattern, flags)
             return False
         except Exception:
             errormsg(_("Invalid Regular Expression!"))
@@ -1384,14 +1478,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Show regex test dialog."""
 
         self.m_regex_test_button.Enable(False)
-        self.tester = RegexTestDialog(
-            self,
-            self.m_case_checkbox.GetValue(),
-            self.m_dotmatch_checkbox.GetValue(),
-            self.m_unicode_checkbox.GetValue(),
-            self.m_searchfor_textbox.GetValue(),
-            self.m_replace_textbox.GetValue()
-        )
+        self.tester = RegexTestDialog(self, Settings.get_regex_support())
         self.tester.Show()
 
     def on_export_html(self, event):

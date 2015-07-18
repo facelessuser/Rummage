@@ -54,7 +54,9 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
         self.m_history_label.SetLabel(RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
-
+        self.m_regex_checkbox.SetValue(Settings.get_regex_support())
+        if Settings.is_regex_available():
+            self.m_regex_checkbox.Enable(True)
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
         self.alert_methods = Settings.get_platform_notify()
@@ -150,6 +152,11 @@ class SettingsDialog(gui.SettingsDialog):
         value = self.m_lang_choice.GetStringSelection()
         Settings.set_language(value)
         event.Skip()
+
+    def on_regex_toggle(self, event):
+        """Set use of regex module."""
+
+        Settings.set_regex_support(self.m_regex_checkbox.GetValue())
 
     def on_cancel(self, event):
         """Close on cancel."""

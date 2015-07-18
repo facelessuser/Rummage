@@ -25,6 +25,7 @@ import sys
 from .rummage.gui.settings import Settings
 from .rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
 from .rummage import version
+import locale
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 CLI_ENCODING = sys.getfilesystemencoding()
@@ -76,13 +77,14 @@ def run():
 
     if not Settings.get_single_instance() or (Settings.get_single_instance() and app.is_instance_okay()):
         if args.regextool:
-            RegexTestDialog(None, False, False, stand_alone=True).Show()
+            RegexTestDialog(None, regex_support=False, stand_alone=True).Show()
         else:
             RummageFrame(
                 None,
                 args.searchpath if args.searchpath is not None else None,
                 debug_mode=args.debug
             ).Show()
+    locale.setlocale(locale.LC_ALL, '')
     app.MainLoop()
 
 

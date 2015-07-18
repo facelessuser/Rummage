@@ -23,7 +23,6 @@ from __future__ import unicode_literals
 import codecs
 import mmap
 import os
-import re
 import shutil
 import sys
 from collections import namedtuple
@@ -31,10 +30,15 @@ from fnmatch import fnmatch
 from os.path import isdir, isfile, join, abspath, getsize
 from time import ctime
 from . import text_decode
-from . import backrefs
+from . import backrefs as bre
 from .file_times import getmtime, getctime
 from .file_hidden import is_hidden
 from collections import deque
+try:
+    import regex
+    REGEX_SUPPORT = True
+except:
+    REGEX_SUPPORT = False
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 
@@ -64,6 +68,16 @@ UNICODE = 32
 FILE_REGEX_MATCH = 64
 DIR_REGEX_MATCH = 128
 BUFFER_INPUT = 256
+
+if REGEX_SUPPORT:
+    ASCII = 512          # (?a)
+    FULLCASE = 1024      # (?f)
+    WORD = 2048          # (?w)
+    BESTMATCH = 4096     # (?b)
+    ENHANCEMATCH = 8192  # (?e)
+    REVERSE = 16384      # (?r)
+    VERSION0 = 32768     # (?v0)
+    VERSION1 = 65536     # (?v1)
 
 TRUNCATE_LENGTH = 120
 
@@ -126,19 +140,19 @@ def get_exception():
     return (exc, tb)
 
 
-def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True, unicode_props=False, binary=False):
+def _bre_pattern(pattern, ignorecase=False, dotall=False, multiline=True, unicode_props=False, binary=False):
     """Prepare regex search pattern flags."""
 
     flags = 0
     if multiline:
-        flags |= re.MULTILINE
+        flags |= bre.MULTILINE
     if ignorecase:
-        flags |= re.IGNORECASE
+        flags |= bre.IGNORECASE
     if dotall:
-        flags |= re.DOTALL
+        flags |= bre.DOTALL
     if not binary and unicode_props:
-        flags |= re.UNICODE
-    return backrefs.compile_search(pattern, flags)
+        flags |= bre.UNICODE
+    return bre.compile_search(pattern, flags)
 
 
 def _literal_pattern(pattern, ignorecase=False):
@@ -146,8 +160,47 @@ def _literal_pattern(pattern, ignorecase=False):
 
     flags = 0
     if ignorecase:
-        flags |= re.IGNORECASE
-    return re.compile(re.escape(pattern), flags)
+        flags |= bre.IGNORECASE
+    return bre.compile(bre.escape(pattern), flags)
+
+if REGEX_SUPPORT:
+    def _regex_pattern(
+        pattern, ignorecase=False, dotall=False, multiline=True,
+        unicode_props=False, binary=False, word=False, fullcase=False,
+        bestmatch=False, enhancematch=False, reverse=False
+    ):
+        """Prepare regex search pattern flags for regex module."""
+
+        flags = regex.VERSION1
+        if word:
+            flags |= regex.WORD
+        if fullcase:
+            flags |= regex.FULLCASE
+        if bestmatch:
+            flags |= regex.BESTMATCH
+        if enhancematch:
+            flags |= regex.ENHANCEMATCH
+        if reverse:
+            flags |= regex.REVERSE
+        if multiline:
+            flags |= regex.MULTILINE
+        if ignorecase:
+            flags |= regex.IGNORECASE
+        if dotall:
+            flags |= regex.DOTALL
+        if not binary and unicode_props:
+            flags |= regex.UNICODE
+        else:
+            flags |= regex.ASCII
+        return regex.compile(pattern, flags)
+
+    def _regex_literal_pattern(pattern, ignorecase=False):
+        """Prepare literal search pattern flags."""
+
+        flags = 0
+        if ignorecase:
+            flags |= regex.IGNORECASE
+        return regex.compile(regex.escape(pattern), flags)
 
 
 class RummageException(Exception):
@@ -255,9 +308,10 @@ class _FileSearch(object):
 
     hex_tx_table = ("\ufffd" * 32) + "".join(chr(c) for c in range(32, 127)) + ("\ufffd" * 129)
 
-    def __init__(self, args, file_obj, file_id, max_count, file_content):
+    def __init__(self, args, file_obj, file_id, max_count, file_content, regex_support=False):
         """Init the file search object."""
 
+        self.regex_support = regex_support and REGEX_SUPPORT
         self.literal = bool(args.flags & LITERAL)
         self.ignorecase = bool(args.flags & IGNORECASE)
         self.dotall = bool(args.flags & DOTALL)
@@ -265,6 +319,12 @@ class _FileSearch(object):
         self.unicode = bool(args.flags & UNICODE)
         self.boolean = bool(args.boolean)
         self.count_only = bool(args.count_only)
+        if regex_support:
+            self.word = bool(args.flags & WORD)
+            self.bestmatch = bool(args.flags & BESTMATCH)
+            self.enhancematch = bool(args.flags & ENHANCEMATCH)
+            self.fullcase = bool(args.flags & FULLCASE)
+            self.reverse = bool(args.flags & REVERSE)
         self.truncate_lines = args.truncate_lines
         self.backup = args.backup
         self.backup_ext = '.%s' % args.backup_ext
@@ -486,14 +546,24 @@ class _FileSearch(object):
 
         if pattern is not None:
             if self.literal:
+                if self.regex_support:
+                    pattern = _regex_literal_pattern(pattern, self.ignorecase)
                 pattern = _literal_pattern(pattern, self.ignorecase)
             else:
-                pattern = _re_pattern(
-                    pattern, self.ignorecase, self.dotall,
-                    self.multiline, unicode_props=self.unicode, binary=self.is_binary
-                )
-            if replace is not None and not self.literal:
-                self.expand = backrefs.compile_replace(pattern, self.replace)
+                if self.regex_support:
+                    pattern = _regex_pattern(
+                        pattern, self.ignorecase, self.dotall,
+                        self.multiline, self.unicode, self.is_binary,
+                        self.word, self.fullcase, self.bestmatch,
+                        self.enhancematch, self.reverse
+                    )
+                else:
+                    pattern = _bre_pattern(
+                        pattern, self.ignorecase, self.dotall,
+                        self.multiline, self.unicode, self.is_binary
+                    )
+            if replace is not None and not self.literal and not self.regex_support:
+                self.expand = bre.compile_replace(pattern, self.replace)
             else:
                 self.expand = None
 
@@ -801,11 +871,13 @@ class _DirWalker(object):
     def __init__(
         self, directory, file_pattern, file_regex_match,
         folder_exclude, dir_regex_match, recursive,
-        show_hidden, size, modified, created, backup_ext
+        show_hidden, size, modified, created, backup_ext,
+        regex_support=False
     ):
         """Init the directory walker object."""
 
         self.dir = directory
+        self.regex_support = regex_support and REGEX_SUPPORT
         self.size = (size[0], size[1] * 1024) if size is not None else size
         self.modified = modified
         self.created = created
@@ -1018,7 +1090,7 @@ class Rummage(object):
         show_hidden=False, encoding=None, size=None,
         modified=None, created=None, text=False, truncate_lines=False,
         boolean=False, count_only=False, replace=None,
-        backup=False, backup_ext=DEFAULT_BAK
+        backup=False, backup_ext=DEFAULT_BAK, regex_support=False
     ):
         """Initialize Rummage object."""
 
@@ -1032,6 +1104,7 @@ class Rummage(object):
             _PROCESS = self
 
         self.alive = False
+        self.regex_support = REGEX_SUPPORT and regex_support
         self.search_params = SearchParams()
         self.search_params.pattern = pattern
         self.search_params.flags = flags
@@ -1073,7 +1146,8 @@ class Rummage(object):
                 size,
                 modified,
                 created,
-                self.search_params.backup_ext if backup else None
+                self.search_params.backup_ext if backup else None,
+                self.regex_support
             )
         elif not self.buffer_input and isfile(self.target):
             self.files.append(
@@ -1124,9 +1198,14 @@ class Rummage(object):
 
         pattern = None
         if folder_exclude is not None:
-            pattern = backrefs.compile_search(
-                folder_exclude, re.IGNORECASE
-            ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
+            if self.regex_support:
+                pattern = regex.compile(
+                    folder_exclude, regex.IGNORECASE | regex.ASCII
+                ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
+            else:
+                pattern = bre.compile_search(
+                    folder_exclude, bre.IGNORECASE
+                ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
         return pattern
 
     def _get_file_pattern(self, file_pattern, file_regex_match):
@@ -1134,9 +1213,14 @@ class Rummage(object):
 
         pattern = None
         if file_pattern is not None:
-            pattern = backrefs.compile_search(
-                file_pattern, re.IGNORECASE
-            ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
+            if self.regex_support:
+                pattern = regex.compile(
+                    file_pattern, regex.IGNORECASE | regex.ASCII
+                ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
+            else:
+                pattern = bre.compile_search(
+                    file_pattern, bre.IGNORECASE
+                ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
     def get_status(self):
@@ -1186,7 +1270,8 @@ class Rummage(object):
                 file_info,
                 self.idx,
                 self.max,
-                content_buffer
+                content_buffer,
+                self.regex_support
             )
             for rec in self.searcher.run():
                 if rec.error is None:

@@ -32,29 +32,41 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     """Regex test dialog."""
 
-    def __init__(self, parent, is_case, is_dot, is_unicode, text="", replace="", stand_alone=False):
+    def __init__(self, parent, regex_support=False, stand_alone=False):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
         self.SetIcon(data.get_image('rummage_64.png').GetIcon())
         self.parent = parent
+        self.regex_support = regex_support
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
             [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
 
-        self.m_case_checkbox.SetValue(is_case)
-        self.m_dot_checkbox.SetValue(is_dot)
-        self.m_unicode_checkbox.SetValue(is_unicode)
+        self.m_case_checkbox.SetValue(parent.m_case_checkbox.GetValue() if parent else False)
+        self.m_dotmatch_checkbox.SetValue(parent.m_dotmatch_checkbox.GetValue() if parent else False)
+        self.m_unicode_checkbox.SetValue(parent.m_unicode_checkbox.GetValue() if parent else False)
+        if self.regex_support:
+            self.m_fullcase_checkbox.SetValue(parent.m_fullcase_checkbox.GetValue() if parent else False)
+            self.m_bestmatch_checkbox.SetValue(parent.m_bestmatch_checkbox.GetValue() if parent else False)
+            self.m_enhancematch_checkbox.SetValue(parent.m_enhancematch_checkbox.GetValue() if parent else False)
+            self.m_word_checkbox.SetValue(parent.m_word_checkbox.GetValue() if parent else False)
+            self.m_reverse_checkbox.SetValue(parent.m_reverse_checkbox.GetValue() if parent else False)
+            self.m_fullcase_checkbox.Show()
+            self.m_bestmatch_checkbox.Show()
+            self.m_enhancematch_checkbox.Show()
+            self.m_word_checkbox.Show()
+            self.m_reverse_checkbox.Show()
         self.stand_alone = stand_alone
         self.regex_event_code = -1
         self.testing = False
         self.init_regex_timer()
         self.start_regex_timer()
 
-        self.m_regex_text.SetValue(text)
-        self.m_replace_text.SetValue(replace)
+        self.m_regex_text.SetValue(parent.m_searchfor_textbox.GetValue() if parent else "")
+        self.m_replace_text.SetValue(parent.m_replace_textbox.GetValue() if parent else "")
 
         self.localize()
 
@@ -78,8 +90,13 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_use_regex_button.SetLabel(_("Use"))
         self.m_close_button.SetLabel(_("Close"))
         self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
-        self.m_dot_checkbox.SetLabel(_("Dot matches newline"))
+        self.m_dotmatch_checkbox.SetLabel(_("Dot matches newline"))
         self.m_unicode_checkbox.SetLabel(_("Use Unicode properties"))
+        self.m_fullcase_checkbox.SetLabel(_("Use fullcase"))
+        self.m_bestmatch_checkbox.SetLabel(_("Use bestmatch"))
+        self.m_enhancematch_checkbox.SetLabel(_("Use enhancematch"))
+        self.m_word_checkbox.SetLabel(_("Use word"))
+        self.m_reverse_checkbox.SetLabel(_("Reverse match"))
         self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(_("Text"))
         self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(_("Replace"))
         main_sizer = self.m_tester_panel.GetSizer()
@@ -93,6 +110,11 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         self.regex_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.regex_event, self.regex_timer)
+
+    def regex_expand(self, m, replace):
+        """Regex module expand."""
+
+        return m.expand(replace)
 
     def start_regex_timer(self):
         """Start update timer."""
@@ -157,7 +179,13 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.parent.m_regex_search_checkbox.SetValue(True)
         self.parent.m_unicode_checkbox.SetValue(self.m_unicode_checkbox.GetValue())
         self.parent.m_case_checkbox.SetValue(self.m_case_checkbox.GetValue())
-        self.parent.m_dotmatch_checkbox.SetValue(self.m_dot_checkbox.GetValue())
+        self.parent.m_dotmatch_checkbox.SetValue(self.m_dotmatch_checkbox.GetValue())
+        if self.regex_support:
+            self.parent.m_fullcase_checkbox.SetValue(self.m_fullcase_checkbox.GetValue())
+            self.parent.m_bestmatch_checkbox.SetValue(self.m_bestmatch_checkbox.GetValue())
+            self.parent.m_enhancematch_checkbox.SetValue(self.m_enhancematch_checkbox.GetValue())
+            self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
+            self.parent.m_reverse_checkbox.SetValue(self.m_reverse_checkbox.GetValue())
         self.Close()
 
     def on_cancel(self, event):
@@ -167,6 +195,9 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     def test_regex(self):
         """Test and highlight search results in content buffer."""
+
+        if self.regex_support:
+            import regex
 
         if not self.testing:
             self.testing = True
@@ -179,16 +210,40 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.testing = False
                 return
 
-            flags = 0
-            if not self.m_case_checkbox.GetValue():
-                flags |= bre.IGNORECASE
-            if self.m_dot_checkbox.GetValue():
-                flags |= bre.DOTALL
-            if self.m_unicode_checkbox.GetValue():
-                flags |= bre.UNICODE
+            if self.regex_support:
+                flags = regex.VERSION1 | regex.MULTILINE
+                if self.m_dotmatch_checkbox.GetValue():
+                    flags |= regex.DOTALL
+                if not self.m_case_checkbox.GetValue():
+                    flags |= regex.IGNORECASE
+                if self.m_unicode_checkbox.GetValue():
+                    flags |= regex.UNICODE
+                else:
+                    flags |= regex.ASCII
+                if self.m_fullcase_checkbox.GetValue():
+                    flags |= regex.FULLCASE
+                if self.m_bestmatch_checkbox.GetValue():
+                    flags |= regex.BESTMATCH
+                if self.m_enhancematch_checkbox.GetValue():
+                    flags |= regex.ENHANCEMATCH
+                if self.m_word_checkbox.GetValue():
+                    flags |= regex.WORD
+                if self.m_reverse_checkbox.GetValue():
+                    flags |= regex.REVERSE
+            else:
+                flags = bre.MULTILINE
+                if not self.m_case_checkbox.GetValue():
+                    flags |= bre.IGNORECASE
+                if self.m_dotmatch_checkbox.GetValue():
+                    flags |= bre.DOTALL
+                if self.m_unicode_checkbox.GetValue():
+                    flags |= bre.UNICODE
 
             try:
-                test = bre.compile_search(self.m_regex_text.GetValue(), flags)
+                if self.regex_support:
+                    test = regex.compile(self.m_regex_text.GetValue(), flags)
+                else:
+                    test = bre.compile_search(self.m_regex_text.GetValue(), flags)
             except Exception:
                 self.testing = False
                 return
@@ -197,7 +252,10 @@ class RegexTestDialog(gui.RegexTestDialog):
             try:
                 rpattern = self.m_replace_text.GetValue()
                 if rpattern:
-                    replace_test = bre.compile_replace(test, self.m_replace_text.GetValue())
+                    if self.regex_support:
+                        replace_test = lambda m, replace=rpattern: self.regex_expand(m, replace)
+                    else:
+                        replace_test = bre.compile_replace(test, self.m_replace_text.GetValue())
             except Exception:
                 pass
 
