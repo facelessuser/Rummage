@@ -21,10 +21,9 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import traceback
-import re
 import sys
 from . import gui
-from ..rumcore import backrefs
+from ..rumcore import backrefs as bre
 from ..localization import _
 from .. import data
 
@@ -33,7 +32,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     """Regex test dialog."""
 
-    def __init__(self, parent, is_case, is_dot, text="", replace="", stand_alone=False):
+    def __init__(self, parent, is_case, is_dot, is_unicode, text="", replace="", stand_alone=False):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
@@ -47,6 +46,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         self.m_case_checkbox.SetValue(is_case)
         self.m_dot_checkbox.SetValue(is_dot)
+        self.m_unicode_checkbox.SetValue(is_unicode)
         self.stand_alone = stand_alone
         self.regex_event_code = -1
         self.testing = False
@@ -79,6 +79,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_close_button.SetLabel(_("Close"))
         self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
         self.m_dot_checkbox.SetLabel(_("Dot matches newline"))
+        self.m_unicode_checkbox.SetLabel(_("Use Unicode properties"))
         self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(_("Text"))
         self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(_("Replace"))
         main_sizer = self.m_tester_panel.GetSizer()
@@ -154,6 +155,9 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.parent.m_searchfor_textbox.SetValue(self.m_regex_text.GetValue())
         self.parent.m_replace_textbox.SetValue(self.m_replace_text.GetValue())
         self.parent.m_regex_search_checkbox.SetValue(True)
+        self.parent.m_unicode_checkbox.SetValue(self.m_unicode_checkbox.GetValue())
+        self.parent.m_case_checkbox.SetValue(self.m_case_checkbox.GetValue())
+        self.parent.m_dotmatch_checkbox.SetValue(self.m_dot_checkbox.GetValue())
         self.Close()
 
     def on_cancel(self, event):
@@ -177,12 +181,14 @@ class RegexTestDialog(gui.RegexTestDialog):
 
             flags = 0
             if not self.m_case_checkbox.GetValue():
-                flags |= re.IGNORECASE
-            if self.m_dot_checkbox:
-                flags |= re.DOTALL
+                flags |= bre.IGNORECASE
+            if self.m_dot_checkbox.GetValue():
+                flags |= bre.DOTALL
+            if self.m_unicode_checkbox.GetValue():
+                flags |= bre.UNICODE
 
             try:
-                test = backrefs.compile_search(self.m_regex_text.GetValue(), flags | re.UNICODE)
+                test = bre.compile_search(self.m_regex_text.GetValue(), flags)
             except Exception:
                 self.testing = False
                 return
@@ -191,7 +197,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             try:
                 rpattern = self.m_replace_text.GetValue()
                 if rpattern:
-                    replace_test = backrefs.compile_replace(test, self.m_replace_text.GetValue())
+                    replace_test = bre.compile_replace(test, self.m_replace_text.GetValue())
             except Exception:
                 pass
 
@@ -249,3 +255,5 @@ class RegexTestDialog(gui.RegexTestDialog):
     on_case_toggle = regex_start_event
 
     on_dot_toggle = regex_start_event
+
+    on_unicode_toggle = regex_start_event

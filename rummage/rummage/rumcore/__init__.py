@@ -60,9 +60,10 @@ IGNORECASE = 2
 DOTALL = 4
 RECURSIVE = 8
 MULTILINE = 16
-FILE_REGEX_MATCH = 32
-DIR_REGEX_MATCH = 64
-BUFFER_INPUT = 128
+UNICODE = 32
+FILE_REGEX_MATCH = 64
+DIR_REGEX_MATCH = 128
+BUFFER_INPUT = 256
 
 TRUNCATE_LENGTH = 120
 
@@ -125,7 +126,7 @@ def get_exception():
     return (exc, tb)
 
 
-def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True, binary=False):
+def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True, unicode_props=False, binary=False):
     """Prepare regex search pattern flags."""
 
     flags = 0
@@ -135,7 +136,7 @@ def _re_pattern(pattern, ignorecase=False, dotall=False, multiline=True, binary=
         flags |= re.IGNORECASE
     if dotall:
         flags |= re.DOTALL
-    if not binary:
+    if not binary and unicode_props:
         flags |= re.UNICODE
     return backrefs.compile_search(pattern, flags)
 
@@ -261,6 +262,7 @@ class _FileSearch(object):
         self.ignorecase = bool(args.flags & IGNORECASE)
         self.dotall = bool(args.flags & DOTALL)
         self.multiline = bool(args.flags & MULTILINE)
+        self.unicode = bool(args.flags & UNICODE)
         self.boolean = bool(args.boolean)
         self.count_only = bool(args.count_only)
         self.truncate_lines = args.truncate_lines
@@ -486,7 +488,10 @@ class _FileSearch(object):
             if self.literal:
                 pattern = _literal_pattern(pattern, self.ignorecase)
             else:
-                pattern = _re_pattern(pattern, self.ignorecase, self.dotall, self.multiline, binary=self.is_binary)
+                pattern = _re_pattern(
+                    pattern, self.ignorecase, self.dotall,
+                    self.multiline, unicode_props=self.unicode, binary=self.is_binary
+                )
             if replace is not None and not self.literal:
                 self.expand = backrefs.compile_replace(pattern, self.replace)
             else:

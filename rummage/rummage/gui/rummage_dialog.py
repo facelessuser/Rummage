@@ -1347,6 +1347,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             flags |= bre.DOTALL
         if not self.m_case_checkbox.GetValue():
             flags |= bre.IGNORECASE
+        if self.m_unicode_checkbox.GetValue():
+            flags |= bre.UNICODE
         return self.validate_regex(self.m_searchfor_textbox.Value, flags)
 
     def validate_regex(self, pattern, flags=0):
@@ -1386,6 +1388,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self,
             self.m_case_checkbox.GetValue(),
             self.m_dotmatch_checkbox.GetValue(),
+            self.m_unicode_checkbox.GetValue(),
             self.m_searchfor_textbox.GetValue(),
             self.m_replace_textbox.GetValue()
         )

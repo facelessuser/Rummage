@@ -240,6 +240,8 @@ class RummageCli(object):
             flags |= bre.DOTALL
         if search_flags & rumcore.IGNORECASE:
             flags |= bre.IGNORECASE
+        if search_flags & rumcore.UNICODE:
+            flags |= bre.UNICODE
         return self.validate_regex(search, flags)
 
     def validate_regex(self, pattern, flags=0):
@@ -260,6 +262,9 @@ class RummageCli(object):
 
         if args.regex_directory_exclude is not None:
             flags |= rumcore.DIR_REGEX_MATCH
+
+        if args.unicode:
+            flags |= rumcore.UNICODE
 
         if not args.regexp:
             flags |= rumcore.LITERAL
@@ -454,6 +459,10 @@ def main():
     parser.add_argument(
         "--dotall", "-a", action="store_true", default=False,
         help="Make the '.' special character in regex match any character at all, including a newline."
+    )
+    parser.add_argument(
+        "--unicode", "-u", action="store_true", default=False,
+        help=r"Use unicode properties for \w, \s, etc."
     )
     parser.add_argument(
         "--replace", "-r", metavar="PATTERN", default=None, type=pyin,
