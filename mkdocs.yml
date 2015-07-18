@@ -5,7 +5,7 @@ pages:
   - About BracketHighlighter: index.md
   - Installation: installation.md
   - User Guide:
-      - Usage: gui-usage.md
+      - Usage: user-guide/gui-usage.md
   - Contributing &amp; Support: contributing.md
   - License: license.md
 theme: readthedocs
