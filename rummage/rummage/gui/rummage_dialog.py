@@ -309,6 +309,9 @@ class RummageThread(threading.Thread):
         elif args.dotall:
             flags |= rumcore.DOTALL
 
+        if args.unicode:
+            flags |= rumcore.UNICODE
+
         if args.ignore_case:
             flags |= rumcore.IGNORECASE
 
@@ -418,6 +421,7 @@ class RummageArgs(object):
         self.modified_compare = None
         self.created_compare = None
         self.count_only = False
+        self.unicode = False
         self.boolean = False
         self.backup = True
         self.replace = None
@@ -574,14 +578,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_regex_search_checkbox.SetLabel(_("Search with regex"))
         self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
         self.m_dotmatch_checkbox.SetLabel(_("Dot matches newline"))
+        self.m_unicode_checkbox.SetLabel(_("Use Unicode properties"))
+        self.m_force_encode_choice.SetSelection(0)
+        self.m_boolean_checkbox.SetLabel(_("Boolean match"))
+        self.m_count_only_checkbox.SetLabel(_("Count only"))
         self.m_backup_checkbox.SetLabel(_("Create backups"))
         self.m_force_encode_checkbox.SetLabel(_("Force"))
         self.m_force_encode_choice.Clear()
         for x in ENCODINGS:
             self.m_force_encode_choice.Append(x)
-        self.m_force_encode_choice.SetSelection(0)
-        self.m_boolean_checkbox.SetLabel(_("Boolean match"))
-        self.m_count_only_checkbox.SetLabel(_("Count only"))
         self.m_subfolder_checkbox.SetLabel(_("Include subfolders"))
         self.m_hidden_checkbox.SetLabel(_("Include hidden"))
         self.m_binary_checkbox.SetLabel(_("Include binary files"))
@@ -698,14 +703,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.m_case_checkbox.SetValue(not Settings.get_search_setting("ignore_case_toggle", False))
         self.m_dotmatch_checkbox.SetValue(Settings.get_search_setting("dotall_toggle", False))
+        self.m_unicode_checkbox.SetValue(Settings.get_search_setting("unicode_toggle", True))
+        self.m_boolean_checkbox.SetValue(Settings.get_search_setting("boolean_toggle", False))
+        self.m_count_only_checkbox.SetValue(Settings.get_search_setting("count_only_toggle", False))
+        self.m_backup_checkbox.SetValue(Settings.get_search_setting("backup_toggle", True))
         self.m_force_encode_checkbox.SetValue(Settings.get_search_setting("force_encode_toggle", False))
         encode_val = Settings.get_search_setting("force_encode", "ASCII")
         index = self.m_force_encode_choice.FindString(encode_val)
         if index != wx.NOT_FOUND:
             self.m_force_encode_choice.SetSelection(index)
-        self.m_boolean_checkbox.SetValue(Settings.get_search_setting("boolean_toggle", False))
-        self.m_count_only_checkbox.SetValue(Settings.get_search_setting("count_only_toggle", False))
-        self.m_backup_checkbox.SetValue(Settings.get_search_setting("backup_toggle", True))
 
         self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
@@ -1019,12 +1025,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args.regexp = self.m_regex_search_checkbox.GetValue()
         self.args.ignore_case = not self.m_case_checkbox.GetValue()
         self.args.dotall = self.m_dotmatch_checkbox.GetValue()
-        self.args.force_encode = None
-        if self.m_force_encode_checkbox.GetValue():
-            self.args.force_encode = self.m_force_encode_choice.GetStringSelection()
+        self.args.unicode = self.m_unicode_checkbox.GetValue()
         self.args.count_only = self.m_count_only_checkbox.GetValue()
         self.args.boolean = self.m_boolean_checkbox.GetValue()
         self.args.backup = self.m_backup_checkbox.GetValue()
+        self.args.force_encode = None
+        if self.m_force_encode_checkbox.GetValue():
+            self.args.force_encode = self.m_force_encode_choice.GetStringSelection()
         self.args.backup_ext = 'rum-bak'
         self.args.recursive = self.m_subfolder_checkbox.GetValue()
         self.args.pattern = self.m_searchfor_textbox.Value
@@ -1102,6 +1109,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("regex_toggle", self.args.regexp),
             ("ignore_case_toggle", self.args.ignore_case),
             ("dotall_toggle", self.args.dotall),
+            ("unicode_toggle", self.args.unicode),
             ("backup_toggle", self.args.backup),
             ("force_encode_toggle", self.args.force_encode is not None),
             ("recursive_toggle", self.args.recursive),
