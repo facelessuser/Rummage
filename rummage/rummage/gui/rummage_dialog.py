@@ -617,7 +617,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_enhancematch_checkbox.SetLabel(_("Improve fuzzy fit"))
         self.m_word_checkbox.SetLabel(_("Unicode word breaks"))
         self.m_reverse_checkbox.SetLabel(_("Search backwards"))
-        self.m_fullcase_checkbox.SetLabel(_("Fullcase"))
+        self.m_fullcase_checkbox.SetLabel(_("Full case-folding"))
         self.m_subfolder_checkbox.SetLabel(_("Include subfolders"))
         self.m_hidden_checkbox.SetLabel(_("Include hidden"))
         self.m_binary_checkbox.SetLabel(_("Include binary files"))

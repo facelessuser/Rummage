@@ -92,6 +92,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_enhancematch_checkbox.SetLabel(_("Improve fuzzy fit"))
         self.m_word_checkbox.SetLabel(_("Unicode word break"))
         self.m_reverse_checkbox.SetLabel(_("Reverse match"))
+        self.m_fullcase_checkbox.SetLabel(_("Full case-folding"))
         self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(_("Text"))
         self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(_("Result"))
         main_sizer = self.m_tester_panel.GetSizer()
