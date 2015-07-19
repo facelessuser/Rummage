@@ -32,13 +32,14 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     """Regex test dialog."""
 
-    def __init__(self, parent, regex_support=False):
+    def __init__(self, parent, regex_support=False, regex_version=0):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
         self.SetIcon(data.get_image('rummage_64.png').GetIcon())
         self.parent = parent
         self.regex_support = regex_support
+        self.regex_version = regex_version
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
@@ -57,6 +58,9 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.m_enhancematch_checkbox.Show()
             self.m_word_checkbox.Show()
             self.m_reverse_checkbox.Show()
+            if self.regex_version == 0:
+                self.m_fullcase_checkbox.SetValue(parent.m_fullcase_checkbox.GetValue() if parent else False)
+                self.m_fullcase_checkbox.Show()
         self.regex_event_code = -1
         self.testing = False
         self.init_regex_timer()
@@ -173,6 +177,8 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.parent.m_enhancematch_checkbox.SetValue(self.m_enhancematch_checkbox.GetValue())
             self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
             self.parent.m_reverse_checkbox.SetValue(self.m_reverse_checkbox.GetValue())
+            if self.regex_version == 0:
+                self.parent.m_fullcase_checkbox.SetValue(self.m_fullcase_checkbox.GetValue())
         self.Close()
 
     def on_cancel(self, event):
@@ -198,7 +204,11 @@ class RegexTestDialog(gui.RegexTestDialog):
                 return
 
             if self.regex_support:
-                flags = regex.VERSION1 | regex.MULTILINE
+                flags = regex.MULTILINE
+                if self.regex_version == 1:
+                    flags |= regex.VERSION1
+                else:
+                    flags |= regex.VERSION0
                 if self.m_dotmatch_checkbox.GetValue():
                     flags |= regex.DOTALL
                 if not self.m_case_checkbox.GetValue():
@@ -215,6 +225,8 @@ class RegexTestDialog(gui.RegexTestDialog):
                     flags |= regex.WORD
                 if self.m_reverse_checkbox.GetValue():
                     flags |= regex.REVERSE
+                if flags & regex.VERSION0 and self.m_fullcase_checkbox.GetValue():
+                    flags |= regex.FULLCASE
             else:
                 flags = bre.MULTILINE
                 if not self.m_case_checkbox.GetValue():
@@ -300,3 +312,13 @@ class RegexTestDialog(gui.RegexTestDialog):
     on_dot_toggle = regex_start_event
 
     on_unicode_toggle = regex_start_event
+
+    on_bestmatch_toggle = regex_start_event
+
+    on_enhancematch_toggle = regex_start_event
+
+    on_word_toggle = regex_start_event
+
+    on_reverse_toggle = regex_start_event
+
+    on_fullcase_toggle = regex_start_event

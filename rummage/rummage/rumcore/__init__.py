@@ -60,10 +60,10 @@ else:
         return bytes(string)
 
 # Common regex flags (re|regex)
-IGNORECASE = 0x1
-DOTALL = 0x2
-MULTILINE = 0x4
-UNICODE = 0x8
+IGNORECASE = 0x1  # (?i)
+DOTALL = 0x2      # (?s)
+MULTILINE = 0x4   # (?m)
+UNICODE = 0x8     # (?u)
 
 # Regex module flags
 if REGEX_SUPPORT:
@@ -73,6 +73,8 @@ if REGEX_SUPPORT:
     BESTMATCH = 0x80      # (?b)
     ENHANCEMATCH = 0x100  # (?e)
     REVERSE = 0x200       # (?r)
+    VERSION0 = 0x400      # (?V0)
+    VERSION1 = 0x800      # (?V1)
 
 # Rumcore related flags
 LITERAL = 0x1000
@@ -142,63 +144,66 @@ def get_exception():
     return (exc, tb)
 
 
-def _bre_pattern(pattern, ignorecase=False, dotall=False, multiline=True, unicode_props=False, binary=False):
+def _bre_pattern(pattern, rum_flags=0, binary=False):
     """Prepare regex search pattern flags."""
 
     flags = 0
-    if multiline:
+    if rum_flags & MULTILINE:
         flags |= bre.MULTILINE
-    if ignorecase:
+    if rum_flags & IGNORECASE:
         flags |= bre.IGNORECASE
-    if dotall:
+    if rum_flags & DOTALL:
         flags |= bre.DOTALL
-    if not binary and unicode_props:
+    if not binary and rum_flags & UNICODE:
         flags |= bre.UNICODE
     return bre.compile_search(pattern, flags)
 
 
-def _literal_pattern(pattern, ignorecase=False):
+def _bre_literal_pattern(pattern, rum_flags=0):
     """Prepare literal search pattern flags."""
 
     flags = 0
-    if ignorecase:
+    if rum_flags & IGNORECASE:
         flags |= bre.IGNORECASE
     return bre.compile(bre.escape(pattern), flags)
 
 if REGEX_SUPPORT:
-    def _regex_pattern(
-        pattern, ignorecase=False, dotall=False, multiline=True,
-        unicode_props=False, binary=False, word=False,
-        bestmatch=False, enhancematch=False, reverse=False
-    ):
+    def _regex_pattern(pattern, rum_flags=0, binary=False):
         """Prepare regex search pattern flags for regex module."""
 
-        flags = regex.VERSION1
-        if word:
+        flags = 0
+
+        if rum_flags & VERSION1:
+            flags |= regex.VERSION1
+        else:
+            flags |= regex.VERSION0
+            if rum_flags & FULLCASE:
+                flags |= regex.FULLCASE
+        if rum_flags & WORD:
             flags |= regex.WORD
-        if bestmatch:
+        if rum_flags & BESTMATCH:
             flags |= regex.BESTMATCH
-        if enhancematch:
+        if rum_flags & ENHANCEMATCH:
             flags |= regex.ENHANCEMATCH
-        if reverse:
+        if rum_flags & REVERSE:
             flags |= regex.REVERSE
-        if multiline:
+        if rum_flags & MULTILINE:
             flags |= regex.MULTILINE
-        if ignorecase:
+        if rum_flags & IGNORECASE:
             flags |= regex.IGNORECASE
-        if dotall:
+        if rum_flags & DOTALL:
             flags |= regex.DOTALL
-        if not binary and unicode_props:
+        if not binary and rum_flags & UNICODE:
             flags |= regex.UNICODE
         else:
             flags |= regex.ASCII
         return regex.compile(pattern, flags)
 
-    def _regex_literal_pattern(pattern, ignorecase=False):
+    def _regex_literal_pattern(pattern, rum_flags=0):
         """Prepare literal search pattern flags."""
 
         flags = 0
-        if ignorecase:
+        if rum_flags & IGNORECASE:
             flags |= regex.IGNORECASE
         return regex.compile(regex.escape(pattern), flags)
 
@@ -312,18 +317,9 @@ class _FileSearch(object):
         """Init the file search object."""
 
         self.regex_support = regex_support and REGEX_SUPPORT
-        self.literal = bool(args.flags & LITERAL)
-        self.ignorecase = bool(args.flags & IGNORECASE)
-        self.dotall = bool(args.flags & DOTALL)
-        self.multiline = bool(args.flags & MULTILINE)
-        self.unicode = bool(args.flags & UNICODE)
+        self.flags = args.flags
         self.boolean = bool(args.boolean)
         self.count_only = bool(args.count_only)
-        if regex_support:
-            self.word = bool(args.flags & WORD)
-            self.bestmatch = bool(args.flags & BESTMATCH)
-            self.enhancematch = bool(args.flags & ENHANCEMATCH)
-            self.reverse = bool(args.flags & REVERSE)
         self.truncate_lines = args.truncate_lines
         self.backup = args.backup
         self.backup_ext = '.%s' % args.backup_ext
@@ -544,27 +540,21 @@ class _FileSearch(object):
             replace = self.replace
 
         if pattern is not None:
-            if self.literal:
+            if bool(self.flags & LITERAL):
                 if self.regex_support:
-                    pattern = _regex_literal_pattern(pattern, self.ignorecase)
-                pattern = _literal_pattern(pattern, self.ignorecase)
-            else:
-                if self.regex_support:
-                    pattern = _regex_pattern(
-                        pattern, self.ignorecase, self.dotall,
-                        self.multiline, self.unicode, self.is_binary,
-                        self.word, self.bestmatch,
-                        self.enhancematch, self.reverse
-                    )
-                else:
-                    pattern = _bre_pattern(
-                        pattern, self.ignorecase, self.dotall,
-                        self.multiline, self.unicode, self.is_binary
-                    )
-            if replace is not None and not self.literal and not self.regex_support:
-                self.expand = bre.compile_replace(pattern, self.replace)
-            else:
+                    pattern = _regex_literal_pattern(pattern, self.flags)
+                pattern = _bre_literal_pattern(pattern, self.flags)
                 self.expand = None
+            else:
+                if self.regex_support:
+                    pattern = _regex_pattern(pattern, self.flags, self.is_binary)
+                    self.expand = None
+                else:
+                    pattern = _bre_pattern(pattern, self.flags, self.is_binary)
+                    if replace is not None:
+                        self.expand = bre.compile_replace(pattern, self.replace)
+                    else:
+                        self.expand = None
 
             for m in pattern.finditer(file_content):
                 yield m

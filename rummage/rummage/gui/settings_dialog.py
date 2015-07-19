@@ -55,8 +55,10 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_history_label.SetLabel(RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
         self.m_regex_checkbox.SetValue(Settings.get_regex_support())
+        self.m_regex_ver_choice.SetSelection(Settings.get_regex_version())
         if Settings.is_regex_available():
             self.m_regex_checkbox.Enable(True)
+            self.m_regex_ver_choice.Enable(True)
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
         self.alert_methods = Settings.get_platform_notify()
@@ -157,6 +159,11 @@ class SettingsDialog(gui.SettingsDialog):
         """Set use of regex module."""
 
         Settings.set_regex_support(self.m_regex_checkbox.GetValue())
+
+    def on_regex_ver_choice(self, event):
+        """Set regex version."""
+
+        Settings.set_regex_version(self.m_regex_ver_choice.GetSelection())
 
     def on_cancel(self, event):
         """Close on cancel."""

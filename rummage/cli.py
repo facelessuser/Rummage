@@ -176,10 +176,11 @@ class RummageCli(object):
             modified = None
 
         flags = self.get_flags(args)
-        if args.regexp or args.regex_regexp:
+        regex_module = args.regex0 or args.regex1
+        if args.re or regex_module:
             if (
                 (args.pattern == "" and args.replace) or
-                self.validate_search_regex(args.pattern, flags, args.regex_regexp)
+                self.validate_search_regex(args.pattern, flags)
             ):
                 raise ValueError("Invlaid regex search pattern")
 
@@ -187,13 +188,13 @@ class RummageCli(object):
             raise ValueError("Invlaid search pattern")
 
         if args.regex_file_pattern:
-            if self.validate_regex(args.regex_file_pattern, flags=0, regex_support=args.regex_regexp):
+            if self.validate_regex(args.regex_file_pattern, flags=0, regex_support=regex_module):
                 raise ValueError("Invalid regex file pattern")
         elif not args.file_pattern:
             raise ValueError("Invalid file pattern")
 
         if args.regex_directory_exclude:
-            if self.validate_regex(args.regex_directory_exclude, flags=0, regex_support=args.regex_regexp):
+            if self.validate_regex(args.regex_directory_exclude, flags=0, regex_support=regex_module):
                 raise ValueError("Invalid regex directory exclude pattern")
 
         self.rummage = rumcore.Rummage(
@@ -213,7 +214,8 @@ class RummageCli(object):
             text=args.process_binary,
             created=created,
             modified=modified,
-            replace=args.replace
+            replace=args.replace,
+            regex_support=regex_module
         )
 
         if args.replace:
@@ -235,12 +237,21 @@ class RummageCli(object):
         self.count = 0
         self.errors = False
 
-    def validate_search_regex(self, search, search_flags, regex_support):
+    def validate_search_regex(self, search, search_flags):
         """Validate search regex."""
 
-        if regex_support:
+        regex_support = False
+        if search_flags & (rumcore.VERSION0 | rumcore.VERSION1):
             import regex
-            flags = regex.VERSION1 | regex.MULTILINE
+
+            regex_support = True
+            flags = regex.MULTILINE
+            if search_flags & rumcore.VERSION1:
+                flags |= regex.VERSION1
+            else:
+                flags |= regex.VERSION0
+                if flags & rumcore.FULLCASE:
+                    flags |= regex.FULLCASE
             if search_flags & rumcore.DOTALL:
                 flags |= regex.DOTALL
             if not search_flags & rumcore.IGNORECASE:
@@ -295,7 +306,7 @@ class RummageCli(object):
         if args.unicode:
             flags |= rumcore.UNICODE
 
-        if not args.regexp and not args.regex_regexp:
+        if not args.re and not args.regex0 and not args.regex1:
             flags |= rumcore.LITERAL
         elif args.dotall:
             flags |= rumcore.DOTALL
@@ -308,7 +319,13 @@ class RummageCli(object):
         elif args.recursive:
             flags |= rumcore.RECURSIVE
 
-        if args.regex_regexp:
+        if args.regex0 or args.regex1:
+            if args.regex1:
+                flags |= rumcore.VERSION1
+            else:
+                flags |= rumcore.VERSION0
+                if args.fullcase:
+                    flags |= rumcore.FULLCASE
             if args.bestmatch:
                 flags |= rumcore.BESTMATCH
             if args.enhancematch:
@@ -488,16 +505,24 @@ def main():
 
     # Search and replace
     parser.add_argument(
-        "--regexp", "-x", action="store_true", default=False,
-        help="Pattern is a regular expression."
+        "--re", "-x", action="store_true", default=False,
+        help="Pattern is a regular expresiion for the Python 're'."
     )
     parser.add_argument(
-        "--regex-regexp", "-X", action="store_true", default=False,
-        help="Pattern is a regular expression for the Python 'regex' module instead of 're'."
+        "--regex0", "-0", action="store_true", default=False,
+        help="Pattern is a regular expression for the Python 'regex' module (ver 0) instead of 're'."
+    )
+    parser.add_argument(
+        "--regex1", "-1", action="store_true", default=False,
+        help="Pattern is a regular expression for the Python 'regex' module (ver 1) instead of 're'."
     )
     parser.add_argument(
         "--ignore-case", "-i", action="store_true", default=False,
         help="Ignore case when performing search."
+    )
+    parser.add_argument(
+        "--fullcase", "-I", action="store_true", default=False,
+        help="Use fullcase (regex module only)."
     )
     parser.add_argument(
         "--bestmatch", '-B', action="store_true", default=False,

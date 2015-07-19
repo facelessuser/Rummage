@@ -116,6 +116,22 @@ class Settings(object):
         return cls.settings.get('regex_support', False) and REGEX_SUPPORT
 
     @classmethod
+    def set_regex_version(cls, value):
+        """Get the regex version."""
+
+        cls.reload_settings()
+        if 0 <= value <= 1:
+            cls.settings["regex_version"] = value
+            cls.save_settings()
+
+    @classmethod
+    def get_regex_version(cls):
+        """Get the regex version."""
+
+        cls.reload_settings()
+        return cls.settings.get('regex_version', 0)
+
+    @classmethod
     def get_hide_limit(cls):
         """Get hide limit setting."""
 
