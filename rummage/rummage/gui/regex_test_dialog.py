@@ -32,7 +32,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     """Regex test dialog."""
 
-    def __init__(self, parent, regex_support=False, stand_alone=False):
+    def __init__(self, parent, regex_support=False):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
@@ -49,17 +49,14 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_dotmatch_checkbox.SetValue(parent.m_dotmatch_checkbox.GetValue() if parent else False)
         self.m_unicode_checkbox.SetValue(parent.m_unicode_checkbox.GetValue() if parent else False)
         if self.regex_support:
-            self.m_fullcase_checkbox.SetValue(parent.m_fullcase_checkbox.GetValue() if parent else False)
             self.m_bestmatch_checkbox.SetValue(parent.m_bestmatch_checkbox.GetValue() if parent else False)
             self.m_enhancematch_checkbox.SetValue(parent.m_enhancematch_checkbox.GetValue() if parent else False)
             self.m_word_checkbox.SetValue(parent.m_word_checkbox.GetValue() if parent else False)
             self.m_reverse_checkbox.SetValue(parent.m_reverse_checkbox.GetValue() if parent else False)
-            self.m_fullcase_checkbox.Show()
             self.m_bestmatch_checkbox.Show()
             self.m_enhancematch_checkbox.Show()
             self.m_word_checkbox.Show()
             self.m_reverse_checkbox.Show()
-        self.stand_alone = stand_alone
         self.regex_event_code = -1
         self.testing = False
         self.init_regex_timer()
@@ -69,11 +66,6 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_replace_text.SetValue(parent.m_replace_textbox.GetValue() if parent else "")
 
         self.localize()
-
-        # If launched as a "stand alone" (main frame) disable unneeded objects
-        if stand_alone:
-            self.m_use_regex_button.Hide()
-            self.m_use_regex_button.GetParent().GetSizer().Layout()
 
         # Ensure good sizing of frame
         best = self.m_tester_panel.GetBestSize()
@@ -92,13 +84,12 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
         self.m_dotmatch_checkbox.SetLabel(_("Dot matches newline"))
         self.m_unicode_checkbox.SetLabel(_("Use Unicode properties"))
-        self.m_fullcase_checkbox.SetLabel(_("Use fullcase"))
-        self.m_bestmatch_checkbox.SetLabel(_("Use bestmatch"))
-        self.m_enhancematch_checkbox.SetLabel(_("Use enhancematch"))
-        self.m_word_checkbox.SetLabel(_("Use word"))
+        self.m_bestmatch_checkbox.SetLabel(_("Best fuzzy match"))
+        self.m_enhancematch_checkbox.SetLabel(_("Improve fuzzy fit"))
+        self.m_word_checkbox.SetLabel(_("Unicode word break"))
         self.m_reverse_checkbox.SetLabel(_("Reverse match"))
         self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(_("Text"))
-        self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(_("Replace"))
+        self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(_("Result"))
         main_sizer = self.m_tester_panel.GetSizer()
         main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Regex Input"))
         self.m_find_label.SetLabel(_("Find"))
@@ -166,9 +157,6 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Enable parent Rummage Dialog "Test Regex" button on close."""
 
         self.stop_regex_timer()
-
-        if not self.stand_alone:
-            self.parent.m_regex_test_button.Enable(True)
         event.Skip()
 
     def on_use(self, event):
@@ -181,7 +169,6 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.parent.m_case_checkbox.SetValue(self.m_case_checkbox.GetValue())
         self.parent.m_dotmatch_checkbox.SetValue(self.m_dotmatch_checkbox.GetValue())
         if self.regex_support:
-            self.parent.m_fullcase_checkbox.SetValue(self.m_fullcase_checkbox.GetValue())
             self.parent.m_bestmatch_checkbox.SetValue(self.m_bestmatch_checkbox.GetValue())
             self.parent.m_enhancematch_checkbox.SetValue(self.m_enhancematch_checkbox.GetValue())
             self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
@@ -220,8 +207,6 @@ class RegexTestDialog(gui.RegexTestDialog):
                     flags |= regex.UNICODE
                 else:
                     flags |= regex.ASCII
-                if self.m_fullcase_checkbox.GetValue():
-                    flags |= regex.FULLCASE
                 if self.m_bestmatch_checkbox.GetValue():
                     flags |= regex.BESTMATCH
                 if self.m_enhancematch_checkbox.GetValue():

@@ -37,7 +37,7 @@ from collections import deque
 try:
     import regex
     REGEX_SUPPORT = True
-except:
+except Exception:
     REGEX_SUPPORT = False
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
@@ -59,25 +59,27 @@ else:
 
         return bytes(string)
 
-LITERAL = 1
-IGNORECASE = 2
-DOTALL = 4
-RECURSIVE = 8
-MULTILINE = 16
-UNICODE = 32
-FILE_REGEX_MATCH = 64
-DIR_REGEX_MATCH = 128
-BUFFER_INPUT = 256
+# Common regex flags (re|regex)
+IGNORECASE = 0x1
+DOTALL = 0x2
+MULTILINE = 0x4
+UNICODE = 0x8
 
+# Regex module flags
 if REGEX_SUPPORT:
-    ASCII = 512          # (?a)
-    FULLCASE = 1024      # (?f)
-    WORD = 2048          # (?w)
-    BESTMATCH = 4096     # (?b)
-    ENHANCEMATCH = 8192  # (?e)
-    REVERSE = 16384      # (?r)
-    VERSION0 = 32768     # (?v0)
-    VERSION1 = 65536     # (?v1)
+    ASCII = 0x10          # (?a)
+    FULLCASE = 0x20       # (?f)
+    WORD = 0x40           # (?w)
+    BESTMATCH = 0x80      # (?b)
+    ENHANCEMATCH = 0x100  # (?e)
+    REVERSE = 0x200       # (?r)
+
+# Rumcore related flags
+LITERAL = 0x1000
+BUFFER_INPUT = 0x2000
+RECURSIVE = 0x4000
+FILE_REGEX_MATCH = 0x8000
+DIR_REGEX_MATCH = 0x10000
 
 TRUNCATE_LENGTH = 120
 
@@ -166,7 +168,7 @@ def _literal_pattern(pattern, ignorecase=False):
 if REGEX_SUPPORT:
     def _regex_pattern(
         pattern, ignorecase=False, dotall=False, multiline=True,
-        unicode_props=False, binary=False, word=False, fullcase=False,
+        unicode_props=False, binary=False, word=False,
         bestmatch=False, enhancematch=False, reverse=False
     ):
         """Prepare regex search pattern flags for regex module."""
@@ -174,8 +176,6 @@ if REGEX_SUPPORT:
         flags = regex.VERSION1
         if word:
             flags |= regex.WORD
-        if fullcase:
-            flags |= regex.FULLCASE
         if bestmatch:
             flags |= regex.BESTMATCH
         if enhancematch:
@@ -323,7 +323,6 @@ class _FileSearch(object):
             self.word = bool(args.flags & WORD)
             self.bestmatch = bool(args.flags & BESTMATCH)
             self.enhancematch = bool(args.flags & ENHANCEMATCH)
-            self.fullcase = bool(args.flags & FULLCASE)
             self.reverse = bool(args.flags & REVERSE)
         self.truncate_lines = args.truncate_lines
         self.backup = args.backup
@@ -554,7 +553,7 @@ class _FileSearch(object):
                     pattern = _regex_pattern(
                         pattern, self.ignorecase, self.dotall,
                         self.multiline, self.unicode, self.is_binary,
-                        self.word, self.fullcase, self.bestmatch,
+                        self.word, self.bestmatch,
                         self.enhancematch, self.reverse
                     )
                 else:

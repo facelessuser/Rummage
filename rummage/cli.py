@@ -176,21 +176,24 @@ class RummageCli(object):
             modified = None
 
         flags = self.get_flags(args)
-        if args.regexp:
-            if (args.pattern == "" and args.replace) or self.validate_search_regex(args.pattern, flags):
+        if args.regexp or args.regex_regexp:
+            if (
+                (args.pattern == "" and args.replace) or
+                self.validate_search_regex(args.pattern, flags, args.regex_regexp)
+            ):
                 raise ValueError("Invlaid regex search pattern")
 
         elif args.pattern == "" and args.replace:
             raise ValueError("Invlaid search pattern")
 
         if args.regex_file_pattern:
-            if self.validate_regex(args.regex_file_pattern):
+            if self.validate_regex(args.regex_file_pattern, flags=0, regex_support=args.regex_regexp):
                 raise ValueError("Invalid regex file pattern")
         elif not args.file_pattern:
             raise ValueError("Invalid file pattern")
 
         if args.regex_directory_exclude:
-            if self.validate_regex(args.regex_directory_exclude):
+            if self.validate_regex(args.regex_directory_exclude, flags=0, regex_support=args.regex_regexp):
                 raise ValueError("Invalid regex directory exclude pattern")
 
         self.rummage = rumcore.Rummage(
@@ -232,22 +235,48 @@ class RummageCli(object):
         self.count = 0
         self.errors = False
 
-    def validate_search_regex(self, search, search_flags):
+    def validate_search_regex(self, search, search_flags, regex_support):
         """Validate search regex."""
 
-        flags = bre.MULTILINE
-        if search_flags & rumcore.DOTALL:
-            flags |= bre.DOTALL
-        if search_flags & rumcore.IGNORECASE:
-            flags |= bre.IGNORECASE
-        if search_flags & rumcore.UNICODE:
-            flags |= bre.UNICODE
-        return self.validate_regex(search, flags)
+        if regex_support:
+            import regex
+            flags = regex.VERSION1 | regex.MULTILINE
+            if search_flags & rumcore.DOTALL:
+                flags |= regex.DOTALL
+            if not search_flags & rumcore.IGNORECASE:
+                flags |= regex.IGNORECASE
+            if search_flags & rumcore.UNICODE:
+                flags |= regex.UNICODE
+            else:
+                flags |= regex.ASCII
+            if search_flags & rumcore.BESTMATCH:
+                flags |= regex.BESTMATCH
+            if search_flags & rumcore.ENHANCEMATCH:
+                flags |= regex.ENHANCEMATCH
+            if search_flags & rumcore.WORD:
+                flags |= regex.WORD
+            if search_flags & rumcore.REVERSE:
+                flags |= regex.REVERSE
+        else:
+            flags = bre.MULTILINE
+            if search_flags & rumcore.DOTALL:
+                flags |= bre.DOTALL
+            if search_flags & rumcore.IGNORECASE:
+                flags |= bre.IGNORECASE
+            if search_flags & rumcore.UNICODE:
+                flags |= bre.UNICODE
+        return self.validate_regex(search, flags, regex_support)
 
-    def validate_regex(self, pattern, flags=0):
+    def validate_regex(self, pattern, flags=0, regex_support=False):
         """Validate regular expresion compiling."""
         try:
-            bre.compile_search(pattern, flags)
+            if regex_support:
+                import regex
+                if flags == 0:
+                    flags = regex.ASCII
+                regex.compile(pattern, flags)
+            else:
+                bre.compile_search(pattern, flags)
             return False
         except Exception:
             return True
@@ -266,7 +295,7 @@ class RummageCli(object):
         if args.unicode:
             flags |= rumcore.UNICODE
 
-        if not args.regexp:
+        if not args.regexp and not args.regex_regexp:
             flags |= rumcore.LITERAL
         elif args.dotall:
             flags |= rumcore.DOTALL
@@ -278,6 +307,16 @@ class RummageCli(object):
             flags |= rumcore.BUFFER_INPUT
         elif args.recursive:
             flags |= rumcore.RECURSIVE
+
+        if args.regex_regexp:
+            if args.bestmatch:
+                flags |= rumcore.BESTMATCH
+            if args.enhancematch:
+                flags |= rumcore.ENHANCEMATCH
+            if args.word:
+                flags |= rumcore.WORD
+            if args.reverse:
+                flags |= rumcore.REVERSE
 
         return flags
 
@@ -453,8 +492,28 @@ def main():
         help="Pattern is a regular expression."
     )
     parser.add_argument(
+        "--regex-regexp", "-X", action="store_true", default=False,
+        help="Pattern is a regular expression for the Python 'regex' module instead of 're'."
+    )
+    parser.add_argument(
         "--ignore-case", "-i", action="store_true", default=False,
         help="Ignore case when performing search."
+    )
+    parser.add_argument(
+        "--bestmatch", '-B', action="store_true", default=False,
+        help="Best fuzzy match (regex module only)."
+    )
+    parser.add_argument(
+        "--enhancematch", '-E', action="store_true", default=False,
+        help="Attempt to improve fuzzy fit (regex module only)."
+    )
+    parser.add_argument(
+        "--reverse", '-Z', action="store_true", default=False,
+        help="Search backwards (regex module only)."
+    )
+    parser.add_argument(
+        "--word", '-N', action="store_true", default=False,
+        help="Use default Unicode word breaks (regex module only)."
     )
     parser.add_argument(
         "--dotall", "-a", action="store_true", default=False,

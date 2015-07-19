@@ -23,7 +23,7 @@ from __future__ import absolute_import
 import argparse
 import sys
 from .rummage.gui.settings import Settings
-from .rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame, RegexTestDialog
+from .rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame
 from .rummage import version
 import locale
 
@@ -53,10 +53,6 @@ def parse_arguments():
         '--searchpath', '-s', default=None, type=pyin,
         help="Path to search."
     )
-    parser.add_argument(
-        '--regextool', action='store_true', default=False,
-        help="Open just the regex tester."
-    )
     return parser.parse_args()
 
 
@@ -76,14 +72,11 @@ def run():
         app = RummageApp(redirect=True)
 
     if not Settings.get_single_instance() or (Settings.get_single_instance() and app.is_instance_okay()):
-        if args.regextool:
-            RegexTestDialog(None, regex_support=False, stand_alone=True).Show()
-        else:
-            RummageFrame(
-                None,
-                args.searchpath if args.searchpath is not None else None,
-                debug_mode=args.debug
-            ).Show()
+        RummageFrame(
+            None,
+            args.searchpath if args.searchpath is not None else None,
+            debug_mode=args.debug
+        ).Show()
     locale.setlocale(locale.LC_ALL, '')
     app.MainLoop()
 
