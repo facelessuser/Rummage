@@ -1124,6 +1124,10 @@ class Rummage(object):
         self.files = deque()
         self.queue = deque()
         self.file_error = None
+
+        # Initialize search objects:
+        # - _DirWalker for if target is a folder
+        # - Append FileAttrRecord if target is a file or buffer
         if not self.buffer_input and isdir(self.target):
             self.path_walker = _DirWalker(
                 self.target,
@@ -1328,14 +1332,18 @@ class Rummage(object):
 
         if self.search_params.pattern:
             if self.file_error is not None:
+                # Single target wasn't set up right; just return error.
                 yield self.file_error
             elif len(self.files):
+                # Single target search (already set up); just search the file.
                 for result in self.search_file(self.target if self.buffer_input else None):
                     yield result
             else:
+                # Crawl directory and search files.
                 for result in self.walk_files():
                     yield result
         else:
+            # No search pattern, so just return files that *would* be searched.
             for f in self.path_walker.run():
                 self.idx += 1
                 self.records += 1
