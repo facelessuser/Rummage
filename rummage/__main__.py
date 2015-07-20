@@ -77,8 +77,7 @@ def run():
             args.searchpath if args.searchpath is not None else None,
             debug_mode=args.debug
         ).Show()
-    if sys.platform == "darwin":
-        locale.setlocale(locale.LC_ALL, '')
+
     app.MainLoop()
 
 

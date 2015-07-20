@@ -194,6 +194,8 @@ class CustomApp(wx.App):
         Store instance check variable.
         """
 
+        self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+
         self.instance_okay = True
         if self.single_instance is not None:
             if not self.ensure_single_instance(self.single_instance):
