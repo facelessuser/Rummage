@@ -54,10 +54,12 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.m_enhancematch_checkbox.SetValue(parent.m_enhancematch_checkbox.GetValue() if parent else False)
             self.m_word_checkbox.SetValue(parent.m_word_checkbox.GetValue() if parent else False)
             self.m_reverse_checkbox.SetValue(parent.m_reverse_checkbox.GetValue() if parent else False)
+            self.m_format_replace_checkbox.SetValue(parent.m_format_replace_checkbox.GetValue() if parent else False)
             self.m_bestmatch_checkbox.Show()
             self.m_enhancematch_checkbox.Show()
             self.m_word_checkbox.Show()
             self.m_reverse_checkbox.Show()
+            self.m_format_replace_checkbox.Show()
             if self.regex_version == 0:
                 self.m_fullcase_checkbox.SetValue(parent.m_fullcase_checkbox.GetValue() if parent else False)
                 self.m_fullcase_checkbox.Show()
@@ -92,6 +94,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_enhancematch_checkbox.SetLabel(_("Improve fuzzy fit"))
         self.m_word_checkbox.SetLabel(_("Unicode word break"))
         self.m_reverse_checkbox.SetLabel(_("Reverse match"))
+        self.m_format_replace_checkbox.SetLabel(_("Format style replacements"))
         self.m_fullcase_checkbox.SetLabel(_("Full case-folding"))
         self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(_("Text"))
         self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(_("Result"))
@@ -110,7 +113,7 @@ class RegexTestDialog(gui.RegexTestDialog):
     def regex_expand(self, m, replace):
         """Regex module expand."""
 
-        return m.expand(replace)
+        return m.expandf(replace) if self.m_format_replace_checkbox.GetValue() else m.expand(replace)
 
     def start_regex_timer(self):
         """Start update timer."""
@@ -178,6 +181,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.parent.m_enhancematch_checkbox.SetValue(self.m_enhancematch_checkbox.GetValue())
             self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
             self.parent.m_reverse_checkbox.SetValue(self.m_reverse_checkbox.GetValue())
+            self.parent.m_format_replace_checkbox.SetValue(self.m_format_replace_checkbox.GetValue())
             if self.regex_version == 0:
                 self.parent.m_fullcase_checkbox.SetValue(self.m_fullcase_checkbox.GetValue())
         self.Close()
@@ -321,5 +325,7 @@ class RegexTestDialog(gui.RegexTestDialog):
     on_word_toggle = regex_start_event
 
     on_reverse_toggle = regex_start_event
+
+    on_format_replace_toggle = regex_start_event
 
     on_fullcase_toggle = regex_start_event

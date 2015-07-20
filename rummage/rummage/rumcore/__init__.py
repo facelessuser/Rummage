@@ -66,21 +66,22 @@ MULTILINE = 0x4   # (?m)
 UNICODE = 0x8     # (?u)
 
 # Regex module flags
-ASCII = 0x10          # (?a)
-FULLCASE = 0x20       # (?f)
-WORD = 0x40           # (?w)
-BESTMATCH = 0x80      # (?b)
-ENHANCEMATCH = 0x100  # (?e)
-REVERSE = 0x200       # (?r)
-VERSION0 = 0x400      # (?V0)
-VERSION1 = 0x800      # (?V1)
+ASCII = 0x10            # (?a)
+FULLCASE = 0x20         # (?f)
+WORD = 0x40             # (?w)
+BESTMATCH = 0x80        # (?b)
+ENHANCEMATCH = 0x100    # (?e)
+REVERSE = 0x200         # (?r)
+VERSION0 = 0x400        # (?V0)
+VERSION1 = 0x800        # (?V1)
+FORMATREPLACE = 0x1000  # Use {1} for groups in replace
 
 # Rumcore related flags
-LITERAL = 0x1000
-BUFFER_INPUT = 0x2000
-RECURSIVE = 0x4000
-FILE_REGEX_MATCH = 0x8000
-DIR_REGEX_MATCH = 0x10000
+LITERAL = 0x10000           # Literal search
+BUFFER_INPUT = 0x20000      # Input is a buffer
+RECURSIVE = 0x40000         # Recursive directory search
+FILE_REGEX_MATCH = 0x80000  # Regex pattern for files
+DIR_REGEX_MATCH = 0x100000  # Regex pattern for directories
 
 TRUNCATE_LENGTH = 120
 
@@ -319,6 +320,7 @@ class _FileSearch(object):
         self.flags = args.flags
         self.boolean = bool(args.boolean)
         self.count_only = bool(args.count_only)
+        self.regex_format_replace = self.regex_support and bool(args.flags & FORMATREPLACE)
         self.truncate_lines = args.truncate_lines
         self.backup = args.backup
         self.backup_ext = '.%s' % args.backup_ext
@@ -519,6 +521,16 @@ class _FileSearch(object):
             line_map.append(last_offset)
         return nl if ending is None else ending, line_map
 
+    def expand_match(self, m):
+        """Expand the match."""
+
+        if self.expand:
+            return self.expand(m)
+        elif self.regex_format_replace:
+            return m.expandf(self.replace)
+        else:
+            return m.expand(self.replace)
+
     def _findall(self, file_content):
         """Find all occurences of search pattern in file."""
 
@@ -673,9 +685,7 @@ class _FileSearch(object):
 
                         for m in self._findall(rum_buff):
                             text.append(rum_buff[offset:m.start(0)])
-                            text.append(
-                                self.expand(m) if self.expand is not None else m.expand(self.replace)
-                            )
+                            text.append(self.expand_match(m))
                             offset = m.end(0)
 
                             yield FileRecord(

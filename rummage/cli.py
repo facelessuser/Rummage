@@ -334,6 +334,8 @@ class RummageCli(object):
                 flags |= rumcore.WORD
             if args.reverse:
                 flags |= rumcore.REVERSE
+            if args.format_replace:
+                flags |= rumcore.FORMATREPLACE
 
         return flags
 
@@ -547,6 +549,10 @@ def main():
     parser.add_argument(
         "--unicode", "-u", action="store_true", default=False,
         help=r"Use unicode properties for \w, \s, etc."
+    )
+    parser.add_argument(
+        "--format-replace", action="store_true", default=False,
+        help="Use string format replacement groups in replace patterns: {group} (regex module only)."
     )
     parser.add_argument(
         "--replace", "-r", metavar="PATTERN", default=None, type=pyin,

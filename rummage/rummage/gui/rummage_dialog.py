@@ -341,6 +341,8 @@ class RummageThread(threading.Thread):
                 flags |= rumcore.WORD
             if args.reverse:
                 flags |= rumcore.REVERSE
+            if args.formatreplace:
+                flags |= rumcore.FORMATREPLACE
 
         return flags
 
@@ -461,6 +463,7 @@ class RummageArgs(object):
         self.fullcase = False
         self.regex_support = False
         self.regex_version = 0
+        self.formatreplace = False
 
 
 class DirPickButton(object):
@@ -624,6 +627,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_enhancematch_checkbox.SetLabel(_("Improve fuzzy fit"))
         self.m_word_checkbox.SetLabel(_("Unicode word breaks"))
         self.m_reverse_checkbox.SetLabel(_("Search backwards"))
+        self.m_format_replace_checkbox.SetLabel(_("Format style replacements"))
         self.m_fullcase_checkbox.SetLabel(_("Full case-folding"))
         self.m_subfolder_checkbox.SetLabel(_("Include subfolders"))
         self.m_hidden_checkbox.SetLabel(_("Include hidden"))
@@ -757,6 +761,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_enhancematch_checkbox.SetValue(Settings.get_search_setting("enhancematch_toggle", False))
         self.m_word_checkbox.SetValue(Settings.get_search_setting("word_toggle", False))
         self.m_reverse_checkbox.SetValue(Settings.get_search_setting("reverse_toggle", False))
+        self.m_format_replace_checkbox.SetValue(Settings.get_search_setting("format_replace_toggle", False))
         self.m_fullcase_checkbox.SetValue(Settings.get_search_setting("fullcase_toggle", False))
 
         self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
@@ -837,6 +842,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_enhancematch_checkbox.Show()
             self.m_bestmatch_checkbox.Show()
             self.m_reverse_checkbox.Show()
+            self.m_format_replace_checkbox.Show()
             if Settings.get_regex_version() == 0:
                 self.m_fullcase_checkbox.Show()
             else:
@@ -846,6 +852,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_enhancematch_checkbox.Hide()
             self.m_bestmatch_checkbox.Hide()
             self.m_reverse_checkbox.Hide()
+            self.m_format_replace_checkbox.Hide()
             self.m_fullcase_checkbox.Hide()
 
     def on_dir_changed(self, event):
@@ -1103,6 +1110,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.args.enhancematch = self.m_enhancematch_checkbox.GetValue()
             self.args.word = self.m_word_checkbox.GetValue()
             self.args.reverse = self.m_reverse_checkbox.GetValue()
+            self.args.formatreplace = self.m_format_replace_checkbox.GetValue()
             if self.args.regex_version == 0:
                 self.args.fullcase = self.m_fullcase_checkbox.GetValue()
         self.args.boolean = self.m_boolean_checkbox.GetValue()
@@ -1199,7 +1207,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("bestmatch_toggle", self.args.bestmatch),
             ("enhancematch_toggle", self.args.enhancematch),
             ("word_toggle", self.args.word),
-            ("reverse_toggle", self.args.reverse)
+            ("reverse_toggle", self.args.reverse),
+            ("format_replace_toggle", self.args.formatreplace)
         ]
 
         if Settings.get_regex_version() == 0:
