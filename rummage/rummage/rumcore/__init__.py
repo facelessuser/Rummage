@@ -1078,7 +1078,7 @@ class Rummage(object):
         self, target, pattern, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None,
         show_hidden=False, encoding=None, size=None,
-        modified=None, created=None, text=False, truncate_lines=False,
+        modified=None, created=None, process_binary=False, truncate_lines=False,
         boolean=False, count_only=False, replace=None,
         backup=False, backup_ext=DEFAULT_BAK, regex_support=False
     ):
@@ -1105,7 +1105,7 @@ class Rummage(object):
         self.search_params.replace = replace
         self.search_params.backup = backup
         self.search_params.encoding = self._verify_encoding(encoding) if encoding is not None else None
-        self.search_params.process_binary = text
+        self.search_params.process_binary = process_binary
         if backup_ext and isinstance(backup_ext, string_type):
             self.search_params.backup_ext = backup_ext
         else:
@@ -1117,7 +1117,6 @@ class Rummage(object):
         self.records = -1
         self.max = int(max_count) if max_count is not None else None
         self.target = abspath(target) if not self.buffer_input else target
-        self.process_binary = text
         file_regex_match = bool(flags & FILE_REGEX_MATCH)
         dir_regex_match = bool(flags & DIR_REGEX_MATCH)
         self.path_walker = None

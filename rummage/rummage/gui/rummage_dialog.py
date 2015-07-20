@@ -280,7 +280,7 @@ class RummageThread(threading.Thread):
             modified=args.modified_compare,
             created=args.created_compare,
             size=args.size_compare,
-            text=args.text,
+            process_binary=args.process_binary,
             truncate_lines=True,
             count_only=args.count_only,
             boolean=args.boolean,
@@ -449,6 +449,7 @@ class RummageArgs(object):
         self.backup_ext = None
         self.bestmatch = False
         self.enhancematch = False
+        self.process_binary = False
         self.word = False
         self.reverse = False
         self.fullcase = False
@@ -1107,10 +1108,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args.recursive = self.m_subfolder_checkbox.GetValue()
         self.args.pattern = self.m_searchfor_textbox.Value
         self.args.replace = self.m_replace_textbox.Value if replace else None
-        self.args.text = self.m_binary_checkbox.GetValue()
 
         # Limit Options
         if os.path.isdir(self.args.target):
+            self.args.process_binary = self.m_binary_checkbox.GetValue()
             self.args.show_hidden = self.m_hidden_checkbox.GetValue()
             if self.m_fileregex_checkbox.GetValue():
                 self.args.regexfilepattern = self.m_filematch_textbox.Value
@@ -1145,7 +1146,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     )
                 )
         else:
-            self.args.text = True
+            self.args.process_binary = True
 
         debug(self.args.target)
 
@@ -1185,7 +1186,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("force_encode_toggle", self.args.force_encode is not None),
             ("recursive_toggle", self.args.recursive),
             ("hidden_toggle", self.args.show_hidden),
-            ("binary_toggle", self.args.text),
+            ("binary_toggle", self.args.process_binary),
             ("regex_file_toggle", self.m_fileregex_checkbox.GetValue()),
             ("boolean_toggle", self.args.boolean),
             ("count_only_toggle", self.args.count_only),

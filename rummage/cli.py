@@ -211,7 +211,7 @@ class RummageCli(object):
             encoding=args.encoding_force,
             backup=True,
             size=size,
-            text=args.process_binary,
+            process_binary=args.process_binary,
             created=created,
             modified=modified,
             replace=args.replace,
