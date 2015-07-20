@@ -60,6 +60,7 @@ _RESULTS = []
 _COMPLETED = 0
 _TOTAL = 0
 _RECORDS = 0
+_SKIPPED = 0
 _ERRORS = []
 _ABORT = False
 
@@ -354,9 +355,10 @@ class RummageThread(threading.Thread):
         global _COMPLETED
         global _TOTAL
         global _RECORDS
+        global _SKIPPED
 
         with _LOCK:
-            _COMPLETED, _TOTAL, _RECORDS = self.rummage.get_status()
+            _COMPLETED, _TOTAL, _SKIPPED, _RECORDS = self.rummage.get_status()
             _RECORDS -= self.no_results
 
     def done(self):
@@ -373,15 +375,19 @@ class RummageThread(threading.Thread):
         global _TOTAL
         global _RECORDS
         global _ERRORS
+        global _SKIPPED
         with _LOCK:
             _RESULTS = []
             _COMPLETED = 0
             _TOTAL = 0
             _RECORDS = 0
+            _SKIPPED = 0
             _ERRORS = []
         for f in self.rummage.find():
             with _LOCK:
-                if f.error is None and (self.file_search or f.match is not None):
+                if hasattr(f, 'skipped') and f.skipped:
+                    self.no_results += 1
+                elif f.error is None and (self.file_search or f.match is not None):
                     _RESULTS.append(f)
                 else:
                     if isinstance(f, rumcore.FileRecord):
@@ -1058,7 +1064,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_replace_button.Enable(False)
 
         # Init search status
-        self.m_statusbar.set_status(_("Searching: 0/0 0% Matches: 0"))
+        self.m_statusbar.set_status(_("Searching: 0/0 0% Skipped: 0 Matches: 0"))
 
         # Setup arguments
         self.set_arguments(replace)
@@ -1269,18 +1275,20 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 completed = _COMPLETED
                 total = _TOTAL
                 records = _RECORDS
+                skipped = _SKIPPED
             count = self.count
             if records > count or not is_complete:
                 with _LOCK:
                     results = _RESULTS[0:records - count]
                     del _RESULTS[0:records - count]
-                count = self.update_table(count, completed, total, *results)
+                count = self.update_table(count, completed, total, skipped, *results)
             else:
                 self.m_statusbar.set_status(
-                    _("Searching: %d/%d %d%% Matches: %d") % (
+                    _("Searching: %d/%d %d%% Skipped: %d Matches: %d") % (
                         completed,
                         total,
                         int(float(completed) / float(total) * 100) if total != 0 else 0,
+                        skipped,
                         count
                     )
                 )
@@ -1297,10 +1305,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_replace_button.Enable(True)
                 if self.kill:
                     self.m_statusbar.set_status(
-                        _("Searching: %d/%d %d%% Matches: %d Benchmark: %s") % (
+                        _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s") % (
                             completed,
                             total,
                             int(float(completed) / float(total) * 100) if total != 0 else 0,
+                            skipped,
                             count,
                             benchmark
                         )
@@ -1318,10 +1327,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.kill = False
                 else:
                     self.m_statusbar.set_status(
-                        _("Searching: %d/%d %d%% Matches: %d Benchmark: %s") % (
+                        _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s") % (
                             completed,
                             total,
                             100,
+                            skipped,
                             count,
                             benchmark
                         )
@@ -1358,7 +1368,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.allow_update = False
             self.checking = False
 
-    def update_table(self, count, done, total, *results):
+    def update_table(self, count, done, total, skipped, *results):
         """Update the result lists with current search results."""
 
         p_range = self.m_progressbar.GetRange()
@@ -1379,12 +1389,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if p_value != done:
                 self.m_progressbar.SetValue(actually_done)
         self.m_statusbar.set_status(
-            _("Searching: %d/%d %d%% Matches: %d") % (
+            _("Searching: %d/%d %d%% Skipped: %d Matches: %d") % (
                 (
                     actually_done, total,
-                    int(float(actually_done) / float(total) * 100) if total != 0 else 0,
+                    int(float(actually_done) / float(total) * 100),
+                    skipped,
                     count
-                ) if total != 0 else (0, 0, 0, 0)
+                ) if total != 0 else (0, 0, 0, 0, 0)
             )
         )
         return count

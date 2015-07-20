@@ -66,15 +66,14 @@ MULTILINE = 0x4   # (?m)
 UNICODE = 0x8     # (?u)
 
 # Regex module flags
-if REGEX_SUPPORT:
-    ASCII = 0x10          # (?a)
-    FULLCASE = 0x20       # (?f)
-    WORD = 0x40           # (?w)
-    BESTMATCH = 0x80      # (?b)
-    ENHANCEMATCH = 0x100  # (?e)
-    REVERSE = 0x200       # (?r)
-    VERSION0 = 0x400      # (?V0)
-    VERSION1 = 0x800      # (?V1)
+ASCII = 0x10          # (?a)
+FULLCASE = 0x20       # (?f)
+WORD = 0x40           # (?w)
+BESTMATCH = 0x80      # (?b)
+ENHANCEMATCH = 0x100  # (?e)
+REVERSE = 0x200       # (?r)
+VERSION0 = 0x400      # (?V0)
+VERSION1 = 0x800      # (?V1)
 
 # Rumcore related flags
 LITERAL = 0x1000
@@ -213,7 +212,7 @@ class RummageException(Exception):
     """Rummage exception."""
 
 
-class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'size', 'modified', 'created', 'error'])):
+class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'size', 'modified', 'created', 'skipped', 'error'])):
 
     """File Attributes."""
 
@@ -1025,6 +1024,7 @@ class _DirWalker(object):
                         None,
                         None,
                         None,
+                        False,
                         get_exception()
                     )
                 if self.kill:
@@ -1043,6 +1043,7 @@ class _DirWalker(object):
                             None,
                             None,
                             None,
+                            False,
                             get_exception()
                         )
 
@@ -1052,8 +1053,11 @@ class _DirWalker(object):
                             self.current_size,
                             self.modified_time,
                             self.created_time,
+                            False,
                             None
                         )
+                    else:
+                        yield FileAttrRecord(join(base, name), None, None, None, True, None)
 
                     if self.kill:
                         break
@@ -1106,6 +1110,7 @@ class Rummage(object):
         self.search_params.backup = backup
         self.search_params.encoding = self._verify_encoding(encoding) if encoding is not None else None
         self.search_params.process_binary = process_binary
+        self.skipped = 0
         if backup_ext and isinstance(backup_ext, string_type):
             self.search_params.backup_ext = backup_ext
         else:
@@ -1151,6 +1156,7 @@ class Rummage(object):
                         getsize(self.target),
                         getmtime(self.target),
                         getctime(self.target),
+                        False,
                         None
                     )
                 )
@@ -1160,6 +1166,7 @@ class Rummage(object):
                     None,
                     None,
                     None,
+                    False,
                     get_exception()
                 )
         elif self.buffer_input:
@@ -1169,6 +1176,7 @@ class Rummage(object):
                     len(self.target),
                     ctime(),
                     ctime(),
+                    False,
                     None
                 )
             )
@@ -1230,7 +1238,7 @@ class Rummage(object):
 
     def get_status(self):
         """Return number of files searched out of current number of files crawled."""
-        return self.idx + 1, self.idx + 1 + len(self.files), self.records + 1
+        return self.idx + 1, self.idx + 1 + len(self.files), self.skipped, self.records + 1
 
     @property
     def kill(self):
@@ -1294,10 +1302,17 @@ class Rummage(object):
         folder_limit = 100
 
         for f in self.path_walker.run():
-            if f.error is None:
-                self.files.append(f)
-            else:
+            if hasattr(f, 'skipped') and f.skipped:
+                self.idx += 1
+                self.records += 1
+                self.skipped += 1
                 yield f
+            elif f.error:
+                self.idx += 1
+                self.records += 1
+                yield f
+            else:
+                self.files.append(f)
 
             if self.kill:
                 self.files.clear()
@@ -1329,6 +1344,7 @@ class Rummage(object):
 
         self.alive = True
         self.idx = -1
+        self.skipped = 0
 
         if self.search_params.pattern:
             if self.file_error is not None:
@@ -1347,6 +1363,8 @@ class Rummage(object):
             for f in self.path_walker.run():
                 self.idx += 1
                 self.records += 1
+                if hasattr(f, 'skipped') and f.skipped:
+                    self.skipped += 1
                 yield f
 
                 if self.kill:
