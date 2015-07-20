@@ -397,7 +397,7 @@ class _FileSearch(object):
         idx = row - 1
         lines = len(line_map) - 1
         start = 0
-        end = len(content) - 1
+        end = len(content)
 
         # 1 index back gives us the start of this line
         # 2 gives us the start of the next
@@ -425,10 +425,11 @@ class _FileSearch(object):
             # Decrement the column if we are at a line's end with one of these.
             # We will verify any line to account for mixed line endings.
             if (
-                line_map and m.start() == line_map[idx] and
+                line_map and m.start() != len(content) and m.start() == line_map[idx] and
                 m.start() != 0 and content[m.start() - 1: m.start() + 1] == win_end
             ):
                 col -= 1
+
             if start_idx is not None:
                 start = line_map[start_idx] + 1
             if end_idx is not None:
@@ -1123,6 +1124,7 @@ class Rummage(object):
         self.is_binary = False
         self.files = deque()
         self.queue = deque()
+        self.file_error = None
         if not self.buffer_input and isdir(self.target):
             self.path_walker = _DirWalker(
                 self.target,
@@ -1139,21 +1141,32 @@ class Rummage(object):
                 self.regex_support
             )
         elif not self.buffer_input and isfile(self.target):
-            self.files.append(
-                FileAttrRecord(
-                    self.target,
-                    getsize(self.target),
-                    getmtime(self.target),
-                    getctime(self.target)
+            try:
+                self.files.append(
+                    FileAttrRecord(
+                        self.target,
+                        getsize(self.target),
+                        getmtime(self.target),
+                        getctime(self.target),
+                        None
+                    )
                 )
-            )
+            except Exception:
+                self.file_error = FileAttrRecord(
+                    self.target,
+                    None,
+                    None,
+                    None,
+                    get_exception()
+                )
         elif self.buffer_input:
             self.files.append(
                 FileAttrRecord(
                     "buffer input",
                     len(self.target),
                     ctime(),
-                    ctime()
+                    ctime(),
+                    None
                 )
             )
 
@@ -1315,7 +1328,9 @@ class Rummage(object):
         self.idx = -1
 
         if self.search_params.pattern:
-            if len(self.files):
+            if self.file_error is not None:
+                yield self.file_error
+            elif len(self.files):
                 for result in self.search_file(self.target if self.buffer_input else None):
                     yield result
             else:
