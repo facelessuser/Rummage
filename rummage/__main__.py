@@ -25,7 +25,6 @@ import sys
 from .rummage.gui.settings import Settings
 from .rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame
 from .rummage import version
-import locale
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 CLI_ENCODING = sys.getfilesystemencoding()
