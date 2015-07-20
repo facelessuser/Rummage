@@ -666,7 +666,7 @@ class _FileSearch(object):
                         self.current_encoding = rum_content.encoding
                         if not self.process_binary:
                             skip = True
-                        file_info = file_info._replace(encoding=self.current_encoding)
+                        file_info = file_info._replace(encoding=self.current_encoding.encode.upper())
 
                     if not skip:
                         offset = 0
@@ -743,7 +743,7 @@ class _FileSearch(object):
                         self.current_encoding = rum_content.encoding
                         if not self.process_binary:
                             skip = True
-                        file_info = file_info._replace(encoding=self.current_encoding)
+                        file_info = file_info._replace(encoding=self.current_encoding.encode.upper())
 
                     if not skip:
                         line_ending = None
