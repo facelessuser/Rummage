@@ -26,6 +26,7 @@ import traceback
 import webbrowser
 from time import time
 import os
+import re
 import wx.lib.newevent
 from .. import version
 from .. import rumcore
@@ -288,7 +289,7 @@ class RummageThread(threading.Thread):
             replace=args.replace,
             backup=args.backup,
             backup_ext=args.backup_ext,
-            regex_support=args.regex_support
+            regex_mode=args.regex_mode
         )
 
         threading.Thread.__init__(self)
@@ -320,7 +321,7 @@ class RummageThread(threading.Thread):
 
         if args.unicode:
             flags |= rumcore.UNICODE
-        elif args.regex_support:
+        elif args.regex_mode == rumcore.REGEX_MODE:
             flags |= rumcore.ASCII
 
         if args.ignore_case:
@@ -332,7 +333,7 @@ class RummageThread(threading.Thread):
         if args.regexdirpattern:
             flags |= rumcore.DIR_REGEX_MATCH
 
-        if args.regex_support:
+        if args.regex_mode == rumcore.REGEX_MODE:
             if args.bestmatch:
                 flags |= rumcore.BESTMATCH
             if args.enhancematch:
@@ -461,7 +462,7 @@ class RummageArgs(object):
         self.word = False
         self.reverse = False
         self.fullcase = False
-        self.regex_support = False
+        self.regex_mode = rumcore.RE_MODE
         self.regex_version = 0
         self.formatreplace = False
 
@@ -837,7 +838,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def refresh_regex_options(self):
         """Refresh the regex module options."""
 
-        if Settings.get_regex_support():
+        mode = Settings.get_regex_mode()
+        if mode == rumcore.REGEX_MODE:
             self.m_word_checkbox.Show()
             self.m_enhancematch_checkbox.Show()
             self.m_bestmatch_checkbox.Show()
@@ -1098,14 +1100,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args.target = self.m_searchin_text.GetValue()
 
         # Search Options
-        self.args.regex_support = Settings.get_regex_support()
+        self.args.regex_mode = Settings.get_regex_mode()
         self.args.regexp = self.m_regex_search_checkbox.GetValue()
         self.args.ignore_case = not self.m_case_checkbox.GetValue()
         self.args.dotall = self.m_dotmatch_checkbox.GetValue()
         self.args.unicode = self.m_unicode_checkbox.GetValue()
         self.args.count_only = self.m_count_only_checkbox.GetValue()
         self.args.regex_version = Settings.get_regex_version()
-        if self.args.regex_support:
+        if self.args.regex_mode == rumcore.REGEX_MODE:
             self.args.bestmatch = self.m_bestmatch_checkbox.GetValue()
             self.args.enhancematch = self.m_enhancematch_checkbox.GetValue()
             self.args.word = self.m_word_checkbox.GetValue()
@@ -1441,7 +1443,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def validate_search_regex(self):
         """Validate search regex."""
 
-        if Settings.get_regex_support():
+        mode = Settings.get_regex_mode()
+        if mode == rumcore.REGEX_MODE:
             import regex
             flags = regex.MULTILINE
             version = Settings.get_regex_version()
@@ -1467,7 +1470,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 flags |= regex.REVERSE
             if version == 0 and self.m_fullcase_checkbox.GetValue():
                 flags |= regex.FULLCASE
-        else:
+        elif mode == rumcore.BRE_MODE:
             flags = bre.MULTILINE
             if self.m_dotmatch_checkbox.GetValue():
                 flags |= bre.DOTALL
@@ -1475,18 +1478,29 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 flags |= bre.IGNORECASE
             if self.m_unicode_checkbox.GetValue():
                 flags |= bre.UNICODE
+        else:
+            flags = re.MULTILINE
+            if self.m_dotmatch_checkbox.GetValue():
+                flags |= re.DOTALL
+            if not self.m_case_checkbox.GetValue():
+                flags |= re.IGNORECASE
+            if self.m_unicode_checkbox.GetValue():
+                flags |= re.UNICODE
         return self.validate_regex(self.m_searchfor_textbox.Value, flags)
 
     def validate_regex(self, pattern, flags=0):
         """Validate regular expresion compiling."""
         try:
-            if Settings.get_regex_support():
+            mode = Settings.get_regex_mode()
+            if mode == rumcore.REGEX_MODE:
                 import regex
                 if flags == 0:
                     flags = regex.ASCII
                 regex.compile(pattern, flags)
-            else:
+            elif mode == rumcore.BRE_MODE:
                 bre.compile_search(pattern, flags)
+            else:
+                re.compile(pattern, flags)
             return False
         except Exception:
             errormsg(_("Invalid Regular Expression!"))
@@ -1510,7 +1524,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_test_regex(self, event):
         """Show regex test dialog."""
 
-        tester = RegexTestDialog(self, Settings.get_regex_support(), Settings.get_regex_version())
+        tester = RegexTestDialog(self)
         tester.ShowModal()
         tester.Destroy()
 

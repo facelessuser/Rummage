@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 import argparse
 import os
+import re
 import sys
 from datetime import datetime
 from .rummage import epoch_timestamp
@@ -41,7 +42,7 @@ BOOL_NONE = 0
 BOOL_MATCH = 1
 BOOL_UNMATCH = 2
 
-RE_DATE_TIME = bre.compile_search(
+RE_DATE_TIME = re.compile_search(
     r'''(?x)
     (?P<symbol>[><])?(?:
         (?P<date>(?P<month>0[1-9]|1[0-2])/(?P<day>0[1-9]|[1-2][0-9]|3[0-1])/(?P<year>[0-9]{4})) |
@@ -50,7 +51,7 @@ RE_DATE_TIME = bre.compile_search(
     '''
 )
 
-RE_DATE_TIME_FULL = bre.compile_search(
+RE_DATE_TIME_FULL = re.compile_search(
     r'''(?x)
     (?P<symbol>[><])?
     (?P<date>(?P<month>0[1-9]|1[0-2])/(?P<day>0[1-9]|[1-2][0-9]|3[0-1])/(?P<year>[0-9]{4})) -
@@ -176,11 +177,17 @@ class RummageCli(object):
             modified = None
 
         flags = self.get_flags(args)
-        regex_module = args.regex0 or args.regex1
-        if args.re or regex_module:
+        if args.regex0 or args.regex1:
+            regex_mode = rumcore.REGEX_MODE
+        elif args.bre:
+            regex_mode = rumcore.BRE_MODE
+        else:
+            regex_mode = rumcore.RE_MODE
+
+        if args.re or args.bre or args.regex0 or args.regex1:
             if (
                 (args.pattern == "" and args.replace) or
-                self.validate_search_regex(args.pattern, flags)
+                self.validate_search_regex(args.pattern, flags, regex_mode)
             ):
                 raise ValueError("Invlaid regex search pattern")
 
@@ -188,13 +195,13 @@ class RummageCli(object):
             raise ValueError("Invlaid search pattern")
 
         if args.regex_file_pattern:
-            if self.validate_regex(args.regex_file_pattern, flags=0, regex_support=regex_module):
+            if self.validate_regex(args.regex_file_pattern, 0, regex_mode):
                 raise ValueError("Invalid regex file pattern")
         elif not args.file_pattern:
             raise ValueError("Invalid file pattern")
 
         if args.regex_directory_exclude:
-            if self.validate_regex(args.regex_directory_exclude, flags=0, regex_support=regex_module):
+            if self.validate_regex(args.regex_directory_exclude, 0, regex_mode):
                 raise ValueError("Invalid regex directory exclude pattern")
 
         self.rummage = rumcore.Rummage(
@@ -215,7 +222,7 @@ class RummageCli(object):
             created=created,
             modified=modified,
             replace=args.replace,
-            regex_support=regex_module
+            regex_mode=regex_mode
         )
 
         if args.replace:
@@ -237,14 +244,12 @@ class RummageCli(object):
         self.count = 0
         self.errors = False
 
-    def validate_search_regex(self, search, search_flags):
+    def validate_search_regex(self, search, search_flags, regex_mode):
         """Validate search regex."""
 
-        regex_support = False
-        if search_flags & (rumcore.VERSION0 | rumcore.VERSION1):
+        if regex_mode == rumcore.REGEX_MODE:
             import regex
 
-            regex_support = True
             flags = regex.MULTILINE
             if search_flags & rumcore.VERSION1:
                 flags |= regex.VERSION1
@@ -268,26 +273,36 @@ class RummageCli(object):
                 flags |= regex.WORD
             if search_flags & rumcore.REVERSE:
                 flags |= regex.REVERSE
-        else:
-            flags = bre.MULTILINE
+        elif regex_mode == rumcore.BRE_MODE:
+            flags = re.MULTILINE
             if search_flags & rumcore.DOTALL:
                 flags |= bre.DOTALL
             if search_flags & rumcore.IGNORECASE:
                 flags |= bre.IGNORECASE
             if search_flags & rumcore.UNICODE:
                 flags |= bre.UNICODE
-        return self.validate_regex(search, flags, regex_support)
+        else:
+            flags = re.MULTILINE
+            if search_flags & rumcore.DOTALL:
+                flags |= re.DOTALL
+            if search_flags & rumcore.IGNORECASE:
+                flags |= re.IGNORECASE
+            if search_flags & rumcore.UNICODE:
+                flags |= re.UNICODE
+        return self.validate_regex(search, flags, regex_mode)
 
-    def validate_regex(self, pattern, flags=0, regex_support=False):
+    def validate_regex(self, pattern, flags=0, regex_mode=rumcore.RE_MODE):
         """Validate regular expresion compiling."""
         try:
-            if regex_support:
+            if regex_mode == rumcore.REGEX_MODE:
                 import regex
                 if flags == 0:
                     flags = regex.ASCII
                 regex.compile(pattern, flags)
-            else:
+            elif regex_mode == rumcore.BRE_MODE:
                 bre.compile_search(pattern, flags)
+            else:
+                re.compile(pattern, flags)
             return False
         except Exception:
             return True
@@ -509,6 +524,10 @@ def main():
     parser.add_argument(
         "--re", "-x", action="store_true", default=False,
         help="Pattern is a regular expresiion for the Python 're'."
+    )
+    parser.add_argument(
+        "--bre", "-X", action="store_true", default=False,
+        help="Pattern is a regular expresiion for the Python 're' with backrefs wrapper."
     )
     parser.add_argument(
         "--regex0", "-0", action="store_true", default=False,

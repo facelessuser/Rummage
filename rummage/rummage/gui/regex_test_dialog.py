@@ -19,27 +19,30 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import wx
-import traceback
+import re
 import sys
+import traceback
+import wx
 from . import gui
-from ..rumcore import backrefs as bre
-from ..localization import _
 from .. import data
+from .settings import Settings
+from ..localization import _
+from .. import rumcore
+from ..rumcore import backrefs as bre
 
 
 class RegexTestDialog(gui.RegexTestDialog):
 
     """Regex test dialog."""
 
-    def __init__(self, parent, regex_support=False, regex_version=0):
+    def __init__(self, parent):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
         self.SetIcon(data.get_image('rummage_64.png').GetIcon())
         self.parent = parent
-        self.regex_support = regex_support
-        self.regex_version = regex_version
+        self.regex_mode = Settings.get_regex_mode()
+        self.regex_version = Settings.get_regex_version()
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
@@ -49,7 +52,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_case_checkbox.SetValue(parent.m_case_checkbox.GetValue() if parent else False)
         self.m_dotmatch_checkbox.SetValue(parent.m_dotmatch_checkbox.GetValue() if parent else False)
         self.m_unicode_checkbox.SetValue(parent.m_unicode_checkbox.GetValue() if parent else False)
-        if self.regex_support:
+        if self.regex_mode == rumcore.REGEX_MODE:
             self.m_bestmatch_checkbox.SetValue(parent.m_bestmatch_checkbox.GetValue() if parent else False)
             self.m_enhancematch_checkbox.SetValue(parent.m_enhancematch_checkbox.GetValue() if parent else False)
             self.m_word_checkbox.SetValue(parent.m_word_checkbox.GetValue() if parent else False)
@@ -176,7 +179,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.parent.m_unicode_checkbox.SetValue(self.m_unicode_checkbox.GetValue())
         self.parent.m_case_checkbox.SetValue(self.m_case_checkbox.GetValue())
         self.parent.m_dotmatch_checkbox.SetValue(self.m_dotmatch_checkbox.GetValue())
-        if self.regex_support:
+        if self.mode == rumcore.REGEX_MODE:
             self.parent.m_bestmatch_checkbox.SetValue(self.m_bestmatch_checkbox.GetValue())
             self.parent.m_enhancematch_checkbox.SetValue(self.m_enhancematch_checkbox.GetValue())
             self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
@@ -194,7 +197,7 @@ class RegexTestDialog(gui.RegexTestDialog):
     def test_regex(self):
         """Test and highlight search results in content buffer."""
 
-        if self.regex_support:
+        if self.regex_mode == rumcore.REGEX_MODE:
             import regex
 
         if not self.testing:
@@ -208,7 +211,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.testing = False
                 return
 
-            if self.regex_support:
+            if self.regex_mode == rumcore.REGEX_MODE:
                 flags = regex.MULTILINE
                 if self.regex_version == 1:
                     flags |= regex.VERSION1
@@ -232,7 +235,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     flags |= regex.REVERSE
                 if flags & regex.VERSION0 and self.m_fullcase_checkbox.GetValue():
                     flags |= regex.FULLCASE
-            else:
+            elif self.regex_mode == rumcore.BRE_MODE:
                 flags = bre.MULTILINE
                 if not self.m_case_checkbox.GetValue():
                     flags |= bre.IGNORECASE
@@ -240,12 +243,22 @@ class RegexTestDialog(gui.RegexTestDialog):
                     flags |= bre.DOTALL
                 if self.m_unicode_checkbox.GetValue():
                     flags |= bre.UNICODE
+            else:
+                flags = re.MULTILINE
+                if not self.m_case_checkbox.GetValue():
+                    flags |= re.IGNORECASE
+                if self.m_dotmatch_checkbox.GetValue():
+                    flags |= re.DOTALL
+                if self.m_unicode_checkbox.GetValue():
+                    flags |= re.UNICODE
 
             try:
-                if self.regex_support:
+                if self.regex_mode == rumcore.REGEX_MODE:
                     test = regex.compile(self.m_regex_text.GetValue(), flags)
-                else:
+                elif self.regex_mode == rumcore.BRE_MODE:
                     test = bre.compile_search(self.m_regex_text.GetValue(), flags)
+                else:
+                    test = re.compile(self.m_regex_text.GetValue(), flags)
             except Exception:
                 self.testing = False
                 return
@@ -254,10 +267,12 @@ class RegexTestDialog(gui.RegexTestDialog):
             try:
                 rpattern = self.m_replace_text.GetValue()
                 if rpattern:
-                    if self.regex_support:
+                    if self.regex_mode == rumcore.REGEX_MODE:
                         replace_test = lambda m, replace=rpattern: self.regex_expand(m, replace)
-                    else:
+                    elif self.regex_mode == rumcore.BRE_MODE:
                         replace_test = bre.compile_replace(test, self.m_replace_text.GetValue())
+                    else:
+                        replace_test = lambda m, replace=rpattern: m.expand(replace)
             except Exception:
                 pass
 

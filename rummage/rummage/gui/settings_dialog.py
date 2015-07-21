@@ -24,6 +24,7 @@ from . import gui
 from .settings import Settings
 from .editor_dialog import EditorDialog
 from ..localization import _
+from .. import rumcore
 
 RECORDS = _("%d Records")
 
@@ -48,16 +49,19 @@ class SettingsDialog(gui.SettingsDialog):
         ]
         history_records = Settings.get_history_record_count(self.history_types)
         self.history_records_cleared = False
+        mode = Settings.get_regex_mode()
 
         self.editor = Settings.get_editor()
         self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
         self.m_history_label.SetLabel(RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
-        self.m_regex_checkbox.SetValue(Settings.get_regex_support())
+        self.m_regex_radio.SetValue(mode == rumcore.REGEX_MODE)
+        self.m_bre_radio.SetValue(mode == rumcore.BRE_MODE)
+        self.m_re_radio.SetValue(mode == rumcore.RE_MODE)
         self.m_regex_ver_choice.SetSelection(Settings.get_regex_version())
         if Settings.is_regex_available():
-            self.m_regex_checkbox.Enable(True)
+            self.m_regex_radio.Enable(True)
             self.m_regex_ver_choice.Enable(True)
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
@@ -90,12 +94,16 @@ class SettingsDialog(gui.SettingsDialog):
         main_sizer = self.m_settings_panel.GetSizer()
         main_sizer.GetItem(0).GetSizer().GetStaticBox().SetLabel(_("Editor"))
         main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(_("General"))
-        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Notifications"))
-        main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(_("History"))
+        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Regular Expression Modules"))
+        main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(_("Notifications"))
+        main_sizer.GetItem(4).GetSizer().GetStaticBox().SetLabel(_("History"))
         self.m_single_checkbox.SetLabel(_("Single Instance (applies to new instances)"))
         self.m_visual_alert_checkbox.SetLabel(_("Notification popup"))
         self.m_audio_alert_checkbox.SetLabel(_("Alert Sound"))
         self.m_language_label.SetLabel(_("Language (restart required)"))
+        self.m_re_radio.SetLabel(_("Use re module"))
+        self.m_bre_radio.SetLabel(_("Use re module with backrefs"))
+        self.m_regex_radio.SetLabel(_("Use experimental regex module"))
         self.m_editor_button.SetLabel(_("change"))
         self.m_history_clear_button.SetLabel(_("Clear"))
         self.m_close_button.SetLabel(_("Close"))
@@ -155,11 +163,6 @@ class SettingsDialog(gui.SettingsDialog):
         Settings.set_language(value)
         event.Skip()
 
-    def on_regex_toggle(self, event):
-        """Set use of regex module."""
-
-        Settings.set_regex_support(self.m_regex_checkbox.GetValue())
-
     def on_regex_ver_choice(self, event):
         """Set regex version."""
 
@@ -169,3 +172,20 @@ class SettingsDialog(gui.SettingsDialog):
         """Close on cancel."""
 
         self.Close()
+
+    def on_change_module(self, event):
+        """Change the module."""
+
+        if self.m_regex_radio.GetValue():
+            mode = rumcore.REGEX_MODE
+        elif self.m_bre_radio.GetValue():
+            mode = rumcore.BRE_MODE
+        else:
+            mode = rumcore.RE_MODE
+        Settings.set_regex_mode(mode)
+
+    on_regex_toggle = on_change_module
+
+    on_bre_toggle = on_change_module
+
+    on_re_toggle = on_change_module

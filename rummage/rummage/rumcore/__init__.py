@@ -23,7 +23,9 @@ from __future__ import unicode_literals
 import codecs
 import mmap
 import os
+import re
 import shutil
+import sre_parse
 import sys
 from collections import namedtuple
 from fnmatch import fnmatch
@@ -77,11 +79,15 @@ VERSION1 = 0x800        # (?V1)
 FORMATREPLACE = 0x1000  # Use {1} for groups in replace
 
 # Rumcore related flags
-LITERAL = 0x10000           # Literal search
-BUFFER_INPUT = 0x20000      # Input is a buffer
-RECURSIVE = 0x40000         # Recursive directory search
+LITERAL = 0x10000            # Literal search
+BUFFER_INPUT = 0x20000       # Input is a buffer
+RECURSIVE = 0x40000          # Recursive directory search
 FILE_REGEX_MATCH = 0x80000  # Regex pattern for files
-DIR_REGEX_MATCH = 0x100000  # Regex pattern for directories
+DIR_REGEX_MATCH = 0x100000   # Regex pattern for directories
+
+RE_MODE = 0
+BRE_MODE = 1
+REGEX_MODE = 2
 
 TRUNCATE_LENGTH = 120
 
@@ -142,6 +148,30 @@ def get_exception():
         del exc_tb
 
     return (exc, tb)
+
+
+def _re_pattern(pattern, rum_flags=0, binary=False):
+    """Prepare regex search pattern flags."""
+
+    flags = 0
+    if rum_flags & MULTILINE:
+        flags |= re.MULTILINE
+    if rum_flags & IGNORECASE:
+        flags |= re.IGNORECASE
+    if rum_flags & DOTALL:
+        flags |= re.DOTALL
+    if not binary and rum_flags & UNICODE:
+        flags |= re.UNICODE
+    return re.compile(pattern, flags)
+
+
+def _re_literal_pattern(pattern, rum_flags=0):
+    """Prepare literal search pattern flags."""
+
+    flags = 0
+    if rum_flags & IGNORECASE:
+        flags |= re.IGNORECASE
+    return re.compile(re.escape(pattern), flags)
 
 
 def _bre_pattern(pattern, rum_flags=0, binary=False):
@@ -313,14 +343,16 @@ class _FileSearch(object):
 
     hex_tx_table = ("\ufffd" * 32) + "".join(chr(c) for c in range(32, 127)) + ("\ufffd" * 129)
 
-    def __init__(self, args, file_obj, file_id, max_count, file_content, regex_support=False):
+    def __init__(self, args, file_obj, file_id, max_count, file_content, regex_mode=RE_MODE):
         """Init the file search object."""
 
-        self.regex_support = regex_support and REGEX_SUPPORT
+        if (regex_mode == REGEX_MODE and not REGEX_SUPPORT) or (RE_MODE > regex_mode > REGEX_MODE):
+            regex_mode = RE_MODE
+        self.regex_mode = regex_mode
         self.flags = args.flags
         self.boolean = bool(args.boolean)
         self.count_only = bool(args.count_only)
-        self.regex_format_replace = self.regex_support and bool(args.flags & FORMATREPLACE)
+        self.regex_format_replace = self.regex_mode == REGEX_MODE and bool(args.flags & FORMATREPLACE)
         self.truncate_lines = args.truncate_lines
         self.backup = args.backup
         self.backup_ext = '.%s' % args.backup_ext
@@ -553,20 +585,23 @@ class _FileSearch(object):
 
         if pattern is not None:
             if bool(self.flags & LITERAL):
-                if self.regex_support:
+                if self.regex_mode == REGEX_MODE:
                     pattern = _regex_literal_pattern(pattern, self.flags)
-                pattern = _bre_literal_pattern(pattern, self.flags)
-                self.expand = None
-            else:
-                if self.regex_support:
-                    pattern = _regex_pattern(pattern, self.flags, self.is_binary)
-                    self.expand = None
+                elif self.regex_mode == BRE_MODE:
+                    pattern = _bre_literal_pattern(pattern, self.flags)
                 else:
+                    pattern = _re_literal_pattern(pattern, self.flags)
+            else:
+                if self.regex_mode == REGEX_MODE:
+                    pattern = _regex_pattern(pattern, self.flags, self.is_binary)
+                elif self.regex_mode == BRE_MODE:
                     pattern = _bre_pattern(pattern, self.flags, self.is_binary)
                     if replace is not None:
                         self.expand = bre.compile_replace(pattern, self.replace)
-                    else:
-                        self.expand = None
+                else:
+                    pattern = _re_pattern(pattern, self.flags, self.is_binary)
+                    if replace is not None:
+                        self.expand = sre_parse.parse_template(self.replace, pattern)
 
             for m in pattern.finditer(file_content):
                 yield m
@@ -871,12 +906,14 @@ class _DirWalker(object):
         self, directory, file_pattern, file_regex_match,
         folder_exclude, dir_regex_match, recursive,
         show_hidden, size, modified, created, backup_ext,
-        regex_support=False
+        regex_mode=RE_MODE
     ):
         """Init the directory walker object."""
 
+        if (regex_mode == REGEX_MODE and not REGEX_SUPPORT) or (RE_MODE > regex_mode > REGEX_MODE):
+            regex_mode = RE_MODE
+        self.regex_mode = regex_mode
         self.dir = directory
-        self.regex_support = regex_support and REGEX_SUPPORT
         self.size = (size[0], size[1] * 1024) if size is not None else size
         self.modified = modified
         self.created = created
@@ -1094,7 +1131,7 @@ class Rummage(object):
         show_hidden=False, encoding=None, size=None,
         modified=None, created=None, process_binary=False, truncate_lines=False,
         boolean=False, count_only=False, replace=None,
-        backup=False, backup_ext=DEFAULT_BAK, regex_support=False
+        backup=False, backup_ext=DEFAULT_BAK, regex_mode=RE_MODE
     ):
         """Initialize Rummage object."""
 
@@ -1108,7 +1145,9 @@ class Rummage(object):
             _PROCESS = self
 
         self.alive = False
-        self.regex_support = REGEX_SUPPORT and regex_support
+        if (regex_mode == REGEX_MODE and not REGEX_SUPPORT) or (RE_MODE > regex_mode > REGEX_MODE):
+            regex_mode = RE_MODE
+        self.regex_mode = regex_mode
         self.search_params = SearchParams()
         self.search_params.pattern = pattern
         self.search_params.flags = flags
@@ -1156,7 +1195,7 @@ class Rummage(object):
                 modified,
                 created,
                 self.search_params.backup_ext if backup else None,
-                self.regex_support
+                self.regex_mode
             )
         elif not self.buffer_input and isfile(self.target):
             try:
@@ -1221,13 +1260,17 @@ class Rummage(object):
 
         pattern = None
         if folder_exclude is not None:
-            if self.regex_support:
+            if self.regex_mode == REGEX_MODE:
                 pattern = regex.compile(
                     folder_exclude, regex.IGNORECASE | regex.ASCII
                 ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
-            else:
+            elif self.regex_mode == BRE_MODE:
                 pattern = bre.compile_search(
                     folder_exclude, bre.IGNORECASE
+                ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
+            else:
+                pattern = re.compile(
+                    folder_exclude, re.IGNORECASE
                 ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
         return pattern
 
@@ -1236,13 +1279,17 @@ class Rummage(object):
 
         pattern = None
         if file_pattern is not None:
-            if self.regex_support:
+            if self.regex_mode == REGEX_MODE:
                 pattern = regex.compile(
                     file_pattern, regex.IGNORECASE | regex.ASCII
                 ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
-            else:
+            elif self.regex_mode == BRE_MODE:
                 pattern = bre.compile_search(
                     file_pattern, bre.IGNORECASE
+                ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
+            else:
+                pattern = re.compile(
+                    file_pattern, re.IGNORECASE
                 ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
@@ -1294,7 +1341,7 @@ class Rummage(object):
                 self.idx,
                 self.max,
                 content_buffer,
-                self.regex_support
+                self.regex_mode
             )
             for rec in self.searcher.run():
                 if rec.error is None:

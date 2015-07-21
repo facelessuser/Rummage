@@ -33,7 +33,7 @@ from .custom_app import debug, debug_struct, error
 from .custom_app import init_app_log, set_debug_mode
 from . generic_dialogs import errormsg
 from .. import data
-from ..rumcore import REGEX_SUPPORT
+from .. import rumcore
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -98,22 +98,27 @@ class Settings(object):
     def is_regex_available(cls):
         """Check if regex support is available."""
 
-        return REGEX_SUPPORT
+        return rumcore.REGEX_SUPPORT
 
     @classmethod
-    def set_regex_support(cls, value):
+    def set_regex_mode(cls, value):
         """Set regex support."""
 
         cls.reload_settings()
-        cls.settings["regex_support"] = value and REGEX_SUPPORT
+        if value == rumcore.REGEX_MODE and not rumcore.REGEX_SUPPORT:
+            value = rumcore.REGEX_MODE
+        cls.settings["regex_mode"] = value
         cls.save_settings()
 
     @classmethod
-    def get_regex_support(cls):
+    def get_regex_mode(cls):
         """See if regex support is enabled."""
 
         cls.reload_settings()
-        return cls.settings.get('regex_support', False) and REGEX_SUPPORT
+        value = cls.settings.get('regex_mode', rumcore.RE_MODE)
+        if value == rumcore.REGEX_MODE and not rumcore.REGEX_SUPPORT:
+            value = rumcore.RE_MODE
+        return value
 
     @classmethod
     def set_regex_version(cls, value):
