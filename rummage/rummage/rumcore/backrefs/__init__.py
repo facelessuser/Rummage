@@ -569,6 +569,11 @@ class ReplaceTemplate(object):
         self._empty = tokens[_EMPTY]
         self._add_back_references(tokens[_REPLACE_TOKENS])
         self._template = self.__escape_template(template)
+        self.parse_template(pattern)
+
+    def parse_template(self, pattern):
+        """Parse the replace template."""
+
         self.groups, self.literals = sre_parse.parse_template(self._template, pattern)
 
     def get_base_template(self):
