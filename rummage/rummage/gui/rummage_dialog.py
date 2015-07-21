@@ -30,7 +30,7 @@ import re
 import wx.lib.newevent
 from .. import version
 from .. import rumcore
-from ..rumcore import backrefs as bre
+from ..rumcore.backrefs import bre, bregex
 from ..epoch_timestamp import local_time_to_epoch_timestamp
 from .. import notify
 from ..localization import _
@@ -839,7 +839,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Refresh the regex module options."""
 
         mode = Settings.get_regex_mode()
-        if mode == rumcore.REGEX_MODE:
+        if mode in rumcore.REGEX_MODES:
             self.m_word_checkbox.Show()
             self.m_enhancematch_checkbox.Show()
             self.m_bestmatch_checkbox.Show()
@@ -1028,7 +1028,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if (
                 not fail and
                 self.m_logic_choice.GetStringSelection() != "any" and
-                bre.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
+                re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
             ):
                 msg = _("Please enter a valid size!")
                 fail = True
@@ -1444,7 +1444,32 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Validate search regex."""
 
         mode = Settings.get_regex_mode()
-        if mode == rumcore.REGEX_MODE:
+        if mode == rumcore.BREGEX_MODE:
+            flags = bregex.MULTILINE
+            version = Settings.get_regex_version()
+            if version == 1:
+                flags |= bregex.VERSION1
+            else:
+                flags |= bregex.VERSION0
+            if self.m_dotmatch_checkbox.GetValue():
+                flags |= bregex.DOTALL
+            if not self.m_case_checkbox.GetValue():
+                flags |= bregex.IGNORECASE
+            if self.m_unicode_checkbox.GetValue():
+                flags |= bregex.UNICODE
+            else:
+                flags |= bregex.ASCII
+            if self.m_bestmatch_checkbox.GetValue():
+                flags |= bregex.BESTMATCH
+            if self.m_enhancematch_checkbox.GetValue():
+                flags |= bregex.ENHANCEMATCH
+            if self.m_word_checkbox.GetValue():
+                flags |= bregex.WORD
+            if self.m_reverse_checkbox.GetValue():
+                flags |= bregex.REVERSE
+            if version == 0 and self.m_fullcase_checkbox.GetValue():
+                flags |= bregex.FULLCASE
+        elif mode == rumcore.REGEX_MODE:
             import regex
             flags = regex.MULTILINE
             version = Settings.get_regex_version()
@@ -1492,7 +1517,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Validate regular expresion compiling."""
         try:
             mode = Settings.get_regex_mode()
-            if mode == rumcore.REGEX_MODE:
+            if mode == rumcore.BREGEX_MODE:
+                if flags == 0:
+                    flags = bregex.ASCII
+                bregex.compile_search(pattern, flags)
+            elif mode == rumcore.REGEX_MODE:
                 import regex
                 if flags == 0:
                     flags = regex.ASCII

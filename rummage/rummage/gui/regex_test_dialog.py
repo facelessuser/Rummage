@@ -28,7 +28,7 @@ from .. import data
 from .settings import Settings
 from ..localization import _
 from .. import rumcore
-from ..rumcore import backrefs as bre
+from ..rumcore.backrefs import bre, bregex
 
 
 class RegexTestDialog(gui.RegexTestDialog):
@@ -52,7 +52,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_case_checkbox.SetValue(parent.m_case_checkbox.GetValue() if parent else False)
         self.m_dotmatch_checkbox.SetValue(parent.m_dotmatch_checkbox.GetValue() if parent else False)
         self.m_unicode_checkbox.SetValue(parent.m_unicode_checkbox.GetValue() if parent else False)
-        if self.regex_mode == rumcore.REGEX_MODE:
+        if self.regex_mode in rumcore.REGEX_MODES:
             self.m_bestmatch_checkbox.SetValue(parent.m_bestmatch_checkbox.GetValue() if parent else False)
             self.m_enhancematch_checkbox.SetValue(parent.m_enhancematch_checkbox.GetValue() if parent else False)
             self.m_word_checkbox.SetValue(parent.m_word_checkbox.GetValue() if parent else False)
@@ -179,7 +179,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.parent.m_unicode_checkbox.SetValue(self.m_unicode_checkbox.GetValue())
         self.parent.m_case_checkbox.SetValue(self.m_case_checkbox.GetValue())
         self.parent.m_dotmatch_checkbox.SetValue(self.m_dotmatch_checkbox.GetValue())
-        if self.mode == rumcore.REGEX_MODE:
+        if self.regex_mode in rumcore.REGEX_MODES:
             self.parent.m_bestmatch_checkbox.SetValue(self.m_bestmatch_checkbox.GetValue())
             self.parent.m_enhancematch_checkbox.SetValue(self.m_enhancematch_checkbox.GetValue())
             self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
@@ -211,7 +211,31 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.testing = False
                 return
 
-            if self.regex_mode == rumcore.REGEX_MODE:
+            if self.regex_mode == rumcore.BREGEX_MODE:
+                flags = bregex.MULTILINE
+                if self.regex_version == 1:
+                    flags |= bregex.VERSION1
+                else:
+                    flags |= bregex.VERSION0
+                if self.m_dotmatch_checkbox.GetValue():
+                    flags |= bregex.DOTALL
+                if not self.m_case_checkbox.GetValue():
+                    flags |= bregex.IGNORECASE
+                if self.m_unicode_checkbox.GetValue():
+                    flags |= bregex.UNICODE
+                else:
+                    flags |= bregex.ASCII
+                if self.m_bestmatch_checkbox.GetValue():
+                    flags |= bregex.BESTMATCH
+                if self.m_enhancematch_checkbox.GetValue():
+                    flags |= bregex.ENHANCEMATCH
+                if self.m_word_checkbox.GetValue():
+                    flags |= bregex.WORD
+                if self.m_reverse_checkbox.GetValue():
+                    flags |= bregex.REVERSE
+                if flags & bregex.VERSION0 and self.m_fullcase_checkbox.GetValue():
+                    flags |= bregex.FULLCASE
+            elif self.regex_mode == rumcore.REGEX_MODE:
                 flags = regex.MULTILINE
                 if self.regex_version == 1:
                     flags |= regex.VERSION1
@@ -253,7 +277,9 @@ class RegexTestDialog(gui.RegexTestDialog):
                     flags |= re.UNICODE
 
             try:
-                if self.regex_mode == rumcore.REGEX_MODE:
+                if self.regex_mode == rumcore.BREGEX_MODE:
+                    test = bregex.compile_search(self.m_regex_text.GetValue(), flags)
+                elif self.regex_mode == rumcore.REGEX_MODE:
                     test = regex.compile(self.m_regex_text.GetValue(), flags)
                 elif self.regex_mode == rumcore.BRE_MODE:
                     test = bre.compile_search(self.m_regex_text.GetValue(), flags)
@@ -267,7 +293,12 @@ class RegexTestDialog(gui.RegexTestDialog):
             try:
                 rpattern = self.m_replace_text.GetValue()
                 if rpattern:
-                    if self.regex_mode == rumcore.REGEX_MODE:
+                    if self.regex_mode == rumcore.BREGEX_MODE:
+                        if self.m_format_replace_checkbox.GetValue():
+                            replace_test = lambda m, replace=rpattern: m.expandf(replace)
+                        else:
+                            replace_test = bregex.compile_replace(test, self.m_replace_text.GetValue())
+                    elif self.regex_mode == rumcore.REGEX_MODE:
                         replace_test = lambda m, replace=rpattern: self.regex_expand(m, replace)
                     elif self.regex_mode == rumcore.BRE_MODE:
                         replace_test = bre.compile_replace(test, self.m_replace_text.GetValue())

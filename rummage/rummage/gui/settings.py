@@ -105,7 +105,7 @@ class Settings(object):
         """Set regex support."""
 
         cls.reload_settings()
-        if value == rumcore.REGEX_MODE and not rumcore.REGEX_SUPPORT:
+        if value in rumcore.REGEX_MODES and not rumcore.REGEX_SUPPORT:
             value = rumcore.REGEX_MODE
         cls.settings["regex_mode"] = value
         cls.save_settings()
@@ -116,7 +116,7 @@ class Settings(object):
 
         cls.reload_settings()
         value = cls.settings.get('regex_mode', rumcore.RE_MODE)
-        if value == rumcore.REGEX_MODE and not rumcore.REGEX_SUPPORT:
+        if value in rumcore.REGEX_MODES and not rumcore.REGEX_SUPPORT:
             value = rumcore.RE_MODE
         return value
 

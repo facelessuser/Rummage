@@ -27,7 +27,7 @@ Licensed under MIT
 Copyright (c) 2011 - 2015 Isaac Muse <isaacmuse@gmail.com>
 """
 from __future__ import unicode_literals
-from . import backrefs as bre
+from . import bre
 import functools
 try:
     import regex
@@ -36,6 +36,40 @@ except Exception:
     REGEX_SUPPORT = False
 
 if REGEX_SUPPORT:
+    # Expose some common re flags and methods to
+    # save having to import re and backrefs libs
+    D = regex.D
+    DEBUG = regex.DEBUG
+    A = regex.A
+    ASCII = regex.ASCII
+    B = regex.B
+    BESTMATCH = regex.BESTMATCH
+    E = regex.E
+    ENHANCEMATCH = regex.ENHANCEMATCH
+    F = regex.F
+    FULLCASE = regex.FULLCASE
+    I = regex.I
+    IGNORECASE = regex.IGNORECASE
+    L = regex.L
+    LOCALE = regex.LOCALE
+    M = regex.M
+    MULTILINE = regex.MULTILINE
+    R = regex.R
+    REVERSE = regex.REVERSE
+    S = regex.S
+    DOTALL = regex.DOTALL
+    U = regex.U
+    UNICODE = regex.UNICODE
+    X = regex.X
+    VERBOSE = regex.VERBOSE
+    V0 = regex.V0
+    VERSION0 = regex.VERSION0
+    V1 = regex.V1
+    VERSION1 = regex.VERSION1
+    W = regex.W
+    WORD = regex.WORD
+    escape = regex.escape
+    purge = regex.purge
     REGEX_TYPE = type(regex.compile('', 0))
 
     class RegexReplaceTemplate(bre.ReplaceTemplate):
@@ -74,3 +108,38 @@ if REGEX_SUPPORT:
                 repl = RegexReplaceTemplate(pattern, repl)
             call = functools.partial(_apply_replace_backrefs, repl=repl)
         return call
+
+    compile_search = regex.compile
+
+    # Convenience methods like re has, but slower due to overhead on each call.
+    # It is recommended to use compile_search and compile_replace
+    def expand(m, repl):
+        """Expand the string using the replace pattern or function."""
+
+        return _apply_replace_backrefs(m, repl)
+
+    match = regex.match
+    fullmatch = regex.fullmatch
+    search = regex.search
+    subf = regex.subf
+    subfn = regex.subfn
+    split = regex.split
+    splititer = regex.splititer
+    findall = regex.findall
+    finditer = regex.finditer
+
+    def sub(pattern, repl, string, count=0, flags=0, pos=None, endpos=None, concurrent=None, **kwargs):
+        """Wrapper for sub."""
+
+        pattern = regex.compile(pattern, flags)
+        return regex.sub(
+            pattern, compile_replace(pattern, repl), string, count, flags, pos, endpos, concurrent, **kwargs
+        )
+
+    def subn(pattern, repl, string, count=0, flags=0, pos=None, endpos=None, concurrent=None, **kwargs):
+        """Wrapper for subn."""
+
+        pattern = regex.compile(pattern, flags)
+        return regex.subn(
+            pattern, compile_replace(pattern, repl), string, count, flags, pos, endpos, concurrent, **kwargs
+        )

@@ -56,12 +56,15 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
         self.m_history_label.SetLabel(RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
+        self.m_bregex_radio.SetValue(mode == rumcore.BREGEX_MODE)
         self.m_regex_radio.SetValue(mode == rumcore.REGEX_MODE)
         self.m_bre_radio.SetValue(mode == rumcore.BRE_MODE)
         self.m_re_radio.SetValue(mode == rumcore.RE_MODE)
         self.m_regex_ver_choice.SetSelection(Settings.get_regex_version())
         if Settings.is_regex_available():
             self.m_regex_radio.Enable(True)
+            self.m_bregex_radio.Enable(True)
+            self.m_regex_version_label.Enable(True)
             self.m_regex_ver_choice.Enable(True)
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
@@ -103,7 +106,9 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_language_label.SetLabel(_("Language (restart required)"))
         self.m_re_radio.SetLabel(_("Use re module"))
         self.m_bre_radio.SetLabel(_("Use re module with backrefs"))
-        self.m_regex_radio.SetLabel(_("Use experimental regex module"))
+        self.m_regex_radio.SetLabel(_("Use regex module"))
+        self.m_bregex_radio.SetLabel(_("Use regex module with backrefs"))
+        self.m_regex_version_label.SetLabel(_("Regex module version to use"))
         self.m_editor_button.SetLabel(_("change"))
         self.m_history_clear_button.SetLabel(_("Clear"))
         self.m_close_button.SetLabel(_("Close"))
@@ -176,13 +181,17 @@ class SettingsDialog(gui.SettingsDialog):
     def on_change_module(self, event):
         """Change the module."""
 
-        if self.m_regex_radio.GetValue():
+        if self.m_bregex_radio.GetValue():
+            mode = rumcore.BREGEX_MODE
+        elif self.m_regex_radio.GetValue():
             mode = rumcore.REGEX_MODE
         elif self.m_bre_radio.GetValue():
             mode = rumcore.BRE_MODE
         else:
             mode = rumcore.RE_MODE
         Settings.set_regex_mode(mode)
+
+    on_bregex_toggle = on_change_module
 
     on_regex_toggle = on_change_module
 

@@ -28,7 +28,7 @@ from datetime import datetime
 from .rummage import epoch_timestamp
 from .rummage import rumcore
 from .rummage import version
-from .rummage.rumcore import backrefs as bre
+from .rummage.rumcore.backrefs import bre, bregex
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 CLI_ENCODING = sys.getfilesystemencoding()
@@ -178,13 +178,16 @@ class RummageCli(object):
 
         flags = self.get_flags(args)
         if args.regex0 or args.regex1:
-            regex_mode = rumcore.REGEX_MODE
-        elif args.bre:
+            if args.backrefs:
+                regex_mode = rumcore.BREGEX_MODE
+            else:
+                regex_mode = rumcore.REGEX_MODE
+        elif args.backrefs:
             regex_mode = rumcore.BRE_MODE
         else:
             regex_mode = rumcore.RE_MODE
 
-        if args.re or args.bre or args.regex0 or args.regex1:
+        if args.re or args.backrefs or args.regex0 or args.regex1:
             if (
                 (args.pattern == "" and args.replace) or
                 self.validate_search_regex(args.pattern, flags, regex_mode)
@@ -247,7 +250,31 @@ class RummageCli(object):
     def validate_search_regex(self, search, search_flags, regex_mode):
         """Validate search regex."""
 
-        if regex_mode == rumcore.REGEX_MODE:
+        if regex_mode == rumcore.BREGEX_MODE:
+            flags = bregex.MULTILINE
+            if search_flags & rumcore.VERSION1:
+                flags |= bregex.VERSION1
+            else:
+                flags |= bregex.VERSION0
+                if flags & rumcore.FULLCASE:
+                    flags |= bregex.FULLCASE
+            if search_flags & rumcore.DOTALL:
+                flags |= bregex.DOTALL
+            if not search_flags & rumcore.IGNORECASE:
+                flags |= bregex.IGNORECASE
+            if search_flags & rumcore.UNICODE:
+                flags |= bregex.UNICODE
+            else:
+                flags |= bregex.ASCII
+            if search_flags & rumcore.BESTMATCH:
+                flags |= bregex.BESTMATCH
+            if search_flags & rumcore.ENHANCEMATCH:
+                flags |= bregex.ENHANCEMATCH
+            if search_flags & rumcore.WORD:
+                flags |= bregex.WORD
+            if search_flags & rumcore.REVERSE:
+                flags |= bregex.REVERSE
+        elif regex_mode == rumcore.REGEX_MODE:
             import regex
 
             flags = regex.MULTILINE
@@ -294,7 +321,11 @@ class RummageCli(object):
     def validate_regex(self, pattern, flags=0, regex_mode=rumcore.RE_MODE):
         """Validate regular expresion compiling."""
         try:
-            if regex_mode == rumcore.REGEX_MODE:
+            if regex_mode == rumcore.BREGEX_MODE:
+                if flags == 0:
+                    flags = bregex.ASCII
+                bregex.compile_search(pattern, flags)
+            elif regex_mode == rumcore.REGEX_MODE:
                 import regex
                 if flags == 0:
                     flags = regex.ASCII
@@ -523,11 +554,14 @@ def main():
     # Search and replace
     parser.add_argument(
         "--re", "-x", action="store_true", default=False,
-        help="Pattern is a regular expresiion for the Python 're'."
+        help="Pattern is a regular expression for the Python 're'."
     )
     parser.add_argument(
         "--bre", "-X", action="store_true", default=False,
-        help="Pattern is a regular expresiion for the Python 're' with backrefs wrapper."
+        help=(
+            "Pattern is a regular expression with backrefs applied.  if --regex0 or --regex1 is enabled, "
+            "backregs will be applied to the 'regex' module instead of the 're' module."
+        )
     )
     parser.add_argument(
         "--regex0", "-0", action="store_true", default=False,

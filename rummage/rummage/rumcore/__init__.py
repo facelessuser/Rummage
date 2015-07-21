@@ -32,15 +32,13 @@ from fnmatch import fnmatch
 from os.path import isdir, isfile, join, abspath, getsize
 from time import ctime
 from . import text_decode
-from . import backrefs as bre
+from .backrefs import bre, bregex
 from .file_times import getmtime, getctime
 from .file_hidden import is_hidden
 from collections import deque
-try:
+if bregex.REGEX_SUPPORT:
     import regex
-    REGEX_SUPPORT = True
-except Exception:
-    REGEX_SUPPORT = False
+REGEX_SUPPORT = bregex.REGEX_SUPPORT
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 
@@ -88,6 +86,9 @@ DIR_REGEX_MATCH = 0x100000   # Regex pattern for directories
 RE_MODE = 0
 BRE_MODE = 1
 REGEX_MODE = 2
+BREGEX_MODE = 3
+
+REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
 
 TRUNCATE_LENGTH = 120
 
@@ -195,7 +196,7 @@ def _bre_literal_pattern(pattern, rum_flags=0):
     flags = 0
     if rum_flags & IGNORECASE:
         flags |= bre.IGNORECASE
-    return bre.compile(bre.escape(pattern), flags)
+    return bre.compile_search(bre.escape(pattern), flags)
 
 if REGEX_SUPPORT:
     def _regex_pattern(pattern, rum_flags=0, binary=False):
@@ -236,6 +237,45 @@ if REGEX_SUPPORT:
         if rum_flags & IGNORECASE:
             flags |= regex.IGNORECASE
         return regex.compile(regex.escape(pattern), flags)
+
+    def _bregex_pattern(pattern, rum_flags=0, binary=False):
+        """Prepare regex search pattern flags for regex module."""
+
+        flags = 0
+
+        if rum_flags & VERSION1:
+            flags |= bregex.VERSION1
+        else:
+            flags |= bregex.VERSION0
+            if rum_flags & FULLCASE:
+                flags |= bregex.FULLCASE
+        if rum_flags & WORD:
+            flags |= bregex.WORD
+        if rum_flags & BESTMATCH:
+            flags |= bregex.BESTMATCH
+        if rum_flags & ENHANCEMATCH:
+            flags |= bregex.ENHANCEMATCH
+        if rum_flags & REVERSE:
+            flags |= bregex.REVERSE
+        if rum_flags & MULTILINE:
+            flags |= bregex.MULTILINE
+        if rum_flags & IGNORECASE:
+            flags |= bregex.IGNORECASE
+        if rum_flags & DOTALL:
+            flags |= bregex.DOTALL
+        if not binary and rum_flags & UNICODE:
+            flags |= bregex.UNICODE
+        else:
+            flags |= bregex.ASCII
+        return bregex.compile_search(pattern, flags)
+
+    def _bregex_literal_pattern(pattern, rum_flags=0):
+        """Prepare literal search pattern flags."""
+
+        flags = 0
+        if rum_flags & IGNORECASE:
+            flags |= bregex.IGNORECASE
+        return bregex.compile_search(bregex.escape(pattern), flags)
 
 
 class RummageException(Exception):
@@ -346,13 +386,13 @@ class _FileSearch(object):
     def __init__(self, args, file_obj, file_id, max_count, file_content, regex_mode=RE_MODE):
         """Init the file search object."""
 
-        if (regex_mode == REGEX_MODE and not REGEX_SUPPORT) or (RE_MODE > regex_mode > REGEX_MODE):
+        if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
         self.flags = args.flags
         self.boolean = bool(args.boolean)
         self.count_only = bool(args.count_only)
-        self.regex_format_replace = self.regex_mode == REGEX_MODE and bool(args.flags & FORMATREPLACE)
+        self.regex_format_replace = self.regex_mode in REGEX_MODES and bool(args.flags & FORMATREPLACE)
         self.truncate_lines = args.truncate_lines
         self.backup = args.backup
         self.backup_ext = '.%s' % args.backup_ext
@@ -458,7 +498,7 @@ class _FileSearch(object):
             # Decrement the column if we are at a line's end with one of these.
             # We will verify any line to account for mixed line endings.
             if (
-                line_map and m.start() != len(content) and m.start() == line_map[idx] and
+                line_map and idx < len(line_map) and m.start() == line_map[idx] and
                 m.start() != 0 and content[m.start() - 1: m.start() + 1] == win_end
             ):
                 col -= 1
@@ -585,14 +625,20 @@ class _FileSearch(object):
 
         if pattern is not None:
             if bool(self.flags & LITERAL):
-                if self.regex_mode == REGEX_MODE:
+                if self.regex_mode == BREGEX_MODE:
+                    pattern = _bregex_literal_pattern(pattern, self.flags)
+                elif self.regex_mode == REGEX_MODE:
                     pattern = _regex_literal_pattern(pattern, self.flags)
                 elif self.regex_mode == BRE_MODE:
                     pattern = _bre_literal_pattern(pattern, self.flags)
                 else:
                     pattern = _re_literal_pattern(pattern, self.flags)
             else:
-                if self.regex_mode == REGEX_MODE:
+                if self.regex_mode == BREGEX_MODE:
+                    pattern = _bregex_pattern(pattern, self.flags, self.is_binary)
+                    if replace is not None and not bool(self.flags & FORMATREPLACE):
+                        self.expand = bregex.compile_replace(pattern, self.replace)
+                elif self.regex_mode == REGEX_MODE:
                     pattern = _regex_pattern(pattern, self.flags, self.is_binary)
                 elif self.regex_mode == BRE_MODE:
                     pattern = _bre_pattern(pattern, self.flags, self.is_binary)
@@ -606,6 +652,7 @@ class _FileSearch(object):
             for m in pattern.finditer(file_content):
                 yield m
                 if self.kill:
+                    print('--=kill=--')
                     break
 
     def _update_file(self, file_name, content, encoding):
@@ -910,7 +957,7 @@ class _DirWalker(object):
     ):
         """Init the directory walker object."""
 
-        if (regex_mode == REGEX_MODE and not REGEX_SUPPORT) or (RE_MODE > regex_mode > REGEX_MODE):
+        if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
         self.dir = directory
@@ -1145,7 +1192,7 @@ class Rummage(object):
             _PROCESS = self
 
         self.alive = False
-        if (regex_mode == REGEX_MODE and not REGEX_SUPPORT) or (RE_MODE > regex_mode > REGEX_MODE):
+        if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
         self.search_params = SearchParams()
@@ -1260,7 +1307,11 @@ class Rummage(object):
 
         pattern = None
         if folder_exclude is not None:
-            if self.regex_mode == REGEX_MODE:
+            if self.regex_mode == BREGEX_MODE:
+                pattern = bregex.compile_search(
+                    folder_exclude, bregex.IGNORECASE
+                ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
+            elif self.regex_mode == REGEX_MODE:
                 pattern = regex.compile(
                     folder_exclude, regex.IGNORECASE | regex.ASCII
                 ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
@@ -1279,7 +1330,11 @@ class Rummage(object):
 
         pattern = None
         if file_pattern is not None:
-            if self.regex_mode == REGEX_MODE:
+            if self.regex_mode == BREGEX_MODE:
+                pattern = bregex.compile_search(
+                    file_pattern, bregex.IGNORECASE
+                ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
+            elif self.regex_mode == REGEX_MODE:
                 pattern = regex.compile(
                     file_pattern, regex.IGNORECASE | regex.ASCII
                 ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
