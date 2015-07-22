@@ -94,7 +94,7 @@ class RummageFrame ( wx.Frame ):
 		
 		fgSizer6.Add( fgSizer8, 1, wx.EXPAND, 5 )
 		
-		fgSizer9 = wx.FlexGridSizer( 3, 3, 0, 0 )
+		fgSizer9 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		fgSizer9.AddGrowableCol( 0 )
 		fgSizer9.AddGrowableCol( 2 )
 		fgSizer9.SetFlexibleDirection( wx.BOTH )
@@ -103,36 +103,70 @@ class RummageFrame ( wx.Frame ):
 		
 		fgSizer9.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		fgSizer37 = wx.FlexGridSizer( 0, 4, 0, 0 )
-		fgSizer37.SetFlexibleDirection( wx.BOTH )
-		fgSizer37.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		gbSizer2 = wx.GridBagSizer( 0, 0 )
+		gbSizer2.SetFlexibleDirection( wx.BOTH )
+		gbSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		gbSizer2.SetEmptyCellSize( wx.Size( -1,0 ) )
 		
 		self.m_regex_search_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Search with regex", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_regex_search_checkbox.SetValue(True) 
-		fgSizer37.Add( self.m_regex_search_checkbox, 0, wx.ALL, 5 )
+		gbSizer2.Add( self.m_regex_search_checkbox, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_case_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Search case-sensitive", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer37.Add( self.m_case_checkbox, 0, wx.ALL, 5 )
+		gbSizer2.Add( self.m_case_checkbox, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_dotmatch_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Dot matches newline", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer37.Add( self.m_dotmatch_checkbox, 0, wx.ALL, 5 )
+		gbSizer2.Add( self.m_dotmatch_checkbox, wx.GBPosition( 0, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_unicode_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Use Unicode properties", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer37.Add( self.m_unicode_checkbox, 0, wx.ALL, 5 )
+		gbSizer2.Add( self.m_unicode_checkbox, wx.GBPosition( 0, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_bestmatch_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Best fuzzy match", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_bestmatch_checkbox.Hide()
+		
+		gbSizer2.Add( self.m_bestmatch_checkbox, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_enhancematch_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Improve fuzzy fit", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_enhancematch_checkbox.Hide()
+		
+		gbSizer2.Add( self.m_enhancematch_checkbox, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_word_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Unicode word breaks", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_word_checkbox.Hide()
+		
+		gbSizer2.Add( self.m_word_checkbox, wx.GBPosition( 1, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_reverse_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Search backwards", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_reverse_checkbox.Hide()
+		
+		gbSizer2.Add( self.m_reverse_checkbox, wx.GBPosition( 1, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_format_replace_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_format_replace_checkbox.Hide()
+		
+		gbSizer2.Add( self.m_format_replace_checkbox, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_fullcase_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Full case-folding", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_fullcase_checkbox.Hide()
+		
+		gbSizer2.Add( self.m_fullcase_checkbox, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_staticline11 = wx.StaticLine( self.m_search_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		gbSizer2.Add( self.m_staticline11, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 4 ), wx.EXPAND |wx.ALL, 5 )
 		
 		self.m_boolean_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Boolean match", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer37.Add( self.m_boolean_checkbox, 0, wx.ALL, 5 )
+		gbSizer2.Add( self.m_boolean_checkbox, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_count_only_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Count only", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer37.Add( self.m_count_only_checkbox, 0, wx.ALL, 5 )
+		gbSizer2.Add( self.m_count_only_checkbox, wx.GBPosition( 4, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_backup_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Create backups", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_backup_checkbox.SetValue(True) 
-		fgSizer37.Add( self.m_backup_checkbox, 0, wx.ALL, 5 )
+		gbSizer2.Add( self.m_backup_checkbox, wx.GBPosition( 4, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		fgSizer40 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer40.SetFlexibleDirection( wx.BOTH )
-		fgSizer40.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		fgSizer40.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_NONE )
 		
 		self.m_force_encode_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Force", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer40.Add( self.m_force_encode_checkbox, 0, wx.ALL, 5 )
@@ -143,40 +177,10 @@ class RummageFrame ( wx.Frame ):
 		fgSizer40.Add( self.m_force_encode_choice, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
-		fgSizer37.Add( fgSizer40, 1, wx.EXPAND, 5 )
-		
-		self.m_bestmatch_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Best fuzzy match", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_bestmatch_checkbox.Hide()
-		
-		fgSizer37.Add( self.m_bestmatch_checkbox, 0, wx.ALL, 5 )
-		
-		self.m_enhancematch_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Improve fuzzy fit", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_enhancematch_checkbox.Hide()
-		
-		fgSizer37.Add( self.m_enhancematch_checkbox, 0, wx.ALL, 5 )
-		
-		self.m_word_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Unicode word breaks", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_word_checkbox.Hide()
-		
-		fgSizer37.Add( self.m_word_checkbox, 0, wx.ALL, 5 )
-		
-		self.m_reverse_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Search backwards", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_reverse_checkbox.Hide()
-		
-		fgSizer37.Add( self.m_reverse_checkbox, 0, wx.ALL, 5 )
-		
-		self.m_format_replace_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_format_replace_checkbox.Hide()
-		
-		fgSizer37.Add( self.m_format_replace_checkbox, 0, wx.ALL, 5 )
-		
-		self.m_fullcase_checkbox = wx.CheckBox( self.m_search_panel, wx.ID_ANY, u"Full case-folding", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_fullcase_checkbox.Hide()
-		
-		fgSizer37.Add( self.m_fullcase_checkbox, 0, wx.ALL, 5 )
+		gbSizer2.Add( fgSizer40, wx.GBPosition( 4, 3 ), wx.GBSpan( 1, 1 ), wx.EXPAND, 5 )
 		
 		
-		fgSizer9.Add( fgSizer37, 1, wx.EXPAND, 5 )
+		fgSizer9.Add( gbSizer2, 1, wx.EXPAND, 5 )
 		
 		
 		fgSizer9.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
@@ -919,7 +923,7 @@ class LoadSearchDialog ( wx.Dialog ):
 class SettingsDialog ( wx.Dialog ):
 	
 	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Preferences", pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Preferences", pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
