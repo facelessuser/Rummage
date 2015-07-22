@@ -655,26 +655,28 @@ class SearchTemplate(object):
         self._nl = tokens[_NL]
         self._hashtag = tokens[_HASHTAG]
         self.search = search
-        self.groups = self.find_char_groups(search)
-        self.verbose, self.unicode = self.find_flags(search, re_verbose, re_unicode)
+        self.groups, quotes = self.find_char_groups(search)
+        self.verbose, self.unicode = self.find_flags(search, quotes, re_verbose, re_unicode)
         if self.verbose:
             self._verbose_tokens = tokens[_VERBOSE_TOKENS]
         else:
             self._verbose_tokens = tuple()
         self.extended = []
 
-    def find_flags(self, s, re_verbose, re_unicode):
+    def find_flags(self, s, quotes, re_verbose, re_unicode):
         """Find verbose and unicode flags."""
 
         new = []
         start = 0
         verbose_flag = re_verbose
         unicode_flag = re_unicode
+        avoid = quotes + self.groups
+        avoid.sort()
         if unicode_flag and verbose_flag:
             return bool(verbose_flag), bool(unicode_flag)
-        for g in self.groups:
-            new.append(s[start:g[0] + 1])
-            start = g[1]
+        for a in avoid:
+            new.append(s[start:a[0] + 1])
+            start = a[1]
         new.append(s[start:])
         for m in self._re_flags.finditer(self._empty.join(new)):
             if m.group(2):
@@ -691,14 +693,27 @@ class SearchTemplate(object):
 
         pos = 0
         groups = []
+        quotes = []
+        quote_found = False
+        quote_start = 0
         escaped = False
         found = False
         first = None
         for c in iterstring(s):
             if c == self._b_slash:
                 escaped = not escaped
+            elif escaped and not found and not quote_found and c == self._quote:
+                quote_found = True
+                quote_start = pos - 1
+                escaped = False
+            elif escaped and not found and quote_found and c == self._end:
+                quotes.append((quote_start, pos))
+                quote_found = False
+                escaped = False
             elif escaped:
                 escaped = False
+            elif quote_found:
+                pass
             elif c == self._ls_bracket and not found:
                 found = True
                 first = pos
@@ -708,7 +723,9 @@ class SearchTemplate(object):
                 groups.append((first, pos))
                 found = False
             pos += 1
-        return groups
+        if quote_found:
+            quotes.append((quote_start, pos - 1))
+        return groups, quotes
 
     def unicode_props(self, props, in_group, negate=False):
         """Insert unicode properties."""

@@ -376,6 +376,30 @@ class TestSearchTemplate(unittest.TestCase):
             '''
         )
 
+    def test_verbose_string_in_quote(self):
+        """Test verbose string flag (?x) in quote."""
+
+        pattern = bre.compile_search(
+            r'''
+            This is not a # \Qcomment(?x)\E
+            This is not a \# \Qcomment\E
+            This is not a [#\ ] \Qcomment\E
+            This is not a [\#] \Qcomment\E
+            This\ is\ not a # \Qcomment\E
+            '''
+        )
+
+        self.assertEqual(
+            pattern.pattern,
+            r'''
+            This is not a # comment\(\?x\)
+            This is not a \# comment
+            This is not a [#\ ] comment
+            This is not a [\#] comment
+            This\ is\ not a # comment
+            '''
+        )
+
     def test_detect_complex_verbose_string_flag(self):
         """Test complex verbose string flag (?x)."""
 
