@@ -146,7 +146,7 @@ if REGEX_SUPPORT:
         def __init__(self, string, verbose):
             """Initialize."""
 
-            if isinstance(bre.string, bre.binary_type):
+            if isinstance(string, bre.binary_type):
                 tokens = bre.btokens
                 local_tokens = btokens
             else:
@@ -194,14 +194,14 @@ if REGEX_SUPPORT:
             self.current = char
             return self.current
 
-    class SearchTemplate(object):
+    class RegexSearchTemplate(object):
 
         """Search Template."""
 
         def __init__(self, search, re_verbose=False, re_version=0):
             """Initialize."""
 
-            if isinstance(bre.search, bre.binary_type):
+            if isinstance(search, bre.binary_type):
                 self.binary = True
                 tokens = bre.btokens
                 local_tokens = btokens
@@ -226,33 +226,35 @@ if REGEX_SUPPORT:
             self._V1 = local_tokens[_V1]
             self.search = search
             if regex.DEFAULT_VERSION == V0:
-                self.groups = self.find_char_groups_v0(search)
+                self.groups, quotes = self.find_char_groups_v0(search)
             else:
-                self.groups = self.find_char_groups_v1(search)
-            self.verbose, self.version = self.find_flags(search, re_verbose, re_version)
+                self.groups, quotes = self.find_char_groups_v1(search)
+            self.verbose, self.version = self.find_flags(search, quotes, re_verbose, re_version)
             if self.version != regex.DEFAULT_VERSION:
                 if self.version == V0:
-                    self.groups = self.find_char_groups_v0(search)
+                    self.groups = self.find_char_groups_v0(search)[0]
                 else:
-                    self.groups = self.find_char_groups_v1(search)
+                    self.groups = self.find_char_groups_v1(search)[0]
             if self.verbose:
                 self._verbose_tokens = tokens[bre._VERBOSE_TOKENS]
             else:
                 self._verbose_tokens = tuple()
             self.extended = []
 
-        def find_flags(self, s, re_verbose, re_version):
+        def find_flags(self, s, quotes, re_verbose, re_version):
             """Find verbose and unicode flags."""
 
             new = []
             start = 0
             verbose_flag = re_verbose
             version_flag = re_version
+            avoid = quotes + self.groups
+            avoid.sort()
             if version_flag and verbose_flag:
                 return bool(verbose_flag), version_flag
-            for g in self.groups:
-                new.append(s[start:g[0] + 1])
-                start = g[1]
+            for a in avoid:
+                new.append(s[start:a[0] + 1])
+                start = a[1]
             new.append(s[start:])
             for m in self._regex_flags.finditer(self._empty.join(new)):
                 if m.group(2):
@@ -271,14 +273,27 @@ if REGEX_SUPPORT:
 
             pos = 0
             groups = []
+            quotes = []
+            quote_found = False
+            quote_start = 0
             escaped = False
             found = False
             first = None
             for c in bre.iterstring(s):
                 if c == self._b_slash:
                     escaped = not escaped
+                elif escaped and not found and not quote_found and c == self._quote:
+                    quote_found = True
+                    quote_start = pos - 1
+                    escaped = False
+                elif escaped and not found and quote_found and c == self._end:
+                    quotes.append((quote_start, pos))
+                    quote_found = False
+                    escaped = False
                 elif escaped:
                     escaped = False
+                elif quote_found:
+                    pass
                 elif c == self._ls_bracket and not found:
                     found = True
                     first = pos
@@ -288,13 +303,18 @@ if REGEX_SUPPORT:
                     groups.append((first, pos))
                     found = False
                 pos += 1
-            return groups
+            if quote_found:
+                quotes.append((quote_start, pos - 1))
+            return groups, quotes
 
         def find_char_groups_v1(self, s):
             """Find character groups."""
 
             pos = 0
             groups = []
+            quotes = []
+            quote_found = False
+            quote_start = 0
             escaped = False
             found = 0
             first = None
@@ -303,9 +323,19 @@ if REGEX_SUPPORT:
                 if c == self._b_slash:
                     # Next char is escaped
                     escaped = not escaped
+                elif escaped and found == 0 and not quote_found and c == self._quote:
+                    quote_found = True
+                    quote_start = pos - 1
+                    escaped = False
+                elif escaped and found == 0 and quote_found and c == self._end:
+                    quotes.append((quote_start, pos))
+                    quote_found = False
+                    escaped = False
                 elif escaped:
                     # Escaped handled
                     escaped = False
+                elif quote_found:
+                    pass
                 elif c == self._ls_bracket and not found:
                     # Start of first char set found
                     found += 1
@@ -328,7 +358,9 @@ if REGEX_SUPPORT:
                     # Sub char set closed; decrement depth counter
                     found -= 1
                 pos += 1
-            return groups
+            if quote_found:
+                quotes.append((quote_start, pos - 1))
+            return groups, quotes
 
         def comments(self, i):
             """Handle comments in verbose patterns."""
@@ -424,6 +456,26 @@ if REGEX_SUPPORT:
             elif isinstance(repl, (bre.string_type, bre.binary_type)):
                 return bre.ReplaceTemplateExpander(m, RegexReplaceTemplate(m.re, repl)).expand()
 
+    def _apply_search_backrefs(pattern, flags=0):
+        """Apply the search backrefs to the search pattern."""
+
+        if isinstance(pattern, (bre.string_type, bre.binary_type)):
+            re_verbose = VERBOSE & flags
+            if flags & V0:
+                re_version = V0
+            elif flags & V1:
+                re_version = V1
+            else:
+                re_version = 0
+            pattern = RegexSearchTemplate(pattern, re_verbose, re_version).apply()
+
+        return pattern
+
+    def compile_search(pattern, flags=0, **kwargs):
+        """Compile with extended search references."""
+
+        return regex.compile(_apply_search_backrefs(pattern, flags), flags, **kwargs)
+
     def compile_replace(pattern, repl):
         """Construct a method that can be used as a replace method for sub, subn, etc."""
 
@@ -434,8 +486,6 @@ if REGEX_SUPPORT:
             call = functools.partial(_apply_replace_backrefs, repl=repl)
         return call
 
-    compile_search = regex.compile
-
     # Convenience methods like re has, but slower due to overhead on each call.
     # It is recommended to use compile_search and compile_replace
     def expand(m, repl):
@@ -443,9 +493,6 @@ if REGEX_SUPPORT:
 
         return _apply_replace_backrefs(m, repl)
 
-    match = regex.match
-    fullmatch = regex.fullmatch
-    search = regex.search
     subf = regex.subf
     subfn = regex.subfn
     split = regex.split
@@ -453,18 +500,98 @@ if REGEX_SUPPORT:
     findall = regex.findall
     finditer = regex.finditer
 
+    def match(pattern, string, flags=0, pos=None, endpos=None, partial=False, concurrent=None, **kwargs):
+        """Wrapper for match."""
+
+        return regex.match(
+            _apply_search_backrefs(pattern, flags), string,
+            flags, pos, endpos, partial, concurrent, **kwargs
+        )
+
+    def fullmatch(pattern, string, flags=0, pos=None, endpos=None, partial=False, concurrent=None, **kwargs):
+        """Wrapper for fullmatch."""
+
+        return regex.fullmatch(
+            _apply_search_backrefs(pattern, flags), string,
+            flags, pos, endpos, partial, concurrent, **kwargs
+        )
+
+    def search(pattern, string, flags=0, pos=None, endpos=None, partial=False, concurrent=None, **kwargs):
+        """Wrapper for search."""
+
+        return regex.search(
+            _apply_search_backrefs(pattern, flags), string,
+            flags, pos, endpos, partial, concurrent, **kwargs
+        )
+
     def sub(pattern, repl, string, count=0, flags=0, pos=None, endpos=None, concurrent=None, **kwargs):
         """Wrapper for sub."""
 
-        pattern = regex.compile(pattern, flags)
+        pattern = compile_search(pattern, flags)
         return regex.sub(
-            pattern, compile_replace(pattern, repl), string, count, flags, pos, endpos, concurrent, **kwargs
+            pattern, compile_replace(pattern, repl), string,
+            count, flags, pos, endpos, concurrent, **kwargs
+        )
+
+    def subf(pattern, format, string, count=0, flags=0, pos=None, endpos=None, concurrent=None, **kwargs):
+        """Wrapper for subf."""
+
+        return regex.subf(
+            _apply_search_backrefs(pattern, flags), format, string,
+            count, flags, pos, endpos, concurrent, kwargs
         )
 
     def subn(pattern, repl, string, count=0, flags=0, pos=None, endpos=None, concurrent=None, **kwargs):
         """Wrapper for subn."""
 
-        pattern = regex.compile(pattern, flags)
+        pattern = compile_search(pattern, flags)
         return regex.subn(
-            pattern, compile_replace(pattern, repl), string, count, flags, pos, endpos, concurrent, **kwargs
+            pattern, compile_replace(pattern, repl), string,
+            count, flags, pos, endpos, concurrent, **kwargs
+        )
+
+    def subfn(pattern, format, string, count=0, flags=0, pos=None, endpos=None, concurrent=None, **kwargs):
+        """Wrapper for subfn."""
+
+        return regex.subfn(
+            _apply_search_backrefs(pattern, flags), format, string,
+            count, flags, pos, endpos, concurrent, **kwargs
+        )
+
+    def split(pattern, string, maxsplit=0, flags=0, concurrent=None, **kwargs):
+        """Wrapper for split."""
+
+        return regex.split(
+            _apply_search_backrefs(pattern, flags), string,
+            maxsplit, flags, concurrent, **kwargs
+        )
+
+    def splititer(pattern, string, maxsplit=0, flags=0, concurrent=None, **kwargs):
+        """Wrapper for splititer."""
+
+        return regex.splititer(
+            _apply_search_backrefs(pattern, flags), string,
+            maxsplit, flags, concurrent, **kwargs
+        )
+
+    def findall(
+        pattern, string, flags=0, pos=None, endpos=None, overlapped=False,
+        concurrent=None, **kwargs
+    ):
+        """Wrapper for findall."""
+
+        return regex.findall(
+            _apply_search_backrefs(pattern, flags), string,
+            flags, pos, endpos, overlapped, concurrent, **kwargs
+        )
+
+    def finditer(
+        pattern, string, flags=0, pos=None, endpos=None, overlapped=False,
+        partial=False, concurrent=None, **kwargs
+    ):
+        """Wrapper for finditer."""
+
+        return regex.finditer(
+            _apply_search_backrefs(pattern, flags), string,
+            flags, pos, endpos, overlapped, partial, concurrent, **kwargs
         )
