@@ -75,19 +75,12 @@ if REGEX_SUPPORT:
     purge = regex.purge
     REGEX_TYPE = type(regex.compile('', 0))
 
-    _DEF_BACK_REF = 0
-    _REGEX_FLAGS = 1
-    _REGEX_SEARCH_REF = 2
-    _REGEX_SEARCH_REF_VERBOSE = 3
-    _V0 = 4
-    _V1 = 5
-
-    utokens = [
-        set("abfnrtvAbBdDsSwWZuxgmM"),      # _DEF_BACK_REF
-        re.compile(                       # _REGEX_FLAGS
+    utokens = {
+        "def_back_ref": set("abfnrtvAbBdDsSwWZuxgmM"),
+        "regex_flags": re.compile(
             r'(?s)(\\.)|\(\?((?:[Laberux]|V0|V1|-?[imsfw])+)[):]|(.)'
         ),
-        re.compile(                       # _REGEX_SEARCH_REF
+        "regex_search_ref": re.compile(
             r'''(?x)
             (\\)+
             (
@@ -98,7 +91,7 @@ if REGEX_SUPPORT:
             )
             '''
         ),
-        re.compile(                       # _REGEX_SEARCH_REF_VERBOSE
+        "regex_search_ref_verbose": re.compile(
             r'''(?x)
             (\\)+
             (
@@ -109,12 +102,12 @@ if REGEX_SUPPORT:
             )
             '''
         ),
-        'V0',                             # _V0
-        'V1'                              # _V1
-    ]
+        "v0": 'V0',
+        "v1": 'V1'
+    }
 
-    btokens = [
-        set(                              # _DEF_BACK_REF
+    btokens = {
+        "def_back_ref": set(
             [
                 b"a", b"b", b"f", b"n", b"r",
                 b"t", b"v", b"A", b"b", b"B",
@@ -123,10 +116,10 @@ if REGEX_SUPPORT:
                 b"m", b"M"
             ]
         ),
-        re.compile(                       # _REGEX_FLAGS
+        "regex_flags": re.compile(
             br'(?s)(\\.)|\(\?((?:[Laberux]|V0|V1|-?[imsfw])+)[):]|(.)'
         ),
-        re.compile(                       # _REGEX_SEARCH_REF
+        "regex_search_ref": re.compile(
             br'''(?x)
             (\\)+
             (
@@ -137,7 +130,7 @@ if REGEX_SUPPORT:
             )
             '''
         ),
-        re.compile(                       # _REGEX_SEARCH_REF_VERBOSE
+        "regex_search_ref_verbose": re.compile(
             br'''(?x)
             (\\)+
             (
@@ -148,9 +141,9 @@ if REGEX_SUPPORT:
             )
             '''
         ),
-        b'V0',                            # _V0
-        b'V1'                             # _V1
-    ]
+        "v0": b'V0',
+        "v1": b'V1'
+    }
 
     class RegexSearchTokens(compat.Tokens):
 
@@ -168,10 +161,10 @@ if REGEX_SUPPORT:
 
             self.string = string
             if verbose:
-                self._re_search_ref = tokens[_REGEX_SEARCH_REF_VERBOSE]
+                self._re_search_ref = tokens["regex_search_ref_verbose"]
             else:
-                self._re_search_ref = tokens[_REGEX_SEARCH_REF]
-            self._b_slash = ctokens[ctok.B_SLASH]
+                self._re_search_ref = tokens["regex_search_ref"]
+            self._b_slash = ctokens["b_slash"]
             self.max_index = len(string) - 1
             self.index = 0
             self.current = None
@@ -223,20 +216,20 @@ if REGEX_SUPPORT:
                 tokens = utokens
                 ctokens = ctok.utokens
 
-            self._verbose_flag = ctokens[ctok.VERBOSE_FLAG]
-            self._empty = ctokens[ctok.EMPTY]
-            self._b_slash = ctokens[ctok.B_SLASH]
-            self._ls_bracket = ctokens[ctok.LS_BRACKET]
-            self._rs_bracket = ctokens[ctok.RS_BRACKET]
-            self._esc_end = ctokens[ctok.ESC_END]
-            self._end = ctokens[ctok.END]
-            self._quote = ctokens[ctok.QUOTE]
-            self._negate = ctokens[ctok.NEGATE]
-            self._regex_flags = tokens[_REGEX_FLAGS]
-            self._nl = ctokens[ctok.NL]
-            self._hashtag = ctokens[ctok.HASHTAG]
-            self._V0 = tokens[_V0]
-            self._V1 = tokens[_V1]
+            self._verbose_flag = ctokens["verbose_flag"]
+            self._empty = ctokens["empty"]
+            self._b_slash = ctokens["b_slash"]
+            self._ls_bracket = ctokens["ls_bracket"]
+            self._rs_bracket = ctokens["rs_bracket"]
+            self._esc_end = ctokens["esc_end"]
+            self._end = ctokens["end"]
+            self._quote = ctokens["quote"]
+            self._negate = ctokens["negate"]
+            self._regex_flags = tokens["regex_flags"]
+            self._nl = ctokens["nl"]
+            self._hashtag = ctokens["hashtag"]
+            self._V0 = tokens["v0"]
+            self._V1 = tokens["v1"]
             self.search = search
             if regex.DEFAULT_VERSION == V0:
                 self.groups, quotes = self.find_char_groups_v0(search)
@@ -249,7 +242,7 @@ if REGEX_SUPPORT:
                 else:
                     self.groups = self.find_char_groups_v1(search)[0]
             if self.verbose:
-                self._verbose_tokens = ctokens[ctok.VERBOSE_TOKENS]
+                self._verbose_tokens = ctokens["verbose_tokens"]
             else:
                 self._verbose_tokens = tuple()
             self.extended = []
@@ -460,10 +453,10 @@ if REGEX_SUPPORT:
 
             self._original = template
             self._back_ref = set()
-            self._b_slash = ctokens[ctok.B_SLASH]
-            self._def_back_ref = tokens[_DEF_BACK_REF]
-            self._empty = ctokens[ctok.EMPTY]
-            self._add_back_references(ctokens[ctok.REPLACE_TOKENS])
+            self._b_slash = ctokens["b_slash"]
+            self._def_back_ref = tokens["def_back_ref"]
+            self._empty = ctokens["empty"]
+            self._add_back_references(ctokens["replace_tokens"])
             self._template = self._escape_template(template)
             self.parse_template(pattern)
 

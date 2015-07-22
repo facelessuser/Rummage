@@ -150,30 +150,16 @@ _UPROP = r'''
 \}
 '''
 
-# Reference indexes
-# Keep a list of unicode references and binary and index into them so
-# we don't have to translate the strings or waste time searching in a dict.
-_DEF_BACK_REF = 0
-_UNI_PROP = 1
-_INVERSE_UNI_PROP = 2
-_ASCII_LOW_PROPS = 3
-_ASCII_UPPER_PROPS = 4
-_NEGATIVE_LOWER = 5
-_NEGATIVE_UPPER = 6
-_RE_SEARCH_REF = 7
-_RE_SEARCH_REF_VERBOSE = 8
-_RE_FLAGS = 9
-
 # Unicode string related references
-utokens = (
-    set("abfnrtvAbBdDsSwWZuxg"),     # _DEF_BACK_REF
-    "p",                             # _UNI_PROP
-    "P",                             # _INVERSE_UNI_PROP
-    'a-z',                           # _ASCII_LOW_PROPS
-    'A-Z',                           # _ASCII_UPPER_PROPS
-    '\u0000-\u0060\u007b-\u007f',    # _NEGATIVE_LOWER
-    '\u0000-\u0040\u005b-\u007f',    # _NEGATIVE_UPPER
-    re.compile(                      # _RE_SEARCH_REF
+utokens = {
+    "def_back_ref": set("abfnrtvAbBdDsSwWZuxg"),
+    "uni_prop": "p",
+    "inverse_uni_prop": "P",
+    "ascii_low_props": 'a-z',
+    "ascii_upper_props": 'A-Z',
+    "negative_lower": '\u0000-\u0060\u007b-\u007f',
+    "negative_upper": '\u0000-\u0040\u005b-\u007f',
+    "re_search_ref": re.compile(
         r'''(?x)
         (\\)+
         (
@@ -186,7 +172,7 @@ utokens = (
         )
         ''' % {"uni_prop": _UPROP}
     ),
-    re.compile(                       # _RE_SEARCH_REF_VERBOSE
+    "re_search_ref_verbose": re.compile(
         r'''(?x)
         (\\)+
         (
@@ -199,14 +185,14 @@ utokens = (
         )
         ''' % {"uni_prop": _UPROP}
     ),
-    re.compile(                       # _RE_FLAGS
+    "re_flags": re.compile(
         r'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
     )
-)
+}
 
 # Byte string related references
-btokens = (
-    set(                             # _DEF_BACK_REF
+btokens = {
+    "def_back_ref": set(
         [
             b"a", b"b", b"f", b"n", b"r",
             b"t", b"v", b"A", b"b", b"B",
@@ -214,13 +200,13 @@ btokens = (
             b"W", b"Z", b"u", b"x", b"g"
         ]
     ),
-    b"p",                             # _UNI_PROP
-    b"P",                             # _INVERSE_UNI_PROP
-    b'a-z',                           # _ASCII_LOW_PROPS
-    b'A-Z',                           # _ASCII_UPPER_PROPS
-    b'\x00-\x60\x7b-\x7f',            # _NEGATIVE_LOWER
-    b'\x00-\x40\x5b-\x7f',            # _NEGATIVE_UPPER
-    re.compile(                       # _RE_SEARCH_REF
+    "uni_prop": b"p",
+    "inverse_uni_prop": b"P",
+    "ascii_low_props": b'a-z',
+    "ascii_upper_props": b'A-Z',
+    "negative_lower": b'\x00-\x60\x7b-\x7f',
+    "negative_upper": b'\x00-\x40\x5b-\x7f',
+    "re_search_ref": re.compile(
         br'''(?x)
         (\\)+
         (
@@ -231,7 +217,7 @@ btokens = (
         )
         '''
     ),
-    re.compile(                       # _RE_SEARCH_REF_VERBOSE
+    "re_search_ref_verbose": re.compile(
         br'''(?x)
         (\\)+
         (
@@ -242,10 +228,10 @@ btokens = (
         )
         '''
     ),
-    re.compile(                        # _RE_FLAGS
+    "re_flags": re.compile(
         br'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
     )
-)
+}
 
 
 def _get_unicode_category(prop, negate=False):
@@ -275,8 +261,8 @@ class ReplaceTokens(compat.Tokens):
             ctokens = ctok.utokens
 
         self.string = string
-        self._b_slash = ctokens[ctok.B_SLASH]
-        self._re_replace_ref = ctokens[ctok.RE_REPLACE_REF]
+        self._b_slash = ctokens["b_slash"]
+        self._re_replace_ref = ctokens["re_replace_ref"]
         self.max_index = len(string) - 1
         self.index = 0
         self.last = 0
@@ -358,10 +344,10 @@ class SearchTokens(compat.Tokens):
 
         self.string = string
         if verbose:
-            self._re_search_ref = tokens[_RE_SEARCH_REF_VERBOSE]
+            self._re_search_ref = tokens["re_search_ref_verbose"]
         else:
-            self._re_search_ref = tokens[_RE_SEARCH_REF]
-        self._b_slash = ctokens[ctok.B_SLASH]
+            self._re_search_ref = tokens["re_search_ref"]
+        self._b_slash = ctokens["b_slash"]
         self.max_index = len(string) - 1
         self.index = 0
         self.current = None
@@ -422,10 +408,10 @@ class ReplaceTemplate(object):
 
         self._original = template
         self._back_ref = set()
-        self._def_back_ref = tokens[_DEF_BACK_REF]
-        self._b_slash = ctokens[ctok.B_SLASH]
-        self._empty = ctokens[ctok.EMPTY]
-        self._add_back_references(ctokens[ctok.REPLACE_TOKENS])
+        self._def_back_ref = tokens["def_back_ref"]
+        self._b_slash = ctokens["b_slash"]
+        self._empty = ctokens["empty"]
+        self._add_back_references(ctokens["replace_tokens"])
         self._template = self._escape_template(template)
         self.groups, self.literals = sre_parse.parse_template(self._template, pattern)
 
@@ -497,34 +483,34 @@ class SearchTemplate(object):
             tokens = utokens
             ctokens = ctok.utokens
 
-        self._verbose_flag = ctokens[ctok.VERBOSE_FLAG]
-        self._empty = ctokens[ctok.EMPTY]
-        self._b_slash = ctokens[ctok.B_SLASH]
-        self._ls_bracket = ctokens[ctok.LS_BRACKET]
-        self._rs_bracket = ctokens[ctok.RS_BRACKET]
-        self._unicode_flag = ctokens[ctok.UNICODE_FLAG]
-        self._esc_end = ctokens[ctok.ESC_END]
-        self._end = ctokens[ctok.END]
-        self._uni_prop = tokens[_UNI_PROP]
-        self._inverse_uni_prop = tokens[_INVERSE_UNI_PROP]
-        self._ascii_low_props = tokens[_ASCII_LOW_PROPS]
-        self._ascii_upper_props = tokens[_ASCII_UPPER_PROPS]
-        self._lc = ctokens[ctok.LC]
-        self._lc_span = ctokens[ctok.LC_SPAN]
-        self._uc = ctokens[ctok.UC]
-        self._uc_span = ctokens[ctok.UC_SPAN]
-        self._quote = ctokens[ctok.QUOTE]
-        self._negate = ctokens[ctok.NEGATE]
-        self._negative_upper = tokens[_NEGATIVE_UPPER]
-        self._negative_lower = tokens[_NEGATIVE_LOWER]
-        self._re_flags = tokens[_RE_FLAGS]
-        self._nl = ctokens[ctok.NL]
-        self._hashtag = ctokens[ctok.HASHTAG]
+        self._verbose_flag = ctokens["verbose_flag"]
+        self._empty = ctokens["empty"]
+        self._b_slash = ctokens["b_slash"]
+        self._ls_bracket = ctokens["ls_bracket"]
+        self._rs_bracket = ctokens["rs_bracket"]
+        self._unicode_flag = ctokens["unicode_flag"]
+        self._esc_end = ctokens["esc_end"]
+        self._end = ctokens["end"]
+        self._uni_prop = tokens["uni_prop"]
+        self._inverse_uni_prop = tokens["inverse_uni_prop"]
+        self._ascii_low_props = tokens["ascii_low_props"]
+        self._ascii_upper_props = tokens["ascii_upper_props"]
+        self._lc = ctokens["lc"]
+        self._lc_span = ctokens["lc_span"]
+        self._uc = ctokens["uc"]
+        self._uc_span = ctokens["uc_span"]
+        self._quote = ctokens["quote"]
+        self._negate = ctokens["negate"]
+        self._negative_upper = tokens["negative_upper"]
+        self._negative_lower = tokens["negative_lower"]
+        self._re_flags = tokens["re_flags"]
+        self._nl = ctokens["nl"]
+        self._hashtag = ctokens["hashtag"]
         self.search = search
         self.groups, quotes = self.find_char_groups(search)
         self.verbose, self.unicode = self.find_flags(search, quotes, re_verbose, re_unicode)
         if self.verbose:
-            self._verbose_tokens = ctokens[ctok.VERBOSE_TOKENS]
+            self._verbose_tokens = ctokens["verbose_tokens"]
         else:
             self._verbose_tokens = tuple()
         self.extended = []
@@ -732,12 +718,12 @@ class ReplaceTemplateExpander(object):
             ctokens = ctok.utokens
 
         self.template = template
-        self._esc_end = ctokens[ctok.ESC_END]
-        self._end = ctokens[ctok.END]
-        self._lc = ctokens[ctok.LC]
-        self._lc_span = ctokens[ctok.LC_SPAN]
-        self._uc = ctokens[ctok.UC]
-        self._uc_span = ctokens[ctok.UC_SPAN]
+        self._esc_end = ctokens["esc_end"]
+        self._end = ctokens["end"]
+        self._lc = ctokens["lc"]
+        self._lc_span = ctokens["lc_span"]
+        self._uc = ctokens["uc"]
+        self._uc_span = ctokens["uc_span"]
         self.index = -1
         self.end_found = False
         self.parent_span = []

@@ -6,47 +6,26 @@ Copyright (c) 2011 - 2015 Isaac Muse <isaacmuse@gmail.com>
 """
 import re
 
-REPLACE_TOKENS = 0
-VERBOSE_TOKENS = 1
-EMPTY = 2
-LS_BRACKET = 3
-RS_BRACKET = 4
-B_SLASH = 5
-ESC_END = 6
-END = 7
-QUOTE = 8
-LC = 9
-LC_SPAN = 10
-UC = 11
-UC_SPAN = 12
-HASHTAG = 13
-NL = 14
-NEGATE = 15
-VERBOSE_FLAG = 16
-RE_REPLACE_REF = 17
-UNICODE_FLAG = 18
-
-
 # Unicode string related references
-utokens = (
-    set("cCElL"),                    # REPLACE_TOKENS
-    set("# "),                       # VERBOSE_TOKENS
-    "",                              # EMPTY
-    "[",                             # LS_BRACKET
-    "]",                             # RS_BRACKET
-    "\\",                            # B_SLASH
-    "\\E",                           # ESC_END
-    "E",                             # END
-    "Q",                             # QUOTE
-    "l",                             # LC
-    "L",                             # LC_SPAN
-    "c",                             # UC
-    "C",                             # UC_SPAN
-    '#',                             # HASHTAG
-    '\n',                            # NL
-    '^',                             # NEGATE
-    'x',                             # VERBOSE_FLAG
-    re.compile(                      # RE_REPLACE_REF
+utokens = {
+    "replace_tokens": set("cCElL"),
+    "verbose_tokens": set("# "),
+    "empty": "",
+    "ls_bracket": "[",
+    "rs_bracket": "]",
+    "b_slash": "\\",
+    "esc_end": "\\E",
+    "end": "E",
+    "quote": "Q",
+    "lc": "l",
+    "lc_span": "L",
+    "uc": "c",
+    "uc_span": "C",
+    "hashtag": '#',
+    "nl": '\n',
+    "negate": '^',
+    "verbose_flag": 'x',
+    "re_replace_ref": re.compile(
         r'''(?x)
         (\\)+
         (
@@ -57,31 +36,31 @@ utokens = (
         )
         '''
     ),
-    'u'                               # UNICODE_FLAG
-)
+    "unicode_flag": 'u'
+}
 
 # Byte string related references
-btokens = (
-    set(                              # REPLACE_TOKENS
+btokens = {
+    "replace_tokens": set(
         [b"c", b"C", b"E", b"l", b"L"]
     ),
-    set([b"#", b" "]),                # VERBOSE_TOKENS
-    b"",                              # EMPTY
-    b"[",                             # LS_BRACKET
-    b"]",                             # RS_BRACKET
-    b"\\",                            # B_SLASH
-    b"\\E",                           # ESC_END
-    b"E",                             # END
-    b"Q",                             # QUOTE
-    b"l",                             # LC
-    b"L",                             # LC_SPAN
-    b"c",                             # UC
-    b"C",                             # UC_SPAN
-    b'#',                             # HASHTAG
-    b'\n',                            # NL
-    b'^',                             # NEGATE
-    b'x',                             # VERBOSE_FLAG
-    re.compile(                       # RE_REPLACE_REF
+    "verbose_tokens": set([b"#", b" "]),
+    "empty": b"",
+    "ls_bracket": b"[",
+    "rs_bracket": b"]",
+    "b_slash": b"\\",
+    "esc_end": b"\\E",
+    "end": b"E",
+    "quote": b"Q",
+    "lc": b"l",
+    "lc_span": b"L",
+    "uc": b"c",
+    "uc_span": b"C",
+    "hashtag": b'#',
+    "nl": b'\n',
+    "negate": b'^',
+    "verbose_flag": b'x',
+    "re_replace_ref": re.compile(
         br'''(?x)
         (\\)+
         (
@@ -92,8 +71,8 @@ btokens = (
         )
         '''
     ),
-    re.compile(                        # RE_FLAGS
+    "re_flags": re.compile(
         br'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
     ),
-    b'u'                               # UNICODE_FLAG
-)
+    "unicode_flag": b'u'
+}
