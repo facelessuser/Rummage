@@ -50,61 +50,9 @@ from __future__ import unicode_literals
 import sre_parse
 import functools
 import re
-import sys
+from . import common_tokens as ctok
+from . import compat
 from . import uniprops
-
-# Compatibility
-PY3 = (3, 0) <= sys.version_info < (4, 0)
-
-if PY3:
-    unichar = chr  # noqa
-    string_type = str  # noqa
-    binary_type = bytes  # noqa
-
-    def iterstring(string):
-        """Iterate through a string."""
-
-        if isinstance(string, binary_type):
-            for x in range(0, len(string)):
-                yield string[x:x + 1]
-        else:
-            for c in string:
-                yield c
-
-    class Tokens(object):
-
-        """Tokens base for PY3."""
-
-        def iternext(self):
-            """Common override method."""
-
-        def __next__(self):
-            """PY3 iterator compatible next."""
-
-            return self.iternext()
-
-else:
-    unichar = unichr  # noqa
-    string_type = basestring  # noqa
-    binary_type = str  # noqa
-
-    def iterstring(string):
-        """Iterate through a string."""
-
-        for c in string:
-            yield c
-
-    class Tokens(object):
-
-        """Tokens base for PY2."""
-
-        def iternext(self):
-            """Common override method."""
-
-        def next(self):
-            """PY2 iterator compatible next."""
-
-            return self.iternext()
 
 # Expose some common re flags and methods to
 # save having to import re and backrefs libs
@@ -206,64 +154,25 @@ _UPROP = r'''
 # Keep a list of unicode references and binary and index into them so
 # we don't have to translate the strings or waste time searching in a dict.
 _DEF_BACK_REF = 0
-_REPLACE_TOKENS = 1
-_SEARCH_TOKENS = 2  # Not Used
-_VERBOSE_TOKENS = 3
-_EMPTY = 4
-_LS_BRACKET = 5
-_RS_BRACKET = 6
-_B_SLASH = 7
-_ESC_END = 8
-_END = 9
-_QUOTE = 10
-_LC = 11
-_LC_SPAN = 12
-_UC = 13
-_UC_SPAN = 14
-_HASHTAG = 15
-_NL = 16
-_UNI_PROP = 17
-_INVERSE_UNI_PROP = 18
-_ASCII_LOW_PROPS = 19
-_ASCII_UPPER_PROPS = 20
-_NEGATIVE_LOWER = 21
-_NEGATIVE_UPPER = 22
-_NEGATE = 23
-_VERBOSE_FLAG = 24
-_RE_SEARCH_REF = 25
-_RE_SEARCH_REF_VERBOSE = 26
-_RE_REPLACE_REF = 27
-_RE_FLAGS = 28
-_LR_BRACKET = 29
-_UNICODE_FLAG = 30
+_UNI_PROP = 1
+_INVERSE_UNI_PROP = 2
+_ASCII_LOW_PROPS = 3
+_ASCII_UPPER_PROPS = 4
+_NEGATIVE_LOWER = 5
+_NEGATIVE_UPPER = 6
+_RE_SEARCH_REF = 7
+_RE_SEARCH_REF_VERBOSE = 8
+_RE_FLAGS = 9
 
 # Unicode string related references
 utokens = (
     set("abfnrtvAbBdDsSwWZuxg"),     # _DEF_BACK_REF
-    set("cCElL"),                    # _REPLACE_TOKENS
-    set("cCElLQ"),                   # _SEARCH_TOKENS
-    set("# "),                       # _VERBOSE_TOKENS
-    "",                              # _EMPTY
-    "[",                             # _LS_BRACKET
-    "]",                             # _RS_BRACKET
-    "\\",                            # _B_SLASH
-    "\\E",                           # _ESC_END
-    "E",                             # _END
-    "Q",                             # _QUOTE
-    "l",                             # _LC
-    "L",                             # _LC_SPAN
-    "c",                             # _UC
-    "C",                             # _UC_SPAN
-    '#',                             # _HASHTAG
-    '\n',                            # _NL
     "p",                             # _UNI_PROP
     "P",                             # _INVERSE_UNI_PROP
     'a-z',                           # _ASCII_LOW_PROPS
     'A-Z',                           # _ASCII_UPPER_PROPS
     '\u0000-\u0060\u007b-\u007f',    # _NEGATIVE_LOWER
     '\u0000-\u0040\u005b-\u007f',    # _NEGATIVE_UPPER
-    '^',                             # _NEGATE
-    'x',                             # _VERBOSE_FLAG
     re.compile(                      # _RE_SEARCH_REF
         r'''(?x)
         (\\)+
@@ -290,22 +199,9 @@ utokens = (
         )
         ''' % {"uni_prop": _UPROP}
     ),
-    re.compile(                       # _RE_REPLACE_REF
-        r'''(?x)
-        (\\)+
-        (
-            [cClLE]
-        )? |
-        (
-            [cClLE]
-        )
-        '''
-    ),
     re.compile(                       # _RE_FLAGS
         r'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
-    ),
-    '(',                              # _LR_BRACKET
-    'u'                               # _UNICODE_FLAG
+    )
 )
 
 # Byte string related references
@@ -318,34 +214,12 @@ btokens = (
             b"W", b"Z", b"u", b"x", b"g"
         ]
     ),
-    set(                              # _REPLACE_TOKENS
-        [b"c", b"C", b"E", b"l", b"L"]
-    ),
-    set(                              # _SEARCH_TOKENS
-        [b"c", b"C", b"E", b"l", b"L", b"Q"]
-    ),
-    set([b"#", b" "]),                # _VERBOSE_TOKENS
-    b"",                              # _EMPTY
-    b"[",                             # _LS_BRACKET
-    b"]",                             # _RS_BRACKET
-    b"\\",                            # _B_SLASH
-    b"\\E",                           # _ESC_END
-    b"E",                             # _END
-    b"Q",                             # _QUOTE
-    b"l",                             # _LC
-    b"L",                             # _LC_SPAN
-    b"c",                             # _UC
-    b"C",                             # _UC_SPAN
-    b'#',                             # _HASHTAG
-    b'\n',                            # _NL
     b"p",                             # _UNI_PROP
     b"P",                             # _INVERSE_UNI_PROP
     b'a-z',                           # _ASCII_LOW_PROPS
     b'A-Z',                           # _ASCII_UPPER_PROPS
     b'\x00-\x60\x7b-\x7f',            # _NEGATIVE_LOWER
     b'\x00-\x40\x5b-\x7f',            # _NEGATIVE_UPPER
-    b'^',                             # _NEGATE
-    b'x',                             # _VERBOSE_FLAG
     re.compile(                       # _RE_SEARCH_REF
         br'''(?x)
         (\\)+
@@ -368,22 +242,9 @@ btokens = (
         )
         '''
     ),
-    re.compile(                       # _RE_REPLACE_REF
-        br'''(?x)
-        (\\)+
-        (
-            [cClLE]
-        )? |
-        (
-            [cClLE]
-        )
-        '''
-    ),
     re.compile(                        # _RE_FLAGS
         br'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
-    ),
-    b'(',                              # _LR_BRACKET
-    b'u'                               # _UNICODE_FLAG
+    )
 )
 
 
@@ -401,21 +262,21 @@ def _get_unicode_category(prop, negate=False):
 
 
 # Break apart template patterns into char tokens
-class ReplaceTokens(Tokens):
+class ReplaceTokens(compat.Tokens):
 
     """Tokens."""
 
     def __init__(self, string, boundaries):
         """Initialize."""
 
-        if isinstance(string, binary_type):
-            tokens = btokens
+        if isinstance(string, compat.binary_type):
+            ctokens = ctok.btokens
         else:
-            tokens = utokens
+            ctokens = ctok.utokens
 
         self.string = string
-        self._b_slash = tokens[_B_SLASH]
-        self._re_replace_ref = tokens[_RE_REPLACE_REF]
+        self._b_slash = ctokens[ctok.B_SLASH]
+        self._re_replace_ref = ctokens[ctok.RE_REPLACE_REF]
         self.max_index = len(string) - 1
         self.index = 0
         self.last = 0
@@ -481,25 +342,26 @@ class ReplaceTokens(Tokens):
         return self.current
 
 
-class SearchTokens(Tokens):
+class SearchTokens(compat.Tokens):
 
     """Tokens."""
 
     def __init__(self, string, verbose):
         """Initialize."""
 
-        if isinstance(string, binary_type):
+        if isinstance(string, compat.binary_type):
             tokens = btokens
+            ctokens = ctok.btokens
         else:
             tokens = utokens
+            ctokens = ctok.utokens
 
         self.string = string
         if verbose:
             self._re_search_ref = tokens[_RE_SEARCH_REF_VERBOSE]
         else:
             self._re_search_ref = tokens[_RE_SEARCH_REF]
-        self._lr_bracket = tokens[_LR_BRACKET]
-        self._b_slash = tokens[_B_SLASH]
+        self._b_slash = ctokens[ctok.B_SLASH]
         self.max_index = len(string) - 1
         self.index = 0
         self.current = None
@@ -544,24 +406,27 @@ class ReplaceTemplate(object):
     def __init__(self, pattern, template):
         """Initialize."""
 
-        if isinstance(template, binary_type):
+        self.setup_template(pattern, template)
+
+    def setup_template(self, pattern, template):
+        """Setup the template."""
+
+        if isinstance(template, compat.binary_type):
             self.binary = True
             tokens = btokens
+            ctokens = ctok.btokens
         else:
             self.binary = False
             tokens = utokens
+            ctokens = ctok.utokens
+
         self._original = template
         self._back_ref = set()
-        self._b_slash = tokens[_B_SLASH]
         self._def_back_ref = tokens[_DEF_BACK_REF]
-        self._empty = tokens[_EMPTY]
-        self._add_back_references(tokens[_REPLACE_TOKENS])
-        self._template = self.__escape_template(template)
-        self.parse_template(pattern)
-
-    def parse_template(self, pattern):
-        """Parse the replace template."""
-
+        self._b_slash = ctokens[ctok.B_SLASH]
+        self._empty = ctokens[ctok.EMPTY]
+        self._add_back_references(ctokens[ctok.REPLACE_TOKENS])
+        self._template = self._escape_template(template)
         self.groups, self.literals = sre_parse.parse_template(self._template, pattern)
 
     def get_base_template(self):
@@ -569,7 +434,7 @@ class ReplaceTemplate(object):
 
         return self._original
 
-    def __escape_template(self, template):
+    def _escape_template(self, template):
         """
         Escape backreferences.
 
@@ -579,7 +444,7 @@ class ReplaceTemplate(object):
 
         new_template = []
         slash_count = 0
-        for c in iterstring(template):
+        for c in compat.iterstring(template):
             if c == self._b_slash:
                 slash_count += 1
             elif c != self._b_slash:
@@ -601,7 +466,7 @@ class ReplaceTemplate(object):
         """
 
         for arg in args:
-            if isinstance(arg, binary_type if self.binary else string_type) and len(arg) == 1:
+            if isinstance(arg, compat.binary_type if self.binary else compat.string_type) and len(arg) == 1:
                 if arg not in self._def_back_ref and arg not in self._back_ref:
                     self._back_ref.add(arg)
 
@@ -623,42 +488,43 @@ class SearchTemplate(object):
     def __init__(self, search, re_verbose=False, re_unicode=False):
         """Initialize."""
 
-        if isinstance(search, binary_type):
+        if isinstance(search, compat.binary_type):
             self.binary = True
             tokens = btokens
+            ctokens = ctok.btokens
         else:
             self.binary = False
             tokens = utokens
+            ctokens = ctok.utokens
 
-        self._verbose_flag = tokens[_VERBOSE_FLAG]
-        self._empty = tokens[_EMPTY]
-        self._b_slash = tokens[_B_SLASH]
-        self._ls_bracket = tokens[_LS_BRACKET]
-        self._rs_bracket = tokens[_RS_BRACKET]
-        self._lr_bracket = tokens[_LR_BRACKET]
-        self._unicode_flag = tokens[_UNICODE_FLAG]
-        self._esc_end = tokens[_ESC_END]
-        self._end = tokens[_END]
+        self._verbose_flag = ctokens[ctok.VERBOSE_FLAG]
+        self._empty = ctokens[ctok.EMPTY]
+        self._b_slash = ctokens[ctok.B_SLASH]
+        self._ls_bracket = ctokens[ctok.LS_BRACKET]
+        self._rs_bracket = ctokens[ctok.RS_BRACKET]
+        self._unicode_flag = ctokens[ctok.UNICODE_FLAG]
+        self._esc_end = ctokens[ctok.ESC_END]
+        self._end = ctokens[ctok.END]
         self._uni_prop = tokens[_UNI_PROP]
         self._inverse_uni_prop = tokens[_INVERSE_UNI_PROP]
         self._ascii_low_props = tokens[_ASCII_LOW_PROPS]
         self._ascii_upper_props = tokens[_ASCII_UPPER_PROPS]
-        self._lc = tokens[_LC]
-        self._lc_span = tokens[_LC_SPAN]
-        self._uc = tokens[_UC]
-        self._uc_span = tokens[_UC_SPAN]
-        self._quote = tokens[_QUOTE]
-        self._negate = tokens[_NEGATE]
+        self._lc = ctokens[ctok.LC]
+        self._lc_span = ctokens[ctok.LC_SPAN]
+        self._uc = ctokens[ctok.UC]
+        self._uc_span = ctokens[ctok.UC_SPAN]
+        self._quote = ctokens[ctok.QUOTE]
+        self._negate = ctokens[ctok.NEGATE]
         self._negative_upper = tokens[_NEGATIVE_UPPER]
         self._negative_lower = tokens[_NEGATIVE_LOWER]
         self._re_flags = tokens[_RE_FLAGS]
-        self._nl = tokens[_NL]
-        self._hashtag = tokens[_HASHTAG]
+        self._nl = ctokens[ctok.NL]
+        self._hashtag = ctokens[ctok.HASHTAG]
         self.search = search
         self.groups, quotes = self.find_char_groups(search)
         self.verbose, self.unicode = self.find_flags(search, quotes, re_verbose, re_unicode)
         if self.verbose:
-            self._verbose_tokens = tokens[_VERBOSE_TOKENS]
+            self._verbose_tokens = ctokens[ctok.VERBOSE_TOKENS]
         else:
             self._verbose_tokens = tuple()
         self.extended = []
@@ -699,7 +565,7 @@ class SearchTemplate(object):
         escaped = False
         found = False
         first = None
-        for c in iterstring(s):
+        for c in compat.iterstring(s):
             if c == self._b_slash:
                 escaped = not escaped
             elif escaped and not found and not quote_found and c == self._quote:
@@ -861,17 +727,17 @@ class ReplaceTemplateExpander(object):
         """Initialize."""
 
         if template.binary:
-            tokens = btokens
+            ctokens = ctok.btokens
         else:
-            tokens = utokens
+            ctokens = ctok.utokens
 
         self.template = template
-        self._esc_end = tokens[_ESC_END]
-        self._end = tokens[_END]
-        self._lc = tokens[_LC]
-        self._lc_span = tokens[_LC_SPAN]
-        self._uc = tokens[_UC]
-        self._uc_span = tokens[_UC_SPAN]
+        self._esc_end = ctokens[ctok.ESC_END]
+        self._end = ctokens[ctok.END]
+        self._lc = ctokens[ctok.LC]
+        self._lc_span = ctokens[ctok.LC_SPAN]
+        self._uc = ctokens[ctok.UC]
+        self._uc_span = ctokens[ctok.UC_SPAN]
         self.index = -1
         self.end_found = False
         self.parent_span = []
@@ -1035,14 +901,14 @@ def _apply_replace_backrefs(m, repl=None):
             return repl(m)
         elif isinstance(repl, ReplaceTemplate):
             return ReplaceTemplateExpander(m, repl).expand()
-        elif isinstance(repl, (string_type, binary_type)):
+        elif isinstance(repl, (compat.string_type, compat.binary_type)):
             return ReplaceTemplateExpander(m, ReplaceTemplate(m.re, repl)).expand()
 
 
 def _apply_search_backrefs(pattern, flags=0):
     """Apply the search backrefs to the search pattern."""
 
-    if isinstance(pattern, (string_type, binary_type)):
+    if isinstance(pattern, (compat.string_type, compat.binary_type)):
         re_verbose = VERBOSE & flags
         re_unicode = UNICODE & flags
         pattern = SearchTemplate(pattern, re_verbose, re_unicode).apply()

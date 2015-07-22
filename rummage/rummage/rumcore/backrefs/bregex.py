@@ -29,11 +29,13 @@ Copyright (c) 2011 - 2015 Isaac Muse <isaacmuse@gmail.com>
 from __future__ import unicode_literals
 import re
 from . import bre
+from . import compat
+from . import common_tokens as ctok
 import functools
 try:
     import regex
     REGEX_SUPPORT = True
-except Exception:
+except Exception:  # pragma: no coverage
     REGEX_SUPPORT = False
 
 if REGEX_SUPPORT:
@@ -73,14 +75,16 @@ if REGEX_SUPPORT:
     purge = regex.purge
     REGEX_TYPE = type(regex.compile('', 0))
 
-    _REGEX_FLAGS = 0
-    _REGEX_SEARCH_REF = 1
-    _REGEX_SEARCH_REF_VERBOSE = 2
-    _V0 = 3
-    _V1 = 4
+    _DEF_BACK_REF = 0
+    _REGEX_FLAGS = 1
+    _REGEX_SEARCH_REF = 2
+    _REGEX_SEARCH_REF_VERBOSE = 3
+    _V0 = 4
+    _V1 = 5
 
     utokens = [
-        re.compile(                       # _RE_FLAGS
+        set("abfnrtvAbBdDsSwWZuxgmM"),      # _DEF_BACK_REF
+        re.compile(                       # _REGEX_FLAGS
             r'(?s)(\\.)|\(\?((?:[Laberux]|V0|V1|-?[imsfw])+)[):]|(.)'
         ),
         re.compile(                       # _REGEX_SEARCH_REF
@@ -110,7 +114,16 @@ if REGEX_SUPPORT:
     ]
 
     btokens = [
-        re.compile(                       # _RE_FLAGS
+        set(                              # _DEF_BACK_REF
+            [
+                b"a", b"b", b"f", b"n", b"r",
+                b"t", b"v", b"A", b"b", b"B",
+                b"d", b"D", b"s", b"S", b"w",
+                b"W", b"Z", b"u", b"x", b"g",
+                b"m", b"M"
+            ]
+        ),
+        re.compile(                       # _REGEX_FLAGS
             br'(?s)(\\.)|\(\?((?:[Laberux]|V0|V1|-?[imsfw])+)[):]|(.)'
         ),
         re.compile(                       # _REGEX_SEARCH_REF
@@ -139,26 +152,26 @@ if REGEX_SUPPORT:
         b'V1'                             # _V1
     ]
 
-    class RegexSearchTokens(bre.Tokens):
+    class RegexSearchTokens(compat.Tokens):
 
         """Tokens."""
 
         def __init__(self, string, verbose):
             """Initialize."""
 
-            if isinstance(string, bre.binary_type):
-                tokens = bre.btokens
-                local_tokens = btokens
+            if isinstance(string, compat.binary_type):
+                tokens = btokens
+                ctokens = ctok.btokens
             else:
-                tokens = bre.utokens
-                local_tokens = utokens
+                tokens = utokens
+                ctokens = ctok.utokens
 
             self.string = string
             if verbose:
-                self._re_search_ref = local_tokens[_REGEX_SEARCH_REF_VERBOSE]
+                self._re_search_ref = tokens[_REGEX_SEARCH_REF_VERBOSE]
             else:
-                self._re_search_ref = local_tokens[_REGEX_SEARCH_REF]
-            self._b_slash = tokens[bre._B_SLASH]
+                self._re_search_ref = tokens[_REGEX_SEARCH_REF]
+            self._b_slash = ctokens[ctok.B_SLASH]
             self.max_index = len(string) - 1
             self.index = 0
             self.current = None
@@ -201,29 +214,29 @@ if REGEX_SUPPORT:
         def __init__(self, search, re_verbose=False, re_version=0):
             """Initialize."""
 
-            if isinstance(search, bre.binary_type):
+            if isinstance(search, compat.binary_type):
                 self.binary = True
-                tokens = bre.btokens
-                local_tokens = btokens
+                tokens = btokens
+                ctokens = ctok.btokens
             else:
                 self.binary = False
-                tokens = bre.utokens
-                local_tokens = utokens
+                tokens = utokens
+                ctokens = ctok.utokens
 
-            self._verbose_flag = tokens[bre._VERBOSE_FLAG]
-            self._empty = tokens[bre._EMPTY]
-            self._b_slash = tokens[bre._B_SLASH]
-            self._ls_bracket = tokens[bre._LS_BRACKET]
-            self._rs_bracket = tokens[bre._RS_BRACKET]
-            self._esc_end = tokens[bre._ESC_END]
-            self._end = tokens[bre._END]
-            self._quote = tokens[bre._QUOTE]
-            self._negate = tokens[bre._NEGATE]
-            self._regex_flags = local_tokens[_REGEX_FLAGS]
-            self._nl = tokens[bre._NL]
-            self._hashtag = tokens[bre._HASHTAG]
-            self._V0 = local_tokens[_V0]
-            self._V1 = local_tokens[_V1]
+            self._verbose_flag = ctokens[ctok.VERBOSE_FLAG]
+            self._empty = ctokens[ctok.EMPTY]
+            self._b_slash = ctokens[ctok.B_SLASH]
+            self._ls_bracket = ctokens[ctok.LS_BRACKET]
+            self._rs_bracket = ctokens[ctok.RS_BRACKET]
+            self._esc_end = ctokens[ctok.ESC_END]
+            self._end = ctokens[ctok.END]
+            self._quote = ctokens[ctok.QUOTE]
+            self._negate = ctokens[ctok.NEGATE]
+            self._regex_flags = tokens[_REGEX_FLAGS]
+            self._nl = ctokens[ctok.NL]
+            self._hashtag = ctokens[ctok.HASHTAG]
+            self._V0 = tokens[_V0]
+            self._V1 = tokens[_V1]
             self.search = search
             if regex.DEFAULT_VERSION == V0:
                 self.groups, quotes = self.find_char_groups_v0(search)
@@ -236,7 +249,7 @@ if REGEX_SUPPORT:
                 else:
                     self.groups = self.find_char_groups_v1(search)[0]
             if self.verbose:
-                self._verbose_tokens = tokens[bre._VERBOSE_TOKENS]
+                self._verbose_tokens = ctokens[ctok.VERBOSE_TOKENS]
             else:
                 self._verbose_tokens = tuple()
             self.extended = []
@@ -279,7 +292,7 @@ if REGEX_SUPPORT:
             escaped = False
             found = False
             first = None
-            for c in bre.iterstring(s):
+            for c in compat.iterstring(s):
                 if c == self._b_slash:
                     escaped = not escaped
                 elif escaped and not found and not quote_found and c == self._quote:
@@ -319,7 +332,7 @@ if REGEX_SUPPORT:
             found = 0
             first = None
             sub_first = None
-            for c in bre.iterstring(s):
+            for c in compat.iterstring(s):
                 if c == self._b_slash:
                     # Next char is escaped
                     escaped = not escaped
@@ -433,6 +446,27 @@ if REGEX_SUPPORT:
 
         """Replace template for the regex module."""
 
+        def setup_template(self, pattern, template):
+            """Setup template."""
+
+            if isinstance(template, compat.binary_type):
+                self.binary = True
+                tokens = btokens
+                ctokens = ctok.btokens
+            else:
+                self.binary = False
+                tokens = utokens
+                ctokens = ctok.utokens
+
+            self._original = template
+            self._back_ref = set()
+            self._b_slash = ctokens[ctok.B_SLASH]
+            self._def_back_ref = tokens[_DEF_BACK_REF]
+            self._empty = ctokens[ctok.EMPTY]
+            self._add_back_references(ctokens[ctok.REPLACE_TOKENS])
+            self._template = self._escape_template(template)
+            self.parse_template(pattern)
+
         def parse_template(self, pattern):
             """Parse template for the regex module."""
 
@@ -453,13 +487,13 @@ if REGEX_SUPPORT:
                 return repl(m)
             elif isinstance(repl, RegexReplaceTemplate):
                 return bre.ReplaceTemplateExpander(m, repl).expand()
-            elif isinstance(repl, (bre.string_type, bre.binary_type)):
+            elif isinstance(repl, (compat.string_type, compat.binary_type)):
                 return bre.ReplaceTemplateExpander(m, RegexReplaceTemplate(m.re, repl)).expand()
 
     def _apply_search_backrefs(pattern, flags=0):
         """Apply the search backrefs to the search pattern."""
 
-        if isinstance(pattern, (bre.string_type, bre.binary_type)):
+        if isinstance(pattern, (compat.string_type, compat.binary_type)):
             re_verbose = VERBOSE & flags
             if flags & V0:
                 re_version = V0
@@ -492,13 +526,6 @@ if REGEX_SUPPORT:
         """Expand the string using the replace pattern or function."""
 
         return _apply_replace_backrefs(m, repl)
-
-    subf = regex.subf
-    subfn = regex.subfn
-    split = regex.split
-    splititer = regex.splititer
-    findall = regex.findall
-    finditer = regex.finditer
 
     def match(pattern, string, flags=0, pos=None, endpos=None, partial=False, concurrent=None, **kwargs):
         """Wrapper for match."""
