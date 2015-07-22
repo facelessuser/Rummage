@@ -587,13 +587,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.limit_panel_hide()
             self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
 
+        self.init_search_path(start_path)
+
         # Setup regex options depending on selected regex module and ensure the window is
         # sized well for them.
         self.refresh_regex_options()
         self.Fit()
         self.optimize_size(height_only=True)
 
-        self.init_search_path(start_path)
         # Only on OSX, WxPython is determined to focus something that doesn't make sense
         # even though we call no focus events.  It apparently runs after we try and focus
         # something on startup.  Trying to delay focus is problematic as we sometimes
