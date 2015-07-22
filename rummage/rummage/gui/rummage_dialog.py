@@ -587,6 +587,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.limit_panel_hide()
             self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
 
+        # Setup regex options depending on selected regex module and ensure the window is
+        # sized well for them.
+        self.refresh_regex_options()
+        self.Fit()
+        self.optimize_size(height_only=True)
+
         self.init_search_path(start_path)
         # Only on OSX, WxPython is determined to focus something that doesn't make sense
         # even though we call no focus events.  It apparently runs after we try and focus
@@ -665,10 +671,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_created_choice.Clear()
         for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
             self.m_created_choice.Append(x)
-
-        self.refresh_regex_options()
-
-        self.Fit()
 
     def on_enter_key(self, event):
         """Search on enter."""
