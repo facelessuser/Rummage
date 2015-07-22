@@ -233,10 +233,9 @@ _VERBOSE_FLAG = 24
 _RE_SEARCH_REF = 25
 _RE_SEARCH_REF_VERBOSE = 26
 _RE_REPLACE_REF = 27
-_RE_IS_VERBOSE = 28
-_RE_FLAGS = 29
-_LR_BRACKET = 30
-_UNICODE_FLAG = 31
+_RE_FLAGS = 28
+_LR_BRACKET = 29
+_UNICODE_FLAG = 30
 
 # Unicode string related references
 utokens = (
@@ -269,11 +268,11 @@ utokens = (
         r'''(?x)
         (\\)+
         (
-            [(lLcCEQ] |
+            [lLcCEQ] |
             %(uni_prop)s
         )? |
         (
-            [(lLcCEQ] |
+            [lLcCEQ] |
             %(uni_prop)s
         )
         ''' % {"uni_prop": _UPROP}
@@ -282,11 +281,11 @@ utokens = (
         r'''(?x)
         (\\)+
         (
-            [(lLcCEQ#] |
+            [lLcCEQ#] |
             %(uni_prop)s
         )? |
         (
-            [(lLcCEQ#] |
+            [lLcCEQ#] |
             %(uni_prop)s
         )
         ''' % {"uni_prop": _UPROP}
@@ -302,11 +301,8 @@ utokens = (
         )
         '''
     ),
-    re.compile(                       # _RE_IS_VERBOSE
-        r'\s*\(\?([iLmsux]+)\)'
-    ),
     re.compile(                       # _RE_FLAGS
-        r'\(\?([iLmsux]+)\)'
+        r'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
     ),
     '(',                              # _LR_BRACKET
     'u'                               # _UNICODE_FLAG
@@ -354,10 +350,10 @@ btokens = (
         br'''(?x)
         (\\)+
         (
-            [(lLcCEQ]
+            [lLcCEQ]
         )? |
         (
-            [(lLcCEQ]
+            [lLcCEQ]
         )
         '''
     ),
@@ -365,10 +361,10 @@ btokens = (
         br'''(?x)
         (\\)+
         (
-            [(lLcCEQ#]
+            [lLcCEQ#]
         )? |
         (
-            [(lLcCEQ#]
+            [lLcCEQ#]
         )
         '''
     ),
@@ -383,11 +379,8 @@ btokens = (
         )
         '''
     ),
-    re.compile(                       # _RE_IS_VERBOSE
-        br'\s*\(\?([iLmsux]+)\)'
-    ),
-    re.compile(                       # _RE_FLAGS
-        br'\(\?([iLmsux]+)\)'
+    re.compile(                        # _RE_FLAGS
+        br'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
     ),
     b'(',                              # _LR_BRACKET
     b'u'                               # _UNICODE_FLAG
@@ -505,7 +498,6 @@ class SearchTokens(Tokens):
             self._re_search_ref = tokens[_RE_SEARCH_REF_VERBOSE]
         else:
             self._re_search_ref = tokens[_RE_SEARCH_REF]
-        self._re_flags = tokens[_RE_FLAGS]
         self._lr_bracket = tokens[_LR_BRACKET]
         self._b_slash = tokens[_B_SLASH]
         self.max_index = len(string) - 1
@@ -538,10 +530,6 @@ class SearchTokens(Tokens):
                         char += self._b_slash
                 else:
                     char += m.group(3)
-        elif char == self._lr_bracket:
-            m = self._re_flags.match(self.string[self.index:])
-            if m:
-                char = m.group(0)
 
         self.index += len(char)
         self.current = char
@@ -642,10 +630,7 @@ class SearchTemplate(object):
             self.binary = False
             tokens = utokens
 
-        self._re_is_verbose = tokens[_RE_IS_VERBOSE]
         self._verbose_flag = tokens[_VERBOSE_FLAG]
-        self.verbose = self.is_verbose(search, re_verbose)
-        self.unicode = re_unicode
         self._empty = tokens[_EMPTY]
         self._b_slash = tokens[_B_SLASH]
         self._ls_bracket = tokens[_LS_BRACKET]
@@ -666,26 +651,40 @@ class SearchTemplate(object):
         self._negate = tokens[_NEGATE]
         self._negative_upper = tokens[_NEGATIVE_UPPER]
         self._negative_lower = tokens[_NEGATIVE_LOWER]
+        self._re_flags = tokens[_RE_FLAGS]
         self._nl = tokens[_NL]
         self._hashtag = tokens[_HASHTAG]
+        self.search = search
+        self.groups = self.find_char_groups(search)
+        self.verbose, self.unicode = self.find_flags(search, re_verbose, re_unicode)
         if self.verbose:
             self._verbose_tokens = tokens[_VERBOSE_TOKENS]
         else:
             self._verbose_tokens = tuple()
-        self.search = search
         self.extended = []
-        self.escaped = False
-        self.groups = []
 
-    def is_verbose(self, string, verbose):
-        """Check if regex pattern is verbose."""
+    def find_flags(self, s, re_verbose, re_unicode):
+        """Find verbose and unicode flags."""
 
-        v = verbose
-        if not v:
-            m = self._re_is_verbose.match(string.lstrip())
-            if m and self._verbose_flag in m.group(1):
-                v = True
-        return v
+        new = []
+        start = 0
+        verbose_flag = re_verbose
+        unicode_flag = re_unicode
+        if unicode_flag and verbose_flag:
+            return bool(verbose_flag), bool(unicode_flag)
+        for g in self.groups:
+            new.append(s[start:g[0] + 1])
+            start = g[1]
+        new.append(s[start:])
+        for m in self._re_flags.finditer(self._empty.join(new)):
+            if m.group(2):
+                if self._verbose_flag in m.group(2):
+                    verbose_flag = True
+                if self._unicode_flag in m.group(2):
+                    unicode_flag = True
+            if unicode_flag and verbose_flag:
+                break
+        return bool(verbose_flag), bool(unicode_flag)
 
     def find_char_groups(self, s):
         """Find character groups."""
@@ -796,8 +795,6 @@ class SearchTemplate(object):
     def apply(self):
         """Apply search template."""
 
-        self.groups = self.find_char_groups(self.search)
-
         i = SearchTokens(self.search, self.verbose)
         iter(i)
 
@@ -807,38 +804,22 @@ class SearchTemplate(object):
 
                 c = t[1:]
 
-                if t.startswith(self._lr_bracket):
-                    if not self.binary and not self.in_group(i.index - 1) and self._unicode_flag in t:
-                        self.unicode = True
-                    self.extended.append(t)
-                elif c.startswith(self._uni_prop):
+                if c.startswith(self._uni_prop):
                     self.extended.extend(self.unicode_props(c[2:-1], self.in_group(i.index - 1)))
                 elif c.startswith(self._inverse_uni_prop):
                     self.extended.extend(self.unicode_props(c[2:-1], self.in_group(i.index - 1), negate=True))
                 elif c == self._lc:
                     # Postpone evaluation of ASCII props as we don't yet know if unicode flag is enabled
-                    self.extended.append(
-                        lambda case=_LOWER, in_group=self.in_group(i.index - 1):
-                            self.ascii_props(case, in_group)
-                    )
+                    self.extended.extend(self.ascii_props(_LOWER, self.in_group(i.index - 1)))
                 elif c == self._lc_span:
                     # Postpone evaluation of ASCII props as we don't yet know if unicode flag is enabled
-                    self.extended.append(
-                        lambda case=_LOWER, in_group=self.in_group(i.index - 1), negate=True:
-                            self.ascii_props(case, in_group, negate=negate)
-                    )
+                    self.extended.extend(self.ascii_props(_LOWER, self.in_group(i.index - 1), negate=True))
                 elif c == self._uc:
                     # Postpone evaluation of ASCII props as we don't yet know if unicode flag is enabled
-                    self.extended.append(
-                        lambda case=_UPPER, in_group=self.in_group(i.index - 1):
-                            self.ascii_props(case, in_group)
-                    )
+                    self.extended.extend(self.ascii_props(_UPPER, self.in_group(i.index - 1)))
                 elif c == self._uc_span:
                     # Postpone evaluation of ASCII props as we don't yet know if unicode flag is enabled
-                    self.extended.append(
-                        lambda case=_UPPER, in_group=self.in_group(i.index - 1), negate=True:
-                            self.ascii_props(case, in_group, negate=negate)
-                    )
+                    self.extended.extend(self.ascii_props(_UPPER, self.in_group(i.index - 1), negate=True))
                 elif c[0:1] in self._verbose_tokens:
                     self.extended.append(t)
                 elif c == self._quote:
@@ -850,14 +831,6 @@ class SearchTemplate(object):
                 self.extended.extend(self.comments(i))
             else:
                 self.extended.append(t)
-
-        # Handle ASCII properties now that we know if the unicode flag is set
-        count = 0
-        for entry in self.extended:
-            if not isinstance(entry, (string_type, binary_type)):
-                new_entry = entry()
-                self.extended[count] = new_entry[0] if new_entry else self._empty
-            count += 1
 
         return self._empty.join(self.extended)
 

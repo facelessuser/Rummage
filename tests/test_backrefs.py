@@ -328,6 +328,54 @@ class TestSearchTemplate(unittest.TestCase):
             '''
         )
 
+    def test_detect_verbose_string_flag_at_end(self):
+        """Test verbose string flag (?x) at end."""
+
+        pattern = bre.compile_search(
+            r'''
+            This is a # \Qcomment\E
+            This is not a \# \Qcomment\E
+            This is not a [#\ ] \Qcomment\E
+            This is not a [\#] \Qcomment\E
+            This\ is\ a # \Qcomment\E (?x)
+            '''
+        )
+
+        self.assertEqual(
+            pattern.pattern,
+            r'''
+            This is a # \Qcomment\E
+            This is not a \# comment
+            This is not a [#\ ] comment
+            This is not a [\#] comment
+            This\ is\ a # \Qcomment\E (?x)
+            '''
+        )
+
+    def test_ignore_verbose_string(self):
+        """Test verbose string flag (?x) in char set."""
+
+        pattern = bre.compile_search(
+            r'''
+            This is not a # \Qcomment\E
+            This is not a \# \Qcomment\E
+            This is not a [#\ (?x)] \Qcomment\E
+            This is not a [\#] \Qcomment\E
+            This\ is\ not a # \Qcomment\E
+            '''
+        )
+
+        self.assertEqual(
+            pattern.pattern,
+            r'''
+            This is not a # comment
+            This is not a \# comment
+            This is not a [#\ (?x)] comment
+            This is not a [\#] comment
+            This\ is\ not a # comment
+            '''
+        )
+
     def test_detect_complex_verbose_string_flag(self):
         """Test complex verbose string flag (?x)."""
 
