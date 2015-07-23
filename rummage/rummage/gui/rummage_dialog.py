@@ -883,12 +883,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if search == "":
             errormsg(_("There is no search to save!"))
             return
-        dlg = SaveSearchDialog(
-            self,
-            search,
-            self.m_replace_textbox.GetValue(),
-            self.m_regex_search_checkbox.GetValue()
-        )
+        dlg = SaveSearchDialog(self)
         dlg.ShowModal()
         dlg.Destroy()
 
@@ -897,12 +892,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         dlg = LoadSearchDialog(self)
         dlg.ShowModal()
-        search, replace, is_regex = dlg.get_search()
         dlg.Destroy()
-        if search is not None and is_regex is not None and replace is not None:
-            self.m_searchfor_textbox.SetValue(search)
-            self.m_replace_textbox.SetValue(replace)
-            self.m_regex_search_checkbox.SetValue(is_regex)
 
     def limit_panel_toggle(self):
         """Show/Hide limit panel."""

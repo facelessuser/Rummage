@@ -42,10 +42,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
 
         super(LoadSearchDialog, self).__init__(parent)
 
-        self.search = None
-        self.replace = None
-        self.is_regex = None
-
+        self.parent = parent
         self.localize()
 
         best = self.m_load_panel.GetBestSize()
@@ -78,8 +75,10 @@ class LoadSearchDialog(gui.LoadSearchDialog):
             # saves.
             if len(x) == 3:
                 x.insert(2, '')
-            search_type = SEARCH_REGEX if x[3] else SEARCH_LITERAL
-            self.m_search_list.set_item_map(count, x[0], x[1], x[2], search_type)
+            if len(x) == 4:
+                x.insert(3, '')
+            search_type = SEARCH_REGEX if x[4] else SEARCH_LITERAL
+            self.m_search_list.set_item_map(count, x[0], x[1], x[2], x[3], search_type)
             count += 1
         self.m_search_list.load_list()
 
@@ -89,15 +88,25 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         item = self.m_search_list.GetFirstSelected()
         if item == -1:
             return
-        self.search = self.m_search_list.get_map_item(item, col=1)
-        self.replace = self.m_search_list.get_map_item(item, col=2)
-        self.is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=3)] == "Regex"
+        search = self.m_search_list.get_map_item(item, col=1)
+        replace = self.m_search_list.get_map_item(item, col=2)
+        flags = self.m_search_list.get_map_item(item, col=3)
+        is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=4)] == "Regex"
+
+        self.parent.m_searchfor_textbox.SetValue(search)
+        self.parent.m_replace_textbox.SetValue(replace)
+        self.parent.m_regex_search_checkbox.SetValue(is_regex)
+        self.parent.m_case_checkbox.SetValue("i" not in flags)
+        self.parent.m_dotmatch_checkbox.SetValue("s" in flags)
+        self.parent.m_unicode_checkbox.SetValue("u" in flags)
+        self.parent.m_bestmatch_checkbox.SetValue("b" in flags)
+        self.parent.m_enhancematch_checkbox.SetValue("e" in flags)
+        self.parent.m_word_checkbox.SetValue("w" in flags)
+        self.parent.m_reverse_checkbox.SetValue("r" in flags)
+        self.parent.m_fullcase_checkbox.SetValue("f" in flags)
+        self.parent.m_format_replace_checkbox.SetValue("F" in flags)
+
         self.Close()
-
-    def get_search(self):
-        """Get the selected search entry."""
-
-        return self.search, self.replace, self.is_regex
 
     def on_delete(self, event):
         """Delete search entry."""

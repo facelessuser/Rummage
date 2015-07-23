@@ -23,7 +23,7 @@ import wx
 import sys
 
 from . import gui
-from .settings import Settings
+from .settings import Settings, rumcore
 from .generic_dialogs import errormsg
 from ..localization import _
 
@@ -32,7 +32,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
 
     """Save search dialog."""
 
-    def __init__(self, parent, search, replace, is_regex):
+    def __init__(self, parent):
         """Init SaveSearchDialog object."""
 
         super(SaveSearchDialog, self).__init__(parent)
@@ -42,9 +42,10 @@ class SaveSearchDialog(gui.SaveSearchDialog):
             [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
 
-        self.search = search
-        self.replace = replace
-        self.is_regex = is_regex
+        self.parent = parent
+        self.search = parent.m_searchfor_textbox.GetValue()
+        self.replace = parent.m_replace_textbox.GetValue()
+        self.is_regex = parent.m_regex_search_checkbox.GetValue()
 
         self.localize()
 
@@ -94,7 +95,31 @@ class SaveSearchDialog(gui.SaveSearchDialog):
             errormsg(_("Please give the search a name!"))
             return
 
-        Settings.add_search(value, self.search, self.replace, self.is_regex)
+        flags = ""
+        if not self.parent.m_case_checkbox.GetValue():
+            flags += "i"
+        if self.is_regex:
+            if self.parent.m_dotmatch_checkbox.GetValue():
+                flags += "s"
+            if self.parent.m_unicode_checkbox.GetValue():
+                flags += "u"
+            mode = Settings.get_regex_mode()
+            if mode in rumcore.REGEX_MODES:
+                version = Settings.get_regex_version()
+                if self.parent.m_bestmatch_checkbox.GetValue():
+                    flags += "b"
+                if self.parent.m_enhancematch_checkbox.GetValue():
+                    flags += "e"
+                if self.parent.m_word_checkbox.GetValue():
+                    flags += "w"
+                if self.parent.m_reverse_checkbox.GetValue():
+                    flags += "r"
+                if version == 0 and self.parent.m_fullcase_checkbox.GetValue():
+                    flags += "f"
+                if self.parent.m_format_replace_checkbox.GetValue():
+                    flags += "F"
+
+        Settings.add_search(value, self.search, self.replace, flags, self.is_regex)
         self.Close()
 
     def on_cancel(self, event):

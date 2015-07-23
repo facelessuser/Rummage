@@ -334,12 +334,12 @@ class Settings(object):
         cls.save_settings()
 
     @classmethod
-    def add_search(cls, name, search, replace, is_regex):
+    def add_search(cls, name, search, replace, flags, is_regex):
         """Add saved search."""
 
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", [])
-        searches.append((name, search, replace, is_regex))
+        searches.append((name, search, replace, flags, is_regex))
         cls.settings["saved_searches"] = searches
         cls.save_settings()
 
