@@ -42,7 +42,7 @@ BOOL_NONE = 0
 BOOL_MATCH = 1
 BOOL_UNMATCH = 2
 
-RE_DATE_TIME = re.compile_search(
+RE_DATE_TIME = re.compile(
     r'''(?x)
     (?P<symbol>[><])?(?:
         (?P<date>(?P<month>0[1-9]|1[0-2])/(?P<day>0[1-9]|[1-2][0-9]|3[0-1])/(?P<year>[0-9]{4})) |
@@ -51,7 +51,7 @@ RE_DATE_TIME = re.compile_search(
     '''
 )
 
-RE_DATE_TIME_FULL = re.compile_search(
+RE_DATE_TIME_FULL = re.compile(
     r'''(?x)
     (?P<symbol>[><])?
     (?P<date>(?P<month>0[1-9]|1[0-2])/(?P<day>0[1-9]|[1-2][0-9]|3[0-1])/(?P<year>[0-9]{4})) -
@@ -80,6 +80,62 @@ class RummageCli(object):
     def __init__(self, args):
         """Initialize."""
 
+        self.current_file = None
+        self.count = 0
+        self.errors = False
+
+        # Parse search inputs
+        target = self.parse_target(args)
+        context = self.parse_context(args)
+        file_pattern = self.parse_file_pattern(args)
+        directory_exclude = self.parse_directory_exclude(args)
+        size = self.parse_size_limit(args)
+        created = self.parse_created(args)
+        modified = self.parse_modified(args)
+        flags = self.get_flags(args)
+        regex_mode = self.get_regex_mode(args)
+        self.validate_patterns(args, flags, regex_mode)
+
+        # Parse the rest of the inputs and set associated variables
+        if args.replace:
+            self.bool_match = BOOL_NONE
+        elif args.files_with_matches:
+            self.bool_match = BOOL_MATCH
+        elif args.files_without_match:
+            self.bool_match = BOOL_UNMATCH
+        else:
+            self.bool_match = BOOL_NONE
+
+        self.search_files = not args.search and not args.replace
+        self.no_filename = args.buffer or args.no_filename
+        self.count_only = args.count or args.replace is not None
+        self.show_lines = args.line_numbers
+        self.only_matching = args.only_matching
+
+        self.rummage = rumcore.Rummage(
+            target=target,
+            pattern=args.search,
+            file_pattern=file_pattern,
+            folder_exclude=directory_exclude,
+            context=context,
+            max_count=int(args.max_count) if args.max_count is not None else None,
+            flags=self.get_flags(args),
+            boolean=args.files_with_matches or args.files_without_match,
+            show_hidden=args.show_hidden,
+            truncate_lines=args.truncate,
+            encoding=args.encoding_force,
+            backup=True,
+            size=size,
+            process_binary=args.process_binary,
+            created=created,
+            modified=modified,
+            replace=args.replace,
+            regex_mode=regex_mode
+        )
+
+    def parse_target(self, args):
+        """Parse target."""
+
         if not args.buffer:
             if os.path.exists(args.target):
                 target = args.target
@@ -87,6 +143,10 @@ class RummageCli(object):
                 raise ValueError("%s does not exist" % args.target)
         else:
             target = args.target
+        return target
+
+    def parse_context(self, args):
+        """Parse context flag."""
 
         if args.context is not None:
             try:
@@ -96,6 +156,10 @@ class RummageCli(object):
                 raise ValueError("Context should be two numbers separated by a comma")
         else:
             context = (0, 0)
+        return context
+
+    def parse_file_pattern(self, args):
+        """Parse file pattern."""
 
         if args.regex_file_pattern is not None:
             file_pattern = args.regex_file_pattern
@@ -103,6 +167,10 @@ class RummageCli(object):
             file_pattern = args.file_pattern
         else:
             file_pattern = None
+        return file_pattern
+
+    def parse_directory_exclude(self, args):
+        """Parse directory exclude."""
 
         if args.regex_directory_exclude is not None:
             directory_exclude = args.regex_directory_exclude
@@ -110,6 +178,10 @@ class RummageCli(object):
             directory_exclude = args.directory_exclude
         else:
             directory_exclude = None
+        return directory_exclude
+
+    def parse_size_limit(self, args):
+        """Parse size limit."""
 
         if args.size_limit is not None:
             try:
@@ -123,6 +195,10 @@ class RummageCli(object):
                 raise ValueError("Size should be in KB in the form: 1000, <1000, or >1000")
         else:
             size = None
+        return size
+
+    def parse_created(self, args):
+        """Parse created."""
 
         if args.created is not None:
             sym = 'eq'
@@ -149,6 +225,10 @@ class RummageCli(object):
             created = (sym, epoch_timestamp.local_time_to_epoch_timestamp(date, time))
         else:
             created = None
+        return created
+
+    def parse_modified(self, args):
+        """Parse modified."""
 
         if args.modified is not None:
             sym = 'eq'
@@ -175,8 +255,11 @@ class RummageCli(object):
             modified = (sym, rumcore.epoch_timestamp.local_time_to_epoch_timestamp(date, time))
         else:
             modified = None
+        return modified
 
-        flags = self.get_flags(args)
+    def get_regex_mode(self, args):
+        """Get the regex mode."""
+
         if args.regex0 or args.regex1:
             if args.backrefs:
                 regex_mode = rumcore.BREGEX_MODE
@@ -186,15 +269,19 @@ class RummageCli(object):
             regex_mode = rumcore.BRE_MODE
         else:
             regex_mode = rumcore.RE_MODE
+        return regex_mode
+
+    def validate_patterns(self, args, flags, regex_mode):
+        """Validate inputs."""
 
         if args.re or args.backrefs or args.regex0 or args.regex1:
             if (
-                (args.pattern == "" and args.replace) or
-                self.validate_search_regex(args.pattern, flags, regex_mode)
+                (args.search == "" and args.replace) or
+                self.validate_search_regex(args.search, flags, regex_mode)
             ):
                 raise ValueError("Invlaid regex search pattern")
 
-        elif args.pattern == "" and args.replace:
+        elif args.search == "" and args.replace:
             raise ValueError("Invlaid search pattern")
 
         if args.regex_file_pattern:
@@ -207,50 +294,12 @@ class RummageCli(object):
             if self.validate_regex(args.regex_directory_exclude, 0, regex_mode):
                 raise ValueError("Invalid regex directory exclude pattern")
 
-        self.rummage = rumcore.Rummage(
-            target=target,
-            pattern=args.pattern,
-            file_pattern=file_pattern,
-            folder_exclude=directory_exclude,
-            context=context,
-            max_count=int(args.max_count) if args.max_count is not None else None,
-            flags=self.get_flags(args),
-            boolean=args.files_with_matches or args.files_without_match,
-            show_hidden=args.show_hidden,
-            truncate_lines=args.truncate,
-            encoding=args.encoding_force,
-            backup=True,
-            size=size,
-            process_binary=args.process_binary,
-            created=created,
-            modified=modified,
-            replace=args.replace,
-            regex_mode=regex_mode
-        )
-
-        if args.replace:
-            self.bool_match = BOOL_NONE
-        elif args.files_with_matches:
-            self.bool_match = BOOL_MATCH
-        elif args.files_without_match:
-            self.bool_match = BOOL_UNMATCH
-        else:
-            self.bool_match = BOOL_NONE
-
-        self.search_files = not args.pattern and not args.replace
-        self.no_filename = args.buffer or args.no_filename
-        self.count_only = args.count or args.replace is not None
-        self.show_lines = args.line_numbers
-        self.only_matching = args.only_matching
-
-        self.current_file = None
-        self.count = 0
-        self.errors = False
-
     def validate_search_regex(self, search, search_flags, regex_mode):
         """Validate search regex."""
 
-        if regex_mode == rumcore.BREGEX_MODE:
+        if regex_mode in rumcore.REGEX_MODES:
+            # bregex just wraps regex's flags as it uses
+            # regex so we will use bregex flags for both regex and bregex
             flags = bregex.MULTILINE
             if search_flags & rumcore.VERSION1:
                 flags |= bregex.VERSION1
@@ -274,33 +323,9 @@ class RummageCli(object):
                 flags |= bregex.WORD
             if search_flags & rumcore.REVERSE:
                 flags |= bregex.REVERSE
-        elif regex_mode == rumcore.REGEX_MODE:
-            import regex
-
-            flags = regex.MULTILINE
-            if search_flags & rumcore.VERSION1:
-                flags |= regex.VERSION1
-            else:
-                flags |= regex.VERSION0
-                if flags & rumcore.FULLCASE:
-                    flags |= regex.FULLCASE
-            if search_flags & rumcore.DOTALL:
-                flags |= regex.DOTALL
-            if not search_flags & rumcore.IGNORECASE:
-                flags |= regex.IGNORECASE
-            if search_flags & rumcore.UNICODE:
-                flags |= regex.UNICODE
-            else:
-                flags |= regex.ASCII
-            if search_flags & rumcore.BESTMATCH:
-                flags |= regex.BESTMATCH
-            if search_flags & rumcore.ENHANCEMATCH:
-                flags |= regex.ENHANCEMATCH
-            if search_flags & rumcore.WORD:
-                flags |= regex.WORD
-            if search_flags & rumcore.REVERSE:
-                flags |= regex.REVERSE
-        elif regex_mode == rumcore.BRE_MODE:
+        else:
+            # bre just wraps re's flags as it uses
+            # re so we will use bre flags for both re and bre
             flags = re.MULTILINE
             if search_flags & rumcore.DOTALL:
                 flags |= bre.DOTALL
@@ -308,14 +333,7 @@ class RummageCli(object):
                 flags |= bre.IGNORECASE
             if search_flags & rumcore.UNICODE:
                 flags |= bre.UNICODE
-        else:
-            flags = re.MULTILINE
-            if search_flags & rumcore.DOTALL:
-                flags |= re.DOTALL
-            if search_flags & rumcore.IGNORECASE:
-                flags |= re.IGNORECASE
-            if search_flags & rumcore.UNICODE:
-                flags |= re.UNICODE
+
         return self.validate_regex(search, flags, regex_mode)
 
     def validate_regex(self, pattern, flags=0, regex_mode=rumcore.RE_MODE):
@@ -487,7 +505,9 @@ class RummageCli(object):
                     self.errors = True
                     pyout("ERROR: %s" % f.error)
             else:
-                if not f.error:
+                if hasattr(f, 'skipped') and f.skipped:
+                    pass
+                elif not f.error:
                     if self.bool_match != BOOL_NONE:
                         self.bool_output(f)
                     elif self.count_only:
@@ -557,10 +577,10 @@ def main():
         help="Pattern is a regular expression for the Python 're'."
     )
     parser.add_argument(
-        "--bre", "-X", action="store_true", default=False,
+        "--backrefs", "-X", action="store_true", default=False,
         help=(
             "Pattern is a regular expression with backrefs applied.  if --regex0 or --regex1 is enabled, "
-            "backregs will be applied to the 'regex' module instead of the 're' module."
+            "backrefs will be applied to the 'regex' module instead of the 're' module."
         )
     )
     parser.add_argument(
@@ -701,7 +721,7 @@ def main():
 
     # Positional arguments (must follow flag arguments)
     parser.add_argument(
-        "pattern", default=None, type=pyin,
+        "--search", "-s", default="", type=pyin,
         help="Search pattern"
     )
     parser.add_argument(
