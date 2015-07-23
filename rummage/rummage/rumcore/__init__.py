@@ -330,7 +330,7 @@ class RummageFileContent(object):
         """Return content of either a memory map file or string."""
 
         try:
-            return self.string_buffer if self.string_buffer else self._read_file()
+            return self._decode_string() if self.string_buffer else self._read_file()
         except RummageException:
             # Bubble up RummageExceptions
             raise
@@ -349,6 +349,11 @@ class RummageFileContent(object):
             self.file_map.close()
         if self.file_obj is not None:
             self.file_obj.close()
+
+    def _decode_string(self):
+        """Decode the string buffer."""
+
+        return self.string_buffer.decode(self.encoding.encode) if self.encoding.encode != "bin" else self.string_buffer
 
     def _read_bin(self):
         """Setup binary file reading with mmap."""
@@ -651,9 +656,6 @@ class _FileSearch(object):
 
             for m in pattern.finditer(file_content):
                 yield m
-                if self.kill:
-                    print('--=kill=--')
-                    break
 
     def _update_file(self, file_name, content, encoding):
         """Update the file content."""
@@ -691,7 +693,10 @@ class _FileSearch(object):
         file_info = None
         string_buffer = self.file_content is not None
 
-        if not string_buffer:
+        if string_buffer and self.encoding is None:
+            self.is_binary = True
+            self.current_encoding = text_decode.Encoding("bin", None)
+        else:
             try:
                 self.current_encoding = text_decode.Encoding('bin', None)
                 self.is_binary = False
@@ -716,8 +721,6 @@ class _FileSearch(object):
                         self.current_encoding = encoding
             except Exception:
                 error = get_exception()
-        elif isinstance(self.file_content, binary_type):
-            self.is_binary = True
 
         file_info = FileInfoRecord(
             self.idx,
@@ -725,7 +728,7 @@ class _FileSearch(object):
             "%.2fKB" % (float(file_obj.size) / 1024.0),
             file_obj.modified,
             file_obj.created,
-            self.current_encoding.encode.upper() if not string_buffer else "--"
+            self.current_encoding.encode.upper()
         )
 
         return file_info, error

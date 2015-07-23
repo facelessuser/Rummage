@@ -77,7 +77,7 @@ class RummageCli(object):
 
     """Rummage command line frontend."""
 
-    def __init__(self, args):
+    def __init__(self, args, is_buffer):
         """Initialize."""
 
         self.current_file = None
@@ -85,14 +85,14 @@ class RummageCli(object):
         self.errors = False
 
         # Parse search inputs
-        target = self.parse_target(args)
+        target = self.parse_target(args, is_buffer)
         context = self.parse_context(args)
         file_pattern = self.parse_file_pattern(args)
         directory_exclude = self.parse_directory_exclude(args)
         size = self.parse_size_limit(args)
         created = self.parse_created(args)
         modified = self.parse_modified(args)
-        flags = self.get_flags(args)
+        flags = self.get_flags(args, is_buffer)
         regex_mode = self.get_regex_mode(args)
         self.validate_patterns(args, flags, regex_mode)
 
@@ -107,7 +107,7 @@ class RummageCli(object):
             self.bool_match = BOOL_NONE
 
         self.search_files = not args.search and not args.replace
-        self.no_filename = args.buffer or args.no_filename
+        self.no_filename = is_buffer or args.no_filename
         self.count_only = args.count or args.replace is not None
         self.show_lines = args.line_numbers
         self.only_matching = args.only_matching
@@ -119,11 +119,11 @@ class RummageCli(object):
             folder_exclude=directory_exclude,
             context=context,
             max_count=int(args.max_count) if args.max_count is not None else None,
-            flags=self.get_flags(args),
+            flags=flags,
             boolean=args.files_with_matches or args.files_without_match,
             show_hidden=args.show_hidden,
             truncate_lines=args.truncate,
-            encoding=args.encoding_force,
+            encoding=args.encoding,
             backup=True,
             size=size,
             process_binary=args.process_binary,
@@ -133,10 +133,10 @@ class RummageCli(object):
             regex_mode=regex_mode
         )
 
-    def parse_target(self, args):
+    def parse_target(self, args, is_buffer):
         """Parse target."""
 
-        if not args.buffer:
+        if not is_buffer:
             if os.path.exists(args.target):
                 target = args.target
             else:
@@ -274,7 +274,7 @@ class RummageCli(object):
     def validate_patterns(self, args, flags, regex_mode):
         """Validate inputs."""
 
-        if args.re or args.backrefs or args.regex0 or args.regex1:
+        if args.re or args.regex0 or args.regex1:
             if (
                 (args.search == "" and args.replace) or
                 self.validate_search_regex(args.search, flags, regex_mode)
@@ -356,7 +356,7 @@ class RummageCli(object):
         except Exception:
             return True
 
-    def get_flags(self, args):
+    def get_flags(self, args, is_buffer):
         """Get rummage flags."""
 
         flags = rumcore.MULTILINE
@@ -378,7 +378,7 @@ class RummageCli(object):
         if args.ignore_case:
             flags |= rumcore.IGNORECASE
 
-        if args.buffer:
+        if is_buffer:
             flags |= rumcore.BUFFER_INPUT
         elif args.recursive:
             flags |= rumcore.RECURSIVE
@@ -406,7 +406,7 @@ class RummageCli(object):
     def count_lines(self, string, nl):
         """Count lines of context."""
 
-        return string.count(nl) + (1 if string[-1] != nl else 0)
+        return string.count(nl) + (1 if string[-1:] != nl else 0)
 
     def display_match(self, file_name, lineno, line, separator):
         """Display the match."""
@@ -424,7 +424,7 @@ class RummageCli(object):
             line_printed = False
             count = 0
             start_match = f.match.context[0]
-            if f.info.encoding == 'BIN':
+            if f.info.encoding in ('BIN'):
                 self.display_match(f.info.name, f.match.lineno, f.match.lines, ':')
             else:
                 end_match = self.count_lines(f.match.lines, f.match.ending) - f.match.context[1]
@@ -507,7 +507,7 @@ class RummageCli(object):
                         pyout(f.name)
                 else:
                     self.errors = True
-                    pyout("ERROR: %s" % f.error)
+                    pyout("ERROR: %s" % "".join(f.error))
             else:
                 if hasattr(f, 'skipped') and f.skipped:
                     pass
@@ -522,8 +522,37 @@ class RummageCli(object):
                         self.normal_output(f)
                 else:
                     self.errors = True
-                    pyout("ERROR: %s" % f.error)
+                    pyout("ERROR: %s" % "".join(f.error))
         self.count_flush()
+
+
+def get_file_stream():
+    """Get the file stream."""
+
+    import fileinput
+    sys.argv = []
+    text = []
+    try:
+        for line in fileinput.input():
+            text.append(line)
+    except Exception:
+        import traceback
+        pyout(traceback.format_exc())
+
+    return b''.join(text) if text else b''
+
+
+def get_stream(args):
+    """Get file(s) or stream."""
+
+    stream = False
+
+    if not args.target:
+        args.target = get_file_stream()
+        stream = True
+    else:
+        args.target = args.target[0]
+    return stream
 
 
 def main():
@@ -581,10 +610,10 @@ def main():
         help="Pattern is a regular expression for the Python 're'."
     )
     parser.add_argument(
-        "--backrefs", "-X", action="store_true", default=False,
+        "--backrefs", "-b", action="store_true", default=False,
         help=(
-            "Pattern is a regular expression with backrefs applied.  if --regex0 or --regex1 is enabled, "
-            "backrefs will be applied to the 'regex' module instead of the 're' module."
+            "Apply backrefs to regular expression. Will use the 're' module if --re is used or "
+            "the 'regex' module if --regex0 or --regex1 is used."
         )
     )
     parser.add_argument(
@@ -642,10 +671,10 @@ def main():
         "--recursive", "-R", action="store_true", default=False,
         help="Recursively search a directory tree."
     )
-    search_mode_group.add_argument(
-        "--buffer", "-b", action="store_true", default=False,
-        help="Parse input parameter as a string buffer."
-    )
+    # search_mode_group.add_argument(
+    #     "--buffer", "-b", action="store_true", default=False,
+    #     help="Parse input parameter as a string buffer."
+    # )
 
     # Limit search
     dir_pattern_group = parser.add_mutually_exclusive_group()
@@ -719,8 +748,11 @@ def main():
 
     # Encoding
     parser.add_argument(
-        "--encoding-force", "-e", metavar="ENCODING", default=None, type=pyin,
-        help="Do not detect encoding, but force the specified encoding."
+        "--encoding", "-e", metavar="ENCODING", default=None, type=pyin,
+        help=(
+            "Do not detect encoding, but force the specified encoding. If piping a buffer, "
+            "the buffer will be binary unless --encoding is passed in."
+        )
     )
 
     # Positional arguments (must follow flag arguments)
@@ -729,11 +761,15 @@ def main():
         help="Search pattern"
     )
     parser.add_argument(
-        "target", default=None, type=pyin,
+        "target", default=[], type=pyin, nargs='?',
         help="File, directory, or string buffer to search."
     )
 
-    rumcl = RummageCli(parser.parse_args())
+    args = parser.parse_args()
+
+    is_buffer = get_stream(args)
+
+    rumcl = RummageCli(args, is_buffer)
     rumcl.display_output()
 
     sys.exit(rumcl.errors)
