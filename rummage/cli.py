@@ -500,7 +500,11 @@ class RummageCli(object):
         for f in self.rummage.find():
             if self.search_files:
                 if not f.error:
-                    pyout(f.name)
+                    if hasattr(f, 'skipped') and f.skipped:
+                        if self.bool_match == BOOL_UNMATCH:
+                            pyout(f.name)
+                    elif self.bool_match != BOOL_UNMATCH:
+                        pyout(f.name)
                 else:
                     self.errors = True
                     pyout("ERROR: %s" % f.error)
