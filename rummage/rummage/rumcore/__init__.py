@@ -329,18 +329,7 @@ class RummageFileContent(object):
     def __enter__(self):
         """Return content of either a memory map file or string."""
 
-        try:
-            return self._decode_string() if self.string_buffer else self._read_file()
-        except RummageException:
-            # Bubble up RummageExceptions
-            raise
-        except Exception:
-            if self.encoding.encode != "bin":
-                if self.file_obj is not None:
-                    self.file_obj.close()
-                self.encoding = text_decode.Encoding("bin", None)
-                self._read_bin()
-                return self.file_map
+        return self._decode_string() if self.string_buffer else self._read_file()
 
     def __exit__(self, *args):
         """Close file obj and memory map object if open."""
@@ -353,7 +342,12 @@ class RummageFileContent(object):
     def _decode_string(self):
         """Decode the string buffer."""
 
-        return self.string_buffer.decode(self.encoding.encode) if self.encoding.encode != "bin" else self.string_buffer
+        if self.encoding.encode != "bin":
+            try:
+                self.string_buffer = self.string_buffer.decode(self.encoding.encode)
+            except Exception:
+                self.encoding = text_decode.Encoding("bin", None)
+        return self.string_buffer
 
     def _read_bin(self):
         """Setup binary file reading with mmap."""
@@ -368,18 +362,30 @@ class RummageFileContent(object):
     def _read_file(self):
         """Read the file in."""
 
-        if self.encoding.encode == "bin":
-            self._read_bin()
-        else:
-            enc = self.encoding.encode
-            if enc == 'utf-8':
-                enc = 'utf-8-sig'
-            elif enc.startswith('utf-16'):
-                enc = 'utf-16'
-            elif enc.startswith('utf-32'):
-                enc = 'utf-32'
-            self.file_obj = codecs.open(self.name, 'r', encoding=enc)
-        return self.file_obj.read() if self.file_map is None else self.file_map
+        try:
+            if self.encoding.encode == "bin":
+                self._read_bin()
+            else:
+                enc = self.encoding.encode
+                if enc == 'utf-8':
+                    enc = 'utf-8-sig'
+                elif enc.startswith('utf-16'):
+                    enc = 'utf-16'
+                elif enc.startswith('utf-32'):
+                    enc = 'utf-32'
+                self.file_obj = codecs.open(self.name, 'r', encoding=enc)
+            return self.file_obj.read() if self.file_map is None else self.file_map
+        except RummageException:
+            # Bubble up RummageExceptions
+            raise
+        except Exception:
+            if self.encoding.encode != "bin":
+                if self.file_obj is not None:
+                    self.file_obj.close()
+                self.encoding = text_decode.Encoding("bin", None)
+                self._read_bin()
+                return self.file_map
+
 
 
 class _FileSearch(object):
@@ -693,34 +699,36 @@ class _FileSearch(object):
         file_info = None
         string_buffer = self.file_content is not None
 
-        if string_buffer and self.encoding is None:
-            self.is_binary = True
-            self.current_encoding = text_decode.Encoding("bin", None)
-        else:
-            try:
-                self.current_encoding = text_decode.Encoding('bin', None)
-                self.is_binary = False
-                if self.encoding is not None:
-                    if self.encoding == 'bin':
-                        self.current_encoding = text_decode.Encoding(self.encoding, None)
-                        self.is_binary = True
-                    elif self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
+        try:
+            self.current_encoding = text_decode.Encoding('bin', None)
+            self.is_binary = False
+            if self.encoding is not None:
+                if self.encoding == 'bin':
+                    self.current_encoding = text_decode.Encoding(self.encoding, None)
+                    self.is_binary = True
+                elif self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
+                    if not string_buffer:
                         bom = text_decode.inspect_bom(file_obj.name)
-                        if bom and bom.encode.startswith(self.encoding):
-                            self.current_encoding = bom
-                        else:
-                            self.current_encoding = text_decode.Encoding(self.encoding, None)
+                    else:
+                        bom = text_decode.has_bom(self.file_content[:4])
+                    if bom and bom.encode.startswith(self.encoding):
+                        self.current_encoding = bom
                     else:
                         self.current_encoding = text_decode.Encoding(self.encoding, None)
                 else:
-                    # Guess encoding and decode file
-                    encoding = text_decode.guess(file_obj.name, verify=True, verify_block_size=1024)
-                    if encoding is not None:
-                        if encoding.encode == "bin":
-                            self.is_binary = True
-                        self.current_encoding = encoding
-            except Exception:
-                error = get_exception()
+                    self.current_encoding = text_decode.Encoding(self.encoding, None)
+            else:
+                # Guess encoding and decode file
+                if not string_buffer:
+                    encoding = text_decode.guess(file_obj.name, verify=False)
+                else:
+                    encoding = text_decode.sguess(self.file_content)
+                if encoding is not None:
+                    if encoding.encode == "bin":
+                        self.is_binary = True
+                    self.current_encoding = encoding
+        except Exception:
+            error = get_exception()
 
         file_info = FileInfoRecord(
             self.idx,
@@ -743,10 +751,11 @@ class _FileSearch(object):
         """Search and replace."""
 
         text = deque()
+        is_file = True if self.file_content else False
 
         file_info, error = self._get_file_info(self.file_obj)
         if error is not None:
-            if self.file_content:
+            if is_file:
                 yield BufferRecord(None, error)
             else:
                 yield FileRecord(file_info, None, error)
@@ -756,6 +765,7 @@ class _FileSearch(object):
                 rum_content = RummageFileContent(
                     file_info.name, file_info.size, self.current_encoding, self.file_content
                 )
+                self.file_content = None
                 with rum_content as rum_buff:
                     skip = False
                     if self.is_binary is False and rum_content.encoding.encode == "bin":
@@ -794,20 +804,20 @@ class _FileSearch(object):
                         text.append(rum_buff[offset:])
 
                 if not self.kill and text:
-                    if self.file_content:
+                    if is_file:
                         yield BufferRecord((b'' if self.is_binary else '').join(text), None)
                     else:
                         self._update_file(
                             file_info.name, text, self.current_encoding
                         )
                 else:
-                    if self.file_content:
+                    if is_file:
                         yield BufferRecord(None, None)
                     else:
                         yield FileRecord(file_info, None, None)
 
             except Exception:
-                if self.file_content:
+                if is_file:
                     yield BufferRecord(
                         None,
                         get_exception()
@@ -830,6 +840,7 @@ class _FileSearch(object):
                 rum_content = RummageFileContent(
                     file_info.name, file_info.size, self.current_encoding, self.file_content
                 )
+                self.file_content = None
                 with rum_content as rum_buff:
 
                     skip = False

@@ -220,7 +220,7 @@ def _simple_detect(m):
     return encoding
 
 
-def _has_bom(content):
+def has_bom(content):
     """Check for UTF8, UTF16, and UTF32 BOMS."""
 
     bom = None
@@ -245,7 +245,7 @@ def _detect_encoding(f, ext, file_size):
     encoding = None
     with contextlib.closing(mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)) as m:
         # Check for boms
-        encoding = _has_bom(m.read(4))
+        encoding = has_bom(m.read(4))
         m.seek(0)
         # Check start of file if there is a high likely hood of being a binary file.
         if encoding is None and _is_binary(m.read(1024)):
@@ -284,13 +284,49 @@ def _detect_encoding(f, ext, file_size):
     return encoding
 
 
+def _detect_bfr_encoding(bfr, buffer_size):
+    """Guess using chardet."""
+
+    encoding = has_bom(bfr[:4])
+    if encoding is None and _is_binary(bfr[:1024]):
+        encoding = Encoding('bin', None)
+    if encoding is None and _is_very_small(buffer_size):
+        encoding = _simple_detect(bfr)
+    if encoding is None:
+        enc = None
+        conf = None
+        detector = DetectEncoding()
+        start = 0
+        end = start + 1024
+        while start < buffer_size:
+            detector.feed(bfr[start:end])
+            start = end
+            end = start + 1024
+            if detector.done:
+                break
+        result = detector.close()
+
+        if result is not None:
+            enc = result['encoding']
+            conf = result['confidence']
+
+        if enc is not None and conf >= CONFIDENCE_MAP.get(enc, MIN_CONFIDENCE):
+            encoding = Encoding(
+                enc,
+                None
+            )
+        else:
+            encoding = Encoding('bin', None)
+    return encoding
+
+
 def inspect_bom(filename):
     """Inspect file for bom."""
 
     encoding = None
     try:
         with open(filename, "rb") as f:
-            encoding = _has_bom(f.read(4))
+            encoding = has_bom(f.read(4))
     except Exception:  # pragma: no cover
         # print(traceback.format_exc())
         pass
@@ -324,6 +360,25 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096):
         pass
 
     # If something went wrong, we will just return 'None'
+    return encoding
+
+
+def sguess(bfr):
+    """Guess the encoding of the buffer."""
+
+    encoding = None
+
+    try:
+        buffer_size = len(bfr)
+        if not _is_very_large(buffer_size):
+            if buffer_size == 0:
+                encoding = Encoding('ascii', None)
+            else:
+                encoding = _detect_bfr_encoding(bfr, buffer_size)
+
+    except Exception:
+        # print(traceback.format_exc())
+        pass
     return encoding
 
 
