@@ -387,7 +387,6 @@ class RummageFileContent(object):
                 return self.file_map
 
 
-
 class _FileSearch(object):
 
     """Search for files."""
