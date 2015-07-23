@@ -56,7 +56,7 @@ class RummageApp(PipeApp):
             args = iter(event.data.split("|"))
             filename = None
             for a in args:
-                if a == "-s":
+                if a == "--path":
                     try:
                         a = args.next()
                         filename = a
@@ -87,7 +87,7 @@ class RummageApp(PipeApp):
                 except StopIteration:
                     break
         if not path_arg_found:
-            args.extend(['-s', os.getcwdu()])
+            args.extend(['--path', os.getcwdu()])
 
         return args
 

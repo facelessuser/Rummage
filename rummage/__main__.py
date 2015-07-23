@@ -49,7 +49,7 @@ def parse_arguments():
     parser.add_argument('--version', action='version', version=('%(prog)s ' + version.__version__))
     parser.add_argument('--debug', action='store_true', default=False, help=argparse.SUPPRESS)
     parser.add_argument(
-        '--searchpath', '-s', default=None, type=pyin,
+        '--path', default=None, type=pyin,
         help="Path to search."
     )
     return parser.parse_args()
@@ -73,7 +73,7 @@ def run():
     if not Settings.get_single_instance() or (Settings.get_single_instance() and app.is_instance_okay()):
         RummageFrame(
             None,
-            args.searchpath if args.searchpath is not None else None,
+            args.path if args.path is not None else None,
             debug_mode=args.debug
         ).Show()
 
