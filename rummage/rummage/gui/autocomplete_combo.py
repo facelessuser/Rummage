@@ -21,14 +21,25 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 from wx.combo import ComboCtrl
+import sys
+
+if sys.platform.startswith('win'):
+    _PLATFORM = "windows"
+elif sys.platform == "darwin":
+    _PLATFORM = "osx"
+else:
+    _PLATFORM = "linux"
 
 
 class AutoCompleteCombo(ComboCtrl):
 
     """AutoCompleteCombo box."""
 
-    def __init__(self, parent, choices=[], load_last=False, changed_callback=None):
+    def __init__(self, parent, choices=None, load_last=False, changed_callback=None):
         """Init the AutoCompleteCombo object."""
+
+        if choices is None:
+            choices = []
 
         ComboCtrl.__init__(
             self, parent, wx.ID_ANY,
@@ -50,6 +61,8 @@ class AutoCompleteCombo(ComboCtrl):
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
         self.Bind(wx.EVT_TEXT, self.on_text_change)
+        if _PLATFORM != "linux":
+            self.Bind(wx.EVT_TEXT, self.on_text_change)
         try:
             self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
         except Exception:
@@ -274,7 +287,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def on_motion(self, event):
         """Select item on hover."""
 
-        item, flags = self.HitTest(event.GetPosition())
+        item = self.HitTest(event.GetPosition())[0]
         if item >= 0:
             self.Select(item)
 
@@ -300,7 +313,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
     def on_left_down(self, event):
         """Select item and dismiss popup on left mouse click."""
 
-        item, flags = self.HitTest(event.GetPosition())
+        item = self.HitTest(event.GetPosition())[0]
         if item >= 0:
             self.waiting_value = item
         wx.CallAfter(self.Dismiss)
