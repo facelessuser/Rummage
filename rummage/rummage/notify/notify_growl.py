@@ -113,7 +113,7 @@ def setup_growl(app_name, icon, alert_function):
 
         Options.growl.register()
     except Exception:
-        print(traceback.format_exc())
+        # print(traceback.format_exc())
         Options.growl = None
 
     if Options.growl is not None:
