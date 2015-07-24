@@ -60,7 +60,6 @@ class AutoCompleteCombo(ComboCtrl):
         self.Bind(wx.EVT_KEY_UP, self.on_key_up)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
-        self.Bind(wx.EVT_TEXT, self.on_text_change)
         if _PLATFORM != "linux":
             self.Bind(wx.EVT_TEXT, self.on_text_change)
         try:
