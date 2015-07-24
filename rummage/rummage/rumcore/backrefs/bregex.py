@@ -1,14 +1,15 @@
 r"""
 Backrefs for the 'regex' module.
 
-Only extends the replace if a compiled replace is used.
+Add the ability to use the following backrefs with re:
 
+    * \Q and \Q...\E - Escape/quote chars (search)
     * \c and \C...\E - Uppercase char or chars (replace)
     * \l and \L...\E - Lowercase char or chars (replace)
 
 Compiling
 =========
-pattern = regex.compile(r'somepattern', flags)
+pattern = compile_search(r'somepattern', flags)
 replace = compile_replace(pattern, r'\1 some replace pattern')
 
 Usage
@@ -76,7 +77,6 @@ if REGEX_SUPPORT:
     REGEX_TYPE = type(regex.compile('', 0))
 
     utokens = {
-        "def_back_ref": set("abfnrtvAbBdDsSwWZuxgmM"),
         "regex_flags": re.compile(
             r'(?s)(\\.)|\(\?((?:[Laberux]|V0|V1|-?[imsfw])+)[):]|(.)'
         ),
@@ -107,15 +107,6 @@ if REGEX_SUPPORT:
     }
 
     btokens = {
-        "def_back_ref": set(
-            [
-                b"a", b"b", b"f", b"n", b"r",
-                b"t", b"v", b"A", b"b", b"B",
-                b"d", b"D", b"s", b"S", b"w",
-                b"W", b"Z", b"u", b"x", b"g",
-                b"m", b"M"
-            ]
-        ),
         "regex_flags": re.compile(
             br'(?s)(\\.)|\(\?((?:[Laberux]|V0|V1|-?[imsfw])+)[):]|(.)'
         ),
@@ -438,27 +429,6 @@ if REGEX_SUPPORT:
     class RegexReplaceTemplate(bre.ReplaceTemplate):
 
         """Replace template for the regex module."""
-
-        def setup_template(self, pattern, template):
-            """Setup template."""
-
-            if isinstance(template, compat.binary_type):
-                self.binary = True
-                tokens = btokens
-                ctokens = ctok.btokens
-            else:
-                self.binary = False
-                tokens = utokens
-                ctokens = ctok.utokens
-
-            self._original = template
-            self._back_ref = set()
-            self._b_slash = ctokens["b_slash"]
-            self._def_back_ref = tokens["def_back_ref"]
-            self._empty = ctokens["empty"]
-            self._add_back_references(ctokens["replace_tokens"])
-            self._template = self._escape_template(template)
-            self.parse_template(pattern)
 
         def parse_template(self, pattern):
             """Parse template for the regex module."""

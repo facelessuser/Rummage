@@ -152,7 +152,6 @@ _UPROP = r'''
 
 # Unicode string related references
 utokens = {
-    "def_back_ref": set("abfnrtvAbBdDsSwWZuxg"),
     "uni_prop": "p",
     "inverse_uni_prop": "P",
     "ascii_low_props": 'a-z',
@@ -392,27 +391,23 @@ class ReplaceTemplate(object):
     def __init__(self, pattern, template):
         """Initialize."""
 
-        self.setup_template(pattern, template)
-
-    def setup_template(self, pattern, template):
-        """Setup the template."""
-
         if isinstance(template, compat.binary_type):
             self.binary = True
-            tokens = btokens
             ctokens = ctok.btokens
         else:
             self.binary = False
-            tokens = utokens
             ctokens = ctok.utokens
 
         self._original = template
         self._back_ref = set()
-        self._def_back_ref = tokens["def_back_ref"]
         self._b_slash = ctokens["b_slash"]
         self._empty = ctokens["empty"]
         self._add_back_references(ctokens["replace_tokens"])
         self._template = self._escape_template(template)
+        self.parse_template(pattern)
+
+    def parse_template(self, pattern):
+        """Parse template."""
         self.groups, self.literals = sre_parse.parse_template(self._template, pattern)
 
     def get_base_template(self):
@@ -453,8 +448,7 @@ class ReplaceTemplate(object):
 
         for arg in args:
             if isinstance(arg, compat.binary_type if self.binary else compat.string_type) and len(arg) == 1:
-                if arg not in self._def_back_ref and arg not in self._back_ref:
-                    self._back_ref.add(arg)
+                self._back_ref.add(arg)
 
     def get_group_index(self, index):
         """Find and return the appropriate group index."""
