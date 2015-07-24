@@ -6,27 +6,24 @@
 Rummage
 =======
 
-Rummage is a GUI for grep like searches in python.  It was inspired by the tool I use in windows called GrepWin found here: http://stefanstools.sourceforge.net/grepWin.html.  I mainly used the tool for searches, and I wanted a similar tool in OSX...so I wrote Rummage.  The feel is loosely based off of GrepWin, though currently it has no replace options (not sure if/when I will add replace).  It is written in Python; therefore, it will be slower on searches than it would be if the searching were written in C (maybe down the line).  The big reason I wrote this is so I can build a similar tool on both OSX, Windows, and/or Linux (though I haven't yet tested Linux).
+Rummage is a cross platform tool for crawling directories and searching and replacing in text files.  It is written in Python.  Rummage allows for literal or regex searches and has configurations for limiting the files that are searched.
 
-Please see the [Wiki](https://github.com/facelessuser/Rummage/wiki/Rummage-Documentation) for documentation.
-
-For help and support, or to see what is planned next, see the the [Issues](https://github.com/facelessuser/Rummage/issues?state=open) page.
-
-## Note on Replacing
-Rummage will back up a file when replacing in `<your file name>.rum-bak`.  If the copy fails, it shouldn't replace.  You can disable backups if you like, but know there are greater risks associated with this.  Replace should work without issues, but remember, this is free software, and things can go wrong.  If you disable backups, there is a greater risk if something goes wrong.  Even with backups, something *could* go wrong.  I am not responsible for files corrupted or lost.  You have been warned.
-
-Large files, really large files, can possibly cause an issue and may error out as, currently, the entire file will be read into memory for a replace.  Depending on your pattern on just searches, a lot can also be read into memory.  If you are doing really large files, know that it may error out or get really slow.  Remember this is done in Python, if you are doing massive GB files, maybe you are using the wrong tool for the job.
+Rummage was inspired by the tool I use in windows called [grepWin](http://stefanstools.sourceforge.net/grepWin.html).  I wanted a similar tool in OSX and Linux, but I found none that I liked...so I wrote Rummage.  The feel is loosely based off of GrepWin.  It is written in Python; therefore, it will be slower on searches than it would be if the searching were written in C.  If you specify an encoding when searching large projects, it should perform quite reasonably as it won't have to guess the encoding of files. On small projects, encoding guessing isn't too bad.  Though I still use grepWin on Windows, Rummage can come in handy by doing things such as fuzzy searching (when using the python **regex** engine) which grepWin cannot do.  It can also dump its results to either CSV or HTML which is sometimes nice.
 
 ## Screenshots
+Images are out of date.
 
 <img src="http://dl.dropboxusercontent.com/u/342698/Rummage/rummage_osx.png" border="0">
+
+# Documentation
+http://facelessuser.github.io/Rummage/
 
 License
 =======
 
 Rummage is released under the MIT license.
 
-Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

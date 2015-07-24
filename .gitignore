@@ -44,3 +44,5 @@ nosetests.xml
 Output/*
 
 pyinstaller
+
+site/*

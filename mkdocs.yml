@@ -2,7 +2,7 @@ site_name: Rummage Documentation
 repo_url: https://github.com/facelessuser/Rummage
 site_description: A search and replace tool written in Python.
 pages:
-  - About BracketHighlighter: index.md
+  - About Rummage: index.md
   - Installation: installation.md
   - User Guide:
       - Usage: user-guide/gui-usage.md
