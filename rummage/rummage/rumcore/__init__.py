@@ -836,6 +836,7 @@ class _FileSearch(object):
         if not self.is_binary or self.process_binary:
 
             try:
+                file_record_sent = False
                 rum_content = RummageFileContent(
                     file_info.name, file_info.size, self.current_encoding, self.file_content
                 )
@@ -853,7 +854,6 @@ class _FileSearch(object):
                     if not skip:
                         line_ending = None
                         line_map = []
-                        file_record_sent = False
 
                         for m in self._findall(rum_buff):
                             if line_ending is None and not self.boolean and not self.count_only and not self.is_binary:
