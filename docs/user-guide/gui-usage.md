@@ -151,9 +151,25 @@ The **Regular Expression Modules** panel is where the desired regular expression
 If using **regex**, you can set it the version (mode) to use.  `V0` tries to be completely compatible with **re**.  `V1` breaks compatibility with **re** but adds a number of useful additions even over **V0**.
 
 ### Notifications
-The **Notification** panel controls how (such things as notification results) can be enabled/disabled and configured.  You can enable/disable notification popups and/or audible notification sound.
+The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable notification popups and/or audible notification sound.
 
 You can also select whether to use the systems builtin notifications or growl.
+
+Ubuntu
+: 
+   - Growl: Support for Linux - http://mattn.github.io/growl-for-linux/.
+   - Native: OSD via `notify-send`.
+
+OSX
+: 
+    - Growl: Support for OSX - http://growl.info/.
+    - Native: Notification Center via [terminal-notifier](https://github.com/alloy/terminal-notifier). Path to `terminal-notifier` must be configured.
+
+Windows
+: 
+    - Growl: Support for Windows - http://www.growlforwindows.com/gfw/.
+    - Native: Native windows taskbar notifications.
+
 
 ### History
 The **History** panel is where all text box drop down history can be cleared.
