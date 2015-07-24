@@ -73,7 +73,10 @@ class EditorDialog(gui.EditorDialog):
         self.m_instructions_label.SetLabel(
             _(
                 "Select the application and then set the arguments.\n\n"
-                "Use {$file}, {$line}, and {$col} syntax to specify the file, line, and column respectively."
+                "Special variables:\n"
+                "{$file} --> file path\n"
+                "{$line} --> line number\n"
+                "{$col} --> column number"
             )
         )
         self.m_instructions_label.Wrap(325)
