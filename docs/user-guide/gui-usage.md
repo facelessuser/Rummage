@@ -125,6 +125,15 @@ The limit search pattern contains inputs and toggles to filter which files will 
 | Include hidden | The given OS's native hidden files, folders and dotfiles will be included in the search. |
 | Include binary files | Forces rummage to search binary files. |
 
+## Export to CSV or HTML
+
+![HTML Export](../images/html_export.png)
+
+Rummage allows the exporting of the results to either CSV or HTML.  Simply select **File-->Export** and pick either **CSV** or **HTML**.  The HTML output will be styled similar to the GUI interface with the results in tables with sortable columns.
+
+!!! note "Note":
+    Really, really large sets of results will probably be best suited for CSV as a browser may have a hard time loading the entire data set at once.
+
 ## Preferences
 
 ![Preferences](../images/preferences.png)
@@ -133,6 +142,20 @@ The preference dialog (found at **File-->Preferences**) is where Rummage keeps s
 
 ### Editor
 The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog where you can browse for your editor of choice and manage the arguments to pass to the editor.
+
+![Editor Options](../images/editor_options.png)
+
+The editor options dialog has a file picker to select the the editor.  In OSX it may be beneficial to create a shell script or symlink that you can references as the picker won't be able to descend into an `.app` bundle as it is viewed as a file instead of a folder.
+
+You can then add arguments.  Each argument must be added as a separate entry.  So something like `--file myfile.txt` would be counted as **two** arguments while `--file=myfile` would be counted as one.
+
+As noted in the image above, Rummage provides 3 special variables that can be used to insert the file name, line number, or column number.
+
+| Argument Variables | Description |
+|--------------------|-------------|
+| \{$file} | Insert the file name. |
+| \{$line} | Insert the line number. |
+| \{$col}  | Insert the column number. |
 
 ### General
 The **General** panel contains a couple of useful settings.
@@ -146,24 +169,32 @@ Language
     Rummage has internal support to display dialog labels in different languages.  Currently Rummage has English and most of Russian.
 
 ### Regular Expression Modules
-The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected.  By default, Rummage will use **re**, but if **regex** is installed in your Python installation, it can be selected as well.  There is also the option of using [backrefs](#backrefs) (a wrapper that adds a couple of special escapes) with your engine of choice as well.
+The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected.  By default, Rummage will use **re**, but if **regex** is installed in your Python installation, it can be selected as well.  There is also the option of using [backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes) with your engine of choice as well.
 
 If using **regex**, you can set it the version (mode) to use.  `V0` tries to be completely compatible with **re**.  `V1` breaks compatibility with **re** but adds a number of useful additions even over **V0**.
 
 ### Notifications
 The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable notification popups and/or audible notification sound.
 
-You can also select whether to use the systems builtin notifications or growl.
+You can also select whether to use the systems built in notifications or growl.
 
 Ubuntu
 : 
    - Growl: Support for Linux - http://mattn.github.io/growl-for-linux/.
    - Native: OSD via `notify-send`.
 
+    !!! Note "Note"
+        Though Rummage should run on any Linux distro, the native dialog option was built around Ubuntu's native notifications called OSD.  Notifications will not work on other distros that do not use OSD **unless** they use Growl.  Even without Growl, other distros will probably still get the audible cue but, as each distro varies; it is difficult to be certain.  As notifications are not crucial to usage, this is minor concern.
+
 OSX
 : 
     - Growl: Support for OSX - http://growl.info/.
     - Native: Notification Center via [terminal-notifier](https://github.com/alloy/terminal-notifier). Path to `terminal-notifier` must be configured.
+
+    !!! Note "Note"
+        When selecting `native` on OSX, an option to select the path to terminal notifier will be available since native dialogs rely on `terminal-notifier` to send notifications to the Notification Center. This must be configured or *native* notifications will not work.
+
+        When selecting the `terminal-notifier` path, you can select either the binary directly or the `.<app` bundle (depending on how you installed `terminal-notifier`).  When selecting the `.app` bundle, Rummage will know how to access the binary inside the bundle.
 
 Windows
 : 
@@ -174,7 +205,7 @@ Windows
 ### History
 The **History** panel is where all text box drop down history can be cleared.
 
-## Backrefs
+## Backrefs (Extended Regex Escapes)
 Rummage has the option of using a special wrapper around Python's **re** or **regex** library called backrefs.  Backrefs was written for use with Rummage and adds various additional backrefs that are known to some regex engines, but not to Python's **re** or **regex**.  The supported back references actually vary depending on the engine being used as one may already have support.  You can enable extended back references in the **Preferences** dialog under the [Regular Expressions Module](#regular-expression-modules) panel.
 
 ### Search Back References

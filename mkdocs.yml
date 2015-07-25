@@ -6,6 +6,7 @@ pages:
   - Installation: installation.md
   - User Guide:
       - Usage: user-guide/gui-usage.md
+  - API Usage: api.md
   - Contributing &amp; Support: contributing.md
   - License: license.md
 theme: readthedocs
