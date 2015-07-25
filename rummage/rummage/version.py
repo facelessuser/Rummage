@@ -5,4 +5,4 @@ __version__ = "0.3.0"
 __status__ = "Beta"
 __maintainers__ = [("Isaac Muses", "IsaacMuse@gmail.com")]
 __help__ = "https://github.com/facelessuser/Rummage/issues"
-__manual__ = "https://github.com/facelessuser/Rummage/wiki/Rummage-Documentation"
+__manual__ = "http://facelessuser.github.io/Rummage/"
