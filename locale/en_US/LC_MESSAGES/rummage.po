@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-12-14 22:31+MST\n"
+"POT-Creation-Date: 2015-07-24 23:07+MDT\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,568 +15,715 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 
-#: _gui/about_dialog.py:28
+#: rummage/rummage/gui/about_dialog.py:38
 msgid "About"
 msgstr ""
 
-#: _gui/about_dialog.py:35
+#: rummage/rummage/gui/about_dialog.py:49
 msgid "Version: %s %s"
 msgstr ""
 
-#: _gui/about_dialog.py:38
+#: rummage/rummage/gui/about_dialog.py:52
 msgid ""
 "Developers(s):\n"
 "%s"
 msgstr ""
 
-#: _gui/about_dialog.py:41 _gui/about_dialog.py:51 _gui/about_dialog.py:54
+#: rummage/rummage/gui/about_dialog.py:55
+#: rummage/rummage/gui/about_dialog.py:63
+#: rummage/rummage/gui/about_dialog.py:66
 msgid "Contact"
 msgstr ""
 
-#: _gui/arg_dialog.py:51
+#: rummage/rummage/gui/arg_dialog.py:59
 msgid "Edit Argument"
 msgstr ""
 
-#: _gui/arg_dialog.py:52 _gui/editor_dialog.py:65
+#: rummage/rummage/gui/arg_dialog.py:60
+#: rummage/rummage/gui/editor_dialog.py:71
 msgid "Apply"
 msgstr ""
 
-#: _gui/arg_dialog.py:53 _gui/editor_dialog.py:66 _gui/generic_dialogs.py:14
-#: _gui/load_search_dialog.py:153 _gui/save_search_dialog.py:53
+#: rummage/rummage/gui/arg_dialog.py:61
+#: rummage/rummage/gui/editor_dialog.py:72
+#: rummage/rummage/gui/generic_dialogs.py:26
+#: rummage/rummage/gui/load_search_dialog.py:64
+#: rummage/rummage/gui/save_search_dialog.py:66
 msgid "Cancel"
 msgstr ""
 
-#: _gui/editor_dialog.py:59
+#: rummage/rummage/gui/editor_dialog.py:65
 msgid "Configure Editor"
 msgstr ""
 
-#: _gui/editor_dialog.py:60
+#: rummage/rummage/gui/editor_dialog.py:66
 msgid "Add"
 msgstr ""
 
-#: _gui/editor_dialog.py:61
+#: rummage/rummage/gui/editor_dialog.py:67
 msgid "Delete"
 msgstr ""
 
-#: _gui/editor_dialog.py:62
+#: rummage/rummage/gui/editor_dialog.py:68
 msgid "Edit"
 msgstr ""
 
-#: _gui/editor_dialog.py:63
+#: rummage/rummage/gui/editor_dialog.py:69
 msgid "Up"
 msgstr ""
 
-#: _gui/editor_dialog.py:64
+#: rummage/rummage/gui/editor_dialog.py:70
 msgid "Down"
 msgstr ""
 
-#: _gui/editor_dialog.py:67
+#: rummage/rummage/gui/editor_dialog.py:74
 msgid ""
 "Select the application and then set the arguments.\n"
 "\n"
-"Use {$file}, {$line}, and {$col} syntax to specify the file, line, and column respectively."
+"Special variables:\n"
+"{$file} --> file path\n"
+"{$line} --> line number\n"
+"{$col} --> column number"
 msgstr ""
 
-#: _gui/editor_dialog.py:70
+#: rummage/rummage/gui/editor_dialog.py:84
 msgid "Application"
 msgstr ""
 
-#: _gui/editor_dialog.py:71
+#: rummage/rummage/gui/editor_dialog.py:85
 msgid "Arguments"
 msgstr ""
 
-#: _gui/export_csv.py:34
+#: rummage/rummage/gui/error_text_dialog.py:40
+#: rummage/rummage/gui/search_error_list.py:38
+msgid "Error"
+msgstr ""
+
+#: rummage/rummage/gui/export_csv.py:34
 msgid "Regex Search"
 msgstr ""
 
-#: _gui/export_csv.py:36
+#: rummage/rummage/gui/export_csv.py:36
 msgid "Literal Search"
 msgstr ""
 
-#: _gui/export_csv.py:42 _gui/export_csv.py:48 _gui/export_html.py:232
-#: _gui/export_html.py:260 _gui/result_panels.py:222 _gui/result_panels.py:323
-#: _gui/rummage_dialog.py:502
+#: rummage/rummage/gui/export_csv.py:43 rummage/rummage/gui/export_csv.py:51
+#: rummage/rummage/gui/export_html.py:86
+#: rummage/rummage/gui/export_html.py:112
+#: rummage/rummage/gui/result_lists.py:41
+#: rummage/rummage/gui/result_lists.py:163
+#: rummage/rummage/gui/rummage_dialog.py:651
 msgid "File"
 msgstr ""
 
-#: _gui/export_csv.py:42 _gui/export_csv.py:48 _gui/export_html.py:234
-#: _gui/export_html.py:262 _gui/result_panels.py:224 _gui/result_panels.py:325
+#: rummage/rummage/gui/export_csv.py:43 rummage/rummage/gui/export_csv.py:51
+#: rummage/rummage/gui/export_html.py:88
+#: rummage/rummage/gui/export_html.py:114
+#: rummage/rummage/gui/result_lists.py:43
+#: rummage/rummage/gui/result_lists.py:165
 msgid "Matches"
 msgstr ""
 
-#: _gui/export_csv.py:42 _gui/export_html.py:233 _gui/result_panels.py:223
+#: rummage/rummage/gui/export_csv.py:43 rummage/rummage/gui/export_html.py:87
+#: rummage/rummage/gui/result_lists.py:42
 msgid "Size"
 msgstr ""
 
-#: _gui/export_csv.py:42 _gui/export_html.py:235 _gui/result_panels.py:225
+#: rummage/rummage/gui/export_csv.py:43 rummage/rummage/gui/export_html.py:89
+#: rummage/rummage/gui/result_lists.py:44
 msgid "Path"
 msgstr ""
 
-#: _gui/export_csv.py:42 _gui/export_html.py:236 _gui/result_panels.py:226
+#: rummage/rummage/gui/export_csv.py:43 rummage/rummage/gui/export_html.py:90
+#: rummage/rummage/gui/result_lists.py:45
 msgid "Encoding"
 msgstr ""
 
-#: _gui/export_csv.py:42 _gui/export_html.py:237 _gui/result_panels.py:227
-#: _gui/rummage_dialog.py:481
+#: rummage/rummage/gui/export_csv.py:43 rummage/rummage/gui/export_html.py:91
+#: rummage/rummage/gui/result_lists.py:46
+#: rummage/rummage/gui/rummage_dialog.py:618
 msgid "Modified"
 msgstr ""
 
-#: _gui/export_csv.py:42 _gui/export_html.py:238 _gui/result_panels.py:228
-#: _gui/rummage_dialog.py:482
+#: rummage/rummage/gui/export_csv.py:43 rummage/rummage/gui/export_html.py:92
+#: rummage/rummage/gui/result_lists.py:47
+#: rummage/rummage/gui/rummage_dialog.py:619
 msgid "Created"
 msgstr ""
 
-#: _gui/export_csv.py:48 _gui/export_html.py:261 _gui/result_panels.py:324
+#: rummage/rummage/gui/export_csv.py:51 rummage/rummage/gui/export_html.py:113
+#: rummage/rummage/gui/result_lists.py:164
 msgid "Line"
 msgstr ""
 
-#: _gui/export_csv.py:48 _gui/export_html.py:263 _gui/result_panels.py:326
+#: rummage/rummage/gui/export_csv.py:51 rummage/rummage/gui/export_html.py:115
+#: rummage/rummage/gui/result_lists.py:166
 msgid "Context"
 msgstr ""
 
-#: _gui/export_html.py:187
+#: rummage/rummage/gui/export_html.py:44
 msgid "Rummage Results"
 msgstr ""
 
-#: _gui/export_html.py:266 _gui/rummage_dialog.py:449
-#: _gui/rummage_dialog.py:962
+#: rummage/rummage/gui/export_html.py:118
 msgid "Files"
 msgstr ""
 
-#: _gui/export_html.py:267 _gui/rummage_dialog.py:450
-#: _gui/rummage_dialog.py:963
+#: rummage/rummage/gui/export_html.py:119
 msgid "Content"
 msgstr ""
 
-#: _gui/export_html.py:288
+#: rummage/rummage/gui/export_html.py:138
 msgid "Regex search:"
 msgstr ""
 
-#: _gui/export_html.py:290
+#: rummage/rummage/gui/export_html.py:140
 msgid "Literal search:"
 msgstr ""
 
-#: _gui/generic_dialogs.py:14
+#: rummage/rummage/gui/generic_dialogs.py:26
 msgid "Okay"
 msgstr ""
 
-#: _gui/generic_dialogs.py:14
+#: rummage/rummage/gui/generic_dialogs.py:26
 msgid "Yes or no?"
 msgstr ""
 
-#: _gui/generic_dialogs.py:22
+#: rummage/rummage/gui/generic_dialogs.py:32
 msgid "INFO"
 msgstr ""
 
-#: _gui/generic_dialogs.py:30
+#: rummage/rummage/gui/generic_dialogs.py:38
 msgid "ERROR"
 msgstr ""
 
-#: _gui/generic_dialogs.py:38
+#: rummage/rummage/gui/generic_dialogs.py:44
 msgid "WARNING"
 msgstr ""
 
-#: _gui/load_search_dialog.py:23 _gui/rummage_dialog.py:494
-#: _gui/rummage_dialog.py:495
+#: rummage/rummage/gui/load_search_dialog.py:28
+#: rummage/rummage/gui/rummage_dialog.py:643
+#: rummage/rummage/gui/rummage_dialog.py:644
 msgid "Regex"
 msgstr ""
 
-#: _gui/load_search_dialog.py:24 _gui/regex_test_dialog.py:73
+#: rummage/rummage/gui/load_search_dialog.py:29
+#: rummage/rummage/gui/regex_test_dialog.py:102
 msgid "Text"
 msgstr ""
 
-#: _gui/load_search_dialog.py:150
+#: rummage/rummage/gui/load_search_dialog.py:61
 msgid "Searches"
 msgstr ""
 
-#: _gui/load_search_dialog.py:151
+#: rummage/rummage/gui/load_search_dialog.py:62
 msgid "Remove"
 msgstr ""
 
-#: _gui/load_search_dialog.py:152
+#: rummage/rummage/gui/load_search_dialog.py:63
 msgid "Load"
 msgstr ""
 
-#: _gui/load_search_dialog.py:211 _gui/save_search_dialog.py:54
+#: rummage/rummage/gui/load_search_list.py:37
+#: rummage/rummage/gui/save_search_dialog.py:67
 msgid "Name"
 msgstr ""
 
-#: _gui/load_search_dialog.py:212 _gui/rummage_dialog.py:95
-#: _gui/rummage_dialog.py:475 _gui/rummage_dialog.py:499
+#: rummage/rummage/gui/load_search_list.py:38
+#: rummage/rummage/gui/rummage_dialog.py:193
+#: rummage/rummage/gui/rummage_dialog.py:648
 msgid "Search"
 msgstr ""
 
-#: _gui/load_search_dialog.py:213
+#: rummage/rummage/gui/load_search_list.py:39
+#: rummage/rummage/gui/regex_test_dialog.py:107
+#: rummage/rummage/gui/rummage_dialog.py:195
+msgid "Replace"
+msgstr ""
+
+#: rummage/rummage/gui/load_search_list.py:40
+msgid "Flags/Toggles"
+msgstr ""
+
+#: rummage/rummage/gui/load_search_list.py:41
 msgid "Type"
 msgstr ""
 
-#: _gui/open_editor.py:31
+#: rummage/rummage/gui/open_editor.py:37
 msgid "No editor is currently set!"
 msgstr ""
 
-#: _gui/regex_test_dialog.py:68
+#: rummage/rummage/gui/regex_test_dialog.py:90
 msgid "Regex Tester"
 msgstr ""
 
-#: _gui/regex_test_dialog.py:69
+#: rummage/rummage/gui/regex_test_dialog.py:91
 msgid "Use"
 msgstr ""
 
-#: _gui/regex_test_dialog.py:70 _gui/settings_dialog.py:95
+#: rummage/rummage/gui/regex_test_dialog.py:92
+#: rummage/rummage/gui/settings_dialog.py:123
 msgid "Close"
 msgstr ""
 
-#: _gui/regex_test_dialog.py:71 _gui/rummage_dialog.py:486
+#: rummage/rummage/gui/regex_test_dialog.py:93
+#: rummage/rummage/gui/rummage_dialog.py:623
 msgid "Search case-sensitive"
 msgstr ""
 
-#: _gui/regex_test_dialog.py:72 _gui/rummage_dialog.py:487
+#: rummage/rummage/gui/regex_test_dialog.py:94
+#: rummage/rummage/gui/rummage_dialog.py:624
 msgid "Dot matches newline"
 msgstr ""
 
-#: _gui/regex_test_dialog.py:74
+#: rummage/rummage/gui/regex_test_dialog.py:95
+#: rummage/rummage/gui/rummage_dialog.py:625
+msgid "Use Unicode properties"
+msgstr ""
+
+#: rummage/rummage/gui/regex_test_dialog.py:96
+#: rummage/rummage/gui/rummage_dialog.py:634
+msgid "Best fuzzy match"
+msgstr ""
+
+#: rummage/rummage/gui/regex_test_dialog.py:97
+#: rummage/rummage/gui/rummage_dialog.py:635
+msgid "Improve fuzzy fit"
+msgstr ""
+
+#: rummage/rummage/gui/regex_test_dialog.py:98
+msgid "Unicode word break"
+msgstr ""
+
+#: rummage/rummage/gui/regex_test_dialog.py:99
+msgid "Reverse match"
+msgstr ""
+
+#: rummage/rummage/gui/regex_test_dialog.py:100
+#: rummage/rummage/gui/rummage_dialog.py:638
+msgid "Format style replacements"
+msgstr ""
+
+#: rummage/rummage/gui/regex_test_dialog.py:101
+#: rummage/rummage/gui/rummage_dialog.py:639
+msgid "Full case-folding"
+msgstr ""
+
+#: rummage/rummage/gui/regex_test_dialog.py:103
+msgid "Result"
+msgstr ""
+
+#: rummage/rummage/gui/regex_test_dialog.py:105
 msgid "Regex Input"
 msgstr ""
 
-#: _gui/rummage_dialog.py:63
+#: rummage/rummage/gui/regex_test_dialog.py:106
+msgid "Find"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:68
 msgid "any"
 msgstr ""
 
-#: _gui/rummage_dialog.py:64
+#: rummage/rummage/gui/rummage_dialog.py:69
 msgid "greater than"
 msgstr ""
 
-#: _gui/rummage_dialog.py:65
+#: rummage/rummage/gui/rummage_dialog.py:70
 msgid "equal to"
 msgstr ""
 
-#: _gui/rummage_dialog.py:66
+#: rummage/rummage/gui/rummage_dialog.py:71
 msgid "less than"
 msgstr ""
 
-#: _gui/rummage_dialog.py:67
+#: rummage/rummage/gui/rummage_dialog.py:72
 msgid "on any"
 msgstr ""
 
-#: _gui/rummage_dialog.py:68
+#: rummage/rummage/gui/rummage_dialog.py:73
 msgid "after"
 msgstr ""
 
-#: _gui/rummage_dialog.py:69
+#: rummage/rummage/gui/rummage_dialog.py:74
 msgid "on"
 msgstr ""
 
-#: _gui/rummage_dialog.py:70
+#: rummage/rummage/gui/rummage_dialog.py:75
 msgid "before"
 msgstr ""
 
-#: _gui/rummage_dialog.py:94
+#: rummage/rummage/gui/rummage_dialog.py:192
 msgid "Stop"
 msgstr ""
 
-#: _gui/rummage_dialog.py:96
+#: rummage/rummage/gui/rummage_dialog.py:194
 msgid "Aborting"
 msgstr ""
 
-#: _gui/rummage_dialog.py:260
+#: rummage/rummage/gui/rummage_dialog.py:419
 msgid "%01.2f seconds"
 msgstr ""
 
-#: _gui/rummage_dialog.py:388
+#: rummage/rummage/gui/rummage_dialog.py:511
 msgid "Select directory to rummage"
 msgstr ""
 
-#: _gui/rummage_dialog.py:470 _gui/rummage_dialog.py:1427
+#: rummage/rummage/gui/rummage_dialog.py:588
+#: rummage/rummage/gui/rummage_dialog.py:1607
 msgid "Show Limit Search Panel"
 msgstr ""
 
-#: _gui/rummage_dialog.py:476
+#: rummage/rummage/gui/rummage_dialog.py:610
+msgid "Search and Replace"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:611
 msgid "Limit Search"
 msgstr ""
 
-#: _gui/rummage_dialog.py:478
-msgid "Where"
+#: rummage/rummage/gui/rummage_dialog.py:614
+msgid "Search in"
 msgstr ""
 
-#: _gui/rummage_dialog.py:479
-msgid "What"
+#: rummage/rummage/gui/rummage_dialog.py:615
+msgid "Search for"
 msgstr ""
 
-#: _gui/rummage_dialog.py:480
+#: rummage/rummage/gui/rummage_dialog.py:616
+msgid "Replace with"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:617
 msgid "Size is"
 msgstr ""
 
-#: _gui/rummage_dialog.py:483
+#: rummage/rummage/gui/rummage_dialog.py:620
 msgid "Exclude folders"
 msgstr ""
 
-#: _gui/rummage_dialog.py:484
+#: rummage/rummage/gui/rummage_dialog.py:621
 msgid "Files which match"
 msgstr ""
 
-#: _gui/rummage_dialog.py:485
+#: rummage/rummage/gui/rummage_dialog.py:622
 msgid "Search with regex"
 msgstr ""
 
-#: _gui/rummage_dialog.py:488
-msgid "Treat all as UTF-8"
-msgstr ""
-
-#: _gui/rummage_dialog.py:489
+#: rummage/rummage/gui/rummage_dialog.py:627
 msgid "Boolean match"
 msgstr ""
 
-#: _gui/rummage_dialog.py:490
+#: rummage/rummage/gui/rummage_dialog.py:628
 msgid "Count only"
 msgstr ""
 
-#: _gui/rummage_dialog.py:491
+#: rummage/rummage/gui/rummage_dialog.py:629
+msgid "Create backups"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:630
+msgid "Force"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:636
+msgid "Unicode word breaks"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:637
+msgid "Search backwards"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:640
 msgid "Include subfolders"
 msgstr ""
 
-#: _gui/rummage_dialog.py:492
+#: rummage/rummage/gui/rummage_dialog.py:641
 msgid "Include hidden"
 msgstr ""
 
-#: _gui/rummage_dialog.py:493
+#: rummage/rummage/gui/rummage_dialog.py:642
 msgid "Include binary files"
 msgstr ""
 
-#: _gui/rummage_dialog.py:496
+#: rummage/rummage/gui/rummage_dialog.py:645
 msgid "Test Regex"
 msgstr ""
 
-#: _gui/rummage_dialog.py:497 _gui/save_search_dialog.py:51
+#: rummage/rummage/gui/rummage_dialog.py:646
+#: rummage/rummage/gui/save_search_dialog.py:64
 msgid "Save Search"
 msgstr ""
 
-#: _gui/rummage_dialog.py:498
+#: rummage/rummage/gui/rummage_dialog.py:647
 msgid "Load Search"
 msgstr ""
 
-#: _gui/rummage_dialog.py:501
+#: rummage/rummage/gui/rummage_dialog.py:650
 msgid "Export"
 msgstr ""
 
-#: _gui/rummage_dialog.py:503
+#: rummage/rummage/gui/rummage_dialog.py:652
 msgid "View"
 msgstr ""
 
-#: _gui/rummage_dialog.py:504
+#: rummage/rummage/gui/rummage_dialog.py:653
 msgid "Help"
 msgstr ""
 
-#: _gui/rummage_dialog.py:505
+#: rummage/rummage/gui/rummage_dialog.py:654
 msgid "&Preferences"
 msgstr ""
 
-#: _gui/rummage_dialog.py:506
+#: rummage/rummage/gui/rummage_dialog.py:655
 msgid "&Exit"
 msgstr ""
 
-#: _gui/rummage_dialog.py:507
+#: rummage/rummage/gui/rummage_dialog.py:656
 msgid "HTML"
 msgstr ""
 
-#: _gui/rummage_dialog.py:508
+#: rummage/rummage/gui/rummage_dialog.py:657
 msgid "CSV"
 msgstr ""
 
-#: _gui/rummage_dialog.py:509 _gui/rummage_dialog.py:1429
+#: rummage/rummage/gui/rummage_dialog.py:658
+#: rummage/rummage/gui/rummage_dialog.py:1609
 msgid "Hide Limit Search Panel"
 msgstr ""
 
-#: _gui/rummage_dialog.py:510
+#: rummage/rummage/gui/rummage_dialog.py:659
+msgid "Open Log File"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:660
 msgid "&About Rummage"
 msgstr ""
 
-#: _gui/rummage_dialog.py:511
+#: rummage/rummage/gui/rummage_dialog.py:661
 msgid "Documentation"
 msgstr ""
 
-#: _gui/rummage_dialog.py:512
+#: rummage/rummage/gui/rummage_dialog.py:662
 msgid "Help and Support"
 msgstr ""
 
-#: _gui/rummage_dialog.py:732
+#: rummage/rummage/gui/rummage_dialog.py:884
 msgid "There is no search to save!"
 msgstr ""
 
-#: _gui/rummage_dialog.py:838
-msgid "Please enter a valid search regex!"
+#: rummage/rummage/gui/rummage_dialog.py:946
+msgid "Are you sure you want to replace all instances?"
 msgstr ""
 
-#: _gui/rummage_dialog.py:841
-msgid "Please enter a valid search!"
+#: rummage/rummage/gui/rummage_dialog.py:948
+msgid "Backups are currently disabled."
 msgstr ""
 
-#: _gui/rummage_dialog.py:848
-msgid "Please enter a valid file pattern!"
-msgstr ""
-
-#: _gui/rummage_dialog.py:852
-msgid "Please enter a valid exlcude directory regex!"
-msgstr ""
-
-#: _gui/rummage_dialog.py:855
+#: rummage/rummage/gui/rummage_dialog.py:996
 msgid "Please enter a valid search path!"
 msgstr ""
 
-#: _gui/rummage_dialog.py:862
+#: rummage/rummage/gui/rummage_dialog.py:1000
+msgid "Please enter a valid search regex!"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:1003
+msgid "Please enter a valid search!"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:1012
+msgid "Please enter a valid file regex!"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:1015
+msgid "Please enter a valid file pattern!"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:1019
+msgid "Please enter a valid exlcude directory regex!"
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:1026
 msgid "Please enter a valid size!"
 msgstr ""
 
-#: _gui/rummage_dialog.py:868
+#: rummage/rummage/gui/rummage_dialog.py:1032
 msgid "Please enter a modified date!"
 msgstr ""
 
-#: _gui/rummage_dialog.py:874
+#: rummage/rummage/gui/rummage_dialog.py:1038
 msgid "Please enter a created date!"
 msgstr ""
 
-#: _gui/rummage_dialog.py:925
-msgid "Searching: 0/0 0% Matches: 0"
+#: rummage/rummage/gui/rummage_dialog.py:1069
+msgid "Searching: 0/0 0% Skipped: 0 Matches: 0"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1123 _gui/rummage_dialog.py:1264
-msgid "Searching: %d/%d %d%% Matches: %d"
+#: rummage/rummage/gui/rummage_dialog.py:1291
+#: rummage/rummage/gui/rummage_dialog.py:1396
+msgid "Searching: %d/%d %d%% Skipped: %d Matches: %d"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1144 _gui/rummage_dialog.py:1165
-msgid "Searching: %d/%d %d%% Matches: %d Benchmark: %s"
+#: rummage/rummage/gui/rummage_dialog.py:1312
+#: rummage/rummage/gui/rummage_dialog.py:1334
+msgid "Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1156
+#: rummage/rummage/gui/rummage_dialog.py:1325
 msgid "Search Aborted"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1157 _gui/rummage_dialog.py:1178
+#: rummage/rummage/gui/rummage_dialog.py:1326
+#: rummage/rummage/gui/rummage_dialog.py:1348
 msgid ""
 "\n"
 "%d matches found!"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1177
+#: rummage/rummage/gui/rummage_dialog.py:1347
 msgid "Search Completed"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1190
+#: rummage/rummage/gui/rummage_dialog.py:1362
 msgid "errors"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1191
+#: rummage/rummage/gui/rummage_dialog.py:1363
 msgid ""
 "%d errors\n"
-"See log for details."
+"Click to see errors."
 msgstr ""
 
-#: _gui/rummage_dialog.py:1192
-msgid "View Log"
+#: rummage/rummage/gui/rummage_dialog.py:1559
+#: rummage/rummage/gui/rummage_dialog.py:1583
+msgid "There is nothing to export!"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1196
+#: rummage/rummage/gui/rummage_dialog.py:1561
+#: rummage/rummage/gui/rummage_dialog.py:1585
+msgid "Export to..."
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:1574
+msgid "There was a problem exporting the HTML!  See the log for more info."
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:1598
+msgid "There was a problem exporting the CSV!  See the log for more info."
+msgstr ""
+
+#: rummage/rummage/gui/rummage_dialog.py:1624
+msgid "Cannot find log file!"
+msgstr ""
+
+#: rummage/rummage/gui/save_search_dialog.py:65
+msgid "Save"
+msgstr ""
+
+#: rummage/rummage/gui/save_search_dialog.py:95
+msgid "Please give the search a name!"
+msgstr ""
+
+#: rummage/rummage/gui/search_error_dialog.py:52
+msgid "Errors"
+msgstr ""
+
+#: rummage/rummage/gui/search_error_dialog.py:72
 msgid ""
 "Cound not process %s:\n"
 "%s"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1197
-msgid "file"
+#: rummage/rummage/gui/search_error_list.py:39
+msgid "File Name"
 msgstr ""
 
-#: _gui/rummage_dialog.py:1326
-msgid "Invalid Regular Expression!"
-msgstr ""
-
-#: _gui/rummage_dialog.py:1375 _gui/rummage_dialog.py:1401
-msgid "There is nothing to export!"
-msgstr ""
-
-#: _gui/rummage_dialog.py:1377 _gui/rummage_dialog.py:1403
-msgid "Export to..."
-msgstr ""
-
-#: _gui/rummage_dialog.py:1390
-msgid "There was a problem exporting the HTML!  See the log for more info."
-msgstr ""
-
-#: _gui/rummage_dialog.py:1416
-msgid "There was a problem exporting the CSV!  See the log for more info."
-msgstr ""
-
-#: _gui/save_search_dialog.py:52
-msgid "Save"
-msgstr ""
-
-#: _gui/save_search_dialog.py:88
-msgid "Please give the search a name!"
-msgstr ""
-
-#: _gui/settings.py:73
+#: rummage/rummage/gui/settings.py:86
 msgid "Failed to load settings file!"
 msgstr ""
 
-#: _gui/settings.py:522
+#: rummage/rummage/gui/settings.py:563
 msgid "Failed to save settings file!"
 msgstr ""
 
-#: _gui/settings.py:539
+#: rummage/rummage/gui/settings.py:578
 msgid "Failed to save cache file!"
 msgstr ""
 
-#: _gui/settings_dialog.py:22
+#: rummage/rummage/gui/settings_dialog.py:30
 msgid "%d Records"
 msgstr ""
 
-#: _gui/settings_dialog.py:81
+#: rummage/rummage/gui/settings_dialog.py:104
 msgid "Preferences"
 msgstr ""
 
-#: _gui/settings_dialog.py:83
+#: rummage/rummage/gui/settings_dialog.py:106
 msgid "Editor"
 msgstr ""
 
-#: _gui/settings_dialog.py:84
+#: rummage/rummage/gui/settings_dialog.py:107
 msgid "General"
 msgstr ""
 
-#: _gui/settings_dialog.py:85
+#: rummage/rummage/gui/settings_dialog.py:108
+msgid "Regular Expression Modules"
+msgstr ""
+
+#: rummage/rummage/gui/settings_dialog.py:109
 msgid "Notifications"
 msgstr ""
 
-#: _gui/settings_dialog.py:86
+#: rummage/rummage/gui/settings_dialog.py:110
 msgid "History"
 msgstr ""
 
-#: _gui/settings_dialog.py:87
+#: rummage/rummage/gui/settings_dialog.py:111
 msgid "Single Instance (applies to new instances)"
 msgstr ""
 
-#: _gui/settings_dialog.py:88
-msgid "Enable debug level"
-msgstr ""
-
-#: _gui/settings_dialog.py:89
+#: rummage/rummage/gui/settings_dialog.py:112
 msgid "Notification popup"
 msgstr ""
 
-#: _gui/settings_dialog.py:90
+#: rummage/rummage/gui/settings_dialog.py:113
 msgid "Alert Sound"
 msgstr ""
 
-#: _gui/settings_dialog.py:91
+#: rummage/rummage/gui/settings_dialog.py:114
+msgid "Path to terminal-notifier"
+msgstr ""
+
+#: rummage/rummage/gui/settings_dialog.py:115
 msgid "Language (restart required)"
 msgstr ""
 
-#: _gui/settings_dialog.py:92
+#: rummage/rummage/gui/settings_dialog.py:116
+msgid "Use re module"
+msgstr ""
+
+#: rummage/rummage/gui/settings_dialog.py:117
+msgid "Use re module with backrefs"
+msgstr ""
+
+#: rummage/rummage/gui/settings_dialog.py:118
+msgid "Use regex module"
+msgstr ""
+
+#: rummage/rummage/gui/settings_dialog.py:119
+msgid "Use regex module with backrefs"
+msgstr ""
+
+#: rummage/rummage/gui/settings_dialog.py:120
+msgid "Regex module version to use"
+msgstr ""
+
+#: rummage/rummage/gui/settings_dialog.py:121
 msgid "change"
 msgstr ""
 
-#: _gui/settings_dialog.py:93
-msgid "Show Log"
-msgstr ""
-
-#: _gui/settings_dialog.py:94
+#: rummage/rummage/gui/settings_dialog.py:122
 msgid "Clear"
 msgstr ""
 

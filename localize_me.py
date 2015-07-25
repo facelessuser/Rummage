@@ -21,7 +21,7 @@ def localize(args):
     pygettext = abspath(args.pygettext) if args.pygettext is not None else "pygettext.py"
     msgfmt = abspath(args.msgfmt) if args.msgfmt is not None else "msgfmt.py"
     locale_pth = "locale"
-    search_pth = join("_gui", "*.py")
+    search_pth = join("rummage", "rummage", "gui", "*.py")
     cmd = [
         pygettext,
         "-na",
