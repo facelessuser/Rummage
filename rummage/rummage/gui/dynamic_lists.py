@@ -38,6 +38,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
             parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
             style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_VIRTUAL
         )
+        self.sort_init = True
         self.column_count = len(columns)
         self.headers = columns
         self.itemDataMap = {}
@@ -85,7 +86,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         if self.size_sample or not USE_SAMPLE_SIZE:
             for x in range(0, self.column_count):
                 text = self.get_item_text(idx, x, True)
-                lw, lh, d, e = self.dc.GetFullTextExtent(text)
+                lw = self.dc.GetFullTextExtent(text)[0]
                 width = lw + 30
                 if width > self.widest_cell[x]:
                     self.widest_cell[x] = width
@@ -113,7 +114,9 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         for x in range(0, self.column_count):
             self.InsertColumn(x, self.headers[x])
         self.SetItemCount(len(self.itemDataMap))
-        listmix.ColumnSorterMixin.__init__(self, self.column_count)
+        if self.sort_init:
+            listmix.ColumnSorterMixin.__init__(self, self.column_count)
+            self.sort_init = False
         self.SortListItems(col=0, ascending=1)
         self.init_column_size()
 

@@ -131,7 +131,7 @@ class ResultFileList(DynamicList):
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
             text = self.get_item_text(idx, 2, True)
-            lw, lh, d, e = self.dc.GetFullTextExtent(text)
+            lw = self.dc.GetFullTextExtent(text)[0]
             width = lw + 30
             if width > self.widest_cell[2]:
                 self.widest_cell[2] = width
@@ -220,7 +220,7 @@ class ResultContentList(DynamicList):
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
             text = self.get_item_text(idx, 2, True)
-            lw, lh, d, e = self.dc.GetFullTextExtent(text)
+            lw = self.dc.GetFullTextExtent(text)[0]
             width = lw + 30
             if width > self.widest_cell[2]:
                 self.widest_cell[2] = width
