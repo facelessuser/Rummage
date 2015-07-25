@@ -1009,7 +1009,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_filematch_textbox.GetValue().strip() == "" or
                     self.validate_regex(self.m_filematch_textbox.Value)
                 ):
-                    msg = "Please enter a valid file regex!"
+                    msg = _("Please enter a valid file regex!")
                     fail = True
             elif not fail and self.m_filematch_textbox.GetValue().strip() == "":
                 msg = _("Please enter a valid file pattern!")
@@ -1525,8 +1525,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 re.compile(pattern, flags)
             return False
         except Exception:
-            errormsg(_("Invalid Regular Expression!"))
-            error(traceback.format_exc())
+            debug(traceback.format_exc())
             return True
 
     def on_debug_console(self, event):
