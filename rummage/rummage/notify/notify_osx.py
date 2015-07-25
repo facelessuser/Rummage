@@ -11,6 +11,7 @@ from os.path import exists
 import ctypes
 import ctypes.util
 import sys
+import platform
 
 __all__ = ("get_notify", "alert", "setup", "destroy")
 
@@ -50,6 +51,15 @@ def _callmethod(obj, method, *args, **kwargs):
 
     cast_return = kwargs.get("cast_return", ctypes.c_void_p)
     return cast_return(objc.objc_msgSend(obj, objc.sel_registerName(method), *args))
+
+
+def _is_ver_okay():
+    """See if version is > 10.8."""
+
+    try:
+        return float(platform.mac_ver()[0].split('.')[:2]) >= 10.9
+    except Exception:
+        return False
 
 
 class Options(object):
@@ -139,7 +149,9 @@ def setup(app_name, icon, *args):
         if sender is not None and isinstance(sender, binary_type):
             sender = sender.decode('utf-8')
 
-        if notify_icon is not None and isinstance(notify_icon, binary_type):
+        if _is_ver_okay():
+            notify_icon = None
+        elif notify_icon is not None and isinstance(notify_icon, binary_type):
             notify_icon = notify_icon.decode('utf-8')
 
     Options.app_name = app_name
