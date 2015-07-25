@@ -389,6 +389,7 @@ class Settings(object):
         pth = cls.get_config_folder()
         png = join(pth, "Rummage-notify.png")
         icon = join(pth, "Rummage-notify.ico")
+        icns = join(pth, "Rummage-notify.icns")
 
         try:
             if not exists(png):
@@ -404,17 +405,27 @@ class Settings(object):
         except Exception:
             icon = None
 
+        try:
+            if not exists(icns):
+                with open(icns, "wb") as f:
+                    f.write(data.get_image('rummage.icns').GetData())
+        except Exception:
+            icns = None
+
         # Set up notifications
-        if first_time:
-            notify.setup_notifications(
-                "Rummage",
-                png,
-                icon,
-                (
-                    "/Library/Ruby/Gems/2.0.0/gems/terminal-notifier-1.5.1/bin/terminal-notifier",
-                    None
-                )
-            )
+        notifier = cls.get_term_notifier()
+        if (
+            isdir(notifier) and
+            notifier.endswith('.app') and
+            exists(join(notifier, 'Contents/MacOS/terminal-notifier'))
+        ):
+            notifier = join(notifier, 'Contents/MacOS/terminal-notifier')
+        notify.setup_notifications(
+            "Rummage",
+            png,
+            icon,
+            (notifier, None, icns)
+        )
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
 
     @classmethod
@@ -458,6 +469,22 @@ class Settings(object):
             notify_method = "native"
         cls.reload_settings()
         cls.settings["notify_method"] = notify_method
+        cls.save_settings()
+        cls.init_notify()
+
+    @classmethod
+    def get_term_notifier(cls):
+        """Get term notifier location."""
+
+        cls.reload_settings()
+        return cls.settings.get('term_notifier', '')
+
+    @classmethod
+    def set_term_notifier(cls, value):
+        """Set term notifier location."""
+
+        cls.reload_settings()
+        cls.settings['term_notifier'] = value
         cls.save_settings()
         cls.init_notify()
 

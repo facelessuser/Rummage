@@ -60,6 +60,7 @@ class Options(object):
     sender = "com.apple.Terminal"
     terminal_notifier = None
     app_name = ""
+    icon = None
 
     @classmethod
     def clear(cls):
@@ -69,6 +70,7 @@ class Options(object):
         cls.sender = "com.apple.Terminal"
         cls.terminal_notifier = None
         cls.app_name = ""
+        cls.icon = None
 
 
 def alert(sound=None):
@@ -105,6 +107,8 @@ def notify_osx_call(title, message, sound, fallback):
         if Options.sender is not None:
             params += ["-sender", Options.sender]
             params += ["-activate", Options.sender]
+        if Options.icon is not None:
+            params += ["-appIcon", Options.icon]
         if sound:
             params += ["-sound", "Glass"]
         subprocess.call(params)
@@ -124,15 +128,19 @@ def setup(app_name, icon, *args):
     term_notify = None
     sender = None
 
-    if len(args) and len(args[0]) == 2:
+    if len(args) and len(args[0]) == 3:
         term_notify = args[0][0]
         sender = args[0][1]
+        notify_icon = args[0][2]
 
         if term_notify is not None and isinstance(term_notify, binary_type):
             term_notify = term_notify.decode('utf-8')
 
         if sender is not None and isinstance(sender, binary_type):
             sender = sender.decode('utf-8')
+
+        if notify_icon is not None and isinstance(notify_icon, binary_type):
+            notify_icon = notify_icon.decode('utf-8')
 
     Options.app_name = app_name
 
@@ -141,9 +149,13 @@ def setup(app_name, icon, *args):
         Options.terminal_notifier = term_notify
         if sender is not None:
             Options.sender = sender
+        if notify_icon is not None and exists(notify_icon):
+            Options.icon = notify_icon
         Options.notify = notify_osx_call
     except Exception:
-        print(traceback.format_exc())
+        # print(term_notify)
+        # print(traceback.format_exc())
+        pass
 
 
 def destroy():

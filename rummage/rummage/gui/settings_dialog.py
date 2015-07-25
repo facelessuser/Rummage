@@ -25,6 +25,7 @@ from .settings import Settings
 from .editor_dialog import EditorDialog
 from ..localization import _
 from .. import rumcore
+import sys
 
 RECORDS = _("%d Records")
 
@@ -80,6 +81,13 @@ class SettingsDialog(gui.SettingsDialog):
         if locale is None:
             locale = "en_US"
         self.m_lang_choice.SetStringSelection(locale)
+        self.m_term_note_picker.SetPath(Settings.get_term_notifier())
+        if sys.platform == "darwin":
+            is_native = Settings.get_notify_method() == "default"
+            self.m_term_note_label.Show()
+            self.m_term_note_picker.Show()
+            self.m_term_note_label.Enable(is_native)
+            self.m_term_note_picker.Enable(is_native)
 
         self.localize()
 
@@ -103,6 +111,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_single_checkbox.SetLabel(_("Single Instance (applies to new instances)"))
         self.m_visual_alert_checkbox.SetLabel(_("Notification popup"))
         self.m_audio_alert_checkbox.SetLabel(_("Alert Sound"))
+        self.m_term_note_label.SetLabel(_("Path to terminal-notifier"))
         self.m_language_label.SetLabel(_("Language (restart required)"))
         self.m_re_radio.SetLabel(_("Use re module"))
         self.m_bre_radio.SetLabel(_("Use re module with backrefs"))
@@ -138,9 +147,19 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_history_label.SetLabel(RECORDS % 0)
         self.m_history_clear_button.Enable(False)
 
+    def on_term_note_change(self, event):
+        """Update term path."""
+
+        Settings.set_term_notifier(self.m_term_note_picker.GetPath())
+
     def on_notify_choice(self, event):
         """Update notify method."""
 
+        string_choice = self.m_notify_choice.GetStringSelection()
+        is_native = string_choice == "default"
+        if sys.platform == "darwin":
+            self.m_term_note_picker.Enable(is_native)
+            self.m_term_note_label.Enable(is_native)
         Settings.set_notify_method(self.m_notify_choice.GetStringSelection())
         event.Skip()
 
