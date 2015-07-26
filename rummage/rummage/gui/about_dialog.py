@@ -52,7 +52,7 @@ class AboutDialog(gui.AboutDialog):
             _("Version: %s %s") % (version.__version__, version.__status__)
         )
         self.m_developers_label.SetLabel(
-            _("Developers(s):\n%s") % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in version.__maintainers__]))
+            _("Developer(s):\n%s") % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in version.__maintainers__]))
         )
 
         self.m_dev_toggle.SetLabel(_("Contact") + " >>")
