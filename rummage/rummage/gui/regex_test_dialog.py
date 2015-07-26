@@ -39,7 +39,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
-        self.SetIcon(data.get_image('rummage_64.png').GetIcon())
+        self.SetIcon(data.get_image('rummage_large.png').GetIcon())
         self.parent = parent
         self.regex_mode = Settings.get_regex_mode()
         self.regex_version = Settings.get_regex_version()

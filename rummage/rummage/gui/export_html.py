@@ -285,7 +285,7 @@ def export(export_html, search, regex_search, result_list, result_content_list):
                 "lang": get_current_domain()
             }
         )
-        html.write(BODY_START % {"icon": base64.b64encode(data.get_image('rummage_64.png').GetData())})
+        html.write(BODY_START % {"icon": base64.b64encode(data.get_image('rummage.png').GetData())})
         html.write(
             (TABS_START if len(result_content_list) else TABS_START_SINGLE) % {
                 "file_tab": FILES,

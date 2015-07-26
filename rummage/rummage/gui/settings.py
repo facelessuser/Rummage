@@ -394,7 +394,7 @@ class Settings(object):
         try:
             if not exists(png):
                 with open(png, "wb") as f:
-                    f.write(data.get_image('rummage_64.png').GetData())
+                    f.write(data.get_image('rummage.png').GetData())
         except Exception:
             png = None
 

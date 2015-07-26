@@ -50,7 +50,6 @@ from .search_error_dialog import SearchErrorDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .messages import dirpickermsg, filepickermsg
-from .messages import error_icon
 from .. import data
 
 DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
@@ -528,7 +527,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.hide_limit_panel = False
 
-        self.SetIcon(data.get_image('rummage_64.png').GetIcon())
+        self.SetIcon(data.get_image('rummage_large.png').GetIcon())
 
         self.error_dlg = None
         self.debounce_search = False
@@ -1354,12 +1353,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     errors = _ERRORS[:]
                     del _ERRORS[:]
                 if errors:
-                    graphic = error_icon.GetImage()
-                    graphic.Rescale(16, 16)
-                    image = wx.BitmapFromImage(graphic)
+                    bm = data.get_image('error.png').GetBitmap()
+                    bm.SetHeight(16)
+                    bm.SetWidth(16)
                     self.error_dlg = SearchErrorDialog(self, errors)
                     self.m_statusbar.set_icon(
-                        _("errors"), image,
+                        _("errors"), bm,
                         msg=_("%d errors\nClick to see errors.") % len(errors),
                         click_left=self.on_error_click
                         # context=[(_("View Log"), lambda e: self.open_debug_console())]
