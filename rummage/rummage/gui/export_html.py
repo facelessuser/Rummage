@@ -38,7 +38,7 @@ def html_encode(text):
         '&nbsp;',
         ''.join(
             encode_table.get(c, c) for c in text
-        ).encode('utf-8', 'xmlcharrefreplace')
+        )
     )
 
 TITLE = html_encode(_("Rummage Results"))
