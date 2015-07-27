@@ -60,13 +60,15 @@ def get_bitmap(file_name):
     if sys.platform == "darwin":
         bm = wx.BitmapFromImage(image)
         bm.SetSize(
-            int(bm.GetWidth() / 2),
-            int(bm.GetHeight()/ 2)
+            (
+                int(bm.GetWidth() / 2),
+                int(bm.GetHeight() / 2)
+            )
         )
     else:
         scaled = image.Rescale(
             int(image.GetWidth() / 2),
-            int(image.GetHeight()/ 2)
+            int(image.GetHeight() / 2)
         )
         bm = wx.BitmapFromImage(scaled)
 
