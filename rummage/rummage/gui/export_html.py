@@ -140,7 +140,7 @@ SEARCH_LABEL_REGEX = html_encode(_("Regex search:"))
 SEARCH_LABEL_LITERAL = html_encode(_("Literal search:"))
 
 TABS_END = '''
-<label id="search_label">%(label)s %(search)s</label>
+<div id="search_div"><label id="search_label">%(label)s %(search)s</label></div>
 </div>
 '''
 
@@ -279,7 +279,7 @@ def export(export_html, search, regex_search, result_list, result_content_list):
             HTML_HEADER % {
                 "js": data.get_file('sorttable.js'),
                 "morejs": LOAD_TAB,
-                "css": data.get_file('results.css').replace('{{bg}}', data.get_image('bg_fade.png', b64=True), 1),
+                "css": data.get_file('results.css'),
                 "icon": base64.b64encode(data.get_image('glass.png').GetData()),
                 "title": TITLE,
                 "lang": get_current_domain()
