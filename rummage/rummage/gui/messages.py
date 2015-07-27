@@ -24,6 +24,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import re
+import sys
 from collections import namedtuple
 from wx.lib.embeddedimage import PyEmbeddedImage
 
@@ -1238,10 +1239,19 @@ class Messages(wx.Dialog):
             if icn is not None:
                 # We use a large icon size but half it so it will
                 # work on retina.
-                bm = icn.GetBitmap()
-                bm.SetHeight(DEFAULT_ICON_SIZE)
-                bm.SetWidth(DEFAULT_ICON_SIZE)
-                icon = MessageIcon(bm, DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
+                if sys.platform == "darwin":
+                    bm = icn.GetBitmap()
+                    bm.SetHeight(DEFAULT_ICON_SIZE)
+                    bm.SetWidth(DEFAULT_ICON_SIZE)
+                    icon = MessageIcon(bm, DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
+                else:
+                    icon = MessageIcon(
+                        wx.BitmapFromImage(
+                            icn.GetImage().Rescale(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
+                        ),
+                        DEFAULT_ICON_SIZE,
+                        DEFAULT_ICON_SIZE
+                    )
 
         return icon
 

@@ -1353,12 +1353,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     errors = _ERRORS[:]
                     del _ERRORS[:]
                 if errors:
-                    bm = data.get_image('error.png').GetBitmap()
-                    bm.SetHeight(16)
-                    bm.SetWidth(16)
                     self.error_dlg = SearchErrorDialog(self, errors)
                     self.m_statusbar.set_icon(
-                        _("errors"), bm,
+                        _("errors"),
+                        data.get_bitmap('error.png'),
                         msg=_("%d errors\nClick to see errors.") % len(errors),
                         click_left=self.on_error_click
                         # context=[(_("View Log"), lambda e: self.open_debug_console())]

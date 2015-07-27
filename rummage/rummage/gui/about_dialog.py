@@ -37,13 +37,10 @@ class AboutDialog(gui.AboutDialog):
 
         self.SetTitle(_("About"))
 
-        bm = data.get_image('rummage_dialog.png').GetBitmap()
-        bm.SetHeight(64)
-        bm.SetWidth(64)
         self.m_bitmap = wx.StaticBitmap(
             self.m_about_panel,
             wx.ID_ANY,
-            bm,
+            data.get_bitmap('rummage_dialog.png'),
             wx.DefaultPosition,
             wx.Size(64, 64), 0
         )

@@ -46,18 +46,9 @@ class SavedSearchList(DynamicList):
         """Create image list."""
 
         self.images = wx.ImageList(16, 16)
-        glass = data.get_image('glass.png').GetBitmap()
-        glass.SetHeight(16)
-        glass.SetWidth(16)
-        su = data.get_image('su.png').GetBitmap()
-        su.SetHeight(16)
-        su.SetWidth(16)
-        sd = data.get_image('sd.png').GetBitmap()
-        sd.SetHeight(16)
-        sd.SetWidth(16)
-        self.glass = self.images.Add(glass)
-        self.sort_up = self.images.Add(su)
-        self.sort_down = self.images.Add(sd)
+        self.glass = self.images.Add(data.get_bitmap('glass.png'))
+        self.sort_up = self.images.Add(data.get_bitmap('su.png'))
+        self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def get_item_text(self, item, col, absolute=False):

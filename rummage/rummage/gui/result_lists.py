@@ -56,22 +56,10 @@ class ResultFileList(DynamicList):
         """Create the image list."""
 
         self.images = wx.ImageList(16, 16)
-        doc = data.get_image('doc.png').GetBitmap()
-        doc.SetHeight(16)
-        doc.SetWidth(16)
-        binary = data.get_image('binary.png').GetBitmap()
-        binary.SetHeight(16)
-        binary.SetWidth(16)
-        su = data.get_image('su.png').GetBitmap()
-        su.SetHeight(16)
-        su.SetWidth(16)
-        sd = data.get_image('sd.png').GetBitmap()
-        sd.SetHeight(16)
-        sd.SetWidth(16)
-        self.doc = self.images.Add(doc)
-        self.bin = self.images.Add(binary)
-        self.sort_up = self.images.Add(su)
-        self.sort_down = self.images.Add(sd)
+        self.doc = self.images.Add(data.get_bitmap('doc.png'))
+        self.bin = self.images.Add(data.get_bitmap('binary.png'))
+        self.sort_up = self.images.Add(data.get_bitmap('su.png'))
+        self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def set_match(self, obj, file_search=False):
@@ -187,22 +175,10 @@ class ResultContentList(DynamicList):
         """Create the image list."""
 
         self.images = wx.ImageList(16, 16)
-        doc = data.get_image('doc.png').GetBitmap()
-        doc.SetHeight(16)
-        doc.SetWidth(16)
-        binary = data.get_image('binary.png').GetBitmap()
-        binary.SetHeight(16)
-        binary.SetWidth(16)
-        su = data.get_image('su.png').GetBitmap()
-        su.SetHeight(16)
-        su.SetWidth(16)
-        sd = data.get_image('sd.png').GetBitmap()
-        sd.SetHeight(16)
-        sd.SetWidth(16)
-        self.doc = self.images.Add(doc)
-        self.bin = self.images.Add(binary)
-        self.sort_up = self.images.Add(su)
-        self.sort_down = self.images.Add(sd)
+        self.doc = self.images.Add(data.get_bitmap('doc.png'))
+        self.bin = self.images.Add(data.get_bitmap('binary.png'))
+        self.sort_up = self.images.Add(data.get_bitmap('su.png'))
+        self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def on_enter_window(self, event):
