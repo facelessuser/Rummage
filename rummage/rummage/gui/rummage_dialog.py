@@ -367,7 +367,6 @@ class RummageThread(threading.Thread):
     def payload(self):
         """Execute the rummage command and gather results."""
 
-        global _ABORT
         global _RESULTS
         global _COMPLETED
         global _TOTAL
@@ -1020,7 +1019,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if (
                 not fail and
                 self.m_logic_choice.GetStringSelection() != "any" and
-                value is None 
+                value is None
             ):
                 msg = _("Please enter a valid size!")
                 fail = True
