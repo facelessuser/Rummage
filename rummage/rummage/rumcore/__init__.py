@@ -77,11 +77,11 @@ VERSION1 = 0x800        # (?V1)
 FORMATREPLACE = 0x1000  # Use {1} for groups in replace
 
 # Rumcore related flags
-LITERAL = 0x10000            # Literal search
-BUFFER_INPUT = 0x20000       # Input is a buffer
-RECURSIVE = 0x40000          # Recursive directory search
+LITERAL = 0x10000           # Literal search
+BUFFER_INPUT = 0x20000      # Input is a buffer
+RECURSIVE = 0x40000         # Recursive directory search
 FILE_REGEX_MATCH = 0x80000  # Regex pattern for files
-DIR_REGEX_MATCH = 0x100000   # Regex pattern for directories
+DIR_REGEX_MATCH = 0x100000  # Regex pattern for directories
 
 RE_MODE = 0
 BRE_MODE = 1
@@ -93,9 +93,6 @@ REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
 TRUNCATE_LENGTH = 120
 
 DEFAULT_BAK = 'rum-bak'
-
-ABORT = False
-_PROCESS = False
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -396,6 +393,7 @@ class _FileSearch(object):
     def __init__(self, args, file_obj, file_id, max_count, file_content, regex_mode=RE_MODE):
         """Init the file search object."""
 
+        self.abort = False
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
@@ -740,11 +738,10 @@ class _FileSearch(object):
 
         return file_info, error
 
-    @property
     def kill(self):
         """Kill process."""
 
-        return ABORT
+        self.abort = True
 
     def search_and_replace(self):
         """Search and replace."""
@@ -795,14 +792,14 @@ class _FileSearch(object):
                                 None
                             )
 
-                            if self.kill:
+                            if self.abort:
                                 break
 
                     # Grab the rest of the file if we found things to replace.
-                    if not self.kill and text:
+                    if not self.abort and text:
                         text.append(rum_buff[offset:])
 
-                if not self.kill and text:
+                if not self.abort and text:
                     if is_file:
                         yield BufferRecord((b'' if self.is_binary else '').join(text), None)
                     else:
@@ -902,7 +899,7 @@ class _FileSearch(object):
                                 if self.max_count == 0:
                                     break
 
-                            if self.kill:
+                            if self.abort:
                                 break
 
                 if not file_record_sent:
@@ -914,7 +911,7 @@ class _FileSearch(object):
                 )
 
     def run(self):
-        """Start the file search thread."""
+        """Start the file search."""
 
         try:
             if self.replace is not None:
@@ -970,6 +967,7 @@ class _DirWalker(object):
     ):
         """Init the directory walker object."""
 
+        self.abort = False
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
@@ -1109,11 +1107,10 @@ class _DirWalker(object):
                     valid = False
         return valid
 
-    @property
     def kill(self):
         """Abort process."""
 
-        return ABORT
+        self.abort = True
 
     def walk(self):
         """Start search for valid files."""
@@ -1134,7 +1131,7 @@ class _DirWalker(object):
                         False,
                         get_exception()
                     )
-                if self.kill:
+                if self.abort:
                     break
 
             # Seach files if they were found
@@ -1166,9 +1163,9 @@ class _DirWalker(object):
                     else:
                         yield FileAttrRecord(join(base, name), None, None, None, True, None)
 
-                    if self.kill:
+                    if self.abort:
                         break
-            if self.kill:
+            if self.abort:
                 break
 
     def run(self):
@@ -1195,16 +1192,7 @@ class Rummage(object):
     ):
         """Initialize Rummage object."""
 
-        global _PROCESS
-        global ABORT
-        if _PROCESS and _PROCESS.alive:
-            ABORT = True
-            raise RummageException("Rummage process already running!")
-        else:
-            ABORT = False
-            _PROCESS = self
-
-        self.alive = False
+        self.abort = False
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
@@ -1365,18 +1353,21 @@ class Rummage(object):
         """Return number of files searched out of current number of files crawled."""
         return self.idx + 1, self.idx + 1 + len(self.files), self.skipped, self.records + 1
 
-    @property
     def kill(self):
         """Kill process."""
 
-        return ABORT
+        self.abort = True
+        if self.searcher:
+            self.searcher.kill()
+        if self.path_walker:
+            self.path_walker.kill()
 
     def _get_next_file(self):
         """Get the next file from the file crawler results."""
 
         file_info = self.files.popleft() if self.path_walker is None else None
         if file_info is None:
-            if not self.kill:
+            if not self.abort:
                 self.idx += 1
                 file_info = self.files.popleft()
         else:
@@ -1398,7 +1389,7 @@ class Rummage(object):
     def search_file(self, content_buffer=None):
         """Search file."""
 
-        global ABORT
+        # global ABORT
 
         file_info = self._get_next_file()
         if file_info is not None:
@@ -1419,10 +1410,11 @@ class Rummage(object):
                 yield rec
 
                 if self.max is not None and self.max == 0:
-                    ABORT = True
+                    self.abort
+                    # ABORT = True
 
     def walk_files(self):
-        """Single threaded run."""
+        """Crawl the directory."""
 
         folder_limit = 100
 
@@ -1439,7 +1431,7 @@ class Rummage(object):
             else:
                 self.files.append(f)
 
-            if self.kill:
+            if self.abort:
                 self.files.clear()
 
             # Search 50 for every 100
@@ -1451,11 +1443,11 @@ class Rummage(object):
                         yield rec
 
         # Clear files if kill was signalled.
-        if self.kill:
+        if self.abort:
             self.files.clear()
 
         # Finish searching the rest
-        while self.files and not self.kill:
+        while self.files and not self.abort:
             for rec in self.search_file():
                 yield rec
 
@@ -1492,7 +1484,5 @@ class Rummage(object):
                     self.skipped += 1
                 yield f
 
-                if self.kill:
+                if self.abort:
                     self.files.clear()
-
-        self.alive = False

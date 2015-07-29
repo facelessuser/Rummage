@@ -349,7 +349,7 @@ class RummageThread(threading.Thread):
     def kill(self):
         """Abort Rummage thread."""
 
-        rumcore.ABORT = True
+        self.rummage.kill()
 
     def update_status(self):
         """Update status."""
