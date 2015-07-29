@@ -404,7 +404,7 @@ class RummageThread(threading.Thread):
             wx.GetApp().WakeUpIdle()
 
             if _ABORT:
-                break
+                self.rummage.kill()
 
     def run(self):
         """Start the Rummage thread benchmark the time."""
