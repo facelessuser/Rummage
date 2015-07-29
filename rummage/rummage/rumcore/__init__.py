@@ -393,7 +393,6 @@ class _FileSearch(object):
     def __init__(self, args, file_obj, file_id, max_count, file_content, regex_mode=RE_MODE):
         """Init the file search object."""
 
-        self.abort = False
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
@@ -738,11 +737,6 @@ class _FileSearch(object):
 
         return file_info, error
 
-    def kill(self):
-        """Kill process."""
-
-        self.abort = True
-
     def search_and_replace(self):
         """Search and replace."""
 
@@ -792,14 +786,11 @@ class _FileSearch(object):
                                 None
                             )
 
-                            if self.abort:
-                                break
-
                     # Grab the rest of the file if we found things to replace.
-                    if not self.abort and text:
+                    if text:
                         text.append(rum_buff[offset:])
 
-                if not self.abort and text:
+                if text:
                     if is_file:
                         yield BufferRecord((b'' if self.is_binary else '').join(text), None)
                     else:
@@ -899,9 +890,6 @@ class _FileSearch(object):
                                 if self.max_count == 0:
                                     break
 
-                            if self.abort:
-                                break
-
                 if not file_record_sent:
                     yield FileRecord(file_info, None, None)
             except Exception:
@@ -967,7 +955,6 @@ class _DirWalker(object):
     ):
         """Init the directory walker object."""
 
-        self.abort = False
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
@@ -1107,11 +1094,6 @@ class _DirWalker(object):
                     valid = False
         return valid
 
-    def kill(self):
-        """Abort process."""
-
-        self.abort = True
-
     def walk(self):
         """Start search for valid files."""
 
@@ -1131,8 +1113,6 @@ class _DirWalker(object):
                         False,
                         get_exception()
                     )
-                if self.abort:
-                    break
 
             # Seach files if they were found
             if len(files):
@@ -1163,11 +1143,6 @@ class _DirWalker(object):
                     else:
                         yield FileAttrRecord(join(base, name), None, None, None, True, None)
 
-                    if self.abort:
-                        break
-            if self.abort:
-                break
-
     def run(self):
         """Run the directory walker."""
 
@@ -1193,6 +1168,8 @@ class Rummage(object):
         """Initialize Rummage object."""
 
         self.abort = False
+        self.searcher = None
+        self.path_walker = None
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
@@ -1353,15 +1330,6 @@ class Rummage(object):
         """Return number of files searched out of current number of files crawled."""
         return self.idx + 1, self.idx + 1 + len(self.files), self.skipped, self.records + 1
 
-    def kill(self):
-        """Kill process."""
-
-        self.abort = True
-        if self.searcher:
-            self.searcher.kill()
-        if self.path_walker:
-            self.path_walker.kill()
-
     def _get_next_file(self):
         """Get the next file from the file crawler results."""
 
@@ -1389,8 +1357,6 @@ class Rummage(object):
     def search_file(self, content_buffer=None):
         """Search file."""
 
-        # global ABORT
-
         file_info = self._get_next_file()
         if file_info is not None:
 
@@ -1410,8 +1376,7 @@ class Rummage(object):
                 yield rec
 
                 if self.max is not None and self.max == 0:
-                    self.abort
-                    # ABORT = True
+                    self.abort = True
 
     def walk_files(self):
         """Crawl the directory."""

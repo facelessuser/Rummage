@@ -346,11 +346,6 @@ class RummageThread(threading.Thread):
 
         return flags
 
-    def kill(self):
-        """Abort Rummage thread."""
-
-        self.rummage.kill()
-
     def update_status(self):
         """Update status."""
 
@@ -400,12 +395,12 @@ class RummageThread(threading.Thread):
             wx.GetApp().WakeUpIdle()
 
             if _ABORT:
-                self.kill()
-                _ABORT = False
+                break
 
     def run(self):
         """Start the Rummage thread benchmark the time."""
 
+        global _ABORT
         self.running = True
         start = time()
 
@@ -420,6 +415,8 @@ class RummageThread(threading.Thread):
         self.runtime = runtime
         self.running = False
         self.update_status()
+        if _ABORT:
+            _ABORT = False
 
 
 class RummageArgs(object):
@@ -952,34 +949,31 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def start_search(self, replace=False):
         """Initiate search or stop search depending on search state."""
+
         global _ABORT
         if self.debounce_search:
             return
         self.debounce_search = True
         if replace:
             if self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
-                if self.thread is not None:
+                if self.thread is not None and not self.kill:
                     self.m_replace_button.SetLabel(SEARCH_BTN_ABORT)
                     _ABORT = True
                     self.kill = True
-                    self.thread.kill()
                 else:
-                    # TODO: do I need this?
-                    self.allow_update = False
+                    self.debounce_search = False
             else:
                 if not self.validate_search_inputs(True):
                     self.do_search(replace=True)
                 self.debounce_search = False
         else:
             if self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
-                if self.thread is not None:
+                if self.thread is not None and not self.kill:
                     self.m_search_button.SetLabel(SEARCH_BTN_ABORT)
                     _ABORT = True
                     self.kill = True
-                    self.thread.kill()
                 else:
-                    # TODO: do I need this?
-                    self.allow_update = False
+                    self.debounce_search = False
             else:
                 if not self.validate_search_inputs():
                     self.do_search()
@@ -1271,9 +1265,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Check if updates to the result lists can be done."""
 
         if not self.checking and self.allow_update:
+            self.checking = True
             is_complete = self.thread.done()
             debug("Processing current results")
-            self.checking = True
             with _LOCK:
                 completed = _COMPLETED
                 total = _TOTAL
@@ -1328,6 +1322,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     elif Settings.get_alert():
                         notify.play_alert()
                     self.kill = False
+                    global _ABORT
+                    if _ABORT:
+                        _ABORT = False
                 else:
                     self.m_statusbar.set_status(
                         _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s") % (
@@ -1361,12 +1358,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         click_left=self.on_error_click
                         # context=[(_("View Log"), lambda e: self.open_debug_console())]
                     )
-
                 self.m_result_file_list.load_list()
                 self.m_result_list.load_list()
                 self.m_grep_notebook.SetSelection(1)
                 self.debounce_search = False
                 self.allow_update = False
+                self.thread = None
             self.checking = False
 
     def update_table(self, count, done, total, skipped, *results):
@@ -1531,10 +1528,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.toggle_debug_console()
 
     def on_close(self, event):
-        """Ensure thread is stopped, and ensure tester window, debug console is closed."""
+        """Ensure thread is stopped, notifications are destroyed, debug console is closed."""
+
+        global _ABORT
 
         if self.thread is not None:
-            self.thread.abort = True
+            _ABORT = True
         notify.destroy_notifications()
         self.close_debug_console()
         event.Skip()
