@@ -120,6 +120,12 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.SortListItems(col=0, ascending=1)
         self.init_column_size()
 
+    def GetSecondarySortValues(self, col, key1, key2):
+        """Get secondary sort values."""
+
+        sscol = 1 if col == 0 else 0
+        return (self.itemDataMap[key1][sscol], self.itemDataMap[key2][sscol])
+
     def SortItems(self, sorter=None):
         """Sort items."""
 
