@@ -29,6 +29,7 @@ from .rummage import epoch_timestamp
 from .rummage import rumcore
 from .rummage import version
 from .rummage.rumcore.backrefs import bre, bregex
+import decimal
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 CLI_ENCODING = sys.getfilesystemencoding()
@@ -185,14 +186,16 @@ class RummageCli(object):
 
         if args.size_limit is not None:
             try:
+                assert args.size_limit.startswith(('<', '>', '=')), "No comparison operator"
+                size_limit = round(decimal.Decimal(args.size_limit[1:]) * decimal.Decimal(1024))
                 if args.size_limit.startswith('<'):
-                    size = ('lt', int(args.size_limit[1:]))
+                    size = ('lt', size_limit)
                 elif args.size_limit.startswith('>'):
-                    size = ('gt', int(args.size_limit[1:]))
+                    size = ('gt', size_limit)
                 else:
-                    size = ('eq', int(args.size_limit))
+                    size = ('eq', size_limit)
             except Exception:
-                raise ValueError("Size should be in KB in the form: 1000, <1000, or >1000")
+                raise ValueError("Size should be in KB in the form: =1000.0, <1000.0, or >1000.0")
         else:
             size = None
         return size
@@ -697,7 +700,7 @@ def main():
     )
     parser.add_argument(
         "--size-limit", '-z', metavar="LIMIT", default=None, type=pyin,
-        help="File size limit in KB: equal to '-z 1000', less than '-z <1000', or greater than '-z >1000'"
+        help="File size limit in KB: equal to '-z 1000.0', less than '-z <1000.0', or greater than '-z >1000.0'"
     )
     parser.add_argument(
         "--created", '-C', metavar="DATETIME", default=None, type=pyin,

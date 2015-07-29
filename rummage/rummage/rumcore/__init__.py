@@ -350,7 +350,7 @@ class RummageFileContent(object):
         """Setup binary file reading with mmap."""
         try:
             self.file_obj = open(self.name, "rb")
-            if self.size != '0.00KB':
+            if self.size != 0:
                 self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)
         except Exception:
             # _read_bin has no other fallbacks, so we issue this if it fails.
@@ -729,7 +729,7 @@ class _FileSearch(object):
         file_info = FileInfoRecord(
             self.idx,
             file_obj.name,
-            "%.2fKB" % (float(file_obj.size) / 1024.0),
+            file_obj.size,
             file_obj.modified,
             file_obj.created,
             self.current_encoding.encode.upper()
@@ -959,7 +959,7 @@ class _DirWalker(object):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
         self.dir = directory
-        self.size = (size[0], size[1] * 1024) if size is not None else size
+        self.size = (size[0], size[1]) if size is not None else size
         self.modified = modified
         self.created = created
         self.file_pattern = file_pattern

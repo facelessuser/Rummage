@@ -51,6 +51,7 @@ from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .messages import dirpickermsg, filepickermsg
 from .. import data
+import decimal
 
 DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
 
@@ -1011,10 +1012,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 if self.validate_regex(self.m_exclude_textbox.Value):
                     msg = _("Please enter a valid exlcude directory regex!")
                     fail = True
+
+            try:
+                value = float(self.m_size_text.GetValue())
+            except ValueError:
+                value = None
             if (
                 not fail and
                 self.m_logic_choice.GetStringSelection() != "any" and
-                re.match(r"[1-9]+[\d]*", self.m_size_text.GetValue()) is None
+                value is None 
             ):
                 msg = _("Please enter a valid size!")
                 fail = True
@@ -1125,8 +1131,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.args.regexdirpattern = True
             cmp_size = self.m_logic_choice.GetSelection()
             if cmp_size:
-                size = self.m_size_text.GetValue()
-                self.args.size_compare = (LIMIT_COMPARE[cmp_size], int(size))
+                size = decimal.Decimal(self.m_size_text.GetValue())
+                self.args.size_compare = (LIMIT_COMPARE[cmp_size], int(round(size * decimal.Decimal(1024))))
             else:
                 self.args.size_compare = None
             cmp_modified = self.m_modified_choice.GetSelection()

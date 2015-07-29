@@ -26,6 +26,7 @@ from .dynamic_lists import DynamicList, USE_SAMPLE_SIZE
 from .open_editor import open_editor
 from ..localization import _
 from .. import data
+import decimal
 
 
 class ResultFileList(DynamicList):
@@ -68,7 +69,7 @@ class ResultFileList(DynamicList):
         if file_search:
             self.set_item_map(
                 obj.name,
-                basename(obj.name), float(obj.size) / 1024.0, 0,
+                basename(obj.name), decimal.Decimal(obj.size) / decimal.Decimal(1024), 0,
                 dirname(obj.name), '', obj.modified,
                 obj.created, 1, 1
             )
@@ -79,7 +80,7 @@ class ResultFileList(DynamicList):
             else:
                 self.set_item_map(
                     item_id,
-                    basename(obj.info.name), float(obj.info.size.strip("KB")), 1,
+                    basename(obj.info.name), decimal.Decimal(obj.info.size) / decimal.Decimal(1024), 1,
                     dirname(obj.info.name), obj.info.encoding, obj.info.modified,
                     obj.info.created, obj.match.lineno, obj.match.colno
                 )
@@ -109,7 +110,7 @@ class ResultFileList(DynamicList):
         if not absolute:
             item = self.itemIndexMap[item]
         if col == 1:
-            return '%.2fKB' % self.itemDataMap[item][col]
+            return '%.2fKB' % round(self.itemDataMap[item][col], 2)
         elif col in [5, 6]:
             return ctime(self.itemDataMap[item][col])
         else:
