@@ -121,13 +121,8 @@ class RummageCli(object):
             context=context,
             max_count=int(args.max_count) if args.max_count is not None else None,
             flags=flags,
-            boolean=args.files_with_matches or args.files_without_match,
-            show_hidden=args.show_hidden,
-            truncate_lines=args.truncate,
             encoding=args.encoding,
-            backup=True,
             size=size,
-            process_binary=args.process_binary,
             created=created,
             modified=modified,
             replace=args.replace,
@@ -362,13 +357,31 @@ class RummageCli(object):
     def get_flags(self, args, is_buffer):
         """Get rummage flags."""
 
-        flags = rumcore.MULTILINE
+        flags = rumcore.MULTILINE | rumcore.BACKUP
 
         if args.regex_file_pattern is not None:
             flags |= rumcore.FILE_REGEX_MATCH
 
         if args.regex_directory_exclude is not None:
             flags |= rumcore.DIR_REGEX_MATCH
+
+        if args.show_hidden:
+            flags |= rumcore.SHOW_HIDDEN
+
+        if args.process_binary:
+            flags |= rumcore.PROCESS_BINARY
+
+        if args.count:
+            flags |= rumcore.COUNT_ONLY
+
+        if args.files_with_matches or args.files_without_match:
+            flags |= rumcore.BOOLEAN
+
+        # if args.backup:
+        #     flags |= rumcore.BACKUP
+
+        if args.truncate:
+            flags |= rumcore.TRUNCATE_LINES
 
         if args.unicode:
             flags |= rumcore.UNICODE

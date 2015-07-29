@@ -82,6 +82,12 @@ BUFFER_INPUT = 0x20000      # Input is a buffer
 RECURSIVE = 0x40000         # Recursive directory search
 FILE_REGEX_MATCH = 0x80000  # Regex pattern for files
 DIR_REGEX_MATCH = 0x100000  # Regex pattern for directories
+SHOW_HIDDEN = 0x200000      # Show hidden files and folders
+COUNT_ONLY = 0x400000       # Only count the matches; no context
+BOOLEAN = 0x800000          # Just check if file has one match and move on
+PROCESS_BINARY = 0x1000000  # Process binary files
+TRUNCATE_LINES = 0x2000000  # Turncate context lines to 120 chars
+BACKUP = 0x4000000          # Backup files on replace
 
 RE_MODE = 0
 BRE_MODE = 1
@@ -397,11 +403,12 @@ class _FileSearch(object):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
         self.flags = args.flags
-        self.boolean = bool(args.boolean)
-        self.count_only = bool(args.count_only)
+        self.boolean = bool(args.flags & BOOLEAN)
+        self.count_only = bool(args.flags & COUNT_ONLY)
         self.regex_format_replace = self.regex_mode in REGEX_MODES and bool(args.flags & FORMATREPLACE)
-        self.truncate_lines = args.truncate_lines
-        self.backup = args.backup
+        self.truncate_lines = bool(args.flags & TRUNCATE_LINES)
+        self.process_binary = bool(args.flags & PROCESS_BINARY)
+        self.backup = bool(args.flags & BACKUP)
         self.backup_ext = '.%s' % args.backup_ext
         self.bom = None
         if self.truncate_lines:
@@ -417,7 +424,6 @@ class _FileSearch(object):
         self.file_obj = file_obj
         self.max_count = max_count
         self.encoding = args.encoding if args.encoding is not None else None
-        self.process_binary = args.process_binary
         self.file_content = file_content
         self.is_binary = False
         self.current_encoding = None
@@ -749,7 +755,7 @@ class _FileSearch(object):
                 yield BufferRecord(None, error)
             else:
                 yield FileRecord(file_info, None, error)
-        if not self.is_binary or self.process_binary:
+        elif not self.is_binary or self.process_binary:
 
             try:
                 rum_content = RummageFileContent(
@@ -821,7 +827,7 @@ class _FileSearch(object):
         file_info, error = self._get_file_info(self.file_obj)
         if error is not None:
             yield FileRecord(file_info, None, error)
-        if not self.is_binary or self.process_binary:
+        elif not self.is_binary or self.process_binary:
 
             try:
                 file_record_sent = False
@@ -933,13 +939,8 @@ class SearchParams(object):
         self.pattern = None
         self.flags = 0
         self.context = 0
-        self.truncate_lines = False
-        self.boolean = False
-        self.count_only = False
         self.replace = None
-        self.backup = True
         self.encoding = None
-        self.process_binary = False
         self.backup_ext = DEFAULT_BAK
 
 
@@ -1159,11 +1160,8 @@ class Rummage(object):
 
     def __init__(
         self, target, pattern, file_pattern=None, folder_exclude=None,
-        flags=0, context=(0, 0), max_count=None,
-        show_hidden=False, encoding=None, size=None,
-        modified=None, created=None, process_binary=False, truncate_lines=False,
-        boolean=False, count_only=False, replace=None,
-        backup=False, backup_ext=DEFAULT_BAK, regex_mode=RE_MODE
+        flags=0, context=(0, 0), max_count=None, encoding=None, size=None,
+        modified=None, created=None, replace=None, backup_ext=DEFAULT_BAK, regex_mode=RE_MODE
     ):
         """Initialize Rummage object."""
 
@@ -1177,13 +1175,8 @@ class Rummage(object):
         self.search_params.pattern = pattern
         self.search_params.flags = flags
         self.search_params.context = context
-        self.search_params.truncate_lines = truncate_lines
-        self.search_params.boolean = boolean
-        self.search_params.count_only = count_only
         self.search_params.replace = replace
-        self.search_params.backup = backup
         self.search_params.encoding = self._verify_encoding(encoding) if encoding is not None else None
-        self.search_params.process_binary = process_binary
         self.skipped = 0
         if backup_ext and isinstance(backup_ext, string_type):
             self.search_params.backup_ext = backup_ext
@@ -1215,11 +1208,11 @@ class Rummage(object):
                 self._get_dir_pattern(folder_exclude, dir_regex_match),
                 dir_regex_match,
                 bool(flags & RECURSIVE),
-                show_hidden,
+                bool(flags & SHOW_HIDDEN),
                 size,
                 modified,
                 created,
-                self.search_params.backup_ext if backup else None,
+                self.search_params.backup_ext if bool(flags & BACKUP) else None,
                 self.regex_mode
             )
         elif not self.buffer_input and isfile(self.target):

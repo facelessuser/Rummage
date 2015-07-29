@@ -277,17 +277,11 @@ class RummageThread(threading.Thread):
             file_pattern=self.not_none(args.regexfilepattern, alt=self.not_none(args.filepattern)),
             folder_exclude=self.not_none(args.directory_exclude),
             flags=self.get_flags(args),
-            show_hidden=args.show_hidden,
             encoding=args.force_encode,
             modified=args.modified_compare,
             created=args.created_compare,
             size=args.size_compare,
-            process_binary=args.process_binary,
-            truncate_lines=True,
-            count_only=args.count_only,
-            boolean=args.boolean,
             replace=args.replace,
-            backup=args.backup,
             backup_ext=args.backup_ext,
             regex_mode=args.regex_mode
         )
@@ -302,7 +296,7 @@ class RummageThread(threading.Thread):
     def get_flags(self, args):
         """Determine rumcore flags from RummageArgs."""
 
-        flags = rumcore.MULTILINE
+        flags = rumcore.MULTILINE | rumcore.TRUNCATE_LINES
 
         if args.regex_version == 1:
             flags |= rumcore.VERSION1
@@ -332,6 +326,21 @@ class RummageThread(threading.Thread):
 
         if args.regexdirpattern:
             flags |= rumcore.DIR_REGEX_MATCH
+
+        if args.show_hidden:
+            flags |= rumcore.SHOW_HIDDEN
+
+        if args.process_binary:
+            flags |= rumcore.PROCESS_BINARY
+
+        if args.count_only:
+            flags |= rumcore.COUNT_ONLY
+
+        if args.boolean:
+            flags |= rumcore.BOOLEAN
+
+        if args.backup:
+            flags |= rumcore.BACKUP
 
         if args.regex_mode == rumcore.REGEX_MODE:
             if args.bestmatch:
