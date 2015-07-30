@@ -357,7 +357,7 @@ class RummageCli(object):
     def get_flags(self, args, is_buffer):
         """Get rummage flags."""
 
-        flags = rumcore.MULTILINE | rumcore.BACKUP
+        flags = rumcore.MULTILINE
 
         if args.regex_file_pattern is not None:
             flags |= rumcore.FILE_REGEX_MATCH
@@ -377,8 +377,8 @@ class RummageCli(object):
         if args.files_with_matches or args.files_without_match:
             flags |= rumcore.BOOLEAN
 
-        # if args.backup:
-        #     flags |= rumcore.BACKUP
+        if args.backup:
+            flags |= rumcore.BACKUP
 
         if args.truncate:
             flags |= rumcore.TRUNCATE_LINES
@@ -575,7 +575,9 @@ def main():
     """Main entry point."""
 
     # Setup arg parsing object
-    parser = argparse.ArgumentParser(prog="rumcl", description="Rummage CLI search and replace tool.", add_help=False)
+    parser = argparse.ArgumentParser(
+        prog="rumcl", description="Rummage CLI search and replace tool.", add_help=False
+    )
     # Flag arguments
     parser.add_argument(
         "--version", action="version", version=("%(prog)s " + version.__version__)
@@ -673,24 +675,23 @@ def main():
         help=r"Use unicode properties for \w, \s, etc."
     )
     parser.add_argument(
-        "--format-replace", action="store_true", default=False,
+        "--format-replace", "-P", action="store_true", default=False,
         help="Use string format replacement groups in replace patterns: {group} (regex module only)."
     )
     parser.add_argument(
         "--replace", "-r", metavar="PATTERN", default=None, type=pyin,
         help="Replace find with the specified pattern."
     )
+    parser.add_argument(
+        "--backup", "-k", action="store_true", default=False,
+        help="Backup original file when replacing."
+    )
 
     # Search modes
-    search_mode_group = parser.add_mutually_exclusive_group()
-    search_mode_group.add_argument(
+    parser.add_argument(
         "--recursive", "-R", action="store_true", default=False,
         help="Recursively search a directory tree."
     )
-    # search_mode_group.add_argument(
-    #     "--buffer", "-b", action="store_true", default=False,
-    #     help="Parse input parameter as a string buffer."
-    # )
 
     # Limit search
     dir_pattern_group = parser.add_mutually_exclusive_group()
