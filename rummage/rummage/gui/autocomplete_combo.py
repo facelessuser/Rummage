@@ -62,6 +62,8 @@ class AutoCompleteCombo(ComboCtrl):
         self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
         if _PLATFORM != "linux":
             self.Bind(wx.EVT_TEXT, self.on_text_change)
+        else:
+            self.Bind(wx.EVT_TEXT, lambda event: self.changed_callback())
         try:
             self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
         except Exception:
