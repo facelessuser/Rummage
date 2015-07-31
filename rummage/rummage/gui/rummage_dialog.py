@@ -904,21 +904,21 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if not self.hide_limit_panel:
             pth = self.m_searchin_text.GetValue()
-            if os.path.isfile(pth):
+            if os.path.isfile(pth) and self.m_limiter_panel.IsShown():
                 self.m_limiter_panel.Hide()
                 self.m_limiter_panel.GetContainingSizer().Layout()
-                self.optimize_size()
-            else:
+                self.Refresh()
+            elif not self.m_limiter_panel.IsShown():
                 self.m_limiter_panel.Show()
                 self.m_limiter_panel.Fit()
                 self.m_limiter_panel.GetSizer().Layout()
                 self.m_limiter_panel.GetContainingSizer().Layout()
                 self.m_settings_panel.GetSizer().Layout()
-                self.optimize_size()
-        else:
+                self.Refresh()
+        elif self.m_limiter_panel.IsShown():
             self.m_limiter_panel.Hide()
             self.m_limiter_panel.GetContainingSizer().Layout()
-            self.optimize_size()
+            self.Refresh()
 
     def limit_panel_hide(self):
         """Hide the limit panel."""
