@@ -236,7 +236,7 @@ if REGEX_SUPPORT:
     def _regex_literal_pattern(pattern, rum_flags=0):
         """Prepare literal search pattern flags."""
 
-        flags = 0
+        flags = regex.VERSION0 | regex.ASCII
         if rum_flags & IGNORECASE:
             flags |= regex.IGNORECASE
         return regex.compile(regex.escape(pattern), flags)
@@ -275,7 +275,7 @@ if REGEX_SUPPORT:
     def _bregex_literal_pattern(pattern, rum_flags=0):
         """Prepare literal search pattern flags."""
 
-        flags = 0
+        flags = bregex.VERSION0 | bregex.ASCII
         if rum_flags & IGNORECASE:
             flags |= bregex.IGNORECASE
         return bregex.compile_search(bregex.escape(pattern), flags)
