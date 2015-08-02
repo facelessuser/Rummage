@@ -876,7 +876,7 @@ class ReplaceTemplateExpander(object):
 def _apply_replace_backrefs(m, repl=None):
     """Expand with either the ReplaceTemplate or the user function, compile on the fly, or return None."""
 
-    if repl is not None:
+    if repl is not None and m is not None:
         if hasattr(repl, '__call__'):
             return repl(m)
         elif isinstance(repl, ReplaceTemplate):
