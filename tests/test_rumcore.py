@@ -22,7 +22,7 @@ class TestHelperFunctions(unittest.TestCase):
         """Test the re flag settings."""
 
         if rc.PY3:
-            default = re.UNICODE
+            default = re.ASCII
         else:
             default = 0
 
@@ -30,8 +30,8 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertEqual(rc._re_pattern(r"test", rc.MULTILINE).flags, re.MULTILINE | default)
         self.assertEqual(rc._re_pattern(r"test", rc.DOTALL).flags, re.DOTALL | default)
         self.assertEqual(rc._re_pattern(r"test", rc.IGNORECASE).flags, re.IGNORECASE | default)
-        self.assertEqual(rc._re_pattern(r"test", rc.UNICODE).flags, re.UNICODE | default)
-        self.assertEqual(rc._re_pattern(br"test", rc.UNICODE, binary=True).flags, 0)
+        self.assertEqual(rc._re_pattern(r"test", rc.UNICODE).flags, re.UNICODE)
+        self.assertEqual(rc._re_pattern(br"test", rc.UNICODE, binary=True).flags, default)
         self.assertEqual(
             rc._re_pattern(r"test", rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE).flags,
             re.UNICODE | re.DOTALL | re.IGNORECASE | re.MULTILINE
@@ -41,7 +41,7 @@ class TestHelperFunctions(unittest.TestCase):
         """Test the literal re flags."""
 
         if rc.PY3:
-            default = re.UNICODE
+            default = re.ASCII
         else:
             default = 0
 
@@ -56,7 +56,7 @@ class TestHelperFunctions(unittest.TestCase):
         """Test the bre flag settings."""
 
         if rc.PY3:
-            default = re.UNICODE
+            default = re.ASCII
         else:
             default = 0
 
@@ -64,8 +64,8 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertEqual(rc._bre_pattern(r"test", rc.MULTILINE).flags, bre.MULTILINE | default)
         self.assertEqual(rc._bre_pattern(r"test", rc.DOTALL).flags, bre.DOTALL | default)
         self.assertEqual(rc._bre_pattern(r"test", rc.IGNORECASE).flags, bre.IGNORECASE | default)
-        self.assertEqual(rc._bre_pattern(r"test", rc.UNICODE).flags, bre.UNICODE | default)
-        self.assertEqual(rc._bre_pattern(br"test", rc.UNICODE, binary=True).flags, 0)
+        self.assertEqual(rc._bre_pattern(r"test", rc.UNICODE).flags, bre.UNICODE)
+        self.assertEqual(rc._bre_pattern(br"test", rc.UNICODE, binary=True).flags, default)
         self.assertEqual(
             rc._bre_pattern(r"test", rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE).flags,
             bre.UNICODE | bre.DOTALL | bre.IGNORECASE | bre.MULTILINE
@@ -75,7 +75,7 @@ class TestHelperFunctions(unittest.TestCase):
         """Test the literal bre flags."""
 
         if rc.PY3:
-            default = re.UNICODE
+            default = re.ASCII
         else:
             default = 0
 

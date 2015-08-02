@@ -232,7 +232,8 @@ class TestSearchTemplate(unittest.TestCase):
     def test_unicode_shorthand_ascii_only(self):
         """Ensure that when the unicode flag is not used, only ascii properties are used."""
 
-        pattern = bre.compile_search(r'ex\lmple')
+        flags = bre.ASCII if PY3 else 0
+        pattern = bre.compile_search(r'ex\lmple', flags)
         m = pattern.match('exámple')
         self.assertTrue(m is None)
         m = pattern.match('example')
@@ -433,39 +434,64 @@ class TestSearchTemplate(unittest.TestCase):
         )
 
     def test_unicode_string_flag(self):
-        """Test finding unicode string flag."""
+        """Test finding unicode/ascii string flag."""
 
-        template = bre.SearchTemplate(r'Testing for (?iu) Unicode flag.', False, False)
-        template.apply()
-        self.assertTrue(template.unicode)
+        if PY3:
+            template = bre.SearchTemplate(r'Testing for (?ia) ASCII flag.', False, None)
+            template.apply()
+            self.assertFalse(template.unicode)
+        else:
+            template = bre.SearchTemplate(r'Testing for (?iu) Unicode flag.', False, None)
+            template.apply()
+            self.assertTrue(template.unicode)
 
     def test_unicode_string_flag_in_group(self):
-        """Test ignoring unicode string flag in group."""
+        """Test ignoring unicode/ascii string flag in group."""
 
-        template = bre.SearchTemplate(r'Testing for [(?iu)] Unicode flag.', False, False)
-        template.apply()
-        self.assertFalse(template.unicode)
+        if PY3:
+            template = bre.SearchTemplate(r'Testing for [(?ia)] ASCII flag.', False, None)
+            template.apply()
+            self.assertTrue(template.unicode)
+        else:
+            template = bre.SearchTemplate(r'Testing for [(?iu)] Unicode flag.', False, None)
+            template.apply()
+            self.assertFalse(template.unicode)
 
     def test_unicode_string_flag_escaped(self):
-        """Test ignoring unicode string flag in group."""
+        """Test ignoring unicode/ascii string flag in group."""
 
-        template = bre.SearchTemplate(r'Testing for \(?iu) Unicode flag.', False, False)
-        template.apply()
-        self.assertFalse(template.unicode)
+        if PY3:
+            template = bre.SearchTemplate(r'Testing for \(?ia) ASCII flag.', False, None)
+            template.apply()
+            self.assertTrue(template.unicode)
+        else:
+            template = bre.SearchTemplate(r'Testing for \(?iu) Unicode flag.', False, None)
+            template.apply()
+            self.assertFalse(template.unicode)
 
     def test_unicode_string_flag_unescaped(self):
         """Test unescaped unicode string flag."""
 
-        template = bre.SearchTemplate(r'Testing for \\(?iu) Unicode flag.', False, False)
-        template.apply()
-        self.assertTrue(template.unicode)
+        if PY3:
+            template = bre.SearchTemplate(r'Testing for \\(?ia) ASCII flag.', False, None)
+            template.apply()
+            self.assertFalse(template.unicode)
+        else:
+            template = bre.SearchTemplate(r'Testing for \\(?iu) Unicode flag.', False, None)
+            template.apply()
+            self.assertTrue(template.unicode)
 
     def test_unicode_string_flag_escaped_deep(self):
         """Test deep escaped unicode flag."""
 
-        template = bre.SearchTemplate(r'Testing for \\\(?iu) Unicode flag.', False, False)
-        template.apply()
-        self.assertFalse(template.unicode)
+        if PY3:
+            template = bre.SearchTemplate(r'Testing for \\\(?ia) ASCII flag.', False, None)
+            template.apply()
+            self.assertTrue(template.unicode)
+        else:
+            template = bre.SearchTemplate(r'Testing for \\\(?iu) Unicode flag.', False, None)
+            template.apply()
+            self.assertFalse(template.unicode)
 
     def test_verbose_comment_no_nl(self):
         """Test verbose comment with no newline."""

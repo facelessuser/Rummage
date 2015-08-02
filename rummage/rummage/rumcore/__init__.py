@@ -166,13 +166,15 @@ def _re_pattern(pattern, rum_flags=0, binary=False):
         flags |= re.DOTALL
     if not binary and rum_flags & UNICODE:
         flags |= re.UNICODE
+    elif PY3:
+        flags |= re.ASCII
     return re.compile(pattern, flags)
 
 
 def _re_literal_pattern(pattern, rum_flags=0):
     """Prepare literal search pattern flags."""
 
-    flags = 0
+    flags = re.ASCII if PY3 else 0
     if rum_flags & IGNORECASE:
         flags |= re.IGNORECASE
     return re.compile(re.escape(pattern), flags)
@@ -190,16 +192,19 @@ def _bre_pattern(pattern, rum_flags=0, binary=False):
         flags |= bre.DOTALL
     if not binary and rum_flags & UNICODE:
         flags |= bre.UNICODE
+    elif PY3:
+        flags |= bre.ASCII
     return bre.compile_search(pattern, flags)
 
 
 def _bre_literal_pattern(pattern, rum_flags=0):
     """Prepare literal search pattern flags."""
 
-    flags = 0
+    flags = bre.ASCII if PY3 else 0
     if rum_flags & IGNORECASE:
         flags |= bre.IGNORECASE
     return bre.compile_search(bre.escape(pattern), flags)
+
 
 if REGEX_SUPPORT:
     def _regex_pattern(pattern, rum_flags=0, binary=False):
@@ -1313,11 +1318,11 @@ class Rummage(object):
                 ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
             elif self.regex_mode == BRE_MODE:
                 pattern = bre.compile_search(
-                    folder_exclude, bre.IGNORECASE
+                    folder_exclude, bre.IGNORECASE | (bre.ASCII if PY3 else 0)
                 ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
             else:
                 pattern = re.compile(
-                    folder_exclude, re.IGNORECASE
+                    folder_exclude, re.IGNORECASE | (re.ASCII if PY3 else 0)
                 ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
         return pattern
 
@@ -1336,11 +1341,11 @@ class Rummage(object):
                 ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
             elif self.regex_mode == BRE_MODE:
                 pattern = bre.compile_search(
-                    file_pattern, bre.IGNORECASE
+                    file_pattern, bre.IGNORECASE | (bre.ASCII if PY3 else 0)
                 ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
             else:
                 pattern = re.compile(
-                    file_pattern, re.IGNORECASE
+                    file_pattern, re.IGNORECASE | (re.ASCII if PY3 else 0)
                 ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
         return pattern
 
