@@ -375,8 +375,10 @@ def sguess(bfr):
                 encoding = Encoding('ascii', None)
             else:
                 encoding = _detect_bfr_encoding(bfr, buffer_size)
+        else:
+            encoding = Encoding('bin', None)
 
-    except Exception:
+    except Exception:  # pragma: no cover
         # print(traceback.format_exc())
         pass
     return encoding

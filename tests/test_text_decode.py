@@ -128,6 +128,49 @@ class TestPyEncodingGuess(unittest.TestCase):
         self.assertEqual(encoding.bom, None)
 
 
+class TestSizeSguess(unittest.TestCase):
+
+    """Test Python file encoding based on special logic dependant on size."""
+
+    def test_zero_size(self):
+        """Test a file with zero size."""
+
+        with open('tests/encodings/zero_size.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_large')
+    def test_too_big(self, mock_size):
+        """Test a file size 30MB or greater."""
+
+        mock_size.return_value = True
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)
+
+    def test_too_small_ascii(self):
+        """Test a small ascii file."""
+
+        with open('tests/encodings/ascii.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+    def test_too_small_utf8(self):
+        """Test a small utf-8 file."""
+
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+
 class TestSizeGuess(unittest.TestCase):
 
     """Test Python file encoding based on special logic dependant on size."""
@@ -160,6 +203,80 @@ class TestSizeGuess(unittest.TestCase):
 
         encoding = text_decode.guess('tests/encodings/utf8.txt')
         self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+
+class TestChardetSguess(unittest.TestCase):
+
+    """
+    Test guessing with chardet.
+
+    Force small file detection to ensure picking an encoding early.
+    """
+
+    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    def test_confidence_pass_guess(self, mock_detect, mock_small):
+        """Test result with an encoding with acceptable confidence."""
+
+        instance = mock_detect.return_value
+        instance.close.return_value = {"encoding": "utf-8", "confidence": 1.0}
+        mock_small.return_value = False
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    def test_confidence_fail_guess(self, mock_detect, mock_small):
+        """Test result with an encoding with unacceptable confidence."""
+
+        instance = mock_detect.return_value
+        instance.close.return_value = {"encoding": "utf-8", "confidence": 0.4}
+        mock_small.return_value = False
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    def test_none_encoding_guess(self, mock_detect, mock_small):
+        """Test result with an encoding that is None confidence."""
+
+        instance = mock_detect.return_value
+        instance.close.return_value = {"encoding": None, "confidence": 0.4}
+        mock_small.return_value = False
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    def test_none_guess(self, mock_detect, mock_small):
+        """Test result with no encoding match."""
+
+        instance = mock_detect.return_value
+        instance.close.return_value = None
+        mock_small.return_value = False
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)
+
+    def test_binary_guess(self):
+        """Test result with no encoding match."""
+
+        with open('tests/encodings/binary.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'bin')
         self.assertEqual(encoding.bom, None)
 
 
