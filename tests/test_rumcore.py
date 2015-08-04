@@ -1,11 +1,14 @@
 """Tests for rumcore."""
 from __future__ import unicode_literals
 import unittest
+import os
 from rummage.rummage import rumcore as rc
 import re
 import regex
 from rummage.rummage.rumcore.backrefs import bre
 from rummage.rummage.rumcore.backrefs import bregex
+from rummage.rummage.rumcore import text_decode as td
+import codecs
 
 
 class TestHelperFunctions(unittest.TestCase):
@@ -201,8 +204,124 @@ class TestHelperFunctions(unittest.TestCase):
 
         try:
             test = 3 + "3"
-        except:
+        except TypeError:
             test = None
             error = rc.get_exception()
         self.assertTrue(test is None)
         self.assertTrue(error[0].startswith('TypeError'))
+
+
+class TestRummageFileContent(unittest.TestCase):
+
+    """Tests for RummageFileContent."""
+
+    def test_string_bin(self):
+        """Test passing a binary string."""
+
+        encoding = td.Encoding('bin', None)
+        rfc = rc.RummageFileContent("buffer", None, encoding, b'test')
+        with rfc as bfr:
+            text = bfr
+        self.assertEqual(rfc.encoding.encode, 'bin')
+        self.assertEqual(text, b'test')
+
+    def test_string_utf8(self):
+        """Test passing a binary string with utf-8 encoding."""
+
+        encoding = td.Encoding('utf-8', None)
+        rfc = rc.RummageFileContent("buffer", None, encoding, b'test')
+        with rfc as bfr:
+            text = bfr
+        self.assertEqual(rfc.encoding.encode, 'utf-8')
+        self.assertEqual(text, 'test')
+
+    def test_string_bad_encode(self):
+        """Test passing a binary string with bad encoding."""
+
+        encoding = td.Encoding('bad', None)
+        rfc = rc.RummageFileContent("buffer", None, encoding, b'test')
+        with rfc as bfr:
+            text = bfr
+        self.assertEqual(rfc.encoding.encode, 'bin')
+        self.assertEqual(text, b'test')
+
+    def test_bin(self):
+        """Test bin file."""
+
+        encoding = td.Encoding('bin', None)
+        name = "tests/encodings/binary.txt"
+        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        with rfc as f:
+            text = f[:]
+        with open(name, 'rb') as f:
+            text2 = f.read()
+        self.assertEqual(rfc.encoding.encode, 'bin')
+        self.assertEqual(text, text2)
+
+    def test_utf8(self):
+        """Test utf-8 file."""
+
+        encoding = td.Encoding('utf-8', codecs.BOM_UTF8)
+        name = "tests/encodings/utf8_bom.txt"
+        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        with rfc as f:
+            text = f[:]
+        with codecs.open(name, 'r', encoding='utf-8-sig') as f:
+            text2 = f.read()
+        self.assertEqual(rfc.encoding.encode, 'utf-8')
+        self.assertEqual(text, text2)
+
+    def test_utf16(self):
+        """Test utf-16 file."""
+
+        encoding = td.Encoding('utf-16-be', codecs.BOM_UTF16_BE)
+        name = "tests/encodings/utf16_be_bom.txt"
+        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        with rfc as f:
+            text = f[:]
+        with codecs.open(name, 'r', encoding='utf-16') as f:
+            text2 = f.read()
+        self.assertEqual(rfc.encoding.encode, 'utf-16-be')
+        self.assertEqual(text, text2)
+
+    def test_utf32(self):
+        """Test utf-8 file."""
+
+        encoding = td.Encoding('utf-32-be', codecs.BOM_UTF32_BE)
+        name = "tests/encodings/utf32_be_bom.txt"
+        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        with rfc as f:
+            text = f[:]
+        with codecs.open(name, 'r', encoding='utf-32') as f:
+            text2 = f.read()
+        self.assertEqual(rfc.encoding.encode, 'utf-32-be')
+        self.assertEqual(text, text2)
+
+    def test_rummageexception(self):
+        """Test RummageException with file."""
+
+        encoding = td.Encoding('ascii', None)
+        name = "tests/encodings/does_not_exist.txt"
+        rfc = rc.RummageFileContent(name, 10, encoding)
+        self.assertRaises(rc.RummageException, rfc.__enter__)
+
+    def test_bin_rummageexception(self):
+        """Test RummageException with a bin file."""
+
+        encoding = td.Encoding('bin', None)
+        name = "tests/encodings/does_not_exist.txt"
+        rfc = rc.RummageFileContent(name, 10, encoding)
+        self.assertRaises(rc.RummageException, rfc.__enter__)
+
+    def test_wrong(self):
+        """Test wrong encoding failure."""
+
+        encoding = td.Encoding('utf-32-be', codecs.BOM_UTF32_BE)
+        name = "tests/encodings/utf8.txt"
+        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        with rfc as f:
+            text = f[:]
+        with open(name, 'rb') as f:
+            text2 = f.read()
+        self.assertEqual(rfc.encoding.encode, 'bin')
+        self.assertEqual(text, text2)

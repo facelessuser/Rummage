@@ -100,9 +100,9 @@ TRUNCATE_LENGTH = 120
 
 DEFAULT_BAK = 'rum-bak'
 
-if sys.platform.startswith('win'):
+if sys.platform.startswith('win'):  # pragma: no cover
     _PLATFORM = "windows"
-elif sys.platform == "darwin":
+elif sys.platform == "darwin":    # pragma: no cover
     _PLATFORM = "osx"
 else:
     _PLATFORM = "linux"
@@ -347,12 +347,25 @@ class RummageFileContent(object):
         if self.file_obj is not None:
             self.file_obj.close()
 
+    def _get_encoding(self):
+        """Get the encoding."""
+
+        enc = self.encoding.encode
+        if enc == 'utf-8':
+            enc = 'utf-8-sig'
+        elif enc.startswith('utf-16'):
+            enc = 'utf-16'
+        elif enc.startswith('utf-32'):
+            enc = 'utf-32'
+        return enc
+
     def _decode_string(self):
         """Decode the string buffer."""
 
         if self.encoding.encode != "bin":
             try:
-                self.string_buffer = self.string_buffer.decode(self.encoding.encode)
+                enc = self._get_encoding()
+                self.string_buffer = self.string_buffer.decode(enc)
             except Exception:
                 self.encoding = text_decode.Encoding("bin", None)
         return self.string_buffer
@@ -374,13 +387,7 @@ class RummageFileContent(object):
             if self.encoding.encode == "bin":
                 self._read_bin()
             else:
-                enc = self.encoding.encode
-                if enc == 'utf-8':
-                    enc = 'utf-8-sig'
-                elif enc.startswith('utf-16'):
-                    enc = 'utf-16'
-                elif enc.startswith('utf-32'):
-                    enc = 'utf-32'
+                enc = self._get_encoding()
                 self.file_obj = codecs.open(self.name, 'r', encoding=enc)
             return self.file_obj.read() if self.file_map is None else self.file_map
         except RummageException:
@@ -671,9 +678,18 @@ class _FileSearch(object):
             for m in pattern.finditer(file_content):
                 yield m
 
-    def _update_file(self, file_name, content, encoding):
+    def _update_buffer(self, content):
+        """Update the buffer content."""
+
+        encoding = self.current_encoding
+        if encoding.bom:
+            content.insert(0, encoding.bom.decode(encoding.encode))
+        return BufferRecord((b'' if self.is_binary else '').join(content), None)
+
+    def _update_file(self, file_name, content):
         """Update the file content."""
 
+        encoding = self.current_encoding
         if self.backup:
             backup = file_name + self.backup_ext
             shutil.copy2(file_name, backup)
@@ -812,7 +828,7 @@ class _FileSearch(object):
 
                 if not self.abort and text:
                     if is_file:
-                        yield BufferRecord((b'' if self.is_binary else '').join(text), None)
+                        yield self._update_buffer(text, self.current_encoding)
                     else:
                         self._update_file(
                             file_info.name, text, self.current_encoding
