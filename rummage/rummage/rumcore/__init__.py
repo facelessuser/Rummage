@@ -29,7 +29,6 @@ import sre_parse
 import sys
 from collections import namedtuple
 from fnmatch import fnmatch
-from os.path import isdir, isfile, join, abspath, getsize
 from time import ctime
 from . import text_decode
 from .backrefs import bre, bregex
@@ -1056,7 +1055,7 @@ class _DirWalker(object):
         """Verify file size meets requirements."""
 
         size_okay = False
-        self.current_size = getsize(pth)
+        self.current_size = os.path.getsize(pth)
         if self.size is None:
             size_okay = True
         else:
@@ -1079,7 +1078,11 @@ class _DirWalker(object):
         """Return whether a file can be searched."""
 
         valid = False
-        if self.file_pattern is not None and not self._is_hidden(join(base, name)) and not self._is_backup(name):
+        if (
+            self.file_pattern is not None and
+            not self._is_hidden(os.path.join(base, name)) and
+            not self._is_backup(name)
+        ):
             if self.file_regex_match:
                 valid = True if self.file_pattern.match(name) is not None else False
             else:
@@ -1097,9 +1100,9 @@ class _DirWalker(object):
                 elif matched:
                     valid = True
             if valid:
-                valid = self._is_size_okay(join(base, name))
+                valid = self._is_size_okay(os.path.join(base, name))
             if valid:
-                valid = self._is_times_okay(join(base, name))
+                valid = self._is_times_okay(os.path.join(base, name))
         return valid
 
     def _valid_folder(self, base, name):
@@ -1108,7 +1111,7 @@ class _DirWalker(object):
         valid = True
         if not self.recursive:
             valid = False
-        elif self._is_hidden(join(base, name)):
+        elif self._is_hidden(os.path.join(base, name)):
             valid = False
         elif self.folder_exclude is not None:
             if self.dir_regex_match:
@@ -1146,7 +1149,7 @@ class _DirWalker(object):
                 except Exception:
                     dirs.remove(name)
                     yield FileAttrRecord(
-                        join(base, name),
+                        os.path.join(base, name),
                         None,
                         None,
                         None,
@@ -1165,7 +1168,7 @@ class _DirWalker(object):
                     except Exception:
                         valid = False
                         yield FileAttrRecord(
-                            join(base, name),
+                            os.path.join(base, name),
                             None,
                             None,
                             None,
@@ -1175,7 +1178,7 @@ class _DirWalker(object):
 
                     if valid:
                         yield FileAttrRecord(
-                            join(base, name),
+                            os.path.join(base, name),
                             self.current_size,
                             self.modified_time,
                             self.created_time,
@@ -1183,7 +1186,7 @@ class _DirWalker(object):
                             None
                         )
                     else:
-                        yield FileAttrRecord(join(base, name), None, None, None, True, None)
+                        yield FileAttrRecord(os.path.join(base, name), None, None, None, True, None)
 
                     if self.abort:
                         break
@@ -1234,7 +1237,7 @@ class Rummage(object):
         self.idx = -1
         self.records = -1
         self.max = int(max_count) if max_count is not None else None
-        self.target = abspath(target) if not self.buffer_input else target
+        self.target = os.path.abspath(target) if not self.buffer_input else target
         file_regex_match = bool(flags & FILE_REGEX_MATCH)
         dir_regex_match = bool(flags & DIR_REGEX_MATCH)
         self.path_walker = None
@@ -1246,7 +1249,7 @@ class Rummage(object):
         # Initialize search objects:
         # - _DirWalker for if target is a folder
         # - Append FileAttrRecord if target is a file or buffer
-        if not self.buffer_input and isdir(self.target):
+        if not self.buffer_input and os.path.isdir(self.target):
             self.path_walker = _DirWalker(
                 self.target,
                 self._get_file_pattern(file_pattern, file_regex_match),
@@ -1261,12 +1264,12 @@ class Rummage(object):
                 self.search_params.backup_ext if bool(flags & BACKUP) else None,
                 self.regex_mode
             )
-        elif not self.buffer_input and isfile(self.target):
+        elif not self.buffer_input and os.path.isfile(self.target):
             try:
                 self.files.append(
                     FileAttrRecord(
                         self.target,
-                        getsize(self.target),
+                        os.path.getsize(self.target),
                         getmtime(self.target),
                         getctime(self.target),
                         False,
