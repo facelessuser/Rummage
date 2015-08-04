@@ -113,7 +113,7 @@ class TimedStatusExtension(object):
 
     """Timed status in status bar."""
 
-    def set_timed_status(self, text):
+    def set_timed_status(self, text, index=0):
         """
         Set the status for a short time.
 
@@ -121,36 +121,42 @@ class TimedStatusExtension(object):
         when the timed status completes.
         """
 
-        if self.text_timer.IsRunning():
-            self.text_timer.Stop()
+        if self.text_timer[index].IsRunning():
+            self.text_timer[index].Stop()
         else:
-            self.saved_text = self.GetStatusText(0)
-        self.SetStatusText(text, 0)
-        self.text_timer.Start(5000, oneShot=True)
+            self.saved_text = self.GetStatusText(index)
+        self.SetStatusText(text, index)
+        self.text_timer[index].Start(5000, oneShot=True)
 
-    def sb_time_setup(self):
+    def sb_time_setup(self, field_count):
         """Setup timer for timed status."""
 
-        self.saved_text = ""
-        self.text_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.clear_text, self.text_timer)
+        self.field_count = field_count
+        self.saved_text = [""] * field_count
+        self.text_timer = [wx.Timer(self)] * field_count
+        count = 0
+        for x in self.text_timer:
+            self.Bind(wx.EVT_TIMER, lambda event, index=count: self.clear_text(event, index), self.text_timer[count])
+            count += 1
 
-    def clear_text(self, event):
+    def clear_text(self, event, index):
         """Clear the status."""
 
-        self.SetStatusText(self.saved_text, 0)
+        self.SetStatusText(self.saved_text, index)
 
-    def set_status(self, text):
+    def set_status(self, text, index=0):
         """Set the status."""
 
-        if self.text_timer.IsRunning():
-            self.text_timer.Stop()
-        self.SetStatusText(text, 0)
+        if self.text_timer[index].IsRunning():
+            self.text_timer[index].Stop()
+        self.SetStatusText(text, index)
 
 
 class IconTrayExtension(object):
 
     """Add icon tray extension."""
+
+    fields = [-1]
 
     def remove_icon(self, name):
         """Remove an icon from the tray."""
@@ -220,7 +226,7 @@ class IconTrayExtension(object):
             else:
                 # Linux? Should be fine with 1, but haven't tested yet.
                 self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 1])
-        rect = self.GetFieldRect(1)
+        rect = self.GetFieldRect(len(self.fields))
         for v in self.sb_icons.values():
             v.SetPosition((rect.x + x_offset, rect.y))
             v.Hide()
@@ -236,9 +242,9 @@ class IconTrayExtension(object):
     def sb_tray_setup(self):
         """Setup the status bar with icon tray."""
 
-        self.SetFieldsCount(2)
+        self.SetFieldsCount(len(self.fields) + 1)
         self.SetStatusText('', 0)
-        self.SetStatusWidths([-1, 1])
+        self.SetStatusWidths(self.fields + [1])
         self.sb_icons = OrderedDict()
         self.Bind(wx.EVT_SIZE, self.on_sb_size)
 
@@ -247,27 +253,29 @@ class CustomStatusExtension(IconTrayExtension, TimedStatusExtension):
 
     """Custom status extension."""
 
-    def sb_setup(self):
+    def sb_setup(self, fields):
         """Setup the extention variant of the CustomStatusBar object."""
 
+        self.fields = fields
         self.sb_tray_setup()
-        self.sb_time_setup()
+        self.sb_time_setup(len(self.fields))
 
 
 class CustomStatusBar(wx.StatusBar, CustomStatusExtension):
 
     """Custom status bar."""
 
-    def __init__(self, parent, name):
+    def __init__(self, parent, name, fields=None):
         """Init the CustomStatusBar object."""
 
+        field_array = [-1] if not fields else fields[:]
         super(CustomStatusBar, self).__init__(
             parent,
             id=wx.ID_ANY,
             style=wx.STB_DEFAULT_STYLE,
             name=name
         )
-        self.sb_setup()
+        self.sb_setup(field_array)
 
 
 def extend(instance, extension):
@@ -280,8 +288,9 @@ def extend(instance, extension):
     )
 
 
-def extend_sb(sb):
+def extend_sb(sb, fields=None):
     """Extend the statusbar."""
 
+    field_array = [-1] if not fields else fields[:]
     extend(sb, CustomStatusExtension)
-    sb.sb_setup()
+    sb.sb_setup(field_array)
