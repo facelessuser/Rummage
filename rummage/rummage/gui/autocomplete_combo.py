@@ -63,7 +63,7 @@ class AutoCompleteCombo(ComboCtrl):
         if _PLATFORM != "linux":
             self.Bind(wx.EVT_TEXT, self.on_text_change)
         else:
-            self.Bind(wx.EVT_TEXT, lambda event: self.changed_callback())
+            self.Bind(wx.EVT_TEXT, self.on_changed_callback)
         try:
             self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
         except Exception:
@@ -186,6 +186,13 @@ class AutoCompleteCombo(ComboCtrl):
         self.update_semaphore = True
         self.GetTextCtrl().SetValue(text)
         self.update_semaphore = False
+
+    def on_changed_callback(self, event):
+        """Handle callback."""
+
+        if self.changed_callback is not None:
+            self.changed_callback()
+        event.Skip()
 
     def on_text_change(self, event):
         """Autocomplete on text change event."""
