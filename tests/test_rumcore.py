@@ -325,3 +325,97 @@ class TestRummageFileContent(unittest.TestCase):
             text2 = f.read()
         self.assertEqual(rfc.encoding.encode, 'bin')
         self.assertEqual(text, text2)
+
+
+class TestDirWalker(unittest.TestCase):
+
+    """Test the _DirWalker class."""
+
+    def setUp(self):
+        """Setup the tests."""
+
+        self.errors = []
+        self.skipped = []
+        self.files = []
+
+    def crawl_files(self, walker):
+        """Crawl the files."""
+
+        for f in walker.run():
+            if hasattr(f, 'skipped') and f.skipped:
+                self.skipped.append(f)
+            elif f.error:
+                self.errors.append(f)
+            else:
+                self.files.append(f)
+
+    def test_non_recursive(self):
+        """Test non-recursive search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            ['*.txt'], False,
+            None, False,
+            False, False,
+            None, None, None,
+            'rum-bak'
+        )
+
+        self.crawl_files(walker)
+
+    def test_recursive(self):
+        """Test non-recursive search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            ['*.txt'], False,
+            None, False,
+            True, False,
+            None, None, None,
+            'rum-bak'
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.files), 1)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_recursive_hidden(self):
+        """Test non-recursive search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            ['*.txt'], False,
+            None, False,
+            True, True,
+            None, None, None,
+            'rum-bak'
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 2)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_recursive_hidden_hidden(self):
+        """Test non-recursive search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            ['*.txt'], False,
+            ['.hidden'], False,
+            True, True,
+            None, None, None,
+            'rum-bak'
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.files), 1)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
