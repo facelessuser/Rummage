@@ -989,23 +989,46 @@ class _DirWalker(object):
         """Init the directory walker object."""
 
         self.abort = False
-        if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
+        if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode or regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
         self.dir = directory
         self.size = (size[0], size[1]) if size is not None else size
         self.modified = modified
         self.created = created
-        self.file_pattern = file_pattern
+        self.file_pattern = self._parse_pattern(file_pattern, file_regex_match)
         self.file_regex_match = file_regex_match
         self.dir_regex_match = dir_regex_match
-        self.folder_exclude = folder_exclude
+        self.folder_exclude = self._parse_pattern(folder_exclude, dir_regex_match)
         self.recursive = recursive
         self.show_hidden = show_hidden
         self.backup_ext = None
         ext = '.%s' % backup_ext if backup_ext else None
         if ext is not None:
             self.backup_ext = ext.lower() if _PLATFORM == "windows" else ext
+
+    def _parse_pattern(self, string, regex_match):
+        r"""Compile or format the inclusion\exclusion pattern."""
+
+        pattern = None
+        if string is not None:
+            if self.regex_mode == BREGEX_MODE:
+                pattern = bregex.compile_search(
+                    string, bregex.IGNORECASE
+                ) if regex_match else [f.lower() for f in string.split("|")]
+            elif self.regex_mode == REGEX_MODE:
+                pattern = regex.compile(
+                    string, regex.IGNORECASE | regex.ASCII
+                ) if regex_match else [f.lower() for f in string.split("|")]
+            elif self.regex_mode == BRE_MODE:
+                pattern = bre.compile_search(
+                    string, bre.IGNORECASE | (bre.ASCII if PY3 else 0)
+                ) if regex_match else [f.lower() for f in string.split("|")]
+            else:
+                pattern = re.compile(
+                    string, re.IGNORECASE | (re.ASCII if PY3 else 0)
+                ) if regex_match else [f.lower() for f in string.split("|")]
+        return pattern
 
     def _is_hidden(self, path):
         """Check if file is hidden."""
@@ -1067,10 +1090,9 @@ class _DirWalker(object):
 
         is_backup = False
         if self.backup_ext is not None:
-            if _PLATFORM == "windows":
-                if name.lower().endswith(self.backup_ext):
-                    is_backup = True
-            elif name.endswith(self.backup_ext):
+            if _PLATFORM == "windows":  # pragma: no cover
+                name = name.lower()
+            if name.endswith(self.backup_ext):
                 is_backup = True
         return is_backup
 
@@ -1146,7 +1168,7 @@ class _DirWalker(object):
                 try:
                     if not self._valid_folder(base, name):
                         dirs.remove(name)
-                except Exception:
+                except Exception:  # pragma: no cover
                     dirs.remove(name)
                     yield FileAttrRecord(
                         os.path.join(base, name),
@@ -1165,7 +1187,7 @@ class _DirWalker(object):
                 for name in files:
                     try:
                         valid = self._valid_file(base, name)
-                    except Exception:
+                    except Exception:  # pragma: no cover
                         valid = False
                         yield FileAttrRecord(
                             os.path.join(base, name),
@@ -1199,7 +1221,7 @@ class _DirWalker(object):
         try:
             for f in self.walk():
                 yield f
-        except Exception:
+        except Exception:  # pragma: no cover
             yield ErrorRecord(get_exception())
 
 
@@ -1252,9 +1274,9 @@ class Rummage(object):
         if not self.buffer_input and os.path.isdir(self.target):
             self.path_walker = _DirWalker(
                 self.target,
-                self._get_file_pattern(file_pattern, file_regex_match),
+                file_pattern,
                 file_regex_match,
-                self._get_dir_pattern(folder_exclude, dir_regex_match),
+                folder_exclude,
                 dir_regex_match,
                 bool(flags & RECURSIVE),
                 bool(flags & SHOW_HIDDEN),
@@ -1321,52 +1343,6 @@ class Rummage(object):
             codecs.lookup(enc)
 
         return enc
-
-    def _get_dir_pattern(self, folder_exclude, dir_regex_match):
-        """Compile or format the directory exclusion pattern."""
-
-        pattern = None
-        if folder_exclude is not None:
-            if self.regex_mode == BREGEX_MODE:
-                pattern = bregex.compile_search(
-                    folder_exclude, bregex.IGNORECASE
-                ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
-            elif self.regex_mode == REGEX_MODE:
-                pattern = regex.compile(
-                    folder_exclude, regex.IGNORECASE | regex.ASCII
-                ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
-            elif self.regex_mode == BRE_MODE:
-                pattern = bre.compile_search(
-                    folder_exclude, bre.IGNORECASE | (bre.ASCII if PY3 else 0)
-                ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
-            else:
-                pattern = re.compile(
-                    folder_exclude, re.IGNORECASE | (re.ASCII if PY3 else 0)
-                ) if dir_regex_match else [f.lower() for f in folder_exclude.split("|")]
-        return pattern
-
-    def _get_file_pattern(self, file_pattern, file_regex_match):
-        """Compile or format the file pattern."""
-
-        pattern = None
-        if file_pattern is not None:
-            if self.regex_mode == BREGEX_MODE:
-                pattern = bregex.compile_search(
-                    file_pattern, bregex.IGNORECASE
-                ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
-            elif self.regex_mode == REGEX_MODE:
-                pattern = regex.compile(
-                    file_pattern, regex.IGNORECASE | regex.ASCII
-                ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
-            elif self.regex_mode == BRE_MODE:
-                pattern = bre.compile_search(
-                    file_pattern, bre.IGNORECASE | (bre.ASCII if PY3 else 0)
-                ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
-            else:
-                pattern = re.compile(
-                    file_pattern, re.IGNORECASE | (re.ASCII if PY3 else 0)
-                ) if file_regex_match else [f.lower() for f in file_pattern.split("|")]
-        return pattern
 
     def get_status(self):
         """Return number of files searched out of current number of files crawled."""
