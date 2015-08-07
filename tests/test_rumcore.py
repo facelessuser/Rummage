@@ -354,7 +354,44 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            ['*.txt'], False,
+            '*.txt', False,
+            None, False,
+            False, False,
+            None, None, None,
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_non_recursive_inverse(self):
+        """Test non-recursive inverse search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            '*.*|-*.file', False,
+            None, False,
+            False, False,
+            None, None, None,
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.files), 2)
+
+    def test_non_recursive_inverse_backup(self):
+        """Test non-recursive inverse search with backup."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            '*.*|-*.file', False,
             None, False,
             False, False,
             None, None, None,
@@ -363,22 +400,26 @@ class TestDirWalker(unittest.TestCase):
 
         self.crawl_files(walker)
 
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
+
     def test_recursive(self):
         """Test non-recursive search."""
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            ['*.txt'], False,
+            '*.txt', False,
             None, False,
             True, False,
             None, None, None,
-            'rum-bak'
+            None
         )
 
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.skipped), 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
 
@@ -387,35 +428,269 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            ['*.txt'], False,
+            '*.txt', False,
             None, False,
             True, True,
             None, None, None,
-            'rum-bak'
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 4)
+        self.assertEqual(len(self.files), 2)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_recursive_hidden_folder_exclude(self):
+        """Test non-recursive search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            '*.txt', False,
+            '.hidden', False,
+            True, True,
+            None, None, None,
+            None
         )
 
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 3)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
 
-    def test_recursive_hidden_hidden(self):
-        """Test non-recursive search."""
+    def test_recursive_hidden_folder_exclude_inverse(self):
+        """Test non-recursive search with inverse."""
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            ['*.txt'], False,
-            ['.hidden'], False,
+            '*.txt', False,
+            '*|-.hidden', False,
             True, True,
             None, None, None,
-            'rum-bak'
+            None
         )
 
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.skipped), 4)
+        self.assertEqual(len(self.files), 2)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_recursive_hidden_re_folder_exclude(self):
+        """Test non-recursive search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            '*.txt', False,
+            r'\.hidden', True,
+            True, True,
+            None, None, None,
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_re(self):
+        """Test regex search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'.*?\.txt', True,
+            None, False,
+            False, False,
+            None, None, None,
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(walker.regex_mode, rc.RE_MODE)
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.files), 2)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_bre(self):
+        """Test bre search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'.*?\.txt', True,
+            None, False,
+            False, False,
+            None, None, None,
+            None,
+            rc.BRE_MODE
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(walker.regex_mode, rc.BRE_MODE)
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.files), 2)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_regex(self):
+        """Test regex search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'.*?\.txt', True,
+            None, False,
+            False, False,
+            None, None, None,
+            None,
+            rc.REGEX_MODE
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(walker.regex_mode, rc.REGEX_MODE)
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.files), 2)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_bregex(self):
+        """Test bregex search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'.*?\.txt', True,
+            None, False,
+            False, False,
+            None, None, None,
+            None,
+            rc.BREGEX_MODE
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(walker.regex_mode, rc.BREGEX_MODE)
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.files), 2)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_bad_regular_expression_mode(self):
+        """Test bad regular expression mode search."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'.*?\.txt', True,
+            None, False,
+            False, False,
+            None, None, None,
+            None,
+            -1
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(walker.regex_mode, rc.RE_MODE)
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(len(self.files), 2)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
+    def test_abort(self):
+        """Test aborting."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            '*.txt', False,
+            None, False,
+            True, True,
+            None, None, None,
+            None
+        )
+
+        records = 0
+        for f in walker.run():
+            records += 1
+            walker.kill()
+
+        self.assertEqual(records, 1)
+
+    def test_abort_early(self):
+        """Test aborting early."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            '*.txt', False,
+            None, False,
+            True, True,
+            None, None, None,
+            None
+        )
+
+        walker.kill()
+        records = 0
+        for f in walker.run():
+            records += 1
+
+        self.assertEqual(records, 1)
+
+    def test_size_less(self):
+        """Test size less than x."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'*.*', False,
+            None, False,
+            True, True,
+            ("lt", 1), None, None,
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 1)
+        self.assertEqual(len(self.files), 5)
+
+    def test_size_greater(self):
+        """Test size less than x."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'*.*', False,
+            None, False,
+            True, True,
+            ("gt", 1), None, None,
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 5)
+        self.assertEqual(len(self.files), 1)
+
+    def test_size_equal(self):
+        """Test size less than x."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'*.*', False,
+            None, False,
+            True, True,
+            ("eq", 0), None, None,
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 1)
+        self.assertEqual(len(self.files), 5)
