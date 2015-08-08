@@ -8,7 +8,9 @@ import regex
 from rummage.rummage.rumcore.backrefs import bre
 from rummage.rummage.rumcore.backrefs import bregex
 from rummage.rummage.rumcore import text_decode as td
+from rummage.rummage import epoch_timestamp as epoch
 import codecs
+import datetime
 
 
 class TestHelperFunctions(unittest.TestCase):
@@ -660,7 +662,7 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.files), 5)
 
     def test_size_greater(self):
-        """Test size less than x."""
+        """Test size greater than x."""
 
         walker = rc._DirWalker(
             'tests/dir_walker',
@@ -678,7 +680,7 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.files), 1)
 
     def test_size_equal(self):
-        """Test size less than x."""
+        """Test size equals than x."""
 
         walker = rc._DirWalker(
             'tests/dir_walker',
@@ -694,3 +696,81 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 1)
         self.assertEqual(len(self.files), 5)
+
+    def test_time_modified_less(self):
+        """Test modified time less than x."""
+
+        future = datetime.datetime.today() + datetime.timedelta(days=2)
+        date = "%02d/%02d/%04d" % (future.month, future.day, future.year)
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'*.*', False,
+            None, False,
+            True, True,
+            None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')), None,
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(len(self.files), 6)
+
+    def test_time_modified_greater(self):
+        """Test modified time greater than x."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'*.*', False,
+            None, False,
+            True, True,
+            None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')), None,
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(len(self.files), 6)
+
+    def test_time_created_less(self):
+        """Test created time less than x."""
+
+        future = datetime.datetime.today() + datetime.timedelta(days=2)
+        date = "%02d/%02d/%04d" % (future.month, future.day, future.year)
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'*.*', False,
+            None, False,
+            True, True,
+            None, None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')),
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(len(self.files), 6)
+
+    def test_time_created_greater(self):
+        """Test created time greater than x."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'*.*', False,
+            None, False,
+            True, True,
+            None, None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')),
+            None
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(len(self.files), 6)
