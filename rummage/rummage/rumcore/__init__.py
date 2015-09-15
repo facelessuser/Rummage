@@ -827,10 +827,10 @@ class _FileSearch(object):
 
                 if not self.abort and text:
                     if is_file:
-                        yield self._update_buffer(text, self.current_encoding)
+                        yield self._update_buffer(text)
                     else:
                         self._update_file(
-                            file_info.name, text, self.current_encoding
+                            file_info.name, text
                         )
                 else:
                     if is_file:
