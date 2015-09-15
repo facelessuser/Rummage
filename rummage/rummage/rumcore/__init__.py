@@ -74,6 +74,7 @@ REVERSE = 0x200         # (?r)
 VERSION0 = 0x400        # (?V0)
 VERSION1 = 0x800        # (?V1)
 FORMATREPLACE = 0x1000  # Use {1} for groups in replace
+POSIX = 0x2000          # (?p)
 
 # Rumcore related flags
 LITERAL = 0x10000           # Literal search
@@ -231,6 +232,8 @@ if REGEX_SUPPORT:
             flags |= regex.IGNORECASE
         if rum_flags & DOTALL:
             flags |= regex.DOTALL
+        if rum_flags & POSIX:
+            flags |= regex.POSIX
         if not binary and rum_flags & UNICODE:
             flags |= regex.UNICODE
         else:
@@ -270,6 +273,8 @@ if REGEX_SUPPORT:
             flags |= bregex.IGNORECASE
         if rum_flags & DOTALL:
             flags |= bregex.DOTALL
+        if rum_flags & POSIX:
+            flags |= bregex.POSIX
         if not binary and rum_flags & UNICODE:
             flags |= bregex.UNICODE
         else:
