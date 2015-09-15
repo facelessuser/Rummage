@@ -103,6 +103,7 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertEqual(rc._regex_pattern(r"test", rc.DOTALL).flags, regex.ASCII | regex.V0 | regex.DOTALL)
         self.assertEqual(rc._regex_pattern(r"test", rc.IGNORECASE).flags, regex.ASCII | regex.V0 | regex.IGNORECASE)
         self.assertEqual(rc._regex_pattern(r"test", rc.WORD).flags, regex.ASCII | regex.V0 | regex.WORD)
+        self.assertEqual(rc._regex_pattern(r"test", rc.POSIX).flags, regex.ASCII | regex.V0 | regex.POSIX)
         self.assertEqual(rc._regex_pattern(r"test", rc.BESTMATCH).flags, regex.ASCII | regex.V0 | regex.BESTMATCH)
         self.assertEqual(rc._regex_pattern(r"test", rc.ENHANCEMATCH).flags, regex.ASCII | regex.V0 | regex.ENHANCEMATCH)
         self.assertEqual(rc._regex_pattern(r"test", rc.REVERSE).flags, regex.ASCII | regex.V0 | regex.REVERSE)
@@ -112,19 +113,21 @@ class TestHelperFunctions(unittest.TestCase):
             rc._regex_pattern(
                 r"test",
                 rc.DOTALL | rc.IGNORECASE | rc.MULTILINE | rc.WORD |
-                rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE
+                rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE | rc.POSIX
             ).flags,
             regex.V0 | regex.ASCII | regex.DOTALL | regex.IGNORECASE | regex.MULTILINE |
-            regex.WORD | regex.ENHANCEMATCH | regex.BESTMATCH | regex.REVERSE | regex.FULLCASE
+            regex.WORD | regex.ENHANCEMATCH | regex.BESTMATCH | regex.REVERSE | regex.FULLCASE |
+            regex.POSIX
         )
         self.assertEqual(
             rc._regex_pattern(
                 r"test",
                 rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE | rc.FULLCASE |
-                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.VERSION1
+                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.VERSION1 | rc.POSIX
             ).flags,
             regex.V1 | regex.UNICODE | regex.DOTALL | regex.IGNORECASE | regex.MULTILINE |
-            regex.WORD | regex.ENHANCEMATCH | regex.BESTMATCH | regex.REVERSE | regex.FULLCASE
+            regex.WORD | regex.ENHANCEMATCH | regex.BESTMATCH | regex.REVERSE | regex.FULLCASE |
+            regex.POSIX
         )
 
     def test_regex_literal_flags(self):
@@ -157,6 +160,7 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertEqual(rc._bregex_pattern(r"test", rc.DOTALL).flags, bregex.ASCII | bregex.V0 | bregex.DOTALL)
         self.assertEqual(rc._bregex_pattern(r"test", rc.IGNORECASE).flags, bregex.ASCII | bregex.V0 | bregex.IGNORECASE)
         self.assertEqual(rc._bregex_pattern(r"test", rc.WORD).flags, bregex.ASCII | bregex.V0 | bregex.WORD)
+        self.assertEqual(rc._regex_pattern(r"test", rc.POSIX).flags, regex.ASCII | regex.V0 | bregex.POSIX)
         self.assertEqual(rc._bregex_pattern(r"test", rc.BESTMATCH).flags, bregex.ASCII | bregex.V0 | bregex.BESTMATCH)
         self.assertEqual(
             rc._bregex_pattern(r"test", rc.ENHANCEMATCH).flags, bregex.ASCII | bregex.V0 | bregex.ENHANCEMATCH
@@ -168,19 +172,21 @@ class TestHelperFunctions(unittest.TestCase):
             rc._bregex_pattern(
                 r"test",
                 rc.DOTALL | rc.IGNORECASE | rc.MULTILINE | rc.WORD |
-                rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE
+                rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE | rc.POSIX
             ).flags,
             bregex.V0 | bregex.ASCII | bregex.DOTALL | bregex.IGNORECASE | bregex.MULTILINE |
-            bregex.WORD | bregex.ENHANCEMATCH | bregex.BESTMATCH | bregex.REVERSE | bregex.FULLCASE
+            bregex.WORD | bregex.ENHANCEMATCH | bregex.BESTMATCH | bregex.REVERSE | bregex.FULLCASE |
+            bregex.POSIX
         )
         self.assertEqual(
             rc._bregex_pattern(
                 r"test",
                 rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE | rc.FULLCASE |
-                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.VERSION1
+                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.VERSION1 | rc.POSIX
             ).flags,
             bregex.V1 | bregex.UNICODE | bregex.DOTALL | bregex.IGNORECASE | bregex.MULTILINE |
-            bregex.WORD | bregex.ENHANCEMATCH | bregex.BESTMATCH | bregex.REVERSE | bregex.FULLCASE
+            bregex.WORD | bregex.ENHANCEMATCH | bregex.BESTMATCH | bregex.REVERSE | bregex.FULLCASE |
+            bregex.POSIX
         )
 
     def test_bregex_literal_flags(self):
@@ -774,3 +780,41 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 0)
         self.assertEqual(len(self.files), 6)
+
+
+class TestFileSearch(unittest.TestCase):
+
+    """Test file searching."""
+
+    def get_file_attr(self, name):
+        """Get the file attributes."""
+
+        return rc.FileAttrRecord(
+            name,
+            os.path.getsize(name),
+            rc.getmtime(name),
+            rc.getctime(name),
+            False,
+            None
+        )
+
+    def test_literal_search(self):
+        """Test for literal search."""
+
+        search_params = rc.SearchParams()
+        search_params.pattern = "search1"
+        search_params.encoding = None
+        search_params.context = (0, 0)
+        search_params.flags = rc.IGNORECASE | rc.LITERAL
+
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            0,
+            None,
+            None
+        )
+
+        results = [r for r in fs.run()]
+        print(results)
+        self.assertEqual(len(results), 2)
