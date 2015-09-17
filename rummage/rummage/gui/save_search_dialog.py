@@ -114,6 +114,8 @@ class SaveSearchDialog(gui.SaveSearchDialog):
                     flags += "w"
                 if self.parent.m_reverse_checkbox.GetValue():
                     flags += "r"
+                if self.parent.m_posix_checkbox.GetValue():
+                    flags += "p"
                 if version == 0 and self.parent.m_fullcase_checkbox.GetValue():
                     flags += "f"
                 if self.parent.m_format_replace_checkbox.GetValue():

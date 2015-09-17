@@ -57,11 +57,13 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.m_enhancematch_checkbox.SetValue(parent.m_enhancematch_checkbox.GetValue() if parent else False)
             self.m_word_checkbox.SetValue(parent.m_word_checkbox.GetValue() if parent else False)
             self.m_reverse_checkbox.SetValue(parent.m_reverse_checkbox.GetValue() if parent else False)
+            self.m_posix_checkbox.SetValue(parent.m_posix_checkbox.GetValue() if parent else False)
             self.m_format_replace_checkbox.SetValue(parent.m_format_replace_checkbox.GetValue() if parent else False)
             self.m_bestmatch_checkbox.Show()
             self.m_enhancematch_checkbox.Show()
             self.m_word_checkbox.Show()
             self.m_reverse_checkbox.Show()
+            self.m_posix_checkbox.Show()
             self.m_format_replace_checkbox.Show()
             if self.regex_version == 0:
                 self.m_fullcase_checkbox.SetValue(parent.m_fullcase_checkbox.GetValue() if parent else False)
@@ -97,6 +99,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_enhancematch_checkbox.SetLabel(_("Improve fuzzy fit"))
         self.m_word_checkbox.SetLabel(_("Unicode word break"))
         self.m_reverse_checkbox.SetLabel(_("Reverse match"))
+        self.m_posix_checkbox.SetLabel(_("Use POSIX matching"))
         self.m_format_replace_checkbox.SetLabel(_("Format style replacements"))
         self.m_fullcase_checkbox.SetLabel(_("Full case-folding"))
         self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(_("Text"))
@@ -184,6 +187,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.parent.m_enhancematch_checkbox.SetValue(self.m_enhancematch_checkbox.GetValue())
             self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
             self.parent.m_reverse_checkbox.SetValue(self.m_reverse_checkbox.GetValue())
+            self.parent.m_posix_checkbox.SetValue(self.m_posix_checkbox.GetValue())
             self.parent.m_format_replace_checkbox.SetValue(self.m_format_replace_checkbox.GetValue())
             if self.regex_version == 0:
                 self.parent.m_fullcase_checkbox.SetValue(self.m_fullcase_checkbox.GetValue())
@@ -233,6 +237,8 @@ class RegexTestDialog(gui.RegexTestDialog):
                     flags |= bregex.WORD
                 if self.m_reverse_checkbox.GetValue():
                     flags |= bregex.REVERSE
+                if self.m_posix_checkbox.GetValue():
+                    flags |= bregex.POSIX
                 if flags & bregex.VERSION0 and self.m_fullcase_checkbox.GetValue():
                     flags |= bregex.FULLCASE
             elif self.regex_mode == rumcore.REGEX_MODE:
@@ -257,6 +263,8 @@ class RegexTestDialog(gui.RegexTestDialog):
                     flags |= regex.WORD
                 if self.m_reverse_checkbox.GetValue():
                     flags |= regex.REVERSE
+                if self.m_posix_checkbox.GetValue():
+                    flags |= regex.POSIX
                 if flags & regex.VERSION0 and self.m_fullcase_checkbox.GetValue():
                     flags |= regex.FULLCASE
             elif self.regex_mode == rumcore.BRE_MODE:

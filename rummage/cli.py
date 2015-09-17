@@ -321,6 +321,8 @@ class RummageCli(object):
                 flags |= bregex.WORD
             if search_flags & rumcore.REVERSE:
                 flags |= bregex.REVERSE
+            if search_flags & rumcore.POSIX:
+                flags |= bregex.POSIX
         else:
             # bre just wraps re's flags as it uses
             # re so we will use bre flags for both re and bre
@@ -414,6 +416,8 @@ class RummageCli(object):
                 flags |= rumcore.WORD
             if args.reverse:
                 flags |= rumcore.REVERSE
+            if args.posix:
+                flags |= rumcore.POSIX
             if args.format_replace:
                 flags |= rumcore.FORMATREPLACE
 
@@ -661,6 +665,10 @@ def main():
     parser.add_argument(
         "--reverse", '-Z', action="store_true", default=False,
         help="Search backwards (regex module only)."
+    )
+    parser.add_argument(
+        "--posix", "-O", action="store_true", default=False,
+        help="Use POSIX matching (regex module only)."
     )
     parser.add_argument(
         "--word", '-N', action="store_true", default=False,

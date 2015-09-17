@@ -141,15 +141,20 @@ class RummageFrame ( wx.Frame ):
 		
 		gbSizer2.Add( self.m_reverse_checkbox, wx.GBPosition( 1, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
+		self.m_posix_checkbox = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Use POSIX matching", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_posix_checkbox.Hide()
+		
+		gbSizer2.Add( self.m_posix_checkbox, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
 		self.m_format_replace_checkbox = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_format_replace_checkbox.Hide()
 		
-		gbSizer2.Add( self.m_format_replace_checkbox, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		gbSizer2.Add( self.m_format_replace_checkbox, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_fullcase_checkbox = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Full case-folding", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_fullcase_checkbox.Hide()
 		
-		gbSizer2.Add( self.m_fullcase_checkbox, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		gbSizer2.Add( self.m_fullcase_checkbox, wx.GBPosition( 2, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_staticline11 = wx.StaticLine( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		gbSizer2.Add( self.m_staticline11, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 4 ), wx.EXPAND |wx.ALL, 5 )
@@ -708,6 +713,11 @@ class RegexTestDialog ( wx.Dialog ):
 		
 		fgSizer19.Add( self.m_reverse_checkbox, 0, wx.ALL, 5 )
 		
+		self.m_posix_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Use POSIX matching", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_posix_checkbox.Hide()
+		
+		fgSizer19.Add( self.m_posix_checkbox, 0, wx.ALL, 5 )
+		
 		self.m_format_replace_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_format_replace_checkbox.Hide()
 		
@@ -779,6 +789,7 @@ class RegexTestDialog ( wx.Dialog ):
 		self.m_enhancematch_checkbox.Bind( wx.EVT_CHECKBOX, self.on_enhancematch_toggle )
 		self.m_word_checkbox.Bind( wx.EVT_CHECKBOX, self.on_word_toggle )
 		self.m_reverse_checkbox.Bind( wx.EVT_CHECKBOX, self.on_reverse_toggle )
+		self.m_posix_checkbox.Bind( wx.EVT_CHECKBOX, self.on_posix_toggle )
 		self.m_format_replace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_format_replace_toggle )
 		self.m_fullcase_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullcase_toggle )
 		self.m_use_regex_button.Bind( wx.EVT_BUTTON, self.on_use )
@@ -820,6 +831,9 @@ class RegexTestDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_reverse_toggle( self, event ):
+		event.Skip()
+	
+	def on_posix_toggle( self, event ):
 		event.Skip()
 	
 	def on_format_replace_toggle( self, event ):

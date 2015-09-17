@@ -103,6 +103,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.parent.m_enhancematch_checkbox.SetValue("e" in flags)
         self.parent.m_word_checkbox.SetValue("w" in flags)
         self.parent.m_reverse_checkbox.SetValue("r" in flags)
+        self.parent.m_posix_checkbox.SetValue("p" in flags)
         self.parent.m_fullcase_checkbox.SetValue("f" in flags)
         self.parent.m_format_replace_checkbox.SetValue("F" in flags)
 
