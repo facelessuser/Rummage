@@ -295,13 +295,15 @@ class ArgPipeThread(object):
             if not os.path.exists(self.pipe_name):
                 os.mkfifo(self.pipe_name)
 
-            with codecs.open(self.pipe_name, "r", 'utf-8') as pipein:
-                while self.check_pipe:
-                    line = pipein.readline()[:-1]
-                    if line != "":
-                        evt = PipeEvent(data=line)
-                        wx.PostEvent(self.app, evt)
-                    time.sleep(0.2)
+            while self.check_pipe:
+                with codecs.open(self.pipe_name, "r", 'utf-8') as pipein:
+                    while self.check_pipe:
+                        line = pipein.readline()[:-1]
+                        if line != "":
+                            evt = PipeEvent(data=line)
+                            wx.PostEvent(self.app, evt)
+                            break
+                        time.sleep(0.2)
         self.running = False
 
 
