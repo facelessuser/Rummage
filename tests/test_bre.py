@@ -15,7 +15,6 @@ else:
 
 
 class TestSearchTemplate(unittest.TestCase):
-
     """Search template tests."""
 
     def test_ascii_upper_props(self):
@@ -582,7 +581,6 @@ class TestSearchTemplate(unittest.TestCase):
 
 
 class TestReplaceTemplate(unittest.TestCase):
-
     """Test replace template."""
 
     def test_get_replace_template_string(self):
@@ -978,7 +976,6 @@ class TestReplaceTemplate(unittest.TestCase):
 
 
 class TestConvenienceFunctions(unittest.TestCase):
-
     """Test convenience functions."""
 
     def test_match(self):

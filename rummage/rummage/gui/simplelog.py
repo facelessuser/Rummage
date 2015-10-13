@@ -33,7 +33,6 @@ global_log = None
 
 
 class Log(object):
-
     """Log."""
 
     def __init__(self, filename=None, fmt="%(message)s", level=ERROR, filemode="w"):

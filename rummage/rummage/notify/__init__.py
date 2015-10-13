@@ -37,7 +37,6 @@ __all__ = ("info", "warning", "error", "setup_notifications", "enable_growl", "h
 # Fallback Notifications
 ###################################
 class NotifyFallback(object):
-
     """Fallback class."""
 
     def __init__(self, *args, **kwargs):

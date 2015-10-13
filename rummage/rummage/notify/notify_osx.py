@@ -63,7 +63,6 @@ def _is_ver_okay():
 
 
 class Options(object):
-
     """Notification options."""
 
     notify = None

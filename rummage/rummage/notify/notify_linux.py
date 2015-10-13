@@ -12,7 +12,6 @@ __all__ = ("get_notify", "alert", "setup", "destroy")
 
 
 class Options(object):
-
     """Notification options."""
 
     icon = None

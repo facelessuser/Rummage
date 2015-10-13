@@ -140,7 +140,6 @@ if REGEX_SUPPORT:
     }
 
     class RegexSearchTokens(compat.Tokens):
-
         """Tokens."""
 
         def __init__(self, string, verbose):
@@ -195,7 +194,6 @@ if REGEX_SUPPORT:
             return self.current
 
     class RegexSearchTemplate(object):
-
         """Search Template."""
 
         def __init__(self, search, re_verbose=False, re_version=0):
@@ -430,7 +428,6 @@ if REGEX_SUPPORT:
             return self._empty.join(self.extended)
 
     class RegexReplaceTemplate(bre.ReplaceTemplate):
-
         """Replace template for the regex module."""
 
         def parse_template(self, pattern):

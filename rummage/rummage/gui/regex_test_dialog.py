@@ -32,7 +32,6 @@ from ..rumcore.backrefs import bre, bregex
 
 
 class RegexTestDialog(gui.RegexTestDialog):
-
     """Regex test dialog."""
 
     def __init__(self, parent):

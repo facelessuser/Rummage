@@ -55,7 +55,6 @@ NOTIFY_STYLES = {
 
 
 class Settings(object):
-
     """Handle settings."""
 
     filename = None

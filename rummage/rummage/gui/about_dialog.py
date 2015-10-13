@@ -27,7 +27,6 @@ from .. import data
 
 
 class AboutDialog(gui.AboutDialog):
-
     """About Dialog."""
 
     def __init__(self, parent):

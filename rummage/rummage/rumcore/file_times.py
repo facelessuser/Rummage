@@ -16,13 +16,11 @@ if _PLATFORM == "osx":
 
     # http://stackoverflow.com/questions/946967/get-file-creation-time-with-python-on-mac
     class StructTimeSpec(ctypes.Structure):
-
         """TimeSpec structure."""
 
         _fields_ = [('tv_sec', ctypes.c_long), ('tv_nsec', ctypes.c_long)]
 
     class StructStat64(ctypes.Structure):
-
         """Stat64 structure."""
 
         _fields_ = [

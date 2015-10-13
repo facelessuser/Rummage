@@ -25,7 +25,6 @@ from .. import data
 
 
 class SavedSearchList(DynamicList):
-
     """Error list."""
 
     def __init__(self, parent):

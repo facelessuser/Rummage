@@ -91,13 +91,11 @@ RE_BAD_UTF8 = re.compile(
 
 
 class Encoding(namedtuple('Encoding', ['encode', 'bom'])):
-
     """BOM object."""
 
 
 if chardet.__version__ == "2.3.0":  # pragma: no cover
     class DetectEncoding(UniversalDetector):
-
         """Stop Hungarian from being picked until chardet can fix this."""
 
         def close(self):

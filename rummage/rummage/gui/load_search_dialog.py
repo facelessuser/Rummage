@@ -34,7 +34,6 @@ SEARCH_TYPE = {
 
 
 class LoadSearchDialog(gui.LoadSearchDialog):
-
     """Load search dialog."""
 
     def __init__(self, parent):

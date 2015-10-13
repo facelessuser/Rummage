@@ -30,7 +30,6 @@ import decimal
 
 
 class ResultFileList(DynamicList):
-
     """ResultFileList."""
 
     def __init__(self, parent):
@@ -152,7 +151,6 @@ class ResultFileList(DynamicList):
 
 
 class ResultContentList(DynamicList):
-
     """ResultContentList."""
 
     def __init__(self, parent):

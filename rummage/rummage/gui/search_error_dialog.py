@@ -27,7 +27,6 @@ from .error_text_dialog import ErrorTextDialog
 
 
 class SearchErrorDialog(gui.SearchErrorDialog):
-
     """Load search dialog."""
 
     def __init__(self, parent, errors):

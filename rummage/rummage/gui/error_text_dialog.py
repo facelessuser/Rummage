@@ -24,7 +24,6 @@ from ..localization import _
 
 
 class ErrorTextDialog(gui.ErrorTextDialog):
-
     """ErrorText Dialog."""
 
     def __init__(self, parent, text):

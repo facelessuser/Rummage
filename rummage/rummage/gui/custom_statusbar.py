@@ -63,7 +63,6 @@ if wx.VERSION > (2, 9, 4) and wx.VERSION < (3, 0, 3):
 
 
 class ContextMenu(wx.Menu):
-
     """Context Menu."""
 
     def __init__(self, parent, menu, pos):
@@ -90,7 +89,6 @@ class ContextMenu(wx.Menu):
 
 
 class ToolTip(wx.lib.agw.supertooltip.SuperToolTip):
-
     """Tooltip."""
 
     def __init__(self, target, message, header="", style="Office 2007 Blue", start_delay=.1):
@@ -110,7 +108,6 @@ class ToolTip(wx.lib.agw.supertooltip.SuperToolTip):
 
 
 class TimedStatusExtension(object):
-
     """Timed status in status bar."""
 
     def set_timed_status(self, text, index=0):
@@ -153,7 +150,6 @@ class TimedStatusExtension(object):
 
 
 class IconTrayExtension(object):
-
     """Add icon tray extension."""
 
     fields = [-1]
@@ -250,7 +246,6 @@ class IconTrayExtension(object):
 
 
 class CustomStatusExtension(IconTrayExtension, TimedStatusExtension):
-
     """Custom status extension."""
 
     def sb_setup(self, fields):
@@ -262,7 +257,6 @@ class CustomStatusExtension(IconTrayExtension, TimedStatusExtension):
 
 
 class CustomStatusBar(wx.StatusBar, CustomStatusExtension):
-
     """Custom status bar."""
 
     def __init__(self, parent, name, fields=None):

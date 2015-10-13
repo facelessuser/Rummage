@@ -28,7 +28,6 @@ USE_SAMPLE_SIZE = True
 
 
 class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
-
     """Dynamic list."""
 
     def __init__(self, parent, columns):

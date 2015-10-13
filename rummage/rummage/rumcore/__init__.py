@@ -291,42 +291,34 @@ if REGEX_SUPPORT:
 
 
 class RummageException(Exception):
-
     """Rummage exception."""
 
 
 class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'size', 'modified', 'created', 'skipped', 'error'])):
-
     """File Attributes."""
 
 
 class FileInfoRecord(namedtuple('FileInfoRecord', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
-
     """A record for tracking file info."""
 
 
 class FileRecord(namedtuple('FileRecord', ['info', 'match', 'error'])):
-
     """A record that reports file info, matching status, and errors."""
 
 
 class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines', 'ending', 'context'])):
-
     """A record that contains match info, lineno content, context, etc."""
 
 
 class BufferRecord(namedtuple('BufferRecord', ['content', 'error'])):
-
     """A record with the string buffer replacements."""
 
 
 class ErrorRecord(namedtuple('ErrorRecord', ['error'])):
-
     """A record for non-file related errors."""
 
 
 class RummageFileContent(object):
-
     """Either return a string or memory map file object."""
 
     def __init__(self, name, size, encoding, file_content=None):
@@ -407,7 +399,6 @@ class RummageFileContent(object):
 
 
 class _FileSearch(object):
-
     """Search for files."""
 
     hex_tx_table = ("\ufffd" * 32) + "".join(chr(c) for c in range(32, 127)) + ("\ufffd" * 129)
@@ -967,7 +958,6 @@ class _FileSearch(object):
 
 
 class SearchParams(object):
-
     """Search parameter object."""
 
     def __init__(self):
@@ -982,7 +972,6 @@ class SearchParams(object):
 
 
 class _DirWalker(object):
-
     """Walk the directory."""
 
     def __init__(
@@ -1231,7 +1220,6 @@ class _DirWalker(object):
 
 
 class Rummage(object):
-
     """Perform the rummaging."""
 
     def __init__(

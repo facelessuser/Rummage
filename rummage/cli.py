@@ -75,7 +75,6 @@ def pyin(value):
 
 
 class RummageCli(object):
-
     """Rummage command line frontend."""
 
     def __init__(self, args, is_buffer):

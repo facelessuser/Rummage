@@ -31,7 +31,6 @@ RECORDS = _("%d Records")
 
 
 class SettingsDialog(gui.SettingsDialog):
-
     """SettingsDialog."""
 
     def __init__(self, parent):

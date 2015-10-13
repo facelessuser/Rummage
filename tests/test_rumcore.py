@@ -14,7 +14,6 @@ import datetime
 
 
 class TestHelperFunctions(unittest.TestCase):
-
     """Test helper functions."""
 
     def test_to_ascii(self):
@@ -220,7 +219,6 @@ class TestHelperFunctions(unittest.TestCase):
 
 
 class TestRummageFileContent(unittest.TestCase):
-
     """Tests for RummageFileContent."""
 
     def test_string_bin(self):
@@ -336,7 +334,6 @@ class TestRummageFileContent(unittest.TestCase):
 
 
 class TestDirWalker(unittest.TestCase):
-
     """Test the _DirWalker class."""
 
     def setUp(self):
@@ -783,7 +780,6 @@ class TestDirWalker(unittest.TestCase):
 
 
 class TestFileSearch(unittest.TestCase):
-
     """Test file searching."""
 
     def get_file_attr(self, name):

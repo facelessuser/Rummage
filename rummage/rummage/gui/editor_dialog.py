@@ -27,7 +27,6 @@ from ..localization import _
 
 
 class EditorDialog(gui.EditorDialog):
-
     """EditorDialog."""
 
     def __init__(self, parent, editor=[]):

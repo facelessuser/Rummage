@@ -29,7 +29,6 @@ from ..localization import _
 
 
 class SaveSearchDialog(gui.SaveSearchDialog):
-
     """Save search dialog."""
 
     def __init__(self, parent):

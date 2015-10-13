@@ -260,7 +260,6 @@ def update_autocomplete(obj, key, load_last=False, default=None):
 
 
 class RummageThread(threading.Thread):
-
     """Threaded Rummage."""
 
     def __init__(self, args):
@@ -431,7 +430,6 @@ class RummageThread(threading.Thread):
 
 
 class RummageArgs(object):
-
     """Rummage argument object."""
 
     def __init__(self):
@@ -476,7 +474,6 @@ class RummageArgs(object):
 
 
 class DirPickButton(object):
-
     """Directory pick button."""
 
     def GetPath(self):
@@ -526,7 +523,6 @@ class DirPickButton(object):
 
 
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
-
     """Rummage Frame."""
 
     def __init__(self, parent, start_path, debug_mode=False):

@@ -32,7 +32,6 @@ else:
 
 
 class AutoCompleteCombo(ComboCtrl):
-
     """AutoCompleteCombo box."""
 
     def __init__(self, parent, choices=None, load_last=False, changed_callback=None):
@@ -234,7 +233,6 @@ class AutoCompleteCombo(ComboCtrl):
 
 
 class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
-
     """ListCtrlComboPopup."""
 
     def __init__(self, parent, txt_ctrl):

@@ -6,7 +6,6 @@ ZERO = timedelta(0)
 
 
 class UTCTimezone(tzinfo):
-
     """Epoch UTC time zone object."""
 
     def utcoffset(self, dt):

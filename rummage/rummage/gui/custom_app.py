@@ -63,7 +63,6 @@ DEBUG_CONSOLE = False
 
 
 class GuiLog(wx.PyOnDemandOutputWindow):
-
     """GUI logging."""
 
     def __init__(self, title="Debug Console"):
@@ -137,7 +136,6 @@ class GuiLog(wx.PyOnDemandOutputWindow):
 
 
 class CustomApp(wx.App):
-
     """Custom app that adds a number of features."""
 
     def __init__(self, *args, **kwargs):
@@ -212,7 +210,6 @@ class CustomApp(wx.App):
 
 
 class ArgPipeThread(object):
-
     """Argument pipe thread for receiving arguments from another instance."""
 
     def __init__(self, app, pipe_name):
@@ -308,7 +305,6 @@ class ArgPipeThread(object):
 
 
 class PipeApp(CustomApp):
-
     """Pip app variant that allows the app to be sent data via a pipe."""
 
     def __init__(self, *args, **kwargs):
@@ -402,7 +398,6 @@ class PipeApp(CustomApp):
 
 
 class DebugFrameExtender(object):
-
     """Extend frame with debugger."""
 
     def set_keybindings(self, keybindings=[], debug_event=None):

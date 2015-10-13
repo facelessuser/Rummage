@@ -7,7 +7,6 @@ import mock
 
 
 class TestBom(unittest.TestCase):
-
     """Test BOM detection."""
 
     def test_utf8(self):
@@ -53,7 +52,6 @@ class TestBom(unittest.TestCase):
 
 
 class TestValidateEncoding(unittest.TestCase):
-
     """Test Encoding validation."""
 
     def test_encoding_okay(self):
@@ -82,7 +80,6 @@ class TestValidateEncoding(unittest.TestCase):
 
 
 class TestPyEncodingGuess(unittest.TestCase):
-
     """Test Python file encoding guess."""
 
     def test_py_default_ascii_file(self):
@@ -129,7 +126,6 @@ class TestPyEncodingGuess(unittest.TestCase):
 
 
 class TestSizeSguess(unittest.TestCase):
-
     """Test Python file encoding based on special logic dependant on size."""
 
     def test_zero_size(self):
@@ -172,7 +168,6 @@ class TestSizeSguess(unittest.TestCase):
 
 
 class TestSizeGuess(unittest.TestCase):
-
     """Test Python file encoding based on special logic dependant on size."""
 
     def test_zero_size(self):
@@ -207,7 +202,6 @@ class TestSizeGuess(unittest.TestCase):
 
 
 class TestChardetSguess(unittest.TestCase):
-
     """
     Test guessing with chardet.
 
@@ -281,7 +275,6 @@ class TestChardetSguess(unittest.TestCase):
 
 
 class TestChardetGuess(unittest.TestCase):
-
     """
     Test guessing with chardet.
 

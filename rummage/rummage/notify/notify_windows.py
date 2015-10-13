@@ -49,7 +49,6 @@ NIF_SHOWTIP = 0x80
 
 
 class WndClassEx(ctypes.Structure):
-
     """WNDCLASSEX structure."""
 
     _fields_ = [
@@ -69,7 +68,6 @@ class WndClassEx(ctypes.Structure):
 
 
 class NotifyIconData(ctypes.Structure):
-
     """NOTIFYICONDATA structure."""
 
     _fields_ = [
@@ -92,14 +90,12 @@ class NotifyIconData(ctypes.Structure):
 
 
 class NotifyIconDataV3(ctypes.Structure):
-
     """NOTIFYICONDATA_V3 structure."""
 
     _fields_ = NotifyIconData._fields_[:-1]  # noqa
 
 
 class Options(object):
-
     """Notification options."""
 
     notify = None
@@ -121,7 +117,6 @@ def alert(sound=None):
 
 
 class WinNotifyLevel(object):
-
     """Windows notification level."""
 
     ICON_INFORMATION = 0x01
@@ -143,7 +138,6 @@ def notify_win_fallback(title, message, sound, icon, fallback):
 
 
 class WindowsNotify(object):
-
     """Windows notification class."""
 
     window_handle = None

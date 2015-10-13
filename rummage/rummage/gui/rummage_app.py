@@ -34,7 +34,6 @@ wx.Log.EnableLogging(False)
 
 
 class RummageApp(PipeApp):
-
     """RummageApp."""
 
     def __init__(self, *args, **kwargs):

@@ -26,7 +26,6 @@ from ..localization import _
 
 
 class ArgDialog(gui.ArgDialog):
-
     """Argument Dialog."""
 
     def __init__(self, parent, value):
