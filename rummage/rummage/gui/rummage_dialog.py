@@ -1110,7 +1110,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.args.unicode = self.m_unicode_checkbox.GetValue()
         self.args.count_only = self.m_count_only_checkbox.GetValue()
         self.args.regex_version = Settings.get_regex_version()
-        if self.args.regex_mode == rumcore.REGEX_MODE:
+        if self.args.regex_mode in rumcore.REGEX_MODES:
             self.args.bestmatch = self.m_bestmatch_checkbox.GetValue()
             self.args.enhancematch = self.m_enhancematch_checkbox.GetValue()
             self.args.word = self.m_word_checkbox.GetValue()
