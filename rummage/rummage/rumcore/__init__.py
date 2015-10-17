@@ -668,7 +668,8 @@ class _FileSearch(object):
                 else:
                     pattern = _re_pattern(pattern, self.flags, self.is_binary)
                     if replace is not None:
-                        self.expand = sre_parse.parse_template(self.replace, pattern)
+                        template = sre_parse.parse_template(self.replace, pattern)
+                        self.expand = lambda m, t=template: sre_parse.expand_template(t, m)
 
             for m in pattern.finditer(file_content):
                 yield m
