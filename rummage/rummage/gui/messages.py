@@ -1080,9 +1080,6 @@ class MessageIcon(namedtuple('MessageIcon', ['bitmap', 'width', 'height'])):
     """Message icon named tuple."""
 
 
-###########################################################################
-# Class Messages
-###########################################################################
 class Messages(wx.Dialog):
     """Simple message dialog."""
 
