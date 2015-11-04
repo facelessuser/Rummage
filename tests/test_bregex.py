@@ -67,19 +67,19 @@ class TestSearchTemplate(unittest.TestCase):
         """Ensure escaped backrefs don't get processed."""
 
         result = bregex.RegexSearchTemplate(r'Testing escaped \\Qbackrefs\\E!').apply()
-        self.assertEqual(r'Testing escaped \Qbackrefs\E!', result)
+        self.assertEqual(r'Testing escaped \\Qbackrefs\\E!', result)
 
     def test_escaped_escaped_backrefs(self):
         """Ensure escaping escaped backrefs do get processed."""
 
         result = bregex.RegexSearchTemplate(r'Testing escaped escaped \\\Qbackrefs\\\E!').apply()
-        self.assertEqual(r'Testing escaped escaped \backrefs\\!', result)
+        self.assertEqual(r'Testing escaped escaped \\backrefs\\\\!', result)
 
     def test_escaped_escaped_escaped_backrefs(self):
         """Ensure escaping escaped escaped backrefs don't get processed."""
 
         result = bregex.RegexSearchTemplate(r'Testing escaped escaped \\\\Qbackrefs\\\\E!').apply()
-        self.assertEqual(r'Testing escaped escaped \\Qbackrefs\\E!', result)
+        self.assertEqual(r'Testing escaped escaped \\\\Qbackrefs\\\\E!', result)
 
     def test_escaped_escaped_escaped_escaped_backrefs(self):
         """
@@ -89,7 +89,7 @@ class TestSearchTemplate(unittest.TestCase):
         """
 
         result = bregex.RegexSearchTemplate(r'Testing escaped escaped \\\\\Qbackrefs\\\\\E!').apply()
-        self.assertEqual(r'Testing escaped escaped \\backrefs\\\\!', result)
+        self.assertEqual(r'Testing escaped escaped \\\\backrefs\\\\\\\\!', result)
 
     def test_normal_escaping(self):
         """Normal escaping should be unaltered."""
