@@ -899,6 +899,19 @@ class TestReplaceTemplate(unittest.TestCase):
             results
         )
 
+    def test_zero_width_boundary(self):
+        """Test that we handle zero width boundaries."""
+
+        text = '//\nfunc (xx *XX) getChild(int i) PararseTree {\n    return null\n}\n\n//'
+        pattern = bre.compile_search(r'^(\s*func \(xx.*?\()(\w+.*?)\s+([^,)]+)((?:,[^)]*)?)(\)\s+.*?\{)', bre.MULTILINE)
+        expand = bre.compile_replace(pattern, r'\1\3 \2\4\5')
+        results = pattern.sub(expand, text)
+
+        self.assertEqual(
+            '//\nfunc (xx *XX) getChild(i int) PararseTree {\n    return null\n}\n\n//',
+            results
+        )
+
     def test_mixed_groups1(self):
         """Test mix of upper and lower case with named groups and a string replace pattern."""
 
