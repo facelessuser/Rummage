@@ -34,6 +34,7 @@ from .custom_app import init_app_log, set_debug_mode
 from . generic_dialogs import errormsg
 from .. import data
 from .. import rumcore
+from .. import portalocker
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -75,15 +76,22 @@ class Settings(object):
         cls.get_times()
         if cls.settings_file is not None:
             try:
+                f = None
                 with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
+                    assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock settings."
                     cls.settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
+                    assert portalocker.unlock(f), "Could not unlock settings."
                 with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
+                    assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock cache file."
                     cls.cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
+                    assert portalocker.unlock(f), "Could not unlock cache file."
             except Exception:
                 e = traceback.format_exc()
                 try:
-                    errormsg(_("Failed to load settings file!"))
                     error(e)
+                    if f is not None:
+                        portalocker.unlock(f)
+                    errormsg(_("Failed to load settings file!"))
                 except Exception:
                     print(str(e))
         if cls.debug:
@@ -284,13 +292,22 @@ class Settings(object):
             settings = None
             cache = None
             if cls.settings_file is not None:
+                f = None
                 try:
                     with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
+                        assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock settings."
                         settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
+                        assert portalocker.unlock(f), "could not unlock settings."
                     with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
+                        assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock cache file."
                         cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
+                        assert portalocker.unlock(f), "could not unlock cache file."
                 except Exception:
-                    pass
+                    try:
+                        if f is not None:
+                            portalocker.unlock(f)
+                    except Exception:
+                        pass
             if settings is not None:
                 cls.settings = settings
             if cache is not None:
@@ -554,11 +571,16 @@ class Settings(object):
         """Save settings."""
 
         try:
+            f = None
             with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock settings."
                 f.write(json.dumps(cls.settings, sort_keys=True, indent=4, separators=(',', ': ')))
+                assert portalocker.unlock(f), "could not unlock settings."
         except Exception:
             e = traceback.format_exc()
             try:
+                if f is not None:
+                    portalocker.unlock(f)
                 errormsg(_("Failed to save settings file!"))
                 error(e)
             except Exception:
@@ -569,11 +591,16 @@ class Settings(object):
         """Save cache."""
 
         try:
+            f = None
             with codecs.open(cls.cache_file, "w", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock cache file."
                 f.write(json.dumps(cls.cache, sort_keys=True, indent=4, separators=(',', ': ')))
+                assert portalocker.unlock(f), "could not unlock cache file."
         except Exception:
             e = traceback.format_exc()
             try:
+                if f is not None:
+                    portalocker.unlock(f)
                 errormsg(_("Failed to save cache file!"))
                 error(e)
             except Exception:
