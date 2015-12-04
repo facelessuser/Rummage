@@ -134,14 +134,15 @@ if os.name == 'nt':
 elif os.name == 'posix':
     def lock(file, flags):
         """Return True on success, False otherwise."""
-        if fcntl.flock(file.fileno(), flags) == 0:
+
+        if not fcntl.flock(file.fileno(), flags):
             return True
         else:
             return False
 
     def unlock(file):
         """Return True on success, False otherwise."""
-        if fcntl.flock(file.fileno(), fcntl.LOCK_UN) == 0:
+        if not fcntl.flock(file.fileno(), fcntl.LOCK_UN):
             return True
         else:
             return False

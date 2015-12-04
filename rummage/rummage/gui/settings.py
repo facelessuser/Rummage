@@ -78,13 +78,13 @@ class Settings(object):
             try:
                 locked = False
                 with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
-                    assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock settings."
+                    assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
                     locked = True
                     cls.settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
                     assert portalocker.unlock(f), "Could not unlock settings."
                     locked = False
                 with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
-                    assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock cache file."
+                    assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock cache file."
                     locked = True
                     cls.cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
                     assert portalocker.unlock(f), "Could not unlock cache file."
@@ -267,12 +267,21 @@ class Settings(object):
             cls.fifo = join(folder, FIFO)
             cls.config_folder = folder
         try:
+            locked = False
             for filename in (settings, cache):
                 if not exists(filename):
                     with codecs.open(filename, "w", encoding="utf-8") as f:
+                        assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock file."
+                        locked = True
                         f.write(json.dumps({}, sort_keys=True, indent=4, separators=(',', ': ')))
+                        assert portalocker.unlock(f), "Could not unlock file."
+                        locked = False
         except Exception:
-            pass
+            try:
+                if locked:
+                    portalocker.unlock(f)
+            except Exception:
+                pass
         return settings, cache, log
 
     @classmethod
@@ -299,13 +308,13 @@ class Settings(object):
                 locked = False
                 try:
                     with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
-                        assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock settings."
+                        assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
                         locked = True
                         settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
                         assert portalocker.unlock(f), "could not unlock settings."
                         locked = False
                     with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
-                        assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock cache file."
+                        assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock cache file."
                         locked = True
                         cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
                         assert portalocker.unlock(f), "could not unlock cache file."
