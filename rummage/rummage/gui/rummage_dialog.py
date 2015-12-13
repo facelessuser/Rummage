@@ -28,7 +28,7 @@ from time import time
 import os
 import re
 import wx.lib.newevent
-from .. import version
+from .. import __meta__
 from .. import rumcore
 from ..rumcore.backrefs import bre, bregex
 from ..epoch_timestamp import local_time_to_epoch_timestamp
@@ -1647,12 +1647,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_documentation(self, event):
         """Open documentation site."""
 
-        webbrowser.open_new_tab(version.__manual__)
+        webbrowser.open_new_tab(__meta__.__manual__)
 
     def on_issues(self, event):
         """Open issues site."""
 
-        webbrowser.open_new_tab(version.__help__)
+        webbrowser.open_new_tab(__meta__.__help__)
 
     def on_about(self, event):
         """Show about dialog."""

@@ -24,7 +24,7 @@ import argparse
 import sys
 from .rummage.gui.settings import Settings
 from .rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame
-from .rummage import version
+from .rummage import __meta__
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 CLI_ENCODING = sys.getfilesystemencoding()
@@ -44,9 +44,9 @@ def pyin(value):
 def parse_arguments():
     """Parse the arguments."""
 
-    parser = argparse.ArgumentParser(prog=version.__app__, description='A python grep like tool.')
+    parser = argparse.ArgumentParser(prog=__meta__.__app__, description='A python grep like tool.')
     # Flag arguments
-    parser.add_argument('--version', action='version', version=('%(prog)s ' + version.__version__))
+    parser.add_argument('--version', action='version', version=('%(prog)s ' + __meta__.__version__))
     parser.add_argument('--debug', action='store_true', default=False, help=argparse.SUPPRESS)
     parser.add_argument(
         '--path', default=None, type=pyin,

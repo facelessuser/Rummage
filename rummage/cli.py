@@ -27,7 +27,7 @@ import sys
 from datetime import datetime
 from .rummage import epoch_timestamp
 from .rummage import rumcore
-from .rummage import version
+from .rummage import __meta__
 from .rummage.rumcore.backrefs import bre, bregex
 import decimal
 
@@ -583,7 +583,7 @@ def main():
     )
     # Flag arguments
     parser.add_argument(
-        "--version", action="version", version=("%(prog)s " + version.__version__)
+        "--version", action="version", version=("%(prog)s " + __meta__.__version__)
     )
     parser.add_argument(
         "--help", action="help",

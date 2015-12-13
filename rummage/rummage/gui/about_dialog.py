@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import wx
 from . import gui
 from ..localization import _
-from .. import version
+from .. import __meta__
 from .. import data
 
 
@@ -43,12 +43,12 @@ class AboutDialog(gui.AboutDialog):
             wx.DefaultPosition,
             wx.Size(64, 64), 0
         )
-        self.m_app_label.SetLabel(version.__app__)
+        self.m_app_label.SetLabel(__meta__.__app__)
         self.m_version_label.SetLabel(
-            _("Version: %s %s") % (version.__version__, version.__status__)
+            _("Version: %s %s") % (__meta__.__version__, __meta__.__status__)
         )
         self.m_developers_label.SetLabel(
-            _("Developer(s):\n%s") % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in version.__maintainers__]))
+            _("Developer(s):\n%s") % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in __meta__.__maintainers__]))
         )
 
         self.m_dev_toggle.SetLabel(_("Contact") + " >>")

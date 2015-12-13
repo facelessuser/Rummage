@@ -3,15 +3,36 @@
 """Setup package."""
 from setuptools import setup, find_packages
 import sys
+import os
+import imp
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 
+
+def get_version():
+    """Get version and version_info without importing the entire module."""
+
+    devstatus = {
+        'alpha': '3 - Alpha',
+        'beta': '4 - Beta',
+        'candidate': '4 - Beta',
+        'final': '5 - Production/Stable'
+    }
+    path = os.path.join(os.path.dirname(__file__), 'rummage', 'rummage')
+    fp, pathname, desc = imp.find_module('__version__', [path])
+    try:
+        v = imp.load_module('__version__', fp, pathname, desc)
+        return v.version, devstatus[v.version_info[3]]
+    finally:
+        fp.close()
+
+VER, DEVSTATUS = get_version()
+
 LONG_DESC = '''
-Rummage is a CLI and GUI tool for searching through folders and fle content.
+Rummage is a CLI and GUI tool for searching and replacing texst in files.
 It is built with wxPython 3.0.0+ and requires Python 2.7 or Python 3.0 for command line.
 
-The project repo is found at:
-https://github.com/facelessuser/Rummage.
+The project repo is found at: https://github.com/facelessuser/Rummage.
 '''
 
 if PY3:
@@ -34,7 +55,7 @@ else:
 
 setup(
     name='Rummage',
-    version='0.3.0',
+    version=VER,
     keywords='grep search find',
     description='A gui file search app.',
     long_description=LONG_DESC,
@@ -53,7 +74,7 @@ setup(
     },
     license='MIT License',
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: %s' % DEVSTATUS,
         'Environment :: Console',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
