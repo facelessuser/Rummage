@@ -1,15 +1,14 @@
+sudo: false
 language: python
 env:
   - TOXENV=py27-unittests
   - TOXENV=py34-unittests
-  #- TOXENV=py35-unittests
+  - TOXENV=py35-unittests
   - TOXENV=lint
 install:
   - pip install tox
   - pip install codecov
-  # - pip install coveralls
 script:
   - tox
 after_success:
   - codecov
-#   - coveralls
