@@ -81,23 +81,6 @@ RE_TYPE = type(re.compile('', 0))
 _UPPER = 0
 _LOWER = 1
 
-# Mapping of friendly unicode category names to shorthand codes.
-unicode_posix_property_map = {
-    "Alnum",
-    "Alpha",
-    "ASCII",
-    "Blank",
-    "Cntrl",
-    "Digit",
-    "Graph",
-    "Lower",
-    "Print",
-    "Punct",
-    "Space",
-    "Upper",
-    "XDigit"
-}
-
 unicode_property_map = {
     # Other
     "Other": "C",
@@ -211,7 +194,7 @@ utokens = {
     ),
     "ascii_flag": "a",
     "re_posix": re.compile(
-        r'\[:(alnum|alpha|ascii|blank|cntrl|digit|graph|lower|print|punct|space|upper|word|xdigit):\]'
+        r'\[:(\^?(?:alnum|alpha|ascii|blank|cntrl|digit|graph|lower|print|punct|space|upper|word|xdigit)):\]'
     ),
     "posix": {
         "alnum": r"a-zA-Z0-9",
@@ -230,20 +213,34 @@ utokens = {
         "xdigit": r"A-Fa-f0-9"
     },
     "uposix": {
-        "alnum": r"\p{L&}\p{Nd}",
-        "alpha": r"\p{L&}",
-        "ascii": r"\x00-\x7F",
-        "blank": r"\p{Zs}\t",
-        "cntrl": r"\p{Cc}",
-        "digit": r"\p{Nd}",
-        "graph": r"\P{Z}\P{C}",
-        "lower": r"\p{Ll}",
-        "print": r"\P{C}",
-        "punct": r"\p{P}\p{S}",
-        "space": r"\p{Z}\t\r\n\v\f",
-        "upper": r"\p{Lu}",
-        "word": r"\p{L}\p{N}\p{Pc}",
-        "xdigit": r"A-Fa-f0-9"
+        "alnum": "Alnum",
+        "alpha": "Alpha",
+        "ascii": "ASCII",
+        "blank": "Blank",
+        "cntrl": "Cntrl",
+        "digit": "Digit",
+        "graph": "Graph",
+        "lower": "Lower",
+        "print": "Print",
+        "punct": "Punct",
+        "space": "Space",
+        "upper": "Upper",
+        "word": "Word",
+        "xdigit": "XDigit",
+        "^alnum": "^Alnum",
+        "^alpha": "^Alpha",
+        "^ascii": "^ASCII",
+        "^blank": "^Blank",
+        "^cntrl": "^Cntrl",
+        "^digit": "^Digit",
+        "^graph": "^Graph",
+        "^lower": "^Lower",
+        "^print": "^Print",
+        "^punct": "^Punct",
+        "^space": "^Space",
+        "^upper": "^Upper",
+        "^word": "^Word",
+        "^xdigit": "^XDigit"
     }
 }
 
@@ -282,7 +279,7 @@ btokens = {
     ),
     "ascii_flag": b"a",
     "re_posix": re.compile(
-        br'\[:(alnum|alpha|ascii|blank|cntrl|digit|graph|lower|print|punct|space|upper|word|xdigit):\]'
+        br'\[:(\^?(?:alnum|alpha|ascii|blank|cntrl|digit|graph|lower|print|punct|space|upper|word|xdigit)):\]'
     ),
     "posix": {
         b"alnum": br"a-zA-Z0-9",
@@ -301,20 +298,34 @@ btokens = {
         b"xdigit": br"A-Fa-f0-9"
     },
     "uposix": {
-        b"alnum": br"\p{L&}\p{Nd}",
-        b"alpha": br"\p{L&}",
-        b"ascii": br"\x00-\x7F",
-        b"blank": br"\p{Zs}\t",
-        b"cntrl": br"\p{Cc}",
-        b"digit": br"\p{Nd}",
-        b"graph": br"\P{Z}\P{C}",
-        b"lower": br"\p{Ll}",
-        b"print": br"\P{C}",
-        b"punct": br"\p{P}\p{S}",
-        b"space": br"\p{Z}\t\r\n\v\f",
-        b"upper": br"\p{Lu}",
-        b"word": br"\p{L}\p{N}\p{Pc}",
-        b"xdigit": br"A-Fa-f0-9"
+        b"alnum": b"Alnum",
+        b"alpha": b"Alpha",
+        b"ascii": b"ASCII",
+        b"blank": b"Blank",
+        b"cntrl": b"Cntrl",
+        b"digit": b"Digit",
+        b"graph": b"Graph",
+        b"lower": b"Lower",
+        b"print": b"Print",
+        b"punct": b"Punct",
+        b"space": b"Space",
+        b"upper": b"Upper",
+        b"word": b"Word",
+        b"xdigit": b"XDigit",
+        b"^alnum": b"^Alnum",
+        b"^alpha": b"^Alpha",
+        b"^ascii": b"^ASCII",
+        b"^blank": b"^Blank",
+        b"^cntrl": b"^Cntrl",
+        b"^digit": b"^Digit",
+        b"^graph": b"^Graph",
+        b"^lower": b"^Lower",
+        b"^print": b"^Print",
+        b"^punct": b"^Punct",
+        b"^space": b"^Space",
+        b"^upper": b"^Upper",
+        b"^word": b"^Word",
+        b"^xdigit": b"^XDigit"
     }
 }
 
@@ -691,7 +702,7 @@ class SearchTemplate(object):
             return self.unicode_props(p[3:-1], True, p[1] == self._inverse_uni_prop)[0]
 
         if self.unicode or force_unicode:
-            pattern = _RE_UPROP.sub(repl, self._uposix[prop])
+            pattern = uniprops.posix_unicode_properties[self._uposix[prop]]
         else:
             pattern = self._posix[prop]
 
