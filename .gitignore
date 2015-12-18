@@ -46,3 +46,5 @@ Output/*
 pyinstaller
 
 site/*
+
+rummage/rummage/rumcore/backrefs/uniprops.py

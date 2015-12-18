@@ -82,6 +82,22 @@ _UPPER = 0
 _LOWER = 1
 
 # Mapping of friendly unicode category names to shorthand codes.
+unicode_posix_property_map = {
+    "Alnum",
+    "Alpha",
+    "ASCII",
+    "Blank",
+    "Cntrl",
+    "Digit",
+    "Graph",
+    "Lower",
+    "Print",
+    "Punct",
+    "Space",
+    "Upper",
+    "XDigit"
+}
+
 unicode_property_map = {
     # Other
     "Other": "C",
@@ -154,6 +170,8 @@ _UPROP = r'''
 \}
 '''
 
+_RE_UPROP = re.compile(r'(?x)\\%s' % _UPROP)
+
 # Unicode string related references
 utokens = {
     "uni_prop": "p",
@@ -191,19 +209,46 @@ utokens = {
     "re_flags": re.compile(
         r'(?s)(\\.)|\(\?([aiLmsux]+)\)|(.)' if compat.PY3 else r'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
     ),
-    "ascii_flag": "a"
+    "ascii_flag": "a",
+    "re_posix": re.compile(
+        r'\[:(alnum|alpha|ascii|blank|cntrl|digit|graph|lower|print|punct|space|upper|word|xdigit):\]'
+    ),
+    "posix": {
+        "alnum": r"a-zA-Z0-9",
+        "alpha": r"a-zA-Z",
+        "ascii": r"\u0000-\u007F",
+        "blank": r" \t",
+        "cntrl": r"\u0000-\u001F\u007F",
+        "digit": r"0-9",
+        "graph": r"\u0021-\u007E",
+        "lower": r"a-z",
+        "print": r"\u0020-\u007E",
+        "punct": r"!\"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~",
+        "space": r" \t\r\n\v\f",
+        "upper": r"A-Z",
+        "word": r"A-Za-z0-9_",
+        "xdigit": r"A-Fa-f0-9"
+    },
+    "uposix": {
+        "alnum": r"\p{L&}\p{Nd}",
+        "alpha": r"\p{L&}",
+        "ascii": r"\x00-\x7F",
+        "blank": r"\p{Zs}\t",
+        "cntrl": r"\p{Cc}",
+        "digit": r"\p{Nd}",
+        "graph": r"\P{Z}\P{C}",
+        "lower": r"\p{Ll}",
+        "print": r"\P{C}",
+        "punct": r"\p{P}\p{S}",
+        "space": r"\p{Z}\t\r\n\v\f",
+        "upper": r"\p{Lu}",
+        "word": r"\p{L}\p{N}\p{Pc}",
+        "xdigit": r"A-Fa-f0-9"
+    }
 }
 
 # Byte string related references
 btokens = {
-    "def_back_ref": set(
-        [
-            b"a", b"b", b"f", b"n", b"r",
-            b"t", b"v", b"A", b"b", b"B",
-            b"d", b"D", b"s", b"S", b"w",
-            b"W", b"Z", b"u", b"x", b"g"
-        ]
-    ),
     "uni_prop": b"p",
     "inverse_uni_prop": b"P",
     "ascii_low_props": b'a-z',
@@ -235,7 +280,42 @@ btokens = {
     "re_flags": re.compile(
         br'(?s)(\\.)|\(\?([aiLmsux]+)\)|(.)' if compat.PY3 else br'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
     ),
-    "ascii_flag": b"a"
+    "ascii_flag": b"a",
+    "re_posix": re.compile(
+        br'\[:(alnum|alpha|ascii|blank|cntrl|digit|graph|lower|print|punct|space|upper|word|xdigit):\]'
+    ),
+    "posix": {
+        b"alnum": br"a-zA-Z0-9",
+        b"alpha": br"a-zA-Z",
+        b"ascii": br"\x00-\x7F",
+        b"blank": br" \t",
+        b"cntrl": br"\x00-\x1F\x7F",
+        b"digit": br"0-9",
+        b"graph": br"\x21-\x7E",
+        b"lower": br"a-z",
+        b"print": br"\x20-\x7E",
+        b"punct": br"!\"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~",
+        b"space": br" \t\r\n\v\f",
+        b"upper": br"A-Z",
+        b"word": br"A-Za-z0-9_",
+        b"xdigit": br"A-Fa-f0-9"
+    },
+    "uposix": {
+        b"alnum": br"\p{L&}\p{Nd}",
+        b"alpha": br"\p{L&}",
+        b"ascii": br"\x00-\x7F",
+        b"blank": br"\p{Zs}\t",
+        b"cntrl": br"\p{Cc}",
+        b"digit": br"\p{Nd}",
+        b"graph": br"\P{Z}\P{C}",
+        b"lower": br"\p{Ll}",
+        b"print": br"\P{C}",
+        b"punct": br"\p{P}\p{S}",
+        b"space": br"\p{Z}\t\r\n\v\f",
+        b"upper": br"\p{Lu}",
+        b"word": br"\p{L}\p{N}\p{Pc}",
+        b"xdigit": br"A-Fa-f0-9"
+    }
 }
 
 
@@ -356,7 +436,9 @@ class SearchTokens(compat.Tokens):
             self._re_search_ref = tokens["re_search_ref_verbose"]
         else:
             self._re_search_ref = tokens["re_search_ref"]
+        self._ls_bracket = ctokens["ls_bracket"]
         self._b_slash = ctokens["b_slash"]
+        self._re_posix = tokens["re_posix"]
         self.max_index = len(string) - 1
         self.index = 0
         self.current = None
@@ -384,6 +466,10 @@ class SearchTokens(compat.Tokens):
                     char += self._b_slash
                 else:
                     char += m.group(3)
+        elif char == self._ls_bracket:
+            m = self._re_posix.match(self.string[self.index:])
+            if m:
+                char = m.group(0)
 
         self.index += len(char)
         self.current = char
@@ -504,6 +590,9 @@ class SearchTemplate(object):
         self._negative_upper = tokens["negative_upper"]
         self._negative_lower = tokens["negative_lower"]
         self._re_flags = tokens["re_flags"]
+        self._re_posix = tokens["re_posix"]
+        self._posix = tokens["posix"]
+        self._uposix = tokens["uposix"]
         self._nl = ctokens["nl"]
         self._hashtag = ctokens["hashtag"]
         self.search = search
@@ -557,17 +646,21 @@ class SearchTemplate(object):
         quote_found = False
         quote_start = 0
         escaped = False
+        posix = False
         found = False
         first = None
         for c in compat.iterstring(s):
-            if c == self._b_slash:
+            if posix:
+                if c == self._rs_bracket:
+                    posix = False
+            elif c == self._b_slash:
                 escaped = not escaped
             elif escaped and not found and not quote_found and c == self._quote:
                 quote_found = True
                 quote_start = pos - 1
                 escaped = False
             elif escaped and not found and quote_found and c == self._end:
-                quotes.append((quote_start, pos))
+                quotes.append((quote_start + 2, pos - 2))
                 quote_found = False
                 escaped = False
             elif escaped:
@@ -577,20 +670,51 @@ class SearchTemplate(object):
             elif c == self._ls_bracket and not found:
                 found = True
                 first = pos
+            elif c == self._ls_bracket and self._re_posix.match(s[pos:]) is not None:
+                posix = True
             elif c == self._negate and found and (pos == first + 1):
                 first = pos
             elif c == self._rs_bracket and found and (pos != first + 1):
-                groups.append((first, pos))
+                groups.append((first + 1, pos - 1))
                 found = False
             pos += 1
         if quote_found:
-            quotes.append((quote_start, pos - 1))
+            quotes.append((quote_start + 2, pos - 1))
         return groups, quotes
+
+    def posix_props(self, prop, force_unicode=False):
+        """Insert posix properties."""
+
+        def repl(m):
+            """Replace."""
+            p = m.group(0)
+            return self.unicode_props(p[3:-1], True, p[1] == self._inverse_uni_prop)[0]
+
+        if self.unicode or force_unicode:
+            pattern = _RE_UPROP.sub(repl, self._uposix[prop])
+        else:
+            pattern = self._posix[prop]
+
+        return [pattern]
 
     def unicode_props(self, props, in_group, negate=False):
         """Insert unicode properties."""
 
         if len(props) > 2:
+            # # \p{posixclasses}
+            # # Should probably come up with auto-generated posix table.
+            # if props in unicode_posix_property_map:
+            #     v = self.posix_props(props.lower(), force_unicode=True)
+            #     if not in_group:
+            #         if negate:
+            #             v = self._ls_bracket + self._negate + v + self._rs_bracket
+            #         else:
+            #             v = self._ls_bracket + v + self._rs_bracket
+            #     elif negate:
+            #         # ???
+            #         v = ''
+            #     return [v]
+
             props = unicode_property_map.get(props, None)
 
         properties = []
@@ -681,21 +805,19 @@ class SearchTemplate(object):
 
                 c = t[1:]
 
-                if c.startswith(self._uni_prop):
+                if t.startswith(self._ls_bracket) and self.in_group(i.index - 1):
+                    self.extended.extend(self.posix_props(t[2:-2]))
+                elif c.startswith(self._uni_prop):
                     self.extended.extend(self.unicode_props(c[2:-1], self.in_group(i.index - 1)))
                 elif c.startswith(self._inverse_uni_prop):
                     self.extended.extend(self.unicode_props(c[2:-1], self.in_group(i.index - 1), negate=True))
                 elif c == self._lc:
-                    # Postpone evaluation of ASCII props as we don't yet know if unicode flag is enabled
                     self.extended.extend(self.ascii_props(_LOWER, self.in_group(i.index - 1)))
                 elif c == self._lc_span:
-                    # Postpone evaluation of ASCII props as we don't yet know if unicode flag is enabled
                     self.extended.extend(self.ascii_props(_LOWER, self.in_group(i.index - 1), negate=True))
                 elif c == self._uc:
-                    # Postpone evaluation of ASCII props as we don't yet know if unicode flag is enabled
                     self.extended.extend(self.ascii_props(_UPPER, self.in_group(i.index - 1)))
                 elif c == self._uc_span:
-                    # Postpone evaluation of ASCII props as we don't yet know if unicode flag is enabled
                     self.extended.extend(self.ascii_props(_UPPER, self.in_group(i.index - 1), negate=True))
                 elif c[0:1] in self._verbose_tokens:
                     self.extended.append(t)

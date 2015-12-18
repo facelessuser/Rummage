@@ -282,7 +282,7 @@ if REGEX_SUPPORT:
                     quote_start = pos - 1
                     escaped = False
                 elif escaped and not found and quote_found and c == self._end:
-                    quotes.append((quote_start, pos))
+                    quotes.append((quote_start + 2, pos - 2))
                     quote_found = False
                     escaped = False
                 elif escaped:
@@ -295,11 +295,11 @@ if REGEX_SUPPORT:
                 elif c == self._negate and found and (pos == first + 1):
                     first = pos
                 elif c == self._rs_bracket and found and (pos != first + 1):
-                    groups.append((first, pos))
+                    groups.append((first + 1, pos - 1))
                     found = False
                 pos += 1
             if quote_found:
-                quotes.append((quote_start, pos - 1))
+                quotes.append((quote_start + 2, pos - 1))
             return groups, quotes
 
         def find_char_groups_v1(self, s):

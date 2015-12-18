@@ -17,6 +17,32 @@ else:
 class TestSearchTemplate(unittest.TestCase):
     """Search template tests."""
 
+    def test_posix_in_group_unicode(self):
+        """Test posix in a group."""
+
+        pattern = bre.compile_search(r'Test [[:graph:]]', re.UNICODE)
+        pattern2 = bre.compile_search(r'Test [\P{Z}\P{C}]', re.UNICODE)
+        self.assertEqual(pattern.pattern, pattern2.pattern)
+
+    def test_posix_in_group_ascii(self):
+        """Test posix in a group."""
+
+        pattern = bre.compile_search(r'Test [[:graph:]]')
+        pattern2 = bre.compile_search(r'Test [\u0021-\u007E]')
+        self.assertEqual(pattern.pattern, pattern2.pattern)
+
+    def test_not_posix_at_start_group(self):
+        """Test a situation that is not a posix at the start of a group."""
+
+        pattern = bre.compile_search(r'Test [:graph:]]')
+        self.assertEqual(pattern.pattern, r'Test [:graph:]]')
+
+    def test_not_posix_at_end_group(self):
+        """Test a situation that is not a posix at the end of a group."""
+
+        pattern = bre.compile_search(r'Test [[:graph:]')
+        self.assertEqual(pattern.pattern, r'Test [[:graph:]')
+
     def test_ascii_upper_props(self):
         """Test ascii uppercase properties."""
 
