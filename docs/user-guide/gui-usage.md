@@ -255,6 +255,7 @@ Unicode properties can be used with the format: `\p{UnicodeProperty}`.  The inve
 | Private_Use | Co |
 | Unassigned | Cn |
 | Letter | L |
+| Cased_Letter | L& |
 | Uppercase_Letter | Lu |
 | Lowercase_Letter | Ll |
 | Titlecase_Letter | Lt |
