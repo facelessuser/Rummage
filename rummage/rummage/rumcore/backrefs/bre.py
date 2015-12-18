@@ -93,6 +93,7 @@ unicode_property_map = {
 
     # Letter
     "Letter": "L",
+    "Cased_Letter": "L&",
     "Uppercase_Letter": "Lu",
     "Lowercase_Letter": "Ll",
     "Titlecase_Letter": "Lt",
@@ -139,9 +140,9 @@ unicode_property_map = {
 _UPROP = r'''
 (?:p|P)\{
 (?:
-    C(?:c|f|s|o|n)?|L(?:u|l|t|m|o|n)?|M(?:n|c|e|d)?|N(?:d|l|o|c|d)?|
+    C(?:c|f|s|o|n)?|L(?:&|u|l|t|m|o|n)?|M(?:n|c|e|d)?|N(?:d|l|o|c|d)?|
     P(?:c|d|s|e|i|f|o)?|S(?:c|m|k|o)?|Z(?:p|s|l)?|
-    Letter|Uppercase_Letter|Lowercase_Letter|Titlecase_Letter|Modifier_Letter|Other_Letter|
+    Letter|Cased_Letter|Uppercase_Letter|Lowercase_Letter|Titlecase_Letter|Modifier_Letter|Other_Letter|
     Mark|Nonspacing_Mark|Spacing_Mark|Enclosing_Mark|
     Number|Decimal_Number|Letter_Number|Other_Number|
     Punctuation|Connector_Punctuation|Dash_Punctuation|Open_Punctuation|Close_Punctuation|

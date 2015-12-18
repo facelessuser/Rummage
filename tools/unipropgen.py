@@ -1,7 +1,7 @@
 """
 Generate a unicode prop table for Python narrow and wide builds.
 
-Narrow builds will stop at 0xffff
+Narrow builds will stop at 0xffff.
 """
 from __future__ import unicode_literals
 import sys
@@ -64,7 +64,8 @@ def gen_properties(f, narrow=False):
     else:
         unicode_range = NARROW_RANGE
 
-    table = {}
+    # L& won't be found in the table, so intialize it at the start.
+    table = {'L': {'&': [], '^&': []}}
     all_chars = set()
     p = None
     for i in range(unicode_range[0], unicode_range[1] + 1):
@@ -78,6 +79,9 @@ def gen_properties(f, narrow=False):
             table[p[0]][p[1]] = []
             table[p[0]]['^' + p[1]] = []
         table[p[0]][p[1]].append(i)
+        # Add L& which is a combo of Ll, Lu, and Lt
+        if p[0] == 'L' and p[1] in ('l', 'u', 't'):
+            table['L']['&'].append(i)
 
     # Create inverse of each category
     for k1, v1 in table.items():
@@ -122,11 +126,11 @@ def gen_properties(f, narrow=False):
     f.write('    unicode_properties = {\n')
     count = len(table) - 1
     i = 0
-    for k1, v1 in table.items():
+    for k1, v1 in sorted(table.items()):
         f.write('        "%s": {\n' % k1)
         count2 = len(v1) - 1
         j = 0
-        for k2, v2 in v1.items():
+        for k2, v2 in sorted(v1.items()):
             f.write('            "%s": "%s"' % (k2, v2))
             if j == count2:
                 f.write('\n        }')

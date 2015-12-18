@@ -26,7 +26,33 @@ def get_version():
     finally:
         fp.close()
 
+
+def generate_unicode_table():
+    """Generate the unicode table for the given Python version."""
+
+    fail = False
+    path = os.path.join(os.path.dirname(__file__), 'tools')
+    fp, pathname, desc = imp.find_module('unipropgen', [path])
+    try:
+        unipropgen = imp.load_module('unipropgen', fp, pathname, desc)
+        unipropgen.build_unicode_property_table(
+            os.path.join(
+                os.path.dirname(__file__),
+                'rummage', 'rummage', 'rumcore', 'backrefs', 'uniprops.py'
+            )
+        )
+    except Exception as e:
+        print(e)
+        fail = True
+    finally:
+        fp.close()
+
+    assert not fail, "Failed uniprops.py generation!"
+
+
 VER, DEVSTATUS = get_version()
+generate_unicode_table()
+
 
 LONG_DESC = '''
 Rummage is a CLI and GUI tool for searching and replacing texst in files.
