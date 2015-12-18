@@ -4,18 +4,16 @@ Detailed usage for rummage.
 ---
 
 ## Overview
-Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, Content.  Each element is labeled to indicate its functionality, and they are grouped with like elements.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the scope of what files get searched can be narrowed with filters.  Search options are all contained in the **Search** tab.  When a search has been completed, general info about matches in files will be displayed in the **Files** tab, and more detailed context information will be displayed in the **Content** tab.
+Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search options are all contained in the **Search** tab.  When a search has been completed, general info about matches found in files will be displayed in the **Files** tab, and more detailed context information will be displayed in the **Content** tab.
 
-Rummage also comes with a simple regex tester to test out patterns.  Rummage also has a feature where patterns can be saved for later and/or frequent use.
-
-At the bottom of the dialog are the search and replace buttons that initiate the search or replace.
+Rummage also comes with a simple regex tester to test out patterns, and a feature where patterns can be saved for later and/or frequent use.
 
 The status bar will show search progress, match counts, and other useful information.
 
 !!! caution "Warning: Replace"
-    When replacing, Rummage will back up the file in `<your file name>.rum-bak`.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you use version control.  If using encoding guessing, Rummage *might* guess the wrong encoding causing some things to get lost during replace.  And aside from those issues, something unexpected *could* always occur as well.
+    When replacing, Rummage will back up the file in `<your file name>.rum-bak`.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you use version control.  If using encoding guessing, Rummage *might* guess the wrong encoding causing some things to get lost during replace.  And aside from those issues, something unexpected *could* always occur as well, but hopefully not as Rummage is been trough a lot of testing.
 
-    In short, if you disable backups, there is a greater risk as you will no longer have a safety net.  Even with backups, something *could* go wrong.  This is free software, and I am not responsible for files corrupted or lost.  You have been warned.
+    In short, if you disable backups, there is a greater risk as you will no longer have a safety net.  Even with backups, something *could* go wrong.  This is free software, and I am not responsible for files corrupted or lost.
 
     Large files, really large files, can possibly cause an issue and may error out as the entire file will be read into memory for a replace.  If you are doing really large files, know that it may error out or get really slow.  Remember this is done in Python, if you are doing massive GB files, maybe you are using the wrong tool for the job.
 
@@ -33,21 +31,21 @@ The second panel, is the **Limit Search** panel.  The **Limit Search** panel con
 
 The **Files** tab is where files with matches are shown after a search completes.  The files are arranged in a sortable table.  Each entry will show the files name, file size, number of matches in the file, the file path, detected file encoding, date/time when the file was created, and date/time of when the file was last modified.
 
-When mousing over an entry, the full path to the file will be shown in the status bar.  If you have a editor option in the preference dialog configured properly, you can double click an entry to open the file in your favorite editor.
+When mousing over an entry, the full path to the file will be shown in the status bar.  If you have the editor option in the preference dialog configured properly, you can double click an entry to open the file in your favorite editor.
 
 ## Content Tab
 
 ![Content Tab](../images/content_tab.png)
 
-The **Content** tab shows each match in a file individually in a sortable table.  Each entry shows the file name, the line on which the match was found, the number of matches on that line, and the the content of the mentioned line.
+The **Content** tab shows each match in a file individually in a sortable table.  Each entry shows the file name, the line on which the match was found, the number of matches on that line, and the content of the line.  Long lines will be truncated. 
 
-When mousing over an entry, the full path to the file will be shown in the status bar.  If you have a editor option in the preference dialog configured properly, you can double click an entry to open the file in your favorite editor.
+When mousing over an entry, the full path to the file will be shown in the status bar.  If you have the editor option in the preference dialog configured properly, you can double click an entry to open the file in your favorite editor.
 
 ## Search &amp; Replace Panel
 
 ![Search and Replace Panel](../images/search_replace_panel.png)
 
-The **Search &amp; Replace** panel contains three text boxes with a dropdown history. The first textbox defines **where to search**, the second defines **what to search for**, and the last defines **what to replace matches with**; this is only needed when doing replaces.  You can select previously used patterns and search targets by expanding the dropdown panel for the input.
+The **Search &amp; Replace** panel contains three text boxes with a dropdown history. The first textbox defines **where to search**, the second defines **what to search for**, and the last defines **what to replace matches with** (this is only needed when doing replaces).  You can select previously used patterns and search targets by expanding the dropdown panel for the input.
 
 Below the text boxes are toggles that control the regex engines flags and/or features.  These will vary depending on which regex engine you are using as Rummage can be used with Python's default [**re**](https://docs.python.org/2/library/re.html) engine or the third party [**regex**](https://pypi.python.org/pypi/regex) engine.  Both optionally can use the a special wrapper called **backrefs** to add support for a couple special escapes.
 
@@ -66,7 +64,7 @@ Both the **re** and **regex** engine have a couple of shared flags that are expo
 | Use Unicode properties | Changes the behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use use characters from the Unicode property database (will also modify `\l`, `\L`, `\c`, and `\C` if using **backrefs** with **re**). |
 
 ### Regex Engine Flags
-If the **regex** engine is being used for regular expressions, a couple of extra toggles will be available.  **Regex** can be run in either `VERSION0` or `VERSION1` mode.  `VERSION0` is compatible with **re** regex patterns and has the extra `fullcase` toggle.  `VERSION1` does not have this toggle as it is enabled by default and can only be disabled inline in a pattern with `(?-f)`.
+If the **regex** engine is being used for regular expressions, a couple of extra toggles will be available.  **Regex** can be run in either `VERSION0` or `VERSION1` mode.  `VERSION0` is compatible with **re** regex patterns and has the extra `fullcase` toggle.  `VERSION1` does not have this toggle as it is enabled by default and can only be disabled inline in a pattern with `(?-f)`. `VERSION1` is not directly compatible with **re** as it adds a number of changes to the syntax allowing for more advanced search options.
 
 | Toggle | Description |
 |--------|-------------|
@@ -78,7 +76,7 @@ If the **regex** engine is being used for regular expressions, a couple of extra
 | Full case-folding | Use full case folding. Regex `V0` only as it is enabled by default for `V1`. |
 
 ### Rummage Flags
-Rummage has a couple non
+Rummage has a couple of flags that are not specific to the regular expression engine.
 
 | Toggle | Description |
 |--------|-------------|
@@ -93,7 +91,7 @@ Rummage has a couple non
 
 Rummage comes with a simple regex tester.  It has a simple multi-line text box for content to search, and another multi-line box that will show the final results after the find and replace.  Below that you will find two text input boxes for the find pattern and the replace pattern.  Lastly, all related regular expression flag toggles will be found under the patterns.
 
-To use the tester, simply enter the content to search, set your desired toggles, and input your find and replace pattern.  As you change your pattern or change your toggles, matches will automatically highlight, and the result box will be updated.
+To use the tester, simply enter the content to search, set your desired toggles, and input your find and replace pattern.  As you change your pattern or change your toggles, matches will be updated and highlighted, and the result box will be updated.
 
 When you are satisfied with your result, click the `Use` button, and your pattern and settings will be populated in the main window.
 
