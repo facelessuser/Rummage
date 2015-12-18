@@ -23,6 +23,13 @@ class TestSearchTemplate(unittest.TestCase):
         pattern = bre.compile_search(r'Test [[:graph:]]', re.UNICODE)
         self.assertNotEqual(pattern.pattern, r'Test [[:graph:]]')
 
+    def test_posix_in_group_unicode_with_normal_form(self):
+        r"""Test posix in a group against \p{} form."""
+
+        pattern = bre.compile_search(r'Test [[:graph:]]', re.UNICODE)
+        pattern2 = bre.compile_search(r'Test [\p{Graph}]', re.UNICODE)
+        self.assertEqual(pattern.pattern, pattern2.pattern)
+
     def test_posix_in_group_ascii(self):
         """Test posix in a group."""
         if PY3:

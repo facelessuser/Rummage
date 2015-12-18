@@ -148,7 +148,8 @@ _UPROP = r'''
     Initial_Punctuation|Final_Punctuation|Other_Punctuation|
     Symbol|Math_Symbol|Currency_Symbol|Modifier_Symbol|Other_Symbol|
     Separator|Space_Separator|Line_Separator|Paragraph_Separator|
-    Control|Format|Surrogate|Private_Use|Unassigned
+    Control|Format|Surrogate|Private_Use|Unassigned|
+    Alnum|Alpha|ASCII|Blank|Cntrl|Digit|Graph|Lower|Print|Punct|Space|Upper|Word|XDigit|
 )
 \}
 '''
@@ -711,24 +712,30 @@ class SearchTemplate(object):
     def unicode_props(self, props, in_group, negate=False):
         """Insert unicode properties."""
 
-        if len(props) > 2:
-            # # \p{posixclasses}
-            # # Should probably come up with auto-generated posix table.
-            # if props in unicode_posix_property_map:
-            #     v = self.posix_props(props.lower(), force_unicode=True)
-            #     if not in_group:
-            #         if negate:
-            #             v = self._ls_bracket + self._negate + v + self._rs_bracket
-            #         else:
-            #             v = self._ls_bracket + v + self._rs_bracket
-            #     elif negate:
-            #         # ???
-            #         v = ''
-            #     return [v]
-
-            props = unicode_property_map.get(props, None)
-
         properties = []
+        if len(props) > 2:
+            if props in uniprops.posix_unicode_properties:
+                # \p{posixclasses}
+                if not in_group:
+                    v = uniprops.posix_unicode_properties[props]
+                    if negate:
+                        v = self._ls_bracket + self._negate + v + self._rs_bracket
+                    else:
+                        v = self._ls_bracket + v + self._rs_bracket
+                else:
+                    if props.startswith(self._negate):
+                        negate = not negate
+                    if not negate and props.startswith(self._negate):
+                        props = props[1:]
+                    elif negate and not props.startswith(self._negate):
+                        props = self._negate + props
+                    v = uniprops.posix_unicode_properties[props]
+                properties = [v]
+                props = None
+            else:
+                # \p{Full_Unicode_Property_Name}
+                props = unicode_property_map.get(props, None)
+
         if props is not None:
             if not in_group:
                 v = _get_unicode_category(props)
