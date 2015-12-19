@@ -334,7 +334,7 @@ btokens = {
         b"graph": br"\x21-\x7E",
         b"lower": br"a-z",
         b"print": br"\x20-\x7E",
-        b"punct": br"!\"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~",
+        b"punct": br"!\"\#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~",
         b"space": br" \t\r\n\v\f",
         b"upper": br"A-Z",
         b"word": br"A-Za-z0-9_",

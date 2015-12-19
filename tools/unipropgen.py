@@ -144,7 +144,7 @@ def gen_posix(posix_table, table, all_chars, f):
     posix_table["Upper"] = list(s2)
     posix_table["^Upper"] = list(all_chars - s2)
 
-    # Graph: \p{L}\p{N}\p{Pc}
+    # Word: \p{L}\p{N}\p{Pc}
     s2 = set()
     for table_name in ('L', 'N'):
         for sub_table_name in table[table_name]:
