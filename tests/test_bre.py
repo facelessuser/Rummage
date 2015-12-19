@@ -318,7 +318,7 @@ class TestSearchTemplate(unittest.TestCase):
         """Excercising inverse unicode properties."""
 
         pattern = bre.compile_search(r'\P{Po}', re.UNICODE)
-        m = pattern.match(r'⁋')
+        m = pattern.match(r'·')
         self.assertTrue(m is None)
         m = pattern.match(r'P')
         self.assertTrue(m is not None)
@@ -327,7 +327,7 @@ class TestSearchTemplate(unittest.TestCase):
         """Excercising negated inverse unicode properties."""
 
         pattern = bre.compile_search(r'[^\P{Po}]', re.UNICODE)
-        m = pattern.match(r'⁋')
+        m = pattern.match(r'·')
         self.assertTrue(m is not None)
         m = pattern.match(r'P')
         self.assertTrue(m is None)

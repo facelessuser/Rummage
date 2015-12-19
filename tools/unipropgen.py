@@ -172,8 +172,8 @@ def gen_posix(posix_table, table, all_chars, f):
                     v2.append(uniformat(first))
                 else:
                     v2.append("%s-%s" % (uniformat(first), uniformat(last)))
-                first = None
-                last = None
+                first = i
+                last = i
         if first is not None:
             if first == last:
                 v2.append(uniformat(first))
@@ -188,7 +188,7 @@ def gen_posix(posix_table, table, all_chars, f):
     count = len(posix_table) - 1
     i = 0
     for k1, v1 in sorted(posix_table.items()):
-        f.write('        "%s": "%s"' % (k1, v1))
+        f.write('        "%s": r"%s"' % (k1, v1))
         if i == count:
             f.write('\n    }\n')
         else:
@@ -255,8 +255,8 @@ def gen_properties(f, narrow=False):
                         v3.append(uniformat(first))
                     else:
                         v3.append("%s-%s" % (uniformat(first), uniformat(last)))
-                    first = None
-                    last = None
+                    first = i
+                    last = i
             if first is not None:
                 if first == last:
                     v3.append(uniformat(first))
@@ -275,7 +275,7 @@ def gen_properties(f, narrow=False):
         count2 = len(v1) - 1
         j = 0
         for k2, v2 in sorted(v1.items()):
-            f.write('            "%s": "%s"' % (k2, v2))
+            f.write('            "%s": r"%s"' % (k2, v2))
             if j == count2:
                 f.write('\n        }')
             else:

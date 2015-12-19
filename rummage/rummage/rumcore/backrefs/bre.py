@@ -162,8 +162,8 @@ utokens = {
     "inverse_uni_prop": "P",
     "ascii_low_props": 'a-z',
     "ascii_upper_props": 'A-Z',
-    "negative_lower": '\u0000-\u0060\u007b-\u007f',
-    "negative_upper": '\u0000-\u0040\u005b-\u007f',
+    "negative_lower": r'\u0000-\u0060\u007b-\uffff' if uniprops.NARROW else r'\u0000-\u0060\u007b-\U0010ffff',
+    "negative_upper": r'\u0000-\u0040\u005b-\uffff' if uniprops.NARROW else r'\u0000-\u0040\u005b-\U0010ffff',
     "re_search_ref": re.compile(
         r'''(?x)
         (\\)+
@@ -211,7 +211,49 @@ utokens = {
         "space": r" \t\r\n\v\f",
         "upper": r"A-Z",
         "word": r"A-Za-z0-9_",
-        "xdigit": r"A-Fa-f0-9"
+        "xdigit": r"A-Fa-f0-9",
+        "^alnum": (
+            r"\u0000-\u002f\u003a-\u0040\u005b-\u0060\u007b-\uffff"
+        ) if uniprops.NARROW else (
+            r"\u0000-\u002f\u003a-\u0040\u005b-\u0060\u007b-\U0010ffff"
+        ),
+        "^alpha": (
+            r"\u0000-\u0040\u005b-\u0060\u007b-\uffff"
+        ) if uniprops.NARROW else (
+            r"\u0000-\u0040\u005b-\u0060\u007b-\U0010ffff"
+        ),
+        "^ascii": r"\u0080-\uffff" if uniprops.NARROW else r"\u0080-\U0010ffff",
+        "^blank": (
+            r"\u0000-\u0008\u000a-\u001f\u0021-\uffff"
+        ) if uniprops.NARROW else (
+            r"\u0000-\u0008\u000a-\u001f\u0021-\U0010ffff"
+        ),
+        "^cntrl": r"\u0020-\u007E\u0080-\uffff" if uniprops.NARROW else r"\u0020-\u007E\u0080-\U0010ffff",
+        "^digit": r"\u0000-\u002f\u003a-\uffff" if uniprops.NARROW else r"\u0000-\u002f\u003a-\U0010ffff",
+        "^graph": r"\u0000-\u0020\u007F-\uffff" if uniprops.NARROW else r"\u0000-\u0020\u007F-\U0010ffff",
+        "^lower": r"\u0000-\u0060\u007B-\uffff" if uniprops.NARROW else r"\u0000-\u0060\u007B-\U0010ffff",
+        "^print": r"\u0000-\u001F\u007F-\uffff" if uniprops.NARROW else r"\u0000-\u001F\u007F-\U0010ffff",
+        "^punct": (
+            r"\u0000-\u0020\u0030-\u0039\u0041-\u005a\u0061\u007a\u007f-\uffff"
+        ) if uniprops.NARROW else (
+            r"\u0000-\u0020\u0030-\u0039\u0041-\u005a\u0061\u007a\u007f-\U0010ffff"
+        ),
+        "^space": (
+            r"\u0000-\u0008\u000e-\u001f\u0021-\uffff"
+        ) if uniprops.NARROW else (
+            r"\u0000-\u0008\u000e-\u001f\u0021-\U0010ffff"
+        ),
+        "^upper": r"\u0000-\u0040\u005B-\uffff" if uniprops.NARROW else r"\u0000-\u0040\u005B-\U0010ffff",
+        "^word": (
+            r"\u0000-\u002f\u003a-\u0040\u005b-\u005e\u0060\u007b-\uffff"
+        ) if uniprops.NARROW else (
+            r"\u0000-\u002f\u003a-\u0040\u005b-\u005e\u0060\u007b-\U0010ffff"
+        ),
+        "^xdigit": (
+            r"\u0000-\u002f\u003a-\u0040\u0047-\u0060\u0067-\uffff"
+        ) if uniprops.NARROW else (
+            r"\u0000-\u002f\u003a-\u0040\u0047-\u0060\u0067-\U0010ffff"
+        )
     },
     "uposix": {
         "alnum": "Alnum",
@@ -251,8 +293,8 @@ btokens = {
     "inverse_uni_prop": b"P",
     "ascii_low_props": b'a-z',
     "ascii_upper_props": b'A-Z',
-    "negative_lower": b'\x00-\x60\x7b-\x7f',
-    "negative_upper": b'\x00-\x40\x5b-\x7f',
+    "negative_lower": br'\x00-\x60\x7b-\xff',
+    "negative_upper": br'\x00-\x40\x5b-\xff',
     "re_search_ref": re.compile(
         br'''(?x)
         (\\)+
@@ -296,7 +338,21 @@ btokens = {
         b"space": br" \t\r\n\v\f",
         b"upper": br"A-Z",
         b"word": br"A-Za-z0-9_",
-        b"xdigit": br"A-Fa-f0-9"
+        b"xdigit": br"A-Fa-f0-9",
+        b"^alnum": br"\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\xff",
+        b"^alpha": br"\x00-\x40\x5b-\x60\x7b-\xff",
+        b"^ascii": br"\x80-\xff",
+        b"^blank": br"\x00-\x08\x0a-\x1f\x21-\xff",
+        b"^cntrl": br"\x20-\x7E\x80-\xff",
+        b"^digit": br"\x00-\x2f\x3a-\xff",
+        b"^graph": br"\x00-\x20\x7F-\xff",
+        b"^lower": br"\x00-\x60\x7B-\xff",
+        b"^print": br"\x00-\x1F\x7F-\xff",
+        b"^punct": br"\x00-\x20\x30-\x39\x41-\x5a\x61\x7a\x7f-\xff",
+        b"^space": br"\x00-\x08\x0e-\x1f\x21-\xff",
+        b"^upper": br"\x00-\x40\x5B-\xff",
+        b"^word": br"\x00-\x2f\x3a-\x40\x5b-\x5e\x60\x7b-\xff",
+        b"^xdigit": br"\x00-\x2f\x3a-\x40\x47-\x60\x67-\xff"
     },
     "uposix": {
         b"alnum": b"Alnum",
