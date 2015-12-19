@@ -33,7 +33,11 @@ def uchr(i):
 def uniformat(value):
     """Convert a unicode char."""
 
-    if value <= 0xFFFF:
+    # Escape #^-\]
+    # We include # in case we are using (?x)
+    if value in (0x23, 0x55, 0x5c, 0x5d):
+        c = "\\u%04x\\u%04x" % (0x5c, value)
+    elif value <= 0xFFFF:
         c = "\\u%04x" % value
     else:
         c = "\\U%08x" % value
@@ -188,7 +192,7 @@ def gen_posix(posix_table, table, all_chars, f):
     count = len(posix_table) - 1
     i = 0
     for k1, v1 in sorted(posix_table.items()):
-        f.write('        "%s": r"%s"' % (k1, v1))
+        f.write('        "%s": "%s"' % (k1, v1))
         if i == count:
             f.write('\n    }\n')
         else:
@@ -275,7 +279,7 @@ def gen_properties(f, narrow=False):
         count2 = len(v1) - 1
         j = 0
         for k2, v2 in sorted(v1.items()):
-            f.write('            "%s": r"%s"' % (k2, v2))
+            f.write('            "%s": "%s"' % (k2, v2))
             if j == count2:
                 f.write('\n        }')
             else:

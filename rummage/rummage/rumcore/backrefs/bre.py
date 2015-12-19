@@ -149,7 +149,7 @@ _UPROP = r'''
     Symbol|Math_Symbol|Currency_Symbol|Modifier_Symbol|Other_Symbol|
     Separator|Space_Separator|Line_Separator|Paragraph_Separator|
     Control|Format|Surrogate|Private_Use|Unassigned|
-    Alnum|Alpha|ASCII|Blank|Cntrl|Digit|Graph|Lower|Print|Punct|Space|Upper|Word|XDigit|
+    Alnum|Alpha|ASCII|Blank|Cntrl|Digit|Graph|Lower|Print|Punct|Space|Upper|Word|XDigit
 )
 \}
 '''
@@ -162,8 +162,8 @@ utokens = {
     "inverse_uni_prop": "P",
     "ascii_low_props": 'a-z',
     "ascii_upper_props": 'A-Z',
-    "negative_lower": r'\u0000-\u0060\u007b-\uffff' if uniprops.NARROW else r'\u0000-\u0060\u007b-\U0010ffff',
-    "negative_upper": r'\u0000-\u0040\u005b-\uffff' if uniprops.NARROW else r'\u0000-\u0040\u005b-\U0010ffff',
+    "negative_lower": '\u0000-\u0060\u007b-\uffff' if uniprops.NARROW else '\u0000-\u0060\u007b-\U0010ffff',
+    "negative_upper": '\u0000-\u0040\u005b-\uffff' if uniprops.NARROW else '\u0000-\u0040\u005b-\U0010ffff',
     "re_search_ref": re.compile(
         r'''(?x)
         (\\)+
@@ -200,59 +200,59 @@ utokens = {
     "posix": {
         "alnum": r"a-zA-Z0-9",
         "alpha": r"a-zA-Z",
-        "ascii": r"\u0000-\u007F",
+        "ascii": "\u0000-\u007F",
         "blank": r" \t",
-        "cntrl": r"\u0000-\u001F\u007F",
+        "cntrl": "\u0000-\u001F\u007F",
         "digit": r"0-9",
-        "graph": r"\u0021-\u007E",
+        "graph": "\u0021-\u007E",
         "lower": r"a-z",
-        "print": r"\u0020-\u007E",
-        "punct": r"!\"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~",
+        "print": "\u0020-\u007E",
+        "punct": r"!\"\#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~",
         "space": r" \t\r\n\v\f",
         "upper": r"A-Z",
         "word": r"A-Za-z0-9_",
         "xdigit": r"A-Fa-f0-9",
         "^alnum": (
-            r"\u0000-\u002f\u003a-\u0040\u005b-\u0060\u007b-\uffff"
+            "\u0000-\u002f\u003a-\u0040\u005b-\u0060\u007b-\uffff"
         ) if uniprops.NARROW else (
-            r"\u0000-\u002f\u003a-\u0040\u005b-\u0060\u007b-\U0010ffff"
+            "\u0000-\u002f\u003a-\u0040\u005b-\u0060\u007b-\U0010ffff"
         ),
         "^alpha": (
-            r"\u0000-\u0040\u005b-\u0060\u007b-\uffff"
+            "\u0000-\u0040\u005b-\u0060\u007b-\uffff"
         ) if uniprops.NARROW else (
-            r"\u0000-\u0040\u005b-\u0060\u007b-\U0010ffff"
+            "\u0000-\u0040\u005b-\u0060\u007b-\U0010ffff"
         ),
         "^ascii": r"\u0080-\uffff" if uniprops.NARROW else r"\u0080-\U0010ffff",
         "^blank": (
-            r"\u0000-\u0008\u000a-\u001f\u0021-\uffff"
+            "\u0000-\u0008\u000a-\u001f\u0021-\uffff"
         ) if uniprops.NARROW else (
-            r"\u0000-\u0008\u000a-\u001f\u0021-\U0010ffff"
+            "\u0000-\u0008\u000a-\u001f\u0021-\U0010ffff"
         ),
-        "^cntrl": r"\u0020-\u007E\u0080-\uffff" if uniprops.NARROW else r"\u0020-\u007E\u0080-\U0010ffff",
-        "^digit": r"\u0000-\u002f\u003a-\uffff" if uniprops.NARROW else r"\u0000-\u002f\u003a-\U0010ffff",
-        "^graph": r"\u0000-\u0020\u007F-\uffff" if uniprops.NARROW else r"\u0000-\u0020\u007F-\U0010ffff",
-        "^lower": r"\u0000-\u0060\u007B-\uffff" if uniprops.NARROW else r"\u0000-\u0060\u007B-\U0010ffff",
-        "^print": r"\u0000-\u001F\u007F-\uffff" if uniprops.NARROW else r"\u0000-\u001F\u007F-\U0010ffff",
+        "^cntrl": "\u0020-\u007E\u0080-\uffff" if uniprops.NARROW else "\u0020-\u007E\u0080-\U0010ffff",
+        "^digit": "\u0000-\u002f\u003a-\uffff" if uniprops.NARROW else "\u0000-\u002f\u003a-\U0010ffff",
+        "^graph": "\u0000-\u0020\u007F-\uffff" if uniprops.NARROW else "\u0000-\u0020\u007F-\U0010ffff",
+        "^lower": "\u0000-\u0060\u007B-\uffff" if uniprops.NARROW else "\u0000-\u0060\u007B-\U0010ffff",
+        "^print": "\u0000-\u001F\u007F-\uffff" if uniprops.NARROW else "\u0000-\u001F\u007F-\U0010ffff",
         "^punct": (
-            r"\u0000-\u0020\u0030-\u0039\u0041-\u005a\u0061\u007a\u007f-\uffff"
+            "\u0000-\u0020\u0030-\u0039\u0041-\u005a\u0061\u007a\u007f-\uffff"
         ) if uniprops.NARROW else (
-            r"\u0000-\u0020\u0030-\u0039\u0041-\u005a\u0061\u007a\u007f-\U0010ffff"
+            "\u0000-\u0020\u0030-\u0039\u0041-\u005a\u0061\u007a\u007f-\U0010ffff"
         ),
         "^space": (
-            r"\u0000-\u0008\u000e-\u001f\u0021-\uffff"
+            "\u0000-\u0008\u000e-\u001f\u0021-\uffff"
         ) if uniprops.NARROW else (
-            r"\u0000-\u0008\u000e-\u001f\u0021-\U0010ffff"
+            "\u0000-\u0008\u000e-\u001f\u0021-\U0010ffff"
         ),
         "^upper": r"\u0000-\u0040\u005B-\uffff" if uniprops.NARROW else r"\u0000-\u0040\u005B-\U0010ffff",
         "^word": (
-            r"\u0000-\u002f\u003a-\u0040\u005b-\u005e\u0060\u007b-\uffff"
+            "\u0000-\u002f\u003a-\u0040\u005b-\u005e\u0060\u007b-\uffff"
         ) if uniprops.NARROW else (
-            r"\u0000-\u002f\u003a-\u0040\u005b-\u005e\u0060\u007b-\U0010ffff"
+            "\u0000-\u002f\u003a-\u0040\u005b-\u005e\u0060\u007b-\U0010ffff"
         ),
         "^xdigit": (
-            r"\u0000-\u002f\u003a-\u0040\u0047-\u0060\u0067-\uffff"
+            "\u0000-\u002f\u003a-\u0040\u0047-\u0060\u0067-\uffff"
         ) if uniprops.NARROW else (
-            r"\u0000-\u002f\u003a-\u0040\u0047-\u0060\u0067-\U0010ffff"
+            "\u0000-\u002f\u003a-\u0040\u0047-\u0060\u0067-\U0010ffff"
         )
     },
     "uposix": {

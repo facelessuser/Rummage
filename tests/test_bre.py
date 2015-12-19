@@ -31,10 +31,10 @@ class TestSearchTemplate(unittest.TestCase):
         self.assertEqual(pattern.pattern, pattern2.pattern)
 
     def test_posix_in_group_ascii(self):
-        """Test posix in a group."""
+        """Test posix in a group for ascii."""
         if PY3:
             pattern = bre.compile_search(r'Test [[:graph:]]', re.ASCII)
-            pattern2 = bre.compile_search(r'Test [\u0021-\u007E]', re.ASCII)
+            pattern2 = bre.compile_search('Test [\u0021-\u007E]', re.ASCII)
         else:
             pattern = bre.compile_search(r'Test [[:graph:]]')
             pattern2 = bre.compile_search(r'Test [\u0021-\u007E]')
