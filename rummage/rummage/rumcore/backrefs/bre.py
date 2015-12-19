@@ -753,11 +753,6 @@ class SearchTemplate(object):
     def posix_props(self, prop, force_unicode=False):
         """Insert posix properties."""
 
-        def repl(m):
-            """Replace."""
-            p = m.group(0)
-            return self.unicode_props(p[3:-1], True, p[1] == self._inverse_uni_prop)[0]
-
         if self.unicode or force_unicode:
             pattern = uniprops.posix_unicode_properties[self._uposix[prop]]
         else:
@@ -779,12 +774,14 @@ class SearchTemplate(object):
                     else:
                         v = self._ls_bracket + v + self._rs_bracket
                 else:
-                    if props.startswith(self._negate):
-                        negate = not negate
-                    if not negate and props.startswith(self._negate):
-                        props = props[1:]
-                    elif negate and not props.startswith(self._negate):
+                    # if props.startswith(self._negate):
+                    #     negate = not negate
+                    # if not negate and props.startswith(self._negate):
+                    #     props = props[1:]
+                    # elif negate and not props.startswith(self._negate):
+                    if negate:  # For now unless I add support for \p{^Alnum}
                         props = self._negate + props
+
                     v = uniprops.posix_unicode_properties[props]
                 properties = [v]
                 props = None
