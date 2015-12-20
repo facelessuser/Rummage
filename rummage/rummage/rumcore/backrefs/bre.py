@@ -160,8 +160,8 @@ _RE_UPROP = re.compile(r'(?x)\\%s' % _UPROP)
 utokens = {
     "uni_prop": "p",
     "inverse_uni_prop": "P",
-    "ascii_lower": 'Lower',
-    "ascii_upper": 'Upper',
+    "ascii_lower": 'lower',
+    "ascii_upper": 'upper',
     "re_search_ref": re.compile(
         r'''(?x)
         (\\)+
@@ -231,8 +231,8 @@ utokens = {
 btokens = {
     "uni_prop": b"p",
     "inverse_uni_prop": b"P",
-    "ascii_lower": b"Lower",
-    "ascii_upper": b"Upper",
+    "ascii_lower": b"lower",
+    "ascii_upper": b"upper",
     "re_search_ref": re.compile(
         br'''(?x)
         (\\)+
@@ -664,13 +664,13 @@ class SearchTemplate(object):
             quotes.append((quote_start + 2, pos - 1))
         return groups, quotes
 
-    def posix_props(self, prop, force_unicode=False):
+    def posix_props(self, prop):
         """Insert posix properties."""
 
-        if self.unicode or force_unicode:
-            pattern = uniprops.posix_unicode_properties[self._posix[prop]]
-        else:
+        if self.binary or not self.unicode:
             pattern = _get_posix_category(self._posix[prop])
+        else:
+            pattern = uniprops.posix_unicode_properties[self._posix[prop]]
 
         return [pattern]
 
@@ -683,10 +683,7 @@ class SearchTemplate(object):
                 # \p{posixclasses}
                 if not in_group:
                     v = uniprops.posix_unicode_properties[props]
-                    if negate:
-                        v = self._ls_bracket + self._negate + v + self._rs_bracket
-                    else:
-                        v = self._ls_bracket + v + self._rs_bracket
+                    v = self._ls_bracket + (self._negate if negate else self._empty) + v + self._rs_bracket
                 else:
                     # if props.startswith(self._negate):
                     #     negate = not negate
@@ -707,10 +704,7 @@ class SearchTemplate(object):
             if not in_group:
                 v = _get_unicode_category(props)
                 if v is not None:
-                    if negate:
-                        v = self._ls_bracket + self._negate + v + self._rs_bracket
-                    else:
-                        v = self._ls_bracket + v + self._rs_bracket
+                    v = self._ls_bracket + (self._negate if negate else self._empty) + v + self._rs_bracket
                     properties = [v]
             else:
                 v = _get_unicode_category(props, negate)
@@ -718,24 +712,21 @@ class SearchTemplate(object):
                     properties = [v]
         return properties
 
-    def ascii_props(self, case, in_group, negate=False):
-        """Insert ascii (or unicode) case properties."""
+    def letter_case_props(self, case, in_group, negate=False):
+        """Insert letter (ascii or unicode) case properties."""
 
         # Use traditional ASCII upper/lower case unless:
         #    1. The strings fed in are not binary
         #    2. And the the unicode flag was used
-        if self.binary or not self.unicode:
-            v = _get_posix_category(self._ascii_upper if case == _UPPER else self._ascii_lower)
-            if not in_group:
-                if negate:
-                    v = self._ls_bracket + self._negate + v + self._rs_bracket
-                else:
-                    v = self._ls_bracket + v + self._rs_bracket
-            elif negate:
-                v = _get_posix_category(self._negate + (self._ascii_upper if case == _UPPER else self._ascii_lower))
-            return [v]
+        if not in_group:
+            v = self.posix_props(self._ascii_upper if case == _UPPER else self._ascii_lower)
+            v[0] = self._ls_bracket + (self._negate if negate else self._empty) + v[0] + self._rs_bracket
         else:
-            return self.unicode_props('Lu' if case == _UPPER else 'Ll', in_group, negate)
+            v = self.posix_props(
+                (self._negate if negate else self._empty) +
+                (self._ascii_upper if case == _UPPER else self._ascii_lower)
+            )
+        return v
 
     def comments(self, i):
         """Handle comments in verbose patterns."""
@@ -797,13 +788,13 @@ class SearchTemplate(object):
                 elif c.startswith(self._inverse_uni_prop):
                     self.extended.extend(self.unicode_props(c[2:-1], self.in_group(i.index - 1), negate=True))
                 elif c == self._lc:
-                    self.extended.extend(self.ascii_props(_LOWER, self.in_group(i.index - 1)))
+                    self.extended.extend(self.letter_case_props(_LOWER, self.in_group(i.index - 1)))
                 elif c == self._lc_span:
-                    self.extended.extend(self.ascii_props(_LOWER, self.in_group(i.index - 1), negate=True))
+                    self.extended.extend(self.letter_case_props(_LOWER, self.in_group(i.index - 1), negate=True))
                 elif c == self._uc:
-                    self.extended.extend(self.ascii_props(_UPPER, self.in_group(i.index - 1)))
+                    self.extended.extend(self.letter_case_props(_UPPER, self.in_group(i.index - 1)))
                 elif c == self._uc_span:
-                    self.extended.extend(self.ascii_props(_UPPER, self.in_group(i.index - 1), negate=True))
+                    self.extended.extend(self.letter_case_props(_UPPER, self.in_group(i.index - 1), negate=True))
                 elif c[0:1] in self._verbose_tokens:
                     self.extended.append(t)
                 elif c == self._quote:
