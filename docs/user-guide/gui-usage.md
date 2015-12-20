@@ -288,7 +288,7 @@ Unicode properties can be used with the format: `\p{UnicodeProperty}`.  The inve
 | Paragraph_Separator | Z |
 
 ### Posix Properties
-Posix properties in the form of `[:alnum:]` and the inverse `[:^alnum:]` are available.  These character classes are only available inside a character group `[]`.  If needed, you can use the alternate form of `\p{Alnum}` to use inside and outside a character group.
+Posix properties in the form of `[:posix:]` and the inverse `[:^posix:]` are available.  These character classes are only available inside a character group `[]`.  If needed, you can use the alternate form of `\p{Posix}` to use inside and outside a character group. If using the `\p{Posix}` form, the return will always be Unicode.
 
 <table markdown="1" class="docutils">
 <thead>
