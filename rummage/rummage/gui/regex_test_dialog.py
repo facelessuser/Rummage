@@ -197,6 +197,16 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         self.Close()
 
+    def reset_highlights(self):
+        """Reset highlights."""
+
+        # Reset Colors
+        self.m_test_text.SetStyle(
+            0,
+            self.m_test_text.GetLastPosition(),
+            wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
+        )
+
     def test_regex(self):
         """Test and highlight search results in content buffer."""
 
@@ -293,6 +303,10 @@ class RegexTestDialog(gui.RegexTestDialog):
                 else:
                     test = re.compile(self.m_regex_text.GetValue(), flags)
             except Exception:
+                self.reset_highlights()
+                self.m_test_replace_text.SetValue(
+                    self.m_test_text.GetValue() if self.m_replace_text.GetValue() else ''
+                )
                 self.testing = False
                 return
 
@@ -318,11 +332,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 text = self.m_test_text.GetValue()
 
                 # Reset Colors
-                self.m_test_text.SetStyle(
-                    0,
-                    self.m_test_text.GetLastPosition(),
-                    wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
-                )
+                self.reset_highlights()
 
                 new_text = []
                 offset = 0
