@@ -10,8 +10,12 @@ Add the ability to use the following backrefs with re:
     * \Q and \Q...\E - Escape/quote chars (search)
     * \c and \C...\E - Uppercase char or chars (replace)
     * \l and \L...\E - Lowercase char or chars (replace)
-    * \p{Lu} and \p{Letter} and \p{Uppercase_Letter} - Unicode properties (search unicode)
-    * \P{Lu} adn \P{Letter} and \P{Uppercase_Letter} - Inverse Unicode properties (search unicode)
+    * [:ascii:]      - Posix style classes (search)
+    * [:^ascii:]     - Inverse Posix style classes (search)
+    * \p{Lu} and \p{Letter} and \p{gc=Uppercase_Letter}    - Unicode properties (search unicode)
+    * \p{block=Basic_Latin} and \p{InBasic_Latin}          - Unicode block properties (search unicode)
+    * \P{Lu} and \P{Letter} and \P{gc=Uppercase_Letter}    - Inverse Unicode properties (search unicode)
+    * \p{^Lu} and \p{^Letter} and \p{^gc=Uppercase_Letter} - Inverse Unicode properties (search unicode)
 
 Note
 =========
@@ -24,7 +28,8 @@ Note
   but you do *not* have to use re.UNICODE.
 
 - \l, \L, \c, and \C in searches will be ascii ranges unless re.UNICODE is used.  This is to
-  give some consistency with re's \w, \W, \b, \B, \d, \D, \s and \S.
+  give some consistency with re's \w, \W, \b, \B, \d, \D, \s and \S. Some posix classes will
+  also be affected.  See docs for more info.
 
 Compiling
 =========
@@ -136,23 +141,20 @@ unicode_property_map = {
 }
 
 # Regex pattern for unicode properties
-_UPROP = r'''(?:p|P)\{[ ]*\^?[\w=:\- &]+\}'''
+_UPROP = r'''(?:p|P)\{(?:\\.|[^\\}]+)+\}'''
 
 _RE_UPROP = re.compile(r'(?x)\\%s' % _UPROP)
 
 # Unicode string related references
 utokens = {
-    "re_posix": re.compile(r'(?i)\[:\^?[a-z\d]+:\]'),
+    "re_posix": re.compile(r'(?i)\[:(?:\\.|[^\\:}]+)+:\]'),
     "property_amp": '&',
     "property_c": 'c',
     "re_property_strip": re.compile(r'[\-_ ]'),
     "re_property_gc": re.compile(
         r'''(?x)
-        (?:(gc|generalcategory|block)[=:])?([a-z\d&]+)
+        (?:(gc|generalcategory|block)[=:])?((?:\\.|[^\\}]+)+)
         '''
-    ),
-    "re_property_posix": re.compile(
-        r'''(?x)(\^?[a-z\d]+)'''
     ),
     "uni_prop": "p",
     "inverse_uni_prop": "P",
@@ -192,17 +194,14 @@ utokens = {
 
 # Byte string related references
 btokens = {
-    "re_posix": re.compile(br'(?i)\[:\^?[a-z\d]+:\]'),
+    "re_posix": re.compile(br'(?i)\[:(?:\\.|[^\\:}]+)+:\]'),
     "property_amp": b'&',
     "property_c": b'c',
     "re_property_strip": re.compile(br'[\-_ ]'),
     "re_property_gc": re.compile(
         br'''(?x)
-        (?:(gc|generalcategory|block)[=:])?([a-z\d&]+)
+        (?:(gc|generalcategory|block)[=:])?((?:\\.|[^\\}]+)+)
         '''
-    ),
-    "re_property_posix": re.compile(
-        br'''(?x)(\^?[a-z\d]+)'''
     ),
     "uni_prop": b"p",
     "inverse_uni_prop": b"P",
@@ -508,7 +507,6 @@ class SearchTemplate(object):
         self._re_property_gc = tokens.get('re_property_gc', None)
         self._property_amp = tokens["property_amp"]
         self._property_c = tokens["property_c"]
-        self._re_property_posix = tokens["re_property_posix"]
         self._uni_prop = tokens["uni_prop"]
         self._inverse_uni_prop = tokens["inverse_uni_prop"]
         self._lc = ctokens["lc"]
@@ -619,16 +617,13 @@ class SearchTemplate(object):
         and whitespace and '-' and '_' will not be tolerated.
         """
 
-        m = self._re_property_posix.match(prop)
-        prop = m.group(1)
-
         try:
             if self.binary or not self.unicode:
                 pattern = _get_posix_category(prop)
             else:
                 pattern = uniprops.posix_unicode_properties[prop]
         except Exception:
-            raise Exception('Bad posix property!')
+            raise Exception('Invalid posix property!')
 
         return [pattern]
 
@@ -683,7 +678,7 @@ class SearchTemplate(object):
                     props = None
                 except Exception:
                     # Was specified as block, but we can't find it.
-                    raise Exception('Bad block property!')
+                    raise Exception('Invalid Unicode block property!')
 
             if props:
                 # \p{Unicode_Block}
@@ -704,7 +699,7 @@ class SearchTemplate(object):
                 except Exception:
                     # Last resort we tried general category,
                     # but couldn't find it there either.
-                    raise Exception('Bad Unicode property!')
+                    raise Exception('Invalid Unicode general property!')
 
         # Appears it wasn't posix or block, so now we will evaluate it in short form.
         if props is not None:
@@ -719,7 +714,7 @@ class SearchTemplate(object):
                     properties = [v]
             except Exception:
                 # Must have been defined as a bad short form.
-                raise Exception('Bad Unicode short property!')
+                raise Exception('Invalid Unicode general short property!')
         return properties
 
     def letter_case_props(self, case, in_group, negate=False):
