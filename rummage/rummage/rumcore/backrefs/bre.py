@@ -83,81 +83,77 @@ _LOWER = 1
 
 unicode_property_map = {
     # Other
-    "Other": "C",
-    "Control": "Cc",
-    "Format": "Cf",
-    "Surrogate": "Cs",
-    "Private_Use": "Co",
-    "Unassigned": "Cn",
+    "other": "c",
+    "control": "cc",
+    "format": "cf",
+    "surrogate": "cs",
+    "private_use": "co",
+    "unassigned": "cn",
 
     # Letter
-    "Letter": "L",
-    "Cased_Letter": "L&",
-    "Uppercase_Letter": "Lu",
-    "Lowercase_Letter": "Ll",
-    "Titlecase_Letter": "Lt",
-    "Modifier_Letter": "Lm",
-    "Other_Letter": "Lo",
+    "letter": "l",
+    "casedletter": "lc",
+    "uppercaseletter": "lu",
+    "lowercaseletter": "ll",
+    "titlecaseletter": "lt",
+    "modifierletter": "lm",
+    "otherletter": "lo",
 
     # Mark
-    "Mark": "M",
-    "Nonspacing_Mark": "Mc",
-    "Spacing_Mark": "Me",
-    "Enclosing_Mark": "Md",
+    "mark": "m",
+    "nonspacingmark": "mc",
+    "spacingmark": "me",
+    "enclosingmark": "md",
 
     # Number
-    "Number": "N",
-    "Decimal_Number": "Nd",
-    "Letter_Number": "Nl",
-    "Other_Number": "No",
+    "number": "n",
+    "decimalnumber": "nd",
+    "letternumber": "nl",
+    "othernumber": "no",
 
     # Punctuation
-    "Punctuation": "P",
-    "Connector_Punctuation": "Pc",
-    "Dash_Punctuation": "Pd",
-    "Open_Punctuation": "Ps",
-    "Close_Punctuation": "Pe",
-    "Initial_Punctuation": "Pi",
-    "Final_Punctuation": "Pf",
-    "Other_Punctuation": "Po",
+    "punctuation": "p",
+    "connectorpunctuation": "pc",
+    "dashpunctuation": "pd",
+    "openpunctuation": "ps",
+    "closepunctuation": "pe",
+    "initialpunctuation": "pi",
+    "finalpunctuation": "pf",
+    "otherpunctuation": "po",
 
     # Symbol
-    "Symbol": "S",
-    "Math_Symbol": "Sm",
-    "Currency_Symbol": "Sc",
-    "Modifier_Symbol": "Sk",
-    "Other_Symbol": "So",
+    "symbol": "s",
+    "mathsymbol": "sm",
+    "currencysymbol": "sc",
+    "modifiersymbol": "sk",
+    "othersymbol": "so",
 
     # Separator
-    "Separator": "Z",
-    "Space_Separator": "Zs",
-    "Line_Separator": "Zl",
-    "Paragraph_Separator": "Zp"
+    "separator": "z",
+    "spaceseparator": "zs",
+    "lineseparator": "zl",
+    "paragraph_separator": "zp"
 }
 
 # Regex pattern for unicode properties
-_UPROP = r'''
-(?:p|P)\{
-(?:
-    C(?:c|f|s|o|n)?|L(?:&|u|l|t|m|o|n)?|M(?:n|c|e|d)?|N(?:d|l|o|c|d)?|
-    P(?:c|d|s|e|i|f|o)?|S(?:c|m|k|o)?|Z(?:p|s|l)?|
-    Letter|Cased_Letter|Uppercase_Letter|Lowercase_Letter|Titlecase_Letter|Modifier_Letter|Other_Letter|
-    Mark|Nonspacing_Mark|Spacing_Mark|Enclosing_Mark|
-    Number|Decimal_Number|Letter_Number|Other_Number|
-    Punctuation|Connector_Punctuation|Dash_Punctuation|Open_Punctuation|Close_Punctuation|
-    Initial_Punctuation|Final_Punctuation|Other_Punctuation|
-    Symbol|Math_Symbol|Currency_Symbol|Modifier_Symbol|Other_Symbol|
-    Separator|Space_Separator|Line_Separator|Paragraph_Separator|
-    Control|Format|Surrogate|Private_Use|Unassigned|
-    Alnum|Alpha|ASCII|Blank|Cntrl|Digit|Graph|Lower|Print|Punct|Space|Upper|Word|XDigit
-)
-\}
-'''
+_UPROP = r'''(?:p|P)\{[ ]*\^?[\w=:\- &]+\}'''
 
 _RE_UPROP = re.compile(r'(?x)\\%s' % _UPROP)
 
 # Unicode string related references
 utokens = {
+    "re_posix": re.compile(r'(?i)\[:\^?[a-z\d]+:\]'),
+    "property_amp": '&',
+    "property_c": 'c',
+    "re_property_strip": re.compile(r'[\-_ ]'),
+    "re_property_gc": re.compile(
+        r'''(?x)
+        (?:(gc|generalcategory|block)[=:])?([a-z\d&]+)
+        '''
+    ),
+    "re_property_posix": re.compile(
+        r'''(?x)(\^?[a-z\d]+)'''
+    ),
     "uni_prop": "p",
     "inverse_uni_prop": "P",
     "ascii_lower": 'lower',
@@ -191,44 +187,23 @@ utokens = {
     "re_flags": re.compile(
         r'(?s)(\\.)|\(\?([aiLmsux]+)\)|(.)' if compat.PY3 else r'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
     ),
-    "ascii_flag": "a",
-    "re_posix": re.compile(
-        r'\[:(\^?(?:alnum|alpha|ascii|blank|cntrl|digit|graph|lower|print|punct|space|upper|word|xdigit)):\]'
-    ),
-    "posix": {
-        "alnum": "Alnum",
-        "alpha": "Alpha",
-        "ascii": "ASCII",
-        "blank": "Blank",
-        "cntrl": "Cntrl",
-        "digit": "Digit",
-        "graph": "Graph",
-        "lower": "Lower",
-        "print": "Print",
-        "punct": "Punct",
-        "space": "Space",
-        "upper": "Upper",
-        "word": "Word",
-        "xdigit": "XDigit",
-        "^alnum": "^Alnum",
-        "^alpha": "^Alpha",
-        "^ascii": "^ASCII",
-        "^blank": "^Blank",
-        "^cntrl": "^Cntrl",
-        "^digit": "^Digit",
-        "^graph": "^Graph",
-        "^lower": "^Lower",
-        "^print": "^Print",
-        "^punct": "^Punct",
-        "^space": "^Space",
-        "^upper": "^Upper",
-        "^word": "^Word",
-        "^xdigit": "^XDigit"
-    }
+    "ascii_flag": "a"
 }
 
 # Byte string related references
 btokens = {
+    "re_posix": re.compile(br'(?i)\[:\^?[a-z\d]+:\]'),
+    "property_amp": b'&',
+    "property_c": b'c',
+    "re_property_strip": re.compile(br'[\-_ ]'),
+    "re_property_gc": re.compile(
+        br'''(?x)
+        (?:(gc|generalcategory|block)[=:])?([a-z\d&]+)
+        '''
+    ),
+    "re_property_posix": re.compile(
+        br'''(?x)(\^?[a-z\d]+)'''
+    ),
     "uni_prop": b"p",
     "inverse_uni_prop": b"P",
     "ascii_lower": b"lower",
@@ -258,40 +233,7 @@ btokens = {
     "re_flags": re.compile(
         br'(?s)(\\.)|\(\?([aiLmsux]+)\)|(.)' if compat.PY3 else br'(?s)(\\.)|\(\?([iLmsux]+)\)|(.)'
     ),
-    "ascii_flag": b"a",
-    "re_posix": re.compile(
-        br'\[:(\^?(?:alnum|alpha|ascii|blank|cntrl|digit|graph|lower|print|punct|space|upper|word|xdigit)):\]'
-    ),
-    "posix": {
-        b"alnum": b"Alnum",
-        b"alpha": b"Alpha",
-        b"ascii": b"ASCII",
-        b"blank": b"Blank",
-        b"cntrl": b"Cntrl",
-        b"digit": b"Digit",
-        b"graph": b"Graph",
-        b"lower": b"Lower",
-        b"print": b"Print",
-        b"punct": b"Punct",
-        b"space": b"Space",
-        b"upper": b"Upper",
-        b"word": b"Word",
-        b"xdigit": b"XDigit",
-        b"^alnum": b"^Alnum",
-        b"^alpha": b"^Alpha",
-        b"^ascii": b"^ASCII",
-        b"^blank": b"^Blank",
-        b"^cntrl": b"^Cntrl",
-        b"^digit": b"^Digit",
-        b"^graph": b"^Graph",
-        b"^lower": b"^Lower",
-        b"^print": b"^Print",
-        b"^punct": b"^Punct",
-        b"^space": b"^Space",
-        b"^upper": b"^Upper",
-        b"^word": b"^Word",
-        b"^xdigit": b"^XDigit"
-    }
+    "ascii_flag": b"a"
 }
 
 
@@ -562,6 +504,11 @@ class SearchTemplate(object):
         self._ascii_flag = tokens["ascii_flag"]
         self._esc_end = ctokens["esc_end"]
         self._end = ctokens["end"]
+        self._re_property_strip = tokens['re_property_strip']
+        self._re_property_gc = tokens.get('re_property_gc', None)
+        self._property_amp = tokens["property_amp"]
+        self._property_c = tokens["property_c"]
+        self._re_property_posix = tokens["re_property_posix"]
         self._uni_prop = tokens["uni_prop"]
         self._inverse_uni_prop = tokens["inverse_uni_prop"]
         self._lc = ctokens["lc"]
@@ -574,7 +521,6 @@ class SearchTemplate(object):
         self._ascii_lower = tokens["ascii_lower"]
         self._re_flags = tokens["re_flags"]
         self._re_posix = tokens["re_posix"]
-        self._posix = tokens["posix"]
         self._nl = ctokens["nl"]
         self._hashtag = ctokens["hashtag"]
         self.search = search
@@ -665,51 +611,115 @@ class SearchTemplate(object):
         return groups, quotes
 
     def posix_props(self, prop):
-        """Insert posix properties."""
+        """
+        Insert posix properties.
 
-        if self.binary or not self.unicode:
-            pattern = _get_posix_category(self._posix[prop])
-        else:
-            pattern = uniprops.posix_unicode_properties[self._posix[prop]]
+        Posix style properties are not as forgiving
+        as Unicode properties.  Case does matter,
+        and whitespace and '-' and '_' will not be tolerated.
+        """
+
+        m = self._re_property_posix.match(prop)
+        prop = m.group(1)
+
+        try:
+            if self.binary or not self.unicode:
+                pattern = _get_posix_category(prop)
+            else:
+                pattern = uniprops.posix_unicode_properties[prop]
+        except Exception:
+            raise Exception('Bad posix property!')
 
         return [pattern]
 
     def unicode_props(self, props, in_group, negate=False):
-        """Insert unicode properties."""
+        """
+        Insert unicode properties.
 
+        Unicode properties are very forgiving.
+        Case doesn't matter and [ -_] will be stripped out.
+        """
+
+        # 'GC = Some_Unpredictable-Category Name' -> 'gc=someunpredictablecategoryname'
+        props = self._re_property_strip.sub(self._empty, props.lower())
+
+        # \p{^negated} Strip off the caret after evaluation.
+        if props.startswith(self._negate):
+            negate = not negate
+        if props.startswith(self._negate):
+            props = props[1:]
+
+        # Get the property and value.
+        # If a property is present and not block,
+        # we can assume GC as that is all we support.
+        # If we are wrong it will fail.
+        m = self._re_property_gc.match(props)
+        props = m.group(2)
+        block = m.group(1) and m.group(1) == 'block'
+        gc = m.group(1) and not block
+
+        # Try to parse as posix or block or convert long form to short of form.
         properties = []
+        v = None
         if len(props) > 2:
-            if props in uniprops.posix_unicode_properties:
+            if not block and not gc:
                 # \p{posixclasses}
-                if not in_group:
-                    v = uniprops.posix_unicode_properties[props]
-                    v = self._ls_bracket + (self._negate if negate else self._empty) + v + self._rs_bracket
-                else:
-                    # if props.startswith(self._negate):
-                    #     negate = not negate
-                    # if not negate and props.startswith(self._negate):
-                    #     props = props[1:]
-                    # elif negate and not props.startswith(self._negate):
-                    if negate:  # For now unless I add support for \p{^Alnum}
-                        props = self._negate + props
+                try:
+                    v = uniprops.posix_unicode_properties[(self._negate if negate else self._empty) + props]
+                    if not in_group:
+                        v = self._ls_bracket + v + self._rs_bracket
+                    properties = [v]
+                    props = None
+                except Exception:
+                    # It doesn't appear to be a posix property.
+                    pass
 
-                    v = uniprops.posix_unicode_properties[props]
-                properties = [v]
-                props = None
-            else:
-                # \p{Full_Unicode_Property_Name}
-                props = unicode_property_map.get(props, None)
+            if props and block:
+                try:
+                    v = uniprops.unicode_blocks[(self._negate if negate else self._empty) + props]
+                    if not in_group:
+                        v = self._ls_bracket + v + self._rs_bracket
+                    properties = [v]
+                    props = None
+                except Exception:
+                    # Was specified as block, but we can't find it.
+                    raise Exception('Bad block property!')
 
+            if props:
+                # \p{Unicode_Block}
+                if props.startswith('in'):
+                    try:
+                        v = uniprops.unicode_blocks[(self._negate if negate else self._empty) + props[2:]]
+                        if not in_group:
+                            v = self._ls_bracket + v + self._rs_bracket
+                        properties = [v]
+                        props = None
+                    except Exception:
+                        pass
+
+            if props:
+                # \p{Unicode_Property} -> \p{Up}
+                try:
+                    props = unicode_property_map[props]
+                except Exception:
+                    # Last resort we tried general category,
+                    # but couldn't find it there either.
+                    raise Exception('Bad Unicode property!')
+
+        # Appears it wasn't posix or block, so now we will evaluate it in short form.
         if props is not None:
-            if not in_group:
-                v = _get_unicode_category(props)
-                if v is not None:
-                    v = self._ls_bracket + (self._negate if negate else self._empty) + v + self._rs_bracket
+            # \p{Up} Short form of general category.
+            try:
+                if not in_group:
+                    v = _get_unicode_category(props.replace(self._property_amp, self._property_c), negate)
+                    v = self._ls_bracket + v + self._rs_bracket
                     properties = [v]
-            else:
-                v = _get_unicode_category(props, negate)
-                if v is not None:
+                else:
+                    v = _get_unicode_category(props.replace(self._property_amp, self._property_c), negate)
                     properties = [v]
+            except Exception:
+                # Must have been defined as a bad short form.
+                raise Exception('Bad Unicode short property!')
         return properties
 
     def letter_case_props(self, case, in_group, negate=False):
@@ -719,8 +729,11 @@ class SearchTemplate(object):
         #    1. The strings fed in are not binary
         #    2. And the the unicode flag was used
         if not in_group:
-            v = self.posix_props(self._ascii_upper if case == _UPPER else self._ascii_lower)
-            v[0] = self._ls_bracket + (self._negate if negate else self._empty) + v[0] + self._rs_bracket
+            v = self.posix_props(
+                (self._negate if negate else self._empty) +
+                (self._ascii_upper if case == _UPPER else self._ascii_lower)
+            )
+            v[0] = self._ls_bracket + v[0] + self._rs_bracket
         else:
             v = self.posix_props(
                 (self._negate if negate else self._empty) +
@@ -1007,7 +1020,6 @@ def _apply_search_backrefs(pattern, flags=0):
         elif bool(UNICODE & flags):
             re_unicode = True
         pattern = SearchTemplate(pattern, re_verbose, re_unicode).apply()
-
     return pattern
 
 

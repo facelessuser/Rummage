@@ -17,6 +17,42 @@ else:
 class TestSearchTemplate(unittest.TestCase):
     """Search template tests."""
 
+    def test_unicode_block(self):
+        """Test unicode block."""
+
+        pattern = bre.compile_search(r'\p{InBasicLatin}')
+        m = pattern.match(r'a')
+        self.assertTrue(m is not None)
+        m = pattern.match(r'·')
+        self.assertTrue(m is None)
+
+    def test_unicode_block_specifier(self):
+        """Test unicode block by specifier."""
+
+        pattern = bre.compile_search(r'\p{Block: BasicLatin}')
+        m = pattern.match(r'a')
+        self.assertTrue(m is not None)
+        m = pattern.match(r'·')
+        self.assertTrue(m is None)
+
+    def test_inverse_unicode_block(self):
+        """Test inverse unicode block."""
+
+        pattern = bre.compile_search(r'\p{^InBasicLatin}')
+        m = pattern.match(r'a')
+        self.assertTrue(m is None)
+        m = pattern.match(r'·')
+        self.assertTrue(m is not None)
+
+    def test_inverse_unicode_block_specifier(self):
+        """Test inverse unicode block by specifier."""
+
+        pattern = bre.compile_search(r'\p{^Block: BasicLatin}')
+        m = pattern.match(r'a')
+        self.assertTrue(m is None)
+        m = pattern.match(r'·')
+        self.assertTrue(m is not None)
+
     def test_posix_in_group_unicode(self):
         """Test posix in a group."""
 

@@ -244,7 +244,11 @@ None of the replace back references can be used in character classes `[]`.  Thes
     - `\L\cTEST \cTEST\E` --> `Test Test`
 
 ### Unicode Properties
-Unicode properties can be used with the format: `\p{UnicodeProperty}`.  The inverse can also be used to specify everything not in a Unicode property: `\P{UnicodeProperty}`.  They are only used in the search patterns. You can use either the verbose format or the terse format, but only one property may specified between the curly braces.  If you want to use multiple properties, you can place them in a character class: `[\p{UnicodeProperty}\p{OtherUnicodeProperty}]`.  See the table below to see all the Unicode properties that can be used.  Keep in mind that these only work in Unicode string search patterns; you don't have to be using the UNICODE flag.
+Unicode properties can be used with the format: `\p{property=value}`, `\p{property:value}`, `\p{value}`, `\p{^property=value}`, `\p{^value}`.  Though you don't have to specify the `UNICODE` flag, the search pattern must be a Unicode string and the search buffer must also be Unicode.  It supports `General_Category` and `Blocks` as the property.  The inverse can also be used to specify everything not in a Unicode property: `\P{value}` or `\p{^value}` etc.  They are only used in the search patterns. Only one property may specified between the curly braces.  If you want to use multiple properties, you can place them in a character class: `[\p{UnicodeProperty}\p{OtherUnicodeProperty}]`.
+
+When specifying a property, the value matching is case insensitive and characters like `[ -_]` will be ignored.  So the following are all equivalent: `\p{Uppercase_Letter}`, `\p{Uppercase-letter}`, `\p{UPPERCASELETTER}`, `\p{upper case letter}`.
+
+General categories can be specified in one of three ways: `\p{gc=value}`, `\p{General_Category=value}`, `\p{value}`.  Again, case is not important.  See the table below to see all the Unicode category properties that can be used.
 
 | Verbose&nbsp;Property&nbsp;Form | Terse&nbsp;Property&nbsp;Form |
 |---------------------------------|-------------------------------|
@@ -255,7 +259,7 @@ Unicode properties can be used with the format: `\p{UnicodeProperty}`.  The inve
 | Private_Use | Co |
 | Unassigned | Cn |
 | Letter | L |
-| Cased_Letter | L& |
+| Cased_Letter | L& or Lc |
 | Uppercase_Letter | Lu |
 | Lowercase_Letter | Ll |
 | Titlecase_Letter | Lt |
@@ -286,6 +290,10 @@ Unicode properties can be used with the format: `\p{UnicodeProperty}`.  The inve
 | Space_Separator | Zs |
 | Line_Separator | Zl |
 | Paragraph_Separator | Z |
+
+There are a number of Unicode blocks (they won't be listed here), but they can be specified in two ways: `\p{Block=Basic_Latin}` or `\p{InBasic_Latin}`.  If you are using a narrow version of Python, you may be limited to blocks less than `\uffff`.  Unicode Scripts are not supported.
+
+A number of posix property names can be used as well (see [Posix Style Properties](#posix-style-properties) for more info).  They are defined only one way: `\p{Alnum}`.
 
 ### Posix Style Properties
 Posix properties in the form of `[:posix:]` and the inverse `[:^posix:]` are available.  These character classes are only available inside a character group `[]`.  If needed, you can use the alternate form of `\p{Posix}` to use inside and outside a character group. If using the `\p{Posix}` form, the return will always be Unicode.
