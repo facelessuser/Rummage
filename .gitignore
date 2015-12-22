@@ -48,3 +48,5 @@ pyinstaller
 site/*
 
 rummage/rummage/rumcore/backrefs/uniprops.py
+
+tools/unicodedata/*
