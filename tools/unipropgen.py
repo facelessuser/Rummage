@@ -76,6 +76,7 @@ def build_unicode_property_table(output):
         gen_posix(set([x for x in range(0, 0xff + 1)]), f, binary=True)
         gen_properties(f)
 
+
 def char2range(d, double=False, binary=False):
     """Convert the characters in the dict to a range in string form."""
 
