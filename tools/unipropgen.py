@@ -73,8 +73,70 @@ def build_unicode_property_table(output):
             'NARROW = sys.maxunicode == 0xFFFF\n\n'
         )
 
-        gen_bposix(f)
+        gen_posix(set([x for x in range(0, 0xff + 1)]), f, binary=True)
         gen_properties(f)
+
+def char2range(d, double=False, binary=False):
+    """Convert the characters in the dict to a range in string form."""
+
+    fmt = binaryformat if binary else uniformat
+
+    if double:
+        # Convert characters values to ranges
+        for k1, v1 in d.items():
+            for k2, v2 in v1.items():
+                v2.sort()
+                last = None
+                first = None
+                v3 = []
+                for i in v2:
+                    if first is None:
+                        first = i
+                        last = i
+                    elif i == last + 1:
+                        last = i
+                    elif first is not None:
+                        if first == last:
+                            v3.append(fmt(first))
+                        else:
+                            v3.append("%s-%s" % (fmt(first), fmt(last)))
+                        first = i
+                        last = i
+                if first is not None:
+                    if first == last:
+                        v3.append(fmt(first))
+                    else:
+                        v3.append("%s-%s" % (fmt(first), fmt(last)))
+                    first = None
+                    last = None
+                d[k1][k2] = ''.join(v3)
+    else:
+        for k1, v1 in d.items():
+            v1.sort()
+            last = None
+            first = None
+            v2 = []
+            for i in v1:
+                if first is None:
+                    first = i
+                    last = i
+                elif i == last + 1:
+                    last = i
+                elif first is not None:
+                    if first == last:
+                        v2.append(fmt(first))
+                    else:
+                        v2.append("%s-%s" % (fmt(first), fmt(last)))
+                    first = i
+                    last = i
+            if first is not None:
+                if first == last:
+                    v2.append(fmt(first))
+                else:
+                    v2.append("%s-%s" % (fmt(first), fmt(last)))
+                first = None
+                last = None
+            d[k1] = ''.join(v2)
 
 
 def gen_blocks(all_chars, f):
@@ -141,32 +203,7 @@ def gen_scripts(all_chars, f):
         scripts['^' + name] = sorted(all_chars - s)
 
     # Convert characters values to ranges
-    for k1, v1 in scripts.items():
-        v1.sort()
-        last = None
-        first = None
-        v2 = []
-        for i in v1:
-            if first is None:
-                first = i
-                last = i
-            elif i == last + 1:
-                last = i
-            elif first is not None:
-                if first == last:
-                    v2.append(uniformat(first))
-                else:
-                    v2.append("%s-%s" % (uniformat(first), uniformat(last)))
-                first = i
-                last = i
-        if first is not None:
-            if first == last:
-                v2.append(uniformat(first))
-            else:
-                v2.append("%s-%s" % (uniformat(first), uniformat(last)))
-            first = None
-            last = None
-        scripts[k1] = ''.join(v2)
+    char2range(scripts)
 
     # Write out the unicode properties
     f.write('unicode_scripts = {\n')
@@ -181,11 +218,12 @@ def gen_scripts(all_chars, f):
         i += 1
 
 
-def gen_bposix(f):
+def gen_posix(all_chars, f, binary=False):
     """Generate the binary posix table and write out to file."""
 
-    all_chars = set([x for x in range(0, 0xff + 1)])
     posix_table = {}
+
+    prefix = 'b' if binary else ''
 
     # Alnum: [a-zA-Z0-9]
     s2 = set([x for x in range(0x30, 0x39 + 1)])
@@ -261,39 +299,14 @@ def gen_bposix(f):
     posix_table["^xdigit"] = list(all_chars - s2)
 
     # Convert characters values to ranges
-    for k1, v1 in posix_table.items():
-        v1.sort()
-        last = None
-        first = None
-        v2 = []
-        for i in v1:
-            if first is None:
-                first = i
-                last = i
-            elif i == last + 1:
-                last = i
-            elif first is not None:
-                if first == last:
-                    v2.append(binaryformat(first))
-                else:
-                    v2.append("%s-%s" % (binaryformat(first), binaryformat(last)))
-                first = i
-                last = i
-        if first is not None:
-            if first == last:
-                v2.append(binaryformat(first))
-            else:
-                v2.append("%s-%s" % (binaryformat(first), binaryformat(last)))
-            first = None
-            last = None
-        posix_table[k1] = ''.join(v2)
+    char2range(posix_table, binary=binary)
 
     # Write out the unicode properties
-    f.write('bposix_properties = {\n')
+    f.write('%sposix_properties = {\n' % prefix)
     count = len(posix_table) - 1
     i = 0
     for k1, v1 in sorted(posix_table.items()):
-        f.write('    "%s": b"%s"' % (k1, v1))
+        f.write('    "%s": %s"%s"' % (k1, prefix, v1))
         if i == count:
             f.write('\n}\n')
         else:
@@ -301,125 +314,7 @@ def gen_bposix(f):
         i += 1
 
 
-def gen_posix(all_chars, f):
-    """Generate the posix table and write out to file."""
-
-    posix_table = {}
-
-    # Alnum: [a-zA-Z0-9]
-    s2 = set([x for x in range(0x30, 0x39 + 1)])
-    s2 |= set([x for x in range(0x41, 0x5a + 1)])
-    s2 |= set([x for x in range(0x61, 0x7a + 1)])
-    posix_table["alnum"] = list(s2)
-    posix_table["^alnum"] = list(all_chars - s2)
-
-    # Alpha: [a-zA-Z]
-    s2 = set([x for x in range(0x41, 0x5a)])
-    s2 |= set([x for x in range(0x61, 0x7a)])
-    posix_table["alpha"] = list(s2)
-    posix_table["^alpha"] = list(all_chars - s2)
-
-    # ASCII: [\x00-\x7F]
-    s2 = set([x for x in range(0, 0x7F + 1)])
-    posix_table["ascii"] = list(s2)
-    posix_table["^ascii"] = list(all_chars - s2)
-
-    # Blank: [ \t]
-    s2 = set([0x20, 0x09])
-    posix_table["blank"] = list(s2)
-    posix_table["^blank"] = list(all_chars - s2)
-
-    # Cntrl: [\x00-\x1F\x7F]
-    s2 = set([x for x in range(0, 0x1F + 1)] + [0x7F])
-    posix_table["cntrl"] = list(s2)
-    posix_table["^cntrl"] = list(all_chars - s2)
-
-    # Digit: [0-9]
-    s2 = set([x for x in range(0x30, 0x39 + 1)])
-    posix_table["digit"] = list(s2)
-    posix_table["^digit"] = list(all_chars - s2)
-
-    # Graph: [\x21-\x7E]
-    s2 = set([x for x in range(0x21, 0x7E + 1)])
-    posix_table["graph"] = list(s2)
-    posix_table["^graph"] = list(all_chars - s2)
-
-    s2 = set([x for x in range(0x61, 0x7a + 1)])
-    posix_table["lower"] = list(s2)
-    posix_table["^lower"] = list(all_chars - s2)
-
-    # Print: [\x20-\x7E]
-    s2 = set([x for x in range(0x20, 0x7E + 1)])
-    posix_table["print"] = list(s2)
-    posix_table["^print"] = list(all_chars - s2)
-
-    # Punct: [!\"\#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~]
-    s2 = set([x for x in range(0x21, 0x2f + 1)])
-    s2 |= set([x for x in range(0x3a, 0x40 + 1)])
-    s2 |= set([x for x in range(0x5b, 0x60 + 1)])
-    s2 |= set([x for x in range(0x7b, 0x7e + 1)])
-    posix_table["punct"] = list(s2)
-    posix_table["^punct"] = list(all_chars - s2)
-
-    # Space: [ \t\r\n\v\f]
-    s2 = set([x for x in range(0x09, 0x0d + 1)] + [0x20])
-    posix_table["space"] = list(s2)
-    posix_table["^space"] = list(all_chars - s2)
-
-    # Upper: [A-Z]
-    s2 = set([x for x in range(0x41, 0x5a + 1)])
-    posix_table["upper"] = list(s2)
-    posix_table["^upper"] = list(all_chars - s2)
-
-    # XDigit: [A-Fa-f0-9]
-    s2 = set([x for x in range(0x30, 0x39 + 1)])
-    s2 |= set([x for x in range(0x41, 0x46 + 1)])
-    s2 |= set([x for x in range(0x61, 0x66 + 1)])
-    posix_table["xdigit"] = list(s2)
-    posix_table["^xdigit"] = list(all_chars - s2)
-
-    # Convert characters values to ranges
-    for k1, v1 in posix_table.items():
-        v1.sort()
-        last = None
-        first = None
-        v2 = []
-        for i in v1:
-            if first is None:
-                first = i
-                last = i
-            elif i == last + 1:
-                last = i
-            elif first is not None:
-                if first == last:
-                    v2.append(uniformat(first))
-                else:
-                    v2.append("%s-%s" % (uniformat(first), uniformat(last)))
-                first = i
-                last = i
-        if first is not None:
-            if first == last:
-                v2.append(uniformat(first))
-            else:
-                v2.append("%s-%s" % (uniformat(first), uniformat(last)))
-            first = None
-            last = None
-        posix_table[k1] = ''.join(v2)
-
-    # Write out the unicode properties
-    f.write('posix_properties = {\n')
-    count = len(posix_table) - 1
-    i = 0
-    for k1, v1 in sorted(posix_table.items()):
-        f.write('    "%s": "%s"' % (k1, v1))
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
-
-
-def gen_unicode_posix(table, all_chars, f):
+def gen_uposix(table, all_chars, f):
     """Generate the posix table and write out to file."""
 
     posix_table = {}
@@ -509,32 +404,7 @@ def gen_unicode_posix(table, all_chars, f):
     posix_table["^xdigit"] = list(all_chars - s2)
 
     # Convert characters values to ranges
-    for k1, v1 in posix_table.items():
-        v1.sort()
-        last = None
-        first = None
-        v2 = []
-        for i in v1:
-            if first is None:
-                first = i
-                last = i
-            elif i == last + 1:
-                last = i
-            elif first is not None:
-                if first == last:
-                    v2.append(uniformat(first))
-                else:
-                    v2.append("%s-%s" % (uniformat(first), uniformat(last)))
-                first = i
-                last = i
-        if first is not None:
-            if first == last:
-                v2.append(uniformat(first))
-            else:
-                v2.append("%s-%s" % (uniformat(first), uniformat(last)))
-            first = None
-            last = None
-        posix_table[k1] = ''.join(v2)
+    char2range(posix_table)
 
     # Write out the unicode properties
     f.write('posix_unicode_properties = {\n')
@@ -619,39 +489,13 @@ def gen_properties(f):
 
     # Generate posix table and write out to file.
     gen_posix(all_chars, f)
-    gen_unicode_posix(table, all_chars, f)
+    gen_uposix(table, all_chars, f)
 
     # Gen gc mapping.
     gen_gc_alias(f)
 
-    # Convert characters values to ranges
-    for k1, v1 in table.items():
-        for k2, v2 in v1.items():
-            v2.sort()
-            last = None
-            first = None
-            v3 = []
-            for i in v2:
-                if first is None:
-                    first = i
-                    last = i
-                elif i == last + 1:
-                    last = i
-                elif first is not None:
-                    if first == last:
-                        v3.append(uniformat(first))
-                    else:
-                        v3.append("%s-%s" % (uniformat(first), uniformat(last)))
-                    first = i
-                    last = i
-            if first is not None:
-                if first == last:
-                    v3.append(uniformat(first))
-                else:
-                    v3.append("%s-%s" % (uniformat(first), uniformat(last)))
-                first = None
-                last = None
-            table[k1][k2] = ''.join(v3)
+    # Convert char values to string ranges.
+    char2range(table, double=True)
 
     # Write out the unicode properties
     f.write('unicode_properties = {\n')
