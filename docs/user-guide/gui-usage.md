@@ -381,12 +381,6 @@ Posix properties in the form of `[:posix:]` and the inverse `[:^posix:]` are ava
 <td>`[\p{Lu}]`</td>
 </tr>
 <tr>
-<td>word</td>
-<td>Word</td>
-<td>`[A-Za-z0-9_]`</td>
-<td>`[\p{L}\p{N}\p{Pc}]`</td>
-</tr>
-<tr>
 <td>xdigit</td>
 <td>XDigit</td>
 <td>`[A-Fa-f0-9]`</td>

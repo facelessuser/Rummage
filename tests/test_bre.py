@@ -53,6 +53,42 @@ class TestSearchTemplate(unittest.TestCase):
         m = pattern.match(r'·')
         self.assertTrue(m is not None)
 
+    def test_unicode_script(self):
+        """Test unicode script."""
+
+        pattern = bre.compile_search(r'\p{IsLatin}')
+        m = pattern.match(r'a')
+        self.assertTrue(m is not None)
+        m = pattern.match(r'·')
+        self.assertTrue(m is None)
+
+    def test_unicode_script_specifier(self):
+        """Test unicode script by specifier."""
+
+        pattern = bre.compile_search(r'\p{Script: Latin}')
+        m = pattern.match(r'a')
+        self.assertTrue(m is not None)
+        m = pattern.match(r'·')
+        self.assertTrue(m is None)
+
+    def test_inverse_unicode_script(self):
+        """Test inverse unicode script."""
+
+        pattern = bre.compile_search(r'\p{^IsLatin}')
+        m = pattern.match(r'a')
+        self.assertTrue(m is None)
+        m = pattern.match(r'·')
+        self.assertTrue(m is not None)
+
+    def test_inverse_unicode_script_specifier(self):
+        """Test inverse unicode block by specifier."""
+
+        pattern = bre.compile_search(r'\p{^Script: Latin}')
+        m = pattern.match(r'a')
+        self.assertTrue(m is None)
+        m = pattern.match(r'·')
+        self.assertTrue(m is not None)
+
     def test_posix_in_group_unicode(self):
         """Test posix in a group."""
 

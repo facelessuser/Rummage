@@ -1,7 +1,6 @@
 """Download Unicodedata files."""
 from __future__ import unicode_literals
 import sys
-import unicodedata
 import os
 
 __version__ = '1.0.0'
@@ -13,13 +12,12 @@ if PY3:
 else:
     from urllib2 import urlopen
 
-home = os.path.dirname(os.path.abspath(__file__))
+HOME = os.path.dirname(os.path.abspath(__file__))
 
 
-def download_unicodedata(output):
+def download_unicodedata(version, output=HOME):
     """Download unicode data scripts and blocks."""
-    files = ('Blocks.txt', 'Scripts.txt')
-    version = unicodedata.unidata_version
+    files = ('UnicodeData.txt', 'PropertyValueAliases.txt', 'Blocks.txt', 'Scripts.txt')
     url = 'http://www.unicode.org/Public/%s/ucd/' % version
 
     destination = os.path.join(output, 'unicodedata', version)
@@ -28,19 +26,24 @@ def download_unicodedata(output):
     for f in files:
         furl = url + f
         file_location = os.path.join(destination, f)
-        print('Downloading: %s --> %s' % (furl, file_location))
-        response = urlopen(furl)
-        data = response.read()
-        with open(file_location, 'w') as uf:
-            uf.write(data.decode('utf-8'))
+        if not os.path.exists(file_location):
+            print('Downloading: %s --> %s' % (furl, file_location))
+            response = urlopen(furl)
+            data = response.read()
+            with open(file_location, 'w') as uf:
+                uf.write(data.decode('utf-8'))
+        else:
+            print('Skipping: found %s' % file_location)
 
 
 if __name__ == '__main__':
     import argparse
+    import unicodedata
 
     parser = argparse.ArgumentParser(prog='unipropgen', description='Generate a unicode property table.')
     parser.add_argument('--version', action='version', version="%(prog)s " + __version__)
-    parser.add_argument('--output', default=home, help='Output file.')
+    parser.add_argument('--output', default=HOME, help='Output file.')
     args = parser.parse_args()
 
-    download_unicodedata(args.output)
+    version = unicodedata.unidata_version
+    download_unicodedata(version, args.output)

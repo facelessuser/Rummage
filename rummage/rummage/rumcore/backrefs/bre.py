@@ -86,60 +86,6 @@ RE_TYPE = type(re.compile('', 0))
 _UPPER = 0
 _LOWER = 1
 
-unicode_property_map = {
-    # Other
-    "other": "c",
-    "control": "cc",
-    "format": "cf",
-    "surrogate": "cs",
-    "private_use": "co",
-    "unassigned": "cn",
-
-    # Letter
-    "letter": "l",
-    "casedletter": "lc",
-    "uppercaseletter": "lu",
-    "lowercaseletter": "ll",
-    "titlecaseletter": "lt",
-    "modifierletter": "lm",
-    "otherletter": "lo",
-
-    # Mark
-    "mark": "m",
-    "nonspacingmark": "mn",
-    "spacingmark": "mc",
-    "enclosingmark": "me",
-
-    # Number
-    "number": "n",
-    "decimalnumber": "nd",
-    "letternumber": "nl",
-    "othernumber": "no",
-
-    # Punctuation
-    "punctuation": "p",
-    "connectorpunctuation": "pc",
-    "dashpunctuation": "pd",
-    "openpunctuation": "ps",
-    "closepunctuation": "pe",
-    "initialpunctuation": "pi",
-    "finalpunctuation": "pf",
-    "otherpunctuation": "po",
-
-    # Symbol
-    "symbol": "s",
-    "mathsymbol": "sm",
-    "currencysymbol": "sc",
-    "modifiersymbol": "sk",
-    "othersymbol": "so",
-
-    # Separator
-    "separator": "z",
-    "spaceseparator": "zs",
-    "lineseparator": "zl",
-    "paragraph_separator": "zp"
-}
-
 # Regex pattern for unicode properties
 _UPROP = r'''(?:p|P)\{(?:\\.|[^\\}]+)+\}'''
 
@@ -153,7 +99,7 @@ utokens = {
     "re_property_strip": re.compile(r'[\-_ ]'),
     "re_property_gc": re.compile(
         r'''(?x)
-        (?:(gc|generalcategory|block)[=:])?((?:\\.|[^\\}]+)+)
+        (?:(gc|generalcategory|block|blk|script|sc)[=:])?((?:\\.|[^\\}]+)+)
         '''
     ),
     "uni_prop": "p",
@@ -200,7 +146,7 @@ btokens = {
     "re_property_strip": re.compile(br'[\-_ ]'),
     "re_property_gc": re.compile(
         br'''(?x)
-        (?:(gc|generalcategory|block)[=:])?((?:\\.|[^\\}]+)+)
+        (?:(gc|generalcategory|block|blk|script|sc)[=:])?((?:\\.|[^\\}]+)+)
         '''
     ),
     "uni_prop": b"p",
@@ -650,24 +596,33 @@ class SearchTemplate(object):
         # If we are wrong it will fail.
         m = self._re_property_gc.match(props)
         props = m.group(2)
-        block = m.group(1) and m.group(1) == 'block'
-        gc = m.group(1) and not block
+        block = m.group(1) and m.group(1) in ('block', 'blk')
+        script = m.group(1) and m.group(1) in ('script', 'sc')
+        gc = m.group(1) and m.group(1) in ('generalcategory', 'gc')
 
-        # Try to parse as posix or block or convert long form to short of form.
+        # Try to parse as posix, block, script, or convert long form to short of form.
         properties = []
         v = None
         if len(props) > 2:
-            if not block and not gc:
-                # \p{posixclasses}
+            if props and gc:
+                # \p{Unicode_Property} -> \p{Up}
                 try:
-                    v = uniprops.posix_unicode_properties[(self._negate if negate else self._empty) + props]
+                    props = uniprops.unicode_gc_alias[props]
+                except Exception:
+                    # Last resort we tried general category,
+                    # but couldn't find it there either.
+                    raise Exception('Invalid Unicode general property!')
+
+            if props and script:
+                try:
+                    v = uniprops.unicode_scripts[(self._negate if negate else self._empty) + props]
                     if not in_group:
                         v = self._ls_bracket + v + self._rs_bracket
                     properties = [v]
                     props = None
                 except Exception:
-                    # It doesn't appear to be a posix property.
-                    pass
+                    # Was specified as block, but we can't find it.
+                    raise Exception('Invalid Unicode script property!')
 
             if props and block:
                 try:
@@ -681,27 +636,68 @@ class SearchTemplate(object):
                     raise Exception('Invalid Unicode block property!')
 
             if props:
-                # \p{Unicode_Block}
-                if props.startswith('in'):
-                    try:
-                        v = uniprops.unicode_blocks[(self._negate if negate else self._empty) + props[2:]]
-                        if not in_group:
-                            v = self._ls_bracket + v + self._rs_bracket
-                        properties = [v]
-                        props = None
-                    except Exception:
-                        pass
+                # \p{posixclasses}
+                try:
+                    v = uniprops.posix_unicode_properties[(self._negate if negate else self._empty) + props]
+                    if not in_group:
+                        v = self._ls_bracket + v + self._rs_bracket
+                    properties = [v]
+                    props = None
+                except Exception:
+                    # It doesn't appear to be a posix property.
+                    pass
 
             if props:
                 # \p{Unicode_Property} -> \p{Up}
                 try:
-                    props = unicode_property_map[props]
+                    props = uniprops.unicode_gc_alias[props]
                 except Exception:
-                    # Last resort we tried general category,
-                    # but couldn't find it there either.
-                    raise Exception('Invalid Unicode general property!')
+                    if props.startswith('is'):
+                        # \p{IsUnicode_Script}
+                        try:
+                            v = uniprops.unicode_scripts[(self._negate if negate else self._empty) + props[2:]]
+                            if not in_group:
+                                v = self._ls_bracket + v + self._rs_bracket
+                            properties = [v]
+                            props = None
+                        except Exception:
+                            pass
+                    elif props.startswith('in'):
+                        # \p{InUnicode_Block}
+                        try:
+                            v = uniprops.unicode_blocks[(self._negate if negate else self._empty) + props[2:]]
+                            if not in_group:
+                                v = self._ls_bracket + v + self._rs_bracket
+                            properties = [v]
+                            props = None
+                        except Exception:
+                            pass
 
-        # Appears it wasn't posix or block, so now we will evaluate it in short form.
+                    if props is not None:
+                        try:
+                            v = uniprops.unicode_scripts[(self._negate if negate else self._empty) + props]
+                            if not in_group:
+                                v = self._ls_bracket + v + self._rs_bracket
+                            properties = [v]
+                            props = None
+                        except Exception:
+                            pass
+
+                    if props is not None:
+                        try:
+                            v = uniprops.unicode_blocks[(self._negate if negate else self._empty) + props]
+                            if not in_group:
+                                v = self._ls_bracket + v + self._rs_bracket
+                            properties = [v]
+                            props = None
+                        except Exception:
+                            pass
+
+                    if props is not None:
+                        # Can't figure out what this is.
+                        raise Exception('Invalid Unicode property!')
+
+        # Appears it wasn't posix, script, or block, so now we will evaluate it in short form.
         if props is not None:
             # \p{Up} Short form of general category.
             try:

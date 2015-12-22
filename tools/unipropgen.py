@@ -8,231 +8,24 @@ import sys
 import struct
 import unicodedata
 import codecs
+import os
 
 __version__ = '2.0.0'
 
+UNIVERSION = unicodedata.unidata_version
+HOME = os.path.dirname(os.path.abspath(__file__))
+NARROW = sys.maxunicode == 0xFFFF
+
 # Compatibility
 PY3 = sys.version_info >= (3, 0) and sys.version_info[0:2] < (4, 0)
-WIDE_RANGE = (0x0000, 0x10FFFF)
-NARROW_RANGE = (0x0000, 0xFFFF)
+if NARROW:
+    UNICODE_RANGE = (0x0000, 0xFFFF)
+else:
+    UNICODE_RANGE = (0x0000, 0x10FFFF)
 if PY3:
     unichar = chr  # noqa
 else:
     unichar = unichr  # noqa
-
-
-narrow_unicode_blocks = [
-    ("Basic Latin", (0x0000, 0x007F)),
-    ("Latin-1 Supplement", (0x0080, 0x00FF)),
-    ("Latin Extended-A", (0x0100, 0x017F)),
-    ("Latin Extended-B", (0x0180, 0x024F)),
-    ("IPA Extensions", (0x0250, 0x02AF)),
-    ("Spacing Modifier Letters", (0x02B0, 0x02FF)),
-    ("Combining Diacritical Marks", (0x0300, 0x036F)),
-    ("Greek and Coptic", (0x0370, 0x03FF)),
-    ("Cyrillic", (0x0400, 0x04FF)),
-    ("Cyrillic Supplementary", (0x0500, 0x052F)),
-    ("Armenian", (0x0530, 0x058F)),
-    ("Hebrew", (0x0590, 0x05FF)),
-    ("Arabic", (0x0600, 0x06FF)),
-    ("Syriac", (0x0700, 0x074F)),
-    ("Thaana", (0x0780, 0x07BF)),
-    ("Devanagari", (0x0900, 0x097F)),
-    ("Bengali", (0x0980, 0x09FF)),
-    ("Gurmukhi", (0x0A00, 0x0A7F)),
-    ("Gujarati", (0x0A80, 0x0AFF)),
-    ("Oriya", (0x0B00, 0x0B7F)),
-    ("Tamil", (0x0B80, 0x0BFF)),
-    ("Telugu", (0x0C00, 0x0C7F)),
-    ("Kannada", (0x0C80, 0x0CFF)),
-    ("Malayalam", (0x0D00, 0x0D7F)),
-    ("Sinhala", (0x0D80, 0x0DFF)),
-    ("Thai", (0x0E00, 0x0E7F)),
-    ("Lao", (0x0E80, 0x0EFF)),
-    ("Tibetan", (0x0F00, 0x0FFF)),
-    ("Myanmar", (0x1000, 0x109F)),
-    ("Georgian", (0x10A0, 0x10FF)),
-    ("Hangul Jamo", (0x1100, 0x11FF)),
-    ("Ethiopic", (0x1200, 0x137F)),
-    ("Cherokee", (0x13A0, 0x13FF)),
-    ("Unified Canadian Aboriginal Syllabics", (0x1400, 0x167F)),
-    ("Ogham", (0x1680, 0x169F)),
-    ("Runic", (0x16A0, 0x16FF)),
-    ("Tagalog", (0x1700, 0x171F)),
-    ("Hanunoo", (0x1720, 0x173F)),
-    ("Buhid", (0x1740, 0x175F)),
-    ("Tagbanwa", (0x1760, 0x177F)),
-    ("Khmer", (0x1780, 0x17FF)),
-    ("Mongolian", (0x1800, 0x18AF)),
-    ("Limbu", (0x1900, 0x194F)),
-    ("Tai Le", (0x1950, 0x197F)),
-    ("Khmer Symbols", (0x19E0, 0x19FF)),
-    ("Phonetic Extensions", (0x1D00, 0x1D7F)),
-    ("Latin Extended Additional", (0x1E00, 0x1EFF)),
-    ("Greek Extended", (0x1F00, 0x1FFF)),
-    ("General Punctuation", (0x2000, 0x206F)),
-    ("Superscripts and Subscripts", (0x2070, 0x209F)),
-    ("Currency Symbols", (0x20A0, 0x20CF)),
-    ("Combining Diacritical Marks for Symbols", (0x20D0, 0x20FF)),
-    ("Letterlike Symbols", (0x2100, 0x214F)),
-    ("Number Forms", (0x2150, 0x218F)),
-    ("Arrows", (0x2190, 0x21FF)),
-    ("Mathematical Operators", (0x2200, 0x22FF)),
-    ("Miscellaneous Technical", (0x2300, 0x23FF)),
-    ("Control Pictures", (0x2400, 0x243F)),
-    ("Optical Character Recognition", (0x2440, 0x245F)),
-    ("Enclosed Alphanumerics", (0x2460, 0x24FF)),
-    ("Box Drawing", (0x2500, 0x257F)),
-    ("Block Elements", (0x2580, 0x259F)),
-    ("Geometric Shapes", (0x25A0, 0x25FF)),
-    ("Miscellaneous Symbols", (0x2600, 0x26FF)),
-    ("Dingbats", (0x2700, 0x27BF)),
-    ("Miscellaneous Mathematical Symbols-A", (0x27C0, 0x27EF)),
-    ("Supplemental Arrows-A", (0x27F0, 0x27FF)),
-    ("Braille Patterns", (0x2800, 0x28FF)),
-    ("Supplemental Arrows-B", (0x2900, 0x297F)),
-    ("Miscellaneous Mathematical Symbols-B", (0x2980, 0x29FF)),
-    ("Supplemental Mathematical Operators", (0x2A00, 0x2AFF)),
-    ("Miscellaneous Symbols and Arrows", (0x2B00, 0x2BFF)),
-    ("CJK Radicals Supplement", (0x2E80, 0x2EFF)),
-    ("Kangxi Radicals", (0x2F00, 0x2FDF)),
-    ("Ideographic Description Characters", (0x2FF0, 0x2FFF)),
-    ("CJK Symbols and Punctuation", (0x3000, 0x303F)),
-    ("Hiragana", (0x3040, 0x309F)),
-    ("Katakana", (0x30A0, 0x30FF)),
-    ("Bopomofo", (0x3100, 0x312F)),
-    ("Hangul Compatibility Jamo", (0x3130, 0x318F)),
-    ("Kanbun", (0x3190, 0x319F)),
-    ("Bopomofo Extended", (0x31A0, 0x31BF)),
-    ("Katakana Phonetic Extensions", (0x31F0, 0x31FF)),
-    ("Enclosed CJK Letters and Months", (0x3200, 0x32FF)),
-    ("CJK Compatibility", (0x3300, 0x33FF)),
-    ("CJK Unified Ideographs Extension A", (0x3400, 0x4DBF)),
-    ("Yijing Hexagram Symbols", (0x4DC0, 0x4DFF)),
-    ("CJK Unified Ideographs", (0x4E00, 0x9FFF)),
-    ("Yi Syllables", (0xA000, 0xA48F)),
-    ("Yi Radicals", (0xA490, 0xA4CF)),
-    ("Hangul Syllables", (0xAC00, 0xD7AF)),
-    ("High Surrogates", (0xD800, 0xDB7F)),
-    ("High Private Use Surrogates", (0xDB80, 0xDBFF)),
-    ("Low Surrogates", (0xDC00, 0xDFFF)),
-    ("Private Use Area", (0xE000, 0xF8FF)),
-    ("CJK Compatibility Ideographs", (0xF900, 0xFAFF)),
-    ("Alphabetic Presentation Forms", (0xFB00, 0xFB4F)),
-    ("Arabic Presentation Forms-A", (0xFB50, 0xFDFF)),
-    ("Variation Selectors", (0xFE00, 0xFE0F)),
-    ("Combining Half Marks", (0xFE20, 0xFE2F)),
-    ("CJK Compatibility Forms", (0xFE30, 0xFE4F)),
-    ("Small Form Variants", (0xFE50, 0xFE6F)),
-    ("Arabic Presentation Forms-B", (0xFE70, 0xFEFF)),
-    ("Halfwidth and Fullwidth Forms", (0xFF00, 0xFFEF)),
-    ("Specials", (0xFFF0, 0xFFFF))
-]
-
-wide_unicode_blocks = [
-    ("Linear B Syllabary", (0x10000, 0x1007F)),
-    ("Linear B Ideograms", (0x10080, 0x100FF)),
-    ("Aegean Numbers", (0x10100, 0x1013F)),
-    ("Ancient Greek Numbers", (0x10140, 0x1018F)),
-    ("Ancient Symbols", (0x10190, 0x101CF)),
-    ("Phaistos Disc", (0x101D0, 0x101FF)),
-    ("Lycian", (0x10280, 0x1029F)),
-    ("Carian", (0x102A0, 0x102DF)),
-    ("Coptic Epact Numbers", (0x102E0, 0x102FF)),
-    ("Old Italic", (0x10300, 0x1032F)),
-    ("Gothic", (0x10330, 0x1034F)),
-    ("Old Permic", (0x10350, 0x1037F)),
-    ("Ugaritic", (0x10380, 0x1039F)),
-    ("Old Persian", (0x103A0, 0x103DF)),
-    ("Deseret", (0x10400, 0x1044F)),
-    ("Shavian", (0x10450, 0x1047F)),
-    ("Osmanya", (0x10480, 0x104AF)),
-    ("Elbasan", (0x10500, 0x1052F)),
-    ("Caucasian Albanian", (0x10530, 0x1056F)),
-    ("Linear A", (0x10600, 0x1077F)),
-    ("Cypriot Syllabary", (0x10800, 0x1083F)),
-    ("Imperial Aramaic", (0x10840, 0x1085F)),
-    ("Palmyrene", (0x10860, 0x1087F)),
-    ("Nabataean", (0x10880, 0x108AF)),
-    ("Hatran", (0x108E0, 0x108FF)),
-    ("Phoenician", (0x10900, 0x1091F)),
-    ("Lydian", (0x10920, 0x1093F)),
-    ("Meroitic Hieroglyphs", (0x10980, 0x1099F)),
-    ("Meroitic Cursive", (0x109A0, 0x109FF)),
-    ("Kharoshthi", (0x10A00, 0x10A5F)),
-    ("Old South Arabian", (0x10A60, 0x10A7F)),
-    ("Old North Arabian", (0x10A80, 0x10A9F)),
-    ("Manichaean", (0x10AC0, 0x10AFF)),
-    ("Avestan", (0x10B00, 0x10B3F)),
-    ("Inscriptional Parthian", (0x10B40, 0x10B5F)),
-    ("Inscriptional Pahlavi", (0x10B60, 0x10B7F)),
-    ("Psalter Pahlavi", (0x10B80, 0x10BAF)),
-    ("Old Turkic", (0x10C00, 0x10C4F)),
-    ("Old Hungarian", (0x10C80, 0x10CFF)),
-    ("Rumi Numeral Symbols", (0x10E60, 0x10E7F)),
-    ("Brahmi", (0x11000, 0x1107F)),
-    ("Kaithi", (0x11080, 0x110CF)),
-    ("Sora Sompeng", (0x110D0, 0x110FF)),
-    ("Chakma", (0x11100, 0x1114F)),
-    ("Mahajani", (0x11150, 0x1117F)),
-    ("Sharada", (0x11180, 0x111DF)),
-    ("Sinhala Archaic Numbers", (0x111E0, 0x111FF)),
-    ("Khojki", (0x11200, 0x1124F)),
-    ("Multani", (0x11280, 0x112AF)),
-    ("Khudawadi", (0x112B0, 0x112FF)),
-    ("Grantha", (0x11300, 0x1137F)),
-    ("Tirhuta", (0x11480, 0x114DF)),
-    ("Siddham", (0x11580, 0x115FF)),
-    ("Modi", (0x11600, 0x1165F)),
-    ("Takri", (0x11680, 0x116CF)),
-    ("Ahom", (0x11700, 0x1173F)),
-    ("Warang Citi", (0x118A0, 0x118FF)),
-    ("Pau Cin Hau", (0x11AC0, 0x11AFF)),
-    ("Cuneiform", (0x12000, 0x123FF)),
-    ("Cuneiform Numbers and Punctuation", (0x12400, 0x1247F)),
-    ("Early Dynastic Cuneiform", (0x12480, 0x1254F)),
-    ("Egyptian Hieroglyphs", (0x13000, 0x1342F)),
-    ("Anatolian Hieroglyphs", (0x14400, 0x1467F)),
-    ("Bamum Supplement", (0x16800, 0x16A3F)),
-    ("Mro", (0x16A40, 0x16A6F)),
-    ("Bassa Vah", (0x16AD0, 0x16AFF)),
-    ("Pahawh Hmong", (0x16B00, 0x16B8F)),
-    ("Miao", (0x16F00, 0x16F9F)),
-    ("Kana Supplement", (0x1B000, 0x1B0FF)),
-    ("Duployan", (0x1BC00, 0x1BC9F)),
-    ("Shorthand Format Controls", (0x1BCA0, 0x1BCAF)),
-    ("Byzantine Musical Symbols", (0x1D000, 0x1D0FF)),
-    ("Musical Symbols", (0x1D100, 0x1D1FF)),
-    ("Ancient Greek Musical Notation", (0x1D200, 0x1D24F)),
-    ("Tai Xuan Jing Symbols", (0x1D300, 0x1D35F)),
-    ("Counting Rod Numerals", (0x1D360, 0x1D37F)),
-    ("Mathematical Alphanumeric Symbols", (0x1D400, 0x1D7FF)),
-    ("Sutton SignWriting", (0x1D800, 0x1DAAF)),
-    ("Mende Kikakui", (0x1E800, 0x1E8DF)),
-    ("Arabic Mathematical Alphabetic Symbols", (0x1EE00, 0x1EEFF)),
-    ("Mahjong Tiles", (0x1F000, 0x1F02F)),
-    ("Domino Tiles", (0x1F030, 0x1F09F)),
-    ("Playing Cards", (0x1F0A0, 0x1F0FF)),
-    ("Enclosed Alphanumeric Supplement", (0x1F100, 0x1F1FF)),
-    ("Enclosed Ideographic Supplement", (0x1F200, 0x1F2FF)),
-    ("Miscellaneous Symbols and Pictographs", (0x1F300, 0x1F5FF)),
-    ("Emoticons", (0x1F600, 0x1F64F)),
-    ("Ornamental Dingbats", (0x1F650, 0x1F67F)),
-    ("Transport and Map Symbols", (0x1F680, 0x1F6FF)),
-    ("Alchemical Symbols", (0x1F700, 0x1F77F)),
-    ("Geometric Shapes Extended", (0x1F780, 0x1F7FF)),
-    ("Supplemental Arrows-C", (0x1F800, 0x1F8FF)),
-    ("Supplemental Symbols and Pictographs", (0x1F900, 0x1F9FF)),
-    ("CJK Unified Ideographs Extension B", (0x20000, 0x2A6DF)),
-    ("CJK Unified Ideographs Extension C", (0x2A700, 0x2B73F)),
-    ("CJK Unified Ideographs Extension D", (0x2B740, 0x2B81F)),
-    ("CJK Unified Ideographs Extension E", (0x2B820, 0x2CEAF)),
-    ("CJK Compatibility Ideographs Supplement", (0x2F800, 0x2FA1F)),
-    ("Tags", (0xE0000, 0xE007F)),
-    ("Variation Selectors Supplement", (0xE0100, 0xE01EF)),
-    ("Supplementary Private Use Area-A", (0xF0000, 0xFFFFF)),
-    ("Supplementary Private Use Area-B", (0x100000, 0x10FFFF))
-]
 
 
 def uchr(i):
@@ -281,35 +74,108 @@ def build_unicode_property_table(output):
         )
 
         gen_bposix(f)
-        f.write('if not NARROW:\n')
         gen_properties(f)
-        f.write('else:\n')
-        gen_properties(f, narrow=True)
 
 
-def gen_blocks(blocks, all_chars, f, narrow):
+def gen_blocks(all_chars, f):
     """Generate Unicode blocks."""
 
-    f.write('    unicode_blocks = {\n')
-    max_unicode = 0xffff if narrow else 0x10FFFF
+    f.write('unicode_blocks = {')
+    max_unicode = 0xffff if NARROW else 0x10FFFF
 
-    for block in blocks:
-        name = block[0].lower().replace(' ', '').replace('-', '').replace('_', '')
-        f.write('        "%s": "%s-%s",\n' % (name, uniformat(block[1][0]), uniformat(block[1][1])))
+    with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'Blocks.txt'), 'r') as uf:
+        for line in uf:
+            if not line.startswith('#'):
+                data = line.split(';')
+                if len(data) < 2:
+                    continue
+                block = [int(i, 16) for i in data[0].strip().split('..')]
+                if NARROW and block[0] > max_unicode:
+                    break
+                inverse_range = []
+                if block[0] > 0:
+                    inverse_range.append("%s-%s" % (uniformat(0), uniformat(block[0] - 1)))
+                if block[1] < max_unicode:
+                    inverse_range.append("%s-%s" % (uniformat(block[1] + 1), uniformat(max_unicode)))
+                name = data[1].strip().lower().replace(' ', '').replace('-', '').replace('_', '')
+                f.write('\n    "%s": "%s-%s",' % (name, uniformat(block[0]), uniformat(block[1])))
+                f.write('\n    "^%s": "%s",' % (name, ''.join(inverse_range)))
+        f.write('\n}\n')
 
-    count = len(blocks) - 1
+
+def gen_scripts(all_chars, f):
+    """Generate Unicode scripts."""
+
+    max_unicode = 0xffff if NARROW else 0x10FFFF
+
+    def create_span(unirange):
+        """Clamp the unicode range."""
+        if len(unirange) < 2:
+            unirange.append(unirange[0])
+        if NARROW:
+            if unirange[0] > max_unicode:
+                return None
+            if unirange[1] > max_unicode:
+                unirange[1] = max_unicode
+        return [x for x in range(unirange[0], unirange[1] + 1)]
+
+    scripts = {}
+    with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'Scripts.txt'), 'r') as uf:
+        for line in uf:
+            if not line.startswith('#'):
+                data = line.split(';')
+                if len(data) < 2:
+                    continue
+                span = create_span([int(i, 16) for i in data[0].strip().split('..')])
+                if span is None:
+                    continue
+                name = data[1].split('#')[0].strip().lower().replace(' ', '').replace('-', '').replace('_', '')
+
+                if name not in scripts:
+                    scripts[name] = []
+                scripts[name].extend(span)
+
+    for name in list(scripts.keys()):
+        s = set(scripts[name])
+        scripts[name] = sorted(s)
+        scripts['^' + name] = sorted(all_chars - s)
+
+    # Convert characters values to ranges
+    for k1, v1 in scripts.items():
+        v1.sort()
+        last = None
+        first = None
+        v2 = []
+        for i in v1:
+            if first is None:
+                first = i
+                last = i
+            elif i == last + 1:
+                last = i
+            elif first is not None:
+                if first == last:
+                    v2.append(uniformat(first))
+                else:
+                    v2.append("%s-%s" % (uniformat(first), uniformat(last)))
+                first = i
+                last = i
+        if first is not None:
+            if first == last:
+                v2.append(uniformat(first))
+            else:
+                v2.append("%s-%s" % (uniformat(first), uniformat(last)))
+            first = None
+            last = None
+        scripts[k1] = ''.join(v2)
+
+    # Write out the unicode properties
+    f.write('unicode_scripts = {\n')
+    count = len(scripts) - 1
     i = 0
-    for block in blocks:
-        name = '^' + block[0].lower().replace(' ', '').replace('-', '').replace('_', '')
-        char_range = block[1]
-        inverse_range = []
-        if char_range[0] > 0:
-            inverse_range.append("%s-%s" % (uniformat(0), uniformat(char_range[0] - 1)))
-        if char_range[1] < max_unicode:
-            inverse_range.append("%s-%s" % (uniformat(char_range[1] + 1), uniformat(max_unicode)))
-        f.write('        "%s": "%s"' % (name, ''.join(inverse_range)))
+    for k1, v1 in sorted(scripts.items()):
+        f.write('    "%s": "%s"' % (k1, v1))
         if i == count:
-            f.write('\n    }\n')
+            f.write('\n}\n')
         else:
             f.write(',\n')
         i += 1
@@ -359,6 +225,7 @@ def gen_bposix(f):
     posix_table["graph"] = list(s2)
     posix_table["^graph"] = list(all_chars - s2)
 
+    # Lower: [a-z]
     s2 = set([x for x in range(0x61, 0x7a + 1)])
     posix_table["lower"] = list(s2)
     posix_table["^lower"] = list(all_chars - s2)
@@ -385,13 +252,6 @@ def gen_bposix(f):
     s2 = set([x for x in range(0x41, 0x5a + 1)])
     posix_table["upper"] = list(s2)
     posix_table["^upper"] = list(all_chars - s2)
-
-    # Word: [A-Za-z0-9_]
-    s2 = set([x for x in range(0x30, 0x39 + 1)])
-    s2 |= set([x for x in range(0x41, 0x5a + 1)])
-    s2 |= set([x for x in range(0x61, 0x7a + 1)] + [0x5f])
-    posix_table["word"] = list(s2)
-    posix_table["^word"] = list(all_chars - s2)
 
     # XDigit: [A-Fa-f0-9]
     s2 = set([x for x in range(0x30, 0x39 + 1)])
@@ -511,13 +371,6 @@ def gen_posix(all_chars, f):
     posix_table["upper"] = list(s2)
     posix_table["^upper"] = list(all_chars - s2)
 
-    # Word: [A-Za-z0-9_]
-    s2 = set([x for x in range(0x30, 0x39 + 1)])
-    s2 |= set([x for x in range(0x41, 0x5a + 1)])
-    s2 |= set([x for x in range(0x61, 0x7a + 1)] + [0x5f])
-    posix_table["word"] = list(s2)
-    posix_table["^word"] = list(all_chars - s2)
-
     # XDigit: [A-Fa-f0-9]
     s2 = set([x for x in range(0x30, 0x39 + 1)])
     s2 |= set([x for x in range(0x41, 0x46 + 1)])
@@ -554,13 +407,13 @@ def gen_posix(all_chars, f):
         posix_table[k1] = ''.join(v2)
 
     # Write out the unicode properties
-    f.write('    posix_properties = {\n')
+    f.write('posix_properties = {\n')
     count = len(posix_table) - 1
     i = 0
     for k1, v1 in sorted(posix_table.items()):
-        f.write('        "%s": "%s"' % (k1, v1))
+        f.write('    "%s": "%s"' % (k1, v1))
         if i == count:
-            f.write('\n    }\n')
+            f.write('\n}\n')
         else:
             f.write(',\n')
         i += 1
@@ -648,16 +501,6 @@ def gen_unicode_posix(table, all_chars, f):
     posix_table["upper"] = list(s2)
     posix_table["^upper"] = list(all_chars - s2)
 
-    # Word: [\p{L}\p{N}\p{Pc}]
-    s2 = set()
-    for table_name in ('l', 'n'):
-        for sub_table_name in table[table_name]:
-            if not sub_table_name.startswith('^'):
-                s2 |= set(table[table_name][sub_table_name])
-    s2 |= set(table['p']['c'])
-    posix_table["word"] = list(s2)
-    posix_table["^word"] = list(all_chars - s2)
-
     # XDigit: [A-Fa-f0-9]
     s2 = set([x for x in range(0x30, 0x39 + 1)])
     s2 |= set([x for x in range(0x41, 0x46 + 1)])
@@ -694,46 +537,69 @@ def gen_unicode_posix(table, all_chars, f):
         posix_table[k1] = ''.join(v2)
 
     # Write out the unicode properties
-    f.write('    posix_unicode_properties = {\n')
+    f.write('posix_unicode_properties = {\n')
     count = len(posix_table) - 1
     i = 0
     for k1, v1 in sorted(posix_table.items()):
-        f.write('        "%s": "%s"' % (k1, v1))
+        f.write('    "%s": "%s"' % (k1, v1))
         if i == count:
-            f.write('\n    }\n')
+            f.write('\n}\n')
         else:
             f.write(',\n')
         i += 1
 
 
-def gen_properties(f, narrow=False):
-    """Generate the property table and dump it to the provided file."""
+def gen_gc_alias(f):
+    """Generate the General Category alias."""
 
-    if not narrow:
-        unicode_range = WIDE_RANGE
-    else:
-        unicode_range = NARROW_RANGE
+    def format_name(text):
+        """Format the name."""
+        return text.strip().lower().replace(' ', '').replace('-', '').replace('_', '')
+
+    alias = {}
+    with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'PropertyValueAliases.txt'), 'r') as uf:
+        for line in uf:
+            if line.startswith('gc ;'):
+                data = [format_name(x) for x in line.split('#')[0].split(';')[1:]]
+                alias[data[1]] = data[0]
+
+    f.write('unicode_gc_alias = {\n')
+    count = len(alias) - 1
+    i = 0
+    for k1, v1 in sorted(alias.items()):
+        f.write('    "%s": "%s"' % (k1, v1))
+        if i == count:
+            f.write('\n}\n')
+        else:
+            f.write(',\n')
+        i += 1
+
+
+def gen_properties(f):
+    """Generate the property table and dump it to the provided file."""
 
     # L& or Lc won't be found in the table,
     # so intialize 'c' at the start. & will have to be converted to 'c'
     # before sending it through.
     table = {'l': {'c': [], '^c': []}}
-    all_chars = set()
-    p = None
-    for i in range(unicode_range[0], unicode_range[1] + 1):
-        all_chars.add(i)
-        c = uchr(i)
-        p = [x.lower() for x in unicodedata.category(c)]
-
-        if p[0] not in table:
-            table[p[0]] = {}
-        if p[1] not in table[p[0]]:
-            table[p[0]][p[1]] = []
-            table[p[0]]['^' + p[1]] = []
-        table[p[0]][p[1]].append(i)
-        # Add L& which is a combo of Ll, Lu, and Lt
-        if p[0] == 'l' and p[1] in ('l', 'u', 't'):
-            table['l']['c'].append(i)
+    all_chars = set([x for x in range(UNICODE_RANGE[0], UNICODE_RANGE[1] + 1)])
+    with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'UnicodeData.txt'), 'r') as uf:
+        for line in uf:
+            data = line.strip().split(';')
+            if data:
+                i = int(data[0], 16)
+                if NARROW and i > UNICODE_RANGE[1]:
+                    continue
+                p = data[2].lower()
+                if p[0] not in table:
+                    table[p[0]] = {}
+                if p[1] not in table[p[0]]:
+                    table[p[0]][p[1]] = []
+                    table[p[0]]['^' + p[1]] = []
+                table[p[0]][p[1]].append(i)
+                # Add L& which is a combo of Ll, Lu, and Lt
+                if p[0] == 'l' and p[1] in ('l', 'u', 't'):
+                    table['l']['c'].append(i)
 
     # Create inverse of each category
     for k1, v1 in table.items():
@@ -746,15 +612,17 @@ def gen_properties(f, narrow=False):
         table[k1]['^'] = list(all_chars - inverse_category)
 
     # Generate Unicode blocks
-    gen_blocks(
-        (narrow_unicode_blocks if narrow else (narrow_unicode_blocks + wide_unicode_blocks)),
-        all_chars, f,
-        narrow
-    )
+    gen_blocks(all_chars, f)
+
+    # Generate Unicode scripts
+    gen_scripts(all_chars, f)
 
     # Generate posix table and write out to file.
     gen_posix(all_chars, f)
     gen_unicode_posix(table, all_chars, f)
+
+    # Gen gc mapping.
+    gen_gc_alias(f)
 
     # Convert characters values to ranges
     for k1, v1 in table.items():
@@ -786,22 +654,22 @@ def gen_properties(f, narrow=False):
             table[k1][k2] = ''.join(v3)
 
     # Write out the unicode properties
-    f.write('    unicode_properties = {\n')
+    f.write('unicode_properties = {\n')
     count = len(table) - 1
     i = 0
     for k1, v1 in sorted(table.items()):
-        f.write('        "%s": {\n' % k1)
+        f.write('    "%s": {\n' % k1)
         count2 = len(v1) - 1
         j = 0
         for k2, v2 in sorted(v1.items()):
-            f.write('            "%s": "%s"' % (k2, v2))
+            f.write('        "%s": "%s"' % (k2, v2))
             if j == count2:
-                f.write('\n        }')
+                f.write('\n    }')
             else:
                 f.write(',\n')
             j += 1
         if i == count:
-            f.write('\n    }\n')
+            f.write('\n}\n')
         else:
             f.write(',\n')
         i += 1
