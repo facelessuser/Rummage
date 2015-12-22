@@ -12,7 +12,7 @@ import codecs
 __version__ = '2.0.0'
 
 # Compatibility
-PY3 = sys.version_info >= (3, 0) and sys.version_info < (4, 0)
+PY3 = sys.version_info >= (3, 0) and sys.version_info[0:2] < (4, 0)
 WIDE_RANGE = (0x0000, 0x10FFFF)
 NARROW_RANGE = (0x0000, 0xFFFF)
 if PY3:
