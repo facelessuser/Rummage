@@ -106,9 +106,9 @@ unicode_property_map = {
 
     # Mark
     "mark": "m",
-    "nonspacingmark": "mc",
-    "spacingmark": "me",
-    "enclosingmark": "md",
+    "nonspacingmark": "mn",
+    "spacingmark": "mc",
+    "enclosingmark": "me",
 
     # Number
     "number": "n",
