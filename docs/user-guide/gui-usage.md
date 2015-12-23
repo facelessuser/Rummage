@@ -219,6 +219,7 @@ For **re**:
 | `\Q...\E`            | Quotes (escapes) text for regex.  `\E` signifies the end of the quoting. Will be ignored in character classes `[]`. |
 | `\p{UnicodeProperty}`| Unicode property character class. Search string must be a Unicode string. Can be used in character classes `[]`. See [Unicode Properties](#unicode-properties) for more info. |
 | `\P{UnicodeProperty}`| Inverse Unicode property character class. Search string must be a Unicode string. Can be used in character classes `[]`. See [Unicode Properties](#unicode-properties) for more info. |
+| `[[:alnum:]]` | Though not really a backref, support for posix style character classes is available. See [Posix Style Properties](#posix-style-properties) for more info. |
 
 For **regex**:
 
