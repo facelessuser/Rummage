@@ -356,7 +356,7 @@ def gen_binary(all_chars, f):
     categories = []
     binary_props = (
         ('DerivedCoreProperties.txt', None),
-        ('Proplist.txt', None),
+        ('PropList.txt', None),
         ('DerivedNormalizationProps.txt', ('Changes_When_NFKC_Casefolded', 'Full_Composition_Exclusion'))
     )
     binary = {}

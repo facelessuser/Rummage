@@ -587,6 +587,8 @@ class SearchTemplate(object):
             elif m.group(1) in ('bidiclass', 'bc'):
                 category = 'bc'
             elif m.group(2) in ('y', 'n', 'yes', 'no', 't', 'f', 'true', 'false'):
+                if m.group(2) in ('n', 'no', 'f', 'false'):
+                    negate = not negate
                 category = 'binary'
             else:
                 raise ValueError('Invalid unicode property!')
