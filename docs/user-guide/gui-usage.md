@@ -244,11 +244,28 @@ None of the replace back references can be used in character classes `[]`.  Thes
     - `\L\cTEST \cTEST\E` --> `Test Test`
 
 ### Unicode Properties
-Unicode properties can be used with the format: `\p{property=value}`, `\p{property:value}`, `\p{value}`, `\p{^property=value}`, `\p{^value}`.  Though you don't have to specify the `UNICODE` flag, the search pattern must be a Unicode string and the search buffer must also be Unicode.  It supports `General_Category` and `Blocks` as the property.  The inverse can also be used to specify everything not in a Unicode property: `\P{value}` or `\p{^value}` etc.  They are only used in the search patterns. Only one property may specified between the curly braces.  If you want to use multiple properties, you can place them in a character class: `[\p{UnicodeProperty}\p{OtherUnicodeProperty}]`.
+Unicode properties can be used with the format: `\p{property=value}`, `\p{property:value}`, `\p{value}`, `\p{^property=value}`, `\p{^value}`.  Though you don't have to specify the `UNICODE` flag, the search pattern must be a Unicode string and the search buffer must also be Unicode.  It supports `General_Category`, `Block`, 'Script', `Bidi_Class`, and binary properties. It should support most if not all their aliases.  In the future it is possible that more Unicode property support will be added, but the current set seems fairly reasonable.
+
+The inverse of properties can also be used to specify everything not in a Unicode property: `\P{value}` or `\p{^value}` etc.  They are only used in the search patterns. Only one property may specified between the curly braces.  If you want to use multiple properties, you can place them in a character class: `[\p{UnicodeProperty}\p{OtherUnicodeProperty}]`.
 
 When specifying a property, the value matching is case insensitive and characters like `[ -_]` will be ignored.  So the following are all equivalent: `\p{Uppercase_Letter}`, `\p{Uppercase-letter}`, `\p{UPPERCASELETTER}`, `\p{upper case letter}`.
 
-General categories can be specified in one of three ways: `\p{gc=value}`, `\p{General_Category=value}`, `\p{value}`.  Again, case is not important.  See the table below to see all the Unicode category properties that can be used.
+When evaluating a property, they are evaluated in this order:
+
+1. General Category
+2. Script
+3. Blocks
+4. Binary
+5. Bidi Class
+6. Posix Style properties
+
+!!! caution "Narrow Python Builds"
+    If you are using a narrow python build, your max Unicode value will be `\uffff`.  Unicode blocks above that limit will not be available.  Also Unicode values above the limit will not be available in character classes either.
+
+    If you are using a wide build, you should have access to all Unicode values.
+
+#### General Category
+General categories can be specified in one of three ways: `\p{gc: value}`, `\p{General_Category: value}`, `\p{value}` etc.  Again, case is not important.  See the table below to see all the Unicode category properties that can be used.
 
 | Verbose&nbsp;Property&nbsp;Form | Terse&nbsp;Property&nbsp;Form |
 |---------------------------------|-------------------------------|
@@ -291,12 +308,23 @@ General categories can be specified in one of three ways: `\p{gc=value}`, `\p{Ge
 | Line_Separator | Zl |
 | Paragraph_Separator | Z |
 
-There are a number of Unicode blocks (they won't be listed here), but they can be specified in two ways: `\p{Block=Basic_Latin}` or `\p{InBasic_Latin}`.  If you are using a narrow version of Python, you may be limited to blocks less than `\uffff`.  Unicode Scripts are not supported.
+#### Blocks
+There are a number of Unicode blocks and also aliases for blocks (they won't be listed here), but they can be specified in two ways: `\p{Block: Basic_Latin}` or `\p{InBasic_Latin}`.
 
-A number of posix property names can be used as well (see [Posix Style Properties](#posix-style-properties) for more info).  They are defined only one way: `\p{Alnum}`.
+#### Scripts
+There are a number of Unicode scripts and also aliases for scripts (they won't be listed here), but they can be specified in two ways: `\p{Script: Latin}` or `\p{IsLatin}`.
+
+#### Binary
+There are a number of binary properties and even aliases for some of the binary properties.  Comprehensive lists are available on the web, but they are specified in the following way: `\p{Alphabetic}`.  Normal just specifying inverse via `\P{value}` or `\p{^value}` should be enough, but for completeness the form `\p{Alphabetic: Y}` and `\p{Alphabetic: N}` along with all the variants (Yes|No|T|F|True|False).
+
+#### Posix
+A number of posix property names are also available.  In general, when used in the `\p{}` form, they are aliases for existing unicode properties with the same name. There are some posix names that aren't used in the current Unicode properties `alnum`, `xdigit`, etc.  If you want to force the posix form inside `\p{}` you can use their name prefixed with `posix`: `\p{Punct}` --> `\p{PosixPunct}`.  Currently when using posix values in `\p{}` they will be forced into their Unicode form (see [Posix Style Properties](#posix-style-properties) for more info).
 
 ### Posix Style Properties
-Posix properties in the form of `[:posix:]` and the inverse `[:^posix:]` are available.  These character classes are only available inside a character group `[]`.  If needed, you can use the alternate form of `\p{Posix}` to use inside and outside a character group. If using the `\p{Posix}` form, the return will always be Unicode.
+Posix properties in the form of `[:posix:]` and the inverse `[:^posix:]` are available.  These character classes are only available inside a character group `[]`.  If needed, you can use the alternate form of `\p{Posix}` to use inside and outside a character group.
+
+!!! caution "Posix Values in `p{}`"
+    If using the `\p{Posix}` form, the return will always be Unicode and properties like `punct` will revert to the Unicode property form opposed the posix unless `posix` is prefixed to the name.  Example: the Unicode property `punct` = `[\p{P}]`, but the posix `punct` = `[\p{P}\p{S}]`.
 
 <table markdown="1" class="docutils">
 <thead>
