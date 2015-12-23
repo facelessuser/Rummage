@@ -17,7 +17,16 @@ HOME = os.path.dirname(os.path.abspath(__file__))
 
 def download_unicodedata(version, output=HOME):
     """Download unicode data scripts and blocks."""
-    files = ('UnicodeData.txt', 'PropertyValueAliases.txt', 'Blocks.txt', 'Scripts.txt')
+    files = (
+        'UnicodeData.txt',
+        'Scripts.txt',
+        'Blocks.txt',
+        'PropList.txt',
+        'DerivedCoreProperties.txt',
+        'DerivedNormalizationProps.txt',
+        'CompositionExclusions.txt',
+        'PropertyValueAliases.txt'
+    )
     url = 'http://www.unicode.org/Public/%s/ucd/' % version
 
     destination = os.path.join(output, 'unicodedata', version)
