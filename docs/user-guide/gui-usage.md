@@ -257,7 +257,6 @@ When evaluating a property in the form `\p{value}`, they are evaluated in this o
 2. Script
 3. Blocks
 4. Binary
-6. Posix Style properties
 
 When installed, the Unicode version that comes with the Python it is installed under will be used to generate all the Unicode tables.  For instance, Python 2.7 is currently using Unicode 5.2.0.  And Python 3.5 is using 8.0.0.
 

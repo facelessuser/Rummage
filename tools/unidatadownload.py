@@ -25,7 +25,8 @@ def download_unicodedata(version, output=HOME):
         'DerivedCoreProperties.txt',
         'DerivedNormalizationProps.txt',
         'CompositionExclusions.txt',
-        'PropertyValueAliases.txt'
+        'PropertyValueAliases.txt',
+        'PropertyAliases.txt'
     )
     url = 'http://www.unicode.org/Public/%s/ucd/' % version
 

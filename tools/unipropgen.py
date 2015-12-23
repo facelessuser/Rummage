@@ -51,21 +51,9 @@ def get_posix_property(value, uni=False):
     if isinstance(value, binary_type):
         return bposix_properties[value.decode('utf-8')]
     elif uni:
-        return posix_unicode_properties[value]
+        return unicode_binary['posix' + value]
     else:
         return posix_properties[value]
-
-
-def get_uposix_property(value):
-    """"Get unicode posix property (aliases allowed)."""
-
-    if value.startswith('^'):
-        negated = value[1:]
-        value = '^' + unicode_alias['posix'].get(negated, negated)
-    else:
-        value = unicode_alias['posix'].get(value, value)
-
-    return posix_unicode_properties[value]
 
 
 def get_gc_property(value):
@@ -189,10 +177,6 @@ def get_unicode_property(value, prop=None):
         return get_binary_property(value)
     except Exception:
         pass
-    try:
-        return get_uposix_property(value)
-    except Exception:
-        pass
 
     raise ValueError('Invalid Unicode property!')
 '''
@@ -219,6 +203,11 @@ def uniformat(value):
     else:
         c = "\\U%08x" % value
     return c
+
+
+def format_name(text):
+    """Format the name."""
+    return text.strip().lower().replace(' ', '').replace('-', '').replace('_', '')
 
 
 def binaryformat(value):
@@ -300,7 +289,7 @@ def gen_blocks(all_chars, f):
                     inverse_range.append("%s-%s" % (uniformat(0), uniformat(block[0] - 1)))
                 if block[1] < MAXUNICODE:
                     inverse_range.append("%s-%s" % (uniformat(block[1] + 1), uniformat(MAXUNICODE)))
-                name = data[1].strip().lower().replace(' ', '').replace('-', '').replace('_', '')
+                name = format_name(data[1])
                 f.write('\n    "%s": "%s-%s",' % (name, uniformat(block[0]), uniformat(block[1])))
                 f.write('\n    "^%s": "%s",' % (name, ''.join(inverse_range)))
         f.write('\n}\n')
@@ -319,7 +308,7 @@ def gen_scripts(all_chars, f):
                 span = create_span([int(i, 16) for i in data[0].strip().split('..')])
                 if span is None:
                     continue
-                name = data[1].strip().lower().replace(' ', '').replace('-', '').replace('_', '')
+                name = format_name(data[1])
 
                 if name not in scripts:
                     scripts[name] = []
@@ -346,7 +335,7 @@ def gen_scripts(all_chars, f):
         i += 1
 
 
-def gen_binary(all_chars, f):
+def gen_binary(table, all_chars, f):
     """Generate binary properties."""
 
     categories = []
@@ -368,7 +357,7 @@ def gen_binary(all_chars, f):
                     span = create_span([int(i, 16) for i in data[0].strip().split('..')])
                     if span is None:
                         continue
-                    name = data[1].strip().lower().replace(' ', '').replace('-', '').replace('_', '')
+                    name = format_name(data[1])
 
                     if name not in binary:
                         binary[name] = []
@@ -412,6 +401,8 @@ def gen_binary(all_chars, f):
         s = set(binary[name])
         binary[name] = sorted(s)
         binary['^' + name] = sorted(all_chars - s)
+
+    gen_uposix(table, binary, all_chars)
 
     # Convert characters values to ranges
     char2range(binary)
@@ -566,40 +557,38 @@ def gen_posix(all_chars, f, binary=False):
         i += 1
 
 
-def gen_uposix(table, all_chars, f):
+def gen_uposix(table, posix_table, all_chars):
     """Generate the posix table and write out to file."""
-
-    posix_table = {}
 
     # Alnum: [\p{L&}\p{Nd}]
     s2 = set(table['l']['c'] + table['n']['d'])
-    posix_table["alnum"] = list(s2)
-    posix_table["^alnum"] = list(all_chars - s2)
+    posix_table["posixalnum"] = list(s2)
+    posix_table["^posixalnum"] = list(all_chars - s2)
 
     # Alpha: [\p{L&}]
     s2 = set(table['l']['c'])
-    posix_table["alpha"] = list(s2)
-    posix_table["^alpha"] = list(all_chars - s2)
+    posix_table["posixalpha"] = list(s2)
+    posix_table["^posixalpha"] = list(all_chars - s2)
 
     # ASCII: [\x00-\x7F]
     s2 = set([x for x in range(0, 0x7F + 1)])
-    posix_table["ascii"] = list(s2)
-    posix_table["^ascii"] = list(all_chars - s2)
+    posix_table["posixascii"] = list(s2)
+    posix_table["^posixascii"] = list(all_chars - s2)
 
     # Blank: [\p{Zs}\t]
     s2 = set(table['z']['s'] + [0x09])
-    posix_table["blank"] = list(s2)
-    posix_table["^blank"] = list(all_chars - s2)
+    posix_table["posixblank"] = list(s2)
+    posix_table["^posixblank"] = list(all_chars - s2)
 
     # Cntrl: [\p{Cc}]
     s2 = set(table['c']['c'])
-    posix_table["cntrl"] = list(s2)
-    posix_table["^cntrl"] = list(all_chars - s2)
+    posix_table["posixcntrl"] = list(s2)
+    posix_table["^posixcntrl"] = list(all_chars - s2)
 
     # Digit: [\p{Nd}]
     s2 = set(table['n']['d'])
-    posix_table["digit"] = list(s2)
-    posix_table["^digit"] = list(all_chars - s2)
+    posix_table["posixdigit"] = list(s2)
+    posix_table["^posixdigit"] = list(all_chars - s2)
 
     # Graph: [^\p{Z}\p{C}]
     s2 = set()
@@ -607,13 +596,13 @@ def gen_uposix(table, all_chars, f):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
                 s2 |= set(table[table_name][sub_table_name])
-    posix_table["graph"] = list(all_chars - s2)
-    posix_table["^graph"] = list(s2)
+    posix_table["posixgraph"] = list(all_chars - s2)
+    posix_table["^posixgraph"] = list(s2)
 
     # Lower: [\p{Ll}]
     s2 = set(table['l']['l'])
-    posix_table["lower"] = list(s2)
-    posix_table["^lower"] = list(all_chars - s2)
+    posix_table["posixlower"] = list(s2)
+    posix_table["^posixlower"] = list(all_chars - s2)
 
     # Print: [\P{C}]
     s2 = set()
@@ -621,8 +610,8 @@ def gen_uposix(table, all_chars, f):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
                 s2 |= set(table[table_name][sub_table_name])
-    posix_table["print"] = list(all_chars - s2)
-    posix_table["^print"] = list(s2)
+    posix_table["posixprint"] = list(all_chars - s2)
+    posix_table["^posixprint"] = list(s2)
 
     # Punct: [\p{P}\p{S}]
     s2 = set()
@@ -630,8 +619,8 @@ def gen_uposix(table, all_chars, f):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
                 s2 |= set(table[table_name][sub_table_name])
-    posix_table["punct"] = list(s2)
-    posix_table["^punct"] = list(all_chars - s2)
+    posix_table["posixpunct"] = list(s2)
+    posix_table["^posixpunct"] = list(all_chars - s2)
 
     # Space: [\p{Z}\t\r\n\v\f]
     s2 = set()
@@ -640,35 +629,20 @@ def gen_uposix(table, all_chars, f):
             if not sub_table_name.startswith('^'):
                 s2 |= set(table[table_name][sub_table_name])
     s2 |= set([x for x in range(0x09, 0x0e)])
-    posix_table["space"] = list(s2)
-    posix_table["^space"] = list(all_chars - s2)
+    posix_table["posixspace"] = list(s2)
+    posix_table["^posixspace"] = list(all_chars - s2)
 
     # Upper: [\p{Lu}]
     s2 = set(table['l']['u'])
-    posix_table["upper"] = list(s2)
-    posix_table["^upper"] = list(all_chars - s2)
+    posix_table["posixupper"] = list(s2)
+    posix_table["^posixupper"] = list(all_chars - s2)
 
     # XDigit: [A-Fa-f0-9]
     s2 = set([x for x in range(0x30, 0x39 + 1)])
     s2 |= set([x for x in range(0x41, 0x46 + 1)])
     s2 |= set([x for x in range(0x61, 0x66 + 1)])
-    posix_table["xdigit"] = list(s2)
-    posix_table["^xdigit"] = list(all_chars - s2)
-
-    # Convert characters values to ranges
-    char2range(posix_table)
-
-    # Write out the unicode properties
-    f.write('posix_unicode_properties = {\n')
-    count = len(posix_table) - 1
-    i = 0
-    for k1, v1 in sorted(posix_table.items()):
-        f.write('    "%s": "%s"' % (k1, v1))
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
+    posix_table["posixxdigit"] = list(s2)
+    posix_table["^posixxdigit"] = list(all_chars - s2)
 
 
 def gen_alias(categories, f):
@@ -676,14 +650,53 @@ def gen_alias(categories, f):
 
     alias_re = re.compile(r'^#\s+(\w+)\s+\((\w+)\)\s*$')
 
-    def format_name(text):
-        """Format the name."""
-        return text.strip().lower().replace(' ', '').replace('-', '').replace('_', '')
-
     alias = {}
     gather = False
     current_category = None
     line_re = None
+    alias_header_re = re.compile(r'^#\s+(\w+)\s+Properties\s*$')
+    divider_re = re.compile(r'#\s*=+\s*$')
+    posix_props = ('alnum', 'blank', 'graph', 'print', 'xdigit')
+
+    with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'PropertyAliases.txt'), 'r') as uf:
+        div = False
+        capture = False
+        name = None
+        for line in uf:
+            if div:
+                m = alias_header_re.match(line)
+                if m:
+                    name = format_name(m.group(1))
+                    if name in ('catalog', 'enumerated'):
+                        capture = True
+                        name = '_'
+                    elif name in ('binary',):
+                        capture = True
+                    else:
+                        capture = False
+                div = False
+                continue
+            elif divider_re.match(line):
+                div = True
+                continue
+            elif line.startswith('#') or not line.strip():
+                continue
+            elif capture:
+                should_add = False
+                data = [format_name(x) for x in line.split('#')[0].split(';')]
+                index = 0
+                for d in data:
+                    if d in categories:
+                        should_add = True
+                        break
+                    index += 1
+                if should_add:
+                    data[0], data[index] = data[index], data[0]
+                    if name not in alias:
+                        alias[name] = {}
+                    for d in data[1:]:
+                        alias[name][d] = data[0]
+
     with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'PropertyValueAliases.txt'), 'r') as uf:
         for line in uf:
             m = alias_re.match(line)
@@ -697,31 +710,17 @@ def gen_alias(categories, f):
                 if current_category in ('sc', 'blk'):
                     data[1], data[2] = data[2], data[1]
                 if len(data) == 5 and data[2] in ('yes', 'no') and data[1] in ('n', 'y'):
-                    if 'binary' not in alias:
-                        alias['binary'] = {}
-                    alias['binary'][data[0]] = original_name
-                else:
-                    if current_category not in alias:
-                        alias[current_category] = {}
-                    for a in data[2:]:
-                        if a == 'n/a':
-                            continue
-                        alias[current_category][a] = data[1]
+                    data = ['binary', original_name, data[0]]
+                if data[0] not in alias:
+                    alias[data[0]] = {}
+                for a in data[2:]:
+                    if a == 'n/a':
+                        continue
+                    if a not in alias[data[0]]:
+                        alias[data[0]][a] = data[1]
 
-    alias['posix'] = {
-        'posixalnum': 'alnum',
-        'posixalpha': 'alpha',
-        'posixascii': 'ascii',
-        'posixblank': 'blank',
-        'posixcntrl': 'cntrl',
-        'posixdigit': 'digit',
-        'posixgraph': 'graph',
-        'posixlower': 'lower',
-        'posixprint': 'print',
-        'posixspace': 'space',
-        'posixupper': 'upper',
-        'posixxdigit': 'xdigit'
-    }
+    for prop in posix_props:
+        alias['binary'][prop] = 'posix' + prop
 
     f.write('unicode_alias = {\n')
     count = len(alias) - 1
@@ -796,13 +795,12 @@ def gen_properties(f):
 
     # Generate Unicode binary
     print('Building: Binary')
-    categories.extend(gen_binary(all_chars, f))
+    categories.extend(gen_binary(table, all_chars, f))
 
     # Generate posix table and write out to file.
     print('Building: Posix')
     gen_posix(set([x for x in range(0, 0xff + 1)]), f, binary=True)
     gen_posix(all_chars, f)
-    gen_uposix(table, all_chars, f)
 
     # Gen gc mapping.
     print('Builiding: Aliases')
