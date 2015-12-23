@@ -190,10 +190,6 @@ def get_unicode_property(value, prop=None):
     except Exception:
         pass
     try:
-        return get_bidi_property(value)
-    except Exception:
-        pass
-    try:
         return get_uposix_property(value)
     except Exception:
         pass

@@ -250,14 +250,15 @@ The inverse of properties can also be used to specify everything not in a Unicod
 
 When specifying a property, the value matching is case insensitive and characters like `[ -_]` will be ignored.  So the following are all equivalent: `\p{Uppercase_Letter}`, `\p{Uppercase-letter}`, `\p{UPPERCASELETTER}`, `\p{upper case letter}`.
 
-When evaluating a property, they are evaluated in this order:
+When evaluating a property in the form `\p{value}`, they are evaluated in this order:
 
 1. General Category
 2. Script
 3. Blocks
 4. Binary
-5. Bidi Class
 6. Posix Style properties
+
+When installed, the Unicode version that comes with the Python it is installed under will be used to generate all the Unicode tables.  For instance, Python 2.7 is currently using Unicode 5.2.0.  And Python 3.5 is using 8.0.0.
 
 !!! caution "Narrow Python Builds"
     If you are using a narrow python build, your max Unicode value will be `\uffff`.  Unicode blocks above that limit will not be available.  Also Unicode values above the limit will not be available in character classes either.
@@ -316,6 +317,9 @@ There are a number of Unicode scripts and also aliases for scripts (they won't b
 
 #### Binary
 There are a number of binary properties and even aliases for some of the binary properties.  Comprehensive lists are available on the web, but they are specified in the following way: `\p{Alphabetic}`.  Normal just specifying inverse via `\P{value}` or `\p{^value}` should be enough, but for completeness the form `\p{Alphabetic: Y}` and `\p{Alphabetic: N}` along with all the variants (Yes|No|T|F|True|False).
+
+#### Bidi Classes
+Bidi classes must be defined in the form `\p{Bidi_Class: White_Space}` or `\p{bc: ws}` etc.
 
 #### Posix
 A number of posix property names are also available.  In general, when used in the `\p{}` form, they are aliases for existing unicode properties with the same name. There are some posix names that aren't used in the current Unicode properties `alnum`, `xdigit`, etc.  If you want to force the posix form inside `\p{}` you can use their name prefixed with `posix`: `\p{Punct}` --> `\p{PosixPunct}`.  Currently when using posix values in `\p{}` they will be forced into their Unicode form (see [Posix Style Properties](#posix-style-properties) for more info).
