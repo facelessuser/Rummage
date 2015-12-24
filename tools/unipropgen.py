@@ -847,7 +847,9 @@ def gen_properties(f):
 def build_unicode_property_table(output):
     """Build and write out unicode property table."""
 
-    with codecs.open(output, 'w', 'utf-8') as f:
+    if not os.path.exists(output):
+        os.mkdir(output)
+    with codecs.open(os.path.join(output, '__init__.py'), 'w', 'utf-8') as f:
         f.write(HEADER)
         gen_properties(f)
 

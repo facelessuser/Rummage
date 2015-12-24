@@ -58,7 +58,7 @@ def generate_unicode_table():
         unipropgen.build_unicode_property_table(
             os.path.join(
                 os.path.dirname(__file__),
-                'rummage', 'rummage', 'rumcore', 'backrefs', 'uniprops', 'uniprops.py'
+                'rummage', 'rummage', 'rumcore', 'backrefs', 'unicode_tables'
             )
         )
     except Exception as e:
@@ -109,7 +109,9 @@ setup(
     author='Isaac Muse',
     author_email='Isaac.Muse [at] gmail.com',
     url='https://github.com/facelessuser/Rummage',
-    packages=find_packages(exclude=[]),
+    packages=find_packages(
+        exclude=['*.unicode_tables']
+    ),
     install_requires=[
         "gntp>=1.0.2",
         "chardet>=2.3.0"

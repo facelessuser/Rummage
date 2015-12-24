@@ -1,6 +1,6 @@
-"""Uniprops."""
+"""unicode_tables."""
 from __future__ import unicode_literals
-from . import uniprops
+from . import unicode_tables
 import sys
 PY3 = sys.version_info >= (3, 0) and sys.version_info[0:2] < (4, 0)
 if PY3:
@@ -13,11 +13,11 @@ def get_posix_property(value, uni=False):
     """Retrieve the posix category."""
 
     if isinstance(value, binary_type):
-        return uniprops.bposix_properties[value.decode('utf-8')]
+        return unicode_tables.bposix_properties[value.decode('utf-8')]
     elif uni:
-        return uniprops.unicode_binary['posix' + value]
+        return unicode_tables.unicode_binary['posix' + value]
     else:
-        return uniprops.posix_properties[value]
+        return unicode_tables.posix_properties[value]
 
 
 def get_gc_property(value):
@@ -29,18 +29,18 @@ def get_gc_property(value):
     else:
         negate = False
 
-    value = uniprops.unicode_alias['generalcategory'].get(value, value)
+    value = unicode_tables.unicode_alias['generalcategory'].get(value, value)
 
     assert 1 <= len(value) <= 2, 'Invalid property!'
 
     if not negate:
         p1, p2 = (value[0], value[1]) if len(value) > 1 else (value[0], None)
         return ''.join(
-            [v for k, v in uniprops.unicode_properties.get(p1, {}).items() if not k.startswith('^')]
-        ) if p2 is None else uniprops.unicode_properties.get(p1, {}).get(p2, '')
+            [v for k, v in unicode_tables.unicode_properties.get(p1, {}).items() if not k.startswith('^')]
+        ) if p2 is None else unicode_tables.unicode_properties.get(p1, {}).get(p2, '')
     else:
         p1, p2 = (value[0], value[1]) if len(value) > 1 else (value[0], '')
-        return uniprops.unicode_properties.get(p1, {}).get('^' + p2, '')
+        return unicode_tables.unicode_properties.get(p1, {}).get('^' + p2, '')
 
 
 def get_binary_property(value):
@@ -48,11 +48,11 @@ def get_binary_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['binary'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['binary'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['binary'].get(value, value)
+        value = unicode_tables.unicode_alias['binary'].get(value, value)
 
-    return uniprops.unicode_binary[value]
+    return unicode_tables.unicode_binary[value]
 
 
 def get_canonical_combining_class_property(value):
@@ -60,11 +60,11 @@ def get_canonical_combining_class_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['canonicalcombiningclass'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['canonicalcombiningclass'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['canonicalcombiningclass'].get(value, value)
+        value = unicode_tables.unicode_alias['canonicalcombiningclass'].get(value, value)
 
-    return uniprops.uniocde_canonical_combining_class[value]
+    return unicode_tables.uniocde_canonical_combining_class[value]
 
 
 def get_east_asian_width_property(value):
@@ -72,11 +72,11 @@ def get_east_asian_width_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['ea'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['ea'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['ea'].get(value, value)
+        value = unicode_tables.unicode_alias['ea'].get(value, value)
 
-    return uniprops.unicode_east_asian_width[value]
+    return unicode_tables.unicode_east_asian_width[value]
 
 
 def get_grapheme_cluster_break_property(value):
@@ -84,11 +84,11 @@ def get_grapheme_cluster_break_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['graphemeclusterbreak'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['graphemeclusterbreak'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['graphemeclusterbreak'].get(value, value)
+        value = unicode_tables.unicode_alias['graphemeclusterbreak'].get(value, value)
 
-    return uniprops.unicode_grapheme_cluster_break[value]
+    return unicode_tables.unicode_grapheme_cluster_break[value]
 
 
 def get_line_break_property(value):
@@ -96,11 +96,11 @@ def get_line_break_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['linebreak'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['linebreak'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['linebreak'].get(value, value)
+        value = unicode_tables.unicode_alias['linebreak'].get(value, value)
 
-    return uniprops.unicode_line_break[value]
+    return unicode_tables.unicode_line_break[value]
 
 
 def get_sentence_break_property(value):
@@ -108,11 +108,11 @@ def get_sentence_break_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['sentencebreak'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['sentencebreak'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['sentencebreak'].get(value, value)
+        value = unicode_tables.unicode_alias['sentencebreak'].get(value, value)
 
-    return uniprops.unicode_sentence_break[value]
+    return unicode_tables.unicode_sentence_break[value]
 
 
 def get_word_break_property(value):
@@ -120,11 +120,11 @@ def get_word_break_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['wordbreak'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['wordbreak'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['wordbreak'].get(value, value)
+        value = unicode_tables.unicode_alias['wordbreak'].get(value, value)
 
-    return uniprops.unicode_word_break[value]
+    return unicode_tables.unicode_word_break[value]
 
 
 def get_hangul_syllable_type_property(value):
@@ -132,11 +132,11 @@ def get_hangul_syllable_type_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['hangulsyllabletype'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['hangulsyllabletype'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['hangulsyllabletype'].get(value, value)
+        value = unicode_tables.unicode_alias['hangulsyllabletype'].get(value, value)
 
-    return uniprops.unicode_hangul_syllable_type[value]
+    return unicode_tables.unicode_hangul_syllable_type[value]
 
 
 def get_decomposition_type_property(value):
@@ -144,11 +144,11 @@ def get_decomposition_type_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['decompositiontype'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['decompositiontype'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['decompositiontype'].get(value, value)
+        value = unicode_tables.unicode_alias['decompositiontype'].get(value, value)
 
-    return uniprops.unicode_decomposition_type[value]
+    return unicode_tables.unicode_decomposition_type[value]
 
 
 def get_nfc_quick_check_property(value):
@@ -156,11 +156,11 @@ def get_nfc_quick_check_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['nfcquickcheck'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['nfcquickcheck'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['nfcquickcheck'].get(value, value)
+        value = unicode_tables.unicode_alias['nfcquickcheck'].get(value, value)
 
-    return uniprops.unicode_nfc_quick_check[value]
+    return unicode_tables.unicode_nfc_quick_check[value]
 
 
 def get_nfd_quick_check_property(value):
@@ -168,11 +168,11 @@ def get_nfd_quick_check_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['nfdquickcheck'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['nfdquickcheck'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['nfdquickcheck'].get(value, value)
+        value = unicode_tables.unicode_alias['nfdquickcheck'].get(value, value)
 
-    return uniprops.unicode_nfd_quick_check[value]
+    return unicode_tables.unicode_nfd_quick_check[value]
 
 
 def get_nfkc_quick_check_property(value):
@@ -180,11 +180,11 @@ def get_nfkc_quick_check_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['nfkcquickcheck'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['nfkcquickcheck'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['nfkcquickcheck'].get(value, value)
+        value = unicode_tables.unicode_alias['nfkcquickcheck'].get(value, value)
 
-    return uniprops.unicode_nfkc_quick_check[value]
+    return unicode_tables.unicode_nfkc_quick_check[value]
 
 
 def get_nfkd_quick_check_property(value):
@@ -192,11 +192,11 @@ def get_nfkd_quick_check_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['nfkdquickcheck'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['nfkdquickcheck'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['nfkdquickcheck'].get(value, value)
+        value = unicode_tables.unicode_alias['nfkdquickcheck'].get(value, value)
 
-    return uniprops.unicode_nfkd_quick_check[value]
+    return unicode_tables.unicode_nfkd_quick_check[value]
 
 
 def get_numeric_type_property(value):
@@ -204,11 +204,11 @@ def get_numeric_type_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['numerictype'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['numerictype'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['numerictype'].get(value, value)
+        value = unicode_tables.unicode_alias['numerictype'].get(value, value)
 
-    return uniprops.unicode_numeric_type[value]
+    return unicode_tables.unicode_numeric_type[value]
 
 
 def get_numeric_value_property(value):
@@ -216,11 +216,11 @@ def get_numeric_value_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['numericvalue'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['numericvalue'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['numericvalue'].get(value, value)
+        value = unicode_tables.unicode_alias['numericvalue'].get(value, value)
 
-    return uniprops.unicode_numeric_values[value]
+    return unicode_tables.unicode_numeric_values[value]
 
 
 def get_age_property(value):
@@ -228,11 +228,11 @@ def get_age_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['age'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['age'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['age'].get(value, value)
+        value = unicode_tables.unicode_alias['age'].get(value, value)
 
-    return uniprops.unicode_age[value]
+    return unicode_tables.unicode_age[value]
 
 
 def get_decomposition_group_property(value):
@@ -240,11 +240,11 @@ def get_decomposition_group_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['joininggroup'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['joininggroup'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['joininggroup'].get(value, value)
+        value = unicode_tables.unicode_alias['joininggroup'].get(value, value)
 
-    return uniprops.unicode_joining_group[value]
+    return unicode_tables.unicode_joining_group[value]
 
 
 def get_joining_type_property(value):
@@ -252,11 +252,11 @@ def get_joining_type_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['joiningtype'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['joiningtype'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['joiningtype'].get(value, value)
+        value = unicode_tables.unicode_alias['joiningtype'].get(value, value)
 
-    return uniprops.unicode_joining_type[value]
+    return unicode_tables.unicode_joining_type[value]
 
 
 def get_joining_group_property(value):
@@ -264,11 +264,11 @@ def get_joining_group_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['joininggroup'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['joininggroup'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['joininggroup'].get(value, value)
+        value = unicode_tables.unicode_alias['joininggroup'].get(value, value)
 
-    return uniprops.unicode_joining_group[value]
+    return unicode_tables.unicode_joining_group[value]
 
 
 def get_script_property(value):
@@ -276,11 +276,11 @@ def get_script_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['script'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['script'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['script'].get(value, value)
+        value = unicode_tables.unicode_alias['script'].get(value, value)
 
-    return uniprops.unicode_scripts[value]
+    return unicode_tables.unicode_scripts[value]
 
 
 def get_block_property(value):
@@ -288,11 +288,11 @@ def get_block_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['block'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['block'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['block'].get(value, value)
+        value = unicode_tables.unicode_alias['block'].get(value, value)
 
-    return uniprops.unicode_blocks[value]
+    return unicode_tables.unicode_blocks[value]
 
 
 def get_bidi_property(value):
@@ -300,24 +300,24 @@ def get_bidi_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + uniprops.unicode_alias['bidiclass'].get(negated, negated)
+        value = '^' + unicode_tables.unicode_alias['bidiclass'].get(negated, negated)
     else:
-        value = uniprops.unicode_alias['bidiclass'].get(value, value)
+        value = unicode_tables.unicode_alias['bidiclass'].get(value, value)
 
-    return uniprops.unicode_bidi_classes[value]
+    return unicode_tables.unicode_bidi_classes[value]
 
 
 def is_enum(name):
     """Check if name is an enum (not a binary) property."""
 
-    return name in uniprops.enum_names
+    return name in unicode_tables.enum_names
 
 
 def get_unicode_property(value, prop=None):
     """Retrieve the unicode category from the table."""
 
     if prop is not None:
-        prop = uniprops.unicode_alias['_'].get(prop, prop)
+        prop = unicode_tables.unicode_alias['_'].get(prop, prop)
         try:
             if prop == 'generalcategory':
                 return get_gc_property(value)

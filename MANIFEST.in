@@ -13,3 +13,4 @@ include .coveragerc
 include LICENSE.md
 include README.md
 include MANIFEST.in
+prune rummage/rummage/rumcore/backrefs/unicode_tables
