@@ -99,9 +99,9 @@ utokens = {
     "re_property_strip": re.compile(r'[\-_ ]'),
     "re_property_gc": re.compile(
         r'''(?x)
-        (?:(gc|generalcategory|block|blk|script|sc|bidiclass|bc)[=:])?
+        (?:(%s)[=:])?
         ((?:\\.|[^\\}]+)+)
-        '''
+        ''' % '|'.join([k for k in uniprops.uniprops.enum_names])
     ),
     "uni_prop": "p",
     "inverse_uni_prop": "P",
@@ -147,7 +147,9 @@ btokens = {
     "re_property_strip": re.compile(br'[\-_ ]'),
     "re_property_gc": re.compile(
         br'''(?x)
-        (?:(gc|generalcategory|block|blk|script|sc|bidiclass|bc)[=:])?
+        (?:(''' +
+        ('|'.join([k for k in uniprops.uniprops.enum_names])).encode('ascii') +
+        br''')[=:])?
         ((?:\\.|[^\\}]+)+)
         '''
     ),
@@ -578,14 +580,8 @@ class SearchTemplate(object):
         m = self._re_property_gc.match(props)
         props = m.group(2)
         if m.group(1):
-            if m.group(1) in ('block', 'blk'):
-                category = 'blk'
-            elif m.group(1) in ('script', 'sc'):
-                category = 'sc'
-            elif m.group(1) in ('generalcategory', 'gc'):
-                category = 'gc'
-            elif m.group(1) in ('bidiclass', 'bc'):
-                category = 'bc'
+            if uniprops.is_enum(m.group(1)):
+                category = m.group(1)
             elif m.group(2) in ('y', 'n', 'yes', 'no', 't', 'f', 'true', 'false'):
                 if m.group(2) in ('n', 'no', 'f', 'false'):
                     negate = not negate

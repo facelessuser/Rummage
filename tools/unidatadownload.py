@@ -26,7 +26,20 @@ def download_unicodedata(version, output=HOME):
         'DerivedNormalizationProps.txt',
         'CompositionExclusions.txt',
         'PropertyValueAliases.txt',
-        'PropertyAliases.txt'
+        'PropertyAliases.txt',
+        'EastAsianWidth.txt',
+        'LineBreak.txt',
+        'HangulSyllableType.txt',
+        'DerivedAge.txt',
+        'auxiliary/WordBreakProperty.txt',
+        'auxiliary/SentenceBreakProperty.txt',
+        'auxiliary/GraphemeBreakProperty.txt',
+        'extracted/DerivedDecompositionType.txt',
+        'extracted/DerivedNumericType.txt',
+        'extracted/DerivedNumericValues.txt',
+        'extracted/DerivedJoiningType.txt',
+        'extracted/DerivedJoiningGroup.txt',
+        'extracted/DerivedCombiningClass.txt'
     )
     url = 'http://www.unicode.org/Public/%s/ucd/' % version
 
@@ -35,7 +48,7 @@ def download_unicodedata(version, output=HOME):
         os.makedirs(destination)
     for f in files:
         furl = url + f
-        file_location = os.path.join(destination, f)
+        file_location = os.path.join(destination, os.path.basename(f))
         if not os.path.exists(file_location):
             print('Downloading: %s --> %s' % (furl, file_location))
             response = urlopen(furl)

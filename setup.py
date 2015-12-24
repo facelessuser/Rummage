@@ -58,7 +58,7 @@ def generate_unicode_table():
         unipropgen.build_unicode_property_table(
             os.path.join(
                 os.path.dirname(__file__),
-                'rummage', 'rummage', 'rumcore', 'backrefs', 'uniprops.py'
+                'rummage', 'rummage', 'rumcore', 'backrefs', 'uniprops', 'uniprops.py'
             )
         )
     except Exception as e:
