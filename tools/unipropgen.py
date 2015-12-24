@@ -95,14 +95,13 @@ def char2range(d, binary=False):
     fmt = binaryformat if binary else uniformat
 
     for k1, v1 in d.items():
-        if not isinstance(v1, list):
+        if not isinstance(v1, (list, set)):
             char2range(v1, binary=binary)
         else:
-            v1.sort()
             last = None
             first = None
             v2 = []
-            for i in v1:
+            for i in sorted(v1):
                 if first is None:
                     first = i
                     last = i
@@ -171,8 +170,8 @@ def gen_enum(all_chars, file_name, obj_name, f, field=1):
 
     for name in list(obj.keys()):
         s = set(obj[name])
-        obj[name] = sorted(s)
-        obj['^' + name] = sorted(all_chars - s)
+        obj[name] = s
+        obj['^' + name] = all_chars - s
 
     # Convert characters values to ranges
     char2range(obj)
@@ -211,13 +210,13 @@ def gen_age(all_chars, f):
 
     unassigned = set()
     for x in obj.values():
-        unassigned |= set(x)
-    obj['na'] = list(all_chars - unassigned)
+        unassigned.update(x)
+    obj['na'] = all_chars - unassigned
 
     for name in list(obj.keys()):
         s = set(obj[name])
-        obj[name] = sorted(s)
-        obj['^' + name] = sorted(all_chars - s)
+        obj[name] = s
+        obj['^' + name] = all_chars - s
 
     # Convert characters values to ranges
     char2range(obj)
@@ -264,14 +263,14 @@ def gen_nf_quick_check(all_chars, f):
     for k1, v1 in nf.items():
         temp = set()
         for k2 in list(v1.keys()):
-            temp |= set(v1[k2])
-        v1['y'] = list(all_chars - temp)
+            temp.update(v1[k2])
+        v1['y'] = all_chars - temp
 
     for k1, v1 in nf.items():
         for name in list(v1.keys()):
             s = set(nf[k1][name])
-            nf[k1][name] = sorted(s)
-            nf[k1]['^' + name] = sorted(all_chars - s)
+            nf[k1][name] = s
+            nf[k1]['^' + name] = all_chars - s
 
     # Convert characters values to ranges
     char2range(nf)
@@ -356,8 +355,8 @@ def gen_binary(table, all_chars, f):
 
     for name in list(binary.keys()):
         s = set(binary[name])
-        binary[name] = sorted(s)
-        binary['^' + name] = sorted(all_chars - s)
+        binary[name] = s
+        binary['^' + name] = all_chars - s
 
     gen_uposix(table, binary, all_chars)
 
@@ -400,8 +399,8 @@ def gen_bidi(all_chars, f):
 
     for name in list(bidi_class.keys()):
         s = set(bidi_class[name])
-        bidi_class[name] = sorted(s)
-        bidi_class['^' + name] = sorted(all_chars - s)
+        bidi_class[name] = s
+        bidi_class['^' + name] = all_chars - s
 
     # Convert characters values to ranges
     char2range(bidi_class)
@@ -426,77 +425,77 @@ def gen_posix(all_chars, f, binary=False):
     prefix = 'b' if binary else ''
 
     # Alnum: [a-zA-Z0-9]
-    s2 = set([x for x in range(0x30, 0x39 + 1)])
-    s2 |= set([x for x in range(0x41, 0x5a + 1)])
-    s2 |= set([x for x in range(0x61, 0x7a + 1)])
-    posix_table["alnum"] = list(s2)
-    posix_table["^alnum"] = list(all_chars - s2)
+    s = set([x for x in range(0x30, 0x39 + 1)])
+    s.update([x for x in range(0x41, 0x5a + 1)])
+    s.update([x for x in range(0x61, 0x7a + 1)])
+    posix_table["alnum"] = s
+    posix_table["^alnum"] = all_chars - s
 
     # Alpha: [a-zA-Z]
-    s2 = set([x for x in range(0x41, 0x5a)])
-    s2 |= set([x for x in range(0x61, 0x7a)])
-    posix_table["alpha"] = list(s2)
-    posix_table["^alpha"] = list(all_chars - s2)
+    s = set([x for x in range(0x41, 0x5a)])
+    s.update([x for x in range(0x61, 0x7a)])
+    posix_table["alpha"] = s
+    posix_table["^alpha"] = all_chars - s
 
     # ASCII: [\x00-\x7F]
-    s2 = set([x for x in range(0, 0x7F + 1)])
-    posix_table["ascii"] = list(s2)
-    posix_table["^ascii"] = list(all_chars - s2)
+    s = set([x for x in range(0, 0x7F + 1)])
+    posix_table["ascii"] = s
+    posix_table["^ascii"] = all_chars - s
 
     # Blank: [ \t]
-    s2 = set([0x20, 0x09])
-    posix_table["blank"] = list(s2)
-    posix_table["^blank"] = list(all_chars - s2)
+    s = set([0x20, 0x09])
+    posix_table["blank"] = s
+    posix_table["^blank"] = all_chars - s
 
     # Cntrl: [\x00-\x1F\x7F]
-    s2 = set([x for x in range(0, 0x1F + 1)] + [0x7F])
-    posix_table["cntrl"] = list(s2)
-    posix_table["^cntrl"] = list(all_chars - s2)
+    s = set([x for x in range(0, 0x1F + 1)] + [0x7F])
+    posix_table["cntrl"] = s
+    posix_table["^cntrl"] = all_chars - s
 
     # Digit: [0-9]
-    s2 = set([x for x in range(0x30, 0x39 + 1)])
-    posix_table["digit"] = list(s2)
-    posix_table["^digit"] = list(all_chars - s2)
+    s = set([x for x in range(0x30, 0x39 + 1)])
+    posix_table["digit"] = s
+    posix_table["^digit"] = all_chars - s
 
     # Graph: [\x21-\x7E]
-    s2 = set([x for x in range(0x21, 0x7E + 1)])
-    posix_table["graph"] = list(s2)
-    posix_table["^graph"] = list(all_chars - s2)
+    s = set([x for x in range(0x21, 0x7E + 1)])
+    posix_table["graph"] = s
+    posix_table["^graph"] = all_chars - s
 
     # Lower: [a-z]
-    s2 = set([x for x in range(0x61, 0x7a + 1)])
-    posix_table["lower"] = list(s2)
-    posix_table["^lower"] = list(all_chars - s2)
+    s = set([x for x in range(0x61, 0x7a + 1)])
+    posix_table["lower"] = s
+    posix_table["^lower"] = all_chars - s
 
     # Print: [\x20-\x7E]
-    s2 = set([x for x in range(0x20, 0x7E + 1)])
-    posix_table["print"] = list(s2)
-    posix_table["^print"] = list(all_chars - s2)
+    s = set([x for x in range(0x20, 0x7E + 1)])
+    posix_table["print"] = s
+    posix_table["^print"] = all_chars - s
 
     # Punct: [!\"\#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~]
-    s2 = set([x for x in range(0x21, 0x2f + 1)])
-    s2 |= set([x for x in range(0x3a, 0x40 + 1)])
-    s2 |= set([x for x in range(0x5b, 0x60 + 1)])
-    s2 |= set([x for x in range(0x7b, 0x7e + 1)])
-    posix_table["punct"] = list(s2)
-    posix_table["^punct"] = list(all_chars - s2)
+    s = set([x for x in range(0x21, 0x2f + 1)])
+    s.update([x for x in range(0x3a, 0x40 + 1)])
+    s.update([x for x in range(0x5b, 0x60 + 1)])
+    s.update([x for x in range(0x7b, 0x7e + 1)])
+    posix_table["punct"] = s
+    posix_table["^punct"] = all_chars - s
 
     # Space: [ \t\r\n\v\f]
-    s2 = set([x for x in range(0x09, 0x0d + 1)] + [0x20])
-    posix_table["space"] = list(s2)
-    posix_table["^space"] = list(all_chars - s2)
+    s = set([x for x in range(0x09, 0x0d + 1)] + [0x20])
+    posix_table["space"] = s
+    posix_table["^space"] = all_chars - s
 
     # Upper: [A-Z]
-    s2 = set([x for x in range(0x41, 0x5a + 1)])
-    posix_table["upper"] = list(s2)
-    posix_table["^upper"] = list(all_chars - s2)
+    s = set([x for x in range(0x41, 0x5a + 1)])
+    posix_table["upper"] = s
+    posix_table["^upper"] = all_chars - s
 
     # XDigit: [A-Fa-f0-9]
-    s2 = set([x for x in range(0x30, 0x39 + 1)])
-    s2 |= set([x for x in range(0x41, 0x46 + 1)])
-    s2 |= set([x for x in range(0x61, 0x66 + 1)])
-    posix_table["xdigit"] = list(s2)
-    posix_table["^xdigit"] = list(all_chars - s2)
+    s = set([x for x in range(0x30, 0x39 + 1)])
+    s.update([x for x in range(0x41, 0x46 + 1)])
+    s.update([x for x in range(0x61, 0x66 + 1)])
+    posix_table["xdigit"] = s
+    posix_table["^xdigit"] = all_chars - s
 
     # Convert characters values to ranges
     char2range(posix_table, binary=binary)
@@ -518,88 +517,81 @@ def gen_uposix(table, posix_table, all_chars):
     """Generate the posix table and write out to file."""
 
     # Alnum: [\p{L&}\p{Nd}]
-    s2 = set(table['l']['c'] + table['n']['d'])
-    posix_table["posixalnum"] = list(s2)
-    posix_table["^posixalnum"] = list(all_chars - s2)
+    posix_table["posixalnum"] = set(table['l']['c'] + table['n']['d'])
+    posix_table["^posixalnum"] = all_chars - posix_table["posixalnum"]
 
     # Alpha: [\p{L&}]
-    s2 = set(table['l']['c'])
-    posix_table["posixalpha"] = list(s2)
-    posix_table["^posixalpha"] = list(all_chars - s2)
+    posix_table["posixalpha"] = set(table['l']['c'])
+    posix_table["^posixalpha"] = all_chars - posix_table["posixalpha"]
 
     # ASCII: [\x00-\x7F]
-    s2 = set([x for x in range(0, 0x7F + 1)])
-    posix_table["posixascii"] = list(s2)
-    posix_table["^posixascii"] = list(all_chars - s2)
+    posix_table["posixascii"] = set([x for x in range(0, 0x7F + 1)])
+    posix_table["^posixascii"] = all_chars - posix_table["posixascii"]
 
     # Blank: [\p{Zs}\t]
-    s2 = set(table['z']['s'] + [0x09])
-    posix_table["posixblank"] = list(s2)
-    posix_table["^posixblank"] = list(all_chars - s2)
+    posix_table["posixblank"] = set(table['z']['s'] + [0x09])
+    posix_table["^posixblank"] = all_chars - posix_table["posixblank"]
 
     # Cntrl: [\p{Cc}]
-    s2 = set(table['c']['c'])
-    posix_table["posixcntrl"] = list(s2)
-    posix_table["^posixcntrl"] = list(all_chars - s2)
+    posix_table["posixcntrl"] = set(table['c']['c'])
+    posix_table["^posixcntrl"] = all_chars - posix_table["posixcntrl"]
 
     # Digit: [\p{Nd}]
-    s2 = set(table['n']['d'])
-    posix_table["posixdigit"] = list(s2)
-    posix_table["^posixdigit"] = list(all_chars - s2)
+    posix_table["posixdigit"] = set(table['n']['d'])
+    posix_table["^posixdigit"] = all_chars - posix_table["posixdigit"]
 
     # Graph: [^\p{Z}\p{C}]
-    s2 = set()
+    s = set()
     for table_name in ('z', 'c'):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
-                s2 |= set(table[table_name][sub_table_name])
-    posix_table["posixgraph"] = list(all_chars - s2)
-    posix_table["^posixgraph"] = list(s2)
+                s.update(table[table_name][sub_table_name])
+    posix_table["posixgraph"] = all_chars - s
+    posix_table["^posixgraph"] = s
 
     # Lower: [\p{Ll}]
-    s2 = set(table['l']['l'])
-    posix_table["posixlower"] = list(s2)
-    posix_table["^posixlower"] = list(all_chars - s2)
+    posix_table["posixlower"] = set(table['l']['l'])
+    posix_table["^posixlower"] = all_chars - posix_table["posixlower"]
 
     # Print: [\P{C}]
-    s2 = set()
+    s = set()
     for table_name in ('c',):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
-                s2 |= set(table[table_name][sub_table_name])
-    posix_table["posixprint"] = list(all_chars - s2)
-    posix_table["^posixprint"] = list(s2)
+                s.update(table[table_name][sub_table_name])
+    posix_table["posixprint"] = all_chars - s
+    posix_table["^posixprint"] = s
 
     # Punct: [\p{P}\p{S}]
-    s2 = set()
+    s = set()
     for table_name in ('p', 's'):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
-                s2 |= set(table[table_name][sub_table_name])
-    posix_table["posixpunct"] = list(s2)
-    posix_table["^posixpunct"] = list(all_chars - s2)
+                s.update(table[table_name][sub_table_name])
+    posix_table["posixpunct"] = s
+    posix_table["^posixpunct"] = all_chars - s
 
     # Space: [\p{Z}\t\r\n\v\f]
-    s2 = set()
+    s = set()
     for table_name in ('z',):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
-                s2 |= set(table[table_name][sub_table_name])
-    s2 |= set([x for x in range(0x09, 0x0e)])
-    posix_table["posixspace"] = list(s2)
-    posix_table["^posixspace"] = list(all_chars - s2)
+                s.update(table[table_name][sub_table_name])
+    s.update([x for x in range(0x09, 0x0e)])
+    posix_table["posixspace"] = s
+    posix_table["^posixspace"] = all_chars - s
 
     # Upper: [\p{Lu}]
-    s2 = set(table['l']['u'])
-    posix_table["posixupper"] = list(s2)
-    posix_table["^posixupper"] = list(all_chars - s2)
+    s = set(table['l']['u'])
+    posix_table["posixupper"] = s
+    posix_table["^posixupper"] = all_chars - s
 
     # XDigit: [A-Fa-f0-9]
-    s2 = set([x for x in range(0x30, 0x39 + 1)])
-    s2 |= set([x for x in range(0x41, 0x46 + 1)])
-    s2 |= set([x for x in range(0x61, 0x66 + 1)])
-    posix_table["posixxdigit"] = list(s2)
-    posix_table["^posixxdigit"] = list(all_chars - s2)
+    s = set([x for x in range(0x30, 0x39 + 1)])
+    s.update([x for x in range(0x41, 0x46 + 1)])
+    s.update([x for x in range(0x61, 0x66 + 1)])
+    posix_table["posixxdigit"] = s
+    posix_table["^posixxdigit"] = all_chars - s
 
 
 def gen_alias(enum, binary, f):
@@ -771,10 +763,10 @@ def gen_properties(f):
         inverse_category = set()
         for k2, v2 in v1.items():
             if not k2.startswith('^'):
-                s2 = set(v2)
-                inverse_category |= s2
-                table[k1]['^' + k2] = list(all_chars - s2)
-        table[k1]['^'] = list(all_chars - inverse_category)
+                s = set(v2)
+                inverse_category |= s
+                table[k1]['^' + k2] = all_chars - s
+        table[k1]['^'] = all_chars - inverse_category
 
     # Generate Unicode blocks
     print('Building: Blocks')
