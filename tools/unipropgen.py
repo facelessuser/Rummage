@@ -169,9 +169,8 @@ def gen_enum(all_chars, file_name, obj_name, f, field=1):
                 obj[name].extend(span)
 
     for name in list(obj.keys()):
-        s = set(obj[name])
-        obj[name] = s
-        obj['^' + name] = all_chars - s
+        obj[name] = set(obj[name])
+        obj['^' + name] = all_chars - obj[name]
 
     # Convert characters values to ranges
     char2range(obj)
@@ -214,9 +213,8 @@ def gen_age(all_chars, f):
     obj['na'] = all_chars - unassigned
 
     for name in list(obj.keys()):
-        s = set(obj[name])
-        obj[name] = s
-        obj['^' + name] = all_chars - s
+        obj[name] = set(obj[name])
+        obj['^' + name] = all_chars - obj[name]
 
     # Convert characters values to ranges
     char2range(obj)
@@ -268,9 +266,8 @@ def gen_nf_quick_check(all_chars, f):
 
     for k1, v1 in nf.items():
         for name in list(v1.keys()):
-            s = set(nf[k1][name])
-            nf[k1][name] = s
-            nf[k1]['^' + name] = all_chars - s
+            nf[k1][name] = set(nf[k1][name])
+            nf[k1]['^' + name] = all_chars - nf[k1][name]
 
     # Convert characters values to ranges
     char2range(nf)
@@ -354,9 +351,8 @@ def gen_binary(table, all_chars, f):
                 binary[name].extend(span)
 
     for name in list(binary.keys()):
-        s = set(binary[name])
-        binary[name] = s
-        binary['^' + name] = all_chars - s
+        binary[name] = set(binary[name])
+        binary['^' + name] = all_chars - binary[name]
 
     gen_uposix(table, binary, all_chars)
 
@@ -398,9 +394,8 @@ def gen_bidi(all_chars, f):
                 bidi_class[bidi].append(value)
 
     for name in list(bidi_class.keys()):
-        s = set(bidi_class[name])
-        bidi_class[name] = s
-        bidi_class['^' + name] = all_chars - s
+        bidi_class[name] = set(bidi_class[name])
+        bidi_class['^' + name] = all_chars - bidi_class[name]
 
     # Convert characters values to ranges
     char2range(bidi_class)
@@ -438,39 +433,32 @@ def gen_posix(all_chars, f, binary=False):
     posix_table["^alpha"] = all_chars - s
 
     # ASCII: [\x00-\x7F]
-    s = set([x for x in range(0, 0x7F + 1)])
-    posix_table["ascii"] = s
-    posix_table["^ascii"] = all_chars - s
+    posix_table["ascii"] = set([x for x in range(0, 0x7F + 1)])
+    posix_table["^ascii"] = all_chars - posix_table["ascii"]
 
     # Blank: [ \t]
-    s = set([0x20, 0x09])
-    posix_table["blank"] = s
-    posix_table["^blank"] = all_chars - s
+    posix_table["blank"] = set([0x20, 0x09])
+    posix_table["^blank"] = all_chars - posix_table["blank"]
 
     # Cntrl: [\x00-\x1F\x7F]
-    s = set([x for x in range(0, 0x1F + 1)] + [0x7F])
-    posix_table["cntrl"] = s
-    posix_table["^cntrl"] = all_chars - s
+    posix_table["cntrl"] = set([x for x in range(0, 0x1F + 1)] + [0x7F])
+    posix_table["^cntrl"] = all_chars - posix_table["cntrl"]
 
     # Digit: [0-9]
-    s = set([x for x in range(0x30, 0x39 + 1)])
-    posix_table["digit"] = s
-    posix_table["^digit"] = all_chars - s
+    posix_table["digit"] = set([x for x in range(0x30, 0x39 + 1)])
+    posix_table["^digit"] = all_chars - posix_table["digit"]
 
     # Graph: [\x21-\x7E]
-    s = set([x for x in range(0x21, 0x7E + 1)])
-    posix_table["graph"] = s
-    posix_table["^graph"] = all_chars - s
+    posix_table["graph"] = set([x for x in range(0x21, 0x7E + 1)])
+    posix_table["^graph"] = all_chars - posix_table["graph"]
 
     # Lower: [a-z]
-    s = set([x for x in range(0x61, 0x7a + 1)])
-    posix_table["lower"] = s
-    posix_table["^lower"] = all_chars - s
+    posix_table["lower"] = set([x for x in range(0x61, 0x7a + 1)])
+    posix_table["^lower"] = all_chars - posix_table["lower"]
 
     # Print: [\x20-\x7E]
-    s = set([x for x in range(0x20, 0x7E + 1)])
-    posix_table["print"] = s
-    posix_table["^print"] = all_chars - s
+    posix_table["print"] = set([x for x in range(0x20, 0x7E + 1)])
+    posix_table["^print"] = all_chars - posix_table["print"]
 
     # Punct: [!\"\#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~]
     s = set([x for x in range(0x21, 0x2f + 1)])
@@ -481,14 +469,12 @@ def gen_posix(all_chars, f, binary=False):
     posix_table["^punct"] = all_chars - s
 
     # Space: [ \t\r\n\v\f]
-    s = set([x for x in range(0x09, 0x0d + 1)] + [0x20])
-    posix_table["space"] = s
-    posix_table["^space"] = all_chars - s
+    posix_table["space"] = set([x for x in range(0x09, 0x0d + 1)] + [0x20])
+    posix_table["^space"] = all_chars - posix_table["space"]
 
     # Upper: [A-Z]
-    s = set([x for x in range(0x41, 0x5a + 1)])
-    posix_table["upper"] = s
-    posix_table["^upper"] = all_chars - s
+    posix_table["upper"] = set([x for x in range(0x41, 0x5a + 1)])
+    posix_table["^upper"] = all_chars - posix_table["upper"]
 
     # XDigit: [A-Fa-f0-9]
     s = set([x for x in range(0x30, 0x39 + 1)])
@@ -582,9 +568,8 @@ def gen_uposix(table, posix_table, all_chars):
     posix_table["^posixspace"] = all_chars - s
 
     # Upper: [\p{Lu}]
-    s = set(table['l']['u'])
-    posix_table["posixupper"] = s
-    posix_table["^posixupper"] = all_chars - s
+    posix_table["posixupper"] = set(table['l']['u'])
+    posix_table["^posixupper"] = all_chars - posix_table["posixupper"]
 
     # XDigit: [A-Fa-f0-9]
     s = set([x for x in range(0x30, 0x39 + 1)])
