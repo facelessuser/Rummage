@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 import sys
 import os
 import imp
+import traceback
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 
@@ -23,6 +24,8 @@ def get_version():
     try:
         v = imp.load_module('__version__', fp, pathname, desc)
         return v.version, devstatus[v.version_info[3]]
+    except Exception:
+        print(traceback.format_exc())
     finally:
         fp.close()
 
@@ -38,8 +41,8 @@ def download_unicodedata():
     try:
         unidatadownload = imp.load_module('unidatadownload', fp, pathname, desc)
         unidatadownload.download_unicodedata(unicodedata.unidata_version)
-    except Exception as e:
-        print(e)
+    except Exception:
+        print(traceback.format_exc())
         fail = True
     finally:
         fp.close()
@@ -58,11 +61,11 @@ def generate_unicode_table():
         unipropgen.build_unicode_property_table(
             os.path.join(
                 os.path.dirname(__file__),
-                'rummage', 'rummage', 'rumcore', 'backrefs', 'unicode_tables'
+                'rummage', 'rummage', 'rumcore', 'backrefs', 'uniprops', 'unidata'
             )
         )
-    except Exception as e:
-        print(e)
+    except Exception:
+        print(traceback.format_exc())
         fail = True
     finally:
         fp.close()
@@ -109,9 +112,7 @@ setup(
     author='Isaac Muse',
     author_email='Isaac.Muse [at] gmail.com',
     url='https://github.com/facelessuser/Rummage',
-    packages=find_packages(
-        exclude=['*.unicode_tables']
-    ),
+    packages=find_packages(exclude=['*.unidata']),
     install_requires=[
         "gntp>=1.0.2",
         "chardet>=2.3.0"

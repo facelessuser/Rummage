@@ -47,6 +47,6 @@ pyinstaller
 
 site/*
 
-rummage/rummage/rumcore/backrefs/unicode_tables/*
-
 tools/unicodedata/*
+
+rummage/rummage/rumcore/backrefs/uniprops/unidata/*

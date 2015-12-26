@@ -8,7 +8,8 @@ ignore-paths:
   - extra
 ignore-patterns:
   - 'rummage(?:\\|/)rummage(?:\\|/)gui(?:\\|/)gui\.py$'
+  - 'rummage(?:\\|/)rummage(?:\\|/)rumcore(?:\\|/)backrefs(?:\\|/)uniprops(?:\\|/)unidata(?:\\|/).+?\.py$'
 pep257:
   disable:
     - D202
-    - D204
+    - D203

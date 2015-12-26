@@ -95,13 +95,14 @@ def char2range(d, binary=False):
     fmt = binaryformat if binary else uniformat
 
     for k1, v1 in d.items():
-        if not isinstance(v1, (list, set)):
+        if not isinstance(v1, list):
             char2range(v1, binary=binary)
         else:
+            v1.sort()
             last = None
             first = None
             v2 = []
-            for i in sorted(v1):
+            for i in v1:
                 if first is None:
                     first = i
                     last = i
@@ -124,32 +125,34 @@ def char2range(d, binary=False):
             d[k1] = ''.join(v2)
 
 
-def gen_blocks(all_chars, f):
+def gen_blocks(all_chars, output):
     """Generate Unicode blocks."""
 
-    f.write('unicode_blocks = {')
+    with codecs.open(output, 'w', 'utf-8') as f:
+        f.write(HEADER)
+        f.write('unicode_blocks = {')
 
-    with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'Blocks.txt'), 'r') as uf:
-        for line in uf:
-            if not line.startswith('#'):
-                data = line.split(';')
-                if len(data) < 2:
-                    continue
-                block = [int(i, 16) for i in data[0].strip().split('..')]
-                if NARROW and block[0] > MAXUNICODE:
-                    break
-                inverse_range = []
-                if block[0] > 0:
-                    inverse_range.append("%s-%s" % (uniformat(0), uniformat(block[0] - 1)))
-                if block[1] < MAXUNICODE:
-                    inverse_range.append("%s-%s" % (uniformat(block[1] + 1), uniformat(MAXUNICODE)))
-                name = format_name(data[1])
-                f.write('\n    "%s": "%s-%s",' % (name, uniformat(block[0]), uniformat(block[1])))
-                f.write('\n    "^%s": "%s",' % (name, ''.join(inverse_range)))
-        f.write('\n}\n')
+        with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'Blocks.txt'), 'r') as uf:
+            for line in uf:
+                if not line.startswith('#'):
+                    data = line.split(';')
+                    if len(data) < 2:
+                        continue
+                    block = [int(i, 16) for i in data[0].strip().split('..')]
+                    if NARROW and block[0] > MAXUNICODE:
+                        break
+                    inverse_range = []
+                    if block[0] > 0:
+                        inverse_range.append("%s-%s" % (uniformat(0), uniformat(block[0] - 1)))
+                    if block[1] < MAXUNICODE:
+                        inverse_range.append("%s-%s" % (uniformat(block[1] + 1), uniformat(MAXUNICODE)))
+                    name = format_name(data[1])
+                    f.write('\n    "%s": "%s-%s",' % (name, uniformat(block[0]), uniformat(block[1])))
+                    f.write('\n    "^%s": "%s",' % (name, ''.join(inverse_range)))
+            f.write('\n}\n')
 
 
-def gen_enum(all_chars, file_name, obj_name, f, field=1):
+def gen_enum(all_chars, file_name, obj_name, output, field=1):
     """Generate generic enum."""
 
     obj = {}
@@ -169,26 +172,29 @@ def gen_enum(all_chars, file_name, obj_name, f, field=1):
                 obj[name].extend(span)
 
     for name in list(obj.keys()):
-        obj[name] = set(obj[name])
-        obj['^' + name] = all_chars - obj[name]
+        s = set(obj[name])
+        obj[name] = sorted(s)
+        obj['^' + name] = sorted(all_chars - s)
 
     # Convert characters values to ranges
     char2range(obj)
 
-    # Write out the unicode properties
-    f.write('%s = {\n' % obj_name)
-    count = len(obj) - 1
-    i = 0
-    for k1, v1 in sorted(obj.items()):
-        f.write('    "%s": "%s"' % (k1, v1))
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
+    with codecs.open(output, 'w', 'utf-8') as f:
+        f.write(HEADER)
+        # Write out the unicode properties
+        f.write('%s = {\n' % obj_name)
+        count = len(obj) - 1
+        i = 0
+        for k1, v1 in sorted(obj.items()):
+            f.write('    "%s": "%s"' % (k1, v1))
+            if i == count:
+                f.write('\n}\n')
+            else:
+                f.write(',\n')
+            i += 1
 
 
-def gen_age(all_chars, f):
+def gen_age(all_chars, output):
     """Generate Age."""
 
     obj = {}
@@ -209,30 +215,33 @@ def gen_age(all_chars, f):
 
     unassigned = set()
     for x in obj.values():
-        unassigned.update(x)
-    obj['na'] = all_chars - unassigned
+        unassigned |= set(x)
+    obj['na'] = list(all_chars - unassigned)
 
     for name in list(obj.keys()):
-        obj[name] = set(obj[name])
-        obj['^' + name] = all_chars - obj[name]
+        s = set(obj[name])
+        obj[name] = sorted(s)
+        obj['^' + name] = sorted(all_chars - s)
 
     # Convert characters values to ranges
     char2range(obj)
 
-    # Write out the unicode properties
-    f.write('%s = {\n' % 'unicode_age')
-    count = len(obj) - 1
-    i = 0
-    for k1, v1 in sorted(obj.items()):
-        f.write('    "%s": "%s"' % (k1, v1))
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
+    with codecs.open(output, 'w', 'utf-8') as f:
+        f.write(HEADER)
+        # Write out the unicode properties
+        f.write('%s = {\n' % 'unicode_age')
+        count = len(obj) - 1
+        i = 0
+        for k1, v1 in sorted(obj.items()):
+            f.write('    "%s": "%s"' % (k1, v1))
+            if i == count:
+                f.write('\n}\n')
+            else:
+                f.write(',\n')
+            i += 1
 
 
-def gen_nf_quick_check(all_chars, f):
+def gen_nf_quick_check(all_chars, output):
     """Generate binary properties."""
 
     categories = []
@@ -261,34 +270,37 @@ def gen_nf_quick_check(all_chars, f):
     for k1, v1 in nf.items():
         temp = set()
         for k2 in list(v1.keys()):
-            temp.update(v1[k2])
-        v1['y'] = all_chars - temp
+            temp |= set(v1[k2])
+        v1['y'] = list(all_chars - temp)
 
     for k1, v1 in nf.items():
         for name in list(v1.keys()):
-            nf[k1][name] = set(nf[k1][name])
-            nf[k1]['^' + name] = all_chars - nf[k1][name]
+            s = set(nf[k1][name])
+            nf[k1][name] = sorted(s)
+            nf[k1]['^' + name] = sorted(all_chars - s)
 
     # Convert characters values to ranges
     char2range(nf)
 
-    for key, value in sorted(nf.items()):
-        # Write out the unicode properties
-        f.write('unicode_%s = {\n' % key.replace('quickcheck', '_quick_check'))
-        count = len(value) - 1
-        i = 0
-        for k1, v1 in sorted(value.items()):
-            f.write('    "%s": "%s"' % (k1, v1))
-            if i == count:
-                f.write('\n}\n')
-            else:
-                f.write(',\n')
-            i += 1
+    with codecs.open(output, 'w', 'utf-8') as f:
+        f.write(HEADER)
+        for key, value in sorted(nf.items()):
+            # Write out the unicode properties
+            f.write('unicode_%s = {\n' % key.replace('quickcheck', '_quick_check'))
+            count = len(value) - 1
+            i = 0
+            for k1, v1 in sorted(value.items()):
+                f.write('    "%s": "%s"' % (k1, v1))
+                if i == count:
+                    f.write('\n}\n')
+                else:
+                    f.write(',\n')
+                i += 1
 
     return categories
 
 
-def gen_binary(table, all_chars, f):
+def gen_binary(table, all_chars, output):
     """Generate binary properties."""
 
     categories = []
@@ -351,30 +363,33 @@ def gen_binary(table, all_chars, f):
                 binary[name].extend(span)
 
     for name in list(binary.keys()):
-        binary[name] = set(binary[name])
-        binary['^' + name] = all_chars - binary[name]
+        s = set(binary[name])
+        binary[name] = sorted(s)
+        binary['^' + name] = sorted(all_chars - s)
 
     gen_uposix(table, binary, all_chars)
 
     # Convert characters values to ranges
     char2range(binary)
 
-    # Write out the unicode properties
-    f.write('unicode_binary = {\n')
-    count = len(binary) - 1
-    i = 0
-    for k1, v1 in sorted(binary.items()):
-        f.write('    "%s": "%s"' % (k1, v1))
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
+    with codecs.open(output, 'w', 'utf-8') as f:
+        f.write(HEADER)
+        # Write out the unicode properties
+        f.write('unicode_binary = {\n')
+        count = len(binary) - 1
+        i = 0
+        for k1, v1 in sorted(binary.items()):
+            f.write('    "%s": "%s"' % (k1, v1))
+            if i == count:
+                f.write('\n}\n')
+            else:
+                f.write(',\n')
+            i += 1
 
     return categories[:]
 
 
-def gen_bidi(all_chars, f):
+def gen_bidi(all_chars, output):
     """Generate bidi class properties."""
 
     bidi_class = {}
@@ -394,25 +409,28 @@ def gen_bidi(all_chars, f):
                 bidi_class[bidi].append(value)
 
     for name in list(bidi_class.keys()):
-        bidi_class[name] = set(bidi_class[name])
-        bidi_class['^' + name] = all_chars - bidi_class[name]
+        s = set(bidi_class[name])
+        bidi_class[name] = sorted(s)
+        bidi_class['^' + name] = sorted(all_chars - s)
 
     # Convert characters values to ranges
     char2range(bidi_class)
 
-    f.write('unicode_bidi_classes = {\n')
-    count = len(bidi_class) - 1
-    i = 0
-    for k1, v1 in sorted(bidi_class.items()):
-        f.write('    "%s": "%s"' % (k1, v1))
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
+    with codecs.open(output, 'w', 'utf-8') as f:
+        f.write(HEADER)
+        f.write('unicode_bidi_classes = {\n')
+        count = len(bidi_class) - 1
+        i = 0
+        for k1, v1 in sorted(bidi_class.items()):
+            f.write('    "%s": "%s"' % (k1, v1))
+            if i == count:
+                f.write('\n}\n')
+            else:
+                f.write(',\n')
+            i += 1
 
 
-def gen_posix(all_chars, f, binary=False):
+def gen_posix(all_chars, output, binary=False, append=False):
     """Generate the binary posix table and write out to file."""
 
     posix_table = {}
@@ -421,91 +439,94 @@ def gen_posix(all_chars, f, binary=False):
 
     # Alnum: [a-zA-Z0-9]
     s = set([x for x in range(0x30, 0x39 + 1)])
-    s.update([x for x in range(0x41, 0x5a + 1)])
-    s.update([x for x in range(0x61, 0x7a + 1)])
-    posix_table["alnum"] = s
-    posix_table["^alnum"] = all_chars - s
+    s |= set([x for x in range(0x41, 0x5a + 1)])
+    s |= set([x for x in range(0x61, 0x7a + 1)])
+    posix_table["alnum"] = list(s)
+    posix_table["^alnum"] = list(all_chars - s)
 
     # Alpha: [a-zA-Z]
     s = set([x for x in range(0x41, 0x5a)])
-    s.update([x for x in range(0x61, 0x7a)])
-    posix_table["alpha"] = s
-    posix_table["^alpha"] = all_chars - s
+    s |= set([x for x in range(0x61, 0x7a)])
+    posix_table["alpha"] = list(s)
+    posix_table["^alpha"] = list(all_chars - s)
 
     # ASCII: [\x00-\x7F]
     s = set([x for x in range(0, 0x7F + 1)])
-    posix_table["ascii"] = s
-    posix_table["^ascii"] = all_chars - s
+    posix_table["ascii"] = list(s)
+    posix_table["^ascii"] = list(all_chars - s)
 
     # Blank: [ \t]
     s = set([0x20, 0x09])
-    posix_table["blank"] = s
-    posix_table["^blank"] = all_chars - s
+    posix_table["blank"] = list(s)
+    posix_table["^blank"] = list(all_chars - s)
 
     # Cntrl: [\x00-\x1F\x7F]
     s = set([x for x in range(0, 0x1F + 1)] + [0x7F])
-    posix_table["cntrl"] = s
-    posix_table["^cntrl"] = all_chars - s
+    posix_table["cntrl"] = list(s)
+    posix_table["^cntrl"] = list(all_chars - s)
 
     # Digit: [0-9]
     s = set([x for x in range(0x30, 0x39 + 1)])
-    posix_table["digit"] = s
-    posix_table["^digit"] = all_chars - s
+    posix_table["digit"] = list(s)
+    posix_table["^digit"] = list(all_chars - s)
 
     # Graph: [\x21-\x7E]
     s = set([x for x in range(0x21, 0x7E + 1)])
-    posix_table["graph"] = s
-    posix_table["^graph"] = all_chars - s
+    posix_table["graph"] = list(s)
+    posix_table["^graph"] = list(all_chars - s)
 
     # Lower: [a-z]
     s = set([x for x in range(0x61, 0x7a + 1)])
-    posix_table["lower"] = s
-    posix_table["^lower"] = all_chars - s
+    posix_table["lower"] = list(s)
+    posix_table["^lower"] = list(all_chars - s)
 
     # Print: [\x20-\x7E]
     s = set([x for x in range(0x20, 0x7E + 1)])
-    posix_table["print"] = s
-    posix_table["^print"] = all_chars - s
+    posix_table["print"] = list(s)
+    posix_table["^print"] = list(all_chars - s)
 
     # Punct: [!\"\#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~]
     s = set([x for x in range(0x21, 0x2f + 1)])
-    s.update([x for x in range(0x3a, 0x40 + 1)])
-    s.update([x for x in range(0x5b, 0x60 + 1)])
-    s.update([x for x in range(0x7b, 0x7e + 1)])
-    posix_table["punct"] = s
-    posix_table["^punct"] = all_chars - s
+    s |= set([x for x in range(0x3a, 0x40 + 1)])
+    s |= set([x for x in range(0x5b, 0x60 + 1)])
+    s |= set([x for x in range(0x7b, 0x7e + 1)])
+    posix_table["punct"] = list(s)
+    posix_table["^punct"] = list(all_chars - s)
 
     # Space: [ \t\r\n\v\f]
     s = set([x for x in range(0x09, 0x0d + 1)] + [0x20])
-    posix_table["space"] = s
-    posix_table["^space"] = all_chars - s
+    posix_table["space"] = list(s)
+    posix_table["^space"] = list(all_chars - s)
 
     # Upper: [A-Z]
     s = set([x for x in range(0x41, 0x5a + 1)])
-    posix_table["upper"] = s
-    posix_table["^upper"] = all_chars - s
+    posix_table["upper"] = list(s)
+    posix_table["^upper"] = list(all_chars - s)
 
     # XDigit: [A-Fa-f0-9]
     s = set([x for x in range(0x30, 0x39 + 1)])
-    s.update([x for x in range(0x41, 0x46 + 1)])
-    s.update([x for x in range(0x61, 0x66 + 1)])
-    posix_table["xdigit"] = s
-    posix_table["^xdigit"] = all_chars - s
+    s |= set([x for x in range(0x41, 0x46 + 1)])
+    s |= set([x for x in range(0x61, 0x66 + 1)])
+    posix_table["xdigit"] = list(s)
+    posix_table["^xdigit"] = list(all_chars - s)
 
     # Convert characters values to ranges
     char2range(posix_table, binary=binary)
 
-    # Write out the unicode properties
-    f.write('%sposix_properties = {\n' % prefix)
-    count = len(posix_table) - 1
-    i = 0
-    for k1, v1 in sorted(posix_table.items()):
-        f.write('    "%s": %s"%s"' % (k1, prefix, v1))
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
+    with codecs.open(output, 'a' if append else 'w', 'utf-8') as f:
+        if not append:
+            f.write(HEADER)
+        # Write out the unicode properties
+        f.write('%sposix_properties = {\n' % prefix)
+        count = len(posix_table) - 1
+        i = 0
+        for k1, v1 in sorted(posix_table.items()):
+            f.write('    "%s": %s"%s"' % (k1, prefix, v1))
+            if i == count:
+                f.write('\n}\n')
+            else:
+                f.write(',\n')
+            i += 1
 
 
 def gen_uposix(table, posix_table, all_chars):
@@ -513,90 +534,90 @@ def gen_uposix(table, posix_table, all_chars):
 
     # Alnum: [\p{L&}\p{Nd}]
     s = set(table['l']['c'] + table['n']['d'])
-    posix_table["posixalnum"] = s
-    posix_table["^posixalnum"] = all_chars - s
+    posix_table["posixalnum"] = list(s)
+    posix_table["^posixalnum"] = list(all_chars - s)
 
     # Alpha: [\p{L&}]
     s = set(table['l']['c'])
-    posix_table["posixalpha"] = s
-    posix_table["^posixalpha"] = all_chars - s
+    posix_table["posixalpha"] = list(s)
+    posix_table["^posixalpha"] = list(all_chars - s)
 
     # ASCII: [\x00-\x7F]
     s = set([x for x in range(0, 0x7F + 1)])
-    posix_table["posixascii"] = s
-    posix_table["^posixascii"] = all_chars - s
+    posix_table["posixascii"] = list(s)
+    posix_table["^posixascii"] = list(all_chars - s)
 
     # Blank: [\p{Zs}\t]
     s = set(table['z']['s'] + [0x09])
-    posix_table["posixblank"] = s
-    posix_table["^posixblank"] = all_chars - s
+    posix_table["posixblank"] = list(s)
+    posix_table["^posixblank"] = list(all_chars - s)
 
     # Cntrl: [\p{Cc}]
     s = set(table['c']['c'])
-    posix_table["posixcntrl"] = s
-    posix_table["^posixcntrl"] = all_chars - s
+    posix_table["posixcntrl"] = list(s)
+    posix_table["^posixcntrl"] = list(all_chars - s)
 
     # Digit: [\p{Nd}]
     s = set(table['n']['d'])
-    posix_table["posixdigit"] = s
-    posix_table["^posixdigit"] = all_chars - s
+    posix_table["posixdigit"] = list(s)
+    posix_table["^posixdigit"] = list(all_chars - s)
 
     # Graph: [^\p{Z}\p{C}]
     s = set()
     for table_name in ('z', 'c'):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
-                s.update(table[table_name][sub_table_name])
-    posix_table["posixgraph"] = all_chars - s
-    posix_table["^posixgraph"] = s
+                s |= set(table[table_name][sub_table_name])
+    posix_table["posixgraph"] = list(all_chars - s)
+    posix_table["^posixgraph"] = list(s)
 
     # Lower: [\p{Ll}]
     s = set(table['l']['l'])
-    posix_table["posixlower"] = s
-    posix_table["^posixlower"] = all_chars - s
+    posix_table["posixlower"] = list(s)
+    posix_table["^posixlower"] = list(all_chars - s)
 
     # Print: [\P{C}]
     s = set()
     for table_name in ('c',):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
-                s.update(table[table_name][sub_table_name])
-    posix_table["posixprint"] = all_chars - s
-    posix_table["^posixprint"] = s
+                s |= set(table[table_name][sub_table_name])
+    posix_table["posixprint"] = list(all_chars - s)
+    posix_table["^posixprint"] = list(s)
 
     # Punct: [\p{P}\p{S}]
     s = set()
     for table_name in ('p', 's'):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
-                s.update(table[table_name][sub_table_name])
-    posix_table["posixpunct"] = s
-    posix_table["^posixpunct"] = all_chars - s
+                s |= set(table[table_name][sub_table_name])
+    posix_table["posixpunct"] = list(s)
+    posix_table["^posixpunct"] = list(all_chars - s)
 
     # Space: [\p{Z}\t\r\n\v\f]
     s = set()
     for table_name in ('z',):
         for sub_table_name in table[table_name]:
             if not sub_table_name.startswith('^'):
-                s.update(table[table_name][sub_table_name])
-    s.update([x for x in range(0x09, 0x0e)])
-    posix_table["posixspace"] = s
-    posix_table["^posixspace"] = all_chars - s
+                s |= set(table[table_name][sub_table_name])
+    s |= set([x for x in range(0x09, 0x0e)])
+    posix_table["posixspace"] = list(s)
+    posix_table["^posixspace"] = list(all_chars - s)
 
     # Upper: [\p{Lu}]
     s = set(table['l']['u'])
-    posix_table["posixupper"] = s
-    posix_table["^posixupper"] = all_chars - s
+    posix_table["posixupper"] = list(s)
+    posix_table["^posixupper"] = list(all_chars - s)
 
     # XDigit: [A-Fa-f0-9]
     s = set([x for x in range(0x30, 0x39 + 1)])
-    s.update([x for x in range(0x41, 0x46 + 1)])
-    s.update([x for x in range(0x61, 0x66 + 1)])
-    posix_table["posixxdigit"] = s
-    posix_table["^posixxdigit"] = all_chars - s
+    s |= set([x for x in range(0x41, 0x46 + 1)])
+    s |= set([x for x in range(0x61, 0x66 + 1)])
+    posix_table["posixxdigit"] = list(s)
+    posix_table["^posixxdigit"] = list(all_chars - s)
 
 
-def gen_alias(enum, binary, f):
+def gen_alias(enum, binary, output):
     """Generate alias."""
 
     alias_re = re.compile(r'^#\s+(\w+)\s+\((\w+)\)\s*$')
@@ -689,44 +710,70 @@ def gen_alias(enum, binary, f):
     for prop in posix_props:
         alias['binary'][prop] = 'posix' + prop
 
-    f.write('unicode_alias = {\n')
-    count = len(alias) - 1
-    i = 0
-    for k1, v1 in sorted(alias.items()):
-        f.write('    "%s": {\n' % k1)
-        count2 = len(v1) - 1
-        j = 0
-        for k2, v2 in sorted(v1.items()):
-            f.write('        "%s": "%s"' % (k2, v2))
-            if j == count2:
-                f.write('\n    }')
+    with codecs.open(output, 'w', 'utf-8') as f:
+        f.write(HEADER)
+        f.write('unicode_alias = {\n')
+        count = len(alias) - 1
+        i = 0
+        for k1, v1 in sorted(alias.items()):
+            f.write('    "%s": {\n' % k1)
+            count2 = len(v1) - 1
+            j = 0
+            for k2, v2 in sorted(v1.items()):
+                f.write('        "%s": "%s"' % (k2, v2))
+                if j == count2:
+                    f.write('\n    }')
+                else:
+                    f.write(',\n')
+                j += 1
+            if i == count:
+                f.write('\n}\n')
             else:
                 f.write(',\n')
-            j += 1
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
+            i += 1
 
-    cat = set(enum)
-    for k in alias['_'].keys():
-        cat.add(k)
+        cat = set(enum)
+        for k in alias['_'].keys():
+            cat.add(k)
 
-    f.write('enum_names = {\n')
-    count = len(cat) - 1
-    i = 0
-    for name in sorted(cat):
-        f.write('    "%s"' % name)
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
+        f.write('enum_names = {\n')
+        count = len(cat) - 1
+        i = 0
+        for name in sorted(cat):
+            f.write('    "%s"' % name)
+            if i == count:
+                f.write('\n}\n')
+            else:
+                f.write(',\n')
+            i += 1
 
 
-def gen_properties(f):
+def gen_properties(output):
     """Generate the property table and dump it to the provided file."""
+
+    files = {
+        'gc': os.path.join(output, 'generalcategory.py'),
+        'blk': os.path.join(output, 'block.py'),
+        'sc': os.path.join(output, 'script.py'),
+        'bc': os.path.join(output, 'bidiclasse.py'),
+        'binary': os.path.join(output, 'binary.py'),
+        'posix': os.path.join(output, 'posix.py'),
+        'age': os.path.join(output, 'age.py'),
+        'ea': os.path.join(output, 'eastasianwidth.py'),
+        'gcb': os.path.join(output, 'graphemeclusterbreak.py'),
+        'lb': os.path.join(output, 'linebreak.py'),
+        'sb': os.path.join(output, 'sentencebreak.py'),
+        'wb': os.path.join(output, 'wordbreak.py'),
+        'hst': os.path.join(output, 'hangulsyllabletype.py'),
+        'dt': os.path.join(output, 'decompositiontype.py'),
+        'jt': os.path.join(output, 'joiningtype.py'),
+        'jg': os.path.join(output, 'joininggroup.py'),
+        'nt': os.path.join(output, 'numerictype.py'),
+        'nv': os.path.join(output, 'numericvalue.py'),
+        'ccc': os.path.join(output, 'canonicalcombiningclass.py'),
+        'qc': os.path.join(output, 'quickcheck.py'),
+        'alias': os.path.join(output, 'alias.py')
+    }
 
     # L& or Lc won't be found in the table,
     # so intialize 'c' at the start. & will have to be converted to 'c'
@@ -766,99 +813,106 @@ def gen_properties(f):
         for k2, v2 in v1.items():
             if not k2.startswith('^'):
                 s = set(v2)
-                inverse_category.update(s)
-                table[k1]['^' + k2] = all_chars - s
-        table[k1]['^'] = all_chars - inverse_category
+                inverse_category |= s
+                table[k1]['^' + k2] = list(all_chars - s)
+        table[k1]['^'] = list(all_chars - inverse_category)
 
     # Generate Unicode blocks
     print('Building: Blocks')
-    gen_blocks(all_chars, f)
+    gen_blocks(all_chars, files['blk'])
 
     # Generate Unicode scripts
     print('Building: Scripts')
-    gen_enum(all_chars, 'Scripts.txt', 'unicode_scripts', f)
+    gen_enum(all_chars, 'Scripts.txt', 'unicode_scripts', files['sc'])
 
     # Generate Unicode bidi classes
     print('Building: Bidi Classes')
-    gen_bidi(all_chars, f)
+    gen_bidi(all_chars, files['bc'])
 
     # Generate Unicode binary
     print('Building: Binary')
-    binary = gen_binary(table, all_chars, f)
+    binary = gen_binary(table, all_chars, files['binary'])
 
     # Generate posix table and write out to file.
     print('Building: Posix')
-    gen_posix(set([x for x in range(0, 0xff + 1)]), f, binary=True)
-    gen_posix(all_chars, f)
+    gen_posix(set([x for x in range(0, 0xff + 1)]), files['posix'], binary=True)
+    gen_posix(all_chars, files['posix'], append=True)
 
     print('Building: Age')
-    gen_age(all_chars, f)
+    gen_age(all_chars, files['age'])
 
     print('Building: East Asian Width')
-    gen_enum(all_chars, 'EastAsianWidth.txt', 'unicode_east_asian_width', f)
+    gen_enum(all_chars, 'EastAsianWidth.txt', 'unicode_east_asian_width', files['ea'])
 
     print('Building: Grapheme Cluster Break')
-    gen_enum(all_chars, 'GraphemeBreakProperty.txt', 'unicode_grapheme_cluster_break', f)
+    gen_enum(all_chars, 'GraphemeBreakProperty.txt', 'unicode_grapheme_cluster_break', files['gcb'])
 
     print('Building: Line Break')
-    gen_enum(all_chars, 'LineBreak.txt', 'unicode_line_break', f)
+    gen_enum(all_chars, 'LineBreak.txt', 'unicode_line_break', files['lb'])
 
     print('Building: Sentence Break')
-    gen_enum(all_chars, 'SentenceBreakProperty.txt', 'unicode_sentence_break', f)
+    gen_enum(all_chars, 'SentenceBreakProperty.txt', 'unicode_sentence_break', files['sb'])
 
     print('Building: Word Break')
-    gen_enum(all_chars, 'WordBreakProperty.txt', 'unicode_word_break', f)
+    gen_enum(all_chars, 'WordBreakProperty.txt', 'unicode_word_break', files['wb'])
 
     print('Building: Hangul Syllable Type')
-    gen_enum(all_chars, 'HangulSyllableType.txt', 'unicode_hangul_syllable_type', f)
+    gen_enum(all_chars, 'HangulSyllableType.txt', 'unicode_hangul_syllable_type', files['hst'])
 
     print('Building: Decomposition Type')
-    gen_enum(all_chars, 'DerivedDecompositionType.txt', 'unicode_decomposition_type', f)
+    gen_enum(all_chars, 'DerivedDecompositionType.txt', 'unicode_decomposition_type', files['dt'])
 
     print('Building: Joining Type')
-    gen_enum(all_chars, 'DerivedJoiningType.txt', 'unicode_joining_type', f)
+    gen_enum(all_chars, 'DerivedJoiningType.txt', 'unicode_joining_type', files['jt'])
 
     print('Building: Joining Group')
-    gen_enum(all_chars, 'DerivedJoiningGroup.txt', 'unicode_joining_group', f)
+    gen_enum(all_chars, 'DerivedJoiningGroup.txt', 'unicode_joining_group', files['jg'])
 
     print('Building: Numeric Type')
-    gen_enum(all_chars, 'DerivedNumericType.txt', 'unicode_numeric_type', f)
+    gen_enum(all_chars, 'DerivedNumericType.txt', 'unicode_numeric_type', files['nt'])
 
     print('Building: Numeric Value')
-    gen_enum(all_chars, 'DerivedNumericValues.txt', 'unicode_numeric_values', f, field=3)
+    gen_enum(all_chars, 'DerivedNumericValues.txt', 'unicode_numeric_values', files['nv'], field=3)
 
     print('Building: Canonical Combining Class')
-    gen_enum(all_chars, 'DerivedCombiningClass.txt', 'uniocde_canonical_combining_class', f)
+    gen_enum(all_chars, 'DerivedCombiningClass.txt', 'uniocde_canonical_combining_class', files['ccc'])
 
     print('Building: NF* Quick Check')
-    categories.extend(gen_nf_quick_check(all_chars, f))
+    categories.extend(gen_nf_quick_check(all_chars, files['qc']))
 
     print('Building: Aliases')
-    gen_alias(categories, binary, f)
+    gen_alias(categories, binary, files['alias'])
 
     # Convert char values to string ranges.
     char2range(table)
 
-    # Write out the unicode properties
-    f.write('unicode_properties = {\n')
-    count = len(table) - 1
-    i = 0
-    for k1, v1 in sorted(table.items()):
-        f.write('    "%s": {\n' % k1)
-        count2 = len(v1) - 1
-        j = 0
-        for k2, v2 in sorted(v1.items()):
-            f.write('        "%s": "%s"' % (k2, v2))
-            if j == count2:
-                f.write('\n    }')
+    with codecs.open(files['gc'], 'w', 'utf-8') as f:
+        f.write(HEADER)
+        # Write out the unicode properties
+        f.write('unicode_properties = {\n')
+        count = len(table) - 1
+        i = 0
+        for k1, v1 in sorted(table.items()):
+            f.write('    "%s": {\n' % k1)
+            count2 = len(v1) - 1
+            j = 0
+            for k2, v2 in sorted(v1.items()):
+                f.write('        "%s": "%s"' % (k2, v2))
+                if j == count2:
+                    f.write('\n    }')
+                else:
+                    f.write(',\n')
+                j += 1
+            if i == count:
+                f.write('\n}\n')
             else:
                 f.write(',\n')
-            j += 1
-        if i == count:
-            f.write('\n}\n')
-        else:
-            f.write(',\n')
-        i += 1
+            i += 1
+
+    with codecs.open(os.path.join(output, '__init__.py'), 'w') as f:
+        f.write(HEADER)
+        for x in sorted(files):
+            f.write('from .%s import *  # noqa\n' % os.path.basename(files[x])[:-3])
 
 
 def build_unicode_property_table(output):
@@ -866,9 +920,7 @@ def build_unicode_property_table(output):
 
     if not os.path.exists(output):
         os.mkdir(output)
-    with codecs.open(os.path.join(output, '__init__.py'), 'w', 'utf-8') as f:
-        f.write(HEADER)
-        gen_properties(f)
+    gen_properties(output)
 
 
 if __name__ == '__main__':

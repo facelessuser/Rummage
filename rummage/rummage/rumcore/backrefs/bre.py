@@ -101,7 +101,7 @@ utokens = {
         r'''(?x)
         (?:(%s)[=:])?
         ((?:\\.|[^\\}]+)+)
-        ''' % '|'.join([k for k in uniprops.unicode_tables.enum_names])
+        ''' % '|'.join([k for k in uniprops.unidata.enum_names])
     ),
     "uni_prop": "p",
     "inverse_uni_prop": "P",
@@ -148,7 +148,7 @@ btokens = {
     "re_property_gc": re.compile(
         br'''(?x)
         (?:(''' +
-        ('|'.join([k for k in uniprops.unicode_tables.enum_names])).encode('ascii') +
+        ('|'.join([k for k in uniprops.unidata.enum_names])).encode('ascii') +
         br''')[=:])?
         ((?:\\.|[^\\}]+)+)
         '''
