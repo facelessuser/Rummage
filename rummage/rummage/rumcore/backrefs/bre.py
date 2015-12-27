@@ -99,9 +99,9 @@ utokens = {
     "re_property_strip": re.compile(r'[\-_ ]'),
     "re_property_gc": re.compile(
         r'''(?x)
-        (?:(%s)[=:])?
+        (?:((?:\\.|[^\\}]+)+?)[=:])?
         ((?:\\.|[^\\}]+)+)
-        ''' % '|'.join([k for k in uniprops.unidata.enum_names])
+        '''
     ),
     "uni_prop": "p",
     "inverse_uni_prop": "P",
@@ -147,9 +147,7 @@ btokens = {
     "re_property_strip": re.compile(br'[\-_ ]'),
     "re_property_gc": re.compile(
         br'''(?x)
-        (?:(''' +
-        ('|'.join([k for k in uniprops.unidata.enum_names])).encode('ascii') +
-        br''')[=:])?
+        (?:((?:\\.|[^\\}]+)+?)[=:])?
         ((?:\\.|[^\\}]+)+)
         '''
     ),
@@ -551,7 +549,7 @@ class SearchTemplate(object):
             else:
                 pattern = uniprops.get_posix_property(prop, uni=True)
         except Exception:
-            raise Exception('Invalid posix property!')
+            raise ValueError('Invalid POSIX property!')
 
         return [pattern]
 
@@ -587,7 +585,7 @@ class SearchTemplate(object):
                     negate = not negate
                 category = 'binary'
             else:
-                raise ValueError('Invalid unicode property!')
+                raise ValueError('Invalid Unicode property!')
 
         v = uniprops.get_unicode_property((self._negate if negate else self._empty) + props, category)
         if not in_group:

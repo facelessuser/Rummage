@@ -327,6 +327,8 @@ def get_unicode_property(value, prop=None):
                 return get_script_property(value)
             elif prop == 'block':
                 return get_block_property(value)
+            elif prop == 'binary':
+                return get_binary_property(value)
             elif prop == 'bidiclass':
                 return get_bidi_property(value)
             elif prop == 'age':
