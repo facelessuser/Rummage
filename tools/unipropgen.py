@@ -686,7 +686,7 @@ def gen_alias(enum, binary, output):
                 line_re = re.compile(r'%s\s*;' % m.group(2), re.I)
             if gather and line_re.match(line):
                 data = [format_name(x) for x in line.split('#')[0].split(';')]
-                if current_category in ('sc', 'blk'):
+                if current_category in ('sc', 'blk', 'dt'):
                     data[1], data[2] = data[2], data[1]
                 elif current_category == 'age' and UNIVERSION_INFO < (6, 1, 0):
                     if data[2] == 'unassigned':
@@ -753,7 +753,7 @@ def gen_properties(output):
         'gc': os.path.join(output, 'generalcategory.py'),
         'blk': os.path.join(output, 'block.py'),
         'sc': os.path.join(output, 'script.py'),
-        'bc': os.path.join(output, 'bidiclasse.py'),
+        'bc': os.path.join(output, 'bidiclass.py'),
         'binary': os.path.join(output, 'binary.py'),
         'posix': os.path.join(output, 'posix.py'),
         'age': os.path.join(output, 'age.py'),

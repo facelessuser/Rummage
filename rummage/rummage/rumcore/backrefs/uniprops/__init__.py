@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from . import unidata
 import sys
+# import traceback
 PY3 = sys.version_info >= (3, 0) and sys.version_info[0:2] < (4, 0)
 if PY3:
     binary_type = bytes  # noqa
@@ -237,18 +238,6 @@ def get_age_property(value):
     return unidata.unicode_age[value]
 
 
-def get_decomposition_group_property(value):
-    """Get JOINING GROUP property."""
-
-    if value.startswith('^'):
-        negated = value[1:]
-        value = '^' + unidata.unicode_alias['joininggroup'].get(negated, negated)
-    else:
-        value = unidata.unicode_alias['joininggroup'].get(value, value)
-
-    return unidata.unicode_joining_group[value]
-
-
 def get_joining_type_property(value):
     """Get JOINING TYPE property."""
 
@@ -366,6 +355,7 @@ def get_unicode_property(value, prop=None):
             elif prop == 'nfkdquickcheck':
                 return get_nfkd_quick_check_property(value)
         except Exception:
+            # print(traceback.format_exc())
             raise ValueError('Invalid Unicode property!')
 
     if value.startswith('^'):
