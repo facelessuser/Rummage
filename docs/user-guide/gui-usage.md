@@ -245,7 +245,9 @@ None of the replace back references can be used in character classes `[]`.  Thes
     - `\L\cTEST \cTEST\E` --> `Test Test`
 
 ### Unicode Properties
-Unicode properties can be used with the format: `\p{property=value}`, `\p{property:value}`, `\p{value}`, `\p{^property=value}`, `\p{^value}`.  Though you don't have to specify the `UNICODE` flag, the search pattern must be a Unicode string and the search buffer must also be Unicode.  It supports `General_Category`, `Block`, 'Script', `Bidi_Class`, and binary properties. It should support most if not all their aliases.  In the future it is possible that more Unicode property support will be added, but the current set seems fairly reasonable.
+There are quite a few properties that are also supported and an exhaustive list is not currently provided. This documentation will only briefly touch on `General_Category`, `Block`, 'Script', and binary properties.
+
+Unicode properties can be used with the format: `\p{property=value}`, `\p{property:value}`, `\p{value}`, `\p{^property=value}`, `\p{^value}`.  Though you don't have to specify the `UNICODE` flag, the search pattern must be a Unicode string and the search buffer must also be Unicode.
 
 The inverse of properties can also be used to specify everything not in a Unicode property: `\P{value}` or `\p{^value}` etc.  They are only used in the search patterns. Only one property may specified between the curly braces.  If you want to use multiple properties, you can place them in a character class: `[\p{UnicodeProperty}\p{OtherUnicodeProperty}]`.
 
@@ -257,6 +259,8 @@ When evaluating a property in the form `\p{value}`, they are evaluated in this o
 2. Script
 3. Blocks
 4. Binary
+
+All other properties are namespaced.  Example: `\p{Bidi_Class: White_Space}`.
 
 When installed, the Unicode version that comes with the Python it is installed under will be used to generate all the Unicode tables.  For instance, Python 2.7 is currently using Unicode 5.2.0.  And Python 3.5 is using 8.0.0.
 
@@ -318,11 +322,8 @@ There are a number of Unicode scripts and also aliases for scripts (they won't b
 #### Binary
 There are a number of binary properties and even aliases for some of the binary properties.  Comprehensive lists are available on the web, but they are specified in the following way: `\p{Alphabetic}`.  Normal just specifying inverse via `\P{value}` or `\p{^value}` should be enough, but for completeness the form `\p{Alphabetic: Y}` and `\p{Alphabetic: N}` along with all the variants (Yes|No|T|F|True|False).
 
-#### Bidi Classes
-Bidi classes must be defined in the form `\p{Bidi_Class: White_Space}` or `\p{bc: ws}` etc.
-
 #### Posix
-A number of posix property names are also available.  In general, when used in the `\p{}` form, they are aliases for existing unicode properties with the same name. There are some posix names that aren't used in the current Unicode properties `alnum`, `xdigit`, etc.  If you want to force the posix form inside `\p{}` you can use their name prefixed with `posix`: `\p{Punct}` --> `\p{PosixPunct}`.  Currently when using posix values in `\p{}` they will be forced into their Unicode form (see [Posix Style Properties](#posix-style-properties) for more info).
+A number of posix property names are also available.  In general, when used in the `\p{}` form, they are aliases for existing Unicode properties with the same name. There are some posix names that aren't used in the current Unicode properties such as `alnum`, `xdigit`, etc.  If you want to force the posix form inside `\p{}` you can use their name prefixed with `posix`: `\p{Punct}` --> `\p{PosixPunct}` (these `posix` prefixed properties are treated as binary properties)  Currently when using posix values in `\p{}` they will be forced into their Unicode form (see [Posix Style Properties](#posix-style-properties) for more info).
 
 ### Posix Style Properties
 Posix properties in the form of `[:posix:]` and the inverse `[:^posix:]` are available.  These character classes are only available inside a character group `[]`.  If needed, you can use the alternate form of `\p{Posix}` to use inside and outside a character group.
