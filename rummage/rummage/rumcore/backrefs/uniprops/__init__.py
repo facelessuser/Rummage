@@ -15,7 +15,9 @@ def get_posix_property(value, uni=False):
     if isinstance(value, binary_type):
         return unidata.bposix_properties[value.decode('utf-8')]
     elif uni:
-        return unidata.unicode_binary['posix' + value]
+        return unidata.unicode_binary[
+            ('^posix' + value[1:]) if value.startswith('^') else ('posix' + value)
+        ]
     else:
         return unidata.posix_properties[value]
 
