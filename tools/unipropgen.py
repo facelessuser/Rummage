@@ -121,7 +121,7 @@ def char2range(d, binary=False, invert=True):
             ifirst = None
             v2 = []
             iv2 = []
-            if v1[0] != 0:
+            if v1 and v1[0] != 0:
                 ifirst = 0
             for i in v1:
                 if first is None:
@@ -144,7 +144,9 @@ def char2range(d, binary=False, invert=True):
                     first = i
                     last = i
 
-            if first is not None:
+            if not v1:
+                iv2 = ["%s-%s" % (fmt(0), fmt(maxrange))]
+            elif first is not None:
                 if first == last:
                     v2.append(fmt(first))
                 else:
@@ -192,6 +194,54 @@ def gen_blocks(output):
                     f.write('\n    "%s": "%s-%s",' % (name, uniformat(block[0]), uniformat(block[1])))
                     f.write('\n    "^%s": "%s",' % (name, ''.join(inverse_range)))
             f.write('\n}\n')
+
+
+def gen_ccc(output):
+    """Generate canonical combining class."""
+
+    obj = {}
+    with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'DerivedCombiningClass.txt'), 'r') as uf:
+        for line in uf:
+            if not line.startswith('#'):
+                data = line.split('#')[0].split(';')
+                if len(data) < 2:
+                    continue
+                span = create_span([int(i, 16) for i in data[0].strip().split('..')])
+                if span is None:
+                    continue
+                name = format_name(data[1])
+
+                if name not in obj:
+                    obj[name] = []
+                obj[name].extend(span)
+
+    for x in range(0, 256):
+        key = str(x)
+        if key not in obj:
+            obj[key] = []
+
+    for name in list(obj.keys()):
+        s = set(obj[name])
+        obj[name] = sorted(s)
+
+    not_explicitly_defined(obj, '0')
+
+    # Convert characters values to ranges
+    char2range(obj)
+
+    with codecs.open(output, 'w', 'utf-8') as f:
+        f.write(HEADER)
+        # Write out the unicode properties
+        f.write('%s = {\n' % 'uniocde_canonical_combining_class')
+        count = len(obj) - 1
+        i = 0
+        for k1, v1 in sorted(obj.items()):
+            f.write('    "%s": "%s"' % (k1, v1))
+            if i == count:
+                f.write('\n}\n')
+            else:
+                f.write(',\n')
+            i += 1
 
 
 def gen_enum(file_name, obj_name, output, field=1, notexplicit=None):
@@ -889,7 +939,7 @@ def gen_properties(output):
     gen_enum('DerivedNumericValues.txt', 'unicode_numeric_values', files['nv'], field=3)
 
     print('Building: Canonical Combining Class')
-    gen_enum('DerivedCombiningClass.txt', 'uniocde_canonical_combining_class', files['ccc'], notexplicit='0')
+    gen_ccc(files['ccc'])
 
     print('Building: NF* Quick Check')
     categories.extend(gen_nf_quick_check(files['qc']))
