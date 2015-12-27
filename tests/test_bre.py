@@ -23,7 +23,7 @@ class TestSearchTemplate(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             bre.compile_search(r'[[:bad:]]', re.UNICODE)
 
-        self.assertTrue(e.exception.message, 'Invalid POSIX property!')
+        self.assertTrue(str(e), 'Invalid POSIX property!')
 
     def test_bad_binary(self):
         """Test bad binary."""
@@ -31,7 +31,7 @@ class TestSearchTemplate(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             bre.compile_search(r'\p{bad_binary:n}', re.UNICODE)
 
-        self.assertTrue(e.exception.message, 'Invalid Unicode property!')
+        self.assertTrue(str(e), 'Invalid Unicode property!')
 
     def test_bad_category(self):
         """Test bad category."""
@@ -39,7 +39,7 @@ class TestSearchTemplate(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             bre.compile_search(r'\p{alphanumeric: bad}', re.UNICODE)
 
-        self.assertTrue(e.exception.message, 'Invalid Unicode property!')
+        self.assertTrue(str(e), 'Invalid Unicode property!')
 
     def test_unicode_block(self):
         """Test unicode block."""
