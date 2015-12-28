@@ -175,6 +175,8 @@ def gen_blocks(output):
     with codecs.open(output, 'w', 'utf-8') as f:
         f.write(HEADER)
         f.write('unicode_blocks = {')
+        no_block = []
+        last = -1
 
         with open(os.path.join(HOME, 'unicodedata', UNIVERSION, 'Blocks.txt'), 'r') as uf:
             for line in uf:
@@ -183,6 +185,9 @@ def gen_blocks(output):
                     if len(data) < 2:
                         continue
                     block = [int(i, 16) for i in data[0].strip().split('..')]
+                    if block[0] > last + 1:
+                        no_block.append((last + 1, block[0] - 1))
+                    last = block[1]
                     if NARROW and block[0] > MAXUNICODE:
                         break
                     inverse_range = []
@@ -193,6 +198,22 @@ def gen_blocks(output):
                     name = format_name(data[1])
                     f.write('\n    "%s": "%s-%s",' % (name, uniformat(block[0]), uniformat(block[1])))
                     f.write('\n    "^%s": "%s",' % (name, ''.join(inverse_range)))
+            if last < MAXUNICODE:
+                no_block.append((last + 1, MAXUNICODE))
+            last = -1
+            no_block_inverse = []
+            for piece in no_block:
+                if piece[0] > last + 1:
+                    no_block_inverse.append((last + 1, piece[0] - 1))
+                last = piece[1]
+            for block, name in ((no_block, 'noblock'), (no_block_inverse, '^noblock')):
+                f.write('\n    "%s": "' % name)
+                for piece in block:
+                    if piece[0] == piece[1]:
+                        f.write(uniformat(piece[0]))
+                    else:
+                        f.write("%s-%s" % (uniformat(piece[0]), uniformat(piece[1])))
+                f.write('",')
             f.write('\n}\n')
 
 
