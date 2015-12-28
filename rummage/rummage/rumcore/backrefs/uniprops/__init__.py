@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from . import unidata
 import sys
-# import traceback
+
 PY3 = sys.version_info >= (3, 0) and sys.version_info[0:2] < (4, 0)
 if PY3:
     binary_type = bytes  # noqa
@@ -75,9 +75,9 @@ def get_east_asian_width_property(value):
 
     if value.startswith('^'):
         negated = value[1:]
-        value = '^' + unidata.unicode_alias['ea'].get(negated, negated)
+        value = '^' + unidata.unicode_alias['eastasianwidth'].get(negated, negated)
     else:
-        value = unidata.unicode_alias['ea'].get(value, value)
+        value = unidata.unicode_alias['eastasianwidth'].get(value, value)
 
     return unidata.unicode_east_asian_width[value]
 
@@ -354,8 +354,9 @@ def get_unicode_property(value, prop=None):
                 return get_nfkc_quick_check_property(value)
             elif prop == 'nfkdquickcheck':
                 return get_nfkd_quick_check_property(value)
+            else:
+                raise ValueError('Invalid Unicode property!')
         except Exception:
-            # print(traceback.format_exc())
             raise ValueError('Invalid Unicode property!')
 
     if value.startswith('^'):

@@ -773,7 +773,7 @@ def gen_alias(enum, binary, output):
                 line_re = re.compile(r'%s\s*;' % m.group(2), re.I)
             if gather and line_re.match(line):
                 data = [format_name(x) for x in line.split('#')[0].split(';')]
-                if current_category in ('sc', 'blk', 'dt', 'jg', 'sb', 'wb', 'lb', 'gcb'):
+                if current_category in ('sc', 'blk', 'dt', 'jg', 'sb', 'wb', 'lb', 'gcb', 'nt'):
                     data[1], data[2] = data[2], data[1]
                 elif current_category == 'age' and UNIVERSION_INFO < (6, 1, 0):
                     if data[2] == 'unassigned':
@@ -791,6 +791,10 @@ def gen_alias(enum, binary, output):
                         continue
                     if a not in alias[data[0]] and a != data[1]:
                         alias[data[0]][a] = data[1]
+
+    for x in enum:
+        if x not in alias:
+            alias[x] = {}
 
     for prop in posix_props:
         alias['binary'][prop] = 'posix' + prop
