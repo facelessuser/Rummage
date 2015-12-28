@@ -887,7 +887,7 @@ def gen_properties(output):
 
     # Generate Unicode scripts
     print('Building: Scripts')
-    gen_enum('Scripts.txt', 'unicode_scripts', files['sc'])
+    gen_enum('Scripts.txt', 'unicode_scripts', files['sc'], notexplicit='zzzz')
 
     # Generate Unicode bidi classes
     print('Building: Bidi Classes')
@@ -936,7 +936,7 @@ def gen_properties(output):
     gen_enum('DerivedNumericType.txt', 'unicode_numeric_type', files['nt'], notexplicit='none')
 
     print('Building: Numeric Value')
-    gen_enum('DerivedNumericValues.txt', 'unicode_numeric_values', files['nv'], field=3)
+    gen_enum('DerivedNumericValues.txt', 'unicode_numeric_values', files['nv'], field=3, notexplicit='nan')
 
     print('Building: Canonical Combining Class')
     gen_ccc(files['ccc'])
