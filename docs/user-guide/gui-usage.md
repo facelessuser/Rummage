@@ -437,9 +437,49 @@ Posix properties in the form of `[:posix:]` and the inverse `[:^posix:]` are ava
 
 ### Windows
 
-!!! note "Under Construction"
-    Guide coming soon.
+- Create a file `rummage.reg` and put the following in it (replace &lt;rummage_path&gt; path with the actual path to rummage.exe that is created in your Python Script folder on installation).  Remember to escape backslashes appropriately.  This isn't a guide in how to do registry editing proper, so only edit the registry if you are certain of what you are doing.
+
+    ```ini
+    Windows Registry Editor Version 5.00
+
+    [HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...]
+    @=""
+
+    [HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...\command]
+    @="\"<rummage_path>\" \"--path\" \"%1\""
+
+    [HKEY_CLASSES_ROOT\*\shell\Rummage Here...]
+    @=""
+
+    [HKEY_CLASSES_ROOT\*\shell\Rummage Here...\command]
+    @="\"<rummage_path>\" \"--path\" \"%1\""
+
+    ```
+
+- Save file.
+- Double click the registry file to add the context menu into Windows Explorer.
 
 ### Linux
 
-There are many different flavors of Linux using different file managers.  This makes it difficult to give a guide to cover all cases.  Please research about your specific disto's file manager and how to add context menus.  If you would like to include the info here, please issue a pull request.
+There are many different flavors of Linux using different file managers.  This makes it difficult to give a guide to cover all cases.  Please research about your specific distro's file manager and how to add context menus.  If you would like to include the info here, please issue a pull request.
+
+#### Ubuntu Nautilus
+Paths might vary depending on Ubuntu version etc.
+
+- Create an executable file called `Rummage Here...` in `~/.local/share/nautilus/scripts/` with the following content (RUMMAGE_PATH should be the binary created when installing rummage in Python which is usually `/usr/local/bin/rummage`).
+
+    ```py
+    #!/usr/bin/python
+    import os
+    import subprocess
+
+    RUMMAGE_PATH = "/usr/local/bin/rummage"
+
+    selected_paths = os.environ.get("NAUTILUS_SCRIPT_SELECTED_FILE_PATHS", None)
+    if selected_paths is not None:
+        paths = selected_paths.split("\n")
+        if len(paths):
+            subprocess.Popen([RUMMAGE_PATH, "--path", paths[0]])
+    ```
+
+- Restart of Nautilus may or may not be needed, but context menu item should appear under `Scripts` and should work on files and folders.
