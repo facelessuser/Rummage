@@ -432,7 +432,14 @@ Posix properties in the form of `[:posix:]` and the inverse `[:^posix:]` are ava
     - Service receives selected `files or folders` in `any Application`.
     - Shell: `/bin/sh`.
     - Pass input: `as arguments`.
-    - Content of script: `(/Library/Frameworks/Python.framework/Versions/2.7/bin/rummage --path "$1")>/dev/null 2>&1 &`.  This is just an example. You will need to determine the location of your Python install.  If in the future Rummage supports Python 3.3+, you will have to change the command accordingly.
+    - Content of script:
+
+        ```
+        (/Library/Frameworks/Python.framework/Versions/2.7/bin/rummage --path "$1")>/dev/null 2>&1 &
+        ```
+
+        This is just an example. You will need to determine the location of your Python install.  If in the future Rummage supports Python 3.3+, you will have to change the command accordingly.
+
 - Save to `/Users/<username>/Library/Services/Rummage Here...`.
 
 ### Windows
