@@ -44,9 +44,9 @@ Roundup Changes
    - Added return result
 """
 
-__docformat__ = 'restructuredtext'
-
 import os
+
+__docformat__ = 'restructuredtext'
 
 if os.name == 'nt':
     import msvcrt
