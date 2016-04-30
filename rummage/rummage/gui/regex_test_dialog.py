@@ -23,6 +23,7 @@ import re
 import sys
 import traceback
 import wx
+import functools
 from . import gui
 from .. import data
 from .settings import Settings
@@ -210,6 +211,19 @@ class RegexTestDialog(gui.RegexTestDialog):
     def test_regex(self):
         """Test and highlight search results in content buffer."""
 
+        # Replace functions
+        def replace_bregex_format(m, replace=None):
+            """Replace for bregex format."""
+            return m.expandf(replace)
+
+        def replace_regex(m, replace=None):
+            """Replace for regex."""
+            return self.regex_expand(m, replace)
+
+        def replace_re(m, replace=None):
+            """Replace for re."""
+            return m.expand(replace)
+
         if self.regex_mode == rumcore.REGEX_MODE:
             import regex
 
@@ -316,15 +330,15 @@ class RegexTestDialog(gui.RegexTestDialog):
                 if rpattern:
                     if self.regex_mode == rumcore.BREGEX_MODE:
                         if self.m_format_replace_checkbox.GetValue():
-                            replace_test = lambda m, replace=rpattern: m.expandf(replace)
+                            replace_test = functools.partial(replace_bregex_format, replace=rpattern)
                         else:
                             replace_test = bregex.compile_replace(test, self.m_replace_text.GetValue())
                     elif self.regex_mode == rumcore.REGEX_MODE:
-                        replace_test = lambda m, replace=rpattern: self.regex_expand(m, replace)
+                        replace_test = functools.partial(replace_regex, replace=rpattern)
                     elif self.regex_mode == rumcore.BRE_MODE:
                         replace_test = bre.compile_replace(test, self.m_replace_text.GetValue())
                     else:
-                        replace_test = lambda m, replace=rpattern: m.expand(replace)
+                        replace_test = functools.partial(replace_re, replace=rpattern)
             except Exception:
                 pass
 
