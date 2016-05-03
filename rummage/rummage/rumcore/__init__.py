@@ -31,7 +31,7 @@ from collections import namedtuple
 from fnmatch import fnmatch
 from time import ctime
 from . import text_decode
-from .backrefs import bre, bregex
+from backrefs import bre, bregex
 from .file_times import getmtime, getctime
 from .file_hidden import is_hidden
 from collections import deque

@@ -29,7 +29,7 @@ from .. import data
 from .settings import Settings
 from ..localization import _
 from .. import rumcore
-from ..rumcore.backrefs import bre, bregex
+from backrefs import bre, bregex
 
 
 class RegexTestDialog(gui.RegexTestDialog):

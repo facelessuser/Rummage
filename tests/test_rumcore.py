@@ -5,8 +5,8 @@ import os
 from rummage.rummage import rumcore as rc
 import re
 import regex
-from rummage.rummage.rumcore.backrefs import bre
-from rummage.rummage.rumcore.backrefs import bregex
+from backrefs import bre
+from backrefs import bregex
 from rummage.rummage.rumcore import text_decode as td
 from rummage.rummage import epoch_timestamp as epoch
 import codecs

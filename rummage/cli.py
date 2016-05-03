@@ -28,7 +28,7 @@ from datetime import datetime
 from .rummage import epoch_timestamp
 from .rummage import rumcore
 from .rummage import __meta__
-from .rummage.rumcore.backrefs import bre, bregex
+from backrefs import bre, bregex
 import decimal
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)

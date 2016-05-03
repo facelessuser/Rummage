@@ -30,7 +30,7 @@ import re
 import wx.lib.newevent
 from .. import __meta__
 from .. import rumcore
-from ..rumcore.backrefs import bre, bregex
+from backrefs import bre, bregex
 from ..epoch_timestamp import local_time_to_epoch_timestamp
 from .. import notify
 from ..localization import _

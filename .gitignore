@@ -46,7 +46,3 @@ Output/*
 pyinstaller
 
 site/*
-
-tools/unicodedata/*
-
-rummage/rummage/rumcore/backrefs/uniprops/unidata/*

@@ -30,52 +30,7 @@ def get_version():
         fp.close()
 
 
-def download_unicodedata():
-    """Download the unicodedata version for the given Python version."""
-
-    import unicodedata
-
-    fail = False
-    path = os.path.join(os.path.dirname(__file__), 'tools')
-    fp, pathname, desc = imp.find_module('unidatadownload', [path])
-    try:
-        unidatadownload = imp.load_module('unidatadownload', fp, pathname, desc)
-        unidatadownload.download_unicodedata(unicodedata.unidata_version)
-    except Exception:
-        print(traceback.format_exc())
-        fail = True
-    finally:
-        fp.close()
-
-    assert not fail, "Failed to download unicodedata!"
-
-
-def generate_unicode_table():
-    """Generate the unicode table for the given Python version."""
-
-    fail = False
-    path = os.path.join(os.path.dirname(__file__), 'tools')
-    fp, pathname, desc = imp.find_module('unipropgen', [path])
-    try:
-        unipropgen = imp.load_module('unipropgen', fp, pathname, desc)
-        unipropgen.build_unicode_property_table(
-            os.path.join(
-                os.path.dirname(__file__),
-                'rummage', 'rummage', 'rumcore', 'backrefs', 'uniprops', 'unidata'
-            )
-        )
-    except Exception:
-        print(traceback.format_exc())
-        fail = True
-    finally:
-        fp.close()
-
-    assert not fail, "Failed uniprops.py generation!"
-
-
 VER, DEVSTATUS = get_version()
-download_unicodedata()
-generate_unicode_table()
 
 
 LONG_DESC = '''
@@ -112,7 +67,7 @@ setup(
     author='Isaac Muse',
     author_email='Isaac.Muse [at] gmail.com',
     url='https://github.com/facelessuser/Rummage',
-    packages=find_packages(exclude=['*.unidata']),
+    packages=find_packages(exclude=['tests']),
     install_requires=[
         "gntp>=1.0.2",
         "chardet>=2.3.0"

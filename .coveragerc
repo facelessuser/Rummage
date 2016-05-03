@@ -1,11 +1,9 @@
 [run]
 omit=
-    rummage/rummage/rumcore/backrefs/uniprops/unidata/*
     rummage/rummage/rumcore/file_hidden.py
     rummage/rummage/rumcore/file_times.py
 
 [report]
 omit=
-    rummage/rummage/rumcore/backrefs/uniprops/unidata/*
     rummage/rummage/rumcore/file_hidden.py
     rummage/rummage/rumcore/file_times.py
