@@ -20,6 +20,6 @@ In order for PyMdown to work, there are a couple of prerequisites.  **wxPython**
 ## Installation
 There are two recommended ways to install rummage.
 
-1. Install via `#!bash python setup.py build` and `#!bash python setup.py install`.  You should then be able to access Rummage from the command line via `rummage` or `rummage --path mydirectory`.  You can also access the experimental CLI `rumcl <args>` as well.
+1. Install via `#!bash python setup.py build` and `#!bash python setup.py install`.  You should then be able to access Rummage from the command line via `rummage` or `rummage --path mydirectory`.
 
-2. If developing on rummage, you can install via `#!bash pip install --editable .`.  This method will allow you to instantly see your changes without reinstalling which is great for developing.  If you want to do this in a virtual machine, you can.  Like the first method, you should then be able to access Rummage from the command line via `rummage` or `rummage --path mydirectory`.  You can also access the experimental CLI `rumcl <args>` as well.
+2. If developing on rummage, you can install via `#!bash pip install --editable .`.  This method will allow you to instantly see your changes without reinstalling which is great for developing.  If you want to do this in a virtual machine, you can.  Like the first method, you should then be able to access Rummage from the command line via `rummage` or `rummage --path mydirectory`.

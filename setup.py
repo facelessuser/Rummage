@@ -32,12 +32,21 @@ def get_version():
 
 VER, DEVSTATUS = get_version()
 
-
 LONG_DESC = '''
-Rummage is a CLI and GUI tool for searching and replacing texst in files.
-It is built with wxPython 3.0.0+ and requires Python 2.7 or Python 3.0 for command line.
+Rummage is a GUI tool for searching and replacing texst in files.
+It is built with wxPython 3.0.0+ and requires Python 2.7.
+You can check out the list of available extensions and learn more about them by `reading the docs`_.
 
-The project repo is found at: https://github.com/facelessuser/Rummage.
+.. _`reading the docs`: http://facelessuser.github.io/Rummage/
+
+Support
+=======
+
+Help and support is available here at the repository's `bug tracker`_.
+Please read about `support and contributing`_ before creating issues.
+
+.. _`bug tracker`: https://github.com/facelessuser/rummage/issues
+.. _`support and contributing`: http://facelessuser.github.io/rummage/contributing/
 '''
 
 if PY3:
@@ -70,7 +79,8 @@ setup(
     packages=find_packages(exclude=['tests']),
     install_requires=[
         "gntp>=1.0.2",
-        "chardet>=2.3.0"
+        "chardet>=2.3.0",
+        "backrefs>=1.0.0"
     ],
     zip_safe=False,
     entry_points=entry_points,

@@ -4,10 +4,9 @@ site_description: A search and replace tool written in Python.
 pages:
   - About Rummage: index.md
   - Installation: installation.md
-  - User Guide:
-      - Usage: user-guide/gui-usage.md
-  - API Usage: api.md
+  - Usage: usage.md
   - Contributing &amp; Support: contributing.md
+  - Changelog: changelog.md
   - License: license.md
 theme: readthedocs
 theme_dir: doc_theme
