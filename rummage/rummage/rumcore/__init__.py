@@ -428,6 +428,7 @@ class _FileSearch(object):
         self.pattern = args.pattern
         self.replace = args.replace
         self.expand = None
+        self.literal = False
         self.idx = file_id
         self.file_obj = file_obj
         self.max_count = max_count
@@ -617,6 +618,8 @@ class _FileSearch(object):
     def expand_match(self, m):
         """Expand the match."""
 
+        if self.literal:
+            return self.replace
         if self.expand:
             return self.expand(m)
         elif self.regex_format_replace:
@@ -646,6 +649,7 @@ class _FileSearch(object):
 
         if pattern is not None:
             if bool(self.flags & LITERAL):
+                self.literal = True
                 if self.regex_mode == BREGEX_MODE:
                     pattern = _bregex_literal_pattern(pattern, self.flags)
                 elif self.regex_mode == REGEX_MODE:
