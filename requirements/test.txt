@@ -2,4 +2,3 @@ nose
 coverage
 mock
 regex
-backrefs
