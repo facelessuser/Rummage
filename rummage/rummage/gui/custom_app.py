@@ -257,7 +257,7 @@ class ArgPipeThread(object):
                     pass
 
     def IsRunning(self):  # noqa
-        """Returns if the thread is still busy."""
+        """Return if the thread is still busy."""
 
         return self.running
 

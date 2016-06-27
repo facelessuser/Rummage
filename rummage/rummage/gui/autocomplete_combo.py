@@ -357,7 +357,7 @@ class ListCtrlComboPopup(wx.ListCtrl, wx.combo.ComboPopup):
                 self.SetColumnWidth(0, self.GetSize()[0] - 20)
 
     def on_resize_dropdown(self, event):
-        """ListCtrl resize event."""
+        """Handle ListCtrl resize event."""
 
         self.resize_dropdown()
         event.Skip()

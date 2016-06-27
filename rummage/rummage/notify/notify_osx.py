@@ -47,7 +47,7 @@ def _nsstring(string):
 
 
 def _callmethod(obj, method, *args, **kwargs):
-    """ObjC method call."""
+    """Call the ObjC method."""
 
     cast_return = kwargs.get("cast_return", ctypes.c_void_p)
     return cast_return(objc.objc_msgSend(obj, objc.sel_registerName(method), *args))
