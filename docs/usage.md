@@ -19,7 +19,7 @@ The status bar will show search progress, match counts, and other useful informa
 
 ## Search Tab
 
-![Search Tab](../images/search_tab.png)
+![Search Tab](/images/search_tab.png)
 
 The **Search** tab is broken up into 2 panels, the first of which is the **Search &amp; Replace** panel. The **Search &amp; Replace** panel has all the inputs where the search and replace is defined and configured.  It also has access to the regex tester and the save/load dialogs for saving patterns for later use.
 
@@ -27,7 +27,7 @@ The second panel, is the **Limit Search** panel.  The **Limit Search** panel con
 
 ## Files Tab
 
-![Files Tab](../images/files_tab.png)
+![Files Tab](/images/files_tab.png)
 
 The **Files** tab is where files with matches are shown after a search completes.  The files are arranged in a sortable table.  Each entry will show the files name, file size, number of matches in the file, the file path, detected file encoding, date/time when the file was created, and date/time of when the file was last modified.
 
@@ -35,7 +35,7 @@ When mousing over an entry, the full path to the file will be shown in the statu
 
 ## Content Tab
 
-![Content Tab](../images/content_tab.png)
+![Content Tab](/images/content_tab.png)
 
 The **Content** tab shows each match in a file individually in a sortable table.  Each entry shows the file name, the line on which the match was found, the number of matches on that line, and the content of the line.  Long lines will be truncated. 
 
@@ -43,7 +43,7 @@ When mousing over an entry, the full path to the file will be shown in the statu
 
 ## Search &amp; Replace Panel
 
-![Search and Replace Panel](../images/search_replace_panel.png)
+![Search and Replace Panel](/images/search_replace_panel.png)
 
 The **Search &amp; Replace** panel contains three text boxes with a dropdown history. The first textbox defines **where to search**, the second defines **what to search for**, and the last defines **what to replace matches with** (this is only needed when doing replaces).  You can select previously used patterns and search targets by expanding the dropdown panel for the input.
 
@@ -87,7 +87,7 @@ Rummage has a couple of flags that are not specific to the regular expression en
 
 ### Regex Tester
 
-![Regex Tester](../images/regex_tester.png)
+![Regex Tester](/images/regex_tester.png)
 
 Rummage comes with a simple regex tester.  It has a simple multi-line text box for content to search, and another multi-line box that will show the final results after the find and replace.  Below that you will find two text input boxes for the find pattern and the replace pattern.  Lastly, all related regular expression flag toggles will be found under the patterns.
 
@@ -100,15 +100,15 @@ Regular expressions can be very complex, and sometimes you might want to save th
 
 When you have a pattern configured that you want to save, simply click the `Save Search` button, and a dialog will pop up asking you to name the search.  When done, click the `Save` button on the dialog and your search patterns and toggles will be saved.
 
-![Save Search](../images/save_search.png)
+![Save Search](/images/save_search.png)
 
 To load a pattern that was saved previously, click the `Load Search` button.  You will be presented with a dialog showing all your saved searches.  Highlight the pattern you want to load and click the `Load` button.  Your pattern and toggles will be populated in the main dialog.
 
-![Load Search](../images/load_search.png)
+![Load Search](/images/load_search.png)
 
 ## Limit Search Panel
 
-![Limit Search Panel](../images/limit_search_panel.png)
+![Limit Search Panel](/images/limit_search_panel.png)
 
 The limit search pattern contains inputs and toggles to filter which files will be searched.  Some people may like to set up the filters and hide the panel.  If this is desired, you can select in the windows menu **View-->Hide Limit Search Panel**, and the panel will be hidden.
 
@@ -125,7 +125,7 @@ The limit search pattern contains inputs and toggles to filter which files will 
 
 ## Export to CSV or HTML
 
-![HTML Export](../images/html_export.png)
+![HTML Export](/images/html_export.png)
 
 Rummage allows the exporting of the results to either CSV or HTML.  Simply select **File-->Export** and pick either **CSV** or **HTML**.  The HTML output will be styled similar to the GUI interface with the results in tables with sortable columns.
 
@@ -134,14 +134,14 @@ Rummage allows the exporting of the results to either CSV or HTML.  Simply selec
 
 ## Preferences
 
-![Preferences](../images/preferences.png)
+![Preferences](/images/preferences.png)
 
 The preference dialog (found at **File-->Preferences**) is where Rummage keeps settings that are not frequently accessed.
 
 ### Editor
 The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog where you can browse for your editor of choice and manage the arguments to pass to the editor.
 
-![Editor Options](../images/editor_options.png)
+![Editor Options](/images/editor_options.png)
 
 The editor options dialog has a file picker to select the the editor.  In OSX it may be beneficial to create a shell script or symlink that you can references as the picker won't be able to descend into an `.app` bundle as it is viewed as a file instead of a folder.
 

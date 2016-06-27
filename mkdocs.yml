@@ -1,5 +1,5 @@
 site_name: Rummage Documentation
-repo_url: https://github.com/facelessuser/Rummage
+repo_url: https://github.com/facelessuser/Rummage/
 site_description: A search and replace tool written in Python.
 pages:
   - About Rummage: index.md
