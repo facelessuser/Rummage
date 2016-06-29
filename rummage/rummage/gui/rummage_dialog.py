@@ -883,6 +883,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Callback for when a directory changes via the m_searchin_text control."""
 
         self.check_searchin()
+        self.SetTitle(self.m_searchin_text.GetValue())
 
     def on_save_search(self, event):
         """Open a dialog to save a search for later use."""
