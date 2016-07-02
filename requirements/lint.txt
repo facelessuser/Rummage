@@ -1,3 +1,4 @@
 flake8
-pydocstyle
+flake8-docstrings
+flake8-putty
 pep8-naming
