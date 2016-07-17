@@ -79,7 +79,7 @@ class EditorDialog(gui.EditorDialog):
             )
         )
         self.m_instructions_label.Wrap(325)
-        main_sizer = self.m_arg_text.GetParent().GetSizer()
+        main_sizer = self.m_arg_text.GetParent().GetParent().GetSizer()
         main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(_("Application"))
         main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Arguments"))
         self.Fit()
