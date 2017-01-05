@@ -1,17 +1,12 @@
-# Using Rummage {: .doctitle}
-Detailed usage for rummage.
-
----
-
 ## Overview
-Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search options are all contained in the **Search** tab.  When a search has been completed, general info about matches found in files will be displayed in the **Files** tab, and more detailed context information will be displayed in the **Content** tab.
+Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, and Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search options are all contained in the **Search** tab.  When a search has been completed, general info about the matches found in files will be displayed in the **Files** tab, and more detailed context information will be displayed in the **Content** tab.
 
-Rummage also comes with a simple regex tester to test out patterns, and a feature where patterns can be saved for later and/or frequent use.
+Rummage also comes with a simple regex tester to test out patterns. It also provides a feature where patterns can be saved for later and/or frequent use.
 
 The status bar will show search progress, match counts, and other useful information.
 
-!!! caution "Warning: Replace"
-    When replacing, Rummage will back up the file in `<your file name>.rum-bak`.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you use version control.  If using encoding guessing, Rummage *might* guess the wrong encoding causing some things to get lost during replace.  And aside from those issues, something unexpected *could* always occur as well, but hopefully not as Rummage is been trough a lot of testing.
+!!! warning "Warning: Replace"
+    When replacing, Rummage will back up the file in `<your file name>.rum-bak`.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you use version control.  If using encoding guessing, Rummage *might* guess the wrong encoding causing some things to get lost during replace.  And aside from those issues, something unexpected *could* always occur as well, but hopefully not as Rummage has been through a lot of testing.
 
     In short, if you disable backups, there is a greater risk as you will no longer have a safety net.  Even with backups, something *could* go wrong.  This is free software, and I am not responsible for files corrupted or lost.
 
@@ -169,7 +164,7 @@ Language
 ### Regular Expression Modules
 The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected.  By default, Rummage will use **re**, but if **regex** is installed in your Python installation, it can be selected as well.  There is also the option of using [backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes) with your engine of choice as well.
 
-If using **regex**, you can set it the version (mode) to use.  `V0` tries to be completely compatible with **re**.  `V1` breaks compatibility with **re** but adds a number of useful additions even over **V0**.
+If using **regex**, you can set it the version (mode) to use.  `V0` tries to be completely compatible with **re**.  `V1` breaks compatibility with **re** but adds even more useful additions.
 
 ### Notifications
 The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable notification popups and/or audible notification sound.
@@ -182,7 +177,7 @@ Ubuntu
    - Native: OSD via `notify-send`.
 
     !!! Note "Note"
-        Though Rummage should run on any Linux distro, the native dialog option was built around Ubuntu's native notifications called OSD.  Notifications will not work on other distros that do not use OSD **unless** they use Growl.  Even without Growl, other distros will probably still get the audible cue but, as each distro varies; it is difficult to be certain.  As notifications are not crucial to usage, this is minor concern.
+        Though Rummage should run on any Linux distro, the native dialog option was built around Ubuntu's native notifications called OSD.  Notifications will not work on other distros that do not use OSD **unless** they use Growl.  Even without Growl, other distros will probably still get the audible cue, but as each distro varies, it is difficult to be certain.  As notifications are not crucial to usage, this is minor concern.
 
 OSX
 : 

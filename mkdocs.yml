@@ -1,28 +1,48 @@
 site_name: Rummage Documentation
 repo_url: https://github.com/facelessuser/Rummage/
 site_description: A search and replace tool written in Python.
+copyright: Copyright &copy; 2013 - 2017 <a href="https://github.com/facelessuser">Isaac Muse</a>
 pages:
-  - About Rummage: index.md
+  - Rummage: index.md
   - Installation: installation.md
   - Usage: usage.md
   - Contributing &amp; Support: contributing.md
   - Changelog: changelog.md
   - License: license.md
-theme: readthedocs
+theme: material
 theme_dir: doc_theme
 markdown_extensions:
-  - markdown.extensions.toc
-  - markdown.extensions.admonition
-  - markdown.extensions.smarty
+  - markdown.extensions.toc:
+      slugify: !!python/name:pymdownx.headeranchor.uslugify
+  - markdown.extensions.admonition:
+  - markdown.extensions.smarty:
+      smart_quotes: false
   - markdown.extensions.codehilite:
       guess_lang: false
-  - pymdownx.extra
-  - pymdownx.inlinehilite
-  - pymdownx.magiclink
-  - pymdownx.tilde
-  - pymdownx.caret
-  - pymdownx.smartsymbols
-  - pymdownx.githubemoji
-  - pymdownx.tasklist
-  - pymdownx.progressbar
-  - pymdownx.headeranchor
+  - pymdownx.extra:
+  - pymdownx.inlinehilite:
+  - pymdownx.magiclink:
+  - pymdownx.tilde:
+  - pymdownx.caret:
+  - pymdownx.smartsymbols:
+  - pymdownx.emoji:
+      options:
+        attributes:
+          height: 20px
+          width: 20px
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.headeranchor:
+extra:
+  palette:
+    primary: blue
+    accent: cyan
+  font:
+    text: Roboto
+    code: Roboto Mono
+  social:
+    - type: github
+      link: https://github.com/facelessuser
+  logo: images/rummage.png
+extra_css:
+  - extra.css
