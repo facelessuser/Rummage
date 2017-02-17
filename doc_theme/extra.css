@@ -1,5 +1,5 @@
 /* Logo */
-.md-header-nav__icon--home img {
+.md-logo img {
   height: 48px;
   width:  48px;
   margin-top: -12px;
@@ -12,10 +12,43 @@
   overflow: auto;
 }
 
-/* Inline */
-.md-typeset code, .md-typeset tt {
-  white-space: pre-wrap;
-  word-wrap: break-word;
+/* Code */
+.md-typeset a>code {
+    margin: 0 .29412em;
+    padding: .07353em 0;
+    background-color: rgba(237, 237, 237, .5);
+    border-radius: .2rem;
+    box-shadow: 0.29412em 0 0 rgba(237, 237, 237, .5), -0.29412em 0 0 rgba(237, 237, 237, .5);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+}
+
+.md-typeset td code {
+    word-break: normal;
+}
+
+/* Header Anchors */
+.md-typeset .headerlink {
+  vertical-align: middle;
+  font: normal normal 2rem "Material Icons";
+}
+
+.md-typeset h2 .headerlink {margin-top: -.4rem;}
+.md-typeset h3 .headerlink {margin-top: -.3rem;}
+.md-typeset h4 .headerlink,
+.md-typeset h5 .headerlink,
+.md-typeset h6 .headerlink {margin-top: -.2rem;}
+
+@media only screen and (min-width: 76.1876em) {
+  .md-typeset .headerlink {
+    float: left;
+    margin-left: -2.4rem;
+  }
+  .md-typeset h2 .headerlink {margin-top: .6rem;}
+  .md-typeset h3 .headerlink {margin-top: .4rem;}
+  .md-typeset h4 .headerlink {margin-top: .2rem;}
+  .md-typeset h5 .headerlink,
+  .md-typeset h6 .headerlink {margin-top: 0;}
 }
 
 /* Progress Bars */
@@ -173,73 +206,4 @@
     height: 22px;
     border-right: 1px solid #ddd;
   }
-}
-
-/* Critic Block */
-.md-typeset .critic.block {
-  display: block;
-  margin: 0;
-  padding: .02em;
-}
-
-/* Header Anchors */
-.md-typeset .headeranchor-link {
-  opacity: 0;
-  float: left;
-  margin-top:  -.5rem;
-  padding-right: 4px;
-  margin-left: -2.4rem;
-  text-decoration: none;
-}
-
-.md-typeset .headeranchor-link:not(:hover) {
-  color: rgba(0, 0, 0, 0.26);
-}
-
-.md-typeset .headeranchor-link:focus {
-  outline: none;
-}
-
-.md-typeset h1:target .headeranchor-link,
-.md-typeset h2:target .headeranchor-link,
-.md-typeset h3:target .headeranchor-link,
-.md-typeset h4:target .headeranchor-link,
-.md-typeset h5:target .headeranchor-link,
-.md-typeset h6:target .headeranchor-link {
-  opacity: 1;
-  text-decoration: none;
-  -webkit-transform:translateY(.5rem);
-  transform:translateY(.5rem);
-}
-
-.md-typeset h1:hover .headeranchor-link,
-.md-typeset h2:hover .headeranchor-link,
-.md-typeset h3:hover .headeranchor-link,
-.md-typeset h4:hover .headeranchor-link,
-.md-typeset h5:hover .headeranchor-link,
-.md-typeset h6:hover .headeranchor-link {
-  opacity: 1;
-  text-decoration: none;
-  -webkit-transform:translateY(.5rem);
-  transform:translateY(.5rem);
-  -webkit-transition: color .25s,opacity .125s .25s,-webkit-transform .25s .25s;
-  transition: color .25s,opacity .125s .25s,-webkit-transform .25s .25s;
-  transition: transform .25s .25s,color .25s,opacity .125s .25s;
-  transition: transform .25s .25s,color .25s,opacity .125s .25s,-webkit-transform .25s .25s;
-}
-
-.md-typeset .headeranchor {
-  vertical-align: middle;
-  font: normal normal 2rem "Material Icons";
-  line-height: 1;
-  display: inline-block;
-  text-decoration: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.md-typeset .headeranchor:before {
-  content: '\E157';
 }

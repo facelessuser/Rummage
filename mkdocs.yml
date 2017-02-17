@@ -2,6 +2,10 @@ site_name: Rummage Documentation
 repo_url: https://github.com/facelessuser/Rummage
 site_description: A search and replace tool written in Python.
 copyright: Copyright &copy; 2013 - 2017 <a href="https://github.com/facelessuser">Isaac Muse</a>
+
+theme: material
+theme_dir: doc_theme
+
 pages:
   - Rummage: index.md
   - Installation: installation.md
@@ -9,34 +13,52 @@ pages:
   - Contributing &amp; Support: contributing.md
   - Changelog: changelog.md
   - License: license.md
-theme: material
-theme_dir: doc_theme
+
 markdown_extensions:
   - markdown.extensions.toc:
       slugify: !!python/name:pymdownx.headeranchor.uslugify
+      permalink: 
   - markdown.extensions.admonition:
   - markdown.extensions.smarty:
       smart_quotes: false
-  - markdown.extensions.codehilite:
-      guess_lang: false
-  - pymdownx.extra:
+  - pymdownx.betterem:
+  - markdown.extensions.attr_list:
+  - markdown.extensions.def_list:
+  - markdown.extensions.tables:
+  - markdown.extensions.abbr:
+  - pymdownx.extrarawhtml:
+  - pymdownx.superfences:
+      css_class: codehilite
+  - pymdownx.highlight:
+      extend_pygments_lang:
+        - name: php-inline
+          lang: php
+          options:
+            startinline: true
   - pymdownx.inlinehilite:
+      css_class: codehilite
   - pymdownx.magiclink:
+      repo_url_shortener: true
+      base_repo_url: https://github.com/facelessuser/Rummage
+  - pymdownx.escapeall:
+      hardbreak: True
+      nbsp: True
   - pymdownx.tilde:
   - pymdownx.caret:
   - pymdownx.smartsymbols:
   - pymdownx.emoji:
-      options:
-        attributes:
-          height: 20px
-          width: 20px
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.headeranchor:
+  - pymdownx.plainhtml:
+      strip_attributes: ''
+  - pymdownx.snippets:
+      base_path: docs/snippets
+
 extra:
   palette:
     primary: blue
-    accent: cyan
+    accent: purple
   font:
     text: Roboto
     code: Roboto Mono

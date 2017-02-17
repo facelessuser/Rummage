@@ -1,0 +1,15 @@
+[backrefs]: http://facelessuser.github.io/backrefs/
+[chardet]: https://pypi.python.org/pypi/chardet
+[format-string]: https://docs.python.org/2/library/string.html#format-string-syntax
+[gntp]: https://github.com/kdfm/gntp
+[grepwin]: http://stefanstools.sourceforge.net/grepWin.html
+[growl-linux]: http://mattn.github.io/growl-for-linux/
+[growl-macos]: http://growl.info/
+[grol-win]: http://www.growlforwindows.com/gfw/
+[mkdocs]: https://github.com/mkdocs/mkdocs
+[mkdocs-material]: https://github.com/squidfunk/mkdocs-material
+[pymdown-extensions]: https://github.com/facelessuser/pymdown-extensions
+[re]: https://docs.python.org/3/library/re.html
+[regex]: https://pypi.python.org/pypi/regex
+[terminal-notifier]: https://github.com/alloy/terminal-notifier
+[wxpython]: http://www.wxpython.org/

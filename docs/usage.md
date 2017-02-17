@@ -1,4 +1,5 @@
 ## Overview
+
 Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, and Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search options are all contained in the **Search** tab.  When a search has been completed, general info about the matches found in files will be displayed in the **Files** tab, and more detailed context information will be displayed in the **Content** tab.
 
 Rummage also comes with a simple regex tester to test out patterns. It also provides a feature where patterns can be saved for later and/or frequent use.
@@ -42,7 +43,7 @@ When mousing over an entry, the full path to the file will be shown in the statu
 
 The **Search &amp; Replace** panel contains three text boxes with a dropdown history. The first textbox defines **where to search**, the second defines **what to search for**, and the last defines **what to replace matches with** (this is only needed when doing replaces).  You can select previously used patterns and search targets by expanding the dropdown panel for the input.
 
-Below the text boxes are toggles that control the regex engines flags and/or features.  These will vary depending on which regex engine you are using as Rummage can be used with Python's default [**re**](https://docs.python.org/2/library/re.html) engine or the third party [**regex**](https://pypi.python.org/pypi/regex) engine.  Both optionally can use the a special wrapper called **backrefs** to add support for a couple special escapes.
+Below the text boxes are toggles that control the regex engines flags and/or features.  These will vary depending on which regex engine you are using as Rummage can be used with Python's default [**re**][re] engine or the third party [**regex**][regex] engine.  Both optionally can use the a special wrapper called **backrefs** to add support for a couple special escapes.
 
 Underneath the regex flags, are toggles for general Rummage search features.  These will alter search and/or replace behavior.
 
@@ -51,34 +52,34 @@ Lastly, Rummage provides buttons to launch a regex test window or to save and lo
 ### Common Regular Expression Flags
 Both the **re** and **regex** engine have a couple of shared flags that are exposed in Rummage. These toggles are found directly under the search and replace text boxes.
 
-| Toggle | Description |
-|--------|-------------|
-| Search with regex | Alters the behavior of `Search for` and `Replace with`.  When this is checked, both text boxes require regular expression patterns opposed to literal string. |
-| Search case-sensitive | Forces the search to be case-sensitive. |
-| Dot matches newline | `.` will also match newlines. |
-| Use Unicode properties | Changes the behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use use characters from the Unicode property database (will also modify `\l`, `\L`, `\c`, and `\C` if using **backrefs** with **re**). |
+Toggle                   | Description
+------------------------ | -----------
+Search\ with\ regex      | Alters the behavior of `Search for` and `Replace with`.  When this is checked, both text boxes require regular expression patterns opposed to literal string.
+Search\ case-sensitive   | Forces the search to be case-sensitive.
+Dot\ matches\ newline    | `.` will also match newlines.
+Use\ Unicode\ properties | Changes the behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use use characters from the Unicode property database (will also modify `\l`, `\L`, `\c`, and `\C` if using **backrefs** with **re**).
 
 ### Regex Engine Flags
 If the **regex** engine is being used for regular expressions, a couple of extra toggles will be available.  **Regex** can be run in either `VERSION0` or `VERSION1` mode.  `VERSION0` is compatible with **re** regex patterns and has the extra `fullcase` toggle.  `VERSION1` does not have this toggle as it is enabled by default and can only be disabled inline in a pattern with `(?-f)`. `VERSION1` is not directly compatible with **re** as it adds a number of changes to the syntax allowing for more advanced search options.
 
-| Toggle | Description |
-|--------|-------------|
-| Best fuzzy match | If performing a fuzzy match, the *best* fuzzy match will be used. |
-| Improve fuzzy fit | Makes fuzzy matching attempt to improve the fit of the next match that it finds. |
-| Unicode word breaks | Will use proper Unicode word breaks when Unicode is enabled.  This differs from **re**'s default. |
-| Search backwards | Search backwards. The result of a reverse search is not necessarily the reverse of a forward search. |
-| Format style replacements | Replace pattern will use [Python's string replace format](https://docs.python.org/2/library/string.html#format-string-syntax) for replace. `#!python "{1[-1]} {1[-2]} {1[-3]}"` etc. |
-| Full case-folding | Use full case folding. Regex `V0` only as it is enabled by default for `V1`. |
+Toggle                      | Description
+--------------------------- | -----------
+Best\ fuzzy\ match          | If performing a fuzzy match, the *best* fuzzy match will be used.
+Improve\ fuzzy\ fit         | Makes fuzzy matching attempt to improve the fit of the next match that it finds.
+Unicode\ word\ breaks       | Will use proper Unicode word breaks when Unicode is enabled.  This differs from **re**'s default.
+Search\ backwards           | Search backwards. The result of a reverse search is not necessarily the reverse of a forward search.
+Format\ style\ replacements | Replace pattern will use [Python's string replace format][format-string] for replace. `#!python "{1[-1]} {1[-2]} {1[-3]}"` etc.
+Full\ case-folding          | Use full case folding. Regex `V0` only as it is enabled by default for `V1`.
 
 ### Rummage Flags
 Rummage has a couple of flags that are not specific to the regular expression engine.
 
-| Toggle | Description |
-|--------|-------------|
-| Boolean match | Will check each file up until the first match and will then move on.  No line context info will be gathered or displayed. Does not apply to replaces. |
-| Count only | Will just count the number of matches in the file, but will not display line context information. This has no effect or replaces. |
-| Create backups | On replace, files with matches will be backed up before applying the replacements; backup files will have `.rum-bak` extension. |
-| Force &lt;encoding&gt; | Forces all files to be opened with the specified encoding opposed to trying to detect the encoding.  Encoding is hard and slow, so this is the preferred method for fast searches.  On failure, binary will be used instead. |
+Toggle                  | Description
+----------------------- | -----------
+Boolean\ match          | Will check each file up until the first match and will then move on.  No line context info will be gathered or displayed. Does not apply to replaces.
+Count\ only             | Will just count the number of matches in the file, but will not display line context information. This has no effect or replaces.
+Create\ backups         | On replace, files with matches will be backed up before applying the replacements; backup files will have `.rum-bak` extension.
+Force\ &lt;encoding&gt; | Forces all files to be opened with the specified encoding opposed to trying to detect the encoding.  Encoding is hard and slow, so this is the preferred method for fast searches.  On failure, binary will be used instead.
 
 ### Regex Tester
 
@@ -107,16 +108,16 @@ To load a pattern that was saved previously, click the `Load Search` button.  Yo
 
 The limit search pattern contains inputs and toggles to filter which files will be searched.  Some people may like to set up the filters and hide the panel.  If this is desired, you can select in the windows menu **View-->Hide Limit Search Panel**, and the panel will be hidden.
 
-| Limiter | Description |
-|---------|-------------|
-| Size of | Limits files that are searched by size in Kilobytes.  Files are limited by whether they are greater than, less than, or equal to the specified size.  Setting the dropdown to `any` essential disables the filter and allows any file size to be searched. It is recommended to cap searches sizes for the best performances.  The more complex the search pattern, the longer it will take to search really large files. |
-| Modified | Limits the files to be searched by the modified timestamp.  It contains a date picker and time picker that are used to specify the target date and time. Files are limited by whether their timestamp comes before, after, or on specified date time.  Setting the dropdown to `on any` essential disables the filter and allows a file with any timestamp to be searched. |
-| Created | Limits the files to be searched by the creation timestamp.  It contains a date picker and time picker that are used to specify the target date and time. Files are limited by whether their timestamp comes before, after, or on specified date time.  Setting the dropdown to `on any` essential disables the filter and allows a file with any timestamp to be searched. |
-| Files which match | Specifies a file pattern for files that should be searched.  Multiple file patterns can be specified with `;` used as a separator. If the Regex toggle to the text box's right is selected, the file pattern must be a regular expression pattern.  You can select previously used patterns by expanding the dropdown panel for the input. |
-| Exclude folders | Specifies a directory exclude pattern to filter out folders that are not to be crawled.  Multiple file patterns can be specified with `;` used as a separator.  If the Regex toggle to the text box's right is selected, the file pattern must be a regular expression pattern.  You can select previously used patterns by expanding the dropdown panel for the input. |
-| Include subfolders | Indicates that folders should be recursively searched. |
-| Include hidden | The given OS's native hidden files, folders and dotfiles will be included in the search. |
-| Include binary files | Forces rummage to search binary files. |
+Limiter                | Description
+---------------------- |------------
+Size\ of               | Limits files that are searched by size in Kilobytes.  Files are limited by whether they are greater than, less than, or equal to the specified size.  Setting the dropdown to `any` essential disables the filter and allows any file size to be searched. It is recommended to cap searches sizes for the best performances.  The more complex the search pattern, the longer it will take to search really large files.
+Modified               | Limits the files to be searched by the modified timestamp.  It contains a date picker and time picker that are used to specify the target date and time. Files are limited by whether their timestamp comes before, after, or on specified date time.  Setting the dropdown to `on any` essential disables the filter and allows a file with any timestamp to be searched.
+Created                | Limits the files to be searched by the creation timestamp.  It contains a date picker and time picker that are used to specify the target date and time. Files are limited by whether their timestamp comes before, after, or on specified date time.  Setting the dropdown to `on any` essential disables the filter and allows a file with any timestamp to be searched.
+Files\ which\ match    | Specifies a file pattern for files that should be searched.  Multiple file patterns can be specified with `;` used as a separator. If the Regex toggle to the text box's right is selected, the file pattern must be a regular expression pattern.  You can select previously used patterns by expanding the dropdown panel for the input.
+Exclude\ folders       | Specifies a directory exclude pattern to filter out folders that are not to be crawled.  Multiple file patterns can be specified with `;` used as a separator.  If the Regex toggle to the text box's right is selected, the file pattern must be a regular expression pattern.  You can select previously used patterns by expanding the dropdown panel for the input.
+Include\ subfolders    | Indicates that folders should be recursively searched.
+Include\ hidden        | The given OS's native hidden files, folders and dotfiles will be included in the search.
+Include\ binary\ files | Forces rummage to search binary files.
 
 ## Export to CSV or HTML
 
@@ -144,11 +145,11 @@ You can then add arguments.  Each argument must be added as a separate entry.  S
 
 As noted in the image above, Rummage provides 3 special variables that can be used to insert the file name, line number, or column number.
 
-| Argument Variables | Description |
-|--------------------|-------------|
-| \{$file} | Insert the file name. |
-| \{$line} | Insert the line number. |
-| \{$col}  | Insert the column number. |
+Argument Variables | Description
+------------------ | -----------
+\{$file}           | Insert the file name.
+\{$line}           | Insert the line number.
+\{$col}            | Insert the column number.
 
 ### General
 The **General** panel contains a couple of useful settings.
@@ -173,7 +174,7 @@ You can also select whether to use the systems built in notifications or growl.
 
 Ubuntu
 : 
-   - Growl: Support for Linux - http://mattn.github.io/growl-for-linux/.
+   - Growl: [Support for Linux][growl-linux].
    - Native: OSD via `notify-send`.
 
     !!! Note "Note"
@@ -181,8 +182,8 @@ Ubuntu
 
 OSX
 : 
-    - Growl: Support for OSX - http://growl.info/.
-    - Native: Notification Center via [terminal-notifier](https://github.com/alloy/terminal-notifier). Path to `terminal-notifier` must be configured.
+    - Growl: [Support for OSX][growl-macos].
+    - Native: Notification Center via [terminal-notifier][terminal-notifier]. Path to `terminal-notifier` must be configured.
 
     !!! Note "Note"
         When selecting `native` on OSX, an option to select the path to terminal notifier will be available since native dialogs rely on `terminal-notifier` to send notifications to the Notification Center. This must be configured or *native* notifications will not work.
@@ -191,7 +192,7 @@ OSX
 
 Windows
 : 
-    - Growl: Support for Windows - http://www.growlforwindows.com/gfw/.
+    - Growl: [Support for Windows][growl-win].
     - Native: Native windows taskbar notifications.
 
 
@@ -201,7 +202,7 @@ The **History** panel is where all text box drop down history can be cleared.
 ## Backrefs (Extended Regex Escapes)
 Rummage has the option of using a special wrapper around Python's **re** or **regex** library called backrefs.  Backrefs was written for use with Rummage and adds various additional backrefs that are known to some regex engines, but not to Python's **re** or **regex**.  The supported back references actually vary depending on the engine being used as one may already have support.  You can enable extended back references in the **Preferences** dialog under the [Regular Expressions Module](#regular-expression-modules) panel.
 
-To learn more about the added back references when using backrefs, read the official [backrefs documentation](http://facelessuser.github.io/backrefs/usage/).
+To learn more about the added back references when using backrefs, read the official [backrefs documentation][backrefs].
 
 
 ## File Manager Context Menu
@@ -272,3 +273,5 @@ Paths might vary depending on Ubuntu version etc.
     ```
 
 - Restart of Nautilus may or may not be needed, but context menu item should appear under `Scripts` and should work on files and folders.
+
+--8<-- "links.md"

@@ -3,6 +3,7 @@
 [![Coverage][codecov-image]][codecov-link]
 [![Requirements Status][requires-image]][requires-link]
 ![License][license-image]
+
 Rummage
 =======
 

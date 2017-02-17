@@ -1,3 +1,4 @@
+{% import "partials/language.html" as lang %}
 <footer class="md-footer">
   {% if page.previous_page or page.next_page %}
     <div class="md-footer-nav">
@@ -5,12 +6,12 @@
         {% if page.previous_page %}
           <a href="{{ page.previous_page.url }}" title="{{ page.previous_page.title }}" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-footer-nav__icon">arrow_back</i>
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
-                  Previous
+                  {{ lang.t('footer.previous') }}
                 </span>
                 {{ page.previous_page.title }}
               </span>
@@ -22,13 +23,13 @@
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
-                  Next
+                  {{ lang.t('footer.next') }}
                 </span>
                 {{ page.next_page.title }}
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-footer-nav__icon">arrow_forward</i>
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
             </div>
           </a>
         {% endif %}
@@ -39,25 +40,21 @@
     <div class="md-footer-meta__inner md-grid">
       <div class="md-footer-copyright">
         {% if config.copyright %}
-          <span class="md-footer-copyright__highlight">
+          <div class="md-footer-copyright__highlight">
             {{ config.copyright }}
-          </span>
-          <br>
+          </div>
         {% endif %}
         powered by
-        <a href="http://www.mkdocs.org">MkDocs</a>
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
         and
-        <a href="http://squidfunk.github.io/mkdocs-material/">
+        <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
           Material for MkDocs</a>
-        with emoji provided free by <a href="http://www.emojione.com">EmojiOne</a>
+        with emoji provided free by
+        <a href="http://www.emojione.com">EmojiOne</a>
       </div>
-      {% if config.extra.social %}
-        <div class="md-footer-social">
-          {% for social in config.extra.social %}
-            <a href="{{ social.link }}" class="md-footer-social__link socicon-{{ social.type }}"></a>
-          {% endfor %}
-        </div>
-      {% endif %}
+      {% block social %}
+        {% include "partials/social.html" %}
+      {% endblock %}
     </div>
   </div>
 </footer>
