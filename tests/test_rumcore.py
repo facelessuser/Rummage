@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import unittest
 import os
 from rummage.rummage import rumcore as rc
+from rummage.rummage import util
 import re
 import regex
 from backrefs import bre
@@ -20,12 +21,12 @@ class TestHelperFunctions(unittest.TestCase):
         """Test unicode coversion to ascii."""
 
         unicode_string = "test"
-        self.assertTrue(isinstance(rc.to_ascii_bytes(unicode_string), rc.binary_type))
+        self.assertTrue(isinstance(util.to_ascii_bytes(unicode_string), util.bstr))
 
     def test_re_flags(self):
         """Test the re flag settings."""
 
-        if rc.PY3:
+        if util.PY3:
             default = re.ASCII
         else:
             default = 0
@@ -44,7 +45,7 @@ class TestHelperFunctions(unittest.TestCase):
     def test_re_literal_flags(self):
         """Test the literal re flags."""
 
-        if rc.PY3:
+        if util.PY3:
             default = re.ASCII
         else:
             default = 0
@@ -59,7 +60,7 @@ class TestHelperFunctions(unittest.TestCase):
     def test_bre_flags(self):
         """Test the bre flag settings."""
 
-        if rc.PY3:
+        if util.PY3:
             default = re.ASCII
         else:
             default = 0
@@ -78,7 +79,7 @@ class TestHelperFunctions(unittest.TestCase):
     def test_bre_literal_flags(self):
         """Test the literal bre flags."""
 
-        if rc.PY3:
+        if util.PY3:
             default = re.ASCII
         else:
             default = 0
