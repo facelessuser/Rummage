@@ -66,9 +66,9 @@ def run():
         set_debug_mode(True)
 
     if Settings.get_single_instance():
-        app = RummageApp(redirect=True, single_instance_name="Rummage", pipe_name=Settings.get_fifo())
+        app = RummageApp(redirect=False, single_instance_name="Rummage", pipe_name=Settings.get_fifo())
     else:
-        app = RummageApp(redirect=True)
+        app = RummageApp(redirect=False)
 
     if not Settings.get_single_instance() or (Settings.get_single_instance() and app.is_instance_okay()):
         RummageFrame(

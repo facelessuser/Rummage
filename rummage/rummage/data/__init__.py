@@ -58,7 +58,7 @@ def get_bitmap(file_name):
 
     image = get_image(file_name).GetImage()
     if sys.platform == "darwin":
-        bm = wx.BitmapFromImage(image)
+        bm = image.ConvertToBitmap()
         bm.SetSize(
             (
                 int(bm.GetWidth() / 2),
@@ -70,6 +70,6 @@ def get_bitmap(file_name):
             int(image.GetWidth() / 2),
             int(image.GetHeight() / 2)
         )
-        bm = wx.BitmapFromImage(scaled)
+        bm = scaled.ConvertToBitmap()
 
     return bm

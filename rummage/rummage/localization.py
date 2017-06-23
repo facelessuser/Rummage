@@ -1,9 +1,12 @@
 """Localization."""
 from __future__ import unicode_literals
 import gettext
+import sys
 
 lang = None
 current_domain = None
+
+PY3 = (3, 0) <= sys.version_info < (4, 0)
 
 
 def _(text):
@@ -11,7 +14,7 @@ def _(text):
 
     if lang is not None:
         text = lang.gettext(text)
-    return text.decode("utf-8") if not isinstance(text, unicode) else text
+    return text.decode("utf-8") if not isinstance(text, (str if PY3 else unicode)) else text
 
 
 def setup(domain, pth, language=None):

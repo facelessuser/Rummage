@@ -32,6 +32,8 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
+PY3 = (3, 0) <= sys.version_info < (4, 0)
+
 if wx.VERSION > (2, 9, 4) and wx.VERSION < (3, 0, 3):
     def monkey_patch():
         """
@@ -276,7 +278,7 @@ def extend(instance, extension):
     """Extend instance with extension class."""
 
     instance.__class__ = type(
-        b'%s_extended_with_%s' % (instance.__class__.__name__, extension.__name__),
+        ('%s_extended_with_%s' if PY3 else b'%s_extended_with_%s') % (instance.__class__.__name__, extension.__name__),
         (instance.__class__, extension),
         {}
     )

@@ -20,6 +20,7 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
+import wx.adv
 import sys
 import threading
 import traceback
@@ -402,7 +403,7 @@ class RummageThread(threading.Thread):
                     if f.error is not None:
                         _ERRORS.append(f)
             self.update_status()
-            wx.GetApp().WakeUpIdle()
+            wx.WakeUpIdle()
 
             if _ABORT:
                 self.rummage.kill()
@@ -530,6 +531,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         super(RummageFrame, self).__init__(parent)
 
+        self.debug_mode = debug_mode
+
         self.hide_limit_panel = False
 
         self.SetIcon(data.get_image('rummage_large.png').GetIcon())
@@ -554,9 +557,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ],
             debug_event=(self.on_debug_console if debug_mode else None)
         )
-
-        if debug_mode:
-            self.open_debug_console()
 
         # Update status on when idle
         self.Bind(wx.EVT_IDLE, self.on_idle)
@@ -606,7 +606,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # So we disable the window preventing all focus events, and THEN
         # we use a timeout call to delay our default focus to ensure it is done last.
         self.Enable(False)
-        wx.FutureCall(500, self.on_load)
+        wx.CallLater(500, self.on_load).Start()
 
     def localize(self):
         """Localize."""
@@ -683,7 +683,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         obj = self.FindFocus()
         is_ac_combo = isinstance(obj, AutoCompleteCombo)
-        is_date_picker = isinstance(obj, wx.GenericDatePickerCtrl)
+        is_date_picker = isinstance(obj, wx.adv.GenericDatePickerCtrl)
         is_button = isinstance(obj, wx.Button)
         if (
             (
@@ -722,6 +722,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.Enable(True)
         self.m_searchfor_textbox.GetTextCtrl().SetFocus()
         self.Refresh()
+
+        if self.debug_mode:
+            self.open_debug_console()
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""

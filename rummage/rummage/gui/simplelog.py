@@ -21,6 +21,9 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import codecs
 import threading
+import sys
+
+PY3 = (3, 0) <= sys.version_info < (4, 0)
 
 ALL = 0
 DEBUG = 10
@@ -71,7 +74,7 @@ class Log(object):
 
         return log_fmt % {
             "loglevel": lvl,
-            "message": unicode(msg if msg_fmt is None else msg_fmt(msg))
+            "message": (str if PY3 else unicode)(msg if msg_fmt is None else msg_fmt(msg))
         }
 
     def debug(self, msg, log_fmt="%(loglevel)s: %(message)s\n", echo=True, msg_fmt=None):

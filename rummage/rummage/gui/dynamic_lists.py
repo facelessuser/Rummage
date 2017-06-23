@@ -21,10 +21,14 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import wx.lib.mixins.listctrl as listmix
+import sys
+import functools
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
 USE_SAMPLE_SIZE = True
+
+PY3 = (3, 0) <= sys.version_info < (4, 0)
 
 
 class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
@@ -100,7 +104,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def reset_list(self):
         """Reset the list."""
 
-        self.DeleteAllColumns()
+        self.ClearAll()
         self.itemDataMap = {}
         self.SetItemCount(0)
         self.size_sample = COLUMN_SAMPLE_SIZE
@@ -130,7 +134,10 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
         items = list(self.itemDataMap.keys())
         if sorter is not None:
-            items.sort(sorter)
+            if PY3:
+                items.sort(key=functools.cmp_to_key(sorter))
+            else:
+                items.sort(sorter)
         else:
             items.sort()
         self.itemIndexMap = items
@@ -146,14 +153,14 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def get_item_text(self, idx, col, absolute=False):
         """Return the text for the given item and col."""
 
-        return unicode(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
+        return (str if PY3 else unicode)(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
 
     def OnGetItemAttr(self, item):
         """Override method to get attributes for the cells in the given item."""
 
         if item % 2 == 0:
             return self.attr1
-        return -1
+        return None
 
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""

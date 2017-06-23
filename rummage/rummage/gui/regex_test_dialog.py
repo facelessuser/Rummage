@@ -205,7 +205,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_test_text.SetStyle(
             0,
             self.m_test_text.GetLastPosition(),
-            wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
+            wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
         )
 
     def test_regex(self):
@@ -233,7 +233,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.m_test_text.SetStyle(
                     0,
                     self.m_test_text.GetLastPosition(),
-                    wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
+                    wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
                 )
                 self.testing = False
                 return
@@ -361,7 +361,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     self.m_test_text.SetStyle(
                         m.start(0),
                         m.end(0),
-                        wx.TextAttr(colBack=wx.Colour(0xFF, 0xCC, 0x00))
+                        wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(0xFF, 0xCC, 0x00))
                     )
                 if replace_test:
                     new_text.append(text[offset:])

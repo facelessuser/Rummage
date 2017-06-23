@@ -24,12 +24,15 @@ from __future__ import unicode_literals
 import codecs
 import json
 import os
-import simplelog
+from . import simplelog
 import sys
-import thread
 import time
 import wx
 import wx.lib.newevent
+try:
+    import thread
+except ImportError:
+    import _thread as thread
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 
@@ -138,6 +141,8 @@ class GuiLog(wx.PyOnDemandOutputWindow):
 class CustomApp(wx.App):
     """Custom app that adds a number of features."""
 
+    outputWindowClass = GuiLog
+
     def __init__(self, *args, **kwargs):
         """
         Init the custom app.
@@ -150,7 +155,6 @@ class CustomApp(wx.App):
         """
 
         self.instance = None
-        self.outputWindowClass = GuiLog
         self.custom_init(*args, **kwargs)
         if "single_instance_name" in kwargs:
             del kwargs["single_instance_name"]
@@ -165,7 +169,7 @@ class CustomApp(wx.App):
         self.init_callback = None
         instance_name = kwargs.get("single_instance_name", None)
         callback = kwargs.get("callback", None)
-        if instance_name is not None and isinstance(instance_name, basestring):
+        if instance_name is not None and isinstance(instance_name, (str if PY3 else basestring)):
             self.single_instance = instance_name
         if callback is not None and hasattr(callback, '__call__'):
             self.init_callback = callback
@@ -429,6 +433,7 @@ class DebugFrameExtender(object):
         set_debug_console(True)
         # echo out log to console
         log.set_echo(True)
+        print(wx.GetApp().stdioWin)
         if wx.GetApp().stdioWin.frame is None:
             wx.GetApp().stdioWin.write(log.read(), False)
         else:
