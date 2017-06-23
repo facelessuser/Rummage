@@ -5,7 +5,7 @@ import codecs
 import wx
 from wx.lib.embeddedimage import PyEmbeddedImage
 import base64
-import sys
+from .. import util
 
 RESOURCE_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -57,7 +57,7 @@ def get_bitmap(file_name):
     """
 
     image = get_image(file_name).GetImage()
-    if sys.platform == "darwin":
+    if util.platform() == "osx":
         bm = image.ConvertToBitmap()
         bm.SetSize(
             (

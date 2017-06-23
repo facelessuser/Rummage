@@ -21,7 +21,6 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import codecs
 import json
-import sys
 from os import mkdir, listdir
 from os.path import expanduser, exists, join, getmtime, isdir
 import traceback
@@ -35,13 +34,7 @@ from . generic_dialogs import errormsg
 from .. import data
 from .. import rumcore
 from .. import portalocker
-
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
+from .. import util
 
 SETTINGS_FILE = "rummage.settings"
 CACHE_FILE = "rummage.cache"
@@ -235,7 +228,9 @@ class Settings(object):
     def get_settings_files(cls):
         """Get settings, cache, log, and fifo location."""
 
-        if _PLATFORM == "windows":
+        platform = util.platform()
+
+        if platform == "windows":
             folder = expanduser("~\\.Rummage")
             if not exists(folder):
                 mkdir(folder)
@@ -244,7 +239,7 @@ class Settings(object):
             log = join(folder, LOG_FILE)
             cls.fifo = join(folder, '\\\\.\\pipe\\rummage')
             cls.config_folder = folder
-        elif _PLATFORM == "osx":
+        elif platform == "osx":
             old_folder = expanduser("~/Library/Application Support/Rummage")
             folder = expanduser("~/.Rummage")
             if exists(old_folder) and not exists(folder):
@@ -257,7 +252,7 @@ class Settings(object):
             log = join(folder, LOG_FILE)
             cls.fifo = join(folder, FIFO)
             cls.config_folder = folder
-        elif _PLATFORM == "linux":
+        elif platform == "linux":
             folder = expanduser("~/.config/Rummage")
             if not exists(folder):
                 mkdir(folder)
@@ -337,7 +332,7 @@ class Settings(object):
         cls.reload_settings()
         editor = cls.settings.get("editor", [])
         if isinstance(editor, dict):
-            editor = editor.get(_PLATFORM, [])
+            editor = editor.get(util.platform(), [])
 
         return [
             arg.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col)) for arg in editor
@@ -480,16 +475,17 @@ class Settings(object):
     def get_platform_notify(cls):
         """Get all possible platform notification styles."""
 
-        return NOTIFY_STYLES[_PLATFORM]
+        return NOTIFY_STYLES[util.platform()]
 
     @classmethod
     def get_notify_method(cls):
         """Get notification style."""
 
         cls.reload_settings()
-        method = cls.settings.get("notify_method", NOTIFY_STYLES[_PLATFORM][0])
-        if method is None or method == "native" or method not in NOTIFY_STYLES[_PLATFORM]:
-            method = NOTIFY_STYLES[_PLATFORM][0]
+        platform = util.platform()
+        method = cls.settings.get("notify_method", NOTIFY_STYLES[platform][0])
+        if method is None or method == "native" or method not in NOTIFY_STYLES[platform]:
+            method = NOTIFY_STYLES[platform][0]
         return method
 
     @classmethod
@@ -497,7 +493,7 @@ class Settings(object):
         """Set notification style."""
 
         if notify_method not in ["native", "growl"]:
-            notify_method = NOTIFY_STYLES[_PLATFORM][0]
+            notify_method = NOTIFY_STYLES[util.platform()][0]
         if notify_method in ["native"]:
             notify_method = "native"
         cls.reload_settings()

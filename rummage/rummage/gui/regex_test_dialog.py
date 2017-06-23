@@ -20,7 +20,6 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import re
-import sys
 import traceback
 import wx
 import functools
@@ -29,6 +28,7 @@ from .. import data
 from .settings import Settings
 from ..localization import _
 from .. import rumcore
+from .. import util
 from backrefs import bre, bregex
 
 
@@ -46,7 +46,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
-            [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+            [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
 
         self.m_case_checkbox.SetValue(parent.m_case_checkbox.GetValue() if parent else False)

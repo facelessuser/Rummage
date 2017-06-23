@@ -2,18 +2,11 @@
 from __future__ import unicode_literals
 from time import ctime
 import codecs
-import sys
 import subprocess
 from ..localization import _
+from .. import util
 
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
-
-if _PLATFORM == "windows":
+if util.platform() == "windows":
     from os import startfile
 
 
@@ -107,9 +100,10 @@ def export(export_csv, search, regex_search, result_list, result_content_list):
         export_result_list(result_list, csv)
         export_result_content_list(result_content_list, csv)
 
-    if _PLATFORM == "osx":
+    platform = util.platform()
+    if platform == "osx":
         subprocess.Popen(['open', csv.name])
-    elif _PLATFORM == "windows":
+    elif platform == "windows":
         startfile(csv.name)
     else:
         try:

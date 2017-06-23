@@ -21,14 +21,12 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import wx.lib.mixins.listctrl as listmix
-import sys
 import functools
+from .. import util
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
 USE_SAMPLE_SIZE = True
-
-PY3 = (3, 0) <= sys.version_info < (4, 0)
 
 
 class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
@@ -134,10 +132,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
         items = list(self.itemDataMap.keys())
         if sorter is not None:
-            if PY3:
-                items.sort(key=functools.cmp_to_key(sorter))
-            else:
-                items.sort(sorter)
+            util.sorted_callback(items, sorter)
         else:
             items.sort()
         self.itemIndexMap = items
@@ -153,7 +148,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def get_item_text(self, idx, col, absolute=False):
         """Return the text for the given item and col."""
 
-        return (str if PY3 else unicode)(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
+        return util.ustr(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
 
     def OnGetItemAttr(self, item):
         """Override method to get attributes for the cells in the given item."""

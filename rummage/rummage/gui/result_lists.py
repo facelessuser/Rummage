@@ -27,9 +27,7 @@ from .open_editor import open_editor
 from ..localization import _
 from .. import data
 import decimal
-import sys
-
-PY3 = (3, 0) <= sys.version_info < (4, 0)
+from .. import util
 
 
 class ResultFileList(DynamicList):
@@ -116,7 +114,7 @@ class ResultFileList(DynamicList):
         elif col in [5, 6]:
             return ctime(self.itemDataMap[item][col])
         else:
-            return (str if PY3 else unicode)(self.itemDataMap[item][col])
+            return ustr(self.itemDataMap[item][col])
 
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
@@ -208,9 +206,9 @@ class ResultContentList(DynamicList):
         if not absolute:
             item = self.itemIndexMap[item]
         if col == 0:
-            return (str if PY3 else unicode)(self.itemDataMap[item][col][0])
+            return ustr(self.itemDataMap[item][col][0])
         else:
-            return (str if PY3 else unicode)(self.itemDataMap[item][col])
+            return ustr(self.itemDataMap[item][col])
 
     def increment_match_count(self, idx):
         """Increment the match count of the given item."""

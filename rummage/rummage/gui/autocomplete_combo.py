@@ -20,14 +20,7 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-import sys
-
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
+from .. import util
 
 
 class AutoCompleteCombo(wx.ComboCtrl):
@@ -60,7 +53,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
         self.Bind(wx.EVT_KEY_UP, self.on_key_up)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
-        if _PLATFORM != "linux":
+        if util.platform() != "linux":
             self.Bind(wx.EVT_TEXT, self.on_text_change)
         else:
             self.Bind(wx.EVT_TEXT, self.on_changed_callback)

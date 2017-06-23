@@ -21,7 +21,6 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import wx.adv
-import sys
 import threading
 import traceback
 import webbrowser
@@ -52,6 +51,7 @@ from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .messages import dirpickermsg, filepickermsg
 from .. import data
+from .. import util
 import decimal
 
 DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
@@ -552,7 +552,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Setup debugging
         self.set_keybindings(
             [
-                (wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
+                (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
                 (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
             ],
             debug_event=(self.on_debug_console if debug_mode else None)

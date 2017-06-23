@@ -24,31 +24,18 @@ from __future__ import unicode_literals
 import codecs
 import json
 import os
-from . import simplelog
 import sys
+from . import simplelog
 import time
 import wx
 import wx.lib.newevent
+from .. import util
 try:
     import thread
 except ImportError:
     import _thread as thread
 
-PY3 = (3, 0) <= sys.version_info < (4, 0)
-
-if PY3:
-    binary_type = bytes  # noqa
-else:
-    binary_type = str  # noqa
-
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
-
-if _PLATFORM == "windows":
+if util.platform() == "windows":
     import ctypes
     GENERIC_READ = 0x80000000
     GENERIC_WRITE = 0x40000000
@@ -87,7 +74,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
         # Create debug keybinding to open debug console
         debugid = wx.NewId()
         self.frame.Bind(wx.EVT_MENU, self.debug_close, id=debugid)
-        mod = wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL
+        mod = wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL
         accel_tbl = wx.AcceleratorTable(
             [(mod, ord('`'), debugid)]
         )
@@ -169,7 +156,7 @@ class CustomApp(wx.App):
         self.init_callback = None
         instance_name = kwargs.get("single_instance_name", None)
         callback = kwargs.get("callback", None)
-        if instance_name is not None and isinstance(instance_name, (str if PY3 else basestring)):
+        if instance_name is not None and isinstance(instance_name, util.string_type):
             self.single_instance = instance_name
         if callback is not None and hasattr(callback, '__call__'):
             self.init_callback = callback
@@ -237,7 +224,7 @@ class ArgPipeThread(object):
         """
 
         self.check_pipe = False
-        if _PLATFORM == "windows":
+        if util.platform() == "windows":
             file_handle = ctypes.windll.kernel32.CreateFileW(
                 self.pipe_name,
                 GENERIC_READ | GENERIC_WRITE,
@@ -268,7 +255,7 @@ class ArgPipeThread(object):
     def Run(self):  # noqa
         """The actual thread listening loop."""
 
-        if _PLATFORM == "windows":
+        if util.platform() == "windows":
             data = ""
             p = ctypes.windll.kernel32.CreateNamedPipeW(
                 self.pipe_name,
@@ -345,13 +332,13 @@ class PipeApp(CustomApp):
         args = []
         encoding = sys.getfilesystemencoding()
         for a in sys.argv[1:]:
-            args.append(a.decode(encoding) if isinstance(a, binary_type) else a)
+            args.append(a.decode(encoding) if isinstance(a, util.bstr) else a)
         return args
 
     def send_arg_pipe(self):
         """Send the current arguments down the pipe."""
         argv = self.get_sys_args()
-        if _PLATFORM == "windows":
+        if util.platform() == "windows":
             args = self.process_args(argv)
             file_handle = ctypes.windll.kernel32.CreateFileW(
                 self.pipe_name,
@@ -416,7 +403,7 @@ class DebugFrameExtender(object):
         tbl = []
         bindings = keybindings
         if debug_event is not None:
-            mod = wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL
+            mod = wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL
             bindings.append((mod, ord('`'), debug_event))
 
         for binding in keybindings:

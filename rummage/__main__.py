@@ -24,21 +24,16 @@ import argparse
 import sys
 from .rummage.gui.settings import Settings
 from .rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame
+from .rummage import util
 from .rummage import __meta__
 
-PY3 = (3, 0) <= sys.version_info < (4, 0)
 CLI_ENCODING = sys.getfilesystemencoding()
-
-if PY3:
-    binary_type = bytes  # noqa
-else:
-    binary_type = str  # noqa
 
 
 def pyin(value):
     """Read in stdin variables."""
 
-    return value.decode(CLI_ENCODING) if isinstance(value, binary_type) else value
+    return value.decode(CLI_ENCODING) if isinstance(value, util.bstr) else value
 
 
 def parse_arguments():

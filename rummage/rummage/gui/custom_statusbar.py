@@ -21,20 +21,11 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 from collections import OrderedDict
-import sys
 import wx
 import wx.lib.agw.supertooltip
+from .. import util
 
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
-
-PY3 = (3, 0) <= sys.version_info < (4, 0)
-
-if wx.VERSION > (2, 9, 4) and wx.VERSION < (3, 0, 3):
+if wx.VERSION > (2, 9, 4):  #  When will this get fixed :(
     def monkey_patch():
         """
         Monkey patch Supertooltips.
@@ -59,7 +50,7 @@ if wx.VERSION > (2, 9, 4) and wx.VERSION < (3, 0, 3):
             tt_source[count] = line[4:]
             count += 1
         exec(''.join(tt_source))
-        wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint = OnPaint  # noqa
+        wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint = locals()['OnPaint']  # noqa
 
     monkey_patch()
 
@@ -185,7 +176,7 @@ class IconTrayExtension(object):
         if name in self.sb_icons:
             self.hide_tooltip(name)
             self.sb_icons[name].Destroy()
-        self.sb_icons[name] = wx.StaticBitmap(self, bitmap=icon)
+        self.sb_icons[name] = wx.StaticBitmap(self, label=icon)
         if msg is not None:
             ToolTip(self.sb_icons[name], msg)
         if click_left is not None:
@@ -211,10 +202,11 @@ class IconTrayExtension(object):
 
         x_offset = 0
         if resize:
-            if _PLATFORM in "osx":
+            platform = util.platform()
+            if platform in "osx":
                 # OSX must increment by 10
                 self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 10])
-            elif _PLATFORM == "windows":
+            elif platform == "windows":
                 # In at least wxPython 2.9+, the first icon inserted changes the size, additional icons don't.
                 # I've only tested >= 2.9.
                 if len(self.sb_icons):
@@ -278,7 +270,7 @@ def extend(instance, extension):
     """Extend instance with extension class."""
 
     instance.__class__ = type(
-        ('%s_extended_with_%s' if PY3 else b'%s_extended_with_%s') % (instance.__class__.__name__, extension.__name__),
+        ('%s_extended_with_%s' if util.PY3 else b'%s_extended_with_%s') % (instance.__class__.__name__, extension.__name__),
         (instance.__class__, extension),
         {}
     )

@@ -8,18 +8,10 @@ import codecs
 import base64
 import json
 import subprocess
-import sys
 from ..localization import _
 from ..localization import get_current_domain
 from .. import data
-
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
-
+from .. import util
 
 def html_encode(text):
     """Format text for HTML."""
@@ -235,7 +227,8 @@ def export_result_content_list(res, html):
 def open_in_browser(name):
     """Auto open HTML."""
 
-    if _PLATFORM == "osx":
+    platform = util.platform()
+    if platform == "osx":
         web_handler = None
         try:
             launch_services = os.path.expanduser(
@@ -260,7 +253,7 @@ def open_in_browser(name):
             subprocess.Popen(['open', '-b', web_handler, name])
         else:
             subprocess.Popen(['open', name])
-    elif _PLATFORM == "windows":
+    elif platform == "windows":
         webbrowser.open(name, new=2)
     else:
         try:

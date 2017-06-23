@@ -25,7 +25,6 @@ import contextlib
 import mmap
 import os
 import re
-import sys
 import functools
 # import traceback
 from chardet.universaldetector import UniversalDetector
@@ -383,5 +382,7 @@ def sguess(bfr):
 
 
 if __name__ == "__main__":  # pragma: no cover
+    import sys
+
     print("Guessing encoding for %s" % sys.argv[1])
     print(guess(sys.argv[1]))

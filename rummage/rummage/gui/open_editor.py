@@ -20,11 +20,11 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import subprocess
-import sys
 from .settings import Settings
 from .custom_app import debug, error
 from .generic_dialogs import errormsg
 from ..localization import _
+from .. import util
 
 
 def open_editor(filename, line, col):
@@ -39,7 +39,7 @@ def open_editor(filename, line, col):
         return
     debug(cmd)
 
-    if sys.platform.startswith('win'):
+    if util.platform() == "windows":
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         process = subprocess.Popen(
