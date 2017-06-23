@@ -89,7 +89,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
         """Write to log, and if console is open, echo to it as well."""
 
         if self.frame is None:
-            if not wx.Thread_IsMain():
+            if not wx.IsMainThread():
                 if echo:
                     wx.CallAfter(gui_log, text)
                 if get_debug_console():
@@ -100,7 +100,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
                 if get_debug_console():
                     self.CreateOutputWindow(text)
         else:
-            if not wx.Thread_IsMain():
+            if not wx.IsMainThread():
                 if echo:
                     wx.CallAfter(gui_log, text)
                 if get_debug_console():
@@ -198,6 +198,7 @@ class CustomApp(wx.App):
 
         if self.instance is not None:
             del self.instance
+        return 0
 
 
 class ArgPipeThread(object):
@@ -239,13 +240,16 @@ class ArgPipeThread(object):
             )
             ctypes.windll.kernel32.CloseHandle(file_handle)
         else:
-            with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
-                try:
-                    pipeout.write('\n')
-                except IOError:
-                    # It's okay if the pipe is broken, our goal is just to break the
-                    # wait loop for recieving pipe data.
-                    pass
+            # It's okay if the pipe is broken, our goal is just to break the
+            # wait loop for recieving pipe data.
+            try:
+                with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
+                    try:
+                        pipeout.write('\n')
+                    except IOError:
+                        pass
+            except BrokenPipeError:
+                pass
 
     def IsRunning(self):  # noqa
         """Return if the thread is still busy."""
@@ -380,7 +384,7 @@ class PipeApp(CustomApp):
             while running:
                 running = self.pipe_thread.IsRunning()
                 time.sleep(0.1)
-        CustomApp.OnExit(self)
+        return CustomApp.OnExit(self)
 
     def on_pipe_args(self, event):
         """An overridable event for when pipe arguments are received."""
@@ -420,7 +424,6 @@ class DebugFrameExtender(object):
         set_debug_console(True)
         # echo out log to console
         log.set_echo(True)
-        print(wx.GetApp().stdioWin)
         if wx.GetApp().stdioWin.frame is None:
             wx.GetApp().stdioWin.write(log.read(), False)
         else:

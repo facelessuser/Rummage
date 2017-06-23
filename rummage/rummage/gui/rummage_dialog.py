@@ -531,8 +531,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         super(RummageFrame, self).__init__(parent)
 
-        self.debug_mode = debug_mode
-
         self.hide_limit_panel = False
 
         self.SetIcon(data.get_image('rummage_large.png').GetIcon())
@@ -548,6 +546,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if start_path is None:
             cwd = os.getcwdu()
             start_path = cwd
+
+        if debug_mode:
+            self.open_debug_console()
 
         # Setup debugging
         self.set_keybindings(
@@ -722,9 +723,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.Enable(True)
         self.m_searchfor_textbox.GetTextCtrl().SetFocus()
         self.Refresh()
-
-        if self.debug_mode:
-            self.open_debug_console()
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""

@@ -114,7 +114,7 @@ class ResultFileList(DynamicList):
         elif col in [5, 6]:
             return ctime(self.itemDataMap[item][col])
         else:
-            return ustr(self.itemDataMap[item][col])
+            return util.ustr(self.itemDataMap[item][col])
 
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
@@ -206,9 +206,9 @@ class ResultContentList(DynamicList):
         if not absolute:
             item = self.itemIndexMap[item]
         if col == 0:
-            return ustr(self.itemDataMap[item][col][0])
+            return util.ustr(self.itemDataMap[item][col][0])
         else:
-            return ustr(self.itemDataMap[item][col])
+            return util.ustr(self.itemDataMap[item][col])
 
     def increment_match_count(self, idx):
         """Increment the match count of the given item."""
