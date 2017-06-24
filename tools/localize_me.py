@@ -26,7 +26,7 @@ def localize(args):
         pygettext,
         "-na",
         "-o",
-        join(locale_pth, "messages.po"),
+        os.path.join(locale_pth, "messages.po"),
         search_pth
     ]
 
@@ -45,16 +45,16 @@ def localize(args):
         print(output[0])
         return 1
 
-    en_us = join(locale_pth, "en_US")
-    if not exists(en_us):
-        mkdir(en_us)
-    messages = join(en_us, "LC_MESSAGES")
-    if not exists(messages):
-        mkdir(messages)
+    en_us = os.path.join(locale_pth, "en_US")
+    if not os.path.exists(en_us):
+        os.mkdir(en_us)
+    messages = os.path.join(en_us, "LC_MESSAGES")
+    if not os.path.exists(messages):
+        os.mkdir(messages)
 
-    with codecs.open(join(locale_pth, "messages.po"), "r", encoding="utf-8") as f:
+    with codecs.open(os.path.join(locale_pth, "messages.po"), "r", encoding="utf-8") as f:
         content = f.read()
-    with codecs.open(join(messages, "rummage.po"), "w", encoding="utf-8") as f:
+    with codecs.open(os.path.join(messages, "rummage.po"), "w", encoding="utf-8") as f:
         f.write(
             content.replace(
                 '"Content-Type: text/plain; charset=CHARSET\\n"',
@@ -62,11 +62,11 @@ def localize(args):
             )
         )
 
-    for base, dirs, files in walk(locale_pth):
+    for base, dirs, files in os.walk(locale_pth):
         if len(files):
             for f in files:
                 if f == "rummage.po":
-                    source_file = join(base, f)
+                    source_file = os.path.join(base, f)
                     # Setup pygettext call
                     process = subprocess.Popen(
                         [
@@ -78,7 +78,11 @@ def localize(args):
                         shell=(True if _PLATFORM == "windows" else False)
                     )
 
-                    print("Compiling %s/%s/%s..." % (basename(dirname(base)), basename(base), "rummage.po"))
+                    print(
+                        "Compiling %s/%s/%s..." % (
+                            os.path.basename(os.path.dirname(base)), os.path.basename(base), "rummage.po"
+                        )
+                    )
                     output = process.communicate()
                     if process.returncode:
                         print("Compilation failed!")

@@ -21,8 +21,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import codecs
 import json
-from os import mkdir, listdir, remove
-from os.path import expanduser, exists, join, getmtime, isdir
+import os
 import traceback
 from ..file_strip.json import sanitize_json
 from .. import notify
@@ -161,7 +160,7 @@ class Settings(object):
 
         cls.reload_settings()
         locale = cls.settings.get("locale", "en_US")
-        if locale == "en_US" and not exists(join(cls.config_folder, "locale", "en_US")):
+        if locale == "en_US" and not os.path.exists(os.path.join(cls.config_folder, "locale", "en_US")):
             locale = None
         return locale
 
@@ -178,10 +177,10 @@ class Settings(object):
         """Return languages."""
 
         languages = []
-        base = join(cls.config_folder, "locale")
-        if exists(base):
-            for file_obj in listdir(base):
-                if isdir(join(base, file_obj)):
+        base = os.path.join(cls.config_folder, "locale")
+        if os.path.exists(base):
+            for file_obj in os.listdir(base):
+                if os.path.isdir(os.path.join(base, file_obj)):
                     languages.append(file_obj)
         if len(languages) == 0 or "en_US" not in languages:
             languages.append("en_US")
@@ -202,8 +201,8 @@ class Settings(object):
         """Get timestamp on files."""
 
         try:
-            settings_time = getmtime(cls.settings_file)
-            cache_time = getmtime(cls.cache_file)
+            settings_time = os.path.getmtime(cls.settings_file)
+            cache_time = os.path.getmtime(cls.cache_file)
             cls.settings_time = settings_time
             cls.cache_time = cache_time
         except Exception as e:
@@ -231,40 +230,40 @@ class Settings(object):
         platform = util.platform()
 
         if platform == "windows":
-            folder = expanduser("~\\.Rummage")
-            if not exists(folder):
-                mkdir(folder)
-            settings = join(folder, SETTINGS_FILE)
-            cache = join(folder, CACHE_FILE)
-            log = join(folder, LOG_FILE)
-            cls.fifo = join(folder, '\\\\.\\pipe\\rummage')
+            folder = os.path.expanduser("~\\.Rummage")
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            settings = os.path.join(folder, SETTINGS_FILE)
+            cache = os.path.join(folder, CACHE_FILE)
+            log = os.path.join(folder, LOG_FILE)
+            cls.fifo = os.path.join(folder, '\\\\.\\pipe\\rummage')
             cls.config_folder = folder
         elif platform == "osx":
-            old_folder = expanduser("~/Library/Application Support/Rummage")
-            folder = expanduser("~/.Rummage")
-            if exists(old_folder) and not exists(folder):
+            old_folder = os.path.expanduser("~/Library/Application Support/Rummage")
+            folder = os.path.expanduser("~/.Rummage")
+            if os.path.exists(old_folder) and not os.path.exists(folder):
                 import shutil
                 shutil.move(old_folder, folder)
-            if not exists(folder):
-                mkdir(folder)
-            settings = join(folder, SETTINGS_FILE)
-            cache = join(folder, CACHE_FILE)
-            log = join(folder, LOG_FILE)
-            cls.fifo = join(folder, FIFO)
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            settings = os.path.join(folder, SETTINGS_FILE)
+            cache = os.path.join(folder, CACHE_FILE)
+            log = os.path.join(folder, LOG_FILE)
+            cls.fifo = os.path.join(folder, FIFO)
             cls.config_folder = folder
         elif platform == "linux":
-            folder = expanduser("~/.config/Rummage")
-            if not exists(folder):
-                mkdir(folder)
-            settings = join(folder, SETTINGS_FILE)
-            cache = join(folder, CACHE_FILE)
-            log = join(folder, LOG_FILE)
-            cls.fifo = join(folder, FIFO)
+            folder = os.path.expanduser("~/.config/Rummage")
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            settings = os.path.join(folder, SETTINGS_FILE)
+            cache = os.path.join(folder, CACHE_FILE)
+            log = os.path.join(folder, LOG_FILE)
+            cls.fifo = os.path.join(folder, FIFO)
             cls.config_folder = folder
         try:
             locked = False
             for filename in (settings, cache):
-                if not exists(filename):
+                if not os.path.exists(filename):
                     with codecs.open(filename, "w", encoding="utf-8") as f:
                         assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock file."
                         locked = True
@@ -417,37 +416,37 @@ class Settings(object):
         pth = cls.get_config_folder()
 
         # Clean up old images
-        png = join(pth, "Rummage-notify.png")
-        icon = join(pth, "Rummage-notify.ico")
-        icns = join(pth, "Rummage-notify.icns")
+        png = os.path.join(pth, "Rummage-notify.png")
+        icon = os.path.join(pth, "Rummage-notify.ico")
+        icns = os.path.join(pth, "Rummage-notify.icns")
         for img in (png, icon, icns):
             try:
-                if exists(img):
+                if os.path.exists(img):
                     os.remove(img)
             except Exception:
                 pass
 
         # New file names
-        png = join(pth, "rum-notify.png")
-        icon = join(pth, "rum-notify.ico")
-        icns = join(pth, "rum-notify.icns")
+        png = os.path.join(pth, "rum-notify.png")
+        icon = os.path.join(pth, "rum-notify.ico")
+        icns = os.path.join(pth, "rum-notify.icns")
 
         try:
-            if not exists(png):
+            if not os.path.exists(png):
                 with open(png, "wb") as f:
                     f.write(data.get_image('rummage_hires.png').GetData())
         except Exception:
             png = None
 
         try:
-            if not exists(icon):
+            if not os.path.exists(icon):
                 with open(icon, "wb") as f:
                     f.write(data.get_image('rummage_tray.ico').GetData())
         except Exception:
             icon = None
 
         try:
-            if not exists(icns):
+            if not os.path.exists(icns):
                 with open(icns, "wb") as f:
                     f.write(data.get_image('rummage.icns').GetData())
         except Exception:
@@ -456,11 +455,11 @@ class Settings(object):
         # Set up notifications
         notifier = cls.get_term_notifier()
         if (
-            isdir(notifier) and
+            os.path.isdir(notifier) and
             notifier.endswith('.app') and
-            exists(join(notifier, 'Contents/MacOS/terminal-notifier'))
+            os.path.exists(os.path.join(notifier, 'Contents/MacOS/terminal-notifier'))
         ):
-            notifier = join(notifier, 'Contents/MacOS/terminal-notifier')
+            notifier = os.path.join(notifier, 'Contents/MacOS/terminal-notifier')
         notify.setup_notifications(
             "Rummage",
             png,
