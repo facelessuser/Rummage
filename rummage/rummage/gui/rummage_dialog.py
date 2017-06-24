@@ -581,6 +581,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.localize()
 
+        if util.platform() == "osx":
+            self.init_tab_traversal()
+
         # Setup the inputs history and replace
         # placeholder objects with actual objecs
         self.setup_inputs()
@@ -608,6 +611,51 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # we use a timeout call to delay our default focus to ensure it is done last.
         self.Enable(False)
         wx.CallLater(500, self.on_load).Start()
+
+    def init_tab_traversal(self):
+        """Initialize custom tab traversal (OSX doesn't work natively)."""
+
+        self.tab_stop = [
+            self.m_searchin_text,
+            self.m_searchfor_textbox,
+            self.m_replace_textbox,
+            self.m_size_text,
+            self.m_modified_date_picker,
+            self.m_modified_time_picker,
+            self.m_created_date_picker,
+            self.m_created_time_picker,
+            self.m_exclude_textbox,
+            self.m_filematch_textbox
+        ]
+
+        idx = 0
+        self.id_to_tab_idx = {}
+        for ts in self.tab_stop:
+            self.id_to_tab_idx[ts.GetId()] = idx
+            ts.Bind(wx.EVT_KEY_DOWN, self.on_tab_traversal)
+            idx += 1
+        self.min_tab = 0
+        self.max_tab = idx - 1
+        self.max_limit_tab = 2
+
+    def on_tab_traversal(self, event):
+        """Handle tab traversal."""
+
+        key = event.GetKeyCode()
+        if key == wx.WXK_TAB:
+            obj = self.FindFocus()
+            idx = self.id_to_tab_idx.get(obj.GetId())
+            if idx is not None:
+                max_tab = self.max_limit_tab if not self.m_limiter_panel.IsShown() else self.max_tab
+                if event.ShiftDown():
+                    # Tab backwards
+                    idx = max_tab if idx == self.min_tab else idx - 1
+                else:
+                    # Tab forward
+                    idx = self.min_tab if idx == max_tab else idx + 1
+                self.tab_stop[idx].SetFocus()
+                return
+        event.Skip()
 
     def localize(self):
         """Localize."""
@@ -935,6 +983,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Determine if search in input is a file or not, and hide/show elements accordingly."""
 
         self.limit_panel_toggle()
+        self.optimize_size(height_only=True)
 
         pth = self.m_searchin_text.GetValue()
         if not self.searchin_update:
