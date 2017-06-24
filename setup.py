@@ -80,7 +80,9 @@ setup(
     install_requires=[
         "gntp>=1.0.2",
         "chardet>=2.3.0",
-        "backrefs>=1.0.0"
+        "backrefs>=1.0.0",
+        "regex",
+        "wxpython"
     ],
     zip_safe=False,
     entry_points=entry_points,
