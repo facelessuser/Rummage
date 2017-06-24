@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import codecs
 import json
-from os import mkdir, listdir
+from os import mkdir, listdir, remove
 from os.path import expanduser, exists, join, getmtime, isdir
 import traceback
 from ..file_strip.json import sanitize_json
@@ -415,14 +415,27 @@ class Settings(object):
         """Setup growl notification."""
 
         pth = cls.get_config_folder()
+
+        # Clean up old images
         png = join(pth, "Rummage-notify.png")
         icon = join(pth, "Rummage-notify.ico")
         icns = join(pth, "Rummage-notify.icns")
+        for img in (png, icon, icns):
+            try:
+                if exists(img):
+                    os.remove(img)
+            except Exception:
+                pass
+
+        # New file names
+        png = join(pth, "rum-notify.png")
+        icon = join(pth, "rum-notify.ico")
+        icns = join(pth, "rum-notify.icns")
 
         try:
             if not exists(png):
                 with open(png, "wb") as f:
-                    f.write(data.get_image('rummage.png').GetData())
+                    f.write(data.get_image('rummage_hires.png').GetData())
         except Exception:
             png = None
 

@@ -1,7 +1,7 @@
 """
 Notify Growl.
 
-Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 from __future__ import unicode_literals
@@ -112,7 +112,6 @@ def setup_growl(app_name, icon, alert_function):
 
         Options.growl.register()
     except Exception:
-        # print(traceback.format_exc())
         Options.growl = None
 
     if Options.growl is not None:
