@@ -92,7 +92,7 @@ class Settings(object):
                     print(str(e))
         if cls.debug:
             set_debug_mode(True)
-        localization.setup('rummage', join(cls.config_folder, "locale"), cls.get_language())
+        localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
         debug_struct(cls.settings)
         debug_struct(cls.cache)
         cls.init_notify(True)
