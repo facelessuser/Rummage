@@ -420,4 +420,5 @@ class ListCtrlComboPopup(wx.ComboPopup):
         wx.ComboPopup.OnDismiss(self)
 
     def LazyCreate(self):
+        """Lazy create."""
         return wx.ComboPopup.LazyCreate(self)

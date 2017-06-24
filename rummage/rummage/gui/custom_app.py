@@ -35,6 +35,7 @@ try:
 except ImportError:
     import _thread as thread
 
+
 if util.platform() == "windows":
     import ctypes
     GENERIC_READ = 0x80000000
@@ -248,7 +249,7 @@ class ArgPipeThread(object):
                         pipeout.write('\n')
                     except IOError:
                         pass
-            except BrokenPipeError:
+            except util.CommonBrokenPipeError:
                 pass
 
     def IsRunning(self):  # noqa

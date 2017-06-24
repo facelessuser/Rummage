@@ -16,10 +16,19 @@ if PY3:
     string_type = str
     ustr = str
     bstr = bytes
+    CommonBrokenPipeError = BrokenPipeError  # noqa
 else:
     string_type = basestring
     ustr = unicode
     bstr = str
+
+    class CommonBrokenPipeError(Exception):
+        """
+        Broken Pipe Error.
+
+        Include this for consistency, but we won't actually
+        capture this in PY2.
+        """
 
 
 def platform():

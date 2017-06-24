@@ -25,7 +25,7 @@ import wx
 import wx.lib.agw.supertooltip
 from .. import util
 
-if wx.VERSION > (2, 9, 4):  #  When will this get fixed :(
+if wx.VERSION > (2, 9, 4):  # When will this get fixed? :(
     def monkey_patch():
         """
         Monkey patch Supertooltips.
@@ -270,7 +270,9 @@ def extend(instance, extension):
     """Extend instance with extension class."""
 
     instance.__class__ = type(
-        ('%s_extended_with_%s' if util.PY3 else b'%s_extended_with_%s') % (instance.__class__.__name__, extension.__name__),
+        ('%s_extended_with_%s' if util.PY3 else b'%s_extended_with_%s') % (
+            instance.__class__.__name__, extension.__name__
+        ),
         (instance.__class__, extension),
         {}
     )

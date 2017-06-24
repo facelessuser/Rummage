@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 import os
 import codecs
-import wx
 from wx.lib.embeddedimage import PyEmbeddedImage
 import base64
 from .. import util

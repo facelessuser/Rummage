@@ -13,6 +13,7 @@ from ..localization import get_current_domain
 from .. import data
 from .. import util
 
+
 def html_encode(text):
     """Format text for HTML."""
 

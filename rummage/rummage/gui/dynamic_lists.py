@@ -21,7 +21,6 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import wx.lib.mixins.listctrl as listmix
-import functools
 from .. import util
 
 MINIMUM_COL_SIZE = 100
