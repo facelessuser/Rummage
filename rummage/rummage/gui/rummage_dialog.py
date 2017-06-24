@@ -544,7 +544,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread = None
         self.allow_update = False
         if start_path is None:
-            cwd = os.getcwdu()
+            try:
+                cwd = os.getcwdu()
+            except Exception:
+                cwd = os.getcwd()
             start_path = cwd
 
         if debug_mode:
