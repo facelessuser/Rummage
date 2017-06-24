@@ -1,3 +1,5 @@
+# User Guide
+
 ## Overview
 
 Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, and Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search options are all contained in the **Search** tab.  When a search has been completed, general info about the matches found in files will be displayed in the **Files** tab, and more detailed context information will be displayed in the **Content** tab.
@@ -12,6 +14,26 @@ The status bar will show search progress, match counts, and other useful informa
     In short, if you disable backups, there is a greater risk as you will no longer have a safety net.  Even with backups, something *could* go wrong.  This is free software, and I am not responsible for files corrupted or lost.
 
     Large files, really large files, can possibly cause an issue and may error out as the entire file will be read into memory for a replace.  If you are doing really large files, know that it may error out or get really slow.  Remember this is done in Python, if you are doing massive GB files, maybe you are using the wrong tool for the job.
+
+## Running
+
+After installation, you should then be able to access Rummage from the command line via:
+
+```bash
+rummage
+```
+
+Or specify a path:
+
+```bash
+rummage --path mydirectory
+```
+
+You can also run rummage by calling your specific python version like this:
+
+```bash
+python3 -m rummage --path mydirectory
+```
 
 ## Search Tab
 

@@ -13,11 +13,11 @@ Rummage was inspired by the tool I use in windows called [grepWin](http://stefan
 
 ## Screenshots
 
-![Rummage Search](./docs/images/search_tab.png)
+![Rummage Search](./docs/src/markdown/images/search_tab.png)
 
-![Rummage Files](./docs/images/files_tab.png)
+![Rummage Files](./docs/src/markdown/images/files_tab.png)
 
-![Rummage Content](./docs/images/content_tab.png)
+![Rummage Content](./docs/src/markdown/images/content_tab.png)
 
 # Documentation
 http://facelessuser.github.io/Rummage/

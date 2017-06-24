@@ -3,21 +3,22 @@ repo_url: https://github.com/facelessuser/Rummage
 site_description: A search and replace tool written in Python.
 copyright: Copyright &copy; 2013 - 2017 <a href="https://github.com/facelessuser">Isaac Muse</a>
 
-theme: material
-theme_dir: doc_theme
-
 pages:
   - Rummage: index.md
   - Installation: installation.md
-  - Usage: usage.md
+  - User Guide: usage.md
   - Contributing &amp; Support: contributing.md
   - Changelog: changelog.md
   - License: license.md
 
+theme: material
+docs_dir: docs/src/markdown
+theme_dir: docs/theme
+
 markdown_extensions:
   - markdown.extensions.toc:
-      slugify: !!python/name:pymdownx.headeranchor.uslugify
-      permalink: 
+      slugify: !!python/name:pymdownx.slugs.uslugify
+      permalink: "\ue157"
   - markdown.extensions.admonition:
   - markdown.extensions.smarty:
       smart_quotes: false
@@ -28,43 +29,49 @@ markdown_extensions:
   - markdown.extensions.abbr:
   - pymdownx.extrarawhtml:
   - pymdownx.superfences:
-      css_class: codehilite
   - pymdownx.highlight:
+      css_class: codehilite
       extend_pygments_lang:
         - name: php-inline
           lang: php
           options:
             startinline: true
   - pymdownx.inlinehilite:
-      css_class: codehilite
   - pymdownx.magiclink:
       repo_url_shortener: true
       base_repo_url: https://github.com/facelessuser/Rummage
-  - pymdownx.escapeall:
-      hardbreak: True
-      nbsp: True
   - pymdownx.tilde:
   - pymdownx.caret:
   - pymdownx.smartsymbols:
   - pymdownx.emoji:
-      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+      emoji_generator: !!python/name:pymdownx.emoji.to_png
+  - pymdownx.escapeall:
+      hardbreak: True
+      nbsp: True
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.progressbar:
+  - pymdownx.arithmatex:
+  - pymdownx.mark:
   - pymdownx.plainhtml:
       strip_attributes: ''
   - pymdownx.snippets:
-      base_path: docs/snippets
+      base_path: docs/src/markdown/_snippets
+  - pymdownx.keys:
+      separator: "\uff0b"
+  - pymdownx.details:
 
 extra:
   palette:
     primary: blue
-    accent: purple
+    accent: blue
   font:
     text: Roboto
     code: Roboto Mono
   social:
     - type: github
       link: https://github.com/facelessuser
-  logo: images/rummage.png
 extra_css:
-  - extra.css
+  - extra-6068b97e47.css
+extra_javascript:
+  - extra-2aceccb07f.js

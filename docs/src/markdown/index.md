@@ -1,3 +1,5 @@
+# Rummage
+
 ## Overview
 
 Rummage is a cross platform tool for crawling directories and searching and replacing in text files.  It is written in Python and uses wxPython for the GUI.  Rummage allows for literal or regex searches and has configurations for limiting the files that are searched.
