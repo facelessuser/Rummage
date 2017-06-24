@@ -1277,7 +1277,7 @@ def filepickermsg(msg, wildcard, save=False):
     """File picker."""
 
     select = None
-    style = wx.OPEN | wx.FILE_MUST_EXIST if not save else wx.SAVE | wx.OVERWRITE_PROMPT
+    style = wx.FD_OPEN | wx.FD_FILE_MUST_EXIST if not save else wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
     dlg = wx.FileDialog(
         None, msg,
         "", wildcard=wildcard,
