@@ -187,14 +187,14 @@ def export_result_list(res, html):
         html.write(
             RESULT_ROW % {
                 "file": html_encode(item[0]),
-                "size_sort": unicode(item[1]),
+                "size_sort": util.to_ustr(item[1]),
                 "size": '%.2fKB' % item[1],
-                "matches": unicode(item[2]),
+                "matches": util.to_ustr(item[2]),
                 "path": html_encode(item[3]),
                 "encoding": item[4],
-                "mod_sort": unicode(item[5]),
+                "mod_sort": util.to_ustr(item[5]),
                 "modified": ctime(item[5]),
-                "cre_sort": unicode(item[6]),
+                "cre_sort": util.to_ustr(item[6]),
                 "created": ctime(item[6])
             }
         )
@@ -216,8 +216,8 @@ def export_result_content_list(res, html):
             RESULT_CONTENT_ROW % {
                 "file_sort": html_encode(os.path.join(item[0][1], item[0][0])),
                 "file": html_encode(item[0][0]),
-                "line": unicode(item[1]),
-                "matches": unicode(item[2]),
+                "line": util.to_ustr(item[1]),
+                "matches": util.to_ustr(item[2]),
                 "context": html_encode(item[3])
             }
         )
@@ -243,7 +243,7 @@ def open_in_browser(name):
             p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
             p.stdin.write(content)
             out = p.communicate()[0]
-            plist = json.loads(unicode(out))
+            plist = json.loads(util.to_ustr(out))
             for handler in plist['LSHandlers']:
                 if handler.get('LSHandlerURLScheme', '') == "http":
                     web_handler = handler.get('LSHandlerRoleAll', None)
@@ -274,12 +274,12 @@ def export(export_html, search, regex_search, result_list, result_content_list):
                 "js": data.get_file('sorttable.js'),
                 "morejs": LOAD_TAB,
                 "css": data.get_file('results.css'),
-                "icon": base64.b64encode(data.get_image('glass.png').GetData()),
+                "icon": util.to_ustr(base64.b64encode(data.get_image('glass.png').GetData())),
                 "title": TITLE,
                 "lang": get_current_domain()
             }
         )
-        html.write(BODY_START % {"icon": base64.b64encode(data.get_image('rummage.png').GetData())})
+        html.write(BODY_START % {"icon": util.to_ustr(base64.b64encode(data.get_image('rummage.png').GetData()))})
         html.write(
             (TABS_START if len(result_content_list) else TABS_START_SINGLE) % {
                 "file_tab": FILES,
