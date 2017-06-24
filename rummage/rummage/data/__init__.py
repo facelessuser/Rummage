@@ -37,7 +37,7 @@ def get_image(file_name, b64=False):
                 icon = base64.b64encode(f.read())
         except Exception:
             pass
-    return PyEmbeddedImage(icon) if not b64 else unicode(icon)
+    return PyEmbeddedImage(icon) if not b64 else util.to_ustr(icon)
 
 
 def get_bitmap(file_name):

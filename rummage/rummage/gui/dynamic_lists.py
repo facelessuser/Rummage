@@ -147,7 +147,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def get_item_text(self, idx, col, absolute=False):
         """Return the text for the given item and col."""
 
-        return util.ustr(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
+        return util.to_ustr(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
 
     def OnGetItemAttr(self, item):
         """Override method to get attributes for the cells in the given item."""

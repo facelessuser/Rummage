@@ -53,6 +53,24 @@ def to_ascii_bytes(string):
     return bytes(string, 'ascii') if PY3 else bytes(string)
 
 
+def to_ustr(obj):
+    """Convert to string."""
+
+    if isinstance(obj, ustr):
+        return obj
+    elif isinstance(obj, bstr):
+        return ustr(obj, 'utf-8')
+    else:
+        return ustr(obj)
+
+
+def to_bstr(obj):
+    """Convert to byte string."""
+
+    assert isinstance(obj, string_type), TypeError
+    return obj.encode('utf-8') if isinstance(obj, ustr) else obj
+
+
 def getcwd(self):
     """Get the current working directory."""
 
