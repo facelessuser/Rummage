@@ -93,8 +93,7 @@ def export_result_content_list(res, csv):
 def export(export_csv, search, regex_search, result_list, result_content_list):
     """Export results to CSV."""
 
-    with codecs.open(export_csv, "w", encoding="utf-8") as csv:
-        csv.write('\uFEFF')
+    with codecs.open(export_csv, "w", encoding="utf-8-sig") as csv:
         search_expression = "%s,%s\n\n" % ((REGEX_SEARCH if regex_search else LITERAL_SEARCH), csv_encode(search))
         csv.write(search_expression)
         export_result_list(result_list, csv)
