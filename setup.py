@@ -76,7 +76,7 @@ setup(
     author='Isaac Muse',
     author_email='Isaac.Muse [at] gmail.com',
     url='https://github.com/facelessuser/Rummage',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(exclude=['tests', 'tools']),
     install_requires=[
         "gntp>=1.0.2",
         "chardet>=2.3.0",

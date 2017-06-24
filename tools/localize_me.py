@@ -2,7 +2,7 @@
 from __future__ import print_function
 import subprocess
 import sys
-from os.path import dirname, basename, abspath, exists, join
+import os
 from os import mkdir, walk
 import argparse
 import codecs
@@ -18,10 +18,10 @@ else:
 def localize(args):
     """Localize project."""
 
-    pygettext = abspath(args.pygettext) if args.pygettext is not None else "pygettext.py"
-    msgfmt = abspath(args.msgfmt) if args.msgfmt is not None else "msgfmt.py"
+    pygettext = os.path.abspath(args.pygettext) if args.pygettext is not None else "pygettext.py"
+    msgfmt = os.path.abspath(args.msgfmt) if args.msgfmt is not None else "msgfmt.py"
     locale_pth = "locale"
-    search_pth = join("rummage", "rummage", "gui", "*.py")
+    search_pth = os.path.join("rummage", "rummage", "gui", "*.py")
     cmd = [
         pygettext,
         "-na",
