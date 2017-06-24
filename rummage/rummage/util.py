@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 import sys
 import functools
+import os
 
 PY3 = (3, 0) <= sys.version_info
 
@@ -50,3 +51,12 @@ def to_ascii_bytes(string):
     """Convert unicode to ascii byte string."""
 
     return bytes(string, 'ascii') if PY3 else bytes(string)
+
+
+def getcwd(self):
+    """Get the current working directory."""
+
+    if PY3:
+        return os.getcwd()
+    else:
+        return os.getcwdu()
