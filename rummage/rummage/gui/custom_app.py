@@ -277,7 +277,11 @@ class ArgPipeThread(object):
                     data += result.value.replace("\r", "")
                     if len(data) and data[-1] == "\n":
                         lines = data.rstrip("\n").split("\n")
-                        evt = PipeEvent(data=lines[-1])
+                        try:
+                            args = json.loads(lines[-1])
+                        except Exception:
+                            args = []
+                        evt = PipeEvent(data=args)
                         wx.PostEvent(self.app, evt)
                         data = ""
                 ctypes.windll.kernel32.DisconnectNamedPipe(p)
@@ -293,7 +297,11 @@ class ArgPipeThread(object):
                     while self.check_pipe:
                         line = pipein.readline()[:-1]
                         if line != "":
-                            evt = PipeEvent(data=line)
+                            try:
+                                args = json.loads(line)
+                            except Exception:
+                                args = []
+                            evt = PipeEvent(data=args)
                             wx.PostEvent(self.app, evt)
                             break
                         time.sleep(0.2)
@@ -352,7 +360,7 @@ class PipeApp(CustomApp):
                 OPEN_EXISTING,
                 0, None
             )
-            data = '|'.join(args) + '\n'
+            data = json.dumps(args) + '\n'
             bytes_written = ctypes.c_ulong(0)
             ctypes.windll.kernel32.WriteFile(
                 file_handle, ctypes.c_wchar_p(data), len(data) * 2, ctypes.byref(bytes_written), None
@@ -361,7 +369,7 @@ class PipeApp(CustomApp):
         else:
             with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
                 args = self.process_args(argv)
-                pipeout.write('|'.join(args) + '\n')
+                pipeout.write(json.dumps(args) + '\n')
 
     def process_args(self, arguments):
         """Noop, but can be overriden to process the args."""

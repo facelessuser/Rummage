@@ -25,6 +25,7 @@ from .platform_window_focus import platform_window_focus
 from .custom_app import PipeApp, set_debug_mode
 from .rummage_dialog import RummageFrame
 from .regex_test_dialog import RegexTestDialog
+from .. import util
 
 __all__ = (
     'set_debug_mode', 'RummageApp', 'RummageFrame', 'RegexTestDialog'
@@ -52,12 +53,12 @@ class RummageApp(PipeApp):
 
         frame = self.GetTopWindow()
         if frame is not None and isinstance(frame, RummageFrame):
-            args = iter(event.data.split("|"))
+            args = iter(event.data)
             filename = None
             for a in args:
                 if a == "--path":
                     try:
-                        a = args.next()
+                        a = util.iternext(args)
                         filename = a
                         break
                     except StopIteration:
@@ -79,14 +80,14 @@ class RummageApp(PipeApp):
         path_arg_found = False
         for a in argv:
             args.append(a)
-            if a == "-s":
+            if a == "--path":
                 try:
-                    args.append(os.path.abspath(os.path.normpath(argv.next())))
+                    args.append(os.path.abspath(os.path.normpath(util.iternext(argv))))
                     path_arg_found = True
                 except StopIteration:
                     break
         if not path_arg_found:
-            args.extend(['--path', os.getcwdu()])
+            args.extend(['--path', util.getcwd()])
 
         return args
 

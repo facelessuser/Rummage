@@ -78,3 +78,12 @@ def getcwd():
         return os.getcwd()
     else:
         return os.getcwdu()
+
+
+def iternext(item):
+    """Iterate to next."""
+
+    if PY3:
+        return item.__next__()
+    else:
+        return item.next()
