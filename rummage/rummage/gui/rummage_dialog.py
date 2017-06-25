@@ -651,7 +651,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_tab_traversal(self, event, direction):
         """Handle tab traversal."""
 
-
         obj = self.FindFocus()
         idx = self.id_to_tab_idx.get(obj.GetId())
         if idx is not None:
