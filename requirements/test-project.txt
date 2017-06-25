@@ -2,4 +2,3 @@ gntp>=1.0.2
 chardet>=2.3.0
 backrefs
 regex
-wxpython

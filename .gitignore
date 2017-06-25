@@ -46,3 +46,5 @@ Output/*
 pyinstaller
 
 site/*
+
+.cache

@@ -76,11 +76,13 @@ setup(
     author='Isaac Muse',
     author_email='Isaac.Muse [at] gmail.com',
     url='https://github.com/facelessuser/Rummage',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(exclude=['tests', 'tools']),
     install_requires=[
         "gntp>=1.0.2",
         "chardet>=2.3.0",
-        "backrefs>=1.0.0"
+        "backrefs>=1.0.0",
+        "regex",
+        "wxpython"
     ],
     zip_safe=False,
     entry_points=entry_points,
@@ -94,7 +96,12 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ]
 )

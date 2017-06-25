@@ -20,7 +20,7 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-import sys
+import wx.adv
 import threading
 import traceback
 import webbrowser
@@ -51,6 +51,7 @@ from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .messages import dirpickermsg, filepickermsg
 from .. import data
+from .. import util
 import decimal
 
 DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
@@ -402,7 +403,7 @@ class RummageThread(threading.Thread):
                     if f.error is not None:
                         _ERRORS.append(f)
             self.update_status()
-            wx.GetApp().WakeUpIdle()
+            wx.WakeUpIdle()
 
             if _ABORT:
                 self.rummage.kill()
@@ -532,7 +533,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.hide_limit_panel = False
 
-        self.SetIcon(data.get_image('rummage_large.png').GetIcon())
+        self.SetIcon(
+            data.get_image('rummage_medium.png' if util.platform() == 'linux' else 'rummage_large.png').GetIcon()
+        )
 
         self.error_dlg = None
         self.debounce_search = False
@@ -543,20 +546,29 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread = None
         self.allow_update = False
         if start_path is None:
-            cwd = os.getcwdu()
-            start_path = cwd
-
-        # Setup debugging
-        self.set_keybindings(
-            [
-                (wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
-                (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
-            ],
-            debug_event=(self.on_debug_console if debug_mode else None)
-        )
+            start_path = util.getcwd()
 
         if debug_mode:
             self.open_debug_console()
+
+        keybindings = [
+            (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
+            (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
+        ]
+
+        if util.platform() != "windows":
+            keybindings.extend(
+                [
+                    (wx.ACCEL_NORMAL, wx.WXK_TAB, lambda event, direction=0: self.on_tab_traversal(event, direction)),
+                    (wx.ACCEL_SHIFT, wx.WXK_TAB, lambda event, direction=1: self.on_tab_traversal(event, direction))
+                ]
+            )
+
+        # Setup debugging
+        self.set_keybindings(
+            keybindings,
+            debug_event=(self.on_debug_console if debug_mode else None)
+        )
 
         # Update status on when idle
         self.Bind(wx.EVT_IDLE, self.on_idle)
@@ -579,6 +591,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_progressbar.SetValue(0)
 
         self.localize()
+
+        if util.platform() != "windows":
+            self.init_tab_traversal()
 
         # Setup the inputs history and replace
         # placeholder objects with actual objecs
@@ -606,7 +621,49 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # So we disable the window preventing all focus events, and THEN
         # we use a timeout call to delay our default focus to ensure it is done last.
         self.Enable(False)
-        wx.FutureCall(500, self.on_load)
+        wx.CallLater(500, self.on_load).Start()
+
+    def init_tab_traversal(self):
+        """Initialize custom tab traversal (OSX doesn't work natively)."""
+
+        self.tab_stop = [
+            self.m_searchin_text,
+            self.m_searchfor_textbox,
+            self.m_replace_textbox,
+            self.m_size_text,
+            self.m_modified_date_picker,
+            self.m_modified_time_picker,
+            self.m_created_date_picker,
+            self.m_created_time_picker,
+            self.m_exclude_textbox,
+            self.m_filematch_textbox
+        ]
+
+        idx = 0
+        self.id_to_tab_idx = {}
+        for ts in self.tab_stop:
+            self.id_to_tab_idx[ts.GetId()] = idx
+            idx += 1
+        self.min_tab = 0
+        self.max_tab = idx - 1
+        self.max_limit_tab = 2
+
+    def on_tab_traversal(self, event, direction):
+        """Handle tab traversal."""
+
+        obj = self.FindFocus()
+        idx = self.id_to_tab_idx.get(obj.GetId())
+        if idx is not None:
+            max_tab = self.max_limit_tab if not self.m_limiter_panel.IsShown() else self.max_tab
+            if direction:
+                # Tab backwards
+                idx = max_tab if idx == self.min_tab else idx - 1
+            else:
+                # Tab forward
+                idx = self.min_tab if idx == max_tab else idx + 1
+            self.tab_stop[idx].SetFocus()
+            return
+        event.Skip()
 
     def localize(self):
         """Localize."""
@@ -683,7 +740,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         obj = self.FindFocus()
         is_ac_combo = isinstance(obj, AutoCompleteCombo)
-        is_date_picker = isinstance(obj, wx.GenericDatePickerCtrl)
+        is_date_picker = isinstance(obj, wx.adv.GenericDatePickerCtrl)
         is_button = isinstance(obj, wx.Button)
         if (
             (
@@ -934,6 +991,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Determine if search in input is a file or not, and hide/show elements accordingly."""
 
         self.limit_panel_toggle()
+        self.optimize_size(height_only=True)
 
         pth = self.m_searchin_text.GetValue()
         if not self.searchin_update:

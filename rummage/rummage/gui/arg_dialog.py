@@ -20,9 +20,9 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-import sys
 from . import gui
 from ..localization import _
+from .. import util
 
 
 class ArgDialog(gui.ArgDialog):
@@ -35,7 +35,7 @@ class ArgDialog(gui.ArgDialog):
 
         # Ensure OS platform selectall shortcut works
         self.set_keybindings(
-            [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+            [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
 
         self.arg = value

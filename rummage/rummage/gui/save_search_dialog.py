@@ -20,12 +20,11 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-import sys
-
 from . import gui
 from .settings import Settings, rumcore
 from .generic_dialogs import errormsg
 from ..localization import _
+from .. import util
 
 
 class SaveSearchDialog(gui.SaveSearchDialog):
@@ -38,7 +37,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
-            [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+            [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
 
         self.parent = parent

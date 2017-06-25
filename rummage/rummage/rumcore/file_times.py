@@ -1,17 +1,10 @@
 """File times."""
 from __future__ import unicode_literals
-import sys
 from os.path import getmtime as get_modified_time
-
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
+from .. import util
 
 
-if _PLATFORM == "osx":
+if util.platform() == "osx":
     import ctypes
 
     # http://stackoverflow.com/questions/946967/get-file-creation-time-with-python-on-mac

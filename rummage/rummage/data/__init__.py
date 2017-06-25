@@ -2,10 +2,9 @@
 from __future__ import unicode_literals
 import os
 import codecs
-import wx
 from wx.lib.embeddedimage import PyEmbeddedImage
 import base64
-import sys
+from .. import util
 
 RESOURCE_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -38,7 +37,7 @@ def get_image(file_name, b64=False):
                 icon = base64.b64encode(f.read())
         except Exception:
             pass
-    return PyEmbeddedImage(icon) if not b64 else unicode(icon)
+    return PyEmbeddedImage(icon) if not b64 else util.to_ustr(icon)
 
 
 def get_bitmap(file_name):
@@ -57,8 +56,8 @@ def get_bitmap(file_name):
     """
 
     image = get_image(file_name).GetImage()
-    if sys.platform == "darwin":
-        bm = wx.BitmapFromImage(image)
+    if util.platform() == "osx":
+        bm = image.ConvertToBitmap()
         bm.SetSize(
             (
                 int(bm.GetWidth() / 2),
@@ -70,6 +69,6 @@ def get_bitmap(file_name):
             int(image.GetWidth() / 2),
             int(image.GetHeight() / 2)
         )
-        bm = wx.BitmapFromImage(scaled)
+        bm = scaled.ConvertToBitmap()
 
     return bm

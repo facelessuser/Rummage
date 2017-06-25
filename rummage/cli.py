@@ -27,17 +27,12 @@ import sys
 from datetime import datetime
 from .rummage import epoch_timestamp
 from .rummage import rumcore
+from .rummage import util
 from .rummage import __meta__
 from backrefs import bre, bregex
 import decimal
 
-PY3 = (3, 0) <= sys.version_info < (4, 0)
 CLI_ENCODING = sys.getfilesystemencoding()
-
-if PY3:
-    binary_type = bytes  # noqa
-else:
-    binary_type = str  # noqa
 
 BOOL_NONE = 0
 BOOL_MATCH = 1
@@ -71,7 +66,7 @@ def pyout(value):
 def pyin(value):
     """Read in stdin variables."""
 
-    return value.decode(CLI_ENCODING) if isinstance(value, binary_type) else value
+    return value.decode(CLI_ENCODING) if isinstance(value, util.bstr) else value
 
 
 class RummageCli(object):

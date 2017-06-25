@@ -20,7 +20,6 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import re
-import sys
 import traceback
 import wx
 import functools
@@ -29,6 +28,7 @@ from .. import data
 from .settings import Settings
 from ..localization import _
 from .. import rumcore
+from .. import util
 from backrefs import bre, bregex
 
 
@@ -39,14 +39,16 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
-        self.SetIcon(data.get_image('rummage_large.png').GetIcon())
+        self.SetIcon(
+            data.get_image('rummage_medium.png' if util.platform() == 'linux' else 'rummage_large.png').GetIcon()
+        )
         self.parent = parent
         self.regex_mode = Settings.get_regex_mode()
         self.regex_version = Settings.get_regex_version()
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
-            [(wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+            [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
 
         self.m_case_checkbox.SetValue(parent.m_case_checkbox.GetValue() if parent else False)
@@ -205,7 +207,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_test_text.SetStyle(
             0,
             self.m_test_text.GetLastPosition(),
-            wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
+            wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
         )
 
     def test_regex(self):
@@ -233,7 +235,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.m_test_text.SetStyle(
                     0,
                     self.m_test_text.GetLastPosition(),
-                    wx.TextAttr(colText=wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
+                    wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
                 )
                 self.testing = False
                 return
@@ -361,7 +363,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     self.m_test_text.SetStyle(
                         m.start(0),
                         m.end(0),
-                        wx.TextAttr(colBack=wx.Colour(0xFF, 0xCC, 0x00))
+                        wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(0xFF, 0xCC, 0x00))
                     )
                 if replace_test:
                     new_text.append(text[offset:])

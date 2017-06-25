@@ -24,28 +24,19 @@ from __future__ import unicode_literals
 import codecs
 import json
 import os
-import simplelog
 import sys
-import thread
+from . import simplelog
 import time
 import wx
 import wx.lib.newevent
+from .. import util
+try:
+    import thread
+except ImportError:
+    import _thread as thread
 
-PY3 = (3, 0) <= sys.version_info < (4, 0)
 
-if PY3:
-    binary_type = bytes  # noqa
-else:
-    binary_type = str  # noqa
-
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
-
-if _PLATFORM == "windows":
+if util.platform() == "windows":
     import ctypes
     GENERIC_READ = 0x80000000
     GENERIC_WRITE = 0x40000000
@@ -84,7 +75,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
         # Create debug keybinding to open debug console
         debugid = wx.NewId()
         self.frame.Bind(wx.EVT_MENU, self.debug_close, id=debugid)
-        mod = wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL
+        mod = wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL
         accel_tbl = wx.AcceleratorTable(
             [(mod, ord('`'), debugid)]
         )
@@ -99,7 +90,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
         """Write to log, and if console is open, echo to it as well."""
 
         if self.frame is None:
-            if not wx.Thread_IsMain():
+            if not wx.IsMainThread():
                 if echo:
                     wx.CallAfter(gui_log, text)
                 if get_debug_console():
@@ -110,7 +101,7 @@ class GuiLog(wx.PyOnDemandOutputWindow):
                 if get_debug_console():
                     self.CreateOutputWindow(text)
         else:
-            if not wx.Thread_IsMain():
+            if not wx.IsMainThread():
                 if echo:
                     wx.CallAfter(gui_log, text)
                 if get_debug_console():
@@ -138,6 +129,8 @@ class GuiLog(wx.PyOnDemandOutputWindow):
 class CustomApp(wx.App):
     """Custom app that adds a number of features."""
 
+    outputWindowClass = GuiLog
+
     def __init__(self, *args, **kwargs):
         """
         Init the custom app.
@@ -150,7 +143,6 @@ class CustomApp(wx.App):
         """
 
         self.instance = None
-        self.outputWindowClass = GuiLog
         self.custom_init(*args, **kwargs)
         if "single_instance_name" in kwargs:
             del kwargs["single_instance_name"]
@@ -165,7 +157,7 @@ class CustomApp(wx.App):
         self.init_callback = None
         instance_name = kwargs.get("single_instance_name", None)
         callback = kwargs.get("callback", None)
-        if instance_name is not None and isinstance(instance_name, basestring):
+        if instance_name is not None and isinstance(instance_name, util.string_type):
             self.single_instance = instance_name
         if callback is not None and hasattr(callback, '__call__'):
             self.init_callback = callback
@@ -207,6 +199,7 @@ class CustomApp(wx.App):
 
         if self.instance is not None:
             del self.instance
+        return 0
 
 
 class ArgPipeThread(object):
@@ -233,7 +226,7 @@ class ArgPipeThread(object):
         """
 
         self.check_pipe = False
-        if _PLATFORM == "windows":
+        if util.platform() == "windows":
             file_handle = ctypes.windll.kernel32.CreateFileW(
                 self.pipe_name,
                 GENERIC_READ | GENERIC_WRITE,
@@ -248,13 +241,16 @@ class ArgPipeThread(object):
             )
             ctypes.windll.kernel32.CloseHandle(file_handle)
         else:
-            with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
-                try:
-                    pipeout.write('\n')
-                except IOError:
-                    # It's okay if the pipe is broken, our goal is just to break the
-                    # wait loop for recieving pipe data.
-                    pass
+            # It's okay if the pipe is broken, our goal is just to break the
+            # wait loop for recieving pipe data.
+            try:
+                with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
+                    try:
+                        pipeout.write('\n')
+                    except IOError:
+                        pass
+            except util.CommonBrokenPipeError:
+                pass
 
     def IsRunning(self):  # noqa
         """Return if the thread is still busy."""
@@ -264,7 +260,7 @@ class ArgPipeThread(object):
     def Run(self):  # noqa
         """The actual thread listening loop."""
 
-        if _PLATFORM == "windows":
+        if util.platform() == "windows":
             data = ""
             p = ctypes.windll.kernel32.CreateNamedPipeW(
                 self.pipe_name,
@@ -281,7 +277,11 @@ class ArgPipeThread(object):
                     data += result.value.replace("\r", "")
                     if len(data) and data[-1] == "\n":
                         lines = data.rstrip("\n").split("\n")
-                        evt = PipeEvent(data=lines[-1])
+                        try:
+                            args = json.loads(lines[-1])
+                        except Exception:
+                            args = []
+                        evt = PipeEvent(data=args)
                         wx.PostEvent(self.app, evt)
                         data = ""
                 ctypes.windll.kernel32.DisconnectNamedPipe(p)
@@ -297,7 +297,11 @@ class ArgPipeThread(object):
                     while self.check_pipe:
                         line = pipein.readline()[:-1]
                         if line != "":
-                            evt = PipeEvent(data=line)
+                            try:
+                                args = json.loads(line)
+                            except Exception:
+                                args = []
+                            evt = PipeEvent(data=args)
                             wx.PostEvent(self.app, evt)
                             break
                         time.sleep(0.2)
@@ -341,13 +345,13 @@ class PipeApp(CustomApp):
         args = []
         encoding = sys.getfilesystemencoding()
         for a in sys.argv[1:]:
-            args.append(a.decode(encoding) if isinstance(a, binary_type) else a)
+            args.append(a.decode(encoding) if isinstance(a, util.bstr) else a)
         return args
 
     def send_arg_pipe(self):
         """Send the current arguments down the pipe."""
         argv = self.get_sys_args()
-        if _PLATFORM == "windows":
+        if util.platform() == "windows":
             args = self.process_args(argv)
             file_handle = ctypes.windll.kernel32.CreateFileW(
                 self.pipe_name,
@@ -356,7 +360,7 @@ class PipeApp(CustomApp):
                 OPEN_EXISTING,
                 0, None
             )
-            data = '|'.join(args) + '\n'
+            data = json.dumps(args) + '\n'
             bytes_written = ctypes.c_ulong(0)
             ctypes.windll.kernel32.WriteFile(
                 file_handle, ctypes.c_wchar_p(data), len(data) * 2, ctypes.byref(bytes_written), None
@@ -365,7 +369,7 @@ class PipeApp(CustomApp):
         else:
             with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
                 args = self.process_args(argv)
-                pipeout.write('|'.join(args) + '\n')
+                pipeout.write(json.dumps(args) + '\n')
 
     def process_args(self, arguments):
         """Noop, but can be overriden to process the args."""
@@ -389,7 +393,7 @@ class PipeApp(CustomApp):
             while running:
                 running = self.pipe_thread.IsRunning()
                 time.sleep(0.1)
-        CustomApp.OnExit(self)
+        return CustomApp.OnExit(self)
 
     def on_pipe_args(self, event):
         """An overridable event for when pipe arguments are received."""
@@ -412,7 +416,7 @@ class DebugFrameExtender(object):
         tbl = []
         bindings = keybindings
         if debug_event is not None:
-            mod = wx.ACCEL_CMD if sys.platform == "darwin" else wx.ACCEL_CTRL
+            mod = wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL
             bindings.append((mod, ord('`'), debug_event))
 
         for binding in keybindings:

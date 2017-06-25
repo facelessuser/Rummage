@@ -1,7 +1,7 @@
 """
 Notify OSX.
 
-Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 from __future__ import unicode_literals
@@ -108,19 +108,18 @@ def notify_osx_call(title, message, sound, fallback):
     try:
         assert(Options.terminal_notifier is not None and exists(Options.terminal_notifier))
         # Show Notification here
-        params = [Options.terminal_notifier, "-title", Options.app_name]
+        params = [Options.terminal_notifier, "-title", Options.app_name, "-timeout", "5"]
         if message is not None:
             params += ["-message", message]
         if title is not None:
             params += ["-subtitle", title]
         if Options.sender is not None:
             params += ["-sender", Options.sender]
-            params += ["-activate", Options.sender]
         if Options.icon is not None:
             params += ["-appIcon", Options.icon]
         if sound:
             params += ["-sound", "Glass"]
-        subprocess.call(params)
+        subprocess.Popen(params)
 
         # if sound:
         #     # Play sound if desired
@@ -164,9 +163,7 @@ def setup(app_name, icon, *args):
             Options.icon = notify_icon
         Options.notify = notify_osx_call
     except Exception:
-        # print(term_notify)
-        # print(traceback.format_exc())
-        pass
+        print(traceback.format_exc())
 
 
 def destroy():

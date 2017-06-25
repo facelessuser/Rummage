@@ -25,7 +25,7 @@ from .settings import Settings
 from .editor_dialog import EditorDialog
 from ..localization import _
 from .. import rumcore
-import sys
+from .. import util
 
 RECORDS = _("%d Records")
 
@@ -81,7 +81,7 @@ class SettingsDialog(gui.SettingsDialog):
             locale = "en_US"
         self.m_lang_choice.SetStringSelection(locale)
         self.m_term_note_picker.SetPath(Settings.get_term_notifier())
-        if sys.platform == "darwin":
+        if util.platform() == "osx":
             is_native = Settings.get_notify_method() == "default"
             self.m_term_note_label.Show()
             self.m_term_note_picker.Show()
@@ -156,7 +156,7 @@ class SettingsDialog(gui.SettingsDialog):
 
         string_choice = self.m_notify_choice.GetStringSelection()
         is_native = string_choice == "default"
-        if sys.platform == "darwin":
+        if util.platform() == "osx":
             self.m_term_note_picker.Enable(is_native)
             self.m_term_note_label.Enable(is_native)
         Settings.set_notify_method(self.m_notify_choice.GetStringSelection())

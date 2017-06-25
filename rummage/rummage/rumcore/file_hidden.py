@@ -4,15 +4,7 @@ from __future__ import unicode_literals
 import contextlib
 import ctypes
 from os.path import expanduser, basename
-import sys
-
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
-
+from .. import util
 
 _OSX_FOUNDATION_NOT_LOADED = 0
 _OSX_USE_FOUNDATION = 1
@@ -26,7 +18,7 @@ def platform_not_implemented(path):
     raise NotImplementedError
 
 
-if _PLATFORM == "windows":
+if util.platform() == "windows":
     def is_win_hidden(path):
         """Check if hidden for Windows."""
 
@@ -52,7 +44,7 @@ def _test(fn):
     # print "OSX Hidden Method: %d, Test Path: %s, Result: %s"  % (_OSX_FOUNDATION_METHOD, path, str(fn(path)))
 
 
-if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
+if util.platform() == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
     # Fallback to use ctypes to call the ObjC library CoreFoundation for OSX is_hidden
 
     # http://stackoverflow.com/questions/284115/cross-platform-hidden-file-detection
@@ -121,16 +113,17 @@ if _PLATFORM == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LOADED:
         _OSX_FOUNDATION_METHOD = _OSX_FOUNDATION_NOT_LOADED
 
 
-if _PLATFORM != "osx":
+if util.platform() != "osx":
     is_osx_hidden = platform_not_implemented
 
 
 def is_hidden(path):
     """Return if file is hidden based on platform rules."""
 
-    if _PLATFORM == "windows":
+    platform = util.platform()
+    if platform == "windows":
         return is_win_hidden(path)
-    elif _PLATFORM == "osx":
+    elif platform == "osx":
         if is_nix_hidden(path):
             return True
         elif _OSX_FOUNDATION_METHOD != _OSX_FOUNDATION_NOT_LOADED:
@@ -141,6 +134,8 @@ def is_hidden(path):
 
 
 if __name__ == '__main__':
+    import sys
+
     for arg in sys.argv[1:]:
         filename = expanduser(arg)
         print('{}: {}'.format(filename, is_hidden(filename)))

@@ -27,6 +27,7 @@ from .open_editor import open_editor
 from ..localization import _
 from .. import data
 import decimal
+from .. import util
 
 
 class ResultFileList(DynamicList):
@@ -113,7 +114,7 @@ class ResultFileList(DynamicList):
         elif col in [5, 6]:
             return ctime(self.itemDataMap[item][col])
         else:
-            return unicode(self.itemDataMap[item][col])
+            return util.to_ustr(self.itemDataMap[item][col])
 
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
@@ -205,9 +206,9 @@ class ResultContentList(DynamicList):
         if not absolute:
             item = self.itemIndexMap[item]
         if col == 0:
-            return unicode(self.itemDataMap[item][col][0])
+            return util.to_ustr(self.itemDataMap[item][col][0])
         else:
-            return unicode(self.itemDataMap[item][col])
+            return util.to_ustr(self.itemDataMap[item][col])
 
     def increment_match_count(self, idx):
         """Increment the match count of the given item."""

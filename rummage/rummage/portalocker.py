@@ -42,8 +42,8 @@ Roundup Changes
    - Ported to ctypes
    - Dropped support for Win95, Win98 and WinME
    - Added return result
-"""
 
+"""
 import os
 
 __docformat__ = 'restructuredtext'

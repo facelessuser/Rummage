@@ -2,18 +2,11 @@
 from __future__ import unicode_literals
 from time import ctime
 import codecs
-import sys
 import subprocess
 from ..localization import _
+from .. import util
 
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
-
-if _PLATFORM == "windows":
+if util.platform() == "windows":
     from os import startfile
 
 
@@ -65,7 +58,7 @@ def export_result_list(res, csv):
             RESULT_ROW % {
                 "file": csv_encode(item[0]),
                 "size": csv_encode('%.2fKB' % item[1]),
-                "matches": csv_encode(unicode(item[2])),
+                "matches": csv_encode(util.to_ustr(item[2])),
                 "path": csv_encode(item[3]),
                 "encoding": csv_encode(item[4]),
                 "modified": csv_encode(ctime(item[5])),
@@ -88,8 +81,8 @@ def export_result_content_list(res, csv):
         csv.write(
             RESULT_CONTENT_ROW % {
                 "file": csv_encode(item[0][0]),
-                "line": csv_encode(unicode(item[1])),
-                "matches": csv_encode(unicode(item[2])),
+                "line": csv_encode(util.to_ustr(item[1])),
+                "matches": csv_encode(util.to_ustr(item[2])),
                 "context": csv_encode(item[3])
             }
         )
@@ -100,16 +93,16 @@ def export_result_content_list(res, csv):
 def export(export_csv, search, regex_search, result_list, result_content_list):
     """Export results to CSV."""
 
-    with codecs.open(export_csv, "w", encoding="utf-8") as csv:
-        csv.write('\uFEFF')
+    with codecs.open(export_csv, "w", encoding="utf-8-sig") as csv:
         search_expression = "%s,%s\n\n" % ((REGEX_SEARCH if regex_search else LITERAL_SEARCH), csv_encode(search))
         csv.write(search_expression)
         export_result_list(result_list, csv)
         export_result_content_list(result_content_list, csv)
 
-    if _PLATFORM == "osx":
+    platform = util.platform()
+    if platform == "osx":
         subprocess.Popen(['open', csv.name])
-    elif _PLATFORM == "windows":
+    elif platform == "windows":
         startfile(csv.name)
     else:
         try:

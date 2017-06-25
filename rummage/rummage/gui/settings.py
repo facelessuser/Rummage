@@ -21,9 +21,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import codecs
 import json
-import sys
-from os import mkdir, listdir
-from os.path import expanduser, exists, join, getmtime, isdir
+import os
 import traceback
 from ..file_strip.json import sanitize_json
 from .. import notify
@@ -35,13 +33,7 @@ from . generic_dialogs import errormsg
 from .. import data
 from .. import rumcore
 from .. import portalocker
-
-if sys.platform.startswith('win'):
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
+from .. import util
 
 SETTINGS_FILE = "rummage.settings"
 CACHE_FILE = "rummage.cache"
@@ -100,7 +92,7 @@ class Settings(object):
                     print(str(e))
         if cls.debug:
             set_debug_mode(True)
-        localization.setup('rummage', join(cls.config_folder, "locale"), cls.get_language())
+        localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
         debug_struct(cls.settings)
         debug_struct(cls.cache)
         cls.init_notify(True)
@@ -168,7 +160,7 @@ class Settings(object):
 
         cls.reload_settings()
         locale = cls.settings.get("locale", "en_US")
-        if locale == "en_US" and not exists(join(cls.config_folder, "locale", "en_US")):
+        if locale == "en_US" and not os.path.exists(os.path.join(cls.config_folder, "locale", "en_US")):
             locale = None
         return locale
 
@@ -185,10 +177,10 @@ class Settings(object):
         """Return languages."""
 
         languages = []
-        base = join(cls.config_folder, "locale")
-        if exists(base):
-            for file_obj in listdir(base):
-                if isdir(join(base, file_obj)):
+        base = os.path.join(cls.config_folder, "locale")
+        if os.path.exists(base):
+            for file_obj in os.listdir(base):
+                if os.path.isdir(os.path.join(base, file_obj)):
                     languages.append(file_obj)
         if len(languages) == 0 or "en_US" not in languages:
             languages.append("en_US")
@@ -209,8 +201,8 @@ class Settings(object):
         """Get timestamp on files."""
 
         try:
-            settings_time = getmtime(cls.settings_file)
-            cache_time = getmtime(cls.cache_file)
+            settings_time = os.path.getmtime(cls.settings_file)
+            cache_time = os.path.getmtime(cls.cache_file)
             cls.settings_time = settings_time
             cls.cache_time = cache_time
         except Exception as e:
@@ -235,41 +227,43 @@ class Settings(object):
     def get_settings_files(cls):
         """Get settings, cache, log, and fifo location."""
 
-        if _PLATFORM == "windows":
-            folder = expanduser("~\\.Rummage")
-            if not exists(folder):
-                mkdir(folder)
-            settings = join(folder, SETTINGS_FILE)
-            cache = join(folder, CACHE_FILE)
-            log = join(folder, LOG_FILE)
-            cls.fifo = join(folder, '\\\\.\\pipe\\rummage')
+        platform = util.platform()
+
+        if platform == "windows":
+            folder = os.path.expanduser("~\\.Rummage")
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            settings = os.path.join(folder, SETTINGS_FILE)
+            cache = os.path.join(folder, CACHE_FILE)
+            log = os.path.join(folder, LOG_FILE)
+            cls.fifo = os.path.join(folder, '\\\\.\\pipe\\rummage')
             cls.config_folder = folder
-        elif _PLATFORM == "osx":
-            old_folder = expanduser("~/Library/Application Support/Rummage")
-            folder = expanduser("~/.Rummage")
-            if exists(old_folder) and not exists(folder):
+        elif platform == "osx":
+            old_folder = os.path.expanduser("~/Library/Application Support/Rummage")
+            folder = os.path.expanduser("~/.Rummage")
+            if os.path.exists(old_folder) and not os.path.exists(folder):
                 import shutil
                 shutil.move(old_folder, folder)
-            if not exists(folder):
-                mkdir(folder)
-            settings = join(folder, SETTINGS_FILE)
-            cache = join(folder, CACHE_FILE)
-            log = join(folder, LOG_FILE)
-            cls.fifo = join(folder, FIFO)
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            settings = os.path.join(folder, SETTINGS_FILE)
+            cache = os.path.join(folder, CACHE_FILE)
+            log = os.path.join(folder, LOG_FILE)
+            cls.fifo = os.path.join(folder, FIFO)
             cls.config_folder = folder
-        elif _PLATFORM == "linux":
-            folder = expanduser("~/.config/Rummage")
-            if not exists(folder):
-                mkdir(folder)
-            settings = join(folder, SETTINGS_FILE)
-            cache = join(folder, CACHE_FILE)
-            log = join(folder, LOG_FILE)
-            cls.fifo = join(folder, FIFO)
+        elif platform == "linux":
+            folder = os.path.expanduser("~/.config/Rummage")
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            settings = os.path.join(folder, SETTINGS_FILE)
+            cache = os.path.join(folder, CACHE_FILE)
+            log = os.path.join(folder, LOG_FILE)
+            cls.fifo = os.path.join(folder, FIFO)
             cls.config_folder = folder
         try:
             locked = False
             for filename in (settings, cache):
-                if not exists(filename):
+                if not os.path.exists(filename):
                     with codecs.open(filename, "w", encoding="utf-8") as f:
                         assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock file."
                         locked = True
@@ -337,7 +331,7 @@ class Settings(object):
         cls.reload_settings()
         editor = cls.settings.get("editor", [])
         if isinstance(editor, dict):
-            editor = editor.get(_PLATFORM, [])
+            editor = editor.get(util.platform(), [])
 
         return [
             arg.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col)) for arg in editor
@@ -420,26 +414,39 @@ class Settings(object):
         """Setup growl notification."""
 
         pth = cls.get_config_folder()
-        png = join(pth, "Rummage-notify.png")
-        icon = join(pth, "Rummage-notify.ico")
-        icns = join(pth, "Rummage-notify.icns")
+
+        # Clean up old images
+        png = os.path.join(pth, "Rummage-notify.png")
+        icon = os.path.join(pth, "Rummage-notify.ico")
+        icns = os.path.join(pth, "Rummage-notify.icns")
+        for img in (png, icon, icns):
+            try:
+                if os.path.exists(img):
+                    os.remove(img)
+            except Exception:
+                pass
+
+        # New file names
+        png = os.path.join(pth, "rum-notify.png")
+        icon = os.path.join(pth, "rum-notify.ico")
+        icns = os.path.join(pth, "rum-notify.icns")
 
         try:
-            if not exists(png):
+            if not os.path.exists(png):
                 with open(png, "wb") as f:
-                    f.write(data.get_image('rummage.png').GetData())
+                    f.write(data.get_image('rummage_hires.png').GetData())
         except Exception:
             png = None
 
         try:
-            if not exists(icon):
+            if not os.path.exists(icon):
                 with open(icon, "wb") as f:
                     f.write(data.get_image('rummage_tray.ico').GetData())
         except Exception:
             icon = None
 
         try:
-            if not exists(icns):
+            if not os.path.exists(icns):
                 with open(icns, "wb") as f:
                     f.write(data.get_image('rummage.icns').GetData())
         except Exception:
@@ -448,11 +455,11 @@ class Settings(object):
         # Set up notifications
         notifier = cls.get_term_notifier()
         if (
-            isdir(notifier) and
+            os.path.isdir(notifier) and
             notifier.endswith('.app') and
-            exists(join(notifier, 'Contents/MacOS/terminal-notifier'))
+            os.path.exists(os.path.join(notifier, 'Contents/MacOS/terminal-notifier'))
         ):
-            notifier = join(notifier, 'Contents/MacOS/terminal-notifier')
+            notifier = os.path.join(notifier, 'Contents/MacOS/terminal-notifier')
         notify.setup_notifications(
             "Rummage",
             png,
@@ -480,16 +487,17 @@ class Settings(object):
     def get_platform_notify(cls):
         """Get all possible platform notification styles."""
 
-        return NOTIFY_STYLES[_PLATFORM]
+        return NOTIFY_STYLES[util.platform()]
 
     @classmethod
     def get_notify_method(cls):
         """Get notification style."""
 
         cls.reload_settings()
-        method = cls.settings.get("notify_method", NOTIFY_STYLES[_PLATFORM][0])
-        if method is None or method == "native" or method not in NOTIFY_STYLES[_PLATFORM]:
-            method = NOTIFY_STYLES[_PLATFORM][0]
+        platform = util.platform()
+        method = cls.settings.get("notify_method", NOTIFY_STYLES[platform][0])
+        if method is None or method == "native" or method not in NOTIFY_STYLES[platform]:
+            method = NOTIFY_STYLES[platform][0]
         return method
 
     @classmethod
@@ -497,7 +505,7 @@ class Settings(object):
         """Set notification style."""
 
         if notify_method not in ["native", "growl"]:
-            notify_method = NOTIFY_STYLES[_PLATFORM][0]
+            notify_method = NOTIFY_STYLES[util.platform()][0]
         if notify_method in ["native"]:
             notify_method = "native"
         cls.reload_settings()

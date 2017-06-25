@@ -20,13 +20,13 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
+import sys
 import codecs
 import mmap
 import os
 import re
 import shutil
 import sre_parse
-import sys
 from collections import namedtuple
 from fnmatch import fnmatch
 from time import ctime
@@ -35,28 +35,10 @@ from backrefs import bre, bregex
 from .file_times import getmtime, getctime
 from .file_hidden import is_hidden
 from collections import deque
+from .. import util
 if bregex.REGEX_SUPPORT:
     import regex
 REGEX_SUPPORT = bregex.REGEX_SUPPORT
-
-PY3 = (3, 0) <= sys.version_info < (4, 0)
-
-if PY3:
-    binary_type = bytes  # noqa
-    string_type = str  # noqa
-
-    def to_ascii_bytes(string):
-        """Convert unicode to ascii byte string."""
-
-        return bytes(string, 'ascii')
-else:
-    binary_type = str  # noqa
-    string_type = basestring  # noqa
-
-    def to_ascii_bytes(string):
-        """Convert unicode to ascii byte string."""
-
-        return bytes(string)
 
 # Common regex flags (re|regex)
 IGNORECASE = 0x1  # (?i)
@@ -99,13 +81,6 @@ REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
 TRUNCATE_LENGTH = 120
 
 DEFAULT_BAK = 'rum-bak'
-
-if sys.platform.startswith('win'):  # pragma: no cover
-    _PLATFORM = "windows"
-elif sys.platform == "darwin":    # pragma: no cover
-    _PLATFORM = "osx"
-else:
-    _PLATFORM = "linux"
 
 U32 = (
     'u32', 'utf32', 'utf_32'
@@ -166,7 +141,7 @@ def _re_pattern(pattern, rum_flags=0, binary=False):
         flags |= re.DOTALL
     if not binary and rum_flags & UNICODE:
         flags |= re.UNICODE
-    elif PY3:
+    elif util.PY3:
         flags |= re.ASCII
     return re.compile(pattern, flags)
 
@@ -174,7 +149,7 @@ def _re_pattern(pattern, rum_flags=0, binary=False):
 def _re_literal_pattern(pattern, rum_flags=0):
     """Prepare literal search pattern flags."""
 
-    flags = re.ASCII if PY3 else 0
+    flags = re.ASCII if util.PY3 else 0
     if rum_flags & IGNORECASE:
         flags |= re.IGNORECASE
     return re.compile(re.escape(pattern), flags)
@@ -192,7 +167,7 @@ def _bre_pattern(pattern, rum_flags=0, binary=False):
         flags |= bre.DOTALL
     if not binary and rum_flags & UNICODE:
         flags |= bre.UNICODE
-    elif PY3:
+    elif util.PY3:
         flags |= bre.ASCII
     return bre.compile_search(pattern, flags)
 
@@ -200,7 +175,7 @@ def _bre_pattern(pattern, rum_flags=0, binary=False):
 def _bre_literal_pattern(pattern, rum_flags=0):
     """Prepare literal search pattern flags."""
 
-    flags = bre.ASCII if PY3 else 0
+    flags = bre.ASCII if util.PY3 else 0
     if rum_flags & IGNORECASE:
         flags |= bre.IGNORECASE
     return bre.compile_search(bre.escape(pattern), flags)
@@ -635,12 +610,12 @@ class _FileSearch(object):
 
         if self.is_binary:
             try:
-                pattern = to_ascii_bytes(self.pattern)
+                pattern = util.to_ascii_bytes(self.pattern)
             except UnicodeEncodeError:
                 raise RummageException('Unicode chars in binary search pattern')
             if self.replace is not None:
                 try:
-                    replace = to_ascii_bytes(self.replace)
+                    replace = util.to_ascii_bytes(self.replace)
                 except UnicodeEncodeError:
                     raise RummageException('Unicode chars in binary replace pattern')
         else:
@@ -1004,7 +979,7 @@ class _DirWalker(object):
         self.backup_ext = None
         ext = '.%s' % backup_ext if backup_ext else None
         if ext is not None:
-            self.backup_ext = ext.lower() if _PLATFORM == "windows" else ext
+            self.backup_ext = ext.lower() if util.platform() == "windows" else ext
 
     def _parse_pattern(self, string, regex_match):
         r"""Compile or format the inclusion\exclusion pattern."""
@@ -1021,11 +996,11 @@ class _DirWalker(object):
                 ) if regex_match else [f.lower() for f in string.split("|")]
             elif self.regex_mode == BRE_MODE:
                 pattern = bre.compile_search(
-                    string, bre.IGNORECASE | (bre.ASCII if PY3 else 0)
+                    string, bre.IGNORECASE | (bre.ASCII if util.PY3 else 0)
                 ) if regex_match else [f.lower() for f in string.split("|")]
             else:
                 pattern = re.compile(
-                    string, re.IGNORECASE | (re.ASCII if PY3 else 0)
+                    string, re.IGNORECASE | (re.ASCII if util.PY3 else 0)
                 ) if regex_match else [f.lower() for f in string.split("|")]
         return pattern
 
@@ -1089,7 +1064,7 @@ class _DirWalker(object):
 
         is_backup = False
         if self.backup_ext is not None:
-            if _PLATFORM == "windows":  # pragma: no cover
+            if util.platform() == "windows":  # pragma: no cover
                 name = name.lower()
             if name.endswith(self.backup_ext):
                 is_backup = True
@@ -1247,7 +1222,7 @@ class Rummage(object):
         self.search_params.replace = replace
         self.search_params.encoding = self._verify_encoding(encoding) if encoding is not None else None
         self.skipped = 0
-        if backup_ext and isinstance(backup_ext, string_type):
+        if backup_ext and isinstance(backup_ext, util.string_type):
             self.search_params.backup_ext = backup_ext
         else:
             self.search_params.backup_ext = DEFAULT_BAK

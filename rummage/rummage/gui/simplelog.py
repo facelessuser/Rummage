@@ -21,6 +21,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import codecs
 import threading
+from .. import util
 
 ALL = 0
 DEBUG = 10
@@ -71,7 +72,7 @@ class Log(object):
 
         return log_fmt % {
             "loglevel": lvl,
-            "message": unicode(msg if msg_fmt is None else msg_fmt(msg))
+            "message": util.to_ustr(msg if msg_fmt is None else msg_fmt(msg))
         }
 
     def debug(self, msg, log_fmt="%(loglevel)s: %(message)s\n", echo=True, msg_fmt=None):
