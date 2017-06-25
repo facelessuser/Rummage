@@ -6,6 +6,11 @@
 
 - **NEW**: Python 3 support via the new wxPython 4.0.0 Phoenix!
 - **NEW**: Dropped classic wxPython (<4.0.0) as it is too much work to maintain legacy support as well.
+- **NEW**: Serialize piped argument data.
+- **FIX**: Icon now displays in Ubuntu.
+- **FIX**: Fix tab traversal issues by adding a custom tab traversal for macOS and Linux.
+- **FIX**: Fix notifications with terminal-notifier.
+
 
 ## 1.0.2
 
