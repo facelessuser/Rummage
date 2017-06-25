@@ -1,4 +1,4 @@
 gntp>=1.0.2
 chardet>=2.3.0
-backrefs
+backrefs>=1.0.1
 regex

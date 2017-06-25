@@ -34,8 +34,8 @@ VER, DEVSTATUS = get_version()
 
 LONG_DESC = '''
 Rummage is a GUI tool for searching and replacing texst in files.
-It is built with wxPython 3.0.0+ and requires Python 2.7.
-You can check out the list of available extensions and learn more about them by `reading the docs`_.
+It is built with wxPython 4.0.0+ and requires Python 2.7.
+You can learn more about using Rummage by `reading the docs`_.
 
 .. _`reading the docs`: http://facelessuser.github.io/Rummage/
 
@@ -49,29 +49,17 @@ Please read about `support and contributing`_ before creating issues.
 .. _`support and contributing`: http://facelessuser.github.io/rummage/contributing/
 '''
 
-if PY3:
-    entry_points = {
-        'console_scripts': [
-            'rumcl=rummage.cli:main',
-            'rumcl%d.%d=rummage.cli:main' % sys.version_info[:2],
-        ]
-    }
-else:
-    entry_points = {
-        'gui_scripts': [
-            'rummage=rummage.__main__:main'
-        ],
-        'console_scripts': [
-            'rumcl=rummage.cli:main',
-            'rumcl%d.%d=rummage.cli:main' % sys.version_info[:2],
-        ]
-    }
+entry_points = {
+    'gui_scripts': [
+        'rummage=rummage.__main__:main'
+    ]
+}
 
 setup(
-    name='Rummage',
+    name='rummage',
     version=VER,
-    keywords='grep search find',
-    description='A gui file search app.',
+    keywords='grep search find replace gui',
+    description='A GUI file search and replace app.',
     long_description=LONG_DESC,
     author='Isaac Muse',
     author_email='Isaac.Muse [at] gmail.com',
@@ -80,9 +68,9 @@ setup(
     install_requires=[
         "gntp>=1.0.2",
         "chardet>=2.3.0",
-        "backrefs>=1.0.0",
+        "backrefs>=1.0.1",
         "regex",
-        "wxpython"
+        "wxpython>=4.0.0"
     ],
     zip_safe=False,
     entry_points=entry_points,
