@@ -71,7 +71,7 @@ def to_bstr(obj):
     return obj.encode('utf-8') if isinstance(obj, ustr) else obj
 
 
-def getcwd(self):
+def getcwd():
     """Get the current working directory."""
 
     if PY3:
