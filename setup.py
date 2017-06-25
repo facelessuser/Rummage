@@ -70,7 +70,7 @@ setup(
         "chardet>=2.3.0",
         "backrefs>=1.0.1",
         "regex",
-        "wxpython>=4.0.0"
+        "wxpython>=4.0.0a3"
     ],
     zip_safe=False,
     entry_points=entry_points,
