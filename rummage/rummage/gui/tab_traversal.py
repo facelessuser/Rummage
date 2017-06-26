@@ -61,7 +61,7 @@ class CustomTabTraversal(object):
         if no_tab is None:
             no_tab = []
 
-        if util.platform() != "windows":
+        if False:  # util.platform() != "windows":
             self._set_tab_keybindings()
 
             self.tab_stop = tab_stop

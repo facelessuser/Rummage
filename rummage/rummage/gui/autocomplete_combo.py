@@ -37,7 +37,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
         wx.ComboCtrl.__init__(
             self, parent, wx.ID_ANY,
             wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
-            style=wx.TAB_TRAVERSAL | wx.TE_PROCESS_ENTER
+            style=wx.TE_PROCESS_ENTER | wx.WANTS_CHARS
         )
         self.update_semaphore = False
         self.choices = None
@@ -49,7 +49,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
         self.SetPopupControl(self.list)
 
         # Key bindings and events for the object
-        self.Bind(wx.EVT_CHAR, self.on_char)
         self.Bind(wx.EVT_KEY_UP, self.on_key_up)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
@@ -93,12 +92,16 @@ class AutoCompleteCombo(wx.ComboCtrl):
     def tab_forward(self):
         """Tab forward to the next object."""
 
-        self.Navigate(wx.NavigationKeyEvent.FromTab | wx.NavigationKeyEvent.IsForward)
+        self.GetTextCtrl().Navigate(
+            wx.NavigationKeyEvent.FromTab | wx.NavigationKeyEvent.IsForward
+        )
 
     def tab_back(self):
         """Tab backwards to the previous object."""
 
-        self.Navigate(wx.NavigationKeyEvent.FromTab | wx.NavigationKeyEvent.IsBackward)
+        self.GetTextCtrl().Navigate(
+            wx.NavigationKeyEvent.FromTab | wx.NavigationKeyEvent.IsBackward
+        )
 
     def update_choices(self, items, load_last=False):
         """
@@ -141,21 +144,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
             return
         event.Skip()
 
-    def on_char(self, event):
-        """
-        Prevent delete and backspace from triggering autocomplete.
-
-        Allow tab and shift+tab to tab forward and back to other objects.
-        """
-
-        key = event.GetKeyCode()
-        if key == wx.WXK_TAB:
-            if event.ShiftDown():
-                self.tab_back()
-            else:
-                self.tab_forward()
-        event.Skip()
-
     def on_key_up(self, event):
         """
         Popup combo dropdown on arrow up and down.
@@ -183,7 +171,12 @@ class AutoCompleteCombo(wx.ComboCtrl):
         """Swallow up and down arrow event if popup shown."""
 
         key = event.GetKeyCode()
-        if key in [wx.WXK_DELETE, wx.WXK_BACK]:
+        if key == wx.WXK_TAB:
+            if event.ShiftDown():
+                self.tab_back()
+            else:
+                self.tab_forward()
+        elif key in [wx.WXK_DELETE, wx.WXK_BACK]:
             self.update_semaphore = True
         event.Skip()
 

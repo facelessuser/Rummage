@@ -583,21 +583,21 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender, CustomTabTraversal):
 
         self.localize()
 
-        self.max_limit_tab = 2
-        self.init_tab_traversal(
-            [
-                self.m_searchin_text,
-                self.m_searchfor_textbox,
-                self.m_replace_textbox,
-                self.m_size_text,
-                self.m_modified_date_picker,
-                self.m_modified_time_picker,
-                self.m_created_date_picker,
-                self.m_created_time_picker,
-                self.m_exclude_textbox,
-                self.m_filematch_textbox
-            ]
-        )
+        # self.max_limit_tab = 2
+        # self.init_tab_traversal(
+        #     [
+        #         self.m_searchin_text,
+        #         self.m_searchfor_textbox,
+        #         self.m_replace_textbox,
+        #         self.m_size_text,
+        #         self.m_modified_date_picker,
+        #         self.m_modified_time_picker,
+        #         self.m_created_date_picker,
+        #         self.m_created_time_picker,
+        #         self.m_exclude_textbox,
+        #         self.m_filematch_textbox
+        #     ]
+        # )
 
         # Setup the inputs history and replace
         # placeholder objects with actual objecs
