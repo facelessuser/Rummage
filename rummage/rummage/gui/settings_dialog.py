@@ -91,7 +91,8 @@ class SettingsDialog(gui.SettingsDialog, tab_traversal.CustomTabTraversal):
 
         self.localize()
 
-        self.init_tab_traversal([self.m_term_note_picker.GetTextCtrl()])
+        if util.platform() == "osx":
+            self.init_tab_traversal([self.m_term_note_picker.GetTextCtrl()])
 
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
