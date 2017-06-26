@@ -48,6 +48,7 @@ from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
 from .settings_dialog import SettingsDialog
+from .tab_traversal import CustomTabTraversal
 from .about_dialog import AboutDialog
 from .messages import dirpickermsg, filepickermsg
 from .. import data
@@ -523,7 +524,7 @@ class DirPickButton(object):
         event.Skip()
 
 
-class RummageFrame(gui.RummageFrame, DebugFrameExtender):
+class RummageFrame(gui.RummageFrame, DebugFrameExtender, CustomTabTraversal):
     """Rummage Frame."""
 
     def __init__(self, parent, start_path, debug_mode=False):
@@ -551,22 +552,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if debug_mode:
             self.open_debug_console()
 
-        keybindings = [
-            (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
-            (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
-        ]
-
-        if util.platform() != "windows":
-            keybindings.extend(
-                [
-                    (wx.ACCEL_NORMAL, wx.WXK_TAB, lambda event, direction=0: self.on_tab_traversal(event, direction)),
-                    (wx.ACCEL_SHIFT, wx.WXK_TAB, lambda event, direction=1: self.on_tab_traversal(event, direction))
-                ]
-            )
-
         # Setup debugging
         self.set_keybindings(
-            keybindings,
+            [
+                (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
+                (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
+            ],
             debug_event=(self.on_debug_console if debug_mode else None)
         )
 
@@ -592,8 +583,21 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.localize()
 
-        if util.platform() != "windows":
-            self.init_tab_traversal()
+        self.max_limit_tab = 2
+        self.init_tab_traversal(
+            [
+                self.m_searchin_text,
+                self.m_searchfor_textbox,
+                self.m_replace_textbox,
+                self.m_size_text,
+                self.m_modified_date_picker,
+                self.m_modified_time_picker,
+                self.m_created_date_picker,
+                self.m_created_time_picker,
+                self.m_exclude_textbox,
+                self.m_filematch_textbox
+            ]
+        )
 
         # Setup the inputs history and replace
         # placeholder objects with actual objecs
@@ -623,47 +627,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.Enable(False)
         wx.CallLater(500, self.on_load).Start()
 
-    def init_tab_traversal(self):
-        """Initialize custom tab traversal (OSX doesn't work natively)."""
+    def get_max_tab(self):
+        """Get max tab stop (override)."""
 
-        self.tab_stop = [
-            self.m_searchin_text,
-            self.m_searchfor_textbox,
-            self.m_replace_textbox,
-            self.m_size_text,
-            self.m_modified_date_picker,
-            self.m_modified_time_picker,
-            self.m_created_date_picker,
-            self.m_created_time_picker,
-            self.m_exclude_textbox,
-            self.m_filematch_textbox
-        ]
-
-        idx = 0
-        self.id_to_tab_idx = {}
-        for ts in self.tab_stop:
-            self.id_to_tab_idx[ts.GetId()] = idx
-            idx += 1
-        self.min_tab = 0
-        self.max_tab = idx - 1
-        self.max_limit_tab = 2
-
-    def on_tab_traversal(self, event, direction):
-        """Handle tab traversal."""
-
-        obj = self.FindFocus()
-        idx = self.id_to_tab_idx.get(obj.GetId())
-        if idx is not None:
-            max_tab = self.max_limit_tab if not self.m_limiter_panel.IsShown() else self.max_tab
-            if direction:
-                # Tab backwards
-                idx = max_tab if idx == self.min_tab else idx - 1
-            else:
-                # Tab forward
-                idx = self.min_tab if idx == max_tab else idx + 1
-            self.tab_stop[idx].SetFocus()
-            return
-        event.Skip()
+        return self.max_limit_tab if not self.m_limiter_panel.IsShown() else self._max_tab
 
     def localize(self):
         """Localize."""

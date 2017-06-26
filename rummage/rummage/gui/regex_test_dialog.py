@@ -29,10 +29,11 @@ from .settings import Settings
 from ..localization import _
 from .. import rumcore
 from .. import util
+from . import tab_traversal
 from backrefs import bre, bregex
 
 
-class RegexTestDialog(gui.RegexTestDialog):
+class RegexTestDialog(gui.RegexTestDialog, tab_traversal.CustomTabTraversal):
     """Regex test dialog."""
 
     def __init__(self, parent):
@@ -48,7 +49,9 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
-            [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+            [
+                (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)
+            ]
         )
 
         self.m_case_checkbox.SetValue(parent.m_case_checkbox.GetValue() if parent else False)
@@ -72,6 +75,15 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.m_fullcase_checkbox.Show()
         self.regex_event_code = -1
         self.testing = False
+        self.init_tab_traversal(
+            [
+                self.m_test_text,
+                self.m_test_replace_text,
+                self.m_regex_text,
+                self.m_replace_text
+            ],
+            [self.m_test_text]
+        )
         self.init_regex_timer()
         self.start_regex_timer()
 

@@ -23,6 +23,7 @@ import wx
 from . import gui
 from .settings import Settings
 from .editor_dialog import EditorDialog
+from . import tab_traversal
 from ..localization import _
 from .. import rumcore
 from .. import util
@@ -30,7 +31,7 @@ from .. import util
 RECORDS = _("%d Records")
 
 
-class SettingsDialog(gui.SettingsDialog):
+class SettingsDialog(gui.SettingsDialog, tab_traversal.CustomTabTraversal):
     """SettingsDialog."""
 
     def __init__(self, parent):
