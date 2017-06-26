@@ -87,3 +87,9 @@ def iternext(item):
         return item.__next__()
     else:
         return item.next()
+
+
+def translate(lang, text):
+    """Translate text."""
+
+    return lang.gettext(text) if PY3 else lang.ugettext(text)

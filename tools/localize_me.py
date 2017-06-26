@@ -17,8 +17,8 @@ else:
 def localize(args):
     """Localize project."""
 
-    pygettext = os.path.abspath(args.pygettext) if args.pygettext is not None else "pygettext.py"
-    msgfmt = os.path.abspath(args.msgfmt) if args.msgfmt is not None else "msgfmt.py"
+    pygettext = os.path.join(os.path.abspath(args.i18n), 'pygettext.py') if args.i18n is not None else "pygettext.py"
+    msgfmt = os.path.join(os.path.abspath(args.i18n), 'msgfmt.py') if args.i18n is not None else "msgfmt.py"
     locale_pth = "locale"
     search_pth = os.path.join("rummage", "rummage", "gui", "*.py")
     cmd = [
@@ -97,8 +97,7 @@ def main():
     parser = argparse.ArgumentParser(prog="localize_me", description='Localize rummage')
     # Flag arguments
     parser.add_argument('--version', action='version', version=('%(prog)s ' + "1.0.0"))
-    parser.add_argument('--pygettext', nargs="?", default=None, help="Path to pygettext.py")
-    parser.add_argument('--msgfmt', nargs="?", default=None, help="Path to msgfmt.py")
+    parser.add_argument('--i18n', nargs="?", default=None, help="Path to Python's Tools/i18n")
     args = parser.parse_args()
 
     return localize(args)

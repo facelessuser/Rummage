@@ -190,7 +190,7 @@ Single Instance
 
 Language
 : 
-    Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated and not included by default, but can be configured if desired.
+    Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated but includes most of the needed translations. In order to use locale, you must copy the project's localization files to your user settings directory. See [Localization](#localization) to learn more.
 
 ### Regular Expression Modules
 
@@ -308,5 +308,53 @@ Paths might vary depending on Ubuntu version etc.
     ```
 
 - Restart of Nautilus may or may not be needed, but context menu item should appear under `Scripts` and should work on files and folders.
+
+## Localization
+
+Rummage provides an i18n localization framework to allow support for displaying the UI in other languages. But there is some manual setup required as out of the box, only `en_US` is available. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).
+
+### Installing Translations
+
+To install translations, just copy the `locale` folder from the release you are using to your user configuration folder.  For a traditional Python installation, this is where you'd find it for each OS:
+
+Windows: `C:\Users\<my_username>\.Rummage`
+macOS: `/Users/<my_username>/.Rummage`
+Linux: `/home/<my_username>/.config/Rummage`
+
+Unless the UI changes by adding new untranslated strings, you can keep using the same translations.
+
+After installing the localization files, set the language via the `Language` setting in the settings [General panel](#general).
+
+### Adding New
+
+- Clone the project and create a new folder under `locale` with the appropriate locale name.
+- Create another folder under the one you just created called `LC_MESSAGES`.
+- Copy `locale/messages.po` to `locale/<my_LOCALE>/LC_MESSAGES/rummage.po`.
+- Edit the copied file changing things like:
+
+    ```
+    msgid "About"
+    msgstr ""
+    ```
+
+    To:
+
+    ```
+    msgid "About"
+    msgstr "<my_translation>"
+    ```
+
+- Compile `.mo` files by running the `tools/localize_me.py` script from the root of the project:
+
+    ```
+    python3 tools/localize_me.py --i18n /Library/Frameworks/Python.framework/Versions/3.6/share/doc/python3.6/examples/Tools/i18n
+    ```
+
+    Modify the `--i18n` path to the appropriate location of the `i18n` folder for your Python.
+
+- Commit, push, and pull request.
+
+
+I only speak English, so I do not maintain these. If the UI changes, someone from the community will need to update them appropriately via pull requests or they will remain out of date.
 
 --8<-- "links.md"
