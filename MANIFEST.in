@@ -2,12 +2,13 @@ recursive-include rummage *.py
 recursive-include docs *
 recursive-include rummage/rummage/data *.png *.icns *.ico *.js *.css
 recursive-include tests *.txt *.py *.hidden_file *.rum-bak
+recursive-include tools *.py
 recursive-include locale *.mo *.po
 include setup.py
-inlcude gui.fbp
-include localize_me.py
 include setup.cfg
 include tox.ini
+include gui.fbp
+include mkdocs.yml
 include .coveragerc
 include LICENSE.md
 include README.md
