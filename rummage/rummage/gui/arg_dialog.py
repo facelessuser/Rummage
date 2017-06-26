@@ -21,11 +21,12 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 from . import gui
+from . import tab_traversal
 from ..localization import _
 from .. import util
 
 
-class ArgDialog(gui.ArgDialog):
+class ArgDialog(gui.ArgDialog, tab_traversal.CustomTabTraversal):
     """Argument Dialog."""
 
     def __init__(self, parent, value):
@@ -42,6 +43,8 @@ class ArgDialog(gui.ArgDialog):
         self.m_arg_text.SetValue(value)
 
         self.localize()
+
+        self.init_tab_traversal([self.m_arg_text])
 
         # Ensure good sizing for frame
         best = self.m_arg_panel.GetBestSize()

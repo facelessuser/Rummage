@@ -23,11 +23,12 @@ import wx
 from . import gui
 from .settings import Settings, rumcore
 from .generic_dialogs import errormsg
+from . import tab_traversal
 from ..localization import _
 from .. import util
 
 
-class SaveSearchDialog(gui.SaveSearchDialog):
+class SaveSearchDialog(gui.SaveSearchDialog, tab_traversal.CustomTabTraversal):
     """Save search dialog."""
 
     def __init__(self, parent):
@@ -46,6 +47,8 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.is_regex = parent.m_regex_search_checkbox.GetValue()
 
         self.localize()
+
+        self.init_tab_traversal([self.m_name_text])
 
         # Ensure good sizing for dialog
         best = self.m_save_panel.GetBestSize()
