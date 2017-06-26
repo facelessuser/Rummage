@@ -54,7 +54,7 @@ class CustomTabTraversal(object):
         Initialize custom tab traversal.
 
         tab_stop is the objects to tab from and to.
-        no_tab is the objects you can't tab out of (for instance, 
+        no_tab is the objects you can't tab out of (for instance,
         an object that allows tab as an input).
         """
 
