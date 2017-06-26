@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 language: python
 matrix:
   include:
@@ -26,17 +26,19 @@ script:
   - tox
 after_success:
   - codecov
+before_deploy:
+  - sudo apt-get install dpkg-dev build-essential python2.7-dev libwebkitgtk-dev libjpeg-dev libtiff-dev libgtk2.0-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev
 deploy:
-  # - provider: pypi
-  #   user: facelessuser
-  #   password:
-  #     secure: S/7VvUM4b8dViV5YtOJOE3+w8u/n0nV3b3nyYzcgdetxYp9ppUq7wRZEwWRXGkLH7LPHxprq8n7EGHBVpfDHbesUqj+m93OPVNBlNy8Uh3p6bUlaI0f8MW2zAPq04oOHZ0mbWuDe34aHW3IEoCFCFL5gUAgx7cBIjcHPFFyTPsHnQGAVf/cLHfEE+OtJgUeFLgdBKehbcN9P7W96o8TMrJL6bQObytzzLUFN0LfkqBmqnZH+7g1Hlxw3k9ajSC2edLjCDmuEQy+NYsVrW6/XB9vzNzYA1/JREdP+6IEQ+V4temRzgVWNgWjrl83Du+c73Cc/DkVPoOw/udAHqFk/nNYQCZJbzZnuQxqrp/MDKZxmJzmspDX7PCQV3Mw0pxYTbE/3bWSVVPfwi2VCbaOkELndHBOCBXK0U12exlg9vidJA+18M5TkiNIBCjkWAI9uUeLxfQcW9q7hWeiKgbD2VJPpp4V4TjtTAAMEIyq2Eie2uoreKL07Q82QcKKqudKZWaUl++nh/ZNo5u8X0K2YZQWOD9iKrsCOgpov8Bh9Kz57QpBTDgx6l1NTovmbQ4v1vFgGZVx4MnhpQgIqzHU+5Bb8E/ar0FtsCEfG0m5yLwKA0SOrX8vSAlTu8w3yN+Q/pbbetVsvMR3pCeh8bu+s742wS6Llx5RxALi8nJygm6k=
-  #   distributions: "sdist bdist_wheel"
-  #   skip_upload_docs: true
-  #   on:
-  #     tags: true
-  #     repo: facelessuser/Rummage
-  #     condition: "$TOXENV = documents"
+  - provider: pypi
+    user: facelessuser
+    password:
+      secure: S/7VvUM4b8dViV5YtOJOE3+w8u/n0nV3b3nyYzcgdetxYp9ppUq7wRZEwWRXGkLH7LPHxprq8n7EGHBVpfDHbesUqj+m93OPVNBlNy8Uh3p6bUlaI0f8MW2zAPq04oOHZ0mbWuDe34aHW3IEoCFCFL5gUAgx7cBIjcHPFFyTPsHnQGAVf/cLHfEE+OtJgUeFLgdBKehbcN9P7W96o8TMrJL6bQObytzzLUFN0LfkqBmqnZH+7g1Hlxw3k9ajSC2edLjCDmuEQy+NYsVrW6/XB9vzNzYA1/JREdP+6IEQ+V4temRzgVWNgWjrl83Du+c73Cc/DkVPoOw/udAHqFk/nNYQCZJbzZnuQxqrp/MDKZxmJzmspDX7PCQV3Mw0pxYTbE/3bWSVVPfwi2VCbaOkELndHBOCBXK0U12exlg9vidJA+18M5TkiNIBCjkWAI9uUeLxfQcW9q7hWeiKgbD2VJPpp4V4TjtTAAMEIyq2Eie2uoreKL07Q82QcKKqudKZWaUl++nh/ZNo5u8X0K2YZQWOD9iKrsCOgpov8Bh9Kz57QpBTDgx6l1NTovmbQ4v1vFgGZVx4MnhpQgIqzHU+5Bb8E/ar0FtsCEfG0m5yLwKA0SOrX8vSAlTu8w3yN+Q/pbbetVsvMR3pCeh8bu+s742wS6Llx5RxALi8nJygm6k=
+    distributions: "sdist bdist_wheel"
+    skip_upload_docs: true
+    on:
+      tags: true
+      repo: facelessuser/Rummage
+      condition: "$TOXENV = documents"
   - provider: pages
     github_token: $GITHUB_TOKEN
     name: $GITHUB_USER
