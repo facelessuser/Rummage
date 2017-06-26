@@ -67,7 +67,7 @@ setup(
     packages=find_packages(exclude=['tests', 'tools']),
     install_requires=[
         "gntp>=1.0.2",
-        "chardet>=2.3.0",
+        "chardet>=3.0.4",
         "backrefs>=1.0.1",
         "regex",
         "wxpython>=4.0.0a3"

@@ -30,6 +30,10 @@ import functools
 from chardet.universaldetector import UniversalDetector
 from collections import namedtuple
 
+# For some reason we can only mock this
+# if we assign it to a variable
+DetectEncoding = UniversalDetector
+
 # 30 MB: maybe this should be lower for Python?
 MAX_GUESS_SIZE = 31457280
 MIN_GUESS_SIZE = 512
@@ -91,31 +95,6 @@ RE_BAD_UTF8 = re.compile(
 
 class Encoding(namedtuple('Encoding', ['encode', 'bom'])):
     """BOM object."""
-
-
-if chardet.__version__ == "2.3.0":  # pragma: no cover
-    class DetectEncoding(UniversalDetector):
-        """Stop Hungarian from being picked until chardet can fix this."""
-
-        def close(self):
-            """If encoding is hungarian, deny it; if a prober included is hungarian, deny it."""
-
-            if self.done:
-                enc = self.result["encoding"]  # noqa
-                if enc is not None and enc == "ISO-8859-2":
-                    self.result = None
-            count = -1
-            for prober in self._mCharSetProbers:
-                count += 1
-                if not prober:
-                    continue
-                if prober.get_charset_name() == "ISO-8859-2":
-                    self._mCharSetProbers[count] = None
-
-            result = UniversalDetector.close(self)
-            return result
-else:  # pragma: no cover
-    DetectEncoding = UniversalDetector
 
 
 def verify_encode(file_obj, encoding, blocks=1, chunk_size=4096):
