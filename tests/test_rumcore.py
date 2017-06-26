@@ -446,7 +446,7 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 4)
         self.assertEqual(len(self.files), 2)
-        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+        self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_recursive_hidden_folder_exclude(self):
         """Test non-recursive search."""
@@ -484,7 +484,7 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 4)
         self.assertEqual(len(self.files), 2)
-        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+        self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_recursive_hidden_re_folder_exclude(self):
         """Test non-recursive search."""
@@ -523,7 +523,7 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 2)
         self.assertEqual(len(self.files), 2)
-        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+        self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bre(self):
         """Test bre search."""
@@ -544,7 +544,7 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 2)
         self.assertEqual(len(self.files), 2)
-        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+        self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_regex(self):
         """Test regex search."""
@@ -565,7 +565,7 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 2)
         self.assertEqual(len(self.files), 2)
-        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+        self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bregex(self):
         """Test bregex search."""
@@ -586,7 +586,7 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 2)
         self.assertEqual(len(self.files), 2)
-        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+        self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bad_regular_expression_mode(self):
         """Test bad regular expression mode search."""
@@ -607,7 +607,7 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 2)
         self.assertEqual(len(self.files), 2)
-        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+        self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_abort(self):
         """Test aborting."""
