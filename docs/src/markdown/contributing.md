@@ -27,36 +27,34 @@ Contribution from the community is encouraged and can be done in a variety of wa
 
 ## Reviewing Code
 
-Take part in reviewing pull requests and/or reviewing direct commits.  Make suggestions to improve the code and discuss solutions to overcome weakness in the algorithm.
+Take part in reviewing pull requests and/or reviewing direct commits.  Make suggestions to improve the code and discuss solutions to overcome weaknesses in the algorithm.
 
 ## Pull Requests
 
 Pull requests are welcome, and if you plan on contributing directly to the code, there are a couple of things to be mindful of.
 
-Continuous integration tests on are run on all pull requests and commits via Travis CI.  When making a pull request, the tests will automatically be run, and the request must pass to be accepted.  You can (and should) run these tests before pull requesting.  If it is not possible to run these tests locally, they will be run when the pull request is made, but it is strongly suggested that requesters make an effort to verify before requesting to allow for a quick, smooth merge.
-
-Feel free to use a virtual environment if you are concerned about installing any of the Python packages.
+Continuous integration tests are run on all pull requests and commits via Travis CI.  When making a pull request, the tests will automatically be run, and the request must pass to be accepted.  You can (and should) run these tests before pull requesting. You should also add tests for bugs you are fixing. If it is not possible to run these tests locally, they will be run when the pull request is made, but it is strongly suggested that requesters make an effort to verify before requesting to allow for a quick, smooth merge.
 
 ### Running Validation Tests
 
-1. Make sure that `tox` is installed:
+1. Make sure that Tox is installed:
 
     ```
     pip install tox
     ```
 
-2. Run tox:
+2. Run Tox:
 
     ```
     tox
     ```
 
-    Tox should install necessary dependencies and run the tests.
+    Tox should install necessary dependencies and run the tests. If you are a Linux user, please check out information on [requirements](./installation.md#requirements).
 
 ## Documentation Improvements
 
 A ton of time has been spent not only creating and supporting this plugin, but also spent making this documentation.  If you feel it is still lacking, show your appreciation for the plugin by helping to improve the documentation.  Help with documentation is always appreciated and can be done via pull requests.  There shouldn't be any need to run validation tests if only updating documentation.
 
-You don't have to render the docs locally before pull requesting, but if you wish to, I currently use a combination of [MkDocs][mkdocs], the [Material theme][mkdocs-material], and [PyMdown Extensions][pymdown-extensions] to render the docs.  You can preview the docs if you install these two packages.  The command for previewing the docs is `mkdocs serve` from the root directory. You can then view the documents at `localhost:8000`.
+You don't have to render the docs locally before pull requesting, but if you wish to, I currently use a combination of [MkDocs][mkdocs], the [Material theme][mkdocs-material], and [PyMdown Extensions][pymdown-extensions] to render the docs.  You can preview the docs if you install these packages.  The command for previewing the docs is `mkdocs serve`. It should be run from the root directory. You can then view the documents at `localhost:8000`.
 
 --8<-- "links.md"
