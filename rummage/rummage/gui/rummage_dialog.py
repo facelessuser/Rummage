@@ -846,7 +846,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             )
         dlg.Destroy()
         self.refresh_regex_options()
-        self.m_settings_panel.GetContainingSizer().Layout()
+        self.m_settings_panel.GetSizer().Layout()
         self.optimize_size(height_only=True)
 
     def refresh_regex_options(self):
