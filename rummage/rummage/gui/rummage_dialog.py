@@ -613,8 +613,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def localize(self):
         """Localize."""
 
-        self.m_search_panel.GetSizer().GetStaticBox().SetLabel(_("Search and Replace"))
-        self.m_limiter_panel.GetSizer().GetStaticBox().SetLabel(_("Limit Search"))
+        self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(
+            _("Search and Replace")
+        )
+        self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(
+            _("Limit Search")
+        )
         self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
         self.m_replace_button.SetLabel(REPLACE_BTN_REPLACE)
         self.m_searchin_label.SetLabel(_("Search in"))
@@ -842,8 +846,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             )
         dlg.Destroy()
         self.refresh_regex_options()
-        self.m_search_panel.GetContainingSizer().Layout()
-        self.m_limiter_panel.GetContainingSizer().Layout()
+        self.m_settings_panel.GetContainingSizer().Layout()
         self.optimize_size(height_only=True)
 
     def refresh_regex_options(self):
@@ -908,22 +911,22 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def limit_panel_toggle(self):
         """Show/Hide limit panel."""
 
+        limit_box = self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(1).GetSizer()
         if not self.hide_limit_panel:
             pth = self.m_searchin_text.GetValue()
-            if os.path.isfile(pth) and self.m_limiter_panel.IsShown():
-                self.m_limiter_panel.Hide()
-                self.m_limiter_panel.GetContainingSizer().Layout()
-                self.Refresh()
-            elif not self.m_limiter_panel.IsShown():
-                self.m_limiter_panel.Show()
-                self.m_limiter_panel.Fit()
-                self.m_limiter_panel.GetSizer().Layout()
-                self.m_limiter_panel.GetContainingSizer().Layout()
+            if os.path.isfile(pth) and limit_box.IsShown(0):
+                limit_box.ShowItems(False)
                 self.m_settings_panel.GetSizer().Layout()
                 self.Refresh()
-        elif self.m_limiter_panel.IsShown():
-            self.m_limiter_panel.Hide()
-            self.m_limiter_panel.GetContainingSizer().Layout()
+            elif not limit_box.IsShown(0):
+                limit_box.ShowItems(True)
+                limit_box.Fit(limit_box.GetStaticBox())
+                limit_box.Layout()
+                self.m_settings_panel.GetSizer().Layout()
+                self.Refresh()
+        elif limit_box.IsShown(0):
+            limit_box.ShowItems(False)
+            self.m_settings_panel.GetSizer().Layout()
             self.Refresh()
 
     def limit_panel_hide(self):
