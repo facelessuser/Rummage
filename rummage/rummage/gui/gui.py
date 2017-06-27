@@ -226,28 +226,18 @@ class RummageFrame ( wx.Frame ):
 		
 		sbSizer4 = wx.StaticBoxSizer( wx.StaticBox( self.m_settings_panel, wx.ID_ANY, u"Limit Search" ), wx.VERTICAL )
 		
-		fgSizer33 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		fgSizer33.AddGrowableCol( 0 )
-		fgSizer33.SetFlexibleDirection( wx.BOTH )
-		fgSizer33.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		
-		fgSizer26 = wx.FlexGridSizer( 0, 3, 0, 0 )
-		fgSizer26.AddGrowableCol( 2 )
-		fgSizer26.SetFlexibleDirection( wx.HORIZONTAL )
-		fgSizer26.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		
-		fgSizer11 = wx.FlexGridSizer( 0, 5, 0, 0 )
-		fgSizer11.SetFlexibleDirection( wx.HORIZONTAL )
-		fgSizer11.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		gbSizer3 = wx.GridBagSizer( 0, 0 )
+		gbSizer3.SetFlexibleDirection( wx.BOTH )
+		gbSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
 		self.m_size_is_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Size is", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_size_is_label.Wrap( -1 )
-		fgSizer11.Add( self.m_size_is_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
+		gbSizer3.Add( self.m_size_is_label, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		m_logic_choiceChoices = [ u"any", u"greater than", u"equal to", u"less than" ]
 		self.m_logic_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_logic_choiceChoices, 0 )
 		self.m_logic_choice.SetSelection( 0 )
-		fgSizer11.Add( self.m_logic_choice, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
+		gbSizer3.Add( self.m_logic_choice, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		fgSizer37 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer37.SetFlexibleDirection( wx.HORIZONTAL )
@@ -261,88 +251,66 @@ class RummageFrame ( wx.Frame ):
 		fgSizer37.Add( self.m_size_type_label, 0, wx.BOTTOM|wx.RIGHT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
-		fgSizer11.Add( fgSizer37, 1, wx.ALIGN_CENTER_VERTICAL, 5 )
+		gbSizer3.Add( fgSizer37, wx.GBPosition( 0, 2 ), wx.GBSpan( 1, 3 ), wx.EXPAND, 5 )
 		
+		self.m_exclude_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Exclude folders", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_exclude_label.Wrap( -1 )
+		gbSizer3.Add( self.m_exclude_label, wx.GBPosition( 0, 6 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
-		fgSizer11.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		self.m_exclude_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
+		gbSizer3.Add( self.m_exclude_textbox, wx.GBPosition( 0, 7 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
-		
-		fgSizer11.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		self.m_dirregex_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Regex", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer3.Add( self.m_dirregex_checkbox, wx.GBPosition( 0, 8 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_modified_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Modified", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_modified_label.Wrap( -1 )
-		fgSizer11.Add( self.m_modified_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
+		gbSizer3.Add( self.m_modified_label, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		m_modified_choiceChoices = [ u"on any", u"after", u"on", u"before" ]
 		self.m_modified_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_modified_choiceChoices, 0 )
 		self.m_modified_choice.SetSelection( 0 )
-		fgSizer11.Add( self.m_modified_choice, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
+		gbSizer3.Add( self.m_modified_choice, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_modified_date_picker = DatePicker(self.m_settings_panel, wx.ID_ANY)
-		fgSizer11.Add( self.m_modified_date_picker, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		gbSizer3.Add( self.m_modified_date_picker, wx.GBPosition( 1, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_modified_time_picker = TimeCtrl(self.m_settings_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, oob_color="white", fmt24hr=True)
-		fgSizer11.Add( self.m_modified_time_picker, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		gbSizer3.Add( self.m_modified_time_picker, wx.GBPosition( 1, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_modified_spin = wx.SpinButton( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer11.Add( self.m_modified_spin, 0, wx.BOTTOM|wx.RIGHT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
+		gbSizer3.Add( self.m_modified_spin, wx.GBPosition( 1, 4 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_filematch_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Files which match", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_filematch_label.Wrap( -1 )
+		gbSizer3.Add( self.m_filematch_label, wx.GBPosition( 1, 6 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_filematch_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
+		gbSizer3.Add( self.m_filematch_textbox, wx.GBPosition( 1, 7 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_fileregex_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Regex", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer3.Add( self.m_fileregex_checkbox, wx.GBPosition( 1, 8 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_created_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Created", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_created_label.Wrap( -1 )
-		fgSizer11.Add( self.m_created_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
+		gbSizer3.Add( self.m_created_label, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		m_created_choiceChoices = [ u"on any", u"after", u"on", u"before" ]
 		self.m_created_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_created_choiceChoices, 0 )
 		self.m_created_choice.SetSelection( 0 )
-		fgSizer11.Add( self.m_created_choice, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
+		gbSizer3.Add( self.m_created_choice, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_created_date_picker = DatePicker(self.m_settings_panel, wx.ID_ANY)
-		fgSizer11.Add( self.m_created_date_picker, 0, wx.ALL, 5 )
+		gbSizer3.Add( self.m_created_date_picker, wx.GBPosition( 2, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_created_time_picker = TimeCtrl(self.m_settings_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, oob_color="white", fmt24hr=True)
-		fgSizer11.Add( self.m_created_time_picker, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		gbSizer3.Add( self.m_created_time_picker, wx.GBPosition( 2, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_created_spin = wx.SpinButton( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer11.Add( self.m_created_spin, 0, wx.BOTTOM|wx.RIGHT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		
-		fgSizer26.Add( fgSizer11, 1, wx.EXPAND, 5 )
+		gbSizer3.Add( self.m_created_spin, wx.GBPosition( 2, 4 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_staticline41 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
-		fgSizer26.Add( self.m_staticline41, 0, wx.EXPAND |wx.ALL, 5 )
-		
-		fgSizer4 = wx.FlexGridSizer( 0, 3, 0, 0 )
-		fgSizer4.AddGrowableCol( 1 )
-		fgSizer4.SetFlexibleDirection( wx.BOTH )
-		fgSizer4.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		
-		self.m_exclude_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Exclude folders", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_exclude_label.Wrap( -1 )
-		fgSizer4.Add( self.m_exclude_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
-		
-		self.m_exclude_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
-		fgSizer4.Add( self.m_exclude_textbox, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
-		
-		self.m_dirregex_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Regex", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer4.Add( self.m_dirregex_checkbox, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
-		
-		self.m_filematch_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Files which match", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_filematch_label.Wrap( -1 )
-		fgSizer4.Add( self.m_filematch_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
-		
-		self.m_filematch_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
-		fgSizer4.Add( self.m_filematch_textbox, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
-		
-		self.m_fileregex_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Regex", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer4.Add( self.m_fileregex_checkbox, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
-		
-		
-		fgSizer26.Add( fgSizer4, 1, wx.EXPAND, 5 )
-		
-		
-		fgSizer33.Add( fgSizer26, 1, wx.EXPAND, 5 )
-		
-		bSizer17 = wx.BoxSizer( wx.VERTICAL )
+		gbSizer3.Add( self.m_staticline41, wx.GBPosition( 0, 5 ), wx.GBSpan( 3, 1 ), wx.EXPAND |wx.ALL, 5 )
 		
 		fgSizer32 = wx.FlexGridSizer( 0, 5, 0, 0 )
 		fgSizer32.AddGrowableCol( 0 )
@@ -367,21 +335,23 @@ class RummageFrame ( wx.Frame ):
 		fgSizer32.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
 		
-		bSizer17.Add( fgSizer32, 1, wx.EXPAND, 5 )
+		gbSizer3.Add( fgSizer32, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 9 ), wx.EXPAND, 5 )
 		
 		
-		fgSizer33.Add( bSizer17, 1, wx.EXPAND, 5 )
+		gbSizer3.AddGrowableCol( 7 )
+		gbSizer3.AddGrowableRow( 0 )
+		gbSizer3.AddGrowableRow( 1 )
+		gbSizer3.AddGrowableRow( 2 )
+		gbSizer3.AddGrowableRow( 3 )
 		
-		
-		sbSizer4.Add( fgSizer33, 1, wx.EXPAND, 5 )
+		sbSizer4.Add( gbSizer3, 1, wx.EXPAND, 5 )
 		
 		
 		fgSizer2.Add( sbSizer4, 1, wx.EXPAND, 5 )
 		
 		self.m_progressbar = wx.Gauge( self.m_settings_panel, wx.ID_ANY, 100, wx.DefaultPosition, wx.Size( -1,5 ), wx.GA_HORIZONTAL )
-		fgSizer2.Add( self.m_progressbar, 1, wx.ALIGN_CENTER|wx.ALL|wx.EXPAND, 5 )
-		
-		bActionSizer = wx.BoxSizer( wx.VERTICAL )
+		self.m_progressbar.SetValue( 0 ) 
+		fgSizer2.Add( self.m_progressbar, 0, wx.ALIGN_CENTER|wx.ALL|wx.EXPAND, 5 )
 		
 		fgSizer38 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		fgSizer38.AddGrowableCol( 0 )
@@ -398,10 +368,7 @@ class RummageFrame ( wx.Frame ):
 		fgSizer38.Add( self.m_search_button, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
 		
-		bActionSizer.Add( fgSizer38, 1, wx.EXPAND, 5 )
-		
-		
-		fgSizer2.Add( bActionSizer, 1, wx.EXPAND, 5 )
+		fgSizer2.Add( fgSizer38, 1, wx.EXPAND, 5 )
 		
 		
 		bSizer10.Add( fgSizer2, 1, wx.EXPAND, 5 )
