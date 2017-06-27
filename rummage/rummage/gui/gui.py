@@ -9,7 +9,6 @@
 
 import wx
 import wx.adv
-import wx.adv
 import wx.xrc
 from .autocomplete_combo import AutoCompleteCombo
 from .date_picker import DatePicker
@@ -312,11 +311,6 @@ class RummageFrame ( wx.Frame ):
 		self.m_staticline41 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
 		fgSizer26.Add( self.m_staticline41, 0, wx.EXPAND |wx.ALL, 5 )
 		
-		fgSizer3 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		fgSizer3.AddGrowableCol( 0 )
-		fgSizer3.SetFlexibleDirection( wx.HORIZONTAL )
-		fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		
 		fgSizer4 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		fgSizer4.AddGrowableCol( 1 )
 		fgSizer4.SetFlexibleDirection( wx.BOTH )
@@ -343,10 +337,7 @@ class RummageFrame ( wx.Frame ):
 		fgSizer4.Add( self.m_fileregex_checkbox, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
 		
 		
-		fgSizer3.Add( fgSizer4, 1, wx.EXPAND, 5 )
-		
-		
-		fgSizer26.Add( fgSizer3, 1, wx.EXPAND, 5 )
+		fgSizer26.Add( fgSizer4, 1, wx.EXPAND, 5 )
 		
 		
 		fgSizer33.Add( fgSizer26, 1, wx.EXPAND, 5 )
