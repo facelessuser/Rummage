@@ -8,8 +8,10 @@
 - **NEW**: Dropped classic wxPython (<4.0.0) as it is too much work to maintain legacy support as well.
 - **NEW**: Serialize piped argument data.
 - **FIX**: Icon now displays in Ubuntu.
-- **FIX**: Fix tab traversal issues by adding a custom tab traversal for macOS and Linux.
+- **FIX**: Fix tab traversal issues in both macOS and Linux.
+- **FIX**: Fix Linux progress bar disappearing.
 - **FIX**: Fix notifications with terminal-notifier.
+- **FIX**: Fix issues related to localization.
 
 ## 1.0.2
 
