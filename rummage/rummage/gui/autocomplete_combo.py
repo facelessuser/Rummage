@@ -26,7 +26,7 @@ from .. import util
 class AutoCompleteCombo(wx.ComboCtrl):
     """AutoCompleteCombo box."""
 
-    def __init__(self, parent, choices=None, load_last=False, changed_callback=None):
+    def __init__(self, parent, wx_id, choices=None, load_last=False, changed_callback=None):
         """Init the AutoCompleteCombo object."""
 
         if choices is None:
@@ -35,9 +35,9 @@ class AutoCompleteCombo(wx.ComboCtrl):
         self.focusing = False
 
         wx.ComboCtrl.__init__(
-            self, parent, wx.ID_ANY,
+            self, parent, wx_id,
             wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
-            style=wx.TE_PROCESS_ENTER | wx.WANTS_CHARS
+            style=wx.TE_PROCESS_ENTER | wx.TAB_TRAVERSAL
         )
         self.update_semaphore = False
         self.choices = None
@@ -51,7 +51,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
         # Key bindings and events for the object
         self.Bind(wx.EVT_KEY_UP, self.on_key_up)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
-        self.Bind(wx.EVT_SET_FOCUS, self.on_focus)
         if util.platform() != "linux":
             self.Bind(wx.EVT_TEXT, self.on_text_change)
         else:
@@ -78,30 +77,51 @@ class AutoCompleteCombo(wx.ComboCtrl):
 
         self.changed_callback = callback
 
-    def on_focus(self, event):
-        """Ensure the TextCtrl object takes the focus."""
+    def tab_first(self):
+        """Get first tab stop of parent."""
 
-        if self.focusing:
-            return
+        for child in self.GetParent().GetChildren():
+            if child.AcceptsFocusFromKeyboard():
+                child.SetFocus()
+                break
 
-        self.focusing = True
-        self.GetTextCtrl().SetFocus()
-        self.focusing = False
-        event.Skip()
+    def tab_last(self):
+        """Get last tab stop of parent."""
+
+        for child in reversed(self.GetParent().GetChildren()):
+            if child.AcceptsFocusFromKeyboard():
+                child.SetFocus()
+                break
 
     def tab_forward(self):
         """Tab forward to the next object."""
 
-        self.GetTextCtrl().Navigate(
-            wx.NavigationKeyEvent.FromTab | wx.NavigationKeyEvent.IsForward
-        )
+        if util.platform() == "linux":
+            current = self
+            while True:
+                sib = current.GetNextSibling()
+                if sib is None:
+                    self.tab_first()
+                    break
+                if sib.AcceptsFocusFromKeyboard():
+                    sib.SetFocus()
+                    break
+                current = sib
 
     def tab_back(self):
         """Tab backwards to the previous object."""
 
-        self.GetTextCtrl().Navigate(
-            wx.NavigationKeyEvent.FromTab | wx.NavigationKeyEvent.IsBackward
-        )
+        if util.platform() == "linux":
+            current = self
+            while True:
+                sib = current.GetPrevSibling()
+                if sib is None:
+                    self.tab_last()
+                    break
+                if sib.AcceptsFocusFromKeyboard():
+                    sib.SetFocus()
+                    break
+                current = sib
 
     def update_choices(self, items, load_last=False):
         """
@@ -171,11 +191,12 @@ class AutoCompleteCombo(wx.ComboCtrl):
         """Swallow up and down arrow event if popup shown."""
 
         key = event.GetKeyCode()
-        if key == wx.WXK_TAB:
+        if util.platform() == "linux" and key == wx.WXK_TAB:
             if event.ShiftDown():
                 self.tab_back()
             else:
                 self.tab_forward()
+            return
         elif key in [wx.WXK_DELETE, wx.WXK_BACK]:
             self.update_semaphore = True
         event.Skip()

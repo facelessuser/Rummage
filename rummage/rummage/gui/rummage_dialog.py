@@ -595,26 +595,26 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.init_search_path(start_path)
 
-        # Setup regex options depending on selected regex module and ensure the window is
-        # sized well for them.
         self.refresh_regex_options()
-        self.Fit()
-        self.optimize_size(height_only=True)
 
-        # Only on OSX, WxPython is determined to focus something that doesn't make sense
-        # even though we call no focus events.  It apparently runs after we try and focus
-        # something on startup.  Trying to delay focus is problematic as we sometimes
-        # don't wait enough if other events get in the way.
-        # So we disable the window preventing all focus events, and THEN
-        # we use a timeout call to delay our default focus to ensure it is done last.
-        self.Enable(False)
-        wx.CallLater(500, self.on_load).Start()
+        # So this is to fix some platform specific issues.
+        # We will wait until we are sure we are loaded, then
+        # We will fix mac focusing random elements, and we will
+        # process and resize the window to fix Linux tab issues.
+        # Linux seems to need the resize to get its control tab
+        # order right as we are hiding some items, but doing it
+        # now won't work, so we delay it.
+        wx.FutureCall(500, self.on_loaded)
 
     def localize(self):
         """Localize."""
 
-        self.m_search_panel.GetSizer().GetStaticBox().SetLabel(_("Search and Replace"))
-        self.m_limiter_panel.GetSizer().GetStaticBox().SetLabel(_("Limit Search"))
+        self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(
+            _("Search and Replace")
+        )
+        self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(
+            _("Limit Search")
+        )
         self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
         self.m_replace_button.SetLabel(REPLACE_BTN_REPLACE)
         self.m_searchin_label.SetLabel(_("Search in"))
@@ -718,12 +718,21 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if start_path and os.path.exists(start_path):
             self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
 
-    def on_load(self):
-        """Re-enable window (stupid OSX workaround) and select the appropriate entry."""
+    def on_loaded(self):
+        """
+        Stupid workarounds on load.
+
+        Re-enable window (stupid macOS workaround) and select the appropriate entry.
+        Resize window after we are sure everything is loaded (stupid Linux workaround) to fix tab order stuff.
+        """
 
         self.Enable(True)
         self.m_searchfor_textbox.GetTextCtrl().SetFocus()
         self.Refresh()
+
+        self.Fit()
+        self.m_settings_panel.GetSizer().Layout()
+        self.optimize_size(height_only=True)
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""
@@ -842,8 +851,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             )
         dlg.Destroy()
         self.refresh_regex_options()
-        self.m_search_panel.GetContainingSizer().Layout()
-        self.m_limiter_panel.GetContainingSizer().Layout()
+        self.m_settings_panel.GetSizer().Layout()
         self.optimize_size(height_only=True)
 
     def refresh_regex_options(self):
@@ -908,22 +916,22 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def limit_panel_toggle(self):
         """Show/Hide limit panel."""
 
+        limit_box = self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(1).GetSizer()
         if not self.hide_limit_panel:
             pth = self.m_searchin_text.GetValue()
-            if os.path.isfile(pth) and self.m_limiter_panel.IsShown():
-                self.m_limiter_panel.Hide()
-                self.m_limiter_panel.GetContainingSizer().Layout()
-                self.Refresh()
-            elif not self.m_limiter_panel.IsShown():
-                self.m_limiter_panel.Show()
-                self.m_limiter_panel.Fit()
-                self.m_limiter_panel.GetSizer().Layout()
-                self.m_limiter_panel.GetContainingSizer().Layout()
+            if os.path.isfile(pth) and limit_box.IsShown(0):
+                limit_box.ShowItems(False)
                 self.m_settings_panel.GetSizer().Layout()
                 self.Refresh()
-        elif self.m_limiter_panel.IsShown():
-            self.m_limiter_panel.Hide()
-            self.m_limiter_panel.GetContainingSizer().Layout()
+            elif not limit_box.IsShown(0):
+                limit_box.ShowItems(True)
+                limit_box.Fit(limit_box.GetStaticBox())
+                limit_box.Layout()
+                self.m_settings_panel.GetSizer().Layout()
+                self.Refresh()
+        elif limit_box.IsShown(0):
+            limit_box.ShowItems(False)
+            self.m_settings_panel.GetSizer().Layout()
             self.Refresh()
 
     def limit_panel_hide(self):
