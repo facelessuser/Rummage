@@ -9,8 +9,10 @@
 
 import wx
 import wx.adv
+import wx.adv
 import wx.xrc
 from .autocomplete_combo import AutoCompleteCombo
+from .date_picker import DatePicker
 from wx.lib.masked import TimeCtrl
 from .result_lists import ResultFileList
 from .result_lists import ResultContentList
@@ -33,13 +35,14 @@ class RummageFrame ( wx.Frame ):
 		
 		bFrameSizer = wx.BoxSizer( wx.VERTICAL )
 		
+		self.m_main_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer13 = wx.FlexGridSizer( 2, 1, 0, 0 )
 		fgSizer13.AddGrowableCol( 0 )
 		fgSizer13.AddGrowableRow( 0 )
 		fgSizer13.SetFlexibleDirection( wx.BOTH )
 		fgSizer13.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_grep_notebook = wx.Notebook( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.NB_FIXEDWIDTH|wx.NB_NOPAGETHEME )
+		self.m_grep_notebook = wx.Notebook( self.m_main_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.NB_FIXEDWIDTH|wx.NB_NOPAGETHEME )
 		self.m_grep_notebook.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
 		self.m_settings_panel = wx.Panel( self.m_grep_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
@@ -68,7 +71,7 @@ class RummageFrame ( wx.Frame ):
 		self.m_searchin_label.Wrap( -1 )
 		fgSizer8.Add( self.m_searchin_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
-		self.m_searchin_text = AutoCompleteCombo(self.m_settings_panel)
+		self.m_searchin_text = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
 		fgSizer8.Add( self.m_searchin_text, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_searchin_dir_picker = wx.Button( self.m_settings_panel, wx.ID_ANY, u"...", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
@@ -78,7 +81,7 @@ class RummageFrame ( wx.Frame ):
 		self.m_searchfor_label.Wrap( -1 )
 		fgSizer8.Add( self.m_searchfor_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
-		self.m_searchfor_textbox = AutoCompleteCombo(self.m_settings_panel)
+		self.m_searchfor_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
 		fgSizer8.Add( self.m_searchfor_textbox, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
@@ -88,7 +91,7 @@ class RummageFrame ( wx.Frame ):
 		self.m_replace_label.Wrap( -1 )
 		fgSizer8.Add( self.m_replace_label, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 		
-		self.m_replace_textbox = AutoCompleteCombo(self.m_settings_panel)
+		self.m_replace_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
 		fgSizer8.Add( self.m_replace_textbox, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
@@ -247,19 +250,19 @@ class RummageFrame ( wx.Frame ):
 		self.m_logic_choice.SetSelection( 0 )
 		fgSizer11.Add( self.m_logic_choice, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 		
-		fgSizer371 = wx.FlexGridSizer( 0, 2, 0, 0 )
-		fgSizer371.SetFlexibleDirection( wx.HORIZONTAL )
-		fgSizer371.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		fgSizer37 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer37.SetFlexibleDirection( wx.HORIZONTAL )
+		fgSizer37.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
 		self.m_size_text = wx.TextCtrl( self.m_settings_panel, wx.ID_ANY, u"1000", wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
-		fgSizer371.Add( self.m_size_text, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		fgSizer37.Add( self.m_size_text, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_size_type_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"KB", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_size_type_label.Wrap( -1 )
-		fgSizer371.Add( self.m_size_type_label, 0, wx.BOTTOM|wx.RIGHT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
+		fgSizer37.Add( self.m_size_type_label, 0, wx.BOTTOM|wx.RIGHT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
-		fgSizer11.Add( fgSizer371, 1, wx.ALIGN_CENTER_VERTICAL, 5 )
+		fgSizer11.Add( fgSizer37, 1, wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		fgSizer11.Add( ( 0, 0), 1, wx.EXPAND, 5 )
@@ -276,10 +279,10 @@ class RummageFrame ( wx.Frame ):
 		self.m_modified_choice.SetSelection( 0 )
 		fgSizer11.Add( self.m_modified_choice, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_modified_date_picker = wx.adv.GenericDatePickerCtrl(self.m_settings_panel, style=wx.TAB_TRAVERSAL | wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY | wx.adv.DP_ALLOWNONE)
+		self.m_modified_date_picker = DatePicker(self.m_settings_panel, wx.ID_ANY)
 		fgSizer11.Add( self.m_modified_date_picker, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_modified_time_picker = TimeCtrl(self.m_settings_panel, style=wx.TE_PROCESS_TAB, oob_color="white", fmt24hr=True)
+		self.m_modified_time_picker = TimeCtrl(self.m_settings_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, oob_color="white", fmt24hr=True)
 		fgSizer11.Add( self.m_modified_time_picker, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_modified_spin = wx.SpinButton( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -294,10 +297,10 @@ class RummageFrame ( wx.Frame ):
 		self.m_created_choice.SetSelection( 0 )
 		fgSizer11.Add( self.m_created_choice, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 		
-		self.m_created_date_picker = wx.adv.GenericDatePickerCtrl(self.m_settings_panel, style=wx.TAB_TRAVERSAL | wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY | wx.adv.DP_ALLOWNONE)
+		self.m_created_date_picker = DatePicker(self.m_settings_panel, wx.ID_ANY)
 		fgSizer11.Add( self.m_created_date_picker, 0, wx.ALL, 5 )
 		
-		self.m_created_time_picker = TimeCtrl(self.m_settings_panel, style=wx.TE_PROCESS_TAB, oob_color="white", fmt24hr=True)
+		self.m_created_time_picker = TimeCtrl(self.m_settings_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, oob_color="white", fmt24hr=True)
 		fgSizer11.Add( self.m_created_time_picker, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_created_spin = wx.SpinButton( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -323,7 +326,7 @@ class RummageFrame ( wx.Frame ):
 		self.m_exclude_label.Wrap( -1 )
 		fgSizer4.Add( self.m_exclude_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
-		self.m_exclude_textbox = AutoCompleteCombo(self.m_settings_panel)
+		self.m_exclude_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
 		fgSizer4.Add( self.m_exclude_textbox, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 		
 		self.m_dirregex_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Regex", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -333,7 +336,7 @@ class RummageFrame ( wx.Frame ):
 		self.m_filematch_label.Wrap( -1 )
 		fgSizer4.Add( self.m_filematch_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
-		self.m_filematch_textbox = AutoCompleteCombo(self.m_settings_panel)
+		self.m_filematch_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
 		fgSizer4.Add( self.m_filematch_textbox, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 		
 		self.m_fileregex_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Regex", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -447,7 +450,10 @@ class RummageFrame ( wx.Frame ):
 		fgSizer13.Add( self.m_grep_notebook, 1, wx.EXPAND |wx.ALL, 5 )
 		
 		
-		bFrameSizer.Add( fgSizer13, 1, wx.EXPAND, 5 )
+		self.m_main_panel.SetSizer( fgSizer13 )
+		self.m_main_panel.Layout()
+		fgSizer13.Fit( self.m_main_panel )
+		bFrameSizer.Add( self.m_main_panel, 1, wx.EXPAND |wx.ALL, 5 )
 		
 		
 		self.SetSizer( bFrameSizer )

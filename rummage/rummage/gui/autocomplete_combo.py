@@ -26,7 +26,7 @@ from .. import util
 class AutoCompleteCombo(wx.ComboCtrl):
     """AutoCompleteCombo box."""
 
-    def __init__(self, parent, choices=None, load_last=False, changed_callback=None):
+    def __init__(self, parent, wx_id, choices=None, load_last=False, changed_callback=None):
         """Init the AutoCompleteCombo object."""
 
         if choices is None:
@@ -35,9 +35,9 @@ class AutoCompleteCombo(wx.ComboCtrl):
         self.focusing = False
 
         wx.ComboCtrl.__init__(
-            self, parent, wx.ID_ANY,
+            self, parent, wx_id,
             wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
-            style=wx.TE_PROCESS_ENTER
+            style=wx.TE_PROCESS_ENTER | wx.TAB_TRAVERSAL
         )
         self.update_semaphore = False
         self.choices = None

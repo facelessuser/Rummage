@@ -25,20 +25,18 @@ import wx.adv
 from .. import util
 
 
-
 class DatePicker(wx.adv.GenericDatePickerCtrl):
     """DatePickerCtrl."""
 
-    def __init__(self, parent):
+    def __init__(self, parent, wx_id):
         """Initialize."""
 
         wx.adv.GenericDatePickerCtrl.__init__(
-            self, parent, style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY | wx.adv.DP_ALLOWNONE
+            self, parent, wx_id, style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY | wx.adv.DP_ALLOWNONE
         )
 
         if util.platform() == "linux":
             self.Children[0].Bind(wx.EVT_KEY_DOWN, self.on_key_down)
-
 
     def tab_first(self):
         """Get first tab stop of parent."""
@@ -59,7 +57,6 @@ class DatePicker(wx.adv.GenericDatePickerCtrl):
     def tab_forward(self):
         """Tab forward to the next object."""
 
-        found_sib = False
         current = self
         while True:
             sib = current.GetNextSibling()
@@ -74,7 +71,6 @@ class DatePicker(wx.adv.GenericDatePickerCtrl):
     def tab_back(self):
         """Tab backwards to the previous object."""
 
-        found_sib = False
         current = self
         while True:
             sib = current.GetPrevSibling()
