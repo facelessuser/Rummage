@@ -56,7 +56,7 @@ setup(
     name='rummage',
     version=VER,
     keywords='grep search find replace gui',
-    description='A GUI file search and replace app.',
+    description='A GUI search and replace app.',
     long_description=LONG_DESC,
     author='Isaac Muse',
     author_email='Isaac.Muse [at] gmail.com',
