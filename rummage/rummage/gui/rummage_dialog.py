@@ -595,20 +595,16 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.init_search_path(start_path)
 
-        # Setup regex options depending on selected regex module and ensure the window is
-        # sized well for them.
         self.refresh_regex_options()
-        self.Fit()
-        self.optimize_size(height_only=True)
 
-        # Only on OSX, WxPython is determined to focus something that doesn't make sense
-        # even though we call no focus events.  It apparently runs after we try and focus
-        # something on startup.  Trying to delay focus is problematic as we sometimes
-        # don't wait enough if other events get in the way.
-        # So we disable the window preventing all focus events, and THEN
-        # we use a timeout call to delay our default focus to ensure it is done last.
-        self.Enable(False)
-        wx.CallLater(500, self.on_load).Start()
+        # So this is to fix some platform specific issues.
+        # We will wait until we are sure we are loaded, then
+        # We will fix mac focusing random elements, and we will
+        # process and resize the window to fix Linux tab issues.
+        # Linux seems to need the resize to get its control tab
+        # order right as we are hiding some items, but doing it
+        # now won't work, so we delay it.
+        wx.FutureCall(500, self.on_loaded)
 
     def localize(self):
         """Localize."""
@@ -722,12 +718,21 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if start_path and os.path.exists(start_path):
             self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
 
-    def on_load(self):
-        """Re-enable window (stupid OSX workaround) and select the appropriate entry."""
+    def on_loaded(self):
+        """
+        Stupid workarounds on load.
+
+        Re-enable window (stupid macOS workaround) and select the appropriate entry.
+        Resize window after we are sure everything is loaded (stupid Linux workaround) to fix tab order stuff.
+        """
 
         self.Enable(True)
         self.m_searchfor_textbox.GetTextCtrl().SetFocus()
         self.Refresh()
+
+        self.Fit()
+        self.m_settings_panel.GetSizer().Layout()
+        self.optimize_size(height_only=True)
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""
