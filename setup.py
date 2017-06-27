@@ -2,12 +2,9 @@
 # -*- coding: utf-8 -*-
 """Setup package."""
 from setuptools import setup, find_packages
-import sys
 import os
 import imp
 import traceback
-
-PY3 = (3, 0) <= sys.version_info < (4, 0)
 
 
 def get_version():
@@ -34,7 +31,7 @@ VER, DEVSTATUS = get_version()
 
 LONG_DESC = '''
 Rummage is a GUI tool for searching and replacing texst in files.
-It is built with wxPython 4.0.0+ and requires Python 2.7.
+It is built with wxPython 4.0.0+ and requires Python 2.7 or 3.4+.
 You can learn more about using Rummage by `reading the docs`_.
 
 .. _`reading the docs`: http://facelessuser.github.io/Rummage/
@@ -59,7 +56,7 @@ setup(
     name='rummage',
     version=VER,
     keywords='grep search find replace gui',
-    description='A GUI file search and replace app.',
+    description='A GUI search and replace app.',
     long_description=LONG_DESC,
     author='Isaac Muse',
     author_email='Isaac.Muse [at] gmail.com',

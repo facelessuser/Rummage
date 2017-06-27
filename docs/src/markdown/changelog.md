@@ -2,7 +2,7 @@
 
 ## 2.0.0
 
-> Jun XX, 2017
+> Jun 27, 2017
 
 - **NEW**: Python 3 support via the new wxPython 4.0.0 Phoenix!
 - **NEW**: Dropped classic wxPython (<4.0.0) as it is too much work to maintain legacy support as well.

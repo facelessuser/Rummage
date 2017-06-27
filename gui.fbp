@@ -1452,7 +1452,7 @@
                                                                                                 <property name="floatable">1</property>
                                                                                                 <property name="font"></property>
                                                                                                 <property name="gripper">0</property>
-                                                                                                <property name="hidden">1</property>
+                                                                                                <property name="hidden">0</property>
                                                                                                 <property name="id">wxID_ANY</property>
                                                                                                 <property name="label">Best fuzzy match</property>
                                                                                                 <property name="max_size"></property>
@@ -1543,7 +1543,7 @@
                                                                                                 <property name="floatable">1</property>
                                                                                                 <property name="font"></property>
                                                                                                 <property name="gripper">0</property>
-                                                                                                <property name="hidden">1</property>
+                                                                                                <property name="hidden">0</property>
                                                                                                 <property name="id">wxID_ANY</property>
                                                                                                 <property name="label">Improve fuzzy fit</property>
                                                                                                 <property name="max_size"></property>
@@ -1634,7 +1634,7 @@
                                                                                                 <property name="floatable">1</property>
                                                                                                 <property name="font"></property>
                                                                                                 <property name="gripper">0</property>
-                                                                                                <property name="hidden">1</property>
+                                                                                                <property name="hidden">0</property>
                                                                                                 <property name="id">wxID_ANY</property>
                                                                                                 <property name="label">Unicode word breaks</property>
                                                                                                 <property name="max_size"></property>
@@ -1725,7 +1725,7 @@
                                                                                                 <property name="floatable">1</property>
                                                                                                 <property name="font"></property>
                                                                                                 <property name="gripper">0</property>
-                                                                                                <property name="hidden">1</property>
+                                                                                                <property name="hidden">0</property>
                                                                                                 <property name="id">wxID_ANY</property>
                                                                                                 <property name="label">Search backwards</property>
                                                                                                 <property name="max_size"></property>
@@ -1816,7 +1816,7 @@
                                                                                                 <property name="floatable">1</property>
                                                                                                 <property name="font"></property>
                                                                                                 <property name="gripper">0</property>
-                                                                                                <property name="hidden">1</property>
+                                                                                                <property name="hidden">0</property>
                                                                                                 <property name="id">wxID_ANY</property>
                                                                                                 <property name="label">Use POSIX matching</property>
                                                                                                 <property name="max_size"></property>
@@ -1907,7 +1907,7 @@
                                                                                                 <property name="floatable">1</property>
                                                                                                 <property name="font"></property>
                                                                                                 <property name="gripper">0</property>
-                                                                                                <property name="hidden">1</property>
+                                                                                                <property name="hidden">0</property>
                                                                                                 <property name="id">wxID_ANY</property>
                                                                                                 <property name="label">Format style replacements</property>
                                                                                                 <property name="max_size"></property>
@@ -1998,7 +1998,7 @@
                                                                                                 <property name="floatable">1</property>
                                                                                                 <property name="font"></property>
                                                                                                 <property name="gripper">0</property>
-                                                                                                <property name="hidden">1</property>
+                                                                                                <property name="hidden">0</property>
                                                                                                 <property name="id">wxID_ANY</property>
                                                                                                 <property name="label">Full case-folding</property>
                                                                                                 <property name="max_size"></property>
