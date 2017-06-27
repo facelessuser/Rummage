@@ -21,12 +21,11 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 from . import gui
-from . import tab_traversal
 from ..localization import _
 from .. import util
 
 
-class ArgDialog(gui.ArgDialog, tab_traversal.CustomTabTraversal):
+class ArgDialog(gui.ArgDialog):
     """Argument Dialog."""
 
     def __init__(self, parent, value):

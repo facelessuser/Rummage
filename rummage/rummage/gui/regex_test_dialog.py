@@ -29,11 +29,10 @@ from .settings import Settings
 from ..localization import _
 from .. import rumcore
 from .. import util
-from . import tab_traversal
 from backrefs import bre, bregex
 
 
-class RegexTestDialog(gui.RegexTestDialog, tab_traversal.CustomTabTraversal):
+class RegexTestDialog(gui.RegexTestDialog):
     """Regex test dialog."""
 
     def __init__(self, parent):
@@ -75,15 +74,6 @@ class RegexTestDialog(gui.RegexTestDialog, tab_traversal.CustomTabTraversal):
                 self.m_fullcase_checkbox.Show()
         self.regex_event_code = -1
         self.testing = False
-        self.init_tab_traversal(
-            [
-                self.m_test_text,
-                self.m_test_replace_text,
-                self.m_regex_text,
-                self.m_replace_text
-            ],
-            [self.m_test_text]
-        )
         self.init_regex_timer()
         self.start_regex_timer()
 

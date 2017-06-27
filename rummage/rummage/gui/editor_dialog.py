@@ -22,12 +22,11 @@ from __future__ import unicode_literals
 import wx
 from . import gui
 from .arg_dialog import ArgDialog
-from . import tab_traversal
 from ..localization import _
 from .. import util
 
 
-class EditorDialog(gui.EditorDialog, tab_traversal.CustomTabTraversal):
+class EditorDialog(gui.EditorDialog):
     """EditorDialog."""
 
     def __init__(self, parent, editor=[]):
@@ -50,8 +49,6 @@ class EditorDialog(gui.EditorDialog, tab_traversal.CustomTabTraversal):
                 self.m_arg_list.Append(editor[x])
 
         self.localize()
-
-        self.init_tab_traversal([self.m_editor_picker.GetTextCtrl(), self.m_arg_text])
 
         # Ensure good size for frame
         best = self.m_editor_panel.GetBestSize()

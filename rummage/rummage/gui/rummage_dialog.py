@@ -48,7 +48,6 @@ from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
 from .settings_dialog import SettingsDialog
-from .tab_traversal import CustomTabTraversal
 from .about_dialog import AboutDialog
 from .messages import dirpickermsg, filepickermsg
 from .. import data
@@ -524,7 +523,7 @@ class DirPickButton(object):
         event.Skip()
 
 
-class RummageFrame(gui.RummageFrame, DebugFrameExtender, CustomTabTraversal):
+class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     """Rummage Frame."""
 
     def __init__(self, parent, start_path, debug_mode=False):
@@ -583,22 +582,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender, CustomTabTraversal):
 
         self.localize()
 
-        # self.max_limit_tab = 2
-        # self.init_tab_traversal(
-        #     [
-        #         self.m_searchin_text,
-        #         self.m_searchfor_textbox,
-        #         self.m_replace_textbox,
-        #         self.m_size_text,
-        #         self.m_modified_date_picker,
-        #         self.m_modified_time_picker,
-        #         self.m_created_date_picker,
-        #         self.m_created_time_picker,
-        #         self.m_exclude_textbox,
-        #         self.m_filematch_textbox
-        #     ]
-        # )
-
         # Setup the inputs history and replace
         # placeholder objects with actual objecs
         self.setup_inputs()
@@ -626,11 +609,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender, CustomTabTraversal):
         # we use a timeout call to delay our default focus to ensure it is done last.
         self.Enable(False)
         wx.CallLater(500, self.on_load).Start()
-
-    def get_max_tab(self):
-        """Get max tab stop (override)."""
-
-        return self.max_limit_tab if not self.m_limiter_panel.IsShown() else self._max_tab
 
     def localize(self):
         """Localize."""

@@ -23,7 +23,6 @@ import wx
 from . import gui
 from .settings import Settings
 from .editor_dialog import EditorDialog
-from . import tab_traversal
 from ..localization import _
 from .. import rumcore
 from .. import util
@@ -31,7 +30,7 @@ from .. import util
 RECORDS = _("%d Records")
 
 
-class SettingsDialog(gui.SettingsDialog, tab_traversal.CustomTabTraversal):
+class SettingsDialog(gui.SettingsDialog):
     """SettingsDialog."""
 
     def __init__(self, parent):
@@ -90,9 +89,6 @@ class SettingsDialog(gui.SettingsDialog, tab_traversal.CustomTabTraversal):
             self.m_term_note_picker.Enable(is_native)
 
         self.localize()
-
-        if util.platform() == "osx":
-            self.init_tab_traversal([self.m_term_note_picker.GetTextCtrl()])
 
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
