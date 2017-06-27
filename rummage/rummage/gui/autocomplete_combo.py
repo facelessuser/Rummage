@@ -97,7 +97,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
         """Tab forward to the next object."""
 
         if util.platform() == "linux":
-            found_sib = False
             current = self
             while True:
                 sib = current.GetNextSibling()
@@ -113,7 +112,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
         """Tab backwards to the previous object."""
 
         if util.platform() == "linux":
-            found_sib = False
             current = self
             while True:
                 sib = current.GetPrevSibling()
