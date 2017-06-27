@@ -124,38 +124,24 @@ class RummageFrame ( wx.Frame ):
 		gbSizer2.Add( self.m_unicode_checkbox, wx.GBPosition( 0, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_bestmatch_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Best fuzzy match", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_bestmatch_checkbox.Hide()
-		
 		gbSizer2.Add( self.m_bestmatch_checkbox, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_enhancematch_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Improve fuzzy fit", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_enhancematch_checkbox.Hide()
-		
 		gbSizer2.Add( self.m_enhancematch_checkbox, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_word_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Unicode word breaks", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_word_checkbox.Hide()
-		
 		gbSizer2.Add( self.m_word_checkbox, wx.GBPosition( 1, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_reverse_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Search backwards", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_reverse_checkbox.Hide()
-		
 		gbSizer2.Add( self.m_reverse_checkbox, wx.GBPosition( 1, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_posix_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Use POSIX matching", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_posix_checkbox.Hide()
-		
 		gbSizer2.Add( self.m_posix_checkbox, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_format_replace_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_format_replace_checkbox.Hide()
-		
 		gbSizer2.Add( self.m_format_replace_checkbox, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_fullcase_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Full case-folding", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_fullcase_checkbox.Hide()
-		
 		gbSizer2.Add( self.m_fullcase_checkbox, wx.GBPosition( 2, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_staticline11 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
