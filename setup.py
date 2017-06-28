@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 import os
 import imp
 import traceback
+import sys
 
 
 def get_version():
@@ -48,7 +49,7 @@ Please read about `support and contributing`_ before creating issues.
 
 entry_points = {
     'gui_scripts': [
-        'rummage=rummage.__main__:main'
+        'rummage%d.%d=rummage.__main__:main' % sys.version_info[:2]
     ]
 }
 

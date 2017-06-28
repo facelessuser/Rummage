@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1
+
+> Jun 27, 2017
+
+- **FIX**: Release binary in path as `rummage` and `rummage<version>`. So for 2.7, it would be `rummage2.7`.
+
 ## 2.0.0
 
 > Jun 27, 2017
