@@ -2,13 +2,13 @@
 
 ## Overview
 
-Rummage is a cross platform search and replace tool for Python 2.7 and Python 3.4+. It crawls directories and searching for specified patterns and can optionally replace those targets with desired text. Rummage allows for literal or regular expression searches.
+Rummage is a cross platform search and replace tool written in Python. Rummage crawls directories and searches for specified patterns (either regular expression or literal) and can optionally replace those targets with desired text.
 
-Rummage was inspired by the tool [grepWin][grepwin] and was created to provide a suitable GUI search and replace tool for macOS and Linux due to a lack of decent offerings available at the time, but is available on Windows, macOS, and Linux.
+Rummage was inspired by the Windows tool [grepWin][grepwin]. At the time, it was difficult to find a decent GUI search and replace tool macOS and Linux. Rummage was created to fill that void and is available on Linux, macOS, and Windows.
 
-Rummage is written in Python; therefore, it will be slower on searches than it would be if the searching were written in C/C++. If you specify a file encoding when searching large projects, it should perform quite reasonably as it won't have to guess the encoding of files (which is the biggest bottleneck). On small projects, encoding guessing isn't too bad, but [Chardet][chardet] (which is what Rummage uses to guess encoding), is not the fastest as it is not written in C/C++ either.
+Rummage is written in Python and is currently available on Python 2.7 and Python 3.4+. Rummage by default uses the Python's Re regular expression engine, but you can also use the fantastic, feature rich [Regex][regex] search engine and do interesting things like fuzzy searching and more.
 
-Rummage by default uses the Python's Re regular expression engine, but you can also use the fantastic [Regex][regex] search engine and do interesting things like fuzzy searching.
+When specifying a specific file encoding, Rummage is quick enough to search large projects easily. Optionally you can let Rummage detect encoding, but because the encoding detection is done by the pure Python package [Chardet][chardet], it will run significantly slower. Encoding detection is the biggest bottleneck. This shouldn't be a problem in small projects, but it will become quite noticeable in large projects.
 
 ![Search Tab](/images/search_tab.png)
 

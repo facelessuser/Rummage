@@ -9,15 +9,13 @@ Rummage also comes with a simple regular expression tester to test out patterns.
 The status bar will show search progress, match counts, and other useful information.
 
 !!! warning "Warning: Replace"
-    When replacing, Rummage will back up the file in `<your file name>.rum-bak`.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you use version control.  If using encoding guessing, Rummage *might* guess the wrong encoding causing some things to get lost during replace.  And aside from those issues, something unexpected *could* always occur as well, but hopefully not as Rummage has been through a lot of testing.
+    When replacing, Rummage will back up the file in `<your file name>.rum-bak`.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you are using version control.
 
-    In short, if you disable backups, there is a greater risk as you will no longer have a safety net.  Even with backups, something *could* go wrong.  This is free software, and I am not responsible for files corrupted or lost.
-
-    Large files, really large files, can possibly cause an issue and may error out as the entire file will be read into memory for a replace.  If you are doing really large files, know that it may error out or get really slow.  Remember this is done in Python, if you are doing massive GB files, maybe you are using the wrong tool for the job.
+    This is free software, and I am not responsible for files corrupted or lost.
 
 ## Running
 
-After installation, you should then be able to access Rummage from the command line via:
+After installation, you should then be able to access Rummage from the command line.  This assumes the Python bin directory is in the path.
 
 ```bash
 rummage
@@ -325,7 +323,7 @@ Unless the UI changes by adding new untranslated strings, you can keep using the
 
 After installing the localization files, set the language via the `Language` setting in the settings [General panel](#general).
 
-### Adding New
+### Adding New Translations
 
 - Clone the project and create a new folder under `locale` with the appropriate locale name.
 - Create another folder under the one you just created called `LC_MESSAGES`.
@@ -355,6 +353,6 @@ After installing the localization files, set the language via the `Language` set
 - Commit, push, and pull request.
 
 
-I only speak English, so I do not maintain these. If the UI changes, someone from the community will need to update them appropriately via pull requests or they will remain out of date.
+I only speak English, so I do not maintain the translations. If the UI changes, someone from the community will need to update them appropriately via pull requests or they will remain out of date.
 
 --8<-- "links.md"
