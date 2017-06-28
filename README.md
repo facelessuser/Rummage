@@ -2,7 +2,8 @@
 [![Code Health][landscape-image]][landscape-link]
 [![Coverage][codecov-image]][codecov-link]
 [![Requirements Status][requires-image]][requires-link]
-![License][license-image]
+[![pypi-version][pypi-image]][pypi-link]
+![License][license-image-mit]
 
 Rummage
 =======
@@ -48,3 +49,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [codecov-link]: http://codecov.io/github/facelessuser/Rummage?branch=master
 [requires-image]: https://img.shields.io/requires/github/facelessuser/Rummage/master.svg
 [requires-link]: https://requires.io/github/facelessuser/Rummage/requirements/?branch=master
+[pypi-image]: https://img.shields.io/pypi/v/Rummage.svg
+[pypi-link]: https://pypi.python.org/pypi/Rummage
+[license-image-mit]: https://img.shields.io/badge/license-MIT-blue.svg
