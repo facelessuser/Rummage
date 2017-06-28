@@ -2,43 +2,46 @@ sudo: required
 language: python
 matrix:
   include:
-    - python: 2.7
-      env: TOXENV=py27-unittests
-    - python: 3.4
-      env: TOXENV=py34-unittests
-    - python: 3.5
-      env: TOXENV=py35-unittests
-    - python: 3.6
-      env: TOXENV=py36-unittests
-    - python: 2.7
-      env: TOXENV=lint
-    - python: 2.7
-      env: TOXENV=documents
+  - python: 2.7
+    env: TOXENV=py27-unittests
+  - python: 3.4
+    env: TOXENV=py34-unittests
+  - python: 3.5
+    env: TOXENV=py35-unittests
+  - python: 3.6
+    env: TOXENV=py36-unittests
+  - python: 2.7
+    env: TOXENV=lint
+  - python: 2.7
+    env: TOXENV=documents
 addons:
   apt:
     packages:
     - aspell
     - aspell-en
 install:
-  - pip install tox
-  - pip install codecov
+- pip install tox
+- pip install codecov
 script:
-  - tox
+- tox
 after_success:
-  - codecov
+- codecov
 before_deploy:
-  - sudo apt-get install dpkg-dev build-essential python2.7-dev libwebkitgtk-dev libjpeg-dev libtiff-dev libgtk2.0-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev
+- sudo apt-get install dpkg-dev build-essential python2.7-dev libwebkitgtk-dev libjpeg-dev
+  libtiff-dev libgtk2.0-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev
+  freeglut3 freeglut3-dev
 deploy:
+  matrix:
   - provider: pypi
     user: facelessuser
-    password:
-      secure: eD8XGJYdMO8guvBJZRlU5N007ltJO+GXtO4yiDnAb01D5ykkVCWegMBZnr18Y6XOEwXdbXuQtWWv9kHRQEyblntsQZpavlOrVfvhcZXohNxG5vIdyMU8VD7eIu7aP80YCckGrh+fzgBs4l2Nxg8x21ljp0x8H/Wxf5NoQxzbyo6qtRGsNYjG6UMnOEodayFyqcQH8UdgSAGYJqVhVz8JgKRhiBQzbLwGV1Ih27inIGXbr1YeWDYtxqvuDA3eqEyqbQoiQsMNMu96MR1CjXF+6Z2AbMgbD0/kAVO2US7uEjQzoRVrjGFHZlfSFlrHPGHGwl8F5NbCj93En5IkjPNH2tzo+biu76UKU99T7A3Wg9S6y8bs9M5Hf82R+orDEWBj3GrnnCxtFFsmgulvbu3UkqrhfLs0UcUAH0j/YEaw440rCP+6kMm62KpQqZdKGNUX/eKAEYQDkI4iZkKZ3b96e/6r6BPaQEL5SBMGTePmkfCBrPvdCzTz0Uuygv9IImlbnlGdr7peo93/IlWSxeYW+GA+Z769AurtV8TOck6S5tBcGVi8PXaDT6jqyEm74IjjscPsf4N7nyRhGxlh0rjobH+us0vnlQgvlx64mvxPDdK+7LRAIVordOC/TX3CW1FTExFQduakp2k0CkxJhJZb6png4G3F4+U/7v8k2TvGngw=
-    distributions: "sdist bdist_wheel"
+    passowrd:
+      secure: TeUXiC/VhswWSbqyEjsRkAN7UaSxTsA8Y7SxD4/YNLBpTZ4mnunzwBKEuDCCjjiEggaENNkpK9QEsRsDlkLlTfSo3iHo9EwovOTHy1qcAdkE/Qwfsq+Hr1cxj36L7gY0dWAg0HIXvF8XTDb/MouYG7V6hIagHMPLWMxyjuH1yGWNN54GRtUr8ot8lqaShYP32PufqKosg73kR174cZrSdQI3taUvgCl0Dr7KA3kc3dSB2Qh4cY55q060OYp9c7sYV5e7gP21B5vdMy99VnFEJ+86axkjG5I65yBBGKiVoun8jPIm+qsVY1sWYM/G9mezEftxNjqntP0/pnVJGy/x2Zf7zYAYuXvKctwUCt0p5lcvo2//oi/y69QuFu2iWiycsnsu1FyJk9nPMgKsGFO9n6j1RIztiWNxt5MueGNlbGx7eVGdb15LH5LucpPp3FWu2DYJtO71tU1tvJ5qpP97fGWrfRnhQiWa0NS0S/qgZFcaAiY6bSzyJ/Dt8nriPm4S+dMKPKX8vWtib3TxjmU3XySTQbrlQhfkH5vqv2gRFQB6+Eidr7/J0lYAfKWXzSYoPEXyFuFpmpf4XW7DvQLoWiWPFhKvq7zUiZZIu0Q5mBCx0WHMB6tTQuAoNes7zXsrexwc8AAkSsZbb48rQ82wPpeXBSPPmyHxumvoK5EFLNc=
+    distributions: sdist bdist_wheel
     skip_upload_docs: true
     on:
       tags: true
       repo: facelessuser/Rummage
-      condition: "$TOXENV = documents"
+      condition: $TOXENV = documents
   - provider: pages
     github_token: $GITHUB_TOKEN
     name: $GITHUB_USER
@@ -48,4 +51,4 @@ deploy:
     on:
       tags: true
       repo: facelessuser/Rummage
-      condition: "$TOXENV = documents"
+      condition: $TOXENV = documents
