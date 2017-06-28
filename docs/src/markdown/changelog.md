@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2
+
+> Jun 27, 2017
+
+- **FIX**: Revert changes in 2.0.1 as wheels don't run setup and don't properly create the Python specific commands.
+
 ## 2.0.1
 
 > Jun 27, 2017
