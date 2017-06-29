@@ -88,9 +88,17 @@ class SaveSearchDialog(gui.SaveSearchDialog):
     def on_apply(self, event):
         """Ensure there is a name, and proceed to add saved regex to settings."""
 
+        import re
+
         value = self.m_name_text.GetValue()
         if value == "":
             errormsg(_("Please give the search a name!"))
+            return
+
+        not_word = re.compile(r'[^\w -]', re.UNICODE)
+        key = not_word.sub('', value).replace(' ', '-')
+        if key in Settings.get_search():
+            errormsg(_("Name already exists!"))
             return
 
         flags = ""
@@ -119,7 +127,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
                 if self.parent.m_format_replace_checkbox.GetValue():
                     flags += "F"
 
-        Settings.add_search(value, self.search, self.replace, flags, self.is_regex)
+        Settings.add_search(key, value, self.search, self.replace, flags, self.is_regex)
         self.Close()
 
     def on_cancel(self, event):

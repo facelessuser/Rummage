@@ -48,3 +48,5 @@ pyinstaller
 site/*
 
 .cache
+
+*.patch

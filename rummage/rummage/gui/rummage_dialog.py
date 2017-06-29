@@ -47,6 +47,7 @@ from .autocomplete_combo import AutoCompleteCombo
 from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
+from .search_chains_dialog import SearchChainsDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .messages import dirpickermsg, filepickermsg
@@ -733,6 +734,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.Fit()
         self.m_settings_panel.GetSizer().Layout()
         self.optimize_size(height_only=True)
+
+    def on_chain_click(self, event):
+        """Chain button click."""
+
+        dlg = SearchChainsDialog(self)
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""

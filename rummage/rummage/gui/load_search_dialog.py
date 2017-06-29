@@ -67,17 +67,11 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         """Populate list with search entries."""
 
         count = 0
-        for x in Settings.get_search():
-            # TODO: Added with replace feature
-            # remove some time in the future.
-            # Also consider adding version number to properly upgrade
-            # saves.
-            if len(x) == 3:
-                x.insert(2, '')
-            if len(x) == 4:
-                x.insert(3, '')
-            search_type = SEARCH_REGEX if x[4] else SEARCH_LITERAL
-            self.m_search_list.set_item_map(count, x[0], x[1], x[2], x[3], search_type)
+        searches = Settings.get_search()
+        for key in sorted(searches.keys()):
+            s = searches[key]
+            search_type = SEARCH_REGEX if s[4] else SEARCH_LITERAL
+            self.m_search_list.set_item_map(count, s[0], s[1], s[2], s[3], search_type, key)
             count += 1
         self.m_search_list.load_list()
 
@@ -114,8 +108,8 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         item = self.m_search_list.GetFirstSelected()
         if item == -1:
             return
-        idx = self.m_search_list.itemIndexMap[item]
-        Settings.delete_search(idx)
+        name = self.m_search_list.get_item_text(item, 0)
+        Settings.delete_search(name)
         self.m_search_list.reset_list()
         self.load_searches()
 

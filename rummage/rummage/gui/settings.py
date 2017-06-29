@@ -361,36 +361,67 @@ class Settings(object):
         cls.save_settings()
 
     @classmethod
-    def add_search(cls, name, search, replace, flags, is_regex):
+    def _update_search_object_to_unique(cls, searches):
+        """Update search object."""
+
+        import re
+
+        not_word = re.compile(r'[^\w -]', re.UNICODE)
+        new_search = {}
+
+        for entry in searches:
+            name = entry[0]
+            key_name = not_word.sub('', name).replace(' ', '-')
+            entry = list(entry)
+
+            # TODO: Remove in future
+            # Upgrade old format for addition of replace feature
+            if len(entry) == 3:
+                entry.insert(2, '')
+            if len(entry) == 4:
+                entry.insert(3, '')
+
+            unique_id = 1
+            unique_name = key_name
+            while unique_name in new_search:
+                unique_id += 1
+                unique_name = "%s (%d)" % (key_name, index)
+
+            new_search[key_name] = tuple(entry)
+
+        cls.settings["saved_searches"] = new_search
+        cls.save_settings()
+        return new_search
+
+
+    @classmethod
+    def add_search(cls, key, name, search, replace, flags, is_regex):
         """Add saved search."""
 
         cls.reload_settings()
-        searches = cls.settings.get("saved_searches", [])
-        searches.append((name, search, replace, flags, is_regex))
+        searches = cls.settings.get("saved_searches", {})
+        searches[key] = (name, search, replace, flags, is_regex)
         cls.settings["saved_searches"] = searches
         cls.save_settings()
 
     @classmethod
-    def get_search(cls, idx=None):
+    def get_search(cls):
         """Get saved searches or search at index if given."""
 
-        value = None
         cls.reload_settings()
-        searches = cls.settings.get("saved_searches", [])
-        if idx is None:
-            value = searches
-        elif idx < len(searches):
-            value = searches[idx]
-        return value
+        searches = cls.settings.get("saved_searches", {})
+        if isinstance(searches, list):
+            searches = cls._update_search_object_to_unique(searches)
+        return searches
 
     @classmethod
-    def delete_search(cls, idx):
+    def delete_search(cls, key):
         """Delete the search at given index."""
 
         cls.reload_settings()
-        searches = cls.settings.get("saved_searches", [])
-        if idx < len(searches):
-            del searches[idx]
+        searches = cls.settings.get("saved_searches", {})
+        if name in searches:
+            del searches[key]
         cls.settings["saved_searches"] = searches
         cls.save_settings()
 
