@@ -15,6 +15,7 @@ from .date_picker import DatePicker
 from wx.lib.masked import TimeCtrl
 from .result_lists import ResultFileList
 from .result_lists import ResultContentList
+from .search_chain_list import SearchChainList
 from .auto_width_lists import AutoWidthListCtrl
 from .load_search_list import SavedSearchList
 from .search_error_list import ErrorList
@@ -540,6 +541,93 @@ class RummageFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_show_log_file( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class SearchChainDialog
+###########################################################################
+
+class SearchChainDialog ( wx.Dialog ):
+	
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Search Chains", pos = wx.DefaultPosition, size = wx.Size( 470,288 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+		
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		
+		bSizer16 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_chain_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		fgSizer38 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer38.AddGrowableCol( 0 )
+		fgSizer38.AddGrowableRow( 0 )
+		fgSizer38.SetFlexibleDirection( wx.BOTH )
+		fgSizer38.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_chain_list = SearchChainList(self.m_chain_panel)
+		fgSizer38.Add( self.m_chain_list, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		fgSizer39 = wx.FlexGridSizer( 0, 6, 0, 0 )
+		fgSizer39.AddGrowableCol( 0 )
+		fgSizer39.AddGrowableCol( 5 )
+		fgSizer39.AddGrowableRow( 0 )
+		fgSizer39.SetFlexibleDirection( wx.BOTH )
+		fgSizer39.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		
+		fgSizer39.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_add_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Add", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer39.Add( self.m_add_button, 0, wx.ALL, 5 )
+		
+		self.m_edit_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Edit", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer39.Add( self.m_edit_button, 0, wx.ALL, 5 )
+		
+		self.m_remove_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Delete", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer39.Add( self.m_remove_button, 0, wx.ALL, 5 )
+		
+		self.m_cancel_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer39.Add( self.m_cancel_button, 0, wx.ALL, 5 )
+		
+		
+		fgSizer39.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer38.Add( fgSizer39, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_chain_panel.SetSizer( fgSizer38 )
+		self.m_chain_panel.Layout()
+		fgSizer38.Fit( self.m_chain_panel )
+		bSizer16.Add( self.m_chain_panel, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( bSizer16 )
+		self.Layout()
+		
+		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.m_add_button.Bind( wx.EVT_BUTTON, self.on_add_click )
+		self.m_edit_button.Bind( wx.EVT_BUTTON, self.on_edit_click )
+		self.m_remove_button.Bind( wx.EVT_BUTTON, self.on_remove_click )
+		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel_click )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_add_click( self, event ):
+		event.Skip()
+	
+	def on_edit_click( self, event ):
+		event.Skip()
+	
+	def on_remove_click( self, event ):
+		event.Skip()
+	
+	def on_cancel_click( self, event ):
 		event.Skip()
 	
 

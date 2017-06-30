@@ -47,7 +47,7 @@ from .autocomplete_combo import AutoCompleteCombo
 from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
-from .edit_search_chain_dialog import EditSearchChainDialog
+from .search_chain_dialog import SearchChainDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .messages import dirpickermsg, filepickermsg
@@ -738,7 +738,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_chain_click(self, event):
         """Chain button click."""
 
-        dlg = EditSearchChainDialog(self)
+        dlg = SearchChainDialog(self)
         dlg.ShowModal()
         dlg.Destroy()
 

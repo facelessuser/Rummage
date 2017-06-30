@@ -91,6 +91,14 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
     def load_chain(self, chain):
         """Load an existing chain."""
 
+        chains = Settings.get_chains()
+        if chain in chains:
+            self.original_name = chain
+            self.m_chain_textbox.SetValue(chain)
+            searches = chains[chain]
+            for x in range(len(searches)):
+                self.m_search_list.InsertItem(x, searches[x])
+
     def on_add_click(self, event):
         """Add search selection to list."""
 
