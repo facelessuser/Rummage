@@ -43,8 +43,6 @@ class ArgDialog(gui.ArgDialog):
 
         self.localize()
 
-        self.init_tab_traversal([self.m_arg_text])
-
         # Ensure good sizing for frame
         best = self.m_arg_panel.GetBestSize()
         current = self.m_arg_panel.GetSize()
