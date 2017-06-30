@@ -16,7 +16,7 @@ from wx.lib.masked import TimeCtrl
 from .result_lists import ResultFileList
 from .result_lists import ResultContentList
 from .search_chain_list import SearchChainList
-from .auto_width_lists import AutoWidthListCtrl
+from .list_box import ListBox
 from .load_search_list import SavedSearchList
 from .search_error_list import ErrorList
 
@@ -670,7 +670,7 @@ class EditSearchChainDialog ( wx.Dialog ):
 		self.m_search_choice.SetSelection( 0 )
 		gbSizer3.Add( self.m_search_choice, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_search_list = AutoWidthListCtrl( self.m_chain_panel, wx.ID_ANY)
+		self.m_search_list = ListBox( self.m_chain_panel, wx.ID_ANY)
 		self.m_search_list.SetMinSize( wx.Size( 200,-1 ) )
 		
 		gbSizer3.Add( self.m_search_list, wx.GBPosition( 1, 0 ), wx.GBSpan( 4, 1 ), wx.ALL|wx.EXPAND, 5 )
@@ -1407,7 +1407,7 @@ class EditorDialog ( wx.Dialog ):
 		self.m_add_arg_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Add", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gbSizer4.Add( self.m_add_arg_button, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
-		self.m_arg_list = AutoWidthListCtrl( self.m_editor_panel, wx.ID_ANY)
+		self.m_arg_list = ListBox( self.m_editor_panel, wx.ID_ANY)
 		self.m_arg_list.SetMinSize( wx.Size( 200,-1 ) )
 		
 		gbSizer4.Add( self.m_arg_list, wx.GBPosition( 1, 0 ), wx.GBSpan( 6, 1 ), wx.ALL|wx.EXPAND, 5 )

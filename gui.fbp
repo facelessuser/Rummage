@@ -7236,9 +7236,9 @@
                                                     <property name="caption"></property>
                                                     <property name="caption_visible">1</property>
                                                     <property name="center_pane">0</property>
-                                                    <property name="class">wxListCtrl</property>
+                                                    <property name="class">wxListBox</property>
                                                     <property name="close_button">1</property>
-                                                    <property name="construction">self.m_search_list = AutoWidthListCtrl( self.m_chain_panel, wx.ID_ANY)</property>
+                                                    <property name="construction">self.m_search_list = ListBox( self.m_chain_panel, wx.ID_ANY)</property>
                                                     <property name="context_help"></property>
                                                     <property name="context_menu">1</property>
                                                     <property name="declaration"></property>
@@ -7253,7 +7253,7 @@
                                                     <property name="gripper">0</property>
                                                     <property name="hidden">0</property>
                                                     <property name="id">wxID_ANY</property>
-                                                    <property name="include">from .auto_width_lists import AutoWidthListCtrl</property>
+                                                    <property name="include">from .list_box import ListBox</property>
                                                     <property name="max_size"></property>
                                                     <property name="maximize_button">0</property>
                                                     <property name="maximum_size"></property>
@@ -13001,9 +13001,9 @@
                                                     <property name="caption"></property>
                                                     <property name="caption_visible">1</property>
                                                     <property name="center_pane">0</property>
-                                                    <property name="class">wxListCtrl</property>
+                                                    <property name="class">wxListBox</property>
                                                     <property name="close_button">1</property>
-                                                    <property name="construction">self.m_arg_list = AutoWidthListCtrl( self.m_editor_panel, wx.ID_ANY)</property>
+                                                    <property name="construction">self.m_arg_list = ListBox( self.m_editor_panel, wx.ID_ANY)</property>
                                                     <property name="context_help"></property>
                                                     <property name="context_menu">1</property>
                                                     <property name="declaration"></property>

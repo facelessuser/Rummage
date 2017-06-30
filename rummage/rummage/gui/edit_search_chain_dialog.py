@@ -42,11 +42,9 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         """Init SaveSearchDialog object."""
 
         super(EditSearchChainDialog, self).__init__(parent)
-        self.m_search_list.AppendColumn('')
 
         self.search_count = 0
         self.load_searches()
-        self.m_search_list.setResizeColumn(0)
 
         self.original_name = ""
         if chain:
@@ -95,53 +93,52 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
             self.m_chain_textbox.SetValue(chain)
             searches = chains[chain]
             for x in range(len(searches)):
-                self.m_search_list.InsertItem(x, searches[x])
+                self.m_search_list.Insert(searches[x], x)
 
     def on_add_click(self, event):
         """Add search selection to list."""
 
         search = self.m_search_choice.GetSelection()
         if search != wx.NOT_FOUND:
-            index = self.m_search_list.GetFirstSelected()
+            index = self.m_search_list.GetSelection()
             if index == wx.NOT_FOUND:
-                self.m_search_list.InsertItem(
-                    self.m_search_list.GetItemCount(),
-                    self.m_search_choice.GetString(search)
+                self.m_search_list.Insert(
+                    self.m_search_choice.GetString(search),
+                    self.m_search_list.GetCount()
                 )
             else:
-                self.m_search_list.InsertItem(index, self.m_search_choice.GetString(search))
+                self.m_search_list.Insert(self.m_search_choice.GetString(search), index)
 
     def on_remove_click(self, event):
         """Remove search from chain."""
 
-        index = self.m_search_list.GetFirstSelected()
+        index = self.m_search_list.GetSelection()
         selected = self.m_search_list.IsSelected(index)
         if index != wx.NOT_FOUND:
-            self.m_search_list.DeleteItem(index)
-            count = self.m_search_list.GetItemCount()
+            self.m_search_list.Delete(index)
+            count = self.m_search_list.GetCount()
             if selected and count and index <= count - 1:
                 self.m_search_list.Select(index)
 
     def on_up_click(self, event):
         """Move up."""
 
-        index = self.m_search_list.GetFirstSelected()
+        index = self.m_search_list.GetSelection()
         if index > 0:
-            search = self.m_search_list.GetItemText(index)
-            self.m_search_list.DeleteItem(index)
-            self.m_search_list.InsertItem(index - 1, search)
+            search = self.m_search_list.GetString(index)
+            self.m_search_list.Delete(index)
+            self.m_search_list.Insert(search, index - 1)
             self.m_search_list.Select(index - 1)
 
     def on_down_click(self, event):
         """Move up."""
 
-        count = self.m_search_list.GetItemCount()
-        index = self.m_search_list.GetFirstSelected()
-        print(index)
+        count = self.m_search_list.GetCount()
+        index = self.m_search_list.GetSelection()
         if wx.NOT_FOUND < index < count - 1:
-            search = self.m_search_list.GetItemText(index)
-            self.m_search_list.DeleteItem(index)
-            self.m_search_list.InsertItem(index + 1, search)
+            search = self.m_search_list.GetString(index)
+            self.m_search_list.Delete(index)
+            self.m_search_list.Insert(search, index + 1)
             self.m_search_list.Select(index + 1)
 
     def on_apply_click(self, event):
@@ -162,8 +159,8 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
             err = True
 
         searches = []
-        for index in range(self.m_search_list.GetItemCount()):
-            text = self.m_search_list.GetItemText(index)
+        for index in range(self.m_search_list.GetCount()):
+            text = self.m_search_list.GetString(index)
             if text not in self.keys:
                 errormsg(ERR_SEARCH_NOT_EXISTS % text)
                 err = True

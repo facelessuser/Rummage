@@ -33,7 +33,6 @@ class EditorDialog(gui.EditorDialog):
         """Init EditorDialog object."""
 
         super(EditorDialog, self).__init__(parent)
-        self.m_arg_list.AppendColumn('')
 
         self.editor = editor
 
@@ -47,7 +46,7 @@ class EditorDialog(gui.EditorDialog):
 
         if len(editor) > 1:
             for x in range(1, len(editor)):
-                self.m_arg_list.InsertItem(x - 1, editor[x])
+                self.m_arg_list.Insert(editor[x], x - 1)
 
         self.localize()
 
@@ -121,56 +120,55 @@ class EditorDialog(gui.EditorDialog):
 
         value = self.m_arg_text.GetValue()
         if value != "":
-            index = self.m_arg_list.GetFirstSelected()
+            index = self.m_arg_list.GetSelected()
             if index == wx.NOT_FOUND:
-                self.m_arg_list.InsertItem(self.m_arg_list.GetItemCount(), value)
+                self.m_arg_list.Insert(value, self.m_arg_list.GetCount())
             else:
-                self.m_arg_list.InsertItem(index, value)
+                self.m_arg_list.Insert(value, index)
 
 
     def on_edit(self, event):
         """Edit argument."""
 
-        index = self.m_arg_list.GetFirstSelected()
+        index = self.m_arg_list.GetSelected()
         if index > wx.NOT_FOUND:
-            dlg = ArgDialog(self, self.m_arg_list.GetItemText(index))
+            dlg = ArgDialog(self, self.m_arg_list.GetString(index))
             dlg.ShowModal()
             string = dlg.get_arg()
             dlg.Destroy()
 
-            self.m_arg_list.DeleteItem(index)
-            self.m_arg_list.InsertItem(index, string)
+            self.m_arg_list.Delete(index)
+            self.m_arg_list.Insert(string, index)
 
     def on_up(self, event):
         """Move argument up."""
 
-        index = self.m_arg_list.GetFirstSelected()
+        index = self.m_arg_list.GetSelected()
         if index > 0:
-            search = self.m_arg_list.GetItemText(index)
-            self.m_arg_list.DeleteItem(index)
-            self.m_arg_list.InsertItem(index - 1, search)
+            search = self.m_arg_list.GetString(index)
+            self.m_arg_list.Delete(index)
+            self.m_arg_list.Insert(search, index - 1)
             self.m_arg_list.Select(index - 1)
 
     def on_down(self, event):
         """Move argument down."""
 
-        count = self.m_arg_list.GetItemCount()
-        index = self.m_arg_list.GetFirstSelected()
-        print(index)
+        count = self.m_arg_list.GetCount()
+        index = self.m_arg_list.GetSelected()
         if wx.NOT_FOUND < index < count - 1:
-            search = self.m_arg_list.GetItemText(index)
-            self.m_arg_list.DeleteItem(index)
-            self.m_arg_list.InsertItem(index + 1, search)
+            search = self.m_arg_list.GetString(index)
+            self.m_arg_list.Delete(index)
+            self.m_arg_list.Insert(search, index + 1)
             self.m_arg_list.Select(index + 1)
 
     def on_remove(self, event):
         """Remove argument."""
 
-        index = self.m_arg_list.GetFirstSelected()
+        index = self.m_arg_list.GetSelected()
         selected = self.m_arg_list.IsSelected(index)
         if index != wx.NOT_FOUND:
-            self.m_arg_list.DeleteItem(index)
-            count = self.m_arg_list.GetItemCount()
+            self.m_arg_list.Delete(index)
+            count = self.m_arg_list.GetCount()
             if selected and count and index <= count - 1:
                 self.m_arg_list.Select(index)
 
@@ -181,8 +179,8 @@ class EditorDialog(gui.EditorDialog):
         app = self.m_editor_picker.GetPath()
         if app != "":
             editor.append(app)
-        for x in range(0, self.m_arg_list.GetItemCount()):
-            editor.append(self.m_arg_list.GetItemText(x))
+        for x in range(0, self.m_arg_list.GetCount()):
+            editor.append(self.m_arg_list.GetString(x))
         self.editor = editor
         self.Close()
 
