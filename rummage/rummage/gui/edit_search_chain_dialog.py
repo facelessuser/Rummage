@@ -42,7 +42,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         """Init SaveSearchDialog object."""
 
         super(EditSearchChainDialog, self).__init__(parent)
-        self.m_search_list.AppendColumn('searches')
+        self.m_search_list.AppendColumn('')
 
         self.search_count = 0
         self.load_searches()
@@ -54,6 +54,8 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         else:
             self.original_name = ""
 
+        self.localize()
+
         # Ensure good sizing of frame
         best = self.m_chain_panel.GetBestSize()
         current = self.m_chain_panel.GetSize()
@@ -61,6 +63,19 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+
+    def localize(self):
+        """Localize dialog."""
+
+        self.SetTitle(_("Edit/Create Search Chain"))
+        self.m_add_button.SetLabel(_("Add"))
+        self.m_remove_button.SetLabel(_("Delete"))
+        self.m_up_button.SetLabel(_("Up"))
+        self.m_down_button.SetLabel(_('Down'))
+        self.m_apply_button.SetLabel(_('Apply'))
+        self.m_cancel_button.SetLabel(_('Cancel'))
+        self.m_chain_panel.GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(_("Name"))
+        self.m_chain_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(_("Chain"))
 
     def load_searches(self):
         """Load search list in wxChoice."""

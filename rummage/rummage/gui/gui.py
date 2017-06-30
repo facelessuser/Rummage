@@ -590,7 +590,7 @@ class EditSearchChainDialog ( wx.Dialog ):
 		self.m_add_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Add", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gbSizer3.Add( self.m_add_button, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
-		self.m_remove_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Remove", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_remove_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Delete", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gbSizer3.Add( self.m_remove_button, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_up_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Up", wx.DefaultPosition, wx.DefaultSize, 0 )

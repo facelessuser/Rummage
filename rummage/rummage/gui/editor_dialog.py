@@ -33,7 +33,7 @@ class EditorDialog(gui.EditorDialog):
         """Init EditorDialog object."""
 
         super(EditorDialog, self).__init__(parent)
-        self.m_arg_list.AppendColumn('args')
+        self.m_arg_list.AppendColumn('')
 
         self.editor = editor
 
