@@ -82,21 +82,20 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         search = self.m_search_choice.GetSelection()
         if search != wx.NOT_FOUND:
             index = self.m_search_list.GetFirstSelected()
-            if index == -1:
-                self.m_search_list.InsertStringItem(
+            if index == wx.NOT_FOUND:
+                self.m_search_list.InsertItem(
                     self.m_search_list.GetItemCount(),
                     self.m_search_choice.GetString(search)
                 )
             else:
-                self.m_search_list.InsertStringItem(index, self.m_search_choice.GetString(search))
-            count = self.m_search_list.GetItemCount()
+                self.m_search_list.InsertItem(index, self.m_search_choice.GetString(search))
 
     def on_remove_click(self, event):
         """Remove search from chain."""
 
         index = self.m_search_list.GetFirstSelected()
         selected = self.m_search_list.IsSelected(index)
-        if index != -1:
+        if index != wx.NOT_FOUND:
             self.m_search_list.DeleteItem(index)
             count = self.m_search_list.GetItemCount()
             if selected and count and index <= count - 1:
@@ -109,7 +108,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         if index > 0:
             search = self.m_search_list.GetItemText(index)
             self.m_search_list.DeleteItem(index)
-            self.m_search_list.InsertStringItem(index - 1, search)
+            self.m_search_list.InsertItem(index - 1, search)
             self.m_search_list.Select(index - 1)
 
     def on_down_click(self, event):
@@ -118,10 +117,10 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         count = self.m_search_list.GetItemCount()
         index = self.m_search_list.GetFirstSelected()
         print(index)
-        if -1 < index < count - 1:
+        if wx.NOT_FOUND < index < count - 1:
             search = self.m_search_list.GetItemText(index)
             self.m_search_list.DeleteItem(index)
-            self.m_search_list.InsertStringItem(index + 1, search)
+            self.m_search_list.InsertItem(index + 1, search)
             self.m_search_list.Select(index + 1)
 
     def on_apply_click(self, event):

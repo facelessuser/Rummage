@@ -1309,46 +1309,41 @@ class EditorDialog ( wx.Dialog ):
 		
 		sbSizer5 = wx.StaticBoxSizer( wx.StaticBox( self.m_editor_panel, wx.ID_ANY, u"Arguments" ), wx.VERTICAL )
 		
-		fgSizer15 = wx.FlexGridSizer( 2, 2, 0, 0 )
-		fgSizer15.AddGrowableCol( 0 )
-		fgSizer15.AddGrowableRow( 1 )
-		fgSizer15.SetFlexibleDirection( wx.BOTH )
-		fgSizer15.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		gbSizer4 = wx.GridBagSizer( 0, 0 )
+		gbSizer4.SetFlexibleDirection( wx.BOTH )
+		gbSizer4.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
 		self.m_arg_text = wx.TextCtrl( self.m_editor_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER )
-		fgSizer15.Add( self.m_arg_text, 1, wx.ALL|wx.EXPAND, 5 )
+		gbSizer4.Add( self.m_arg_text, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_add_arg_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Add", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer15.Add( self.m_add_arg_button, 0, wx.ALL, 5 )
+		gbSizer4.Add( self.m_add_arg_button, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
-		m_arg_listChoices = []
-		self.m_arg_list = wx.ListBox( self.m_editor_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_arg_listChoices, wx.LB_SINGLE )
-		fgSizer15.Add( self.m_arg_list, 1, wx.ALL|wx.EXPAND, 5 )
+		self.m_arg_list = AutoWidthListCtrl( self.m_editor_panel, wx.ID_ANY)
+		self.m_arg_list.SetMinSize( wx.Size( 200,-1 ) )
 		
-		fgSizer23 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		fgSizer23.SetFlexibleDirection( wx.BOTH )
-		fgSizer23.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		gbSizer4.Add( self.m_arg_list, wx.GBPosition( 1, 0 ), wx.GBSpan( 6, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_remove_arg_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Delete", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer23.Add( self.m_remove_arg_button, 0, wx.ALL, 5 )
+		gbSizer4.Add( self.m_remove_arg_button, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_edit_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Edit", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer23.Add( self.m_edit_button, 0, wx.ALL, 5 )
+		gbSizer4.Add( self.m_edit_button, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_staticline2 = wx.StaticLine( self.m_editor_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-		fgSizer23.Add( self.m_staticline2, 0, wx.EXPAND |wx.ALL, 5 )
+		gbSizer4.Add( self.m_staticline2, wx.GBPosition( 3, 1 ), wx.GBSpan( 1, 1 ), wx.EXPAND |wx.ALL, 5 )
 		
 		self.m_up_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Up", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer23.Add( self.m_up_button, 0, wx.ALL, 5 )
+		gbSizer4.Add( self.m_up_button, wx.GBPosition( 4, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_down_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Down", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer23.Add( self.m_down_button, 0, wx.ALL, 5 )
+		gbSizer4.Add( self.m_down_button, wx.GBPosition( 5, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		
-		fgSizer15.Add( fgSizer23, 1, wx.EXPAND, 5 )
+		gbSizer4.AddGrowableCol( 0 )
+		gbSizer4.AddGrowableRow( 6 )
 		
-		
-		sbSizer5.Add( fgSizer15, 1, wx.EXPAND, 5 )
+		sbSizer5.Add( gbSizer4, 1, wx.EXPAND, 5 )
 		
 		
 		fgSizer14.Add( sbSizer5, 1, wx.EXPAND, 5 )

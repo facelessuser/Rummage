@@ -605,7 +605,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Linux seems to need the resize to get its control tab
         # order right as we are hiding some items, but doing it
         # now won't work, so we delay it.
-        wx.FutureCall(500, self.on_loaded)
+        wx.CallLater(500, self.on_loaded).Start()
 
     def localize(self):
         """Localize."""
