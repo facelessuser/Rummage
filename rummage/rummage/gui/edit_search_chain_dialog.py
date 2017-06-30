@@ -48,11 +48,9 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         self.load_searches()
         self.m_search_list.setResizeColumn(0)
 
+        self.original_name = ""
         if chain:
             self.load_chain(chain)
-            self.original_name = chain
-        else:
-            self.original_name = ""
 
         self.localize()
 
@@ -177,6 +175,8 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
             err = True
 
         if not err:
+            if self.original_name and string != self.original_name:
+                Settings.delete_chain(self.original_name)
             Settings.add_chain(string, searches)
             self.Close()
 

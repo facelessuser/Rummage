@@ -448,7 +448,7 @@ class Settings(object):
 
         cls.reload_settings()
         chains = cls.settings.get("chains", {})
-        if name in chains:
+        if key in chains:
             del chains[key]
         cls.settings["chains"] = chains
         cls.save_settings()

@@ -34,6 +34,8 @@ class SearchChainDialog(gui.SearchChainDialog):
 
         super(SearchChainDialog, self).__init__(parent)
 
+        self.m_chain_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
+
         # Ensure good sizing of frame
         best = self.m_chain_panel.GetBestSize()
         current = self.m_chain_panel.GetSize()
@@ -60,7 +62,7 @@ class SearchChainDialog(gui.SearchChainDialog):
             count += 1
         self.m_chain_list.load_list()
 
-    def on_delete_click(self, event):
+    def on_remove_click(self, event):
         """Delete chain entry."""
 
         item = self.m_chain_list.GetFirstSelected()
@@ -71,28 +73,40 @@ class SearchChainDialog(gui.SearchChainDialog):
         self.m_chain_list.reset_list()
         self.load_chains()
 
-    def on_edit_click(self, event):
+    def edit_chain(self, name=None):
         """Edit chain."""
+
+        dlg = EditSearchChainDialog(self, chain=name)
+        dlg.ShowModal()
+        self.m_chain_list.reset_list()
+        self.load_chains()
+        dlg.Destroy()
+
+    def on_edit_click(self, event):
+        """Edit chain on button click."""
 
         item = self.m_chain_list.GetFirstSelected()
         if item == -1:
             return
 
         name = self.m_chain_list.get_item_text(item, 0)
-        dlg = EditSearchChainDialog(self, chain=name)
-        dlg.ShowModal()
-        # Do something with return.
-        dlg.Destroy()
+        self.edit_chain(name)
 
     def on_add_click(self, event):
-        """Edit chain."""
+        """Add new chain."""
 
-        dlg = EditSearchChainDialog(self)
-        dlg.ShowModal()
-        # Do something with return
-        dlg.Destroy()
+        self.edit_chain()
 
-    def on_cancel(self, event):
+    def on_dclick(self, event):
+        """Edit on double click."""
+
+        pos = event.GetPosition()
+        item = self.m_chain_list.HitTestSubItem(pos)[0]
+        if item != -1:
+            name = self.m_chain_list.GetItem(item, col=0).GetText()
+            self.edit_chain(name)
+
+    def on_cancel_click(self, event):
         """Close window."""
 
         self.Close()
