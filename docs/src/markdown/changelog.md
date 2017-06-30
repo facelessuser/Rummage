@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3
+
+> Jun 30, 2017
+
+- **FIX**: Fix editor argument dialog.
+
 ## 2.0.2
 
 > Jun 27, 2017
