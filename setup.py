@@ -59,7 +59,7 @@ setup(
     description='A GUI search and replace app.',
     long_description=LONG_DESC,
     author='Isaac Muse',
-    author_email='Isaac.Muse [at] gmail.com',
+    author_email='Isaac.Muse@gmail.com',
     url='https://github.com/facelessuser/Rummage',
     packages=find_packages(exclude=['tests', 'tools']),
     install_requires=[
