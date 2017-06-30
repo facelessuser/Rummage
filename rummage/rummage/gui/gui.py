@@ -15,6 +15,7 @@ from .date_picker import DatePicker
 from wx.lib.masked import TimeCtrl
 from .result_lists import ResultFileList
 from .result_lists import ResultContentList
+from .auto_width_lists import AutoWidthListCtrl
 from .load_search_list import SavedSearchList
 from .search_error_list import ErrorList
 
@@ -543,81 +544,66 @@ class RummageFrame ( wx.Frame ):
 	
 
 ###########################################################################
-## Class SearchChainsDialog
+## Class EditSearchChainDialog
 ###########################################################################
 
-class SearchChainsDialog ( wx.Dialog ):
+class EditSearchChainDialog ( wx.Dialog ):
 	
 	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Search Chains", pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Edit/Create Search Chain", pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
 		
 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		
 		bSizer16 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_panel14 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_chain_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer38 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer38.AddGrowableCol( 0 )
 		fgSizer38.AddGrowableRow( 1 )
 		fgSizer38.SetFlexibleDirection( wx.BOTH )
 		fgSizer38.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		sbSizer13 = wx.StaticBoxSizer( wx.StaticBox( self.m_panel14, wx.ID_ANY, u"Name" ), wx.VERTICAL )
+		sbSizer13 = wx.StaticBoxSizer( wx.StaticBox( self.m_chain_panel, wx.ID_ANY, u"Name" ), wx.VERTICAL )
 		
-		self.m_chain_textbox = wx.TextCtrl( self.m_panel14, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_chain_textbox = wx.TextCtrl( self.m_chain_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		sbSizer13.Add( self.m_chain_textbox, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		fgSizer38.Add( sbSizer13, 1, wx.EXPAND, 5 )
 		
-		sbSizer14 = wx.StaticBoxSizer( wx.StaticBox( self.m_panel14, wx.ID_ANY, u"Chain" ), wx.VERTICAL )
+		sbSizer14 = wx.StaticBoxSizer( wx.StaticBox( self.m_chain_panel, wx.ID_ANY, u"Chain" ), wx.VERTICAL )
+		
+		gbSizer3 = wx.GridBagSizer( 0, 0 )
+		gbSizer3.SetFlexibleDirection( wx.BOTH )
+		gbSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
 		m_search_choiceChoices = []
-		self.m_search_choice = wx.Choice( self.m_panel14, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_search_choiceChoices, wx.CB_SORT )
+		self.m_search_choice = wx.Choice( self.m_chain_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_search_choiceChoices, wx.CB_SORT )
 		self.m_search_choice.SetSelection( 0 )
-		sbSizer14.Add( self.m_search_choice, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND, 5 )
+		gbSizer3.Add( self.m_search_choice, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
-		fgSizer40 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		fgSizer40.AddGrowableCol( 0 )
-		fgSizer40.AddGrowableRow( 0 )
-		fgSizer40.SetFlexibleDirection( wx.BOTH )
-		fgSizer40.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		self.m_search_list = AutoWidthListCtrl( self.m_chain_panel, wx.ID_ANY)
+		self.m_search_list.SetMinSize( wx.Size( 200,-1 ) )
 		
-		fgSizer42 = wx.FlexGridSizer( 0, 2, 0, 0 )
-		fgSizer42.AddGrowableCol( 0 )
-		fgSizer42.AddGrowableRow( 0 )
-		fgSizer42.SetFlexibleDirection( wx.BOTH )
-		fgSizer42.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		gbSizer3.Add( self.m_search_list, wx.GBPosition( 1, 0 ), wx.GBSpan( 4, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
-		m_listBox2Choices = []
-		self.m_listBox2 = wx.ListBox( self.m_panel14, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBox2Choices, wx.LB_SINGLE )
-		fgSizer42.Add( self.m_listBox2, 1, wx.EXPAND|wx.ALL, 5 )
+		self.m_add_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Add", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer3.Add( self.m_add_button, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
-		fgSizer411 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		fgSizer411.AddGrowableCol( 0 )
-		fgSizer411.SetFlexibleDirection( wx.BOTH )
-		fgSizer411.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		self.m_remove_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Remove", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer3.Add( self.m_remove_button, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
-		self.m_add_button = wx.Button( self.m_panel14, wx.ID_ANY, u"Add", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer411.Add( self.m_add_button, 0, wx.ALL, 5 )
+		self.m_up_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Up", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer3.Add( self.m_up_button, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
-		self.m_remove_button = wx.Button( self.m_panel14, wx.ID_ANY, u"Remove", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer411.Add( self.m_remove_button, 0, wx.ALL, 5 )
-		
-		self.m_up_button = wx.Button( self.m_panel14, wx.ID_ANY, u"Up", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer411.Add( self.m_up_button, 0, wx.ALL, 5 )
-		
-		self.m_down_button = wx.Button( self.m_panel14, wx.ID_ANY, u"Down", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer411.Add( self.m_down_button, 0, wx.ALL, 5 )
+		self.m_down_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Down", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer3.Add( self.m_down_button, wx.GBPosition( 3, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		
-		fgSizer42.Add( fgSizer411, 1, wx.EXPAND, 5 )
+		gbSizer3.AddGrowableCol( 0 )
+		gbSizer3.AddGrowableRow( 4 )
 		
-		
-		fgSizer40.Add( fgSizer42, 1, wx.EXPAND|wx.BOTTOM, 5 )
-		
-		
-		sbSizer14.Add( fgSizer40, 1, wx.EXPAND, 5 )
+		sbSizer14.Add( gbSizer3, 1, wx.EXPAND, 5 )
 		
 		
 		fgSizer38.Add( sbSizer14, 1, wx.EXPAND, 5 )
@@ -632,10 +618,10 @@ class SearchChainsDialog ( wx.Dialog ):
 		
 		fgSizer41.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_apply_button = wx.Button( self.m_panel14, wx.ID_ANY, u"Apply", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_apply_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Apply", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer41.Add( self.m_apply_button, 0, wx.ALL, 5 )
 		
-		self.m_cancel_button = wx.Button( self.m_panel14, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_cancel_button = wx.Button( self.m_chain_panel, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer41.Add( self.m_cancel_button, 0, wx.ALL, 5 )
 		
 		
@@ -645,10 +631,10 @@ class SearchChainsDialog ( wx.Dialog ):
 		fgSizer38.Add( fgSizer41, 1, wx.EXPAND, 5 )
 		
 		
-		self.m_panel14.SetSizer( fgSizer38 )
-		self.m_panel14.Layout()
-		fgSizer38.Fit( self.m_panel14 )
-		bSizer16.Add( self.m_panel14, 1, wx.EXPAND |wx.ALL, 5 )
+		self.m_chain_panel.SetSizer( fgSizer38 )
+		self.m_chain_panel.Layout()
+		fgSizer38.Fit( self.m_chain_panel )
+		bSizer16.Add( self.m_chain_panel, 1, wx.EXPAND |wx.ALL, 5 )
 		
 		
 		self.SetSizer( bSizer16 )

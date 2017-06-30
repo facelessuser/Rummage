@@ -426,6 +426,34 @@ class Settings(object):
         cls.save_settings()
 
     @classmethod
+    def get_chains(cls):
+        """Get saved chains."""
+
+        cls.reload_settings()
+        return cls.settings.get("chains", {})
+
+    @classmethod
+    def add_chain(cls, key, searches):
+        """Save chain."""
+
+        cls.reload_settings()
+        chains = cls.settings.get("chains", {})
+        chains[key] = searches[:]
+        cls.settings['chains'] = chains
+        cls.save_settings()
+
+    @classmethod
+    def delete_chain(cls, key):
+        """Delete chain."""
+
+        cls.reload_settings()
+        chains = cls.settings.get("chains", {})
+        if name in chains:
+            del chains[key]
+        cls.settings["chains"] = chains
+        cls.save_settings()
+
+    @classmethod
     def get_alert(cls):
         """Get alert setting."""
 
