@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.4
+
+> Jun 30, 2017
+
+- **FIX**: Bump rev.
+
 ## 2.0.3
 
 > Jun 30, 2017
