@@ -24,6 +24,7 @@ import wx
 from .settings import Settings
 from . import gui
 from ..localization import _
+from .save_search_dialog import SaveSearchDialog
 
 SEARCH_REGEX = _("Regex")
 SEARCH_LITERAL = _("Text")
@@ -40,6 +41,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         """Init LoadSearchDialog."""
 
         super(LoadSearchDialog, self).__init__(parent)
+        self.m_search_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
 
         self.parent = parent
         self.localize()
@@ -71,7 +73,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         for key in sorted(searches.keys()):
             s = searches[key]
             search_type = SEARCH_REGEX if s[4] else SEARCH_LITERAL
-            self.m_search_list.set_item_map(count, s[0], s[1], s[2], s[3], search_type, key)
+            self.m_search_list.set_item_map(count, key, s[0], s[1], s[2], s[3], search_type)
             count += 1
         self.m_search_list.load_list()
 
@@ -81,10 +83,10 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         item = self.m_search_list.GetFirstSelected()
         if item == -1:
             return
-        search = self.m_search_list.get_map_item(item, col=1)
-        replace = self.m_search_list.get_map_item(item, col=2)
-        flags = self.m_search_list.get_map_item(item, col=3)
-        is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=4)] == "Regex"
+        search = self.m_search_list.get_map_item(item, col=2)
+        replace = self.m_search_list.get_map_item(item, col=3)
+        flags = self.m_search_list.get_map_item(item, col=4)
+        is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
 
         self.parent.m_searchfor_textbox.SetValue(search)
         self.parent.m_replace_textbox.SetValue(replace)
@@ -112,6 +114,38 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         Settings.delete_search(name)
         self.m_search_list.reset_list()
         self.load_searches()
+
+    def on_edit_click(self, event):
+        """Edit on button click."""
+
+        item = self.m_search_list.GetFirstSelected()
+        if item != -1:
+            self.edit(item)
+
+    def on_dclick(self, event):
+        """Edit saved search on double click (just name and comment)."""
+
+        pos = event.GetPosition()
+        item = self.m_search_list.HitTestSubItem(pos)[0]
+        if item != -1:
+            self.edit(item)
+
+    def edit(self, item):
+        """Edit the saved search."""
+
+        name = self.m_search_list.get_map_item(item, col=0)
+        comment = self.m_search_list.get_map_item(item, col=1)
+        search = self.m_search_list.get_map_item(item, col=2)
+        replace = self.m_search_list.get_map_item(item, col=3)
+        flags = self.m_search_list.get_map_item(item, col=4)
+        is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
+
+        dlg = SaveSearchDialog(self, (name, comment, search, replace, flags, is_regex))
+        dlg.ShowModal()
+        if dlg.saved:
+            self.m_search_list.reset_list()
+            self.load_searches()
+        dlg.Destroy()
 
     def on_cancel(self, event):
         """Close dialog."""

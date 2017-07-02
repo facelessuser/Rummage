@@ -34,6 +34,7 @@ class SavedSearchList(DynamicList):
             parent,
             [
                 _("Name"),
+                _("Comment"),
                 _("Search"),
                 _("Replace"),
                 _("Flags/Toggles"),

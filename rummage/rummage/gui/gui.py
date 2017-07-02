@@ -96,6 +96,9 @@ class RummageFrame ( wx.Frame ):
 		fgSizer8.Add( self.m_replace_textbox, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
+		fgSizer8.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
 		fgSizer6.Add( fgSizer8, 1, wx.EXPAND, 5 )
 		
 		fgSizer9 = wx.FlexGridSizer( 0, 3, 0, 0 )
@@ -174,11 +177,26 @@ class RummageFrame ( wx.Frame ):
 		
 		gbSizer2.Add( fgSizer40, wx.GBPosition( 4, 3 ), wx.GBSpan( 1, 1 ), wx.EXPAND, 5 )
 		
+		self.m_staticline6 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		gbSizer2.Add( self.m_staticline6, wx.GBPosition( 5, 0 ), wx.GBSpan( 1, 4 ), wx.EXPAND |wx.ALL, 5 )
+		
+		fgSizer401 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer401.AddGrowableCol( 1 )
+		fgSizer401.SetFlexibleDirection( wx.BOTH )
+		fgSizer401.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_chains_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Chains", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer401.Add( self.m_chains_checkbox, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		m_chains_comboChoices = []
+		self.m_chains_combo = wx.ComboBox( self.m_settings_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_chains_comboChoices, 0 )
+		fgSizer401.Add( self.m_chains_combo, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		gbSizer2.Add( fgSizer401, wx.GBPosition( 6, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND, 5 )
+		
 		
 		fgSizer9.Add( gbSizer2, 1, wx.EXPAND, 5 )
-		
-		
-		fgSizer9.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
 		
 		fgSizer6.Add( fgSizer9, 1, wx.EXPAND, 5 )
@@ -186,7 +204,7 @@ class RummageFrame ( wx.Frame ):
 		self.m_staticline3 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		fgSizer6.Add( self.m_staticline3, 0, wx.EXPAND |wx.ALL, 5 )
 		
-		fgSizer17 = wx.FlexGridSizer( 0, 5, 0, 0 )
+		fgSizer17 = wx.FlexGridSizer( 0, 6, 0, 0 )
 		fgSizer17.AddGrowableCol( 1 )
 		fgSizer17.SetFlexibleDirection( wx.BOTH )
 		fgSizer17.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -463,6 +481,7 @@ class RummageFrame ( wx.Frame ):
 		# Connect Events
 		self.Bind( wx.EVT_CLOSE, self.on_close )
 		self.m_regex_search_checkbox.Bind( wx.EVT_CHECKBOX, self.on_regex_search_toggle )
+		self.m_chains_checkbox.Bind( wx.EVT_CHECKBOX, self.on_chain_toggle )
 		self.m_regex_test_button.Bind( wx.EVT_BUTTON, self.on_test_regex )
 		self.m_chain_button.Bind( wx.EVT_BUTTON, self.on_chain_click )
 		self.m_save_search_button.Bind( wx.EVT_BUTTON, self.on_save_search )
@@ -490,6 +509,9 @@ class RummageFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_regex_search_toggle( self, event ):
+		event.Skip()
+	
+	def on_chain_toggle( self, event ):
 		event.Skip()
 	
 	def on_test_regex( self, event ):
@@ -1034,7 +1056,7 @@ class LoadSearchDialog ( wx.Dialog ):
 		self.m_search_list = SavedSearchList(self.m_load_panel)
 		fgSizer36.Add( self.m_search_list, 1, wx.ALL|wx.EXPAND, 5 )
 		
-		fgSizer37 = wx.FlexGridSizer( 0, 5, 0, 0 )
+		fgSizer37 = wx.FlexGridSizer( 0, 6, 0, 0 )
 		fgSizer37.AddGrowableCol( 0 )
 		fgSizer37.AddGrowableCol( 4 )
 		fgSizer37.SetFlexibleDirection( wx.BOTH )
@@ -1042,6 +1064,9 @@ class LoadSearchDialog ( wx.Dialog ):
 		
 		
 		fgSizer37.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_edit_button = wx.Button( self.m_load_panel, wx.ID_ANY, u"Edit", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer37.Add( self.m_edit_button, 0, wx.ALL, 5 )
 		
 		self.m_delete_button = wx.Button( self.m_load_panel, wx.ID_ANY, u"Remove", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer37.Add( self.m_delete_button, 0, wx.ALL, 5 )
@@ -1071,6 +1096,7 @@ class LoadSearchDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.m_edit_button.Bind( wx.EVT_BUTTON, self.on_edit_click )
 		self.m_delete_button.Bind( wx.EVT_BUTTON, self.on_delete )
 		self.m_load_button.Bind( wx.EVT_BUTTON, self.on_load )
 		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel )
@@ -1080,6 +1106,9 @@ class LoadSearchDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def on_edit_click( self, event ):
+		event.Skip()
+	
 	def on_delete( self, event ):
 		event.Skip()
 	
@@ -1591,9 +1620,9 @@ class ArgDialog ( wx.Dialog ):
 class SaveSearchDialog ( wx.Dialog ):
 	
 	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Search Name", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Save Search and Replace", pos = wx.DefaultPosition, size = wx.Size( 400,-1 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
 		
-		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		self.SetSizeHints( wx.Size( 400,-1 ), wx.DefaultSize )
 		
 		bSizer9 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -1602,27 +1631,63 @@ class SaveSearchDialog ( wx.Dialog ):
 		
 		fgSizer24 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer24.AddGrowableCol( 0 )
+		fgSizer24.AddGrowableRow( 1 )
 		fgSizer24.SetFlexibleDirection( wx.BOTH )
 		fgSizer24.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		fgSizer34 = wx.FlexGridSizer( 0, 2, 0, 0 )
-		fgSizer34.AddGrowableCol( 1 )
-		fgSizer34.SetFlexibleDirection( wx.BOTH )
-		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		gbSizer5 = wx.GridBagSizer( 0, 0 )
+		gbSizer5.SetFlexibleDirection( wx.BOTH )
+		gbSizer5.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_name_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Name", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_name_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Search name", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_name_label.Wrap( -1 )
-		fgSizer34.Add( self.m_name_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		gbSizer5.Add( self.m_name_label, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
 		
 		self.m_name_text = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer34.Add( self.m_name_text, 1, wx.ALL|wx.EXPAND, 5 )
+		gbSizer5.Add( self.m_name_text, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_comment_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Optional comment", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_comment_label.Wrap( -1 )
+		gbSizer5.Add( self.m_comment_label, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
+		
+		self.m_comment_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer5.Add( self.m_comment_textbox, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_staticline7 = wx.StaticLine( self.m_save_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		gbSizer5.Add( self.m_staticline7, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND |wx.ALL, 5 )
+		
+		self.m_search_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Search pattern", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_search_label.Wrap( -1 )
+		gbSizer5.Add( self.m_search_label, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
+		
+		self.m_search_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		gbSizer5.Add( self.m_search_textbox, wx.GBPosition( 3, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_replace_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Replace pattern", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_replace_label.Wrap( -1 )
+		gbSizer5.Add( self.m_replace_label, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
+		
+		self.m_replace_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		gbSizer5.Add( self.m_replace_textbox, wx.GBPosition( 4, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_flags_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Flags", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_flags_label.Wrap( -1 )
+		gbSizer5.Add( self.m_flags_label, wx.GBPosition( 5, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
+		
+		self.m_flags_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		gbSizer5.Add( self.m_flags_textbox, wx.GBPosition( 5, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
 		
-		fgSizer24.Add( fgSizer34, 1, wx.EXPAND, 5 )
+		gbSizer5.AddGrowableCol( 1 )
+		gbSizer5.AddGrowableRow( 0 )
+		gbSizer5.AddGrowableRow( 1 )
+		
+		fgSizer24.Add( gbSizer5, 1, wx.EXPAND, 5 )
 		
 		fgSizer25 = wx.FlexGridSizer( 0, 4, 0, 0 )
 		fgSizer25.AddGrowableCol( 0 )
 		fgSizer25.AddGrowableCol( 3 )
+		fgSizer25.AddGrowableRow( 0 )
 		fgSizer25.SetFlexibleDirection( wx.BOTH )
 		fgSizer25.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
@@ -1650,7 +1715,6 @@ class SaveSearchDialog ( wx.Dialog ):
 		
 		self.SetSizer( bSizer9 )
 		self.Layout()
-		bSizer9.Fit( self )
 		
 		self.Centre( wx.BOTH )
 		

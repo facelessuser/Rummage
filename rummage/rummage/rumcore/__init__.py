@@ -58,8 +58,10 @@ VERSION1 = 0x800        # (?V1)
 FORMATREPLACE = 0x1000  # Use {1} for groups in replace
 POSIX = 0x2000          # (?p)
 
-# Rumcore related flags
+# Rumcore search related flags
 LITERAL = 0x10000           # Literal search
+
+# Rumcore related flags
 BUFFER_INPUT = 0x20000      # Input is a buffer
 RECURSIVE = 0x40000         # Recursive directory search
 FILE_REGEX_MATCH = 0x80000  # Regex pattern for files
@@ -68,13 +70,16 @@ SHOW_HIDDEN = 0x200000      # Show hidden files and folders
 COUNT_ONLY = 0x400000       # Only count the matches; no context
 BOOLEAN = 0x800000          # Just check if file has one match and move on
 PROCESS_BINARY = 0x1000000  # Process binary files
-TRUNCATE_LINES = 0x2000000  # Turncate context lines to 120 chars
+TRUNCATE_LINES = 0x2000000  # Truncate context lines to 120 chars
 BACKUP = 0x4000000          # Backup files on replace
 
 RE_MODE = 0
 BRE_MODE = 1
 REGEX_MODE = 2
 BREGEX_MODE = 3
+
+SEARCH_MASK = 0x1FFFF
+FILE_MASK = 0xFFE0000
 
 REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
 
@@ -378,36 +383,34 @@ class _FileSearch(object):
 
     hex_tx_table = ("\ufffd" * 32) + "".join(chr(c) for c in range(32, 127)) + ("\ufffd" * 129)
 
-    def __init__(self, args, file_obj, file_id, max_count, file_content, regex_mode=RE_MODE):
+    def __init__(
+        self, search_obj, file_obj, file_id, flags, context, encoding,
+        backup_ext, max_count, file_content, regex_mode=RE_MODE
+    ):
         """Init the file search object."""
 
         self.abort = False
+        self.search_obj = search_obj
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
-        self.flags = args.flags
-        self.boolean = bool(args.flags & BOOLEAN)
-        self.count_only = bool(args.flags & COUNT_ONLY)
-        self.regex_format_replace = self.regex_mode in REGEX_MODES and bool(args.flags & FORMATREPLACE)
-        self.truncate_lines = bool(args.flags & TRUNCATE_LINES)
-        self.process_binary = bool(args.flags & PROCESS_BINARY)
-        self.backup = bool(args.flags & BACKUP)
-        self.backup_ext = '.%s' % args.backup_ext
+        self.flags = flags
+        self.boolean = bool(self.flags & BOOLEAN)
+        self.count_only = bool(self.flags & COUNT_ONLY)
+        self.truncate_lines = bool(self.flags & TRUNCATE_LINES)
+        self.process_binary = bool(self.flags & PROCESS_BINARY)
+        self.backup = bool(self.flags & BACKUP)
+        self.backup_ext = '.%s' % backup_ext
         self.bom = None
-        if self.truncate_lines:
-            self.context = (0, 0)
-        else:
-            self.context = args.context
+        self.context = (0, 0) if self.truncate_lines else context
 
         # Prepare search
-        self.pattern = args.pattern
-        self.replace = args.replace
         self.expand = None
         self.literal = False
         self.idx = file_id
         self.file_obj = file_obj
         self.max_count = max_count
-        self.encoding = args.encoding if args.encoding is not None else None
+        self.encoding = encoding if encoding is not None else None
         self.file_content = file_content
         self.is_binary = False
         self.current_encoding = None
@@ -590,64 +593,66 @@ class _FileSearch(object):
             line_map.append(last_offset)
         return nl if ending is None else ending, line_map
 
-    def expand_match(self, m):
+    def expand_match(self, m, replace):
         """Expand the match."""
 
         if self.literal:
-            return self.replace
+            return replace
         if self.expand:
             return self.expand(m)
         elif self.regex_format_replace:
-            return m.expandf(self.replace)
+            return m.expandf(replace)
         else:
-            return m.expand(self.replace)
+            return m.expand(replace)
 
-    def _findall(self, file_content):
+    def _findall(self, file_content, search_pattern, replace_pattern, flags):
         """Find all occurences of search pattern in file."""
 
         replace = None
         pattern = None
 
+        self.regex_format_replace = self.regex_mode in REGEX_MODES and bool(flags & FORMATREPLACE)
+
         if self.is_binary:
             try:
-                pattern = util.to_ascii_bytes(self.pattern)
+                pattern = util.to_ascii_bytes(search_pattern)
             except UnicodeEncodeError:
                 raise RummageException('Unicode chars in binary search pattern')
-            if self.replace is not None:
+            if r is not None:
                 try:
-                    replace = util.to_ascii_bytes(self.replace)
+                    replace = util.to_ascii_bytes(replace_pattern)
                 except UnicodeEncodeError:
                     raise RummageException('Unicode chars in binary replace pattern')
         else:
-            pattern = self.pattern
-            replace = self.replace
+            pattern = search_pattern
+            replace = replace_pattern
 
         if pattern is not None:
-            if bool(self.flags & LITERAL):
+            if bool(flags & LITERAL):
                 self.literal = True
                 if self.regex_mode == BREGEX_MODE:
-                    pattern = _bregex_literal_pattern(pattern, self.flags)
+                    pattern = _bregex_literal_pattern(pattern, flags)
                 elif self.regex_mode == REGEX_MODE:
-                    pattern = _regex_literal_pattern(pattern, self.flags)
+                    pattern = _regex_literal_pattern(pattern, flags)
                 elif self.regex_mode == BRE_MODE:
-                    pattern = _bre_literal_pattern(pattern, self.flags)
+                    pattern = _bre_literal_pattern(pattern, flags)
                 else:
-                    pattern = _re_literal_pattern(pattern, self.flags)
+                    pattern = _re_literal_pattern(pattern, flags)
             else:
                 if self.regex_mode == BREGEX_MODE:
-                    pattern = _bregex_pattern(pattern, self.flags, self.is_binary)
-                    if replace is not None and not bool(self.flags & FORMATREPLACE):
-                        self.expand = bregex.compile_replace(pattern, self.replace)
+                    pattern = _bregex_pattern(pattern, flags, self.is_binary)
+                    if replace is not None and not bool(flags & FORMATREPLACE):
+                        self.expand = bregex.compile_replace(pattern, replace_pattern)
                 elif self.regex_mode == REGEX_MODE:
-                    pattern = _regex_pattern(pattern, self.flags, self.is_binary)
+                    pattern = _regex_pattern(pattern, flags, self.is_binary)
                 elif self.regex_mode == BRE_MODE:
-                    pattern = _bre_pattern(pattern, self.flags, self.is_binary)
+                    pattern = _bre_pattern(pattern, flags, self.is_binary)
                     if replace is not None:
-                        self.expand = bre.compile_replace(pattern, self.replace)
+                        self.expand = bre.compile_replace(pattern, replace_pattern)
                 else:
-                    pattern = _re_pattern(pattern, self.flags, self.is_binary)
+                    pattern = _re_pattern(pattern, flags, self.is_binary)
                     if replace is not None:
-                        template = sre_parse.parse_template(self.replace, pattern)
+                        template = sre_parse.parse_template(replace_pattern, pattern)
                         self.expand = lambda m, t=template: sre_parse.expand_template(t, m)
 
             for m in pattern.finditer(file_content):
@@ -670,7 +675,7 @@ class _FileSearch(object):
             shutil.copy2(file_name, backup)
 
         if encoding.bom:
-            # Write the bomb first, then write in utf format out in the specified order.
+            # Write the bom first, then write in utf format out in the specified order.
             with open(file_name, 'wb') as f:
                 f.write(encoding.bom)
             with codecs.open(file_name, 'a', encoding=encoding.encode) as f:
@@ -764,6 +769,7 @@ class _FileSearch(object):
                     file_info.name, file_info.size, self.current_encoding, self.file_content
                 )
                 self.file_content = None
+
                 with rum_content as rum_buff:
                     skip = False
                     if self.is_binary is False and rum_content.encoding.encode == "bin":
@@ -776,9 +782,10 @@ class _FileSearch(object):
                     if not skip:
                         offset = 0
 
-                        for m in self._findall(rum_buff):
+                        pattern, replace, flags = self.search_obj[0]
+                        for m in self._findall(rum_buff, pattern, replace, flags):
                             text.append(rum_buff[offset:m.start(0)])
-                            text.append(self.expand_match(m))
+                            text.append(self.expand_match(m, self.replace[0]))
                             offset = m.end(0)
 
                             yield FileRecord(
@@ -797,9 +804,47 @@ class _FileSearch(object):
                             if self.abort:
                                 break
 
-                    # Grab the rest of the file if we found things to replace.
-                    if not self.abort and text:
-                        text.append(rum_buff[offset:])
+                        # Grab the rest of the file if we found things to replace.
+                        if not self.abort and (text or len(self.pattern) > 1):
+                            text.append(rum_buff[offset:])
+
+                # Additional chained replaces
+                count = 1
+                if not self.abort and len(self.pattern) > 1:
+                    for pattern, replace, flags in self.search_obj[1:]:
+                        text2 = ''.join(text)
+                        text = deque()
+                        offset = 0
+
+                        for m in self._findall(text2, pattern, replace, flags):
+                            text.append(text2[offset:m.start(0)])
+                            text.append(self.expand_match(m, self.replace[x]))
+                            offset = m.end(0)
+
+                            yield FileRecord(
+                                file_info,
+                                MatchRecord(
+                                    0,                     # lineno
+                                    0,                     # colno
+                                    (m.start(), m.end()),  # Postion of match
+                                    None,                  # Line(s) in which match is found
+                                    None,                  # Line ending for file
+                                    (0, 0)                 # Number of lines shown before and after matched line(s)
+                                ),
+                                None
+                            )
+
+                            if self.abort:
+                                break
+
+                        count += 1
+
+                        # Grab the rest of the file if we found things to replace.
+                        if not self.abort and (text or count < len(self.pattern)):
+                            text.append(text2[offset:])
+
+                        if self.abort:
+                            break
 
                 if not self.abort and text:
                     if is_file:
@@ -854,55 +899,59 @@ class _FileSearch(object):
                         line_ending = None
                         line_map = []
 
-                        for m in self._findall(rum_buff):
-                            if line_ending is None and not self.boolean and not self.count_only and not self.is_binary:
-                                line_ending, line_map = self._get_line_ending(rum_buff)
+                        for pattern, replace, flags in self.search_obj:
+                            if hasattr(rum_buff, 'seek'):
+                                rum_buff.seek(0)
 
-                            if not self.boolean and not self.count_only:
-                                # Get line related context.
-                                if self.is_binary:
-                                    lines, match, context, row, col = self._get_binary_context(
-                                        rum_buff, m
-                                    )
+                            for m in self._findall(rum_buff, pattern, replace, flags):
+                                if line_ending is None and not self.boolean and not self.count_only and not self.is_binary:
+                                    line_ending, line_map = self._get_line_ending(rum_buff)
+
+                                if not self.boolean and not self.count_only:
+                                    # Get line related context.
+                                    if self.is_binary:
+                                        lines, match, context, row, col = self._get_binary_context(
+                                            rum_buff, m
+                                        )
+                                    else:
+                                        lines, match, context, row, col = self._get_line_context(
+                                            rum_buff, m, line_map
+                                        )
                                 else:
-                                    lines, match, context, row, col = self._get_line_context(
-                                        rum_buff, m, line_map
-                                    )
-                            else:
-                                row = 1
-                                col = 1
-                                match = (m.start(), m.end())
-                                lines = None
-                                line_ending = None
-                                context = (0, 0)
+                                    row = 1
+                                    col = 1
+                                    match = (m.start(), m.end())
+                                    lines = None
+                                    line_ending = None
+                                    context = (0, 0)
 
-                            file_record_sent = True
+                                file_record_sent = True
 
-                            yield FileRecord(
-                                file_info,
-                                MatchRecord(
-                                    row,                     # lineno
-                                    col,                     # colno
-                                    match,                   # Postion of match
-                                    lines,                   # Line(s) in which match is found
-                                    line_ending,             # Line ending for file
-                                    context                  # Number of lines shown before and after matched line(s)
-                                ),
-                                None
-                            )
+                                yield FileRecord(
+                                    file_info,
+                                    MatchRecord(
+                                        row,                     # lineno
+                                        col,                     # colno
+                                        match,                   # Postion of match
+                                        lines,                   # Line(s) in which match is found
+                                        line_ending,             # Line ending for file
+                                        context                  # Number of lines shown before and after matched line(s)
+                                    ),
+                                    None
+                                )
 
-                            if self.boolean:
-                                break
-
-                            # Have we exceeded the maximum desired matches?
-                            if self.max_count is not None:
-                                self.max_count -= 1
-
-                                if self.max_count == 0:
+                                if self.boolean:
                                     break
 
-                            if self.abort:
-                                break
+                                # Have we exceeded the maximum desired matches?
+                                if self.max_count is not None:
+                                    self.max_count -= 1
+
+                                    if self.max_count == 0:
+                                        break
+
+                                if self.abort:
+                                    break
 
                 if not file_record_sent:
                     yield FileRecord(file_info, None, None)
@@ -916,7 +965,7 @@ class _FileSearch(object):
         """Start the file search."""
 
         try:
-            if self.replace is not None:
+            if self.search_obj.is_replace():
                 for rec in self.search_and_replace():
                     yield rec
             else:
@@ -937,18 +986,45 @@ class _FileSearch(object):
             )
 
 
-class SearchParams(object):
-    """Search parameter object."""
+class Search(object):
+    """Search setup object."""
 
-    def __init__(self):
-        """Search parameters."""
+    def __init__(self, replace=False):
+        """Setup search object as as a search only or search and replace object."""
 
-        self.pattern = None
-        self.flags = 0
-        self.context = 0
-        self.replace = None
-        self.encoding = None
-        self.backup_ext = DEFAULT_BAK
+        self._entry = []
+        self._is_replace = replace
+
+    def add(self, search, replace=None, flags=0):
+        """Add search entry."""
+
+        self._entry.append(
+            (
+                search,
+                ("" if replace is None else replace),
+                flags & SEARCH_MASK
+            )
+        )
+
+    def __string__(self):
+        """To string."""
+
+        return str(self._entry)
+
+    def is_replace(self):
+        """Is this a replace object."""
+
+        return self._is_replace
+
+    def __getitem__(self, index):
+        """Get entry item."""
+
+        return self._entry[index]
+
+    def __len__(self):
+        """Get length."""
+
+        return len(self._entry)
 
 
 class _DirWalker(object):
@@ -1203,9 +1279,9 @@ class Rummage(object):
     """Perform the rummaging."""
 
     def __init__(
-        self, target, pattern, file_pattern=None, folder_exclude=None,
+        self, target, searches, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None, encoding=None, size=None,
-        modified=None, created=None, replace=None, backup_ext=DEFAULT_BAK, regex_mode=RE_MODE
+        modified=None, created=None, backup_ext=DEFAULT_BAK, regex_mode=RE_MODE
     ):
         """Initialize Rummage object."""
 
@@ -1215,26 +1291,23 @@ class Rummage(object):
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
-        self.search_params = SearchParams()
-        self.search_params.pattern = pattern
-        self.search_params.flags = flags
-        self.search_params.context = context
-        self.search_params.replace = replace
-        self.search_params.encoding = self._verify_encoding(encoding) if encoding is not None else None
-        self.skipped = 0
-        if backup_ext and isinstance(backup_ext, util.string_type):
-            self.search_params.backup_ext = backup_ext
-        else:
-            self.search_params.backup_ext = DEFAULT_BAK
 
-        self.buffer_input = bool(flags & BUFFER_INPUT)
+        self.search_params = searches
+
+        self.file_flags = flags & FILE_MASK
+        self.context = context
+        self.encoding = self._verify_encoding(encoding) if encoding is not None else None
+        self.skipped = 0
+        self.backup_ext = backup_ext if backup_ext and isinstance(backup_ext, util.string_type) else DEFAULT_BAK
+
+        self.buffer_input = bool(self.file_flags & BUFFER_INPUT)
         self.current_encoding = None
         self.idx = -1
         self.records = -1
         self.max = int(max_count) if max_count is not None else None
         self.target = os.path.abspath(target) if not self.buffer_input else target
-        file_regex_match = bool(flags & FILE_REGEX_MATCH)
-        dir_regex_match = bool(flags & DIR_REGEX_MATCH)
+        file_regex_match = bool(self.file_flags & FILE_REGEX_MATCH)
+        dir_regex_match = bool(self.file_flags & DIR_REGEX_MATCH)
         self.path_walker = None
         self.is_binary = False
         self.files = deque()
@@ -1251,12 +1324,12 @@ class Rummage(object):
                 file_regex_match,
                 folder_exclude,
                 dir_regex_match,
-                bool(flags & RECURSIVE),
-                bool(flags & SHOW_HIDDEN),
+                bool(self.file_flags & RECURSIVE),
+                bool(self.file_flags & SHOW_HIDDEN),
                 size,
                 modified,
                 created,
-                self.search_params.backup_ext if bool(flags & BACKUP) else None,
+                self.backup_ext if bool(self.file_flags & BACKUP) else None,
                 self.regex_mode
             )
         elif not self.buffer_input and os.path.isfile(self.target):
@@ -1291,6 +1364,7 @@ class Rummage(object):
                     None
                 )
             )
+
 
     def _verify_encoding(self, encoding):
         """Verify the encoding is okay."""
@@ -1364,6 +1438,10 @@ class Rummage(object):
                 self.search_params,
                 file_info,
                 self.idx,
+                self.file_flags,
+                self.context,
+                self.encoding,
+                self.backup_ext,
                 self.max,
                 content_buffer,
                 self.regex_mode
@@ -1428,7 +1506,7 @@ class Rummage(object):
         self.idx = -1
         self.skipped = 0
 
-        if self.search_params.pattern:
+        if len(self.search_params):
             if self.file_error is not None:
                 # Single target wasn't set up right; just return error.
                 yield self.file_error

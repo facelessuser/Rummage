@@ -270,21 +270,20 @@ class RummageThread(threading.Thread):
         self.runtime = ""
         self.no_results = 0
         self.running = False
-        self.file_search = not args.pattern
+        self.file_search = len(args['chain']) == 0
 
         self.rummage = rumcore.Rummage(
-            target=args.target,
-            pattern=args.pattern,
-            file_pattern=self.not_none(args.regexfilepattern, alt=self.not_none(args.filepattern)),
-            folder_exclude=self.not_none(args.directory_exclude),
-            flags=self.get_flags(args),
-            encoding=args.force_encode,
-            modified=args.modified_compare,
-            created=args.created_compare,
-            size=args.size_compare,
-            replace=args.replace,
-            backup_ext=args.backup_ext,
-            regex_mode=args.regex_mode
+            target=args['target'],
+            searches=args['chain'],
+            file_pattern=self.not_none(args['filepattern']),
+            folder_exclude=self.not_none(args['directory_exclude']),
+            flags=args['flags'],
+            encoding=args['force_encode'],
+            modified=args['modified_compare'],
+            created=args['created_compare'],
+            size=args['size_compare'],
+            backup_ext=args['backup_ext'],
+            regex_mode=args['regex_mode']
         )
 
         threading.Thread.__init__(self)
@@ -293,71 +292,6 @@ class RummageThread(threading.Thread):
         """Return item if not None, else return the alternate."""
 
         return item if item is not None else alt
-
-    def get_flags(self, args):
-        """Determine rumcore flags from RummageArgs."""
-
-        flags = rumcore.MULTILINE | rumcore.TRUNCATE_LINES
-
-        if args.regex_version == 1:
-            flags |= rumcore.VERSION1
-        else:
-            flags |= rumcore.VERSION0
-            if args.fullcase:
-                flags |= rumcore.FULLCASE
-
-        if args.regexfilepattern is not None:
-            flags |= rumcore.FILE_REGEX_MATCH
-
-        if not args.regexp:
-            flags |= rumcore.LITERAL
-        elif args.dotall:
-            flags |= rumcore.DOTALL
-
-        if args.unicode:
-            flags |= rumcore.UNICODE
-        elif args.regex_mode == rumcore.REGEX_MODE:
-            flags |= rumcore.ASCII
-
-        if args.ignore_case:
-            flags |= rumcore.IGNORECASE
-
-        if args.recursive:
-            flags |= rumcore.RECURSIVE
-
-        if args.regexdirpattern:
-            flags |= rumcore.DIR_REGEX_MATCH
-
-        if args.show_hidden:
-            flags |= rumcore.SHOW_HIDDEN
-
-        if args.process_binary:
-            flags |= rumcore.PROCESS_BINARY
-
-        if args.count_only:
-            flags |= rumcore.COUNT_ONLY
-
-        if args.boolean:
-            flags |= rumcore.BOOLEAN
-
-        if args.backup:
-            flags |= rumcore.BACKUP
-
-        if args.regex_mode == rumcore.REGEX_MODE:
-            if args.bestmatch:
-                flags |= rumcore.BESTMATCH
-            if args.enhancematch:
-                flags |= rumcore.ENHANCEMATCH
-            if args.word:
-                flags |= rumcore.WORD
-            if args.reverse:
-                flags |= rumcore.REVERSE
-            if args.posix:
-                flags |= rumcore.POSIX
-            if args.formatreplace:
-                flags |= rumcore.FORMATREPLACE
-
-        return flags
 
     def update_status(self):
         """Update status."""
@@ -538,12 +472,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             data.get_image('rummage_medium.png' if util.platform() == 'linux' else 'rummage_large.png').GetIcon()
         )
 
+        self.no_pattern = False
+        self.paylod = {}
         self.error_dlg = None
         self.debounce_search = False
         self.searchin_update = False
         self.checking = False
         self.kill = False
-        self.args = RummageArgs()
         self.thread = None
         self.allow_update = False
         if start_path is None:
@@ -597,6 +532,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.init_search_path(start_path)
 
         self.refresh_regex_options()
+        self.refresh_chain_mode()
 
         # So this is to fix some platform specific issues.
         # We will wait until we are sure we are loaded, then
@@ -741,6 +677,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         dlg = SearchChainDialog(self)
         dlg.ShowModal()
         dlg.Destroy()
+        self.setup_chains()
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""
@@ -765,6 +702,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
+        self.m_dirregex_checkbox.SetValue(Settings.get_search_setting("regex_dir_toggle", False))
 
         self.m_logic_choice.SetStringSelection(
             eng_to_i18n(
@@ -796,6 +734,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
+        self.m_chains_checkbox.SetValue(Settings.get_search_setting("chain_toggle", False))
 
         self.m_modified_choice.SetStringSelection(
             eng_to_i18n(
@@ -833,6 +772,32 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
         )
 
+        self.setup_chains(Settings.get_search_setting("chain", ""))
+
+    def setup_chains(self, setup=None):
+        """Setup chains."""
+
+        is_selected = False
+        selected_index = -1
+        selected = self.m_chains_combo.GetStringSelection()
+        chains = sorted(list(Settings.get_chains().keys()))
+        self.m_chains_combo.Clear()
+        for x in range(len(chains)):
+            string = chains[x]
+            if string == selected:
+                is_selected = True
+                selected_index = x
+            self.m_chains_combo.Insert(string, x)
+
+        if setup and setup in chains:
+            index = chains.index(setup)
+            self.m_chains_combo.SetSelection(index)
+        elif is_selected or self.m_chains_combo.GetCount():
+            if is_selected:
+                self.m_chains_combo.SetSelection(selected_index)
+            else:
+                self.m_chains_combo.SetSelection(0)
+
     def on_preferences(self, event):
         """Show settings dialog, and update history of AutoCompleteCombo if the history was cleared."""
 
@@ -862,6 +827,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_settings_panel.GetSizer().Layout()
         self.optimize_size(height_only=True)
 
+    def on_chain_toggle(self, event):
+        """Handle chain toggle event."""
+
+        self.refresh_chain_mode()
+        self.m_settings_panel.GetSizer().Layout()
+        self.optimize_size(height_only=True)
+
     def refresh_regex_options(self):
         """Refresh the regex module options."""
 
@@ -885,6 +857,47 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_posix_checkbox.Hide()
             self.m_format_replace_checkbox.Hide()
             self.m_fullcase_checkbox.Hide()
+
+    def refresh_chain_mode(self):
+        """Refresh chain mode."""
+
+        if self.m_chains_checkbox.GetValue():
+            self.m_regex_search_checkbox.Enable(False)
+            self.m_case_checkbox.Enable(False)
+            self.m_dotmatch_checkbox.Enable(False)
+            self.m_unicode_checkbox.Enable(False)
+            self.m_bestmatch_checkbox.Enable(False)
+            self.m_enhancematch_checkbox.Enable(False)
+            self.m_word_checkbox.Enable(False)
+            self.m_reverse_checkbox.Enable(False)
+            self.m_posix_checkbox.Enable(False)
+            self.m_format_replace_checkbox.Enable(False)
+            self.m_fullcase_checkbox.Enable(False)
+
+            self.m_searchfor_label.Enable(False)
+            self.m_searchfor_textbox.Enable(False)
+            self.m_replace_label.Enable(False)
+            self.m_replace_textbox.Enable(False)
+            return True
+        else:
+            self.m_regex_search_checkbox.Enable(True)
+            self.m_case_checkbox.Enable(True)
+            self.m_dotmatch_checkbox.Enable(True)
+            self.m_unicode_checkbox.Enable(True)
+            self.m_bestmatch_checkbox.Enable(True)
+            self.m_enhancematch_checkbox.Enable(True)
+            self.m_word_checkbox.Enable(True)
+            self.m_reverse_checkbox.Enable(True)
+            self.m_posix_checkbox.Enable(True)
+            self.m_format_replace_checkbox.Enable(True)
+            self.m_fullcase_checkbox.Enable(True)
+
+            self.m_searchfor_label.Enable(True)
+            self.m_searchfor_textbox.Enable(True)
+            self.m_replace_label.Enable(True)
+            self.m_replace_textbox.Enable(True)
+            return False
+
 
     def on_dir_changed(self, event):
         """Event for when the directory changes in the DirPickButton."""
@@ -986,6 +999,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if self.debounce_search:
             return
         self.debounce_search = True
+
         if replace:
             if self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
                 if self.thread is not None and not self.kill:
@@ -995,7 +1009,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 else:
                     self.debounce_search = False
             else:
-                if not self.validate_search_inputs(True):
+                is_chain = self.m_chains_checkbox.GetValue()
+                chain = self.m_chains_checkbox.GetStringSelection()
+                if is_chain and (not chain.strip() or chain not in Settings.get_chains()):
+                    errormsg(_("Please enter a valid chain!"))
+                elif is_chain:
+                    self.do_search(replace=True, chain=chain)
+                elif not self.validate_search_inputs(True):
                     self.do_search(replace=True)
                 self.debounce_search = False
         else:
@@ -1007,7 +1027,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 else:
                     self.debounce_search = False
             else:
-                if not self.validate_search_inputs():
+                is_chain = self.m_chains_checkbox.GetValue()
+                chain = self.m_chains_combo.GetStringSelection()
+                if is_chain and (not chain or chain not in Settings.get_chains()):
+                    errormsg(_("Please enter a valid chain!"))
+                elif is_chain:
+                    self.do_search(chain=chain)
+                elif not self.validate_search_inputs():
                     self.do_search()
                 self.debounce_search = False
 
@@ -1071,7 +1097,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             errormsg(msg)
         return fail
 
-    def do_search(self, replace=False):
+    def do_search(self, replace=False, chain=None):
         """Start the search."""
 
         self.thread = None
@@ -1099,11 +1125,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.set_status(_("Searching: 0/0 0% Skipped: 0 Matches: 0"))
 
         # Setup arguments
-        self.set_arguments(replace)
-        self.save_history(replace)
+        self.set_arguments(chain, replace)
 
         # Setup search thread
-        self.thread = RummageThread(self.args)
+        self.thread = RummageThread(self.payload)
         self.thread.setDaemon(True)
 
         # Reset result tables
@@ -1115,62 +1140,185 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread.start()
         self.allow_update = True
 
-    def set_arguments(self, replace):
+    def chain_flags(self, args, string, regexp):
+        """Chain flags."""
+
+        flags = rumcore.MULTILINE
+
+        if args.regex_version == 1:
+            flags |= rumcore.VERSION1
+        else:
+            flags |= rumcore.VERSION0
+            if args.fullcase:
+                flags |= rumcore.FULLCASE
+
+        if not regexp:
+            flags |= rumcore.LITERAL
+        elif "s" in string:
+            flags |= rumcore.DOTALL
+
+        if "u" in string:
+            flags |= rumcore.UNICODE
+        elif args.regex_mode == rumcore.REGEX_MODE:
+            flags |= rumcore.ASCII
+
+        if "i" in string:
+            flags |= rumcore.IGNORECASE
+
+        if args.regex_mode == rumcore.REGEX_MODE:
+            if "b" in string:
+                flags |= rumcore.BESTMATCH
+            if "e" in string:
+                flags |= rumcore.ENHANCEMATCH
+            if "w" in string:
+                flags |= rumcore.WORD
+            if "r" in string:
+                flags |= rumcore.REVERSE
+            if "p" in string:
+                flags |= rumcore.POSIX
+            if "F" in string:
+                flags |= rumcore.FORMATREPLACE
+
+        return flags
+
+    def get_flags(self, args):
+        """Determine rumcore flags from RummageArgs."""
+
+        flags = rumcore.MULTILINE | rumcore.TRUNCATE_LINES
+
+        if args.regex_version == 1:
+            flags |= rumcore.VERSION1
+        else:
+            flags |= rumcore.VERSION0
+            if args.fullcase:
+                flags |= rumcore.FULLCASE
+
+        if args.regexfilepattern:
+            flags |= rumcore.FILE_REGEX_MATCH
+
+        if not args.regexp:
+            flags |= rumcore.LITERAL
+        elif args.dotall:
+            flags |= rumcore.DOTALL
+
+        if args.unicode:
+            flags |= rumcore.UNICODE
+        elif args.regex_mode == rumcore.REGEX_MODE:
+            flags |= rumcore.ASCII
+
+        if args.ignore_case:
+            flags |= rumcore.IGNORECASE
+
+        if args.recursive:
+            flags |= rumcore.RECURSIVE
+
+        if args.regexdirpattern:
+            flags |= rumcore.DIR_REGEX_MATCH
+
+        if args.show_hidden:
+            flags |= rumcore.SHOW_HIDDEN
+
+        if args.process_binary:
+            flags |= rumcore.PROCESS_BINARY
+
+        if args.count_only:
+            flags |= rumcore.COUNT_ONLY
+
+        if args.boolean:
+            flags |= rumcore.BOOLEAN
+
+        if args.backup:
+            flags |= rumcore.BACKUP
+
+        if args.regex_mode == rumcore.REGEX_MODE:
+            if args.bestmatch:
+                flags |= rumcore.BESTMATCH
+            if args.enhancematch:
+                flags |= rumcore.ENHANCEMATCH
+            if args.word:
+                flags |= rumcore.WORD
+            if args.reverse:
+                flags |= rumcore.REVERSE
+            if args.posix:
+                flags |= rumcore.POSIX
+            if args.formatreplace:
+                flags |= rumcore.FORMATREPLACE
+
+        return flags
+
+    def set_chain_arguments(self, args, chain, replace):
         """Set the search arguments."""
 
-        self.args.reset()
+        search_chain = rumcore.Search(replace)
+        searches = Settings.get_search()
+        for search_name in Settings.get_chains()[chain]:
+            search_obj = searches[search_name]
+            search_chain.add(search_obj[1], search_obj[2], self.chain_flags(args, search_obj[3], search_obj[4]))
+
+        debug(search_chain)
+
+        return search_chain
+
+    def set_arguments(self, chain, replace):
+        """Set the search arguments."""
+
+        # Create a arguments structure from the GUI objects
+        args = RummageArgs()
+
         # Path
-        self.args.target = self.m_searchin_text.GetValue()
+        args.target = self.m_searchin_text.GetValue()
 
         # Search Options
-        self.args.regex_mode = Settings.get_regex_mode()
-        self.args.regexp = self.m_regex_search_checkbox.GetValue()
-        self.args.ignore_case = not self.m_case_checkbox.GetValue()
-        self.args.dotall = self.m_dotmatch_checkbox.GetValue()
-        self.args.unicode = self.m_unicode_checkbox.GetValue()
-        self.args.count_only = self.m_count_only_checkbox.GetValue()
-        self.args.regex_version = Settings.get_regex_version()
-        if self.args.regex_mode in rumcore.REGEX_MODES:
-            self.args.bestmatch = self.m_bestmatch_checkbox.GetValue()
-            self.args.enhancematch = self.m_enhancematch_checkbox.GetValue()
-            self.args.word = self.m_word_checkbox.GetValue()
-            self.args.reverse = self.m_reverse_checkbox.GetValue()
-            self.args.posix = self.m_posix_checkbox.GetValue()
-            self.args.formatreplace = self.m_format_replace_checkbox.GetValue()
-            if self.args.regex_version == 0:
-                self.args.fullcase = self.m_fullcase_checkbox.GetValue()
-        self.args.boolean = self.m_boolean_checkbox.GetValue()
-        self.args.backup = self.m_backup_checkbox.GetValue()
-        self.args.force_encode = None
+        args.regex_mode = Settings.get_regex_mode()
+        args.regexp = self.m_regex_search_checkbox.GetValue()
+        args.ignore_case = not self.m_case_checkbox.GetValue()
+        args.dotall = self.m_dotmatch_checkbox.GetValue()
+        args.unicode = self.m_unicode_checkbox.GetValue()
+        args.count_only = self.m_count_only_checkbox.GetValue()
+        args.regex_version = Settings.get_regex_version()
+        if args.regex_mode in rumcore.REGEX_MODES:
+            args.bestmatch = self.m_bestmatch_checkbox.GetValue()
+            args.enhancematch = self.m_enhancematch_checkbox.GetValue()
+            args.word = self.m_word_checkbox.GetValue()
+            args.reverse = self.m_reverse_checkbox.GetValue()
+            args.posix = self.m_posix_checkbox.GetValue()
+            args.formatreplace = self.m_format_replace_checkbox.GetValue()
+            if args.regex_version == 0:
+                args.fullcase = self.m_fullcase_checkbox.GetValue()
+        args.boolean = self.m_boolean_checkbox.GetValue()
+        args.backup = self.m_backup_checkbox.GetValue()
+        args.force_encode = None
         if self.m_force_encode_checkbox.GetValue():
-            self.args.force_encode = self.m_force_encode_choice.GetStringSelection()
-        self.args.backup_ext = 'rum-bak'
-        self.args.recursive = self.m_subfolder_checkbox.GetValue()
-        self.args.pattern = self.m_searchfor_textbox.Value
-        self.args.replace = self.m_replace_textbox.Value if replace else None
+            args.force_encode = self.m_force_encode_choice.GetStringSelection()
+        args.backup_ext = 'rum-bak'
+        args.recursive = self.m_subfolder_checkbox.GetValue()
+        args.pattern = self.m_searchfor_textbox.Value
+        args.replace = self.m_replace_textbox.Value if replace else None
 
         # Limit Options
-        if os.path.isdir(self.args.target):
-            self.args.process_binary = self.m_binary_checkbox.GetValue()
-            self.args.show_hidden = self.m_hidden_checkbox.GetValue()
+        if os.path.isdir(args.target):
+            args.process_binary = self.m_binary_checkbox.GetValue()
+            args.show_hidden = self.m_hidden_checkbox.GetValue()
+
+            args.filepattern = self.m_filematch_textbox.Value
             if self.m_fileregex_checkbox.GetValue():
-                self.args.regexfilepattern = self.m_filematch_textbox.Value
-            elif self.m_filematch_textbox.Value:
-                self.args.filepattern = self.m_filematch_textbox.Value
+                args.regexfilepattern = True
+
             if self.m_exclude_textbox.Value != "":
-                self.args.directory_exclude = self.m_exclude_textbox.Value
+                args.directory_exclude = self.m_exclude_textbox.Value
             if self.m_dirregex_checkbox.GetValue():
-                self.args.regexdirpattern = True
+                args.regexdirpattern = True
+
             cmp_size = self.m_logic_choice.GetSelection()
             if cmp_size:
                 size = decimal.Decimal(self.m_size_text.GetValue())
-                self.args.size_compare = (LIMIT_COMPARE[cmp_size], int(round(size * decimal.Decimal(1024))))
+                args.size_compare = (LIMIT_COMPARE[cmp_size], int(round(size * decimal.Decimal(1024))))
             else:
-                self.args.size_compare = None
+                args.size_compare = None
             cmp_modified = self.m_modified_choice.GetSelection()
             cmp_created = self.m_created_choice.GetSelection()
             if cmp_modified:
-                self.args.modified_compare = (
+                args.modified_compare = (
                     LIMIT_COMPARE[cmp_modified],
                     local_time_to_epoch_timestamp(
                         self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
@@ -1178,7 +1326,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     )
                 )
             if cmp_created:
-                self.args.created_compare = (
+                args.created_compare = (
                     LIMIT_COMPARE[cmp_created],
                     local_time_to_epoch_timestamp(
                         self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
@@ -1186,11 +1334,44 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     )
                 )
         else:
-            self.args.process_binary = True
+            args.process_binary = True
 
-        debug(self.args.target)
+        # Track whether we have an actual search pattern,
+        # if we are doing a boolean search,
+        # or if we are only counting matches
+        self.no_pattern = False if chain else not args.pattern
+        self.is_boolean = args.boolean
+        self.is_count_only = args.count_only
 
-    def save_history(self, replace):
+        # Setup payload to pass to Rummage thread
+        flags = self.get_flags(args)
+
+        # Setup chain argument
+        if chain:
+            search_chain = self.set_chain_arguments(args, chain, replace)
+        else:
+            search_chain = rumcore.Search(args.replace is not None)
+            if not self.no_pattern:
+                search_chain.add(args.pattern, args.replace, flags & rumcore.SEARCH_MASK)
+
+        self.payload = {
+            'target': args.target,
+            'chain': search_chain,
+            'flags': flags & rumcore.FILE_MASK,
+            'filepattern': args.filepattern,
+            'directory_exclude': args.directory_exclude,
+            'force_encode': args.force_encode,
+            'modified_compare': args.modified_compare,
+            'created_compare': args.created_compare,
+            'size_compare': args.size_compare,
+            'backup_ext': args.backup_ext,
+            'regex_mode': args.regex_mode
+        }
+
+        # Save GUI history
+        self.save_history(args, replace)
+
+    def save_history(self, args, replace):
         """
         Save the current configuration of the search for the next time the app is opened.
 
@@ -1198,53 +1379,58 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """
 
         history = [
-            ("target", self.args.target),
-            ("regex_search", self.args.pattern) if self.args.regexp else ("literal_search", self.args.pattern),
-            ("regex_replace", self.args.replace) if self.args.regexp else ("literal_replace", self.args.replace)
+            ("target", args.target),
+            ("regex_search", args.pattern) if args.regexp else ("literal_search", args.pattern),
+            ("regex_replace", args.replace) if args.regexp else ("literal_replace", args.replace)
         ]
 
         if replace:
             history.append(
-                ("regex_replace", self.args.replace) if self.args.regexp else ("literal_replace", self.args.replace)
+                ("regex_replace", args.replace) if args.regexp else ("literal_replace", args.replace)
             )
 
-        if os.path.isdir(self.args.target):
+        if os.path.isdir(args.target):
             history += [
                 (
-                    "regex_folder_exclude", self.args.directory_exclude
-                ) if self.m_dirregex_checkbox.GetValue() else ("folder_exclude", self.args.directory_exclude),
-                ("regex_file_search", self.args.regexfilepattern),
-                ("file_search", self.args.filepattern)
+                    "regex_folder_exclude", args.directory_exclude
+                ) if self.m_dirregex_checkbox.GetValue() else ("folder_exclude", args.directory_exclude),
+                (
+                    "regex_file_search", args.filepattern
+                ) if self.m_fileregex_checkbox.GetValue() else ("file_search", args.filepattern)
             ]
 
         toggles = [
-            ("regex_toggle", self.args.regexp),
-            ("ignore_case_toggle", self.args.ignore_case),
-            ("dotall_toggle", self.args.dotall),
-            ("unicode_toggle", self.args.unicode),
-            ("backup_toggle", self.args.backup),
-            ("force_encode_toggle", self.args.force_encode is not None),
-            ("recursive_toggle", self.args.recursive),
-            ("hidden_toggle", self.args.show_hidden),
-            ("binary_toggle", self.args.process_binary),
+            ("regex_toggle", args.regexp),
+            ("ignore_case_toggle", args.ignore_case),
+            ("dotall_toggle", args.dotall),
+            ("unicode_toggle", args.unicode),
+            ("backup_toggle", args.backup),
+            ("force_encode_toggle", args.force_encode is not None),
+            ("recursive_toggle", args.recursive),
+            ("hidden_toggle", args.show_hidden),
+            ("binary_toggle", args.process_binary),
             ("regex_file_toggle", self.m_fileregex_checkbox.GetValue()),
-            ("boolean_toggle", self.args.boolean),
-            ("count_only_toggle", self.args.count_only),
-            ("bestmatch_toggle", self.args.bestmatch),
-            ("enhancematch_toggle", self.args.enhancematch),
-            ("word_toggle", self.args.word),
-            ("reverse_toggle", self.args.reverse),
-            ("posix_toggle", self.args.posix),
-            ("format_replace_toggle", self.args.formatreplace)
+            ("regex_dir_toggle", self.m_dirregex_checkbox.GetValue()),
+            ("boolean_toggle", args.boolean),
+            ("count_only_toggle", args.count_only),
+            ("bestmatch_toggle", args.bestmatch),
+            ("enhancematch_toggle", args.enhancematch),
+            ("word_toggle", args.word),
+            ("reverse_toggle", args.reverse),
+            ("posix_toggle", args.posix),
+            ("format_replace_toggle", args.formatreplace),
+            ("chain_toggle", self.m_chains_checkbox.GetValue())
         ]
 
         if Settings.get_regex_version() == 0:
-            toggles.append(("fullcase_toggle", self.args.fullcase))
+            toggles.append(("fullcase_toggle", args.fullcase))
 
         eng_size = i18n_to_eng(self.m_logic_choice.GetStringSelection(), SIZE_LIMIT_I18N)
         eng_mod = i18n_to_eng(self.m_modified_choice.GetStringSelection(), TIME_LIMIT_I18N)
         eng_cre = i18n_to_eng(self.m_created_choice.GetStringSelection(), TIME_LIMIT_I18N)
+        chain_name = self.m_chains_combo.GetStringSelection()
         strings = [
+            ('chain', chain_name if chain_name else ''),
             ("size_compare_string", eng_size),
             ("modified_compare_string", eng_mod),
             ("created_compare_string", eng_cre)
@@ -1412,8 +1598,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         p_value = self.m_progressbar.GetValue()
         actually_done = done - 1 if done > 0 else 0
         for f in results:
-            self.m_result_file_list.set_match(f, not self.args.pattern)
-            if self.args.count_only or self.args.boolean or self.args.replace is not None or not self.args.pattern:
+            self.m_result_file_list.set_match(f, self.no_pattern)
+            if (self.is_count_only or self.is_boolean or self.payload['chain'].is_replace() or self.no_pattern):
                 count += 1
                 continue
 
@@ -1603,8 +1789,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         try:
             export_html.export(
                 html_file,
-                self.args.pattern,
-                self.args.regexp,
+                self.payload['chain'],
                 self.m_result_file_list.itemDataMap,
                 self.m_result_list.itemDataMap
             )
@@ -1627,8 +1812,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         try:
             export_csv.export(
                 csv_file,
-                self.args.pattern,
-                self.args.regexp,
+                self.payload['chain'],
                 self.m_result_file_list.itemDataMap,
                 self.m_result_list.itemDataMap
             )

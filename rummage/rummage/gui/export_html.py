@@ -12,6 +12,7 @@ from ..localization import _
 from ..localization import get_current_domain
 from .. import data
 from .. import util
+from .. import rumcore
 
 
 def html_encode(text):
@@ -134,7 +135,6 @@ SEARCH_LABEL_LITERAL = html_encode(_("Literal search:"))
 
 TABS_END = '''
 <div id="search_div"><label id="search_label">%(label)s %(search)s</label></div>
-</div>
 '''
 
 LOAD_TAB = '''
@@ -265,7 +265,7 @@ def open_in_browser(name):
             # Well we gave it our best...
 
 
-def export(export_html, search, regex_search, result_list, result_content_list):
+def export(export_html, chain, result_list, result_content_list):
     """Export the results as HTML."""
 
     with codecs.open(export_html, "w", encoding="utf-8") as html:
@@ -288,12 +288,14 @@ def export(export_html, search, regex_search, result_list, result_content_list):
         )
         export_result_list(result_list, html)
         export_result_content_list(result_content_list, html)
-        html.write(
-            TABS_END % {
-                "search": html_encode(search),
-                "label": SEARCH_LABEL_REGEX if regex_search else SEARCH_LABEL_LITERAL
-            }
-        )
+        for pattern, replace, flags in chain:
+            html.write(
+                TABS_END % {
+                    "search": html_encode(pattern),
+                    "label": SEARCH_LABEL_LITERAL if flags & rumcore.LITERAL else SEARCH_LABEL_REGEX
+                }
+            )
+        html.write('</div>')
         html.write(TAB_INIT)
         html.write(BODY_END)
 

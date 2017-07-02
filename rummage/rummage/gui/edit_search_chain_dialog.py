@@ -43,6 +43,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
 
         super(EditSearchChainDialog, self).__init__(parent)
 
+        self.saved = False
         self.search_count = 0
         self.load_searches()
 
@@ -175,6 +176,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
             if self.original_name and string != self.original_name:
                 Settings.delete_chain(self.original_name)
             Settings.add_chain(string, searches)
+            self.saved = True
             self.Close()
 
     def on_cancel_click(self, event):

@@ -5,6 +5,7 @@ import codecs
 import subprocess
 from ..localization import _
 from .. import util
+from .. import rumcore
 
 if util.platform() == "windows":
     from os import startfile
@@ -90,12 +91,17 @@ def export_result_content_list(res, csv):
     csv.write("\n")
 
 
-def export(export_csv, search, regex_search, result_list, result_content_list):
+def export(export_csv, chain, result_list, result_content_list):
     """Export results to CSV."""
 
     with codecs.open(export_csv, "w", encoding="utf-8-sig") as csv:
-        search_expression = "%s,%s\n\n" % ((REGEX_SEARCH if regex_search else LITERAL_SEARCH), csv_encode(search))
-        csv.write(search_expression)
+        for pattern, replace, flags in chain:
+            csv.write(
+                "%s,%s\n" % (
+                    (LITERAL_SEARCH if flags & rumcore.LITERAL else REGEX_SEARCH), csv_encode(pattern)
+                )
+            )
+        csv.write('\n')
         export_result_list(result_list, csv)
         export_result_content_list(result_content_list, csv)
 

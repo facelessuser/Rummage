@@ -420,7 +420,7 @@ class Settings(object):
 
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", {})
-        if name in searches:
+        if key in searches:
             del searches[key]
         cls.settings["saved_searches"] = searches
         cls.save_settings()

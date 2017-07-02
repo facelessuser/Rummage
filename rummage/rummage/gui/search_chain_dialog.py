@@ -78,8 +78,9 @@ class SearchChainDialog(gui.SearchChainDialog):
 
         dlg = EditSearchChainDialog(self, chain=name)
         dlg.ShowModal()
-        self.m_chain_list.reset_list()
-        self.load_chains()
+        if dlg.saved:
+            self.m_chain_list.reset_list()
+            self.load_chains()
         dlg.Destroy()
 
     def on_edit_click(self, event):
