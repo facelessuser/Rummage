@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.5
+
+> Jul 2, 2017
+
+- **FIX**: Issue where mousing over results showed nothing in status bar.
+- **FIX**: Issue where double clicking result in Content pattern would not open in editor.
+
 ## 2.0.4
 
 > Jun 30, 2017
