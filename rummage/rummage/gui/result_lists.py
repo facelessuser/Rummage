@@ -101,7 +101,7 @@ class ResultFileList(DynamicList):
             if actual_item != self.last_moused[0]:
                 d = self.itemDataMap[actual_item]
                 self.last_moused = (actual_item, join(d[3], d[0]))
-            self.GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
+            self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
     def get_item_text(self, item, col, absolute=False):
@@ -197,7 +197,7 @@ class ResultContentList(DynamicList):
             if actual_item != self.last_moused[0]:
                 pth = self.itemDataMap[actual_item][0]
                 self.last_moused = (actual_item, join(pth[1], pth[0]))
-            self.GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
+            self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
     def get_item_text(self, item, col, absolute=False):
@@ -256,7 +256,7 @@ class ResultContentList(DynamicList):
             line = self.GetItem(item, col=1).GetText()
             file_row = self.get_map_item(item, col=4)
             col = str(self.get_map_item(item, col=5))
-            path = self.GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
+            path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
                 file_row, col=3, absolute=True
             )
             open_editor(join(normpath(path), filename), line, col)
