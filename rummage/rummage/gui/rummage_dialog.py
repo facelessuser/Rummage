@@ -657,7 +657,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """
         Stupid workarounds on load.
 
-        Re-enable window (stupid macOS workaround) and select the appropriate entry.
+        Focus after loaded (stupid macOS workaround) and select the appropriate entry.
         Resize window after we are sure everything is loaded (stupid Linux workaround) to fix tab order stuff.
         """
 
