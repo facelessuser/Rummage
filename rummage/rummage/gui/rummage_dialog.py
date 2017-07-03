@@ -661,8 +661,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         Resize window after we are sure everything is loaded (stupid Linux workaround) to fix tab order stuff.
         """
 
-        self.Enable(True)
-        self.m_searchfor_textbox.GetTextCtrl().SetFocus()
+        if self.m_chains_checkbox.GetValue():
+            self.m_searchin_text.GetTextCtrl().SetFocus()
+        else:
+            self.m_searchfor_textbox.GetTextCtrl().SetFocus()
         self.Refresh()
 
         self.Fit()
