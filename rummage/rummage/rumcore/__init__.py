@@ -313,7 +313,7 @@ class RummageFileContent(object):
     def __enter__(self):
         """Return content of either a memory map file or string."""
 
-        return self._decode_string() if self.string_buffer else self._read_file()
+        return self.string_buffer if self.string_buffer else self._read_file()
 
     def __exit__(self, *args):
         """Close file obj and memory map object if open."""
@@ -334,17 +334,6 @@ class RummageFileContent(object):
         elif enc.startswith('utf-32'):
             enc = 'utf-32'
         return enc
-
-    def _decode_string(self):
-        """Decode the string buffer."""
-
-        if self.encoding.encode != "bin":
-            try:
-                enc = self._get_encoding()
-                self.string_buffer = self.string_buffer.decode(enc)
-            except Exception:
-                self.encoding = text_decode.Encoding("bin", None)
-        return self.string_buffer
 
     def _read_bin(self):
         """Setup binary file reading with mmap."""
@@ -414,6 +403,7 @@ class _FileSearch(object):
         self.file_content = file_content
         self.is_binary = False
         self.current_encoding = None
+        self.is_unicode_buffer = self.file_content is not None and isinstance(self.file_content, util.ustr)
 
     def _get_binary_context(self, content, m):
         """Get context info for binary file."""
@@ -661,9 +651,6 @@ class _FileSearch(object):
     def _update_buffer(self, content):
         """Update the buffer content."""
 
-        encoding = self.current_encoding
-        if encoding.bom:
-            content.insert(0, encoding.bom.decode(encoding.encode))
         return BufferRecord((b'' if self.is_binary else '').join(content), None)
 
     def _update_file(self, file_name, content):
@@ -706,15 +693,15 @@ class _FileSearch(object):
         try:
             self.current_encoding = text_decode.Encoding('bin', None)
             self.is_binary = False
-            if self.encoding is not None:
+            if string_buffer:
+                self.current_encoding = text_decode.Encoding('unicode' if self.is_unicode_buffer else 'bin', None)
+                self.is_binary = not self.is_unicode_buffer
+            elif self.encoding is not None:
                 if self.encoding == 'bin':
                     self.current_encoding = text_decode.Encoding(self.encoding, None)
                     self.is_binary = True
                 elif self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
-                    if not string_buffer:
-                        bom = text_decode.inspect_bom(file_obj.name)
-                    else:
-                        bom = text_decode.has_bom(self.file_content[:4])
+                    bom = text_decode.inspect_bom(file_obj.name)
                     if bom and bom.encode.startswith(self.encoding):
                         self.current_encoding = bom
                     else:
@@ -723,10 +710,7 @@ class _FileSearch(object):
                     self.current_encoding = text_decode.Encoding(self.encoding, None)
             else:
                 # Guess encoding and decode file
-                if not string_buffer:
-                    encoding = text_decode.guess(file_obj.name, verify=False)
-                else:
-                    encoding = text_decode.sguess(self.file_content)
+                encoding = text_decode.guess(file_obj.name, verify=False)
                 if encoding is not None:
                     if encoding.encode == "bin":
                         self.is_binary = True
@@ -754,14 +738,11 @@ class _FileSearch(object):
         """Search and replace."""
 
         text = deque()
-        is_file = True if self.file_content else False
+        is_buffer = True if self.file_content else False
 
         file_info, error = self._get_file_info(self.file_obj)
         if error is not None:
-            if is_file:
-                yield BufferRecord(None, error)
-            else:
-                yield FileRecord(file_info, None, error)
+            yield FileRecord(file_info, None, error)
         elif not self.is_binary or self.process_binary:
 
             try:
@@ -847,29 +828,25 @@ class _FileSearch(object):
                             break
 
                 if not self.abort and text:
-                    if is_file:
+                    if is_buffer:
                         yield self._update_buffer(text)
                     else:
                         self._update_file(
                             file_info.name, text
                         )
                 else:
-                    if is_file:
-                        yield BufferRecord(None, None)
-                    else:
-                        yield FileRecord(file_info, None, None)
+                    yield FileRecord(
+                        file_info,
+                        None,
+                        None
+                    )
 
             except Exception:
-                if is_file:
-                    yield BufferRecord(
-                        None,
-                        get_exception()
-                    )
-                else:
-                    yield FileRecord(
-                        file_info, None,
-                        get_exception()
-                    )
+                yield FileRecord(
+                    file_info,
+                    None,
+                    get_exception()
+                )
 
     def search(self):
         """Search target file or buffer returning a generator of results."""

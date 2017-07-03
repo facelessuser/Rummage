@@ -232,25 +232,15 @@ class TestRummageFileContent(unittest.TestCase):
         self.assertEqual(rfc.encoding.encode, 'bin')
         self.assertEqual(text, b'test')
 
-    def test_string_utf8(self):
-        """Test passing a binary string with utf-8 encoding."""
+    def test_string_unicode(self):
+        """Test passing a binary string."""
 
-        encoding = td.Encoding('utf-8', None)
-        rfc = rc.RummageFileContent("buffer", None, encoding, b'test')
+        encoding = td.Encoding('unicode', None)
+        rfc = rc.RummageFileContent("buffer", None, encoding, 'test')
         with rfc as bfr:
             text = bfr
-        self.assertEqual(rfc.encoding.encode, 'utf-8')
+        self.assertEqual(rfc.encoding.encode, 'unicode')
         self.assertEqual(text, 'test')
-
-    def test_string_bad_encode(self):
-        """Test passing a binary string with bad encoding."""
-
-        encoding = td.Encoding('bad', None)
-        rfc = rc.RummageFileContent("buffer", None, encoding, b'test')
-        with rfc as bfr:
-            text = bfr
-        self.assertEqual(rfc.encoding.encode, 'bin')
-        self.assertEqual(text, b'test')
 
     def test_bin(self):
         """Test bin file."""
@@ -822,3 +812,32 @@ class TestFileSearch(unittest.TestCase):
         results = [r for r in fs.run()]
         print(results)
         self.assertEqual(len(results), 2)
+
+    def test_literal_chain_search(self):
+        """Test for literal search."""
+
+        search_params = rc.Search()
+        search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
+        search_params.add('search2', None, rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = None
+        context = (0, 0)
+        flags = 0
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
+        )
+
+        results = [r for r in fs.run()]
+        print(results)
+        self.assertEqual(len(results), 4)
