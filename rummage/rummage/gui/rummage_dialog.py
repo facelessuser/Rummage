@@ -997,59 +997,63 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             return
         self.debounce_search = True
 
-        if replace:
-            if self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
-                if self.thread is not None and not self.kill:
-                    self.m_replace_button.SetLabel(SEARCH_BTN_ABORT)
-                    _ABORT = True
-                    self.kill = True
-                else:
-                    self.debounce_search = False
+        if self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
+            # Handle an search request when a search is already running
+
+            if self.thread is not None and not self.kill:
+                self.m_replace_button.SetLabel(SEARCH_BTN_ABORT)
+                _ABORT = True
+                self.kill = True
             else:
-                is_chain = self.m_chains_checkbox.GetValue()
-                chain = self.m_chains_checkbox.GetStringSelection()
-                if is_chain and (not chain.strip() or chain not in Settings.get_chains()):
-                    errormsg(_("Please enter a valid chain!"))
-                elif is_chain:
-                    self.do_search(replace=True, chain=chain)
-                elif not self.validate_search_inputs(True):
-                    self.do_search(replace=True)
                 self.debounce_search = False
         else:
-            if self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
-                if self.thread is not None and not self.kill:
-                    self.m_search_button.SetLabel(SEARCH_BTN_ABORT)
-                    _ABORT = True
-                    self.kill = True
-                else:
-                    self.debounce_search = False
-            else:
-                is_chain = self.m_chains_checkbox.GetValue()
-                chain = self.m_chains_combo.GetStringSelection()
-                if is_chain and (not chain or chain not in Settings.get_chains()):
-                    errormsg(_("Please enter a valid chain!"))
-                elif is_chain:
-                    self.do_search(chain=chain)
-                elif not self.validate_search_inputs():
-                    self.do_search()
-                self.debounce_search = False
+            # Handle a search or a search & replace
 
-    def validate_search_inputs(self, replace=False):
+            is_chain = self.m_chains_checkbox.GetValue()
+            chain = self.m_chains_combo.GetStringSelection() if is_chain else None
+
+            if is_chain and (not chain.strip() or chain not in Settings.get_chains()):
+                errormsg(_("Please enter a valid chain!"))
+            elif not self.validate_search_inputs(replace=replace, chain=chain):
+                self.do_search(replace=replace, chain=chain)
+            self.debounce_search = False
+
+    def validate_search_inputs(self, replace=False, chain=None):
         """Validate the search inputs."""
 
         debug("validate")
         fail = False
         msg = ""
+
         if not fail and not os.path.exists(self.m_searchin_text.GetValue()):
             msg = _("Please enter a valid search path!")
             fail = True
-        if not fail and self.m_regex_search_checkbox.GetValue():
-            if (self.m_searchfor_textbox.GetValue() == "" and replace) or self.validate_search_regex():
-                msg = _("Please enter a valid search regex!")
+
+        if chain is None:
+            if not fail and self.m_regex_search_checkbox.GetValue():
+                if (self.m_searchfor_textbox.GetValue() == "" and replace) or self.validate_search_regex():
+                    msg = _("Please enter a valid search regex!")
+                    fail = True
+            elif not fail and self.m_searchfor_textbox.GetValue() == "" and replace:
+                msg = _("Please enter a valid search!")
                 fail = True
-        elif not fail and self.m_searchfor_textbox.GetValue() == "" and replace:
-            msg = _("Please enter a valid search!")
-            fail = True
+        else:
+            chain_searches = Settings.get_chains().get(chain, {})
+            if not chain_searches:
+                msg = _("There are no searches in this this chain!")
+                fail = True
+            else:
+                searches = Settings.get_search()
+                for search in chain_searches:
+                    s = searches.get(search)
+                    if s is None:
+                        msg = _("'%s' is not found in saved searches!" % search)
+                        fail = True
+                        break
+                    if self.validate_chain_regex(s[1], self.chain_flags(s[3], s[4])):
+                        msg = _("Saved search '%s' does not contain a valid search!" % search)
+                        fail = True
+                        break
 
         if not fail and not os.path.isfile(self.m_searchin_text.GetValue()):
             if not fail and self.m_fileregex_checkbox.GetValue():
@@ -1137,17 +1141,21 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread.start()
         self.allow_update = True
 
-    def chain_flags(self, args, string, regexp):
+    def chain_flags(self, string, regexp):
         """Chain flags."""
+
+        regex_mode = Settings.get_regex_mode()
+        regex_version = Settings.get_regex_version()
 
         flags = rumcore.MULTILINE
 
-        if args.regex_version == 1:
-            flags |= rumcore.VERSION1
-        else:
-            flags |= rumcore.VERSION0
-            if args.fullcase:
-                flags |= rumcore.FULLCASE
+        if regex_mode in rumcore.REGEX_MODES:
+            if regex_version == 1:
+                flags |= rumcore.VERSION1
+            else:
+                flags |= rumcore.VERSION0
+                if "f" in string:
+                    flags |= rumcore.FULLCASE
 
         if not regexp:
             flags |= rumcore.LITERAL
@@ -1156,13 +1164,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if "u" in string:
             flags |= rumcore.UNICODE
-        elif args.regex_mode == rumcore.REGEX_MODE:
+        elif regex_mode == rumcore.REGEX_MODE:
             flags |= rumcore.ASCII
 
         if "i" in string:
             flags |= rumcore.IGNORECASE
 
-        if args.regex_mode == rumcore.REGEX_MODE:
+        if regex_mode in rumcore.REGEX_MODES:
             if "b" in string:
                 flags |= rumcore.BESTMATCH
             if "e" in string:
@@ -1183,12 +1191,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         flags = rumcore.MULTILINE | rumcore.TRUNCATE_LINES
 
-        if args.regex_version == 1:
-            flags |= rumcore.VERSION1
-        else:
-            flags |= rumcore.VERSION0
-            if args.fullcase:
-                flags |= rumcore.FULLCASE
+        if args.regex_mode in rumcore.REGEX_MODES:
+            if args.regex_version == 1:
+                flags |= rumcore.VERSION1
+            else:
+                flags |= rumcore.VERSION0
+                if args.fullcase:
+                    flags |= rumcore.FULLCASE
 
         if args.regexfilepattern:
             flags |= rumcore.FILE_REGEX_MATCH
@@ -1227,7 +1236,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if args.backup:
             flags |= rumcore.BACKUP
 
-        if args.regex_mode == rumcore.REGEX_MODE:
+        if args.regex_mode in  rumcore.REGEX_MODES:
             if args.bestmatch:
                 flags |= rumcore.BESTMATCH
             if args.enhancematch:
@@ -1243,14 +1252,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         return flags
 
-    def set_chain_arguments(self, args, chain, replace):
+    def set_chain_arguments(self, chain, replace):
         """Set the search arguments."""
 
         search_chain = rumcore.Search(replace)
         searches = Settings.get_search()
         for search_name in Settings.get_chains()[chain]:
             search_obj = searches[search_name]
-            search_chain.add(search_obj[1], search_obj[2], self.chain_flags(args, search_obj[3], search_obj[4]))
+            search_chain.add(search_obj[1], search_obj[2], self.chain_flags(search_obj[3], search_obj[4]))
 
         debug(search_chain)
 
@@ -1345,7 +1354,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Setup chain argument
         if chain:
-            search_chain = self.set_chain_arguments(args, chain, replace)
+            search_chain = self.set_chain_arguments(chain, replace)
         else:
             search_chain = rumcore.Search(args.replace is not None)
             if not self.no_pattern:
@@ -1653,81 +1662,95 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Validate search regex."""
 
         mode = Settings.get_regex_mode()
-        if mode == rumcore.BREGEX_MODE:
-            flags = bregex.MULTILINE
-            version = Settings.get_regex_version()
-            if version == 1:
-                flags |= bregex.VERSION1
-            else:
-                flags |= bregex.VERSION0
-            if self.m_dotmatch_checkbox.GetValue():
-                flags |= bregex.DOTALL
-            if not self.m_case_checkbox.GetValue():
-                flags |= bregex.IGNORECASE
-            if self.m_unicode_checkbox.GetValue():
-                flags |= bregex.UNICODE
-            else:
-                flags |= bregex.ASCII
-            if self.m_bestmatch_checkbox.GetValue():
-                flags |= bregex.BESTMATCH
-            if self.m_enhancematch_checkbox.GetValue():
-                flags |= bregex.ENHANCEMATCH
-            if self.m_word_checkbox.GetValue():
-                flags |= bregex.WORD
-            if self.m_reverse_checkbox.GetValue():
-                flags |= bregex.REVERSE
-            if self.m_posix_checkbox.GetValue():
-                flags |= bregex.POSIX
-            if version == 0 and self.m_fullcase_checkbox.GetValue():
-                flags |= bregex.FULLCASE
-        elif mode == rumcore.REGEX_MODE:
+        if mode in rumcore.REGEX_MODES:
             import regex
-            flags = regex.MULTILINE
+
+            engine = bregex if rumcore.BREGEX_MODE else regex
+            flags = engine.MULTILINE
             version = Settings.get_regex_version()
             if version == 1:
-                flags |= regex.VERSION1
+                flags |= engine.VERSION1
             else:
-                flags |= regex.VERSION0
+                flags |= engine.VERSION0
             if self.m_dotmatch_checkbox.GetValue():
-                flags |= regex.DOTALL
+                flags |= engine.DOTALL
             if not self.m_case_checkbox.GetValue():
-                flags |= regex.IGNORECASE
+                flags |= engine.IGNORECASE
             if self.m_unicode_checkbox.GetValue():
-                flags |= regex.UNICODE
+                flags |= engine.UNICODE
             else:
-                flags |= regex.ASCII
+                flags |= engine.ASCII
             if self.m_bestmatch_checkbox.GetValue():
-                flags |= regex.BESTMATCH
+                flags |= engine.BESTMATCH
             if self.m_enhancematch_checkbox.GetValue():
-                flags |= regex.ENHANCEMATCH
+                flags |= engine.ENHANCEMATCH
             if self.m_word_checkbox.GetValue():
-                flags |= regex.WORD
+                flags |= engine.WORD
             if self.m_reverse_checkbox.GetValue():
-                flags |= regex.REVERSE
+                flags |= engine.REVERSE
             if self.m_posix_checkbox.GetValue():
-                flags |= regex.POSIX
+                flags |= engine.POSIX
             if version == 0 and self.m_fullcase_checkbox.GetValue():
-                flags |= regex.FULLCASE
-        elif mode == rumcore.BRE_MODE:
-            flags = bre.MULTILINE
-            if self.m_dotmatch_checkbox.GetValue():
-                flags |= bre.DOTALL
-            if not self.m_case_checkbox.GetValue():
-                flags |= bre.IGNORECASE
-            if self.m_unicode_checkbox.GetValue():
-                flags |= bre.UNICODE
+                flags |= engine.FULLCASE
         else:
-            flags = re.MULTILINE
+            engine = bre if mode == rumcore.BRE_MODE else re
+            flags = engine.MULTILINE
             if self.m_dotmatch_checkbox.GetValue():
-                flags |= re.DOTALL
+                flags |= engine.DOTALL
             if not self.m_case_checkbox.GetValue():
-                flags |= re.IGNORECASE
+                flags |= engine.IGNORECASE
             if self.m_unicode_checkbox.GetValue():
-                flags |= re.UNICODE
+                flags |= engine.UNICODE
+        return self.validate_regex(self.m_searchfor_textbox.Value, flags)
+
+    def validate_chain_regex(self, pattern, cflags):
+        """Validate chain regex."""
+
+        mode = Settings.get_regex_mode()
+        if mode in rumcore.REGEX_MODES:
+            import regex
+
+            engine = bregex if mode == rumcore.BREGEX_MODE else regex
+            flags = engine.MULTILINE
+            if cflags & rumcore.VERSION1:
+                flags |= engine.VERSION1
+            else:
+                flags |= engine.VERSION0
+            if cflags & rumcore.DOTALL:
+                flags |= engine.DOTALL
+            if cflags & rumcore.IGNORECASE:
+                flags |= engine.IGNORECASE
+            if cflags & rumcore.UNICODE:
+                flags |= engine.UNICODE
+            else:
+                flags |= engine.ASCII
+            if cflags & rumcore.BESTMATCH:
+                flags |= engine.BESTMATCH
+            if cflags & rumcore.ENHANCEMATCH:
+                flags |= engine.ENHANCEMATCH
+            if cflags & rumcore.WORD:
+                flags |= engine.WORD
+            if cflags & rumcore.REVERSE:
+                flags |= engine.REVERSE
+            if cflags & rumcore.POSIX:
+                flags |= engine.POSIX
+            if flags & engine.VERSION0 and cflags & rumcore.FULLCASE:
+                flags |= engine.FULLCASE
+        else:
+            engine = bre if mode == rumcore.BRE_MODE else re
+            flags = engine.MULTILINE
+            if cflags & rumcore.DOTALL:
+                flags |= engine.DOTALL
+            if cflags & rumcore.IGNORECASE:
+                flags |= engine.IGNORECASE
+            if cflags & rumcore.UNICODE:
+                flags |= engine.UNICODE
+
         return self.validate_regex(self.m_searchfor_textbox.Value, flags)
 
     def validate_regex(self, pattern, flags=0):
         """Validate regular expresion compiling."""
+
         try:
             mode = Settings.get_regex_mode()
             if mode == rumcore.BREGEX_MODE:
@@ -1745,6 +1768,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 re.compile(pattern, flags)
             return False
         except Exception:
+            debug('Pattern: %s' % pattern)
+            debug('Flags: %s' % hex(flags))
             debug(traceback.format_exc())
             return True
 
