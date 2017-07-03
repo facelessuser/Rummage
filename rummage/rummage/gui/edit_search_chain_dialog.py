@@ -24,7 +24,6 @@ import re
 from . import gui
 from .settings import Settings
 from ..localization import _
-from .custom_app import error
 from .generic_dialogs import errormsg, yesno
 
 RE_KEY = re.compile(r'[\w-]+')

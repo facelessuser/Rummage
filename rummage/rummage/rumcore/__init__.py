@@ -618,7 +618,7 @@ class _FileSearch(object):
                 pattern = util.to_ascii_bytes(search_pattern)
             except UnicodeEncodeError:
                 raise RummageException('Unicode chars in binary search pattern')
-            if r is not None:
+            if replace_pattern is not None:
                 try:
                     replace = util.to_ascii_bytes(replace_pattern)
                 except UnicodeEncodeError:
@@ -818,7 +818,7 @@ class _FileSearch(object):
 
                         for m in self._findall(text2, pattern, replace, flags):
                             text.append(text2[offset:m.start(0)])
-                            text.append(self.expand_match(m, self.replace[x]))
+                            text.append(self.expand_match(m, replace))
                             offset = m.end(0)
 
                             yield FileRecord(
@@ -904,7 +904,10 @@ class _FileSearch(object):
                                 rum_buff.seek(0)
 
                             for m in self._findall(rum_buff, pattern, replace, flags):
-                                if line_ending is None and not self.boolean and not self.count_only and not self.is_binary:
+                                if (
+                                    line_ending is None and not self.boolean and
+                                    not self.count_only and not self.is_binary
+                                ):
                                     line_ending, line_map = self._get_line_ending(rum_buff)
 
                                 if not self.boolean and not self.count_only:
@@ -930,12 +933,12 @@ class _FileSearch(object):
                                 yield FileRecord(
                                     file_info,
                                     MatchRecord(
-                                        row,                     # lineno
-                                        col,                     # colno
-                                        match,                   # Postion of match
-                                        lines,                   # Line(s) in which match is found
-                                        line_ending,             # Line ending for file
-                                        context                  # Number of lines shown before and after matched line(s)
+                                        row,          # lineno
+                                        col,          # colno
+                                        match,        # Postion of match
+                                        lines,        # Line(s) in which match is found
+                                        line_ending,  # Line ending for file
+                                        context       # Number of lines shown before and after matched line(s)
                                     ),
                                     None
                                 )
@@ -1364,7 +1367,6 @@ class Rummage(object):
                     None
                 )
             )
-
 
     def _verify_encoding(self, encoding):
         """Verify the encoding is okay."""

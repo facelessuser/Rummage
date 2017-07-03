@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import wx
 from . import gui
 from .settings import Settings
-from ..localization import _
+# from ..localization import _
 from . edit_search_chain_dialog import EditSearchChainDialog
 
 

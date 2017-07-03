@@ -57,7 +57,6 @@ import decimal
 
 DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
 
-
 _LOCK = threading.Lock()
 _RESULTS = []
 _COMPLETED = 0
@@ -75,7 +74,6 @@ TIME_ANY = _("on any")
 TIME_GT = _("after")
 TIME_EQ = _("on")
 TIME_LT = _("before")
-
 
 LIMIT_COMPARE = {
     0: "any",
@@ -897,7 +895,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_replace_label.Enable(True)
             self.m_replace_textbox.Enable(True)
             return False
-
 
     def on_dir_changed(self, event):
         """Event for when the directory changes in the DirPickButton."""

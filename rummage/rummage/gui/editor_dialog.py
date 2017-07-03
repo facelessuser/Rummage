@@ -126,7 +126,6 @@ class EditorDialog(gui.EditorDialog):
             else:
                 self.m_arg_list.Insert(value, index)
 
-
     def on_edit(self, event):
         """Edit argument."""
 

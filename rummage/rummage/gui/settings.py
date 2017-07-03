@@ -385,14 +385,13 @@ class Settings(object):
             unique_name = key_name
             while unique_name in new_search:
                 unique_id += 1
-                unique_name = "%s (%d)" % (key_name, index)
+                unique_name = "%s (%d)" % (key_name, unique_id)
 
             new_search[key_name] = tuple(entry)
 
         cls.settings["saved_searches"] = new_search
         cls.save_settings()
         return new_search
-
 
     @classmethod
     def add_search(cls, key, name, search, replace, flags, is_regex):
