@@ -1238,7 +1238,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if args.backup:
             flags |= rumcore.BACKUP
 
-        if args.regex_mode in  rumcore.REGEX_MODES:
+        if args.regex_mode in rumcore.REGEX_MODES:
             if args.bestmatch:
                 flags |= rumcore.BESTMATCH
             if args.enhancematch:
