@@ -9,6 +9,7 @@
 
 import wx
 import wx.adv
+import wx.adv
 import wx.xrc
 from .autocomplete_combo import AutoCompleteCombo
 from .date_picker import DatePicker
@@ -1677,6 +1678,9 @@ class SaveSearchDialog ( wx.Dialog ):
 		self.m_flags_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
 		gbSizer5.Add( self.m_flags_textbox, wx.GBPosition( 5, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
+		self.m_type_checkbox = wx.CheckBox( self.m_save_panel, wx.ID_ANY, u"Literal", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer5.Add( self.m_type_checkbox, wx.GBPosition( 6, 0 ), wx.GBSpan( 1, 2 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
+		
 		
 		gbSizer5.AddGrowableCol( 1 )
 		gbSizer5.AddGrowableRow( 0 )
@@ -1719,6 +1723,7 @@ class SaveSearchDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.m_type_checkbox.Bind( wx.EVT_CHECKBOX, self.on_type_toggle )
 		self.m_apply_button.Bind( wx.EVT_BUTTON, self.on_apply )
 		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel )
 	
@@ -1727,6 +1732,9 @@ class SaveSearchDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def on_type_toggle( self, event ):
+		event.Skip()
+	
 	def on_apply( self, event ):
 		event.Skip()
 	

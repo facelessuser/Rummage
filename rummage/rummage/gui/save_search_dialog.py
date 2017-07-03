@@ -83,7 +83,6 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         """Setup."""
 
         if data is not None:
-            print(data)
             self.m_name_text.SetValue(data[0])
             self.m_comment_textbox.SetValue(data[1])
             self.m_search_textbox.SetValue(data[2])
@@ -96,6 +95,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
             self.is_regex = self.parent.m_regex_search_checkbox.GetValue()
             flags = self.get_flag_string()
             self.m_flags_textbox.SetValue(flags)
+        self.m_type_checkbox.SetValue(not self.is_regex)
 
     def get_flag_string(self):
         """Get flags in a string representation."""
@@ -173,6 +173,12 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         Settings.add_search(name, comment, search, replace, flags, self.is_regex)
         self.saved = True
         self.Close()
+
+    def on_type_toggle(self, event):
+        """Prevent toggling."""
+
+        obj = event.GetEventObject()
+        obj.SetValue(not obj.GetValue())
 
     def on_cancel(self, event):
         """Close dialog."""
