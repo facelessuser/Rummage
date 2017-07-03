@@ -12,6 +12,8 @@ from rummage.rummage.rumcore import text_decode as td
 from rummage.rummage import epoch_timestamp as epoch
 import codecs
 import datetime
+import tempfile
+import textwrap
 
 
 class TestHelperFunctions(unittest.TestCase):
@@ -841,3 +843,196 @@ class TestFileSearch(unittest.TestCase):
         results = [r for r in fs.run()]
         print(results)
         self.assertEqual(len(results), 4)
+
+    def test_literal_chain_replace(self):
+        """Test for literal search and replace."""
+
+        before = textwrap.dedent(
+            '''search1
+            search1
+
+            search2
+            search2
+
+            search3
+            search3
+
+            search1, search2, search3
+            '''
+        )
+
+        after = textwrap.dedent(
+            '''replace1
+            replace1
+
+            replace2
+            replace2
+
+            search3
+            search3
+
+            replace1, replace2, search3
+            '''
+        )
+
+        search_params = rc.Search(True)
+        search_params.add('search1', 'replace1', rc.IGNORECASE | rc.LITERAL)
+        search_params.add('search2', 'replace2', rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = None
+        context = (0, 0)
+        flags = 0
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        f = None
+        try:
+            with tempfile.NamedTemporaryFile('wb', delete=False) as f:
+                f.write(before.encode('utf-8'))
+
+            fs = rc._FileSearch(
+                search_params,
+                self.get_file_attr(f.name),
+                file_id,
+                flags,
+                context,
+                encoding,
+                backup_ext,
+                max_count
+            )
+
+            for result in fs.run():
+                if result.error is not None:
+                    print(''.join(result.error))
+
+            with codecs.open(f.name, 'r', encoding='utf-8') as f:
+                self.assertEqual(f.read(), after)
+        finally:
+            if f is not None:
+                os.remove(f.name)
+
+    def test_literal_binary_search(self):
+        """Test for literal search."""
+
+        search_params = rc.Search()
+        search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = 'bin'
+        context = (0, 0)
+        flags = rc.PROCESS_BINARY
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
+        )
+
+        results = [r for r in fs.run()]
+        print(results)
+        self.assertEqual(len(results), 2)
+
+    def test_literal_chain_binary_search(self):
+        """Test for literal search."""
+
+        search_params = rc.Search()
+        search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
+        search_params.add('search2', None, rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = 'bin'
+        context = (0, 0)
+        flags = rc.PROCESS_BINARY
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
+        )
+
+        results = [r for r in fs.run()]
+        print(results)
+        self.assertEqual(len(results), 4)
+
+    def test_literal_chain_binary_replace(self):
+        """Test for literal search and replace."""
+
+        before = textwrap.dedent(
+            '''search1
+            search1
+
+            search2
+            search2
+
+            search3
+            search3
+
+            search1, search2, search3
+            '''
+        )
+
+        after = textwrap.dedent(
+            '''replace1
+            replace1
+
+            replace2
+            replace2
+
+            search3
+            search3
+
+            replace1, replace2, search3
+            '''
+        )
+
+        search_params = rc.Search(True)
+        search_params.add('search1', 'replace1', rc.IGNORECASE | rc.LITERAL)
+        search_params.add('search2', 'replace2', rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = 'bin'
+        context = (0, 0)
+        flags = rc.PROCESS_BINARY
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        f = None
+        try:
+            with tempfile.NamedTemporaryFile('wb', delete=False) as f:
+                f.write(before.encode('utf-8'))
+
+            fs = rc._FileSearch(
+                search_params,
+                self.get_file_attr(f.name),
+                file_id,
+                flags,
+                context,
+                encoding,
+                backup_ext,
+                max_count
+            )
+
+            for result in fs.run():
+                if result.error is not None:
+                    print(''.join(result.error))
+
+            with codecs.open(f.name, 'r', encoding='utf-8') as f:
+                self.assertEqual(f.read(), after)
+        finally:
+            if f is not None:
+                os.remove(f.name)

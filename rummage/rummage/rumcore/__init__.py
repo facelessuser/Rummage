@@ -617,6 +617,8 @@ class _FileSearch(object):
             pattern = search_pattern
             replace = replace_pattern
 
+        self.current_replace = replace
+
         if pattern is not None:
             if bool(flags & LITERAL):
                 self.literal = True
@@ -632,17 +634,17 @@ class _FileSearch(object):
                 if self.regex_mode == BREGEX_MODE:
                     pattern = _bregex_pattern(pattern, flags, self.is_binary)
                     if replace is not None and not bool(flags & FORMATREPLACE):
-                        self.expand = bregex.compile_replace(pattern, replace_pattern)
+                        self.expand = bregex.compile_replace(pattern, replace)
                 elif self.regex_mode == REGEX_MODE:
                     pattern = _regex_pattern(pattern, flags, self.is_binary)
                 elif self.regex_mode == BRE_MODE:
                     pattern = _bre_pattern(pattern, flags, self.is_binary)
                     if replace is not None:
-                        self.expand = bre.compile_replace(pattern, replace_pattern)
+                        self.expand = bre.compile_replace(pattern, replace)
                 else:
                     pattern = _re_pattern(pattern, flags, self.is_binary)
                     if replace is not None:
-                        template = sre_parse.parse_template(replace_pattern, pattern)
+                        template = sre_parse.parse_template(replace, pattern)
                         self.expand = lambda m, t=template: sre_parse.expand_template(t, m)
 
             for m in pattern.finditer(file_content):
@@ -766,7 +768,7 @@ class _FileSearch(object):
                         pattern, replace, flags = self.search_obj[0]
                         for m in self._findall(rum_buff, pattern, replace, flags):
                             text.append(rum_buff[offset:m.start(0)])
-                            text.append(self.expand_match(m, self.replace[0]))
+                            text.append(self.expand_match(m, self.current_replace))
                             offset = m.end(0)
 
                             yield FileRecord(
@@ -786,20 +788,20 @@ class _FileSearch(object):
                                 break
 
                         # Grab the rest of the file if we found things to replace.
-                        if not self.abort and (text or len(self.pattern) > 1):
+                        if not self.abort and (text or len(self.search_obj) > 1):
                             text.append(rum_buff[offset:])
 
                 # Additional chained replaces
                 count = 1
-                if not self.abort and len(self.pattern) > 1:
+                if not self.abort and len(self.search_obj) > 1:
                     for pattern, replace, flags in self.search_obj[1:]:
-                        text2 = ''.join(text)
+                        text2 = (b'' if self.is_binary else '').join(text)
                         text = deque()
                         offset = 0
 
                         for m in self._findall(text2, pattern, replace, flags):
                             text.append(text2[offset:m.start(0)])
-                            text.append(self.expand_match(m, replace))
+                            text.append(self.expand_match(m, self.current_replace))
                             offset = m.end(0)
 
                             yield FileRecord(
@@ -821,7 +823,7 @@ class _FileSearch(object):
                         count += 1
 
                         # Grab the rest of the file if we found things to replace.
-                        if not self.abort and (text or count < len(self.pattern)):
+                        if not self.abort and (text or count < len(self.search_obj)):
                             text.append(text2[offset:])
 
                         if self.abort:
