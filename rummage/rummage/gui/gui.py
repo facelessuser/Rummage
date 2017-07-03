@@ -9,7 +9,6 @@
 
 import wx
 import wx.adv
-import wx.adv
 import wx.xrc
 from .autocomplete_combo import AutoCompleteCombo
 from .date_picker import DatePicker
@@ -178,9 +177,6 @@ class RummageFrame ( wx.Frame ):
 		
 		gbSizer2.Add( fgSizer40, wx.GBPosition( 4, 3 ), wx.GBSpan( 1, 1 ), wx.EXPAND, 5 )
 		
-		self.m_staticline6 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-		gbSizer2.Add( self.m_staticline6, wx.GBPosition( 5, 0 ), wx.GBSpan( 1, 4 ), wx.EXPAND |wx.ALL, 5 )
-		
 		fgSizer401 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer401.AddGrowableCol( 1 )
 		fgSizer401.SetFlexibleDirection( wx.BOTH )
@@ -189,18 +185,22 @@ class RummageFrame ( wx.Frame ):
 		self.m_chains_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Chains", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer401.Add( self.m_chains_checkbox, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		m_chains_comboChoices = []
-		self.m_chains_combo = wx.ComboBox( self.m_settings_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_chains_comboChoices, 0 )
-		fgSizer401.Add( self.m_chains_combo, 0, wx.ALL|wx.EXPAND, 5 )
+		m_chains_choiceChoices = []
+		self.m_chains_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_chains_choiceChoices, 0 )
+		self.m_chains_choice.SetSelection( 0 )
+		fgSizer401.Add( self.m_chains_choice, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
-		gbSizer2.Add( fgSizer401, wx.GBPosition( 6, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND, 5 )
+		gbSizer2.Add( fgSizer401, wx.GBPosition( 5, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND, 5 )
 		
 		
-		fgSizer9.Add( gbSizer2, 1, wx.EXPAND, 5 )
+		fgSizer9.Add( gbSizer2, 1, wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 		
 		
-		fgSizer6.Add( fgSizer9, 1, wx.EXPAND, 5 )
+		fgSizer9.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer6.Add( fgSizer9, 1, wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 		
 		self.m_staticline3 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		fgSizer6.Add( self.m_staticline3, 0, wx.EXPAND |wx.ALL, 5 )

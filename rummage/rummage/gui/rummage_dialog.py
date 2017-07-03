@@ -777,24 +777,24 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         is_selected = False
         selected_index = -1
-        selected = self.m_chains_combo.GetStringSelection()
+        selected = self.m_chains_choice.GetStringSelection()
         chains = sorted(list(Settings.get_chains().keys()))
-        self.m_chains_combo.Clear()
+        self.m_chains_choice.Clear()
         for x in range(len(chains)):
             string = chains[x]
             if string == selected:
                 is_selected = True
                 selected_index = x
-            self.m_chains_combo.Insert(string, x)
+            self.m_chains_choice.Insert(string, x)
 
         if setup and setup in chains:
             index = chains.index(setup)
-            self.m_chains_combo.SetSelection(index)
-        elif is_selected or self.m_chains_combo.GetCount():
+            self.m_chains_choice.SetSelection(index)
+        elif is_selected or self.m_chains_choice.GetCount():
             if is_selected:
-                self.m_chains_combo.SetSelection(selected_index)
+                self.m_chains_choice.SetSelection(selected_index)
             else:
-                self.m_chains_combo.SetSelection(0)
+                self.m_chains_choice.SetSelection(0)
 
     def on_preferences(self, event):
         """Show settings dialog, and update history of AutoCompleteCombo if the history was cleared."""
@@ -1010,7 +1010,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             # Handle a search or a search & replace
 
             is_chain = self.m_chains_checkbox.GetValue()
-            chain = self.m_chains_combo.GetStringSelection() if is_chain else None
+            chain = self.m_chains_choice.GetStringSelection() if is_chain else None
 
             if is_chain and (not chain.strip() or chain not in Settings.get_chains()):
                 errormsg(_("Please enter a valid chain!"))
@@ -1434,7 +1434,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         eng_size = i18n_to_eng(self.m_logic_choice.GetStringSelection(), SIZE_LIMIT_I18N)
         eng_mod = i18n_to_eng(self.m_modified_choice.GetStringSelection(), TIME_LIMIT_I18N)
         eng_cre = i18n_to_eng(self.m_created_choice.GetStringSelection(), TIME_LIMIT_I18N)
-        chain_name = self.m_chains_combo.GetStringSelection()
+        chain_name = self.m_chains_choice.GetStringSelection()
         strings = [
             ('chain', chain_name if chain_name else ''),
             ("size_compare_string", eng_size),
