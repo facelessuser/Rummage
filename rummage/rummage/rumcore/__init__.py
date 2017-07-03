@@ -385,7 +385,7 @@ class _FileSearch(object):
 
     def __init__(
         self, search_obj, file_obj, file_id, flags, context, encoding,
-        backup_ext, max_count, file_content, regex_mode=RE_MODE
+        backup_ext, max_count, file_content=None, regex_mode=RE_MODE
     ):
         """Init the file search object."""
 

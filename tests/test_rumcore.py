@@ -798,18 +798,25 @@ class TestFileSearch(unittest.TestCase):
     def test_literal_search(self):
         """Test for literal search."""
 
-        search_params = rc.SearchParams()
-        search_params.pattern = "search1"
-        search_params.encoding = None
-        search_params.context = (0, 0)
-        search_params.flags = rc.IGNORECASE | rc.LITERAL
+        search_params = rc.Search()
+        search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = None
+        context = (0, 0)
+        flags = 0
+        backup_ext = 'rum-bak',
+        max_count = None
 
         fs = rc._FileSearch(
             search_params,
             self.get_file_attr('tests/searches/searches_unix_ending.txt'),
-            0,
-            None,
-            None
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
         )
 
         results = [r for r in fs.run()]
