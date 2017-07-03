@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import wx
 from . import gui
 from .settings import Settings
-# from ..localization import _
+from ..localization import _
 from . edit_search_chain_dialog import EditSearchChainDialog
 
 
@@ -49,6 +49,11 @@ class SearchChainDialog(gui.SearchChainDialog):
 
     def localize(self):
         """Localize."""
+
+        self.m_add_button.SetLabel(_("Add"))
+        self.m_edit_button.SetLabel(_("Edit"))
+        self.m_remove_button.SetLabel(_("Delete"))
+        self.m_cancel_button.SetLabel(_("Cancel"))
 
     def load_chains(self):
         """Populate list with chain entries."""
