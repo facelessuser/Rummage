@@ -677,7 +677,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         dlg = SearchChainDialog(self)
         dlg.ShowModal()
         dlg.Destroy()
-        self.setup_chains()
+        if self.m_chains_checkbox.GetValue():
+            self.setup_chains()
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""
@@ -754,9 +755,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         setup_timepicker(self.m_modified_time_picker, self.m_modified_spin, "modified_time_string")
         setup_timepicker(self.m_created_time_picker, self.m_created_spin, "created_time_string")
         setup_autocomplete_combo(self.m_searchin_text, "target", changed_callback=self.on_searchin_changed)
-        setup_autocomplete_combo(
-            self.m_searchfor_textbox, "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
-        )
+
+        if not self.m_chains_checkbox.GetValue():
+            setup_autocomplete_combo(
+                self.m_searchfor_textbox,
+                "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
+            )
+        else:
+            self.setup_chains(Settings.get_search_setting("chain", ""))
+
         setup_autocomplete_combo(
             self.m_replace_textbox, "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
         )
@@ -772,31 +779,28 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
         )
 
-        self.setup_chains(Settings.get_search_setting("chain", ""))
-
     def setup_chains(self, setup=None):
         """Setup chains."""
 
         is_selected = False
-        selected_index = -1
-        selected = self.m_chains_choice.GetStringSelection()
+        selected = self.m_searchfor_textbox.Value
         chains = sorted(list(Settings.get_chains().keys()))
-        self.m_chains_choice.Clear()
+
         for x in range(len(chains)):
             string = chains[x]
             if string == selected:
                 is_selected = True
-                selected_index = x
-            self.m_chains_choice.Insert(string, x)
+
+        if not is_selected and not setup:
+            setup = Settings.get_search_setting("chain", "")
+        elif is_selected and not setup:
+            setup = selected
 
         if setup and setup in chains:
-            index = chains.index(setup)
-            self.m_chains_choice.SetSelection(index)
-        elif is_selected or self.m_chains_choice.GetCount():
-            if is_selected:
-                self.m_chains_choice.SetSelection(selected_index)
-            else:
-                self.m_chains_choice.SetSelection(0)
+            self.m_searchfor_textbox.update_choices(chains)
+            self.m_searchfor_textbox.SetValue(setup)
+        else:
+            self.m_searchfor_textbox.update_choices(chains, load_last=True)
 
     def on_preferences(self, event):
         """Show settings dialog, and update history of AutoCompleteCombo if the history was cleared."""
@@ -805,10 +809,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         dlg.ShowModal()
         if dlg.history_cleared():
             update_autocomplete(self.m_searchin_text, "target")
-            update_autocomplete(
-                self.m_searchfor_textbox,
-                "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
-            )
+
+            if not self.m_chains_checkbox.GetValue():
+                update_autocomplete(
+                    self.m_searchfor_textbox,
+                    "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
+                )
+
             update_autocomplete(
                 self.m_replace_textbox,
                 "regex_replace" if self.m_regex_search_checkbox.GetValuie() else "literal_replace"
@@ -874,10 +881,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_format_replace_checkbox.Enable(False)
             self.m_fullcase_checkbox.Enable(False)
 
-            self.m_searchfor_label.Enable(False)
-            self.m_searchfor_textbox.Enable(False)
+            self.m_searchfor_label.SetLabel(_("Search chain"))
             self.m_replace_label.Enable(False)
             self.m_replace_textbox.Enable(False)
+            self.setup_chains(Settings.get_search_setting("chain", ""))
             return True
         else:
             self.m_regex_search_checkbox.Enable(True)
@@ -892,10 +899,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_format_replace_checkbox.Enable(True)
             self.m_fullcase_checkbox.Enable(True)
 
-            self.m_searchfor_label.Enable(True)
-            self.m_searchfor_textbox.Enable(True)
+            self.m_searchfor_label.SetLabel(_("Search for"))
+            self.m_searchfor_textbox.Value = ""
             self.m_replace_label.Enable(True)
             self.m_replace_textbox.Enable(True)
+            update_autocomplete(
+                self.m_searchfor_textbox,
+                "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
+            )
             return False
 
     def on_dir_changed(self, event):
@@ -1018,12 +1029,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             # Handle a search or a search & replace request
 
             is_chain = self.m_chains_checkbox.GetValue()
-            chain = self.m_chains_choice.GetStringSelection() if is_chain else None
+            chain = self.m_searchfor_textbox.Value if is_chain else None
 
             if is_chain and (not chain.strip() or chain not in Settings.get_chains()):
                 errormsg(_("Please enter a valid chain!"))
             elif not self.validate_search_inputs(replace=replace, chain=chain):
-                self.do_search(replace=replace, chain=chain)
+                self.do_search(replace=replace, chain=chain is not None)
             self.debounce_search = False
 
     def validate_search_inputs(self, replace=False, chain=None):
@@ -1353,7 +1364,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Track whether we have an actual search pattern,
         # if we are doing a boolean search,
         # or if we are only counting matches
-        self.no_pattern = False if chain else not args.pattern
+        self.no_pattern = not args.pattern
         self.is_boolean = args.boolean
         self.is_count_only = args.count_only
 
@@ -1362,7 +1373,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Setup chain argument
         if chain:
-            search_chain = self.set_chain_arguments(chain, replace)
+            search_chain = self.set_chain_arguments(args.pattern, replace)
         else:
             search_chain = rumcore.Search(args.replace is not None)
             if not self.no_pattern:
@@ -1383,9 +1394,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         }
 
         # Save GUI history
-        self.save_history(args, replace)
+        self.save_history(args, replace, chain=chain)
 
-    def save_history(self, args, replace):
+    def save_history(self, args, replace, chain):
         """
         Save the current configuration of the search for the next time the app is opened.
 
@@ -1394,9 +1405,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         history = [
             ("target", args.target),
-            ("regex_search", args.pattern) if args.regexp else ("literal_search", args.pattern),
             ("regex_replace", args.replace) if args.regexp else ("literal_replace", args.replace)
         ]
+
+        if not chain:
+            history.append(("regex_search", args.pattern) if args.regexp else ("literal_search", args.pattern))
 
         if replace:
             history.append(
@@ -1442,13 +1455,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         eng_size = i18n_to_eng(self.m_logic_choice.GetStringSelection(), SIZE_LIMIT_I18N)
         eng_mod = i18n_to_eng(self.m_modified_choice.GetStringSelection(), TIME_LIMIT_I18N)
         eng_cre = i18n_to_eng(self.m_created_choice.GetStringSelection(), TIME_LIMIT_I18N)
-        chain_name = self.m_chains_choice.GetStringSelection()
         strings = [
-            ('chain', chain_name if chain_name else ''),
             ("size_compare_string", eng_size),
             ("modified_compare_string", eng_mod),
             ("created_compare_string", eng_cre)
         ]
+
+        if chain:
+            chain_name = self.m_searchfor_textbox.Value
+            strings.append(('chain', chain_name if chain_name else ''))
 
         strings.append(("force_encode", self.m_force_encode_choice.GetStringSelection()))
 
@@ -1469,10 +1484,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Update the combo boxes history for related items
         update_autocomplete(self.m_searchin_text, "target")
-        update_autocomplete(
-            self.m_searchfor_textbox,
-            "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
-        )
+
+        if not chain:
+            update_autocomplete(
+                self.m_searchfor_textbox,
+                "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
+            )
+
         if replace:
             update_autocomplete(
                 self.m_replace_textbox,
@@ -1641,10 +1659,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Switch literal/regex history depending on toggle state."""
 
         if self.m_regex_search_checkbox.GetValue():
-            update_autocomplete(self.m_searchfor_textbox, "regex_search")
+            if not self.m_chains_checkbox.GetValue():
+                update_autocomplete(self.m_searchfor_textbox, "regex_search")
             update_autocomplete(self.m_replace_textbox, "regex_replace")
         else:
-            update_autocomplete(self.m_searchfor_textbox, "literal_search")
+            if not self.m_chains_checkbox.GetValue():
+                update_autocomplete(self.m_searchfor_textbox, "literal_search")
             update_autocomplete(self.m_replace_textbox, "literal_replace")
         event.Skip()
 
