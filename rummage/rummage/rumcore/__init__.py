@@ -744,10 +744,15 @@ class _FileSearch(object):
 
         file_info, error = self._get_file_info(self.file_obj)
         if error is not None:
-            yield FileRecord(file_info, None, error)
+            if is_buffer:
+                yield BufferRecord(None, error)
+            else:
+                yield FileRecord(file_info, None, error)
         elif not self.is_binary or self.process_binary:
 
             try:
+                file_record_sent = False
+
                 rum_content = RummageFileContent(
                     file_info.name, file_info.size, self.current_encoding, self.file_content
                 )
@@ -784,6 +789,8 @@ class _FileSearch(object):
                                 None
                             )
 
+                            file_record_sent = True
+
                             if self.abort:
                                 break
 
@@ -794,6 +801,7 @@ class _FileSearch(object):
                 # Additional chained replaces
                 count = 1
                 if not self.abort and len(self.search_obj) > 1:
+
                     for pattern, replace, flags in self.search_obj[1:]:
                         text2 = (b'' if self.is_binary else '').join(text)
                         text = deque()
@@ -817,6 +825,8 @@ class _FileSearch(object):
                                 None
                             )
 
+                            file_record_sent = True
+
                             if self.abort:
                                 break
 
@@ -830,25 +840,30 @@ class _FileSearch(object):
                             break
 
                 if not self.abort and text:
+                    # Update the file or buffer depending on what is being used.
+                    # For a buffer, we will actually return the the content via a BufferRecord.
                     if is_buffer:
                         yield self._update_buffer(text)
+                        file_record_sent = True
                     else:
                         self._update_file(
                             file_info.name, text
                         )
-                else:
-                    yield FileRecord(
-                        file_info,
-                        None,
-                        None
-                    )
+                elif is_buffer:
+                    # Buffers always return a Buffer record at the end
+                    yield BufferRecord(None, None)
+                    file_record_sent = True
+
+                if not file_record_sent:
+                    # Always return at least one record
+                    yield FileRecord(file_info, None, None)
 
             except Exception:
-                yield FileRecord(
-                    file_info,
-                    None,
-                    get_exception()
-                )
+                # Return a record with the failure attached
+                if is_buffer:
+                    yield BufferRecord(None, get_exception())
+                else:
+                    yield FileRecord(file_info, None, get_exception())
 
     def search(self):
         """Search target file or buffer returning a generator of results."""
@@ -934,6 +949,9 @@ class _FileSearch(object):
 
                                 if self.abort:
                                     break
+
+                            if self.abort:
+                                break
 
                 if not file_record_sent:
                     yield FileRecord(file_info, None, None)
