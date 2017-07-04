@@ -999,8 +999,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             return
         self.debounce_search = True
 
-        if self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]:
-            # Handle an search request when a search is already running
+        if (
+            self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT] or
+            self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]
+        ):
+            # Handle a search request when a search is already running
 
             if self.thread is not None and not self.kill:
                 self.m_replace_button.SetLabel(SEARCH_BTN_ABORT)
