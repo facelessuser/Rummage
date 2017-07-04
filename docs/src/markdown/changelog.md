@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.1.0
+
+> Jul X, 2017
+
+- **NEW**: Add new chained search feature.
+- **NEW**: Restructure internal API to support chained search.
+- **NEW**: Saved searches will now require a unique name and an optional comment. Old legacy saves will be converted on first access. The old legacy name will be the comment, and a unique name will be generated from the comment.
+- **NEW**: Saved search names and comments can be edited from the "Load Search" panel.
+- **NEW**: Internal API no longer will guess and decode strings, only files.  It is expected that the caller handles encoding of string buffers.  A Unicode buffer will be searched as usual, and a binary string buffer will be treated as binary.
+- **FIX**: Fix wxPython deprecation noise in the console.
+- **FIX**: Fix some binary related replace issues.
+- **FIX**: Fix search not aborting.
+
 ## 2.0.5
 
 > Jul 2, 2017
