@@ -999,20 +999,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             return
         self.debounce_search = True
 
-        if (
-            self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT] or
-            self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]
-        ):
-            # Handle a search request when a search is already running
+        is_replacing = self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]
+        is_searching = self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]
+
+        if is_searching or is_replacing:
+            # Handle a search or replace request when a search or replace is already running
 
             if self.thread is not None and not self.kill:
-                self.m_replace_button.SetLabel(SEARCH_BTN_ABORT)
+                if is_replacing:
+                    self.m_replace_button.SetLabel(SEARCH_BTN_ABORT)
+                else:
+                    self.m_search_button.SetLabel(SEARCH_BTN_ABORT)
                 _ABORT = True
                 self.kill = True
             else:
                 self.debounce_search = False
         else:
-            # Handle a search or a search & replace
+            # Handle a search or a search & replace request
 
             is_chain = self.m_chains_checkbox.GetValue()
             chain = self.m_chains_choice.GetStringSelection() if is_chain else None
