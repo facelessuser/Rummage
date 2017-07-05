@@ -642,7 +642,7 @@ class _FileSearch(object):
             replace_pattern is not None and
             not isinstance(replace_pattern, util.string_type)
         ):
-            replace_pattern = replace_pattern.get_replace()(file_info, flags)
+            replace_pattern = replace_pattern(file_info, flags)
             self.is_plugin_replace = True
         else:
             self.is_plugin_replace = False

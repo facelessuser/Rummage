@@ -502,6 +502,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.kill = False
         self.thread = None
         self.allow_update = False
+        self.imported_plugins = {}
         if start_path is None:
             start_path = util.getcwd()
 
@@ -1213,6 +1214,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_progressbar.SetValue(0)
         self.m_statusbar.set_status("")
 
+        # Delete old plugins
+        self.clear_plugins()
+
         # Remove errors icon in status bar
         if self.error_dlg is not None:
             self.error_dlg.Destroy()
@@ -1223,6 +1227,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             # Setup arguments
             self.set_arguments(chain, replace)
         except Exception:
+            self.clear_plugins()
             error(traceback.format_exc())
             errormsg(_("There was an error in setup! Please check the log."))
             return
@@ -1385,20 +1390,30 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         import imp
 
-        module = imp.new_module('__rummage__.' + os.path.splitext(os.path.basename(script))[0])
-        with open(script, 'rb') as f:
-            encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py')
-        with codecs.open(script, 'r', encoding=encoding.encode) as f:
-            exec(
-                compile(
-                    f.read(),
-                    script,
-                    'exec'
-                ),
-                module.__dict__
-            )
+        if script not in self.imported_plugins:
+            module = imp.new_module(script)
+            with open(script, 'rb') as f:
+                encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py')
+            with codecs.open(script, 'r', encoding=encoding.encode) as f:
+                exec(
+                    compile(
+                        f.read(),
+                        script,
+                        'exec'
+                    ),
+                    module.__dict__
+                )
 
-        return module
+            # Don't let the module get garbage collected
+            # We will remove references when we are done with it.
+            self.imported_plugins[script] = module
+
+        return self.imported_plugins[script].get_replace()
+
+    def clear_plugins(self):
+        """Clear old plugins."""
+
+        self.imported_plugins = {}
 
     def set_arguments(self, chain, replace):
         """Set the search arguments."""
@@ -1689,6 +1704,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_replace_button.SetLabel(REPLACE_BTN_REPLACE)
                 self.m_search_button.Enable(True)
                 self.m_replace_button.Enable(True)
+                self.clear_plugins()
                 if self.kill:
                     self.m_statusbar.set_status(
                         _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s") % (
