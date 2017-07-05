@@ -15,6 +15,7 @@
 - **FIX**: Fix search not aborting.
 - **FIX**: Fix issue where selecting file from drop down list didn't hide limit panel.
 - **FIX**: Don't display replace message when aborting replace.
+- **FIX**: Fix limit panel hide logic so it doesn't show a the hidden panel on search.
 
 ## 2.0.5
 

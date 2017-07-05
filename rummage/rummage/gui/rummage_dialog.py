@@ -1037,7 +1037,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 limit_box.ShowItems(False)
                 self.m_settings_panel.GetSizer().Layout()
                 self.Refresh()
-            elif not limit_box.IsShown(0):
+            elif os.path.isdir() and not limit_box.IsShown(0):
                 limit_box.ShowItems(True)
                 limit_box.Fit(limit_box.GetStaticBox())
                 limit_box.Layout()
