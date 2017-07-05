@@ -666,6 +666,7 @@ class Settings(object):
 
         try:
             locked = False
+            cls.settings['__format__'] = '2.0.0'
             with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
                 assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock settings."
                 locked = True
@@ -688,6 +689,7 @@ class Settings(object):
 
         try:
             locked = False
+            cls.cache['__format__'] = '2.0.0'
             with codecs.open(cls.cache_file, "w", encoding="utf-8") as f:
                 assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock cache file."
                 locked = True
