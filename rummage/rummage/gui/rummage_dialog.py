@@ -893,7 +893,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.refresh_chain_mode()
         self.m_settings_panel.GetSizer().Layout()
-        self.optimize_size(height_only=True)
 
     def on_plugin_function_toggle(self, event):
         """Handle plugin function toggle."""
@@ -912,6 +911,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_replace_textbox,
                 "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
             )
+        self.m_settings_panel.GetSizer().Layout()
 
     def refresh_regex_options(self):
         """Refresh the regex module options."""
@@ -956,6 +956,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_searchfor_label.SetLabel(_("Search chain"))
             self.m_replace_label.Enable(False)
             self.m_replace_textbox.Enable(False)
+            self.m_replace_plugin_dir_picker.Enable(False)
             self.setup_chains(Settings.get_search_setting("chain", ""))
             return True
         else:
@@ -975,6 +976,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_searchfor_textbox.Value = ""
             self.m_replace_label.Enable(True)
             self.m_replace_textbox.Enable(True)
+            self.m_replace_plugin_dir_picker.Enable(True)
             update_autocomplete(
                 self.m_searchfor_textbox,
                 "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
