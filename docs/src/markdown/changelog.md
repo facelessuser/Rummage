@@ -5,6 +5,7 @@
 > Jul X, 2017
 
 - **NEW**: Add new chained search feature.
+- **NEW**: Add new replace plugin support.
 - **NEW**: Restructure internal API to support chained search.
 - **NEW**: Saved searches will now require a unique name and an optional comment. Old legacy saves will be converted on first access. The old legacy name will be the comment, and a unique name will be generated from the comment.
 - **NEW**: Saved search names and comments can be edited from the "Load Search" panel.
@@ -12,6 +13,8 @@
 - **FIX**: Fix wxPython deprecation noise in the console.
 - **FIX**: Fix some binary related replace issues.
 - **FIX**: Fix search not aborting.
+- **FIX**: Fix issue where selecting file from drop down list didn't hide limit panel.
+- **FIX**: Don't display replace message when aborting replace.
 
 ## 2.0.5
 

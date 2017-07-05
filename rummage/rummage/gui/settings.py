@@ -233,6 +233,9 @@ class Settings(object):
             folder = os.path.expanduser("~\\.Rummage")
             if not os.path.exists(folder):
                 os.mkdir(folder)
+            plugin_folder = os.path.join(folder, 'plugins')
+            if not os.path.exists(plugin_folder):
+                os.mkdir(plugin_folder)
             settings = os.path.join(folder, SETTINGS_FILE)
             cache = os.path.join(folder, CACHE_FILE)
             log = os.path.join(folder, LOG_FILE)
@@ -246,6 +249,9 @@ class Settings(object):
                 shutil.move(old_folder, folder)
             if not os.path.exists(folder):
                 os.mkdir(folder)
+            plugin_folder = os.path.join(folder, 'plugins')
+            if not os.path.exists(plugin_folder):
+                os.mkdir(plugin_folder)
             settings = os.path.join(folder, SETTINGS_FILE)
             cache = os.path.join(folder, CACHE_FILE)
             log = os.path.join(folder, LOG_FILE)
@@ -255,6 +261,9 @@ class Settings(object):
             folder = os.path.expanduser("~/.config/Rummage")
             if not os.path.exists(folder):
                 os.mkdir(folder)
+            plugin_folder = os.path.join(folder, 'plugins')
+            if not os.path.exists(plugin_folder):
+                os.mkdir(plugin_folder)
             settings = os.path.join(folder, SETTINGS_FILE)
             cache = os.path.join(folder, CACHE_FILE)
             log = os.path.join(folder, LOG_FILE)
@@ -380,6 +389,8 @@ class Settings(object):
                 entry.insert(2, '')
             if len(entry) == 4:
                 entry.insert(3, '')
+            if len(entry) == 5:
+                entry.append(False)
 
             unique_id = 1
             unique_name = key_name
@@ -394,12 +405,12 @@ class Settings(object):
         return new_search
 
     @classmethod
-    def add_search(cls, key, name, search, replace, flags, is_regex):
+    def add_search(cls, key, name, search, replace, flags, is_regex, is_function):
         """Add saved search."""
 
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", {})
-        searches[key] = (name, search, replace, flags, is_regex)
+        searches[key] = (name, search, replace, flags, is_regex, is_function)
         cls.settings["saved_searches"] = searches
         cls.save_settings()
 

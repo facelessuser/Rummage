@@ -27,6 +27,7 @@ import webbrowser
 from time import time
 import os
 import re
+import codecs
 import wx.lib.newevent
 from .. import __meta__
 from .. import rumcore
@@ -55,7 +56,7 @@ from .. import data
 from .. import util
 import decimal
 
-DirChangeEvent, EVT_DIR_CHANGE = wx.lib.newevent.NewEvent()
+PickChangeEvent, EVT_PICK_CHANGE = wx.lib.newevent.NewEvent()
 
 _LOCK = threading.Lock()
 _RESULTS = []
@@ -407,51 +408,72 @@ class RummageArgs(object):
         self.formatreplace = False
 
 
-class DirPickButton(object):
+class PickButton(object):
     """Directory pick button."""
 
+    DIR_TYPE = 0
+    FILE_TYPE = 1
+
     def GetPath(self):
-        """Get current directory path."""
+        """Get current target path."""
 
-        return self.directory
+        return self.target
 
-    def SetPath(self, directory):
-        """Set the current directory path."""
+    def SetPath(self, target):
+        """Set the current target path."""
 
-        if directory is not None and os.path.exists(directory) and os.path.isdir(directory):
-            self.directory = directory
+        if (
+            target is not None and
+            os.path.exists(target) and
+            (
+                (self.pick_type == self.DIR_TYPE and os.path.isdir(target)) or
+                (self.pick_type == self.FILE_TYPE and os.path.isfile(target))
+            )
+        ):
+            self.target = target
 
-    def dir_init(self, default_path=None, dir_change_evt=None):
-        """Init the DirPickButton."""
+    def pick_init(self, pick_type, default_path=None, pick_change_evt=None):
+        """Init the PickButton."""
 
-        self.directory = os.path.expanduser("~")
-        self.Bind(wx.EVT_BUTTON, self.on_dir_pick)
-        self.Bind(EVT_DIR_CHANGE, self.on_dir_change)
-        self.SetPath(default_path)
-        self.dir_change_callback = dir_change_evt
+        if default_path is not None and os.path.exists(default_path):
+            self.default_path = default_path
+        else:
+            self.default_path = os.path.expanduser("~")
+        self.pick_type = pick_type
+        self.target = self.default_path
+        self.Bind(wx.EVT_BUTTON, self.on_pick)
+        self.Bind(EVT_PICK_CHANGE, self.on_change)
+        self.pick_change_callback = pick_change_evt
 
-    def on_dir_change(self, event):
+    def on_change(self, event):
         """If the dir has changed call the callback given."""
 
-        if self.dir_change_callback is not None:
-            self.dir_change_callback(event)
+        if self.pick_change_callback is not None:
+            self.pick_change_callback(event)
         event.Skip()
 
-    def on_dir_pick(self, event):
+    def on_pick(self, event):
         """
-        When a new directory is picked, validate it, and set it if it is good.
+        When a new directory/file is picked, validate it, and set it if it is good.
 
-        Call the DirChangeEvent to do any desired callback as well.
+        Call the PickChangeEvent to do any desired callback as well.
         """
 
-        directory = self.GetPath()
-        if directory is None or not os.path.exists(directory) or not os.path.isdir(directory):
-            directory = os.path.expanduser("~")
-        directory = dirpickermsg(_("Select directory to rummage"), directory)
-        if directory is None or directory == "":
-            directory = None
-        self.SetPath(directory)
-        evt = DirChangeEvent(directory=directory)
+        target = self.GetPath()
+        if (target is None or not os.path.exists(target)):
+            target = self.default_path
+        if (target is None or not os.path.exists(target)):
+            target = os.path.expanduser("~")
+        if self.pick_type == self.DIR_TYPE:
+            target = dirpickermsg(_("Select directory to rummage"), target)
+        else:
+            if os.path.isfile(target):
+                target = os.path.dirname(target)
+            target = filepickermsg(_("Select replace script"), default_path=target, wildcard='*.py')
+        if target is None or target == "":
+            target = None
+        self.SetPath(target)
+        evt = PickChangeEvent(target=target)
         wx.PostEvent(self, evt)
         event.Skip()
 
@@ -475,6 +497,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.error_dlg = None
         self.debounce_search = False
         self.searchin_update = False
+        self.replace_plugin_update = False
         self.checking = False
         self.kill = False
         self.thread = None
@@ -502,8 +525,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.set_status("")
 
         # Extend browse button
-        extend(self.m_searchin_dir_picker, DirPickButton)
-        self.m_searchin_dir_picker.dir_init(dir_change_evt=self.on_dir_changed)
+        extend(self.m_searchin_dir_picker, PickButton)
+        self.m_searchin_dir_picker.pick_init(PickButton.DIR_TYPE, pick_change_evt=self.on_dir_changed)
+        extend(self.m_replace_plugin_dir_picker, PickButton)
+        self.m_replace_plugin_dir_picker.pick_init(
+            PickButton.FILE_TYPE,
+            default_path=os.path.join(Settings.get_config_folder(), 'plugins'),
+            pick_change_evt=self.on_replace_plugin_dir_changed
+        )
 
         # Replace result panel placeholders with new custom panels
         self.m_result_file_list.load_list()
@@ -572,6 +601,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_force_encode_choice.Clear()
         for x in ENCODINGS:
             self.m_force_encode_choice.Append(x)
+        self.m_chains_checkbox.SetLabel(_("Use chain search"))
+        self.m_replace_plugin_checkbox.SetLabel(_("Use plugin replace"))
         self.m_bestmatch_checkbox.SetLabel(_("Best fuzzy match"))
         self.m_enhancematch_checkbox.SetLabel(_("Improve fuzzy fit"))
         self.m_word_checkbox.SetLabel(_("Unicode word breaks"))
@@ -680,6 +711,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if self.m_chains_checkbox.GetValue():
             self.setup_chains()
 
+    def on_plugin_function_click(self, event):
+        """Plugin function click."""
+
+        self.setup
+
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""
 
@@ -736,6 +772,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
         self.m_chains_checkbox.SetValue(Settings.get_search_setting("chain_toggle", False))
+        self.m_replace_plugin_checkbox.SetValue(Settings.get_search_setting("replace_plugin_toggle", False))
 
         self.m_modified_choice.SetStringSelection(
             eng_to_i18n(
@@ -764,9 +801,19 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         else:
             self.setup_chains(Settings.get_search_setting("chain", ""))
 
-        setup_autocomplete_combo(
-            self.m_replace_textbox, "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
-        )
+        if self.m_replace_plugin_checkbox.GetValue():
+            self.m_replace_label.SetLabel(_("Replace plugin"))
+            self.m_replace_plugin_dir_picker.Show()
+            setup_autocomplete_combo(
+                self.m_replace_textbox,
+                "replace_plugin"
+            )
+        else:
+            self.m_replace_plugin_dir_picker.Hide()
+            setup_autocomplete_combo(
+                self.m_replace_textbox,
+                "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
+            )
         setup_autocomplete_combo(
             self.m_exclude_textbox,
             "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude",
@@ -816,10 +863,16 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
                 )
 
-            update_autocomplete(
-                self.m_replace_textbox,
-                "regex_replace" if self.m_regex_search_checkbox.GetValuie() else "literal_replace"
-            )
+            if self.m_replace_plugin_checkbox.GetValue():
+                update_autocomplete(
+                    self.m_replace_textbox,
+                    "replace_plugin"
+                )
+            else:
+                update_autocomplete(
+                    self.m_replace_textbox,
+                    "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
+                )
             update_autocomplete(
                 self.m_exclude_textbox,
                 "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
@@ -840,6 +893,24 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.refresh_chain_mode()
         self.m_settings_panel.GetSizer().Layout()
         self.optimize_size(height_only=True)
+
+    def on_plugin_function_toggle(self, event):
+        """Handle plugin function toggle."""
+
+        if self.m_replace_plugin_checkbox.GetValue():
+            self.m_replace_label.SetLabel(_("Replace plugin"))
+            self.m_replace_plugin_dir_picker.Show()
+            update_autocomplete(
+                self.m_replace_textbox,
+                "replace_plugin"
+            )
+        else:
+            self.m_replace_label.SetLabel(_("Replace with"))
+            self.m_replace_plugin_dir_picker.Hide()
+            update_autocomplete(
+                self.m_replace_textbox,
+                "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
+            )
 
     def refresh_regex_options(self):
         """Refresh the regex module options."""
@@ -913,11 +984,22 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Event for when the directory changes in the DirPickButton."""
 
         if not self.searchin_update:
-            pth = event.directory
+            pth = event.target
             if pth is not None and os.path.exists(pth):
                 self.searchin_update = True
                 self.m_searchin_text.safe_set_value(pth)
                 self.searchin_update = False
+        event.Skip()
+
+    def on_replace_plugin_dir_changed(self, event):
+        """Handle replace plugin dir change."""
+
+        if not self.replace_plugin_update:
+            pth = event.target
+            if pth is not None and os.path.exists(pth):
+                self.replace_plugin_update = True
+                self.m_replace_textbox.safe_set_value(pth)
+                self.replace_plugin_update = False
         event.Skip()
 
     def on_searchin_changed(self):
@@ -994,12 +1076,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_replace_click(self, event):
         """Replace button click."""
 
-        message = [_("Are you sure you want to replace all instances?")]
-        if not self.m_backup_checkbox.GetValue():
-            message.append(_("Backups are currently disabled."))
-
-        if yesno(' '.join(message)):
-            self.start_search(replace=True)
+        self.start_search(replace=True)
         event.Skip()
 
     def start_search(self, replace=False):
@@ -1027,6 +1104,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.debounce_search = False
         else:
             # Handle a search or a search & replace request
+
+            if replace:
+                message = [_("Are you sure you want to replace all instances?")]
+                if not self.m_backup_checkbox.GetValue():
+                    message.append(_("Backups are currently disabled."))
+
+                if not yesno(' '.join(message)):
+                    self.debounce_search = False
+                    return
 
             is_chain = self.m_chains_checkbox.GetValue()
             chain = self.m_searchfor_textbox.Value if is_chain else None
@@ -1133,6 +1219,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.error_dlg = None
         self.m_statusbar.remove_icon("errors")
 
+        try:
+            # Setup arguments
+            self.set_arguments(chain, replace)
+        except Exception:
+            error(traceback.format_exc())
+            errormsg(_("There was an error in setup! Please check the log."))
+            return
+
         # Change button to stop search
         if replace:
             self.m_replace_button.SetLabel(SEARCH_BTN_STOP)
@@ -1143,9 +1237,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Init search status
         self.m_statusbar.set_status(_("Searching: 0/0 0% Skipped: 0 Matches: 0"))
-
-        # Setup arguments
-        self.set_arguments(chain, replace)
 
         # Setup search thread
         self.thread = RummageThread(self.payload)
@@ -1278,11 +1369,36 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         searches = Settings.get_search()
         for search_name in Settings.get_chains()[chain]:
             search_obj = searches[search_name]
-            search_chain.add(search_obj[1], search_obj[2], self.chain_flags(search_obj[3], search_obj[4]))
+            if search_obj[5] and replace:
+                replace_obj = self.import_plugin(search_obj[2])
+            else:
+                replace_obj = search_obj[2]
+
+            search_chain.add(search_obj[1], replace_obj, self.chain_flags(search_obj[3], search_obj[4]))
 
         debug(search_chain)
 
         return search_chain
+
+    def import_plugin(self, script):
+        """Import replace plugin."""
+
+        import imp
+
+        module = imp.new_module('__rummage__.' + os.path.splitext(os.path.basename(script))[0])
+        with open(script, 'rb') as f:
+            encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py')
+        with codecs.open(script, 'r', encoding=encoding.encode) as f:
+            exec(
+                compile(
+                    f.read(),
+                    script,
+                    'exec'
+                ),
+                module.__dict__
+            )
+
+        return module
 
     def set_arguments(self, chain, replace):
         """Set the search arguments."""
@@ -1377,7 +1493,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         else:
             search_chain = rumcore.Search(args.replace is not None)
             if not self.no_pattern:
-                search_chain.add(args.pattern, args.replace, flags & rumcore.SEARCH_MASK)
+                if self.m_replace_plugin_checkbox.GetValue() and replace:
+                    replace = self.import_plugin(args.replace)
+                else:
+                    replace = args.replace
+                search_chain.add(args.pattern, replace, flags & rumcore.SEARCH_MASK)
 
         self.payload = {
             'target': args.target,
@@ -1411,10 +1531,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if not chain:
             history.append(("regex_search", args.pattern) if args.regexp else ("literal_search", args.pattern))
 
-        if replace:
-            history.append(
-                ("regex_replace", args.replace) if args.regexp else ("literal_replace", args.replace)
-            )
+            if replace:
+                if self.m_replace_plugin_checkbox.GetValue():
+                    history.append(
+                        ("replace_plugin", args.replace)
+                    )
+                else:
+                    history.append(
+                        ("regex_replace", args.replace) if args.regexp else ("literal_replace", args.replace)
+                    )
 
         if os.path.isdir(args.target):
             history += [
@@ -1446,7 +1571,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             ("reverse_toggle", args.reverse),
             ("posix_toggle", args.posix),
             ("format_replace_toggle", args.formatreplace),
-            ("chain_toggle", self.m_chains_checkbox.GetValue())
+            ("chain_toggle", self.m_chains_checkbox.GetValue()),
+            ('replace_plugin_toggle', self.m_replace_plugin_checkbox.GetValue())
         ]
 
         if Settings.get_regex_version() == 0:
@@ -1490,12 +1616,18 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_searchfor_textbox,
                 "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
             )
+            if replace:
+                if self.m_replace_plugin_checkbox.GetValue():
+                    update_autocomplete(
+                        self.m_replace_textbox,
+                        "replace_plugin"
+                    )
+                else:
+                    update_autocomplete(
+                        self.m_replace_textbox,
+                        "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
+                    )
 
-        if replace:
-            update_autocomplete(
-                self.m_replace_textbox,
-                "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
-            )
         update_autocomplete(
             self.m_exclude_textbox,
             "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
@@ -1661,11 +1793,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if self.m_regex_search_checkbox.GetValue():
             if not self.m_chains_checkbox.GetValue():
                 update_autocomplete(self.m_searchfor_textbox, "regex_search")
-            update_autocomplete(self.m_replace_textbox, "regex_replace")
+            if self.m_replace_plugin_checkbox.GetValue():
+                update_autocomplete(self.m_replace_textbox, "replace_plugin")
+            else:
+                update_autocomplete(self.m_replace_textbox, "regex_replace")
         else:
             if not self.m_chains_checkbox.GetValue():
                 update_autocomplete(self.m_searchfor_textbox, "literal_search")
-            update_autocomplete(self.m_replace_textbox, "literal_replace")
+            if self.m_replace_plugin_checkbox.GetValue():
+                update_autocomplete(self.m_replace_textbox, "replace_plugin")
+            else:
+                update_autocomplete(self.m_replace_textbox, "literal_replace")
         event.Skip()
 
     def on_fileregex_toggle(self, event):
@@ -1833,7 +1971,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         ):
             errormsg(_("There is nothing to export!"))
             return
-        html_file = filepickermsg(_("Export to..."), "*.html", True)
+        html_file = filepickermsg(_("Export to..."), wildcard="*.html", save=True)
         if html_file is None:
             return
         try:
@@ -1856,7 +1994,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         ):
             errormsg(_("There is nothing to export!"))
             return
-        csv_file = filepickermsg(_("Export to..."), "*.csv", True)
+        csv_file = filepickermsg(_("Export to..."), wildcard="*.csv", save=True)
         if csv_file is None:
             return
         try:

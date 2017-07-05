@@ -298,6 +298,41 @@ class ErrorRecord(namedtuple('ErrorRecord', ['error'])):
     """A record for non-file related errors."""
 
 
+class ReplacePlugin(object):
+    """Rummage replace plugin."""
+
+    def __init__(self, file_info, flags):
+        """Initialize."""
+
+        self.file_info = file_info
+        self.flags = flags
+
+    def get_flags(self):
+        """Get flags."""
+
+        return self.flags
+
+    def get_file_name(self):
+        """Get file name."""
+
+        return self.file_info.name
+
+    def is_binary(self):
+        """Is a binary search."""
+
+        return self.file_info.encoding.encode == 'bin'
+
+    def is_literal(self):
+        """Is a literal search."""
+
+        return self.flags & LITERAL
+
+    def replace(self, m):
+        """Make replacement."""
+
+        return m.group(0)
+
+
 class RummageFileContent(object):
     """Either return a string or memory map file object."""
 
@@ -583,23 +618,34 @@ class _FileSearch(object):
             line_map.append(last_offset)
         return nl if ending is None else ending, line_map
 
-    def expand_match(self, m, replace):
+    def expand_match(self, m):
         """Expand the match."""
 
-        if self.literal:
-            return replace
-        if self.expand:
+        if self.is_plugin_replace:
+            return self.current_replace.replace(m)
+        elif self.literal:
+            return self.current_replace
+        elif self.expand:
             return self.expand(m)
         elif self.regex_format_replace:
-            return m.expandf(replace)
+            return m.expandf(self.current_replace)
         else:
-            return m.expand(replace)
+            return m.expand(self.current_replace)
 
-    def _findall(self, file_content, search_pattern, replace_pattern, flags):
+    def _findall(self, file_content, search_pattern, replace_pattern, flags, file_info):
         """Find all occurences of search pattern in file."""
 
         replace = None
         pattern = None
+
+        if (
+            replace_pattern is not None and
+            not isinstance(replace_pattern, util.string_type)
+        ):
+            replace_pattern = replace_pattern.get_replace()(file_info, flags)
+            self.is_plugin_replace = True
+        else:
+            self.is_plugin_replace = False
 
         self.regex_format_replace = self.regex_mode in REGEX_MODES and bool(flags & FORMATREPLACE)
 
@@ -608,7 +654,7 @@ class _FileSearch(object):
                 pattern = util.to_ascii_bytes(search_pattern)
             except UnicodeEncodeError:
                 raise RummageException('Unicode chars in binary search pattern')
-            if replace_pattern is not None:
+            if replace_pattern is not None and not self.is_plugin_replace:
                 try:
                     replace = util.to_ascii_bytes(replace_pattern)
                 except UnicodeEncodeError:
@@ -633,17 +679,17 @@ class _FileSearch(object):
             else:
                 if self.regex_mode == BREGEX_MODE:
                     pattern = _bregex_pattern(pattern, flags, self.is_binary)
-                    if replace is not None and not bool(flags & FORMATREPLACE):
+                    if replace is not None and not bool(flags & FORMATREPLACE) and not self.is_plugin_replace:
                         self.expand = bregex.compile_replace(pattern, replace)
                 elif self.regex_mode == REGEX_MODE:
                     pattern = _regex_pattern(pattern, flags, self.is_binary)
                 elif self.regex_mode == BRE_MODE:
                     pattern = _bre_pattern(pattern, flags, self.is_binary)
-                    if replace is not None:
+                    if replace is not None and not self.is_plugin_replace:
                         self.expand = bre.compile_replace(pattern, replace)
                 else:
                     pattern = _re_pattern(pattern, flags, self.is_binary)
-                    if replace is not None:
+                    if replace is not None and not self.is_plugin_replace:
                         template = sre_parse.parse_template(replace, pattern)
                         self.expand = lambda m, t=template: sre_parse.expand_template(t, m)
 
@@ -743,6 +789,7 @@ class _FileSearch(object):
         is_buffer = True if self.file_content else False
 
         file_info, error = self._get_file_info(self.file_obj)
+
         if error is not None:
             if is_buffer:
                 yield BufferRecord(None, error)
@@ -771,9 +818,9 @@ class _FileSearch(object):
                         offset = 0
 
                         pattern, replace, flags = self.search_obj[0]
-                        for m in self._findall(rum_buff, pattern, replace, flags):
+                        for m in self._findall(rum_buff, pattern, replace, flags, file_info):
                             text.append(rum_buff[offset:m.start(0)])
-                            text.append(self.expand_match(m, self.current_replace))
+                            text.append(self.expand_match(m))
                             offset = m.end(0)
 
                             yield FileRecord(
@@ -807,9 +854,9 @@ class _FileSearch(object):
                         text = deque()
                         offset = 0
 
-                        for m in self._findall(text2, pattern, replace, flags):
+                        for m in self._findall(text2, pattern, replace, flags, file_info):
                             text.append(text2[offset:m.start(0)])
-                            text.append(self.expand_match(m, self.current_replace))
+                            text.append(self.expand_match(m))
                             offset = m.end(0)
 
                             yield FileRecord(
@@ -897,7 +944,7 @@ class _FileSearch(object):
                             if hasattr(rum_buff, 'seek'):
                                 rum_buff.seek(0)
 
-                            for m in self._findall(rum_buff, pattern, replace, flags):
+                            for m in self._findall(rum_buff, pattern, replace, flags, file_info):
                                 if (
                                     line_ending is None and not self.boolean and
                                     not self.count_only and not self.is_binary
@@ -1356,7 +1403,7 @@ class Rummage(object):
         elif self.buffer_input:
             self.files.append(
                 FileAttrRecord(
-                    "buffer input",
+                    None,
                     len(self.target),
                     ctime(),
                     ctime(),

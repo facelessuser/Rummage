@@ -38,7 +38,8 @@ class SavedSearchList(DynamicList):
                 _("Search"),
                 _("Replace"),
                 _("Flags/Toggles"),
-                _("Type")
+                _("Type"),
+                _("Replace Type")
             ]
         )
 

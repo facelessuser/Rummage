@@ -1273,14 +1273,14 @@ class Messages(wx.Dialog):
         self.EndModal(self.answer)
 
 
-def filepickermsg(msg, wildcard, save=False):
+def filepickermsg(msg, default_path="", wildcard="*", save=False):
     """File picker."""
 
     select = None
     style = wx.FD_OPEN | wx.FD_FILE_MUST_EXIST if not save else wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
     dlg = wx.FileDialog(
         None, msg,
-        "", wildcard=wildcard,
+        default_path, wildcard=wildcard,
         style=style
     )
     if dlg.ShowModal() == wx.ID_OK:

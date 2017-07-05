@@ -95,8 +95,8 @@ class RummageFrame ( wx.Frame ):
 		self.m_replace_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
 		fgSizer8.Add( self.m_replace_textbox, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		
-		fgSizer8.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		self.m_replace_plugin_dir_picker = wx.Button( self.m_settings_panel, wx.ID_ANY, u"...", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
+		fgSizer8.Add( self.m_replace_plugin_dir_picker, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		fgSizer6.Add( fgSizer8, 1, wx.EXPAND, 5 )
@@ -177,8 +177,11 @@ class RummageFrame ( wx.Frame ):
 		
 		gbSizer2.Add( fgSizer40, wx.GBPosition( 4, 3 ), wx.GBSpan( 1, 1 ), wx.EXPAND, 5 )
 		
-		self.m_chains_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Chains", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_chains_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Use chain search", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gbSizer2.Add( self.m_chains_checkbox, wx.GBPosition( 5, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
+		self.m_replace_plugin_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Use plugin replace", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer2.Add( self.m_replace_plugin_checkbox, wx.GBPosition( 5, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		
 		fgSizer9.Add( gbSizer2, 1, wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
@@ -470,6 +473,7 @@ class RummageFrame ( wx.Frame ):
 		self.Bind( wx.EVT_CLOSE, self.on_close )
 		self.m_regex_search_checkbox.Bind( wx.EVT_CHECKBOX, self.on_regex_search_toggle )
 		self.m_chains_checkbox.Bind( wx.EVT_CHECKBOX, self.on_chain_toggle )
+		self.m_replace_plugin_checkbox.Bind( wx.EVT_CHECKBOX, self.on_plugin_function_toggle )
 		self.m_regex_test_button.Bind( wx.EVT_BUTTON, self.on_test_regex )
 		self.m_chain_button.Bind( wx.EVT_BUTTON, self.on_chain_click )
 		self.m_save_search_button.Bind( wx.EVT_BUTTON, self.on_save_search )
@@ -500,6 +504,9 @@ class RummageFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_chain_toggle( self, event ):
+		event.Skip()
+	
+	def on_plugin_function_toggle( self, event ):
 		event.Skip()
 	
 	def on_test_regex( self, event ):
@@ -1668,6 +1675,9 @@ class SaveSearchDialog ( wx.Dialog ):
 		self.m_type_checkbox = wx.CheckBox( self.m_save_panel, wx.ID_ANY, u"Literal", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gbSizer5.Add( self.m_type_checkbox, wx.GBPosition( 6, 0 ), wx.GBSpan( 1, 2 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
 		
+		self.m_replace_plugin_checkbox = wx.CheckBox( self.m_save_panel, wx.ID_ANY, u"Replace plugin", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer5.Add( self.m_replace_plugin_checkbox, wx.GBPosition( 7, 0 ), wx.GBSpan( 1, 2 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
+		
 		
 		gbSizer5.AddGrowableCol( 1 )
 		gbSizer5.AddGrowableRow( 0 )
@@ -1710,7 +1720,8 @@ class SaveSearchDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
-		self.m_type_checkbox.Bind( wx.EVT_CHECKBOX, self.on_type_toggle )
+		self.m_type_checkbox.Bind( wx.EVT_CHECKBOX, self.on_toggle )
+		self.m_replace_plugin_checkbox.Bind( wx.EVT_CHECKBOX, self.on_toggle )
 		self.m_apply_button.Bind( wx.EVT_BUTTON, self.on_apply )
 		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel )
 	
@@ -1719,8 +1730,9 @@ class SaveSearchDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
-	def on_type_toggle( self, event ):
+	def on_toggle( self, event ):
 		event.Skip()
+	
 	
 	def on_apply( self, event ):
 		event.Skip()

@@ -89,13 +89,16 @@ class SaveSearchDialog(gui.SaveSearchDialog):
             self.m_replace_textbox.SetValue(data[3])
             self.m_flags_textbox.SetValue(data[4])
             self.is_regex = data[5]
+            self.is_plugin = data[6]
         else:
             self.m_search_textbox.SetValue(self.parent.m_searchfor_textbox.GetValue())
             self.m_replace_textbox.SetValue(self.parent.m_replace_textbox.GetValue())
             self.is_regex = self.parent.m_regex_search_checkbox.GetValue()
+            self.is_plugin = self.parent.m_replace_plugin_checkbox.GetValue()
             flags = self.get_flag_string()
             self.m_flags_textbox.SetValue(flags)
         self.m_type_checkbox.SetValue(not self.is_regex)
+        self.m_replace_plugin_checkbox.SetValue(self.is_plugin)
 
     def get_flag_string(self):
         """Get flags in a string representation."""
@@ -170,11 +173,11 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         if self.original_name and name != self.original_name:
             Settings.delete_search(self.original_name)
 
-        Settings.add_search(name, comment, search, replace, flags, self.is_regex)
+        Settings.add_search(name, comment, search, replace, flags, self.is_regex, self.is_plugin)
         self.saved = True
         self.Close()
 
-    def on_type_toggle(self, event):
+    def on_toggle(self, event):
         """Prevent toggling."""
 
         obj = event.GetEventObject()

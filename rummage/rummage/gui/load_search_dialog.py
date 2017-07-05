@@ -33,6 +33,13 @@ SEARCH_TYPE = {
     SEARCH_REGEX: "Regex"
 }
 
+REPLACE_PATTERN = _("Pattern")
+REPLACE_PLUGIN = _("Plugin")
+REPLACE_TYPE = {
+    REPLACE_PATTERN: "Pattern",
+    REPLACE_PLUGIN: "Plugin"
+}
+
 
 class LoadSearchDialog(gui.LoadSearchDialog):
     """Load search dialog."""
@@ -73,7 +80,8 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         for key in sorted(searches.keys()):
             s = searches[key]
             search_type = SEARCH_REGEX if s[4] else SEARCH_LITERAL
-            self.m_search_list.set_item_map(count, key, s[0], s[1], s[2], s[3], search_type)
+            replace_type = REPLACE_PLUGIN if s[5] else REPLACE_PATTERN
+            self.m_search_list.set_item_map(count, key, s[0], s[1], s[2], s[3], search_type, replace_type)
             count += 1
         self.m_search_list.load_list()
 
@@ -87,10 +95,12 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         replace = self.m_search_list.get_map_item(item, col=3)
         flags = self.m_search_list.get_map_item(item, col=4)
         is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
+        is_plugin = REPLACE_TYPE[self.m_search_list.get_map_item(item, col=6)] == "Plugin"
 
         self.parent.m_searchfor_textbox.SetValue(search)
         self.parent.m_replace_textbox.SetValue(replace)
         self.parent.m_regex_search_checkbox.SetValue(is_regex)
+        self.parent.m_replace_plugin_checkbox.SetValue(is_plugin)
         self.parent.m_case_checkbox.SetValue("i" not in flags)
         self.parent.m_dotmatch_checkbox.SetValue("s" in flags)
         self.parent.m_unicode_checkbox.SetValue("u" in flags)
@@ -139,8 +149,9 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         replace = self.m_search_list.get_map_item(item, col=3)
         flags = self.m_search_list.get_map_item(item, col=4)
         is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
+        is_plugin = REPLACE_TYPE[self.m_search_list.get_map_item(item, col=6)] == "Plugin"
 
-        dlg = SaveSearchDialog(self, (name, comment, search, replace, flags, is_regex))
+        dlg = SaveSearchDialog(self, (name, comment, search, replace, flags, is_regex, is_plugin))
         dlg.ShowModal()
         if dlg.saved:
             self.m_search_list.reset_list()
