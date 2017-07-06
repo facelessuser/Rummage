@@ -4204,7 +4204,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">2</property>
-                                                                            <property name="flag">wxALL</property>
+                                                                            <property name="flag">wxALL|wxEXPAND</property>
                                                                             <property name="row">1</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="CustomControl" expanded="0">
@@ -4292,7 +4292,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">3</property>
-                                                                            <property name="flag">wxALL</property>
+                                                                            <property name="flag">wxEXPAND|wxTOP|wxBOTTOM|wxLEFT</property>
                                                                             <property name="row">1</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="CustomControl" expanded="0">
@@ -4380,7 +4380,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">4</property>
-                                                                            <property name="flag">wxALL</property>
+                                                                            <property name="flag">wxALIGN_CENTER_VERTICAL|wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT</property>
                                                                             <property name="row">1</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="wxSpinButton" expanded="0">
@@ -4909,7 +4909,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">2</property>
-                                                                            <property name="flag">wxALL</property>
+                                                                            <property name="flag">wxALL|wxEXPAND</property>
                                                                             <property name="row">2</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="CustomControl" expanded="0">
@@ -4997,7 +4997,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">3</property>
-                                                                            <property name="flag">wxALL</property>
+                                                                            <property name="flag">wxEXPAND|wxTOP|wxBOTTOM|wxLEFT</property>
                                                                             <property name="row">2</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="CustomControl" expanded="0">
@@ -5085,7 +5085,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">4</property>
-                                                                            <property name="flag">wxALL</property>
+                                                                            <property name="flag">wxALIGN_CENTER_VERTICAL|wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT</property>
                                                                             <property name="row">2</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="wxSpinButton" expanded="0">
