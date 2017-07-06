@@ -97,10 +97,21 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
         is_plugin = REPLACE_TYPE[self.m_search_list.get_map_item(item, col=6)] == "Plugin"
 
+        # Disable chain mode if enabled
+        if self.parent.m_chains_checkbox.GetValue():
+            self.parent.m_chains_checkbox.SetValue(False)
+            self.parent.on_chain_toggle(None)
+
+        if self.parent.m_replace_plugin_checkbox.GetValue() != is_plugin:
+            self.parent.m_replace_plugin_checkbox.SetValue(is_plugin)
+            self.parent.on_plugin_function_toggle(None)
+
+        if self.parent.m_regex_search_checkbox.GetValue() != is_regex:
+            self.parent.m_regex_search_checkbox.SetValue(is_regex)
+            self.parent.on_regex_search_toggle(None)
+
         self.parent.m_searchfor_textbox.SetValue(search)
         self.parent.m_replace_textbox.SetValue(replace)
-        self.parent.m_regex_search_checkbox.SetValue(is_regex)
-        self.parent.m_replace_plugin_checkbox.SetValue(is_plugin)
         self.parent.m_case_checkbox.SetValue("i" not in flags)
         self.parent.m_dotmatch_checkbox.SetValue("s" in flags)
         self.parent.m_unicode_checkbox.SetValue("u" in flags)

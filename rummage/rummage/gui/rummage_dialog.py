@@ -953,10 +953,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_format_replace_checkbox.Enable(False)
             self.m_fullcase_checkbox.Enable(False)
 
+            self.m_replace_plugin_checkbox.Enable(False)
+
             self.m_searchfor_label.SetLabel(_("Search chain"))
             self.m_replace_label.Enable(False)
             self.m_replace_textbox.Enable(False)
             self.m_replace_plugin_dir_picker.Enable(False)
+
+            self.m_save_search_button.Enable(False)
             self.setup_chains(Settings.get_search_setting("chain", ""))
             return True
         else:
@@ -972,11 +976,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_format_replace_checkbox.Enable(True)
             self.m_fullcase_checkbox.Enable(True)
 
+            self.m_replace_plugin_checkbox.Enable(True)
+
             self.m_searchfor_label.SetLabel(_("Search for"))
             self.m_searchfor_textbox.Value = ""
             self.m_replace_label.Enable(True)
             self.m_replace_textbox.Enable(True)
             self.m_replace_plugin_dir_picker.Enable(True)
+
+            self.m_save_search_button.Enable(True)
             update_autocomplete(
                 self.m_searchfor_textbox,
                 "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
@@ -1822,7 +1830,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 update_autocomplete(self.m_replace_textbox, "replace_plugin")
             else:
                 update_autocomplete(self.m_replace_textbox, "literal_replace")
-        event.Skip()
 
     def on_fileregex_toggle(self, event):
         """Switch literal/regex history depending on toggle state."""
