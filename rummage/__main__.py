@@ -43,6 +43,7 @@ def parse_arguments():
     # Flag arguments
     parser.add_argument('--version', action='version', version=('%(prog)s ' + __meta__.__version__))
     parser.add_argument('--debug', action='store_true', default=False, help=argparse.SUPPRESS)
+    parser.add_argument('--no-redirect', action='store_true', default=False, help=argparse.SUPPRESS)
     parser.add_argument(
         '--path', default=None, type=pyin,
         help="Path to search."
@@ -61,9 +62,9 @@ def run():
         set_debug_mode(True)
 
     if Settings.get_single_instance():
-        app = RummageApp(redirect=True, single_instance_name="Rummage", pipe_name=Settings.get_fifo())
+        app = RummageApp(redirect=not args.no_redirect, single_instance_name="Rummage", pipe_name=Settings.get_fifo())
     else:
-        app = RummageApp(redirect=True)
+        app = RummageApp(redirect=not args.no_redirect)
 
     if not Settings.get_single_instance() or (Settings.get_single_instance() and app.is_instance_okay()):
         RummageFrame(
