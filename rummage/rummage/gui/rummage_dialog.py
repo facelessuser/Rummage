@@ -42,7 +42,7 @@ from .settings import Settings
 from .generic_dialogs import errormsg, yesno
 from .custom_app import DebugFrameExtender
 from .custom_app import debug, error
-from .custom_statusbar import extend_sb, extend
+from .custom_statusbar import extend_sb
 from .regex_test_dialog import RegexTestDialog
 from .autocomplete_combo import AutoCompleteCombo
 from .load_search_dialog import LoadSearchDialog
@@ -51,12 +51,11 @@ from .search_error_dialog import SearchErrorDialog
 from .search_chain_dialog import SearchChainDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
-from .messages import dirpickermsg, filepickermsg
+from .pick_button import PickButton, pick_extend
+from .messages import filepickermsg
 from .. import data
 from .. import util
 import decimal
-
-PickChangeEvent, EVT_PICK_CHANGE = wx.lib.newevent.NewEvent()
 
 _LOCK = threading.Lock()
 _RESULTS = []
@@ -408,76 +407,6 @@ class RummageArgs(object):
         self.formatreplace = False
 
 
-class PickButton(object):
-    """Directory pick button."""
-
-    DIR_TYPE = 0
-    FILE_TYPE = 1
-
-    def GetPath(self):
-        """Get current target path."""
-
-        return self.target
-
-    def SetPath(self, target):
-        """Set the current target path."""
-
-        if (
-            target is not None and
-            os.path.exists(target) and
-            (
-                (self.pick_type == self.DIR_TYPE and os.path.isdir(target)) or
-                (self.pick_type == self.FILE_TYPE and os.path.isfile(target))
-            )
-        ):
-            self.target = target
-
-    def pick_init(self, pick_type, default_path=None, pick_change_evt=None):
-        """Init the PickButton."""
-
-        if default_path is not None and os.path.exists(default_path):
-            self.default_path = default_path
-        else:
-            self.default_path = os.path.expanduser("~")
-        self.pick_type = pick_type
-        self.target = self.default_path
-        self.Bind(wx.EVT_BUTTON, self.on_pick)
-        self.Bind(EVT_PICK_CHANGE, self.on_change)
-        self.pick_change_callback = pick_change_evt
-
-    def on_change(self, event):
-        """If the dir has changed call the callback given."""
-
-        if self.pick_change_callback is not None:
-            self.pick_change_callback(event)
-        event.Skip()
-
-    def on_pick(self, event):
-        """
-        When a new directory/file is picked, validate it, and set it if it is good.
-
-        Call the PickChangeEvent to do any desired callback as well.
-        """
-
-        target = self.GetPath()
-        if (target is None or not os.path.exists(target)):
-            target = self.default_path
-        if (target is None or not os.path.exists(target)):
-            target = os.path.expanduser("~")
-        if self.pick_type == self.DIR_TYPE:
-            target = dirpickermsg(_("Select directory to rummage"), target)
-        else:
-            if os.path.isfile(target):
-                target = os.path.dirname(target)
-            target = filepickermsg(_("Select replace script"), default_path=target, wildcard='*.py')
-        if target is None or target == "":
-            target = None
-        self.SetPath(target)
-        evt = PickChangeEvent(target=target)
-        wx.PostEvent(self, evt)
-        event.Skip()
-
-
 class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     """Rummage Frame."""
 
@@ -526,11 +455,16 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.set_status("")
 
         # Extend browse button
-        extend(self.m_searchin_dir_picker, PickButton)
-        self.m_searchin_dir_picker.pick_init(PickButton.DIR_TYPE, pick_change_evt=self.on_dir_changed)
-        extend(self.m_replace_plugin_dir_picker, PickButton)
+        pick_extend(self.m_searchin_dir_picker, PickButton)
+        self.m_searchin_dir_picker.pick_init(
+            PickButton.DIR_TYPE,
+            _("Select directory to rummage"),
+            pick_change_evt=self.on_dir_changed
+        )
+        pick_extend(self.m_replace_plugin_dir_picker, PickButton)
         self.m_replace_plugin_dir_picker.pick_init(
             PickButton.FILE_TYPE,
+            _("Select replace script"),
             default_path=os.path.join(Settings.get_config_folder(), 'plugins'),
             pick_change_evt=self.on_replace_plugin_dir_changed
         )

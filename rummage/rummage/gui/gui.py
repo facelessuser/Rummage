@@ -826,7 +826,7 @@ class RegexTestDialog ( wx.Dialog ):
 		fgSizer41.SetFlexibleDirection( wx.BOTH )
 		fgSizer41.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		fgSizer39 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer39 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		fgSizer39.AddGrowableCol( 1 )
 		fgSizer39.SetFlexibleDirection( wx.BOTH )
 		fgSizer39.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -838,12 +838,18 @@ class RegexTestDialog ( wx.Dialog ):
 		self.m_regex_text = wx.TextCtrl( self.m_tester_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer39.Add( self.m_regex_text, 0, wx.ALL|wx.EXPAND, 5 )
 		
+		
+		fgSizer39.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
 		self.m_replace_label = wx.StaticText( self.m_tester_panel, wx.ID_ANY, u"Replace", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_replace_label.Wrap( -1 )
 		fgSizer39.Add( self.m_replace_label, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
 		
 		self.m_replace_text = wx.TextCtrl( self.m_tester_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer39.Add( self.m_replace_text, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_replace_plugin_dir_picker = wx.Button( self.m_tester_panel, wx.ID_ANY, u"...", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
+		fgSizer39.Add( self.m_replace_plugin_dir_picker, 0, wx.ALL, 5 )
 		
 		
 		fgSizer41.Add( fgSizer39, 1, wx.EXPAND, 5 )
@@ -871,42 +877,53 @@ class RegexTestDialog ( wx.Dialog ):
 		fgSizer19.Add( self.m_unicode_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_bestmatch_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Best fuzzy match", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_bestmatch_checkbox.Hide()
-		
 		fgSizer19.Add( self.m_bestmatch_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_enhancematch_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Improve fuzzy fit", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_enhancematch_checkbox.Hide()
-		
 		fgSizer19.Add( self.m_enhancematch_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_word_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Unicode word breaks", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_word_checkbox.Hide()
-		
 		fgSizer19.Add( self.m_word_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_reverse_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Search backwards", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_reverse_checkbox.Hide()
-		
 		fgSizer19.Add( self.m_reverse_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_posix_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Use POSIX matching", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_posix_checkbox.Hide()
-		
 		fgSizer19.Add( self.m_posix_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_format_replace_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_format_replace_checkbox.Hide()
-		
 		fgSizer19.Add( self.m_format_replace_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_fullcase_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Full case-folding", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_fullcase_checkbox.Hide()
-		
 		fgSizer19.Add( self.m_fullcase_checkbox, 0, wx.ALL, 5 )
 		
 		
 		fgSizer42.Add( fgSizer19, 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer42.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer42.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_staticline7 = wx.StaticLine( self.m_tester_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		fgSizer42.Add( self.m_staticline7, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		fgSizer42.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer42.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		fgSizer391 = wx.FlexGridSizer( 0, 3, 0, 0 )
+		fgSizer391.SetFlexibleDirection( wx.BOTH )
+		fgSizer391.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_replace_plugin_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Use replace plugin", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer391.Add( self.m_replace_plugin_checkbox, 0, wx.ALL, 5 )
+		
+		
+		fgSizer42.Add( fgSizer391, 1, wx.EXPAND, 5 )
 		
 		
 		fgSizer42.Add( ( 0, 0), 1, wx.EXPAND, 5 )
@@ -969,6 +986,7 @@ class RegexTestDialog ( wx.Dialog ):
 		self.m_posix_checkbox.Bind( wx.EVT_CHECKBOX, self.on_posix_toggle )
 		self.m_format_replace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_format_replace_toggle )
 		self.m_fullcase_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullcase_toggle )
+		self.m_replace_plugin_checkbox.Bind( wx.EVT_CHECKBOX, self.on_replace_plugin_toggle )
 		self.m_use_regex_button.Bind( wx.EVT_BUTTON, self.on_use )
 		self.m_close_button.Bind( wx.EVT_BUTTON, self.on_cancel )
 	
@@ -1017,6 +1035,9 @@ class RegexTestDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_fullcase_toggle( self, event ):
+		event.Skip()
+	
+	def on_replace_plugin_toggle( self, event ):
 		event.Skip()
 	
 	def on_use( self, event ):
