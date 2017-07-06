@@ -66,6 +66,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             pick_change_evt=self.on_replace_plugin_dir_changed
         )
 
+        self.m_regex_search_checkbox.SetValue(parent.m_regex_search_checkbox.GetValue())
         self.m_case_checkbox.SetValue(parent.m_case_checkbox.GetValue())
         self.m_dotmatch_checkbox.SetValue(parent.m_dotmatch_checkbox.GetValue())
         self.m_unicode_checkbox.SetValue(parent.m_unicode_checkbox.GetValue())
@@ -219,8 +220,8 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.parent.on_plugin_function_toggle(None)
 
         # Set "regex search" true if not already
-        if not self.parent.m_regex_search_checkbox.GetValue():
-            self.parent.m_regex_search_checkbox.SetValue(True)
+        if self.parent.m_regex_search_checkbox.GetValue() != self.m_regex_search_checkbox.GetValue():
+            self.parent.m_regex_search_checkbox.SetValue(self.m_regex_search_checkbox.GetValue())
             self.parent.on_regex_search_toggle(None)
 
         self.parent.m_searchfor_textbox.SetValue(self.m_regex_text.GetValue())
