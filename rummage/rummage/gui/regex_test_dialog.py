@@ -284,6 +284,10 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Test and highlight search results in content buffer."""
 
         # Replace functions
+        def replace_literal(m, replace=None):
+            """Replace literal."""
+            return replace
+
         def replace_bregex_format(m, replace=None):
             """Replace for bregex format."""
             return m.expandf(replace)
@@ -307,6 +311,8 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.testing = False
                 return
 
+            is_regex = self.m_regex_search_checkbox.GetValue()
+
             if self.regex_mode in rumcore.REGEX_MODES:
                 import regex
 
@@ -319,9 +325,6 @@ class RegexTestDialog(gui.RegexTestDialog):
                 else:
                     flags |= engine.VERSION0
                     rum_flags |= rumcore.VERSION0
-                if self.m_dotmatch_checkbox.GetValue():
-                    flags |= engine.DOTALL
-                    rum_flags |= rumcore.DOTALL
                 if not self.m_case_checkbox.GetValue():
                     flags |= engine.IGNORECASE
                     rum_flags |= rumcore.IGNORECASE
@@ -331,25 +334,32 @@ class RegexTestDialog(gui.RegexTestDialog):
                 else:
                     flags |= engine.ASCII
                     rum_flags |= rumcore.ASCII
-                if self.m_bestmatch_checkbox.GetValue():
-                    flags |= engine.BESTMATCH
-                    rum_flags |= rumcore.BESTMATCH
-                if self.m_enhancematch_checkbox.GetValue():
-                    flags |= engine.ENHANCEMATCH
-                    rum_flags |= rumcore.ENHANCEMATCH
-                if self.m_word_checkbox.GetValue():
-                    flags |= engine.WORD
-                    rum_flags |= rumcore.WORD
-                if self.m_reverse_checkbox.GetValue():
-                    flags |= engine.REVERSE
-                    rum_flags |= rumcore.REVERSE
-                if self.m_posix_checkbox.GetValue():
-                    flags |= engine.POSIX
-                    rum_flags |= rumcore.POSIX
                 if flags & engine.VERSION0 and self.m_fullcase_checkbox.GetValue():
                     flags |= engine.FULLCASE
                     rum_flags |= rumcore.FULLCASE
-            elif self.regex_mode == rumcore.BRE_MODE:
+                if is_regex:
+                    if self.m_dotmatch_checkbox.GetValue():
+                        flags |= engine.DOTALL
+                        rum_flags |= rumcore.DOTALL
+                    if self.m_bestmatch_checkbox.GetValue():
+                        flags |= engine.BESTMATCH
+                        rum_flags |= rumcore.BESTMATCH
+                    if self.m_enhancematch_checkbox.GetValue():
+                        flags |= engine.ENHANCEMATCH
+                        rum_flags |= rumcore.ENHANCEMATCH
+                    if self.m_word_checkbox.GetValue():
+                        flags |= engine.WORD
+                        rum_flags |= rumcore.WORD
+                    if self.m_reverse_checkbox.GetValue():
+                        flags |= engine.REVERSE
+                        rum_flags |= rumcore.REVERSE
+                    if self.m_posix_checkbox.GetValue():
+                        flags |= engine.POSIX
+                        rum_flags |= rumcore.POSIX
+                    search_text = self.m_regex_text.GetValue()
+                else:
+                    search_text = engine.escape(self.m_regex_text.GetValue())
+            else:
                 engine = bre if self.regex_mode == rumcore.BRE_MODE else re
 
                 flags = engine.MULTILINE
@@ -357,22 +367,30 @@ class RegexTestDialog(gui.RegexTestDialog):
                 if not self.m_case_checkbox.GetValue():
                     flags |= engine.IGNORECASE
                     rum_flags |= rumcore.IGNORECASE
-                if self.m_dotmatch_checkbox.GetValue():
-                    flags |= engine.DOTALL
-                    rum_flags |= rumcore.DOTALL
                 if self.m_unicode_checkbox.GetValue():
                     flags |= engine.UNICODE
                     rum_flags |= rumcore.UNICODE
+                else:
+                    if util.PY3:
+                        flags |= engine.ASCII
+                    rum_flags |= rumcore.ASCII
+                if is_regex:
+                    if self.m_dotmatch_checkbox.GetValue():
+                        flags |= engine.DOTALL
+                        rum_flags |= rumcore.DOTALL
+                    search_text = self.m_regex_text.GetValue()
+                else:
+                    search_text = engine.escape(self.m_regex_text.GetValue())
 
             try:
                 if self.regex_mode == rumcore.BREGEX_MODE:
-                    test = bregex.compile_search(self.m_regex_text.GetValue(), flags)
+                    test = bregex.compile_search(search_text, flags)
                 elif self.regex_mode == rumcore.REGEX_MODE:
-                    test = regex.compile(self.m_regex_text.GetValue(), flags)
+                    test = regex.compile(search_text, flags)
                 elif self.regex_mode == rumcore.BRE_MODE:
-                    test = bre.compile_search(self.m_regex_text.GetValue(), flags)
+                    test = bre.compile_search(search_text, flags)
                 else:
-                    test = re.compile(self.m_regex_text.GetValue(), flags)
+                    test = re.compile(search_text, flags)
             except Exception:
                 self.reset_highlights()
                 self.m_test_replace_text.SetValue(
@@ -399,7 +417,9 @@ class RegexTestDialog(gui.RegexTestDialog):
                     )
                     replace_test = self.import_plugin(rpattern)(file_info, rum_flags).replace
                 elif rpattern:
-                    if self.regex_mode == rumcore.BREGEX_MODE:
+                    if not is_regex:
+                        replace_test = functools.partial(replace_literal, replace=rpattern)
+                    elif self.regex_mode == rumcore.BREGEX_MODE:
                         if self.m_format_replace_checkbox.GetValue():
                             replace_test = functools.partial(replace_bregex_format, replace=rpattern)
                         else:
@@ -488,6 +508,8 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     on_regex_changed = regex_start_event
 
+    on_regex_toggle = regex_start_event
+
     on_case_toggle = regex_start_event
 
     on_dot_toggle = regex_start_event
@@ -501,6 +523,8 @@ class RegexTestDialog(gui.RegexTestDialog):
     on_word_toggle = regex_start_event
 
     on_reverse_toggle = regex_start_event
+
+    on_posix_toggle = regex_start_event
 
     on_format_replace_toggle = regex_start_event
 

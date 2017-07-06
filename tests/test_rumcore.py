@@ -56,7 +56,7 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertEqual(rc._re_literal_pattern(r"test", rc.IGNORECASE).flags, re.IGNORECASE | default)
         self.assertEqual(
             rc._re_literal_pattern(r"test", rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE).flags,
-            re.IGNORECASE | default
+            re.IGNORECASE | re.UNICODE
         )
 
     def test_bre_flags(self):
@@ -90,7 +90,7 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertEqual(rc._bre_literal_pattern(r"test", rc.IGNORECASE).flags, bre.IGNORECASE | default)
         self.assertEqual(
             rc._bre_literal_pattern(r"test", rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE).flags,
-            bre.IGNORECASE | default
+            bre.IGNORECASE | bre.UNICODE
         )
 
     def test_regex_flags(self):
@@ -145,9 +145,9 @@ class TestHelperFunctions(unittest.TestCase):
             rc._regex_literal_pattern(
                 r"test",
                 rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE |
-                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.VERSION1
+                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE | rc.VERSION0
             ).flags,
-            regex.IGNORECASE | regex.V0 | regex.ASCII
+            regex.IGNORECASE | regex.V0 | regex.UNICODE | regex.FULLCASE
         )
 
     def test_bregex_flags(self):
@@ -204,9 +204,9 @@ class TestHelperFunctions(unittest.TestCase):
             rc._bregex_literal_pattern(
                 r"test",
                 rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE |
-                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.VERSION1
+                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE | rc.VERSION0
             ).flags,
-            bregex.IGNORECASE | bregex.V0 | bregex.ASCII
+            bregex.IGNORECASE | bregex.V0 | bregex.UNICODE | bregex.FULLCASE
         )
 
     def test_exception(self):

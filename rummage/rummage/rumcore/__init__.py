@@ -151,12 +151,16 @@ def _re_pattern(pattern, rum_flags=0, binary=False):
     return re.compile(pattern, flags)
 
 
-def _re_literal_pattern(pattern, rum_flags=0):
+def _re_literal_pattern(pattern, rum_flags=0, binary=False):
     """Prepare literal search pattern flags."""
 
-    flags = re.ASCII if util.PY3 else 0
+    flags = 0
     if rum_flags & IGNORECASE:
         flags |= re.IGNORECASE
+    if not binary and rum_flags & UNICODE:
+        flags |= re.UNICODE
+    elif util.PY3:
+        flags |= re.ASCII
     return re.compile(re.escape(pattern), flags)
 
 
@@ -177,12 +181,16 @@ def _bre_pattern(pattern, rum_flags=0, binary=False):
     return bre.compile_search(pattern, flags)
 
 
-def _bre_literal_pattern(pattern, rum_flags=0):
+def _bre_literal_pattern(pattern, rum_flags=0, binary=False):
     """Prepare literal search pattern flags."""
 
-    flags = bre.ASCII if util.PY3 else 0
+    flags = 0
     if rum_flags & IGNORECASE:
         flags |= bre.IGNORECASE
+    if not binary and rum_flags & UNICODE:
+        flags |= bre.UNICODE
+    elif util.PY3:
+        flags |= bre.ASCII
     return bre.compile_search(bre.escape(pattern), flags)
 
 
@@ -220,10 +228,22 @@ if REGEX_SUPPORT:
             flags |= regex.ASCII
         return regex.compile(pattern, flags)
 
-    def _regex_literal_pattern(pattern, rum_flags=0):
+    def _regex_literal_pattern(pattern, rum_flags=0, binary=False):
         """Prepare literal search pattern flags."""
 
-        flags = regex.VERSION0 | regex.ASCII
+        flags = 0
+        if rum_flags & VERSION1:
+            flags |= regex.VERSION1
+        else:
+            flags |= regex.VERSION0
+            if rum_flags & FULLCASE:
+                flags |= regex.FULLCASE
+
+        if not binary and rum_flags & UNICODE:
+            flags |= regex.UNICODE
+        else:
+            flags |= regex.ASCII
+
         if rum_flags & IGNORECASE:
             flags |= regex.IGNORECASE
         return regex.compile(regex.escape(pattern), flags)
@@ -239,6 +259,7 @@ if REGEX_SUPPORT:
             flags |= bregex.VERSION0
             if rum_flags & FULLCASE:
                 flags |= bregex.FULLCASE
+
         if rum_flags & WORD:
             flags |= bregex.WORD
         if rum_flags & BESTMATCH:
@@ -261,10 +282,23 @@ if REGEX_SUPPORT:
             flags |= bregex.ASCII
         return bregex.compile_search(pattern, flags)
 
-    def _bregex_literal_pattern(pattern, rum_flags=0):
+    def _bregex_literal_pattern(pattern, rum_flags=0, binary=False):
         """Prepare literal search pattern flags."""
 
-        flags = bregex.VERSION0 | bregex.ASCII
+        flags = 0
+
+        if rum_flags & VERSION1:
+            flags |= bregex.VERSION1
+        else:
+            flags |= bregex.VERSION0
+            if rum_flags & FULLCASE:
+                flags |= bregex.FULLCASE
+
+        if not binary and rum_flags & UNICODE:
+            flags |= bregex.UNICODE
+        else:
+            flags |= bregex.ASCII
+
         if rum_flags & IGNORECASE:
             flags |= bregex.IGNORECASE
         return bregex.compile_search(bregex.escape(pattern), flags)
@@ -669,13 +703,13 @@ class _FileSearch(object):
             if bool(flags & LITERAL):
                 self.literal = True
                 if self.regex_mode == BREGEX_MODE:
-                    pattern = _bregex_literal_pattern(pattern, flags)
+                    pattern = _bregex_literal_pattern(pattern, flags, self.is_binary)
                 elif self.regex_mode == REGEX_MODE:
-                    pattern = _regex_literal_pattern(pattern, flags)
+                    pattern = _regex_literal_pattern(pattern, flags, self.is_binary)
                 elif self.regex_mode == BRE_MODE:
-                    pattern = _bre_literal_pattern(pattern, flags)
+                    pattern = _bre_literal_pattern(pattern, flags, self.is_binary)
                 else:
-                    pattern = _re_literal_pattern(pattern, flags)
+                    pattern = _re_literal_pattern(pattern, flags, self.is_binary)
             else:
                 if self.regex_mode == BREGEX_MODE:
                     pattern = _bregex_pattern(pattern, flags, self.is_binary)

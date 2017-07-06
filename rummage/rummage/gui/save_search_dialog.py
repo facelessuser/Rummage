@@ -104,16 +104,21 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         """Get flags in a string representation."""
 
         flags = ""
+
+        mode = Settings.get_regex_mode()
+        version = Settings.get_regex_version()
+
         if not self.parent.m_case_checkbox.GetValue():
             flags += "i"
+        if self.parent.m_unicode_checkbox.GetValue():
+            flags += "u"
+        if mode in rumcore.REGEX_MODES and version == 0 and self.parent.m_fullcase_checkbox.GetValue():
+            flags += "f"
+
         if self.is_regex:
             if self.parent.m_dotmatch_checkbox.GetValue():
                 flags += "s"
-            if self.parent.m_unicode_checkbox.GetValue():
-                flags += "u"
-            mode = Settings.get_regex_mode()
             if mode in rumcore.REGEX_MODES:
-                version = Settings.get_regex_version()
                 if self.parent.m_bestmatch_checkbox.GetValue():
                     flags += "b"
                 if self.parent.m_enhancematch_checkbox.GetValue():
@@ -124,8 +129,6 @@ class SaveSearchDialog(gui.SaveSearchDialog):
                     flags += "r"
                 if self.parent.m_posix_checkbox.GetValue():
                     flags += "p"
-                if version == 0 and self.parent.m_fullcase_checkbox.GetValue():
-                    flags += "f"
                 if self.parent.m_format_replace_checkbox.GetValue():
                     flags += "F"
         return flags
