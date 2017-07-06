@@ -10,12 +10,15 @@
 - **NEW**: Saved searches will now require a unique name and an optional comment. Old legacy saves will be converted on first access. The old legacy name will be the comment, and a unique name will be generated from the comment.
 - **NEW**: Saved search names and comments can be edited from the "Load Search" panel.
 - **NEW**: Internal API no longer will guess and decode strings, only files.  It is expected that the caller handles encoding of string buffers.  A Unicode buffer will be searched as usual, and a binary string buffer will be treated as binary.
+- **NEW**: Tester dialog will now process literal searches as well.
+- **NEW**: Literal searches will now utilize the Unicode related flags. This is particularly notable if using the Regex module and wanting to have full case-folding applied in case-insensitive matches.
 - **FIX**: Fix wxPython deprecation noise in the console.
 - **FIX**: Fix some binary related replace issues.
 - **FIX**: Fix search not aborting.
 - **FIX**: Fix issue where selecting file from drop down list didn't hide limit panel.
 - **FIX**: Don't display replace message when aborting replace.
 - **FIX**: Fix limit panel hide logic so it doesn't show a the hidden panel on search.
+- **FIX**: Posix flag not generating refresh in tester dialog.
 
 ## 2.0.5
 

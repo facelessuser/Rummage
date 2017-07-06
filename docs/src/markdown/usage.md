@@ -89,6 +89,7 @@ Toggle                      | Description
 Best\ fuzzy\ match          | If performing a fuzzy match, the *best* fuzzy match will be used.
 Improve\ fuzzy\ fit         | Makes fuzzy matching attempt to improve the fit of the next match that it finds.
 Unicode\ word\ breaks       | Will use proper Unicode word breaks when Unicode is enabled.  This differs from Re's default.
+Use\ POSIX\ matching        | Use the POSIX standard for regular expression, which is to return the leftmost longest match.
 Search\ backwards           | Search backwards. The result of a reverse search is not necessarily the reverse of a forward search.
 Format\ style\ replacements | Replace pattern will use [Python's string replace format][format-string] for replace. `#!python "{1[-1]} {1[-2]} {1[-3]}"` etc.
 Full\ case-folding          | Use full case folding. For Regex `V0` only as it is enabled by default for `V1`.
