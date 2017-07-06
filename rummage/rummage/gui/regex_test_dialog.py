@@ -122,6 +122,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.SetTitle(_("Regex Tester"))
         self.m_use_regex_button.SetLabel(_("Use"))
         self.m_close_button.SetLabel(_("Close"))
+        self.m_regex_search_checkbox.SetLabel(_("Regex search"))
         self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
         self.m_dotmatch_checkbox.SetLabel(_("Dot matches newline"))
         self.m_unicode_checkbox.SetLabel(_("Use Unicode properties"))
@@ -137,6 +138,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         main_sizer = self.m_tester_panel.GetSizer()
         main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Regex Input"))
         self.m_find_label.SetLabel(_("Find"))
+        self.m_replace_plugin_checkbox.SetLabel(_("Use replace plugin"))
         if self.parent.m_replace_plugin_checkbox.GetValue():
             self.m_replace_label.SetLabel(_("Replace plugin"))
         else:
