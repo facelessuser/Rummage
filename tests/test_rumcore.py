@@ -222,13 +222,13 @@ class TestHelperFunctions(unittest.TestCase):
 
 
 class TestRummageFileContent(unittest.TestCase):
-    """Tests for RummageFileContent."""
+    """Tests for _RummageFileContent."""
 
     def test_string_bin(self):
         """Test passing a binary string."""
 
         encoding = td.Encoding('bin', None)
-        rfc = rc.RummageFileContent("buffer", None, encoding, b'test')
+        rfc = rc._RummageFileContent("buffer", None, encoding, b'test')
         with rfc as bfr:
             text = bfr
         self.assertEqual(rfc.encoding.encode, 'bin')
@@ -238,7 +238,7 @@ class TestRummageFileContent(unittest.TestCase):
         """Test passing a binary string."""
 
         encoding = td.Encoding('unicode', None)
-        rfc = rc.RummageFileContent("buffer", None, encoding, 'test')
+        rfc = rc._RummageFileContent("buffer", None, encoding, 'test')
         with rfc as bfr:
             text = bfr
         self.assertEqual(rfc.encoding.encode, 'unicode')
@@ -249,7 +249,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('bin', None)
         name = "tests/encodings/binary.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with open(name, 'rb') as f:
@@ -262,7 +262,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('utf-8', codecs.BOM_UTF8)
         name = "tests/encodings/utf8_bom.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with codecs.open(name, 'r', encoding='utf-8-sig') as f:
@@ -275,7 +275,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('utf-16-be', codecs.BOM_UTF16_BE)
         name = "tests/encodings/utf16_be_bom.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with codecs.open(name, 'r', encoding='utf-16') as f:
@@ -288,7 +288,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('utf-32-be', codecs.BOM_UTF32_BE)
         name = "tests/encodings/utf32_be_bom.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with codecs.open(name, 'r', encoding='utf-32') as f:
@@ -301,7 +301,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('ascii', None)
         name = "tests/encodings/does_not_exist.txt"
-        rfc = rc.RummageFileContent(name, 10, encoding)
+        rfc = rc._RummageFileContent(name, 10, encoding)
         self.assertRaises(rc.RummageException, rfc.__enter__)
 
     def test_bin_rummageexception(self):
@@ -309,7 +309,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('bin', None)
         name = "tests/encodings/does_not_exist.txt"
-        rfc = rc.RummageFileContent(name, 10, encoding)
+        rfc = rc._RummageFileContent(name, 10, encoding)
         self.assertRaises(rc.RummageException, rfc.__enter__)
 
     def test_wrong(self):
@@ -317,7 +317,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('utf-32-be', codecs.BOM_UTF32_BE)
         name = "tests/encodings/utf8.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with open(name, 'rb') as f:

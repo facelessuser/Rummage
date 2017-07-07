@@ -332,6 +332,47 @@ class ErrorRecord(namedtuple('ErrorRecord', ['error'])):
     """A record for non-file related errors."""
 
 
+class Search(object):
+    """Search setup object."""
+
+    def __init__(self, replace=False):
+        """Setup search object as as a search only or search and replace object."""
+
+        self._entry = []
+        self._is_replace = replace
+
+    def add(self, search, replace=None, flags=0):
+        """Add search entry."""
+
+        self._entry.append(
+            (
+                search,
+                ("" if replace is None else replace),
+                flags & SEARCH_MASK
+            )
+        )
+
+    def __string__(self):
+        """To string."""
+
+        return str(self._entry)
+
+    def is_replace(self):
+        """Is this a replace object."""
+
+        return self._is_replace
+
+    def __getitem__(self, index):
+        """Get entry item."""
+
+        return self._entry[index]
+
+    def __len__(self):
+        """Get length."""
+
+        return len(self._entry)
+
+
 class ReplacePlugin(object):
     """Rummage replace plugin."""
 
@@ -340,6 +381,10 @@ class ReplacePlugin(object):
 
         self.file_info = file_info
         self.flags = flags
+        self.on_init()
+
+    def on_init(self):
+        """Override this function to add initialization setup."""
 
     def get_flags(self):
         """Get flags."""
@@ -367,7 +412,7 @@ class ReplacePlugin(object):
         return m.group(0)
 
 
-class RummageFileContent(object):
+class _RummageFileContent(object):
     """Either return a string or memory map file object."""
 
     def __init__(self, name, size, encoding, file_content=None):
@@ -834,7 +879,7 @@ class _FileSearch(object):
             try:
                 file_record_sent = False
 
-                rum_content = RummageFileContent(
+                rum_content = _RummageFileContent(
                     file_info.name, file_info.size, self.current_encoding, self.file_content
                 )
                 self.file_content = None
@@ -956,7 +1001,7 @@ class _FileSearch(object):
 
             try:
                 file_record_sent = False
-                rum_content = RummageFileContent(
+                rum_content = _RummageFileContent(
                     file_info.name, file_info.size, self.current_encoding, self.file_content
                 )
                 self.file_content = None
@@ -1065,47 +1110,6 @@ class _FileSearch(object):
                 None,
                 get_exception()
             )
-
-
-class Search(object):
-    """Search setup object."""
-
-    def __init__(self, replace=False):
-        """Setup search object as as a search only or search and replace object."""
-
-        self._entry = []
-        self._is_replace = replace
-
-    def add(self, search, replace=None, flags=0):
-        """Add search entry."""
-
-        self._entry.append(
-            (
-                search,
-                ("" if replace is None else replace),
-                flags & SEARCH_MASK
-            )
-        )
-
-    def __string__(self):
-        """To string."""
-
-        return str(self._entry)
-
-    def is_replace(self):
-        """Is this a replace object."""
-
-        return self._is_replace
-
-    def __getitem__(self, index):
-        """Get entry item."""
-
-        return self._entry[index]
-
-    def __len__(self):
-        """Get length."""
-
-        return len(self._entry)
 
 
 class _DirWalker(object):
