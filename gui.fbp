@@ -3377,7 +3377,7 @@
                                                                     <property name="proportion">1</property>
                                                                     <object class="wxGridBagSizer" expanded="0">
                                                                         <property name="empty_cell_size"></property>
-                                                                        <property name="flexible_direction">wxHORIZONTAL</property>
+                                                                        <property name="flexible_direction">wxBOTH</property>
                                                                         <property name="growablecols">7</property>
                                                                         <property name="growablerows">0,1,2,3</property>
                                                                         <property name="hgap">0</property>
@@ -4292,7 +4292,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">3</property>
-                                                                            <property name="flag">wxEXPAND|wxTOP|wxBOTTOM|wxLEFT</property>
+                                                                            <property name="flag">wxBOTTOM|wxLEFT|wxTOP|wxALIGN_CENTER_VERTICAL</property>
                                                                             <property name="row">1</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="CustomControl" expanded="0">
@@ -4380,7 +4380,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">4</property>
-                                                                            <property name="flag">wxALIGN_CENTER_VERTICAL|wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT</property>
+                                                                            <property name="flag">wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL</property>
                                                                             <property name="row">1</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="wxSpinButton" expanded="0">
@@ -4997,7 +4997,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">3</property>
-                                                                            <property name="flag">wxEXPAND|wxTOP|wxBOTTOM|wxLEFT</property>
+                                                                            <property name="flag">wxBOTTOM|wxLEFT|wxTOP|wxALIGN_CENTER_VERTICAL</property>
                                                                             <property name="row">2</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="CustomControl" expanded="0">
@@ -5085,7 +5085,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">4</property>
-                                                                            <property name="flag">wxALIGN_CENTER_VERTICAL|wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT</property>
+                                                                            <property name="flag">wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL</property>
                                                                             <property name="row">2</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="wxSpinButton" expanded="0">
