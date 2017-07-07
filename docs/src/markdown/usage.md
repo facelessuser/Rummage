@@ -35,6 +35,7 @@ python3 -m rummage --path mydirectory
 
 ## Search Tab
 
+<!-- TODO: update image -->
 ![Search Tab](/images/search_tab.png)
 
 The **Search** tab is broken up into 2 panels, the first of which is the **Search &amp; Replace** panel. The **Search &amp; Replace** panel has all the inputs where the search and replace is defined and configured.  It also has access to the regular expression tester and the save/load dialogs for saving/loading patterns for later use.
@@ -109,6 +110,7 @@ Use\ replace\ plugin    | When enabled, Rummage will use a [replace plugin](#rep
 
 ### Regular Expression Tester
 
+<!-- TODO: update image -->
 ![Regex Tester](/images/regex_tester.png)
 
 Rummage comes with a simple regular expression tester (but you can also test literal patterns if desired). It has a simple multi-line text box to place content to search, and another multi-line box that will show the final results after the find and replace are applied.  Below that you will find two text input boxes for the find pattern and the replace pattern.  Lastly, all search and replace flag toggles are found under the patterns.
@@ -127,70 +129,92 @@ You'll notice that there are two input boxes. The first requires a unique name (
 
 Underneath the inputs will be the actual search settings being saved.  All of the search settings will be in read only controls.
 
+<!-- TODO: update image -->
 ![Save Search](/images/save_search.png)
 
 To load a pattern that was saved previously, click the `Load Search` button.  You will be presented with a dialog showing all your saved searches.  Highlight the pattern you want to load and click the `Load` button.  Your pattern and toggles will be populated in the main dialog.
 
 If you wish to edit the name or comment of a search, you can double click the entry or click the "Edit" button.
 
+<!-- TODO: update image -->
 ![Load Search](/images/load_search.png)
 
 ### Search Chains
 
-There are times you may have a task that requires you to do multiple find and replaces that are all related, but are not too difficult to represent as a single find and replace. This is where search chains can be helpful.
+<!-- TODO: Search chain dialog -->
 
-Search chains are essentially a sequence of multiple [saved search and replace patterns](#saving-and-loading-regular-expressions). You can create a search chain by clicking the `Search Chains` button which will bring up the search change manager.  Here you can create or delete search chains.
+There are times you may have a task that requires you to do multiple find and replaces that are all related, but are too difficult to represent as a single find and replace. This is where search chains can be helpful.
 
-To use search chains you must put Rummage in "search chain" mode by selecting the check box named `Use search chains` in the main window. When enable "search chain" mode, all controls that don't apply to search chains will be disabled, and the search box will be replaced with a drop down for selecting created chains. When a search is performed, Rummage will iterate over each file with all the saved searches in the chain.
+Search chains are essentially a sequence of multiple [saved search and replace patterns](#saving-and-loading-regular-expressions). You can create a search chain by clicking the `Search Chains` button which will bring up the search change manager.
+
+<!-- TODO: Show checkbox image -->
+
+Here you can create or delete search chains.
+
+<!-- TODO: Image showing configuring chain -->
+
+To use search chains you must put Rummage in "search chain" mode by selecting the check box named `Use search chains` in the main window. When "search chain" mode is enabled, all controls that don't apply to search chains will be disabled, and the search box will be replaced with a drop down for selecting created chains. When a search is performed, Rummage will iterate over each file with all the saved searches in the chain.
 
 ### Replace plugins
 
 Regular expressions are great, but some times regular expressions aren't enough.  If you are dealing with a replace task that requires logic that cannot be represented in a simple replace pattern, you can create a "replace plugin".
 
-Simply create a Python script with a Replace class derived from `ReplacePlugin` class found in `rumcore` at: `#!py from rummage.rummage import rumcore`.  The plugin must include a function called `get_replace` that returns the needed class.
+Simply create a Python script with a Replace class derived from the `ReplacePlugin` class found in `rumcore` at: `#!py from rummage.rummage import rumcore`.  The plugin file must include a function called `get_replace` that returns the needed class.
 
-Base class is below:
+`ReplacePlugin`
+: 
+
+    ```py
+    class ReplacePlugin(object):
+        """Rummage replace plugin."""
+
+        def __init__(self, file_info, flags):
+            """Initialize."""
+
+            self.file_info = file_info
+            self.flags = flags
+            self.on_init()
+
+        def on_init(self):
+            """Override this function to add initialization setup."""
+
+        def get_flags(self):
+            """Get flags."""
+
+            return self.flags
+
+        def get_file_name(self):
+            """Get file name."""
+
+            return self.file_info.name
+
+        def is_binary(self):
+            """Is a binary search."""
+
+            return self.file_info.encoding.encode == 'bin'
+
+        def is_literal(self):
+            """Is a literal search."""
+
+            return self.flags & LITERAL
+
+        def replace(self, m):
+            """Make replacement."""
+
+            return m.group(0)
+    ```
+
+The `file_info` property is a named tuple providing information about the current file such as name, size, creation date, etc.
 
 ```py
-class ReplacePlugin(object):
-    """Rummage replace plugin."""
-
-    def __init__(self, file_info, flags):
-        """Initialize."""
-
-        self.file_info = file_info
-        self.flags = flags
-
-    def get_flags(self):
-        """Get flags."""
-
-        return self.flags
-
-    def get_file_name(self):
-        """Get file name."""
-
-        return self.file_info.name
-
-    def is_binary(self):
-        """Is a binary search."""
-
-        return self.file_info.encoding.encode == 'bin'
-
-    def is_literal(self):
-        """Is a literal search."""
-
-        return self.flags & LITERAL
-
-    def replace(self, m):
-        """Make replacement."""
-
-        return m.group(0)
+class FileInfoRecord(namedtuple('FileInfoRecord', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
+    """A record for tracking file info."""
 ```
 
-The `flags` variable seen above contain only Rummage search related flags:
+The `flags` property seen above contains only Rummage search related flags (the flags are abstracted at this level and are converted to the appropriate regular expression flags later).
 
 ```py
-# Common regex flags (re|regex)
+# Common regular expression flags (re|regex)
 IGNORECASE = 0x1  # (?i)
 DOTALL = 0x2      # (?s)
 MULTILINE = 0x4   # (?m)
@@ -212,7 +236,7 @@ POSIX = 0x2000          # (?p)
 LITERAL = 0x10000           # Literal search
 ```
 
-In this example, we have a replace plugin that replaces the search result with the name of the file.
+In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is assumed this is not a binary replace.
 
 ```py
 from __future__ import unicode_literals
@@ -226,11 +250,7 @@ class TestReplace(rumcore.ReplacePlugin):
     def replace(self, m):
         """Replace method."""
 
-        name = self.get_file_name()
-        if name is None:
-            name = '<buffer>'
-        else:
-            name = os.path.basename(name)
+        name = os.path.basename(self.get_file_name())
         return name
 
 
@@ -240,10 +260,15 @@ def get_replace():
     return TestReplace
 ```
 
-To use replace plugins, simply check the `Use plugin replace` check box, and the main dialogs `Replace with` text box will become the `Replace plugin` text box.
+To use replace plugins, simply check the `Use plugin replace` check box in the main dialog.
+
+<!-- TODO: image showing checkbox -->
+
+The main dialog's `Replace with` text box will become the `Replace plugin` text box with an associated file picker.  Here you can point to your replace plugin file.
 
 ## Limit Search Panel
 
+<!-- TODO: update image -->
 ![Limit Search Panel](/images/limit_search_panel.png)
 
 The limit search pattern contains inputs and toggles to filter which files will be searched.  Some people may like to set up the filters and hide the panel.  If this is desired, you can select in the window's menu **View-->Hide Limit Search Panel**, and the panel will be hidden.
@@ -281,6 +306,7 @@ The preference dialog (found at **File-->Preferences**) is where Rummage keeps s
 
 The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog where you can browse for your editor of choice and manage the arguments to pass to the editor.
 
+<!-- TODO: update image -->
 ![Editor Options](/images/editor_options.png)
 
 The editor options dialog has a file picker to select the the editor.  In macOS it may be beneficial to create a shell script or symlink that you can references as the picker won't be able to descend into an `.app` bundle as it is viewed as a file instead of a folder.
