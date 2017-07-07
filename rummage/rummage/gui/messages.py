@@ -1240,10 +1240,9 @@ class Messages(wx.Dialog):
                     bm.SetWidth(DEFAULT_ICON_SIZE)
                     icon = MessageIcon(bm, DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
                 else:
+                    scaled = icn.GetImage().Rescale(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
                     icon = MessageIcon(
-                        wx.BitmapFromImage(
-                            icn.GetImage().Rescale(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
-                        ),
+                        scaled.ConvertToBitmap(),
                         DEFAULT_ICON_SIZE,
                         DEFAULT_ICON_SIZE
                     )
