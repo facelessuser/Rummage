@@ -39,5 +39,6 @@ symlink
 taskbar
 timestamp
 Tox
+tuple
 UI
 wxPython
