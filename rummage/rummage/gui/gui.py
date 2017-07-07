@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Dec 21 2016)
+## Python code generated with wxFormBuilder (version Jun 22 2017)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO "NOT" EDIT THIS FILE!
@@ -1669,7 +1669,7 @@ class SaveSearchDialog ( wx.Dialog ):
 		self.m_name_text = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		gbSizer5.Add( self.m_name_text, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_comment_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Optional comment", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_comment_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Comment", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_comment_label.Wrap( -1 )
 		gbSizer5.Add( self.m_comment_label, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
 		
@@ -1679,14 +1679,14 @@ class SaveSearchDialog ( wx.Dialog ):
 		self.m_staticline7 = wx.StaticLine( self.m_save_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		gbSizer5.Add( self.m_staticline7, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND |wx.ALL, 5 )
 		
-		self.m_search_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Search pattern", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_search_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Search", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_search_label.Wrap( -1 )
 		gbSizer5.Add( self.m_search_label, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
 		
 		self.m_search_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
 		gbSizer5.Add( self.m_search_textbox, wx.GBPosition( 3, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_replace_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Replace pattern", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_replace_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Replace", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_replace_label.Wrap( -1 )
 		gbSizer5.Add( self.m_replace_label, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
 		

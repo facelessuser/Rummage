@@ -72,9 +72,9 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.m_apply_button.SetLabel(_("Save"))
         self.m_cancel_button.SetLabel(_("Cancel"))
         self.m_name_label.SetLabel(_("Name"))
-        self.m_comment_label.SetLabel(_("Optional comment"))
-        self.m_search_label.SetLabel(_("Search pattern"))
-        self.m_replace_label.SetLabel(_("Replace pattern"))
+        self.m_comment_label.SetLabel(_("Comment"))
+        self.m_search_label.SetLabel(_("Search"))
+        self.m_replace_label.SetLabel(_("Replace"))
         self.m_flags_label.SetLabel(_("Flags"))
 
         self.Fit()
@@ -84,13 +84,17 @@ class SaveSearchDialog(gui.SaveSearchDialog):
 
         if data is not None:
             self.m_name_text.SetValue(data[0])
-            self.m_comment_textbox.SetValue(data[1])
+            if not data[1]:
+                self.m_comment_textbox.SetHint(_("Optional"))
+            else:
+                self.m_comment_textbox.SetValue(data[1])
             self.m_search_textbox.SetValue(data[2])
             self.m_replace_textbox.SetValue(data[3])
             self.m_flags_textbox.SetValue(data[4])
             self.is_regex = data[5]
             self.is_plugin = data[6]
         else:
+            self.m_comment_textbox.SetHint(_("Optional"))
             self.m_search_textbox.SetValue(self.parent.m_searchfor_textbox.GetValue())
             self.m_replace_textbox.SetValue(self.parent.m_replace_textbox.GetValue())
             self.is_regex = self.parent.m_regex_search_checkbox.GetValue()
