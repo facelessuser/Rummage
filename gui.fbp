@@ -4380,7 +4380,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">4</property>
-                                                                            <property name="flag">wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL</property>
+                                                                            <property name="flag">wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL</property>
                                                                             <property name="row">1</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="wxSpinButton" expanded="0">
@@ -5085,7 +5085,7 @@
                                                                             <property name="border">5</property>
                                                                             <property name="colspan">1</property>
                                                                             <property name="column">4</property>
-                                                                            <property name="flag">wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL</property>
+                                                                            <property name="flag">wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL</property>
                                                                             <property name="row">2</property>
                                                                             <property name="rowspan">1</property>
                                                                             <object class="wxSpinButton" expanded="0">
