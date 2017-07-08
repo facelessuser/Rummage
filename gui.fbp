@@ -11,7 +11,7 @@
         <property name="embedded_files_path"></property>
         <property name="encoding">UTF-8</property>
         <property name="event_generation">connect</property>
-        <property name="file">rummage/rummage/gui/gui</property>
+        <property name="file">rummage/lib/gui/gui</property>
         <property name="first_id">1000</property>
         <property name="help_provider">none</property>
         <property name="internationalize">0</property>
@@ -527,7 +527,7 @@
                                                                                         <property name="gripper">0</property>
                                                                                         <property name="hidden">0</property>
                                                                                         <property name="id">wxID_ANY</property>
-                                                                                        <property name="include">from .autocomplete_combo import AutoCompleteCombo</property>
+                                                                                        <property name="include">from .controls.autocomplete_combo import AutoCompleteCombo</property>
                                                                                         <property name="max_size"></property>
                                                                                         <property name="maximize_button">0</property>
                                                                                         <property name="maximum_size"></property>
@@ -4238,7 +4238,7 @@
                                                                                 <property name="gripper">0</property>
                                                                                 <property name="hidden">0</property>
                                                                                 <property name="id">wxID_ANY</property>
-                                                                                <property name="include">from .date_picker import DatePicker</property>
+                                                                                <property name="include">from .controls.date_picker import DatePicker</property>
                                                                                 <property name="max_size"></property>
                                                                                 <property name="maximize_button">0</property>
                                                                                 <property name="maximum_size"></property>
@@ -5975,7 +5975,7 @@
                                                         <property name="gripper">0</property>
                                                         <property name="hidden">0</property>
                                                         <property name="id">wxID_ANY</property>
-                                                        <property name="include">from .result_lists import ResultFileList</property>
+                                                        <property name="include">from .controls.result_lists import ResultFileList</property>
                                                         <property name="max_size"></property>
                                                         <property name="maximize_button">0</property>
                                                         <property name="maximum_size"></property>
@@ -6146,7 +6146,7 @@
                                                         <property name="gripper">0</property>
                                                         <property name="hidden">0</property>
                                                         <property name="id">wxID_ANY</property>
-                                                        <property name="include">from .result_lists import ResultContentList</property>
+                                                        <property name="include">from .controls.result_lists import ResultContentList</property>
                                                         <property name="max_size"></property>
                                                         <property name="maximize_button">0</property>
                                                         <property name="maximum_size"></property>
@@ -6658,7 +6658,7 @@
                                     <property name="gripper">0</property>
                                     <property name="hidden">0</property>
                                     <property name="id">wxID_ANY</property>
-                                    <property name="include">from .search_chain_list import SearchChainList</property>
+                                    <property name="include">from .controls.search_chain_list import SearchChainList</property>
                                     <property name="max_size"></property>
                                     <property name="maximize_button">0</property>
                                     <property name="maximum_size"></property>
@@ -7523,7 +7523,7 @@
                                                     <property name="gripper">0</property>
                                                     <property name="hidden">0</property>
                                                     <property name="id">wxID_ANY</property>
-                                                    <property name="include">from .list_box import ListBox</property>
+                                                    <property name="include">from .controls.list_box import ListBox</property>
                                                     <property name="max_size"></property>
                                                     <property name="maximize_button">0</property>
                                                     <property name="maximum_size"></property>
@@ -10688,7 +10688,7 @@
                                     <property name="gripper">0</property>
                                     <property name="hidden">0</property>
                                     <property name="id">wxID_ANY</property>
-                                    <property name="include">from .load_search_list import SavedSearchList</property>
+                                    <property name="include">from .controls.load_search_list import SavedSearchList</property>
                                     <property name="max_size"></property>
                                     <property name="maximize_button">0</property>
                                     <property name="maximum_size"></property>
@@ -17426,7 +17426,7 @@
                                     <property name="gripper">0</property>
                                     <property name="hidden">0</property>
                                     <property name="id">wxID_ANY</property>
-                                    <property name="include">from .search_error_list import ErrorList</property>
+                                    <property name="include">from .controls.search_error_list import ErrorList</property>
                                     <property name="max_size"></property>
                                     <property name="maximize_button">0</property>
                                     <property name="maximum_size"></property>

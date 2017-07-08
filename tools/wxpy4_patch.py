@@ -11,7 +11,7 @@ RE_APPEND_ITEM = re.compile(r'\bAppendItem\b')
 RE_ADV = re.compile(r'\b(wx\.)(GenericDatePickerCtrl|DP_)')
 RE_ST = re.compile(r'\b(wx\.ST)(_)')
 
-gui = os.path.join('rummage', 'rummage', 'gui', 'gui.py')
+gui = os.path.join('rummage', 'lib', 'gui', 'gui.py')
 
 with codecs.open(gui, 'r', encoding="utf-8") as f:
     buf = f.read().replace('\r', '')

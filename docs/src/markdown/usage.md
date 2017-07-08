@@ -155,7 +155,7 @@ To use search chains you must put Rummage in "search chain" mode by selecting th
 
 Regular expressions are great, but some times regular expressions aren't enough.  If you are dealing with a replace task that requires logic that cannot be represented in a simple replace pattern, you can create a "replace plugin".
 
-Simply create a Python script with a Replace class derived from the `ReplacePlugin` class found in `rumcore` at: `#!py from rummage.rummage import rumcore`.  The plugin file must include a function called `get_replace` that returns the needed class.
+Simply create a Python script with a Replace class derived from the `ReplacePlugin` class found in `rumcore` at: `#!py from rummage.lib import rumcore`.  The plugin file must include a function called `get_replace` that returns the needed class.
 
 ```py
 class ReplacePlugin(object):
@@ -243,7 +243,7 @@ The main dialog's `Replace with` text box will become the `Replace plugin` text 
 
     ```py
     from __future__ import unicode_literals
-    from rummage.rummage import rumcore
+    from rummage.lib import rumcore
     import os
 
 

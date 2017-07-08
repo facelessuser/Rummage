@@ -16,7 +16,7 @@ def get_version():
         'candidate': '4 - Beta',
         'final': '5 - Production/Stable'
     }
-    path = os.path.join(os.path.dirname(__file__), 'rummage', 'rummage')
+    path = os.path.join(os.path.dirname(__file__), 'rummage', 'lib')
     fp, pathname, desc = imp.find_module('__version__', [path])
     try:
         v = imp.load_module('__version__', fp, pathname, desc)
@@ -72,7 +72,7 @@ setup(
     zip_safe=False,
     entry_points=entry_points,
     package_data={
-        'rummage.rummage.data': ['*.css', '*.js', '*.png', '*.ico', '*.icns']
+        'rummage.lib.gui.data': ['*.css', '*.js', '*.png', '*.ico', '*.icns']
     },
     license='MIT License',
     classifiers=[

@@ -2,18 +2,18 @@
 from __future__ import unicode_literals
 import unittest
 import os
-from rummage.rummage import rumcore as rc
-from rummage.rummage import util
 import re
 import regex
-from backrefs import bre
-from backrefs import bregex
-from rummage.rummage.rumcore import text_decode as td
-from rummage.rummage import epoch_timestamp as epoch
 import codecs
 import datetime
 import tempfile
 import textwrap
+from backrefs import bre
+from backrefs import bregex
+from rummage.lib import rumcore as rc
+from rummage.lib import util
+from rummage.lib.util import epoch_timestamp as epoch
+from rummage.lib.rumcore import text_decode as td
 
 
 class TestHelperFunctions(unittest.TestCase):

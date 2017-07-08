@@ -1,9 +1,9 @@
 """Tests for text_decode.py."""
 from __future__ import unicode_literals
 import unittest
-from rummage.rummage.rumcore import text_decode
-import codecs
 import mock
+import codecs
+from rummage.lib.rumcore import text_decode
 
 
 class TestBom(unittest.TestCase):
@@ -137,7 +137,7 @@ class TestSizeSguess(unittest.TestCase):
         self.assertEqual(encoding.encode, 'ascii')
         self.assertEqual(encoding.bom, None)
 
-    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_large')
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_large')
     def test_too_big(self, mock_size):
         """Test a file size 30MB or greater."""
 
@@ -177,7 +177,7 @@ class TestSizeGuess(unittest.TestCase):
         self.assertEqual(encoding.encode, 'ascii')
         self.assertEqual(encoding.bom, None)
 
-    @mock.patch('rummage.rummage.rumcore.text_decode.os.path.getsize')
+    @mock.patch('rummage.lib.rumcore.text_decode.os.path.getsize')
     def test_too_big(self, mock_size):
         """Test a file size 30MB or greater."""
 
@@ -208,8 +208,8 @@ class TestChardetSguess(unittest.TestCase):
     Force small file detection to ensure picking an encoding early.
     """
 
-    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
-    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
     def test_confidence_pass_guess(self, mock_detect, mock_small):
         """Test result with an encoding with acceptable confidence."""
 
@@ -222,8 +222,8 @@ class TestChardetSguess(unittest.TestCase):
         self.assertEqual(encoding.encode, 'utf-8')
         self.assertEqual(encoding.bom, None)
 
-    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
-    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
     def test_confidence_fail_guess(self, mock_detect, mock_small):
         """Test result with an encoding with unacceptable confidence."""
 
@@ -236,8 +236,8 @@ class TestChardetSguess(unittest.TestCase):
         self.assertEqual(encoding.encode, 'bin')
         self.assertEqual(encoding.bom, None)
 
-    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
-    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
     def test_none_encoding_guess(self, mock_detect, mock_small):
         """Test result with an encoding that is None confidence."""
 
@@ -250,8 +250,8 @@ class TestChardetSguess(unittest.TestCase):
         self.assertEqual(encoding.encode, 'bin')
         self.assertEqual(encoding.bom, None)
 
-    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
-    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
     def test_none_guess(self, mock_detect, mock_small):
         """Test result with no encoding match."""
 
@@ -281,8 +281,8 @@ class TestChardetGuess(unittest.TestCase):
     Force small file detection to ensure picking an encoding early.
     """
 
-    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
-    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
     def test_confidence_pass_guess(self, mock_detect, mock_small):
         """Test result with an encoding with acceptable confidence."""
 
@@ -293,8 +293,8 @@ class TestChardetGuess(unittest.TestCase):
         self.assertEqual(encoding.encode, 'utf-8')
         self.assertEqual(encoding.bom, None)
 
-    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
-    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
     def test_confidence_fail_guess(self, mock_detect, mock_small):
         """Test result with an encoding with unacceptable confidence."""
 
@@ -305,8 +305,8 @@ class TestChardetGuess(unittest.TestCase):
         self.assertEqual(encoding.encode, 'bin')
         self.assertEqual(encoding.bom, None)
 
-    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
-    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
     def test_none_encoding_guess(self, mock_detect, mock_small):
         """Test result with an encoding that is None confidence."""
 
@@ -317,8 +317,8 @@ class TestChardetGuess(unittest.TestCase):
         self.assertEqual(encoding.encode, 'bin')
         self.assertEqual(encoding.bom, None)
 
-    @mock.patch('rummage.rummage.rumcore.text_decode._is_very_small')
-    @mock.patch('rummage.rummage.rumcore.text_decode.DetectEncoding')
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
     def test_none_guess(self, mock_detect, mock_small):
         """Test result with no encoding match."""
 
