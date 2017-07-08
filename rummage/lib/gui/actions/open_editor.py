@@ -20,11 +20,13 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import subprocess
-from .settings import Settings
-from .custom_app import debug, error
-from .generic_dialogs import errormsg
+from ..settings import Settings
+from ..app.custom_app import debug, error
+from ..generic_dialogs import errormsg
 from ..localization import _
-from .. import util
+from ... import util
+
+ERR_EDITOR_NOT_SET = _("No editor is currently set!")
 
 
 def open_editor(filename, line, col):
@@ -34,8 +36,8 @@ def open_editor(filename, line, col):
 
     cmd = Settings.get_editor(filename=filename, line=line, col=col)
     if len(cmd) == 0:
-        errormsg(_("No editor is currently set!"))
-        error(u"No editor set: %s" % unicode(cmd))
+        errormsg(ERR_EDITOR_NOT_SET)
+        error("No editor set: %s" % cmd)
         return
     debug(cmd)
 

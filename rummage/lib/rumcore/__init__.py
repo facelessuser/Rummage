@@ -30,14 +30,15 @@ import sre_parse
 from collections import namedtuple
 from fnmatch import fnmatch
 from time import ctime
-from . import text_decode
 from backrefs import bre, bregex
+from collections import deque
+from . import text_decode
 from .file_times import getmtime, getctime
 from .file_hidden import is_hidden
-from collections import deque
 from .. import util
 if bregex.REGEX_SUPPORT:
     import regex
+
 REGEX_SUPPORT = bregex.REGEX_SUPPORT
 
 # Common regex flags (re|regex)

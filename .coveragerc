@@ -1,9 +1,9 @@
 [run]
 omit=
-    rummage/rummage/rumcore/file_hidden.py
-    rummage/rummage/rumcore/file_times.py
+    rummage/lib/rumcore/file_hidden.py
+    rummage/lib/rumcore/file_times.py
 
 [report]
 omit=
-    rummage/rummage/rumcore/file_hidden.py
-    rummage/rummage/rumcore/file_times.py
+    rummage/lib/rumcore/file_hidden.py
+    rummage/lib/rumcore/file_times.py

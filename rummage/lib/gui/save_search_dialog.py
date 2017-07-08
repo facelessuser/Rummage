@@ -24,13 +24,22 @@ import re
 from . import gui
 from .settings import Settings, rumcore
 from .generic_dialogs import errormsg, yesno
-from ..localization import _
+from .localization import _
 from .. import util
 
-RE_NAME = re.compile(r'[\w-]', re.UNICODE)
+TITLE = _("Save Search and Replace")
+OKAY = _("Save")
+CLOSE = _("Cancel")
+NAME = _("Name")
+COMMENT = _("Comment")
+SEARCH = _("Search")
+REPLACE = _("Replace")
+FLAGS = _("Flags")
 OVERWRITE = _("'%s' already exists. Overwrite?")
 ERR_NO_NAME = _("Please give the search a name!")
 ERR_INVALID_NAME = _("Names can only be Unicode word characters, '_', and '-'")
+
+RE_NAME = re.compile(r'[\w-]', re.UNICODE)
 
 
 class SaveSearchDialog(gui.SaveSearchDialog):
@@ -68,14 +77,14 @@ class SaveSearchDialog(gui.SaveSearchDialog):
     def localize(self):
         """Localize the dialog."""
 
-        self.SetTitle(_("Save Search and Replace"))
-        self.m_apply_button.SetLabel(_("Save"))
-        self.m_cancel_button.SetLabel(_("Cancel"))
-        self.m_name_label.SetLabel(_("Name"))
-        self.m_comment_label.SetLabel(_("Comment"))
-        self.m_search_label.SetLabel(_("Search"))
-        self.m_replace_label.SetLabel(_("Replace"))
-        self.m_flags_label.SetLabel(_("Flags"))
+        self.SetTitle(TITLE)
+        self.m_apply_button.SetLabel(OKAY)
+        self.m_cancel_button.SetLabel(CLOSE)
+        self.m_name_label.SetLabel(NAME)
+        self.m_comment_label.SetLabel(COMMENT)
+        self.m_search_label.SetLabel(SEARCH)
+        self.m_replace_label.SetLabel(REPLACE)
+        self.m_flags_label.SetLabel(FLAGS)
 
         self.Fit()
 
@@ -160,7 +169,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
     def on_apply(self, event):
         """Ensure there is a name, and proceed to add saved regex to settings."""
 
-        name = self.m_name_text.GetValue()
+        name = self.m_name_text.GetValue().strip()
         if name == "":
             errormsg(ERR_NO_NAME)
             return

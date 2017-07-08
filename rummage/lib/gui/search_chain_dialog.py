@@ -20,10 +20,16 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-from . import gui
 from .settings import Settings
-from ..localization import _
-from . edit_search_chain_dialog import EditSearchChainDialog
+from .edit_search_chain_dialog import EditSearchChainDialog
+from .localization import _
+from . import gui
+
+TITLE = _("Search Chains")
+ADD = _("Add")
+EDIT = _("Edit")
+DELETE = _("Delete")
+CLOSE = _("Cancel")
 
 
 class SearchChainDialog(gui.SearchChainDialog):
@@ -50,10 +56,11 @@ class SearchChainDialog(gui.SearchChainDialog):
     def localize(self):
         """Localize."""
 
-        self.m_add_button.SetLabel(_("Add"))
-        self.m_edit_button.SetLabel(_("Edit"))
-        self.m_remove_button.SetLabel(_("Delete"))
-        self.m_cancel_button.SetLabel(_("Cancel"))
+        self.SetTitle(TITLE)
+        self.m_add_button.SetLabel(ADD)
+        self.m_edit_button.SetLabel(EDIT)
+        self.m_remove_button.SetLabel(DELETE)
+        self.m_cancel_button.SetLabel(CLOSE)
 
     def load_chains(self):
         """Populate list with chain entries."""
@@ -67,6 +74,16 @@ class SearchChainDialog(gui.SearchChainDialog):
             count += 1
         self.m_chain_list.load_list()
 
+    def edit_chain(self, name=None):
+        """Edit chain."""
+
+        dlg = EditSearchChainDialog(self, chain=name)
+        dlg.ShowModal()
+        if dlg.saved:
+            self.m_chain_list.reset_list()
+            self.load_chains()
+        dlg.Destroy()
+
     def on_remove_click(self, event):
         """Delete chain entry."""
 
@@ -77,16 +94,6 @@ class SearchChainDialog(gui.SearchChainDialog):
         Settings.delete_chain(name)
         self.m_chain_list.reset_list()
         self.load_chains()
-
-    def edit_chain(self, name=None):
-        """Edit chain."""
-
-        dlg = EditSearchChainDialog(self, chain=name)
-        dlg.ShowModal()
-        if dlg.saved:
-            self.m_chain_list.reset_list()
-            self.load_chains()
-        dlg.Destroy()
 
     def on_edit_click(self, event):
         """Edit chain on button click."""

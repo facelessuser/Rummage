@@ -20,10 +20,28 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-from . import gui
 from .arg_dialog import ArgDialog
-from ..localization import _
+from .localization import _
+from . import gui
 from .. import util
+
+TITLE = _("Configure Editor")
+OKAY = _("Apply")
+CLOSE = _("Cancel")
+ADD = _("Add")
+DELETE = _("Delete")
+EDIT = _("Edit")
+UP = _("Up")
+DOWN = _("Down")
+APPLICATION = _("Application")
+ARGUMENTS = _("Arguments")
+INSTRUCTIONS = _(
+    "Select the application and then set the arguments.\n\n"
+    "Special variables:\n"
+    "{$file} --> file path\n"
+    "{$line} --> line number\n"
+    "{$col} --> column number"
+)
 
 
 class EditorDialog(gui.EditorDialog):
@@ -61,27 +79,24 @@ class EditorDialog(gui.EditorDialog):
     def localize(self):
         """Localize dialog."""
 
-        self.SetTitle(_("Configure Editor"))
-        self.m_add_arg_button.SetLabel(_("Add"))
-        self.m_remove_arg_button.SetLabel(_("Delete"))
-        self.m_edit_button.SetLabel(_("Edit"))
-        self.m_up_button.SetLabel(_("Up"))
-        self.m_down_button.SetLabel(_("Down"))
-        self.m_apply_button.SetLabel(_("Apply"))
-        self.m_cancel_button.SetLabel(_("Cancel"))
-        self.m_instructions_label.SetLabel(
-            _(
-                "Select the application and then set the arguments.\n\n"
-                "Special variables:\n"
-                "{$file} --> file path\n"
-                "{$line} --> line number\n"
-                "{$col} --> column number"
-            )
-        )
+        self.SetTitle(TITLE)
+        self.m_add_arg_button.SetLabel(ADD)
+        self.m_remove_arg_button.SetLabel(DELETE)
+        self.m_edit_button.SetLabel(EDIT)
+        self.m_up_button.SetLabel(UP)
+        self.m_down_button.SetLabel(DOWN)
+        self.m_apply_button.SetLabel(OKAY)
+        self.m_cancel_button.SetLabel(CLOSE)
+        self.m_instructions_label.SetLabel(INSTRUCTIONS)
         self.m_instructions_label.Wrap(325)
-        self.m_editor_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(_("Application"))
-        self.m_editor_panel.GetSizer().GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Arguments"))
+        self.m_editor_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(APPLICATION)
+        self.m_editor_panel.GetSizer().GetItem(2).GetSizer().GetStaticBox().SetLabel(ARGUMENTS)
         self.Fit()
+
+    def get_editor(self):
+        """Get the selected editor."""
+
+        return self.editor
 
     def set_keybindings(self, keybindings):
         """Set keybindings for frame."""
@@ -94,6 +109,17 @@ class EditorDialog(gui.EditorDialog):
 
         if len(keybindings):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
+
+    def add_arg(self):
+        """Add argument."""
+
+        value = self.m_arg_text.GetValue()
+        if value != "":
+            index = self.m_arg_list.GetSelected()
+            if index == wx.NOT_FOUND:
+                self.m_arg_list.Insert(value, self.m_arg_list.GetCount())
+            else:
+                self.m_arg_list.Insert(value, index)
 
     def on_textctrl_selectall(self, event):
         """Selectall for TextCtrl."""
@@ -114,17 +140,6 @@ class EditorDialog(gui.EditorDialog):
 
         self.add_arg()
         event.Skip()
-
-    def add_arg(self):
-        """Add argument."""
-
-        value = self.m_arg_text.GetValue()
-        if value != "":
-            index = self.m_arg_list.GetSelected()
-            if index == wx.NOT_FOUND:
-                self.m_arg_list.Insert(value, self.m_arg_list.GetCount())
-            else:
-                self.m_arg_list.Insert(value, index)
 
     def on_edit(self, event):
         """Edit argument."""
@@ -187,8 +202,3 @@ class EditorDialog(gui.EditorDialog):
         """Close on cancel."""
 
         self.Close()
-
-    def get_editor(self):
-        """Get the selected editor."""
-
-        return self.editor

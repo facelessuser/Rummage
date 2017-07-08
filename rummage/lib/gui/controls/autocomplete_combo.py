@@ -20,7 +20,7 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-from .. import util
+from ... import util
 
 
 class AutoCompleteCombo(wx.ComboCtrl):
@@ -152,6 +152,20 @@ class AutoCompleteCombo(wx.ComboCtrl):
             self.list.set_selected_text(value)
         self.list.resize_dropdown()
 
+    def safe_set_value(self, text):
+        """Update TextCtrl without triggering autocomplete."""
+
+        self.update_semaphore = True
+        self.GetTextCtrl().SetValue(text)
+        self.update_semaphore = False
+
+    def pick_item(self):
+        """Set the choice based on the TextCtrl value."""
+
+        value = self.GetTextCtrl().GetValue()
+        if value in self.choices:
+            self.list.set_item(self.choices.index(value))
+
     def on_dismiss(self, event):
         """Load a previously selected choice to the TextCtrl on dismiss."""
 
@@ -180,13 +194,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
             self.pick_item()
         event.Skip()
 
-    def pick_item(self):
-        """Set the choice based on the TextCtrl value."""
-
-        value = self.GetTextCtrl().GetValue()
-        if value in self.choices:
-            self.list.set_item(self.choices.index(value))
-
     def on_key_down(self, event):
         """Swallow up and down arrow event if popup shown."""
 
@@ -200,13 +207,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
         elif key in [wx.WXK_DELETE, wx.WXK_BACK]:
             self.update_semaphore = True
         event.Skip()
-
-    def safe_set_value(self, text):
-        """Update TextCtrl without triggering autocomplete."""
-
-        self.update_semaphore = True
-        self.GetTextCtrl().SetValue(text)
-        self.update_semaphore = False
 
     def on_changed_callback(self, event):
         """Handle callback."""
@@ -308,13 +308,6 @@ class ListCtrlComboPopup(wx.ComboPopup):
         self.list.InsertItem(self.list.GetItemCount(), text)
         self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
 
-    def on_motion(self, event):
-        """Select item on hover."""
-
-        item = self.list.HitTest(event.GetPosition())[0]
-        if item >= 0:
-            self.list.Select(item)
-
     def next_item(self):
         """Select next item."""
 
@@ -334,6 +327,25 @@ class ListCtrlComboPopup(wx.ComboPopup):
 
         self.list.Select(idx)
 
+    def clear(self):
+        """Clear choices."""
+
+        self.list.ClearAll()
+
+    def resize_dropdown(self):
+        """Resize the list box column for the dropdown."""
+
+        if self.list.GetColumnCount():
+            if self.list.GetColumnWidth(0) < self.list.GetSize()[0] - 20:
+                self.list.SetColumnWidth(0, self.list.GetSize()[0] - 20)
+
+    def on_motion(self, event):
+        """Select item on hover."""
+
+        item = self.list.HitTest(event.GetPosition())[0]
+        if item >= 0:
+            self.list.Select(item)
+
     def on_left_down(self, event):
         """Select item and dismiss popup on left mouse click."""
 
@@ -342,11 +354,6 @@ class ListCtrlComboPopup(wx.ComboPopup):
             self.waiting_value = item
         wx.CallAfter(self.Dismiss)
         event.Skip()
-
-    def clear(self):
-        """Clear choices."""
-
-        self.list.ClearAll()
 
     def on_key_down(self, event):
         """Select item and dismiss popup on return key."""
@@ -366,13 +373,6 @@ class ListCtrlComboPopup(wx.ComboPopup):
                 self.prev_item()
                 return
         event.Skip()
-
-    def resize_dropdown(self):
-        """Resize the list box column for the dropdown."""
-
-        if self.list.GetColumnCount():
-            if self.list.GetColumnWidth(0) < self.list.GetSize()[0] - 20:
-                self.list.SetColumnWidth(0, self.list.GetSize()[0] - 20)
 
     def on_resize_dropdown(self, event):
         """Handle ListCtrl resize event."""

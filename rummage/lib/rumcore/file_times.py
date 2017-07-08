@@ -1,6 +1,6 @@
 """File times."""
 from __future__ import unicode_literals
-from os.path import getmtime as get_modified_time
+import os
 from .. import util
 
 
@@ -45,15 +45,13 @@ if util.platform() == "osx":
         return buf.st_birthtimespec.tv_sec
 
 else:
-    from os.path import getctime as get_creation_time
-
     def getctime(pth):
         """Get the creation time for everyone else."""
 
-        return get_creation_time(pth)
+        return os.path.getctime(pth)
 
 
 def getmtime(pth):
-    """Get modified time for everyone."""
+    """Get modified time for everyone (this is just a wrapper)."""
 
-    return get_modified_time(pth)
+    return os.path.getmtime(pth)

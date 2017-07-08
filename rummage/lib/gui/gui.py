@@ -10,15 +10,15 @@
 import wx
 import wx.adv
 import wx.xrc
-from .autocomplete_combo import AutoCompleteCombo
-from .date_picker import DatePicker
+from .controls.autocomplete_combo import AutoCompleteCombo
+from .controls.date_picker import DatePicker
 from wx.lib.masked import TimeCtrl
-from .result_lists import ResultFileList
-from .result_lists import ResultContentList
-from .search_chain_list import SearchChainList
-from .list_box import ListBox
-from .load_search_list import SavedSearchList
-from .search_error_list import ErrorList
+from .controls.result_lists import ResultFileList
+from .controls.result_lists import ResultContentList
+from .controls.search_chain_list import SearchChainList
+from .controls.list_box import ListBox
+from .controls.load_search_list import SavedSearchList
+from .controls.search_error_list import ErrorList
 
 wx.ID_EXit = 1000
 

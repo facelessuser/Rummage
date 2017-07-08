@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import wx.lib.mixins.listctrl as listmix
-from .. import util
+from ... import util
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
@@ -120,6 +120,11 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.SortListItems(col=0, ascending=1)
         self.init_column_size()
 
+    def get_item_text(self, idx, col, absolute=False):
+        """Return the text for the given item and col."""
+
+        return util.to_ustr(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
+
     def GetSecondarySortValues(self, col, key1, key2):
         """Get secondary sort values."""
 
@@ -143,11 +148,6 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Override method to return the text for the given item and col."""
 
         return self.get_item_text(item, col)
-
-    def get_item_text(self, idx, col, absolute=False):
-        """Return the text for the given item and col."""
-
-        return util.to_ustr(self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][col])
 
     def OnGetItemAttr(self, item):
         """Override method to get attributes for the cells in the given item."""

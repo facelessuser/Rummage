@@ -29,33 +29,149 @@ import os
 import re
 import codecs
 import wx.lib.newevent
-from .. import __meta__
-from .. import rumcore
 from backrefs import bre, bregex
-from ..epoch_timestamp import local_time_to_epoch_timestamp
-from .. import notify
-from ..localization import _
-from . import gui
-from . import export_html
-from . import export_csv
 from .settings import Settings
+from .actions import export_html
+from .actions import export_csv
+from .actions import open_editor
 from .generic_dialogs import errormsg, yesno
-from .custom_app import DebugFrameExtender
-from .custom_app import debug, error
-from .custom_statusbar import extend_sb
+from .app.custom_app import DebugFrameExtender, debug, error, simplelog
+from .controls import custom_statusbar
 from .regex_test_dialog import RegexTestDialog
-from .autocomplete_combo import AutoCompleteCombo
+from .controls.autocomplete_combo import AutoCompleteCombo
 from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
 from .search_chain_dialog import SearchChainDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
-from .pick_button import PickButton, pick_extend
+from .controls import pick_button
 from .messages import filepickermsg
-from .. import data
+from .localization import _
+from . import gui
+from . import data
+from . import notify
+from ..util import epoch_timestamp
+from .. import __meta__
+from .. import rumcore
 from .. import util
 import decimal
+
+# Combo options
+SIZE_ANY = _("any")
+SIZE_GT = _("greater than")
+SIZE_EQ = _("equal to")
+SIZE_LT = _("less than")
+
+TIME_ANY = _("on any")
+TIME_GT = _("after")
+TIME_EQ = _("on")
+TIME_LT = _("before")
+
+# Search/replace button states
+SEARCH_BTN_STOP = _("Stop")
+SEARCH_BTN_SEARCH = _("Search")
+SEARCH_BTN_ABORT = _("Aborting")
+REPLACE_BTN_REPLACE = _("Replace")
+
+# Picker/Save messages
+DIRECTORY_SELECT = _("Select directory to rummage")
+SCRIPT_SELECT = _("Select replace script")
+EXPORT_TO = _("Export to...")
+
+# Dialog messages
+MSG_REPLACE_WARN = _("Are you sure you want to replace all instances?")
+MSG_BACKUPS_DISABLED = _("Backups are currently disabled.")
+
+# Notifications
+NOTIFY_SEARCH_ABORTED = _("Search Aborted")
+NOTIFY_SEARCH_COMPLETED = _("Search Completed")
+NOTIFY_MATCHES_FOUND = _("\n%d matches found!")
+
+# ERRORS
+ERR_NO_LOG = _("Cannot find log file!")
+ERR_EMPTY_SEARCH = _("There is no search to save!")
+ERR_HTML_FAILED = _("There was a problem exporting the HTML!  See the log for more info.")
+ERR_CSV_FAILED = _("There was a problem exporting the CSV!  See the log for more info.")
+ERR_NOTHING_TO_EXPORT = _("There is nothing to export!")
+ERR_SETUP = _("There was an error in setup! Please check the log.")
+ERR_INVALID_SEARCH_PTH = _("Please enter a valid search path!")
+ERR_INVALID_SEARCH = _("Please enter a valid search!")
+ERR_EMPTY_CHAIN = _("There are no searches in this this chain!")
+ERR_MISSING_SEARCH = _("'%s' is not found in saved searches!")
+ERR_INVALID_CHAIN = _("Please enter a valid chain!")
+ERR_INVALID_CHAIN_SEARCH = _("Saved search '%s' does not contain a valid search pattern!")
+ERR_INVALID_FILE_SEARCH = _("Please enter a valid file pattern!")
+ERR_INVALID_EXCLUDE = _("Please enter a valid exlcude directory regex!")
+ERR_INVLAID_SIZE = _("Please enter a valid size!")
+ERR_INVALID_MDATE = _("Please enter a modified date!")
+ERR_INVALID_CDATE = _("Please enter a created date!")
+
+# Status
+INIT_STATUS = _("Searching: 0/0 0% Skipped: 0 Matches: 0")
+UPDATE_STATUS = _("Searching: %d/%d %d%% Skipped: %d Matches: %d")
+FINAL_STATUS = _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s")
+BENCHMARK_STATUS = _("%01.2f seconds")
+
+# Status bar popup
+SB_ERRORS = _("errors")
+SB_TOOLTIP_ERR = _("%d errors\nClick to see errors.")
+
+# Controls
+SEARCH_REPLACE = _("Search and Replace")
+LIMIT_SEARCH = _("Limit Search")
+SEARCH_IN = _("Search in")
+SEARCH_FOR = _("Search for")
+SEARCH_CHAIN = _("Search chain")
+REPLACE_WITH = _("Replace with")
+REPLACE_PLUGIN = _("Replace plugin")
+SIZE_IS = _("Size is")
+MODIFIED = _("Modified")
+CREATED = _("Created")
+EXCLUDE = _("Exclude folders")
+FILE_MATCH = _("Files which match")
+SEARCH_WITH_REGEX = _("Search with regex")
+CASE = _("Search case-sensitive")
+DOTALL = _("Dot matches newline")
+UNICODE = _("Use Unicode properties")
+BOOLEAN = _("Boolean match")
+COUNT_ONLY = _("Count only")
+CREATE_BACKUPS = _("Create backups")
+FORCE = _("Force")
+USE_CHAIN = _("Use chain search")
+USE_PLUGIN = _("Use plugin replace")
+BESTMATCH = _("Best fuzzy match")
+FUZZY_FIT = _("Improve fuzzy fit")
+WORD = _("Unicode word breaks")
+REVERSE = _("Search backwards")
+POSIX = _("Use POSIX matching")
+FORMAT = _("Format style replacements")
+CASEFOLD = _("Full case-folding")
+SUBFOLDERS = _("Include subfolders")
+HIDDEN = _("Include hidden")
+INCLUDE_BINARY = _("Include binary files")
+USE_REGEX = _("Regex")
+TEST_REGEX = _("Test Regex")
+SAVE_SEARCH = _("Save Search")
+LOAD_SEARCH = _("Load Search")
+SEARCH = _("Search")
+
+# Menu
+MENU_EXPORT = _("Export")
+MENU_FILE = _("File")
+MENU_VIEW = _("View")
+MENU_HELP = _("Help")
+MENU_PREFERENCES = _("&Preferences")
+MENU_EXIT = _("&Exit")
+MENU_HTML = _("HTML")
+MENU_CSV = _("CSV")
+MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
+MENU_OPEN_LOG = _("Open Log File")
+MENU_ABOUT = _("&About Rummage")
+MENU_DOCUMENTATION = _("Documentation")
+MENU_HELP_SUPPORT = _("Help and Support")
+MENU_SHOW_LIMIT = _("Show Limit Search Panel")
+MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
 
 _LOCK = threading.Lock()
 _RESULTS = []
@@ -65,15 +181,6 @@ _RECORDS = 0
 _SKIPPED = 0
 _ERRORS = []
 _ABORT = False
-
-SIZE_ANY = _("any")
-SIZE_GT = _("greater than")
-SIZE_EQ = _("equal to")
-SIZE_LT = _("less than")
-TIME_ANY = _("on any")
-TIME_GT = _("after")
-TIME_EQ = _("on")
-TIME_LT = _("before")
 
 LIMIT_COMPARE = {
     0: "any",
@@ -188,11 +295,6 @@ TIME_LIMIT_I18N = {
     TIME_EQ: "on",
     TIME_LT: "before"
 }
-
-SEARCH_BTN_STOP = _("Stop")
-SEARCH_BTN_SEARCH = _("Search")
-SEARCH_BTN_ABORT = _("Aborting")
-REPLACE_BTN_REPLACE = _("Replace")
 
 
 def eng_to_i18n(string, mapping):
@@ -354,7 +456,7 @@ class RummageThread(threading.Thread):
             error(traceback.format_exc())
 
         bench = time() - start
-        runtime = _("%01.2f seconds") % bench
+        runtime = BENCHMARK_STATUS % bench
 
         self.runtime = runtime
         self.running = False
@@ -451,20 +553,20 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.Bind(wx.EVT_IDLE, self.on_idle)
 
         # Extend the statusbar
-        extend_sb(self.m_statusbar)
+        custom_statusbar.extend_sb(self.m_statusbar)
         self.m_statusbar.set_status("")
 
         # Extend browse button
-        pick_extend(self.m_searchin_dir_picker, PickButton)
+        pick_button.pick_extend(self.m_searchin_dir_picker, pick_button.PickButton)
         self.m_searchin_dir_picker.pick_init(
-            PickButton.DIR_TYPE,
-            _("Select directory to rummage"),
+            pick_button.PickButton.DIR_TYPE,
+            DIRECTORY_SELECT,
             pick_change_evt=self.on_dir_changed
         )
-        pick_extend(self.m_replace_plugin_dir_picker, PickButton)
+        pick_button.pick_extend(self.m_replace_plugin_dir_picker, pick_button.PickButton)
         self.m_replace_plugin_dir_picker.pick_init(
-            PickButton.FILE_TYPE,
-            _("Select replace script"),
+            pick_button.PickButton.FILE_TYPE,
+            SCRIPT_SELECT,
             default_path=os.path.join(Settings.get_config_folder(), 'plugins'),
             pick_change_evt=self.on_replace_plugin_dir_changed
         )
@@ -489,7 +591,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if Settings.get_hide_limit():
             self.hide_limit_panel = True
             self.limit_panel_hide()
-            self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
+            self.m_hide_limit_menuitem.SetItemLabel(MENU_SHOW_LIMIT)
 
         self.init_search_path(start_path)
 
@@ -509,65 +611,65 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Localize."""
 
         self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(
-            _("Search and Replace")
+            SEARCH_REPLACE
         )
         self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(
-            _("Limit Search")
+            LIMIT_SEARCH
         )
         self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
         self.m_replace_button.SetLabel(REPLACE_BTN_REPLACE)
-        self.m_searchin_label.SetLabel(_("Search in"))
-        self.m_searchfor_label.SetLabel(_("Search for"))
-        self.m_replace_label.SetLabel(_("Replace with"))
-        self.m_size_is_label.SetLabel(_("Size is"))
-        self.m_modified_label.SetLabel(_("Modified"))
-        self.m_created_label.SetLabel(_("Created"))
-        self.m_exclude_label.SetLabel(_("Exclude folders"))
-        self.m_filematch_label.SetLabel(_("Files which match"))
-        self.m_regex_search_checkbox.SetLabel(_("Search with regex"))
-        self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
-        self.m_dotmatch_checkbox.SetLabel(_("Dot matches newline"))
-        self.m_unicode_checkbox.SetLabel(_("Use Unicode properties"))
+        self.m_searchin_label.SetLabel(SEARCH_IN)
+        self.m_searchfor_label.SetLabel(SEARCH_FOR)
+        self.m_replace_label.SetLabel(REPLACE_WITH)
+        self.m_size_is_label.SetLabel(SIZE_IS)
+        self.m_modified_label.SetLabel(MODIFIED)
+        self.m_created_label.SetLabel(CREATED)
+        self.m_exclude_label.SetLabel(EXCLUDE)
+        self.m_filematch_label.SetLabel(FILE_MATCH)
+        self.m_regex_search_checkbox.SetLabel(SEARCH_WITH_REGEX)
+        self.m_case_checkbox.SetLabel(CASE)
+        self.m_dotmatch_checkbox.SetLabel(DOTALL)
+        self.m_unicode_checkbox.SetLabel(UNICODE)
         self.m_force_encode_choice.SetSelection(0)
-        self.m_boolean_checkbox.SetLabel(_("Boolean match"))
-        self.m_count_only_checkbox.SetLabel(_("Count only"))
-        self.m_backup_checkbox.SetLabel(_("Create backups"))
-        self.m_force_encode_checkbox.SetLabel(_("Force"))
+        self.m_boolean_checkbox.SetLabel(BOOLEAN)
+        self.m_count_only_checkbox.SetLabel(COUNT_ONLY)
+        self.m_backup_checkbox.SetLabel(CREATE_BACKUPS)
+        self.m_force_encode_checkbox.SetLabel(FORCE)
         self.m_force_encode_choice.Clear()
         for x in ENCODINGS:
             self.m_force_encode_choice.Append(x)
-        self.m_chains_checkbox.SetLabel(_("Use chain search"))
-        self.m_replace_plugin_checkbox.SetLabel(_("Use plugin replace"))
-        self.m_bestmatch_checkbox.SetLabel(_("Best fuzzy match"))
-        self.m_enhancematch_checkbox.SetLabel(_("Improve fuzzy fit"))
-        self.m_word_checkbox.SetLabel(_("Unicode word breaks"))
-        self.m_reverse_checkbox.SetLabel(_("Search backwards"))
-        self.m_posix_checkbox.SetLabel(_("Use POSIX matching"))
-        self.m_format_replace_checkbox.SetLabel(_("Format style replacements"))
-        self.m_fullcase_checkbox.SetLabel(_("Full case-folding"))
-        self.m_subfolder_checkbox.SetLabel(_("Include subfolders"))
-        self.m_hidden_checkbox.SetLabel(_("Include hidden"))
-        self.m_binary_checkbox.SetLabel(_("Include binary files"))
-        self.m_dirregex_checkbox.SetLabel(_("Regex"))
-        self.m_fileregex_checkbox.SetLabel(_("Regex"))
-        self.m_regex_test_button.SetLabel(_("Test Regex"))
-        self.m_save_search_button.SetLabel(_("Save Search"))
-        self.m_load_search_button.SetLabel(_("Load Search"))
-        self.m_grep_notebook.SetPageText(0, _("Search"))
+        self.m_chains_checkbox.SetLabel(USE_CHAIN)
+        self.m_replace_plugin_checkbox.SetLabel(USE_PLUGIN)
+        self.m_bestmatch_checkbox.SetLabel(BESTMATCH)
+        self.m_enhancematch_checkbox.SetLabel(FUZZY_FIT)
+        self.m_word_checkbox.SetLabel(WORD)
+        self.m_reverse_checkbox.SetLabel(REVERSE)
+        self.m_posix_checkbox.SetLabel(POSIX)
+        self.m_format_replace_checkbox.SetLabel(FORMAT)
+        self.m_fullcase_checkbox.SetLabel(CASEFOLD)
+        self.m_subfolder_checkbox.SetLabel(SUBFOLDERS)
+        self.m_hidden_checkbox.SetLabel(HIDDEN)
+        self.m_binary_checkbox.SetLabel(INCLUDE_BINARY)
+        self.m_dirregex_checkbox.SetLabel(USE_REGEX)
+        self.m_fileregex_checkbox.SetLabel(USE_REGEX)
+        self.m_regex_test_button.SetLabel(TEST_REGEX)
+        self.m_save_search_button.SetLabel(SAVE_SEARCH)
+        self.m_load_search_button.SetLabel(LOAD_SEARCH)
+        self.m_grep_notebook.SetPageText(0, SEARCH)
         exportid = self.m_menu.FindMenuItem("File", "Export")
-        self.m_menu.SetLabel(exportid, _("Export"))
-        self.m_menu.SetMenuLabel(0, _("File"))
-        self.m_menu.SetMenuLabel(1, _("View"))
-        self.m_menu.SetMenuLabel(2, _("Help"))
-        self.m_preferences_menuitem.SetItemLabel(_("&Preferences"))
-        self.m_quit_menuitem.SetItemLabel(_("&Exit"))
-        self.m_export_html_menuitem.SetItemLabel(_("HTML"))
-        self.m_export_csv_menuitem.SetItemLabel(_("CSV"))
-        self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
-        self.m_log_menuitem.SetItemLabel(_("Open Log File"))
-        self.m_about_menuitem.SetItemLabel(_("&About Rummage"))
-        self.m_documentation_menuitem.SetItemLabel(_("Documentation"))
-        self.m_issues_menuitem.SetItemLabel(_("Help and Support"))
+        self.m_menu.SetLabel(exportid, MENU_EXPORT)
+        self.m_menu.SetMenuLabel(0, MENU_FILE)
+        self.m_menu.SetMenuLabel(1, MENU_VIEW)
+        self.m_menu.SetMenuLabel(2, MENU_HELP)
+        self.m_preferences_menuitem.SetItemLabel(MENU_PREFERENCES)
+        self.m_quit_menuitem.SetItemLabel(MENU_EXIT)
+        self.m_export_html_menuitem.SetItemLabel(MENU_HTML)
+        self.m_export_csv_menuitem.SetItemLabel(MENU_CSV)
+        self.m_hide_limit_menuitem.SetItemLabel(MENU_HIDE_LIMIT)
+        self.m_log_menuitem.SetItemLabel(MENU_OPEN_LOG)
+        self.m_about_menuitem.SetItemLabel(MENU_ABOUT)
+        self.m_documentation_menuitem.SetItemLabel(MENU_DOCUMENTATION)
+        self.m_issues_menuitem.SetItemLabel(MENU_HELP_SUPPORT)
 
         self.m_logic_choice.Clear()
         for x in [SIZE_ANY, SIZE_GT, SIZE_EQ, SIZE_LT]:
@@ -581,75 +683,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
             self.m_created_choice.Append(x)
 
-    def on_enter_key(self, event):
-        """Search on enter."""
-
-        obj = self.FindFocus()
-        is_ac_combo = isinstance(obj, AutoCompleteCombo)
-        is_date_picker = isinstance(obj, wx.adv.GenericDatePickerCtrl)
-        is_button = isinstance(obj, wx.Button)
-        if (
-            (
-                is_ac_combo and not obj.IsPopupShown() or
-                (not is_ac_combo and not is_date_picker and not is_button)
-            ) and
-            self.m_grep_notebook.GetSelection() == 0
-        ):
-            self.start_search()
-        elif is_button:
-            wx.PostEvent(
-                obj.GetEventHandler(),
-                wx.PyCommandEvent(wx.EVT_BUTTON.typeId, obj.GetId())
-            )
-
-        event.Skip()
-
-    def on_textctrl_selectall(self, event):
-        """Select all in the TextCtrl and AutoCompleteCombo objects."""
-
-        text = self.FindFocus()
-        if isinstance(text, (wx.TextCtrl, AutoCompleteCombo)):
-            text.SelectAll()
-        event.Skip()
-
     def init_search_path(self, start_path):
         """Initialize the search path input."""
 
         # Init search path with passed in path
         if start_path and os.path.exists(start_path):
             self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
-
-    def on_loaded(self):
-        """
-        Stupid workarounds on load.
-
-        Focus after loaded (stupid macOS workaround) and select the appropriate entry.
-        Resize window after we are sure everything is loaded (stupid Linux workaround) to fix tab order stuff.
-        """
-
-        if self.m_chains_checkbox.GetValue():
-            self.m_searchin_text.GetTextCtrl().SetFocus()
-        else:
-            self.m_searchfor_textbox.GetTextCtrl().SetFocus()
-        self.Refresh()
-
-        self.Fit()
-        self.m_settings_panel.GetSizer().Layout()
-        self.optimize_size(height_only=True)
-
-    def on_chain_click(self, event):
-        """Chain button click."""
-
-        dlg = SearchChainDialog(self)
-        dlg.ShowModal()
-        dlg.Destroy()
-        if self.m_chains_checkbox.GetValue():
-            self.setup_chains()
-
-    def on_plugin_function_click(self, event):
-        """Plugin function click."""
-
-        self.setup
 
     def optimize_size(self, first_time=False, height_only=False):
         """Optimally resize window."""
@@ -737,7 +776,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.setup_chains(Settings.get_search_setting("chain", ""))
 
         if self.m_replace_plugin_checkbox.GetValue():
-            self.m_replace_label.SetLabel(_("Replace plugin"))
+            self.m_replace_label.SetLabel(REPLACE_PLUGIN)
             self.m_replace_plugin_dir_picker.Show()
             setup_autocomplete_combo(
                 self.m_replace_textbox,
@@ -784,69 +823,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         else:
             self.m_searchfor_textbox.update_choices(chains, load_last=True)
 
-    def on_preferences(self, event):
-        """Show settings dialog, and update history of AutoCompleteCombo if the history was cleared."""
-
-        dlg = SettingsDialog(self)
-        dlg.ShowModal()
-        if dlg.history_cleared():
-            update_autocomplete(self.m_searchin_text, "target")
-
-            if not self.m_chains_checkbox.GetValue():
-                update_autocomplete(
-                    self.m_searchfor_textbox,
-                    "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
-                )
-
-            if self.m_replace_plugin_checkbox.GetValue():
-                update_autocomplete(
-                    self.m_replace_textbox,
-                    "replace_plugin"
-                )
-            else:
-                update_autocomplete(
-                    self.m_replace_textbox,
-                    "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
-                )
-            update_autocomplete(
-                self.m_exclude_textbox,
-                "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
-            )
-            update_autocomplete(
-                self.m_filematch_textbox,
-                "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search",
-                default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
-            )
-        dlg.Destroy()
-        self.refresh_regex_options()
-        self.m_settings_panel.GetSizer().Layout()
-        self.optimize_size(height_only=True)
-
-    def on_chain_toggle(self, event):
-        """Handle chain toggle event."""
-
-        self.refresh_chain_mode()
-        self.m_settings_panel.GetSizer().Layout()
-
-    def on_plugin_function_toggle(self, event):
-        """Handle plugin function toggle."""
-
-        if self.m_replace_plugin_checkbox.GetValue():
-            self.m_replace_label.SetLabel(_("Replace plugin"))
-            self.m_replace_plugin_dir_picker.Show()
-            update_autocomplete(
-                self.m_replace_textbox,
-                "replace_plugin"
-            )
-        else:
-            self.m_replace_label.SetLabel(_("Replace with"))
-            self.m_replace_plugin_dir_picker.Hide()
-            update_autocomplete(
-                self.m_replace_textbox,
-                "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
-            )
-        self.m_settings_panel.GetSizer().Layout()
-
     def refresh_regex_options(self):
         """Refresh the regex module options."""
 
@@ -889,7 +865,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
             self.m_replace_plugin_checkbox.Enable(False)
 
-            self.m_searchfor_label.SetLabel(_("Search chain"))
+            self.m_searchfor_label.SetLabel(SEARCH_CHAIN)
             self.m_replace_label.Enable(False)
             self.m_replace_textbox.Enable(False)
             self.m_replace_plugin_dir_picker.Enable(False)
@@ -912,7 +888,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
             self.m_replace_plugin_checkbox.Enable(True)
 
-            self.m_searchfor_label.SetLabel(_("Search for"))
+            self.m_searchfor_label.SetLabel(SEARCH_FOR)
             self.m_searchfor_textbox.Value = ""
             self.m_replace_label.Enable(True)
             self.m_replace_textbox.Enable(True)
@@ -924,52 +900,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
             )
             return False
-
-    def on_dir_changed(self, event):
-        """Event for when the directory changes in the DirPickButton."""
-
-        if not self.searchin_update:
-            pth = event.target
-            if pth is not None and os.path.exists(pth):
-                self.searchin_update = True
-                self.m_searchin_text.safe_set_value(pth)
-                self.searchin_update = False
-        event.Skip()
-
-    def on_replace_plugin_dir_changed(self, event):
-        """Handle replace plugin dir change."""
-
-        if not self.replace_plugin_update:
-            pth = event.target
-            if pth is not None and os.path.exists(pth):
-                self.replace_plugin_update = True
-                self.m_replace_textbox.safe_set_value(pth)
-                self.replace_plugin_update = False
-        event.Skip()
-
-    def on_searchin_changed(self):
-        """Callback for when a directory changes via the m_searchin_text control."""
-
-        self.check_searchin()
-        self.SetTitle(self.m_searchin_text.GetValue())
-
-    def on_save_search(self, event):
-        """Open a dialog to save a search for later use."""
-
-        search = self.m_searchfor_textbox.GetValue()
-        if search == "":
-            errormsg(_("There is no search to save!"))
-            return
-        dlg = SaveSearchDialog(self)
-        dlg.ShowModal()
-        dlg.Destroy()
-
-    def on_load_search(self, event):
-        """Show dialog to pick saved a saved search to use."""
-
-        dlg = LoadSearchDialog(self)
-        dlg.ShowModal()
-        dlg.Destroy()
 
     def limit_panel_toggle(self):
         """Show/Hide limit panel."""
@@ -1012,18 +942,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_searchin_dir_picker.SetPath(os.path.dirname(pth))
             self.searchin_update = False
 
-    def on_search_click(self, event):
-        """Search button click."""
-
-        self.start_search()
-        event.Skip()
-
-    def on_replace_click(self, event):
-        """Replace button click."""
-
-        self.start_search(replace=True)
-        event.Skip()
-
     def start_search(self, replace=False):
         """Initiate search or stop search depending on search state."""
 
@@ -1051,9 +969,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             # Handle a search or a search & replace request
 
             if replace:
-                message = [_("Are you sure you want to replace all instances?")]
+                message = [MSG_REPLACE_WARN]
                 if not self.m_backup_checkbox.GetValue():
-                    message.append(_("Backups are currently disabled."))
+                    message.append(MSG_BACKUPS_DISABLED)
 
                 if not yesno(' '.join(message)):
                     self.debounce_search = False
@@ -1063,90 +981,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             chain = self.m_searchfor_textbox.Value if is_chain else None
 
             if is_chain and (not chain.strip() or chain not in Settings.get_chains()):
-                errormsg(_("Please enter a valid chain!"))
+                errormsg(ERR_INVALID_CHAIN)
             elif not self.validate_search_inputs(replace=replace, chain=chain):
                 self.do_search(replace=replace, chain=chain is not None)
             self.debounce_search = False
-
-    def validate_search_inputs(self, replace=False, chain=None):
-        """Validate the search inputs."""
-
-        debug("validate")
-        fail = False
-        msg = ""
-
-        if not fail and not os.path.exists(self.m_searchin_text.GetValue()):
-            msg = _("Please enter a valid search path!")
-            fail = True
-
-        if chain is None:
-            if not fail and self.m_regex_search_checkbox.GetValue():
-                if (self.m_searchfor_textbox.GetValue() == "" and replace) or self.validate_search_regex():
-                    msg = _("Please enter a valid search regex!")
-                    fail = True
-            elif not fail and self.m_searchfor_textbox.GetValue() == "" and replace:
-                msg = _("Please enter a valid search!")
-                fail = True
-        else:
-            chain_searches = Settings.get_chains().get(chain, {})
-            if not chain_searches:
-                msg = _("There are no searches in this this chain!")
-                fail = True
-            else:
-                searches = Settings.get_search()
-                for search in chain_searches:
-                    s = searches.get(search)
-                    if s is None:
-                        msg = _("'%s' is not found in saved searches!" % search)
-                        fail = True
-                        break
-                    if self.validate_chain_regex(s[1], self.chain_flags(s[3], s[4])):
-                        msg = _("Saved search '%s' does not contain a valid search!" % search)
-                        fail = True
-                        break
-
-        if not fail and not os.path.isfile(self.m_searchin_text.GetValue()):
-            if not fail and self.m_fileregex_checkbox.GetValue():
-                if (
-                    self.m_filematch_textbox.GetValue().strip() == "" or
-                    self.validate_regex(self.m_filematch_textbox.Value)
-                ):
-                    msg = _("Please enter a valid file regex!")
-                    fail = True
-            elif not fail and self.m_filematch_textbox.GetValue().strip() == "":
-                msg = _("Please enter a valid file pattern!")
-                fail = True
-            if not fail and self.m_dirregex_checkbox.GetValue():
-                if self.validate_regex(self.m_exclude_textbox.Value):
-                    msg = _("Please enter a valid exlcude directory regex!")
-                    fail = True
-
-            try:
-                value = float(self.m_size_text.GetValue())
-            except ValueError:
-                value = None
-            if (
-                not fail and
-                self.m_logic_choice.GetStringSelection() != "any" and
-                value is None
-            ):
-                msg = _("Please enter a valid size!")
-                fail = True
-            if not fail:
-                try:
-                    self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
-                except Exception:
-                    msg = _("Please enter a modified date!")
-                    fail = True
-            if not fail:
-                try:
-                    self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
-                except Exception:
-                    msg = _("Please enter a created date!")
-                    fail = True
-        if fail:
-            errormsg(msg)
-        return fail
 
     def do_search(self, replace=False, chain=None):
         """Start the search."""
@@ -1173,7 +1011,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         except Exception:
             self.clear_plugins()
             error(traceback.format_exc())
-            errormsg(_("There was an error in setup! Please check the log."))
+            errormsg(ERR_SETUP)
             return
 
         # Change button to stop search
@@ -1185,7 +1023,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_replace_button.Enable(False)
 
         # Init search status
-        self.m_statusbar.set_status(_("Searching: 0/0 0% Skipped: 0 Matches: 0"))
+        self.m_statusbar.set_status(INIT_STATUS)
 
         # Setup search thread
         self.thread = RummageThread(self.payload)
@@ -1420,7 +1258,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if cmp_modified:
                 args.modified_compare = (
                     LIMIT_COMPARE[cmp_modified],
-                    local_time_to_epoch_timestamp(
+                    epoch_timestamp.local_time_to_epoch_timestamp(
                         self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
                         self.m_modified_time_picker.GetValue()
                     )
@@ -1428,7 +1266,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if cmp_created:
                 args.created_compare = (
                     LIMIT_COMPARE[cmp_created],
-                    local_time_to_epoch_timestamp(
+                    epoch_timestamp.local_time_to_epoch_timestamp(
                         self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
                         self.m_modified_time_picker.GetValue()
                     )
@@ -1596,19 +1434,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search"
         )
 
-    def on_idle(self, event):
-        """On idle event."""
-
-        self.check_updates()
-        event.Skip()
-
-    def on_error_click(self, event):
-        """Handle error icon click."""
-
-        event.Skip()
-        if self.error_dlg is not None:
-            self.error_dlg.ShowModal()
-
     def check_updates(self):
         """Check if updates to the result lists can be done."""
 
@@ -1629,7 +1454,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 count = self.update_table(count, completed, total, skipped, *results)
             else:
                 self.m_statusbar.set_status(
-                    _("Searching: %d/%d %d%% Skipped: %d Matches: %d") % (
+                    UPDATE_STATUS % (
                         completed,
                         total,
                         int(float(completed) / float(total) * 100) if total != 0 else 0,
@@ -1651,7 +1476,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.clear_plugins()
                 if self.kill:
                     self.m_statusbar.set_status(
-                        _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s") % (
+                        FINAL_STATUS % (
                             completed,
                             total,
                             int(float(completed) / float(total) * 100) if total != 0 else 0,
@@ -1664,8 +1489,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_progressbar.SetValue(completed)
                     if Settings.get_notify():
                         notify.error(
-                            _("Search Aborted"),
-                            _("\n%d matches found!") % count,
+                            NOTIFY_SEARCH_ABORTED,
+                            NOTIFY_MATCHES_FOUND % count,
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -1676,7 +1501,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         _ABORT = False
                 else:
                     self.m_statusbar.set_status(
-                        _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s") % (
+                        FINAL_STATUS % (
                             completed,
                             total,
                             100,
@@ -1689,8 +1514,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_progressbar.SetValue(100)
                     if Settings.get_notify():
                         notify.info(
-                            _("Search Completed"),
-                            _("\n%d matches found!") % count,
+                            NOTIFY_SEARCH_COMPLETED,
+                            NOTIFY_MATCHES_FOUND % count,
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -1701,11 +1526,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 if errors:
                     self.error_dlg = SearchErrorDialog(self, errors)
                     self.m_statusbar.set_icon(
-                        _("errors"),
+                        SB_ERRORS,
                         data.get_bitmap('error.png'),
-                        msg=_("%d errors\nClick to see errors.") % len(errors),
+                        msg=SB_TOOLTIP_ERR % len(errors),
                         click_left=self.on_error_click
-                        # context=[(_("View Log"), lambda e: self.open_debug_console())]
                     )
                 self.m_result_file_list.load_list()
                 self.m_result_list.load_list()
@@ -1736,7 +1560,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if p_value != done:
                 self.m_progressbar.SetValue(actually_done)
         self.m_statusbar.set_status(
-            _("Searching: %d/%d %d%% Skipped: %d Matches: %d") % (
+            UPDATE_STATUS % (
                 (
                     actually_done, total,
                     int(float(actually_done) / float(total) * 100),
@@ -1747,41 +1571,85 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         )
         return count
 
-    def on_regex_search_toggle(self, event):
-        """Switch literal/regex history depending on toggle state."""
+    def validate_search_inputs(self, replace=False, chain=None):
+        """Validate the search inputs."""
 
-        if self.m_regex_search_checkbox.GetValue():
-            if not self.m_chains_checkbox.GetValue():
-                update_autocomplete(self.m_searchfor_textbox, "regex_search")
-            if self.m_replace_plugin_checkbox.GetValue():
-                update_autocomplete(self.m_replace_textbox, "replace_plugin")
+        debug("validate")
+        fail = False
+        msg = ""
+
+        if not fail and not os.path.exists(self.m_searchin_text.GetValue()):
+            msg = ERR_INVALID_SEARCH_PTH
+            fail = True
+
+        if chain is None:
+            if not fail and self.m_regex_search_checkbox.GetValue():
+                if (self.m_searchfor_textbox.GetValue() == "" and replace) or self.validate_search_regex():
+                    msg = ERR_INVALID_SEARCH
+                    fail = True
+            elif not fail and self.m_searchfor_textbox.GetValue() == "" and replace:
+                msg = ERR_INVALID_SEARCH
+                fail = True
+        else:
+            chain_searches = Settings.get_chains().get(chain, {})
+            if not chain_searches:
+                msg = ERR_EMPTY_CHAIN
+                fail = True
             else:
-                update_autocomplete(self.m_replace_textbox, "regex_replace")
-        else:
-            if not self.m_chains_checkbox.GetValue():
-                update_autocomplete(self.m_searchfor_textbox, "literal_search")
-            if self.m_replace_plugin_checkbox.GetValue():
-                update_autocomplete(self.m_replace_textbox, "replace_plugin")
-            else:
-                update_autocomplete(self.m_replace_textbox, "literal_replace")
+                searches = Settings.get_search()
+                for search in chain_searches:
+                    s = searches.get(search)
+                    if s is None:
+                        msg = ERR_MISSING_SEARCH % search
+                        fail = True
+                        break
+                    if self.validate_chain_regex(s[1], self.chain_flags(s[3], s[4])):
+                        msg = ERR_INVALID_CHAIN_SEARCH % search
+                        fail = True
+                        break
 
-    def on_fileregex_toggle(self, event):
-        """Switch literal/regex history depending on toggle state."""
+        if not fail and not os.path.isfile(self.m_searchin_text.GetValue()):
+            if not fail and self.m_fileregex_checkbox.GetValue():
+                if (
+                    self.m_filematch_textbox.GetValue().strip() == "" or
+                    self.validate_regex(self.m_filematch_textbox.Value)
+                ):
+                    msg = ERR_INVALID_FILE_SEARCH
+                    fail = True
+            elif not fail and self.m_filematch_textbox.GetValue().strip() == "":
+                msg = ERR_INVALID_FILE_SEARCH
+                fail = True
+            if not fail and self.m_dirregex_checkbox.GetValue():
+                if self.validate_regex(self.m_exclude_textbox.Value):
+                    msg = ERR_INVALID_EXCLUDE
+                    fail = True
 
-        if self.m_fileregex_checkbox.GetValue():
-            update_autocomplete(self.m_filematch_textbox, "regex_file_search", default=[".*"])
-        else:
-            update_autocomplete(self.m_filematch_textbox, "file_search", default=["*?"])
-        event.Skip()
-
-    def on_dirregex_toggle(self, event):
-        """Switch literal/regex history depending on toggle state."""
-
-        if self.m_dirregex_checkbox.GetValue():
-            update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude")
-        else:
-            update_autocomplete(self.m_exclude_textbox, "folder_exclude")
-        event.Skip()
+            try:
+                value = float(self.m_size_text.GetValue())
+            except ValueError:
+                value = None
+            if (
+                not fail and
+                self.m_logic_choice.GetStringSelection() != "any" and
+                value is None
+            ):
+                msg = ERR_INVLAID_SIZE
+                fail = True
+            if not fail:
+                try:
+                    self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
+                except Exception:
+                    msg = ERR_INVALID_MDATE
+                    fail = True
+            if not fail:
+                try:
+                    self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
+                except Exception:
+                    msg = ERR_INVALID_CDATE
+                    fail = True
+        if fail:
+            errormsg(msg)
+        return fail
 
     def validate_search_regex(self):
         """Validate search regex."""
@@ -1898,6 +1766,239 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             debug(traceback.format_exc())
             return True
 
+    def on_loaded(self):
+        """
+        Stupid workarounds on load.
+
+        Focus after loaded (stupid macOS workaround) and select the appropriate entry.
+        Resize window after we are sure everything is loaded (stupid Linux workaround) to fix tab order stuff.
+        """
+
+        if self.m_chains_checkbox.GetValue():
+            self.m_searchin_text.GetTextCtrl().SetFocus()
+        else:
+            self.m_searchfor_textbox.GetTextCtrl().SetFocus()
+        self.Refresh()
+
+        self.Fit()
+        self.m_settings_panel.GetSizer().Layout()
+        self.optimize_size(height_only=True)
+
+    def on_enter_key(self, event):
+        """Search on enter."""
+
+        obj = self.FindFocus()
+        is_ac_combo = isinstance(obj, AutoCompleteCombo)
+        is_date_picker = isinstance(obj, wx.adv.GenericDatePickerCtrl)
+        is_button = isinstance(obj, wx.Button)
+        if (
+            (
+                is_ac_combo and not obj.IsPopupShown() or
+                (not is_ac_combo and not is_date_picker and not is_button)
+            ) and
+            self.m_grep_notebook.GetSelection() == 0
+        ):
+            self.start_search()
+        elif is_button:
+            wx.PostEvent(
+                obj.GetEventHandler(),
+                wx.PyCommandEvent(wx.EVT_BUTTON.typeId, obj.GetId())
+            )
+
+        event.Skip()
+
+    def on_textctrl_selectall(self, event):
+        """Select all in the TextCtrl and AutoCompleteCombo objects."""
+
+        text = self.FindFocus()
+        if isinstance(text, (wx.TextCtrl, AutoCompleteCombo)):
+            text.SelectAll()
+        event.Skip()
+
+    def on_chain_click(self, event):
+        """Chain button click."""
+
+        dlg = SearchChainDialog(self)
+        dlg.ShowModal()
+        dlg.Destroy()
+        if self.m_chains_checkbox.GetValue():
+            self.setup_chains()
+
+    def on_plugin_function_click(self, event):
+        """Plugin function click."""
+
+        self.setup
+
+    def on_preferences(self, event):
+        """Show settings dialog, and update history of AutoCompleteCombo if the history was cleared."""
+
+        dlg = SettingsDialog(self)
+        dlg.ShowModal()
+        if dlg.history_cleared():
+            update_autocomplete(self.m_searchin_text, "target")
+
+            if not self.m_chains_checkbox.GetValue():
+                update_autocomplete(
+                    self.m_searchfor_textbox,
+                    "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
+                )
+
+            if self.m_replace_plugin_checkbox.GetValue():
+                update_autocomplete(
+                    self.m_replace_textbox,
+                    "replace_plugin"
+                )
+            else:
+                update_autocomplete(
+                    self.m_replace_textbox,
+                    "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
+                )
+            update_autocomplete(
+                self.m_exclude_textbox,
+                "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude"
+            )
+            update_autocomplete(
+                self.m_filematch_textbox,
+                "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search",
+                default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
+            )
+        dlg.Destroy()
+        self.refresh_regex_options()
+        self.m_settings_panel.GetSizer().Layout()
+        self.optimize_size(height_only=True)
+
+    def on_chain_toggle(self, event):
+        """Handle chain toggle event."""
+
+        self.refresh_chain_mode()
+        self.m_settings_panel.GetSizer().Layout()
+
+    def on_plugin_function_toggle(self, event):
+        """Handle plugin function toggle."""
+
+        if self.m_replace_plugin_checkbox.GetValue():
+            self.m_replace_label.SetLabel(REPLACE_PLUGIN)
+            self.m_replace_plugin_dir_picker.Show()
+            update_autocomplete(
+                self.m_replace_textbox,
+                "replace_plugin"
+            )
+        else:
+            self.m_replace_label.SetLabel(REPLACE_WITH)
+            self.m_replace_plugin_dir_picker.Hide()
+            update_autocomplete(
+                self.m_replace_textbox,
+                "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
+            )
+        self.m_settings_panel.GetSizer().Layout()
+
+    def on_dir_changed(self, event):
+        """Event for when the directory changes in the DirPickButton."""
+
+        if not self.searchin_update:
+            pth = event.target
+            if pth is not None and os.path.exists(pth):
+                self.searchin_update = True
+                self.m_searchin_text.safe_set_value(pth)
+                self.searchin_update = False
+        event.Skip()
+
+    def on_replace_plugin_dir_changed(self, event):
+        """Handle replace plugin dir change."""
+
+        if not self.replace_plugin_update:
+            pth = event.target
+            if pth is not None and os.path.exists(pth):
+                self.replace_plugin_update = True
+                self.m_replace_textbox.safe_set_value(pth)
+                self.replace_plugin_update = False
+        event.Skip()
+
+    def on_searchin_changed(self):
+        """Callback for when a directory changes via the m_searchin_text control."""
+
+        self.check_searchin()
+        self.SetTitle(self.m_searchin_text.GetValue())
+
+    def on_save_search(self, event):
+        """Open a dialog to save a search for later use."""
+
+        search = self.m_searchfor_textbox.GetValue()
+        if search == "":
+            errormsg(ERR_EMPTY_SEARCH)
+            return
+        dlg = SaveSearchDialog(self)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def on_load_search(self, event):
+        """Show dialog to pick saved a saved search to use."""
+
+        dlg = LoadSearchDialog(self)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def on_search_click(self, event):
+        """Search button click."""
+
+        self.start_search()
+        event.Skip()
+
+    def on_replace_click(self, event):
+        """Replace button click."""
+
+        self.start_search(replace=True)
+        event.Skip()
+
+    def on_idle(self, event):
+        """On idle event."""
+
+        self.check_updates()
+        event.Skip()
+
+    def on_error_click(self, event):
+        """Handle error icon click."""
+
+        event.Skip()
+        if self.error_dlg is not None:
+            self.error_dlg.ShowModal()
+
+    def on_regex_search_toggle(self, event):
+        """Switch literal/regex history depending on toggle state."""
+
+        if self.m_regex_search_checkbox.GetValue():
+            if not self.m_chains_checkbox.GetValue():
+                update_autocomplete(self.m_searchfor_textbox, "regex_search")
+            if self.m_replace_plugin_checkbox.GetValue():
+                update_autocomplete(self.m_replace_textbox, "replace_plugin")
+            else:
+                update_autocomplete(self.m_replace_textbox, "regex_replace")
+        else:
+            if not self.m_chains_checkbox.GetValue():
+                update_autocomplete(self.m_searchfor_textbox, "literal_search")
+            if self.m_replace_plugin_checkbox.GetValue():
+                update_autocomplete(self.m_replace_textbox, "replace_plugin")
+            else:
+                update_autocomplete(self.m_replace_textbox, "literal_replace")
+
+    def on_fileregex_toggle(self, event):
+        """Switch literal/regex history depending on toggle state."""
+
+        if self.m_fileregex_checkbox.GetValue():
+            update_autocomplete(self.m_filematch_textbox, "regex_file_search", default=[".*"])
+        else:
+            update_autocomplete(self.m_filematch_textbox, "file_search", default=["*?"])
+        event.Skip()
+
+    def on_dirregex_toggle(self, event):
+        """Switch literal/regex history depending on toggle state."""
+
+        if self.m_dirregex_checkbox.GetValue():
+            update_autocomplete(self.m_exclude_textbox, "regex_folder_exclude")
+        else:
+            update_autocomplete(self.m_exclude_textbox, "folder_exclude")
+        event.Skip()
+
     def on_debug_console(self, event):
         """Show debug console."""
 
@@ -1928,9 +2029,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             len(self.m_result_file_list.itemDataMap) == 0 and
             len(self.m_result_list.itemDataMap) == 0
         ):
-            errormsg(_("There is nothing to export!"))
+            errormsg(ERR_NOTHING_TO_EXPORT)
             return
-        html_file = filepickermsg(_("Export to..."), wildcard="*.html", save=True)
+        html_file = filepickermsg(EXPORT_TO, wildcard="*.html", save=True)
         if html_file is None:
             return
         try:
@@ -1942,7 +2043,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             )
         except Exception:
             error(traceback.format_exc())
-            errormsg(_("There was a problem exporting the HTML!  See the log for more info."))
+            errormsg(ERR_HTML_FAILED)
 
     def on_export_csv(self, event):
         """Export to CSV."""
@@ -1951,9 +2052,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             len(self.m_result_file_list.itemDataMap) == 0 and
             len(self.m_result_list.itemDataMap) == 0
         ):
-            errormsg(_("There is nothing to export!"))
+            errormsg(ERR_NOTHING_TO_EXPORT)
             return
-        csv_file = filepickermsg(_("Export to..."), wildcard="*.csv", save=True)
+        csv_file = filepickermsg(EXPORT_TO, wildcard="*.csv", save=True)
         if csv_file is None:
             return
         try:
@@ -1965,7 +2066,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             )
         except Exception:
             error(traceback.format_exc())
-            errormsg(_("There was a problem exporting the CSV!  See the log for more info."))
+            errormsg(ERR_CSV_FAILED)
 
     def on_hide_limit(self, event):
         """Hide limit panel."""
@@ -1974,15 +2075,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.limit_panel_hide()
         Settings.set_hide_limit(self.hide_limit_panel)
         if self.hide_limit_panel:
-            self.m_hide_limit_menuitem.SetItemLabel(_("Show Limit Search Panel"))
+            self.m_hide_limit_menuitem.SetItemLabel(MENU_SHOW_LIMIT)
         else:
-            self.m_hide_limit_menuitem.SetItemLabel(_("Hide Limit Search Panel"))
+            self.m_hide_limit_menuitem.SetItemLabel(MENU_HIDE_LIMIT)
 
     def on_show_log_file(self, event):
-        """Show user files in explorer."""
-
-        from . import open_editor
-        from . import simplelog
+        """Show user files in editor."""
 
         try:
             logfile = simplelog.get_global_log().filename
@@ -1991,7 +2089,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if logfile is None or not os.path.exists(logfile):
             error(traceback.format_exc())
-            errormsg(_("Cannot find log file!"))
+            errormsg(ERR_NO_LOG)
         else:
             open_editor.open_editor(logfile, 1, 1)
 

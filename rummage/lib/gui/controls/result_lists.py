@@ -21,13 +21,24 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 from time import ctime
 import wx
-from os.path import normpath, join, basename, dirname
+import decimal
+import os
 from .dynamic_lists import DynamicList, USE_SAMPLE_SIZE
-from .open_editor import open_editor
+from ..actions.open_editor import open_editor
 from ..localization import _
 from .. import data
-import decimal
-from .. import util
+from ... import util
+
+FILE = _("File")
+SIZE = _("Size")
+MATCHES = _("Matches")
+PATH = _("Path")
+ENCODING = _("Encoding")
+MODIFIED = _("Modified")
+CREATED = _("Created")
+LINE = _("Line")
+MATCHES = _("Matches")
+CONTEXT = _("Context")
 
 
 class ResultFileList(DynamicList):
@@ -39,13 +50,13 @@ class ResultFileList(DynamicList):
         super(ResultFileList, self).__init__(
             parent,
             [
-                _("File"),
-                _("Size"),
-                _("Matches"),
-                _("Path"),
-                _("Encoding"),
-                _("Modified"),
-                _("Created")
+                FILE,
+                SIZE,
+                MATCHES,
+                PATH,
+                ENCODING,
+                MODIFIED,
+                CREATED
             ]
         )
         self.last_moused = (-1, "")
@@ -69,8 +80,8 @@ class ResultFileList(DynamicList):
         if file_search:
             self.set_item_map(
                 obj.name,
-                basename(obj.name), decimal.Decimal(obj.size) / decimal.Decimal(1024), 0,
-                dirname(obj.name), '', obj.modified,
+                os.path.basename(obj.name), decimal.Decimal(obj.size) / decimal.Decimal(1024), 0,
+                os.path.dirname(obj.name), '', obj.modified,
                 obj.created, 1, 1
             )
         else:
@@ -80,8 +91,8 @@ class ResultFileList(DynamicList):
             else:
                 self.set_item_map(
                     item_id,
-                    basename(obj.info.name), decimal.Decimal(obj.info.size) / decimal.Decimal(1024), 1,
-                    dirname(obj.info.name), obj.info.encoding, obj.info.modified,
+                    os.path.basename(obj.info.name), decimal.Decimal(obj.info.size) / decimal.Decimal(1024), 1,
+                    os.path.dirname(obj.info.name), obj.info.encoding, obj.info.modified,
                     obj.info.created, obj.match.lineno, obj.match.colno
                 )
 
@@ -100,7 +111,7 @@ class ResultFileList(DynamicList):
             actual_item = self.itemIndexMap[item]
             if actual_item != self.last_moused[0]:
                 d = self.itemDataMap[actual_item]
-                self.last_moused = (actual_item, join(d[3], d[0]))
+                self.last_moused = (actual_item, os.path.join(d[3], d[0]))
             self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
@@ -147,7 +158,7 @@ class ResultFileList(DynamicList):
             path = self.GetItem(item, col=3).GetText()
             line = str(self.get_map_item(item, col=7))
             col = str(self.get_map_item(item, col=8))
-            open_editor(join(normpath(path), filename), line, col)
+            open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()
 
 
@@ -160,10 +171,10 @@ class ResultContentList(DynamicList):
         super(ResultContentList, self).__init__(
             parent,
             [
-                _("File"),
-                _("Line"),
-                _("Matches"),
-                _("Context")
+                FILE,
+                LINE,
+                MATCHES,
+                CONTEXT
             ]
         )
         self.last_moused = (-1, "")
@@ -196,7 +207,7 @@ class ResultContentList(DynamicList):
             actual_item = self.itemIndexMap[item]
             if actual_item != self.last_moused[0]:
                 pth = self.itemDataMap[actual_item][0]
-                self.last_moused = (actual_item, join(pth[1], pth[0]))
+                self.last_moused = (actual_item, os.path.join(pth[1], pth[0]))
             self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
@@ -234,7 +245,7 @@ class ResultContentList(DynamicList):
         else:
             self.set_item_map(
                 item_id,
-                (basename(obj.info.name), dirname(obj.info.name)),
+                (os.path.basename(obj.info.name), os.path.dirname(obj.info.name)),
                 obj.match.lineno, 1,
                 obj.match.lines.replace("\r", "").split("\n")[0],
                 "%d" % obj.info.id, obj.match.colno, obj.info.encoding
@@ -259,5 +270,5 @@ class ResultContentList(DynamicList):
             path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
                 file_row, col=3, absolute=True
             )
-            open_editor(join(normpath(path), filename), line, col)
+            open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()

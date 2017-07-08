@@ -1,5 +1,5 @@
 """
-Load search list.
+Search error list.
 
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -23,31 +23,31 @@ from .dynamic_lists import DynamicList
 from ..localization import _
 from .. import data
 
+ERROR = _("Error")
+FILE_NAME = _("File Name")
 
-class SavedSearchList(DynamicList):
+
+class ErrorList(DynamicList):
     """Error list."""
 
     def __init__(self, parent):
         """Initialization."""
 
-        super(SavedSearchList, self).__init__(
+        super(ErrorList, self).__init__(
             parent,
             [
-                _("Name"),
-                _("Comment"),
-                _("Search"),
-                _("Replace"),
-                _("Flags/Toggles"),
-                _("Type"),
-                _("Replace Type")
+                ERROR,
+                FILE_NAME
             ]
         )
+
+        self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
 
     def create_image_list(self):
         """Create image list."""
 
         self.images = wx.ImageList(16, 16)
-        self.glass = self.images.Add(data.get_bitmap('glass.png'))
+        self.error_symbol = self.images.Add(data.get_bitmap('error.png'))
         self.sort_up = self.images.Add(data.get_bitmap('su.png'))
         self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
@@ -57,4 +57,18 @@ class SavedSearchList(DynamicList):
 
         if not absolute:
             item = self.itemIndexMap[item]
-        return self.itemDataMap[item][col]
+        if col == 0:
+            return self.itemDataMap[item][col][0]
+        else:
+            return self.itemDataMap[item][col]
+
+    def on_dclick(self, event):
+        """Open file at in editor with optional line and column argument."""
+
+        pos = event.GetPosition()
+        item = self.HitTestSubItem(pos)[0]
+        if item != -1:
+            file_name = self.get_map_item(item, col=1)
+            full_error = ''.join(reversed(self.get_map_item(item, col=0)))
+            self.GetParent().GetParent().show_error("%s\n%s" % (file_name, full_error))
+        event.Skip()

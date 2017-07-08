@@ -19,29 +19,36 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
+from .localization import _
 from . import messages
-from ..localization import _
+
+YES_NO = _('Yes or no?')
+OKAY = _("Okay")
+CLOSE = _("Cancel")
+INFO = _("INFO")
+WARNING = _("WARNING")
+ERROR = _("ERROR")
 
 
-def yesno(question, title=_('Yes or no?'), bitmap=None, yes=_("Okay"), no=_("Cancel")):
+def yesno(question, title=YES_NO, bitmap=None, yes=OKAY, no=CLOSE):
     """Wrapper for the prompt dialog."""
 
     return messages.promptmsg(question, title, bitmap, yes, no)
 
 
-def infomsg(msg, title=_("INFO"), bitmap=None):
+def infomsg(msg, title=INFO, bitmap=None):
     """Wrapper for the info dialog."""
 
     messages.infomsg(msg, title, bitmap)
 
 
-def errormsg(msg, title=_("ERROR"), bitmap=None):
+def errormsg(msg, title=ERROR, bitmap=None):
     """Wrapper for the error dialog that also logs the error."""
 
     messages.errormsg(msg, title, bitmap)
 
 
-def warnmsg(msg, title=_("WARNING"), bitmap=None):
+def warnmsg(msg, title=WARNING, bitmap=None):
     """Wrapper for the warning dialog."""
 
     messages.warnmsg(msg, title, bitmap)

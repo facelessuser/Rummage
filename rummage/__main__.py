@@ -22,10 +22,11 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 import argparse
 import sys
-from .rummage.gui.settings import Settings
-from .rummage.gui.rummage_app import set_debug_mode, RummageApp, RummageFrame
-from .rummage import util
-from .rummage import __meta__
+from .lib import util
+from .lib import __meta__
+from .lib.gui import rummage_dialog
+from .lib.gui.app import rummage_app
+from .lib.gui.settings import Settings
 
 CLI_ENCODING = sys.getfilesystemencoding()
 
@@ -57,17 +58,19 @@ def run():
     args = parse_arguments()
 
     Settings.load_settings(args.debug)
+    single_instance = Settings.get_single_instance()
 
     if args.debug:
-        set_debug_mode(True)
+        rummage_app.set_debug_mode(True)
 
-    if Settings.get_single_instance():
-        app = RummageApp(redirect=not args.no_redirect, single_instance_name="Rummage", pipe_name=Settings.get_fifo())
-    else:
-        app = RummageApp(redirect=not args.no_redirect)
+    app = rummage_app.RummageApp(
+        redirect=not args.no_redirect,
+        single_instance_name="Rummage" if single_instance else None,
+        pipe_name=Settings.get_fifo() if single_instance else None
+    )
 
-    if not Settings.get_single_instance() or (Settings.get_single_instance() and app.is_instance_okay()):
-        RummageFrame(
+    if not single_instance or app.is_instance_okay():
+        rummage_dialog.RummageFrame(
             None,
             args.path if args.path is not None else None,
             debug_mode=args.debug

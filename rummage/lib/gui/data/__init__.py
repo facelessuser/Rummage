@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 import os
 import codecs
-from wx.lib.embeddedimage import PyEmbeddedImage
 import base64
-from .. import util
+from wx.lib.embeddedimage import PyEmbeddedImage
+from ... import util
 
 RESOURCE_PATH = os.path.abspath(os.path.dirname(__file__))
 

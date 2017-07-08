@@ -21,8 +21,12 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 from . import gui
-from ..localization import _
+from .localization import _
 from .. import util
+
+TITLE = _("Edit Argument")
+OKAY = _("Apply")
+CLOSE = _("Cancel")
 
 
 class ArgDialog(gui.ArgDialog):
@@ -55,9 +59,9 @@ class ArgDialog(gui.ArgDialog):
     def localize(self):
         """Localize dialog."""
 
-        self.SetTitle(_("Edit Argument"))
-        self.m_apply_button.SetLabel(_("Apply"))
-        self.m_cancel_button.SetLabel(_("Cancel"))
+        self.SetTitle(TITLE)
+        self.m_apply_button.SetLabel(OKAY)
+        self.m_cancel_button.SetLabel(CLOSE)
         self.Fit()
 
     def set_keybindings(self, keybindings):

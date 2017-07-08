@@ -24,16 +24,39 @@ import traceback
 import wx
 import os
 import functools
-from time import ctime
+import codecs
+import time
+from backrefs import bre, bregex
 from . import gui
-from .pick_button import PickButton, pick_extend
-from .. import data
+from .controls.pick_button import PickButton, pick_extend
 from .settings import Settings
-from ..localization import _
+from . import data
+from .localization import _
 from .. import rumcore
 from .. import util
-from backrefs import bre, bregex
-import codecs
+
+TITLE = _("Regex Tester")
+OKAY = _("Use")
+CLOSE = _("Close")
+SELECT_SCRIPT = _("Select replace script")
+REGEX = _("Regex search")
+CASE = _("Search case-sensitive")
+DOT = _("Dot matches newline")
+UNICODE = _("Use Unicode properties")
+BEST_MATCH = _("Best fuzzy match")
+FUZZY_FIT = _("Improve fuzzy fit")
+WORD = _("Unicode word break")
+REVERSE = _("Reverse match")
+POSIX = _("Use POSIX matching")
+FORMAT = _("Format style replacements")
+FULLCASE = _("Full case-folding")
+TEXT = _("Text")
+RESULT = _("Result")
+REGEX_INPUT = _("Regex Input")
+FIND = _("Find")
+USE_REPLACE_PLUGIN = _("Use replace plugin")
+REPLACE_PLUGIN = _("Replace plugin")
+REPLACE = _("Replace")
 
 
 class RegexTestDialog(gui.RegexTestDialog):
@@ -61,7 +84,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         pick_extend(self.m_replace_plugin_dir_picker, PickButton)
         self.m_replace_plugin_dir_picker.pick_init(
             PickButton.FILE_TYPE,
-            _("Select replace script"),
+            SELECT_SCRIPT,
             default_path=os.path.join(Settings.get_config_folder(), 'plugins'),
             pick_change_evt=self.on_replace_plugin_dir_changed
         )
@@ -119,30 +142,30 @@ class RegexTestDialog(gui.RegexTestDialog):
     def localize(self):
         """Localize dialog."""
 
-        self.SetTitle(_("Regex Tester"))
-        self.m_use_regex_button.SetLabel(_("Use"))
-        self.m_close_button.SetLabel(_("Close"))
-        self.m_regex_search_checkbox.SetLabel(_("Regex search"))
-        self.m_case_checkbox.SetLabel(_("Search case-sensitive"))
-        self.m_dotmatch_checkbox.SetLabel(_("Dot matches newline"))
-        self.m_unicode_checkbox.SetLabel(_("Use Unicode properties"))
-        self.m_bestmatch_checkbox.SetLabel(_("Best fuzzy match"))
-        self.m_enhancematch_checkbox.SetLabel(_("Improve fuzzy fit"))
-        self.m_word_checkbox.SetLabel(_("Unicode word break"))
-        self.m_reverse_checkbox.SetLabel(_("Reverse match"))
-        self.m_posix_checkbox.SetLabel(_("Use POSIX matching"))
-        self.m_format_replace_checkbox.SetLabel(_("Format style replacements"))
-        self.m_fullcase_checkbox.SetLabel(_("Full case-folding"))
-        self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(_("Text"))
-        self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(_("Result"))
+        self.SetTitle(TITLE)
+        self.m_use_regex_button.SetLabel(OKAY)
+        self.m_close_button.SetLabel(CLOSE)
+        self.m_regex_search_checkbox.SetLabel(REGEX)
+        self.m_case_checkbox.SetLabel(CASE)
+        self.m_dotmatch_checkbox.SetLabel(DOT)
+        self.m_unicode_checkbox.SetLabel(UNICODE)
+        self.m_bestmatch_checkbox.SetLabel(BEST_MATCH)
+        self.m_enhancematch_checkbox.SetLabel(FUZZY_FIT)
+        self.m_word_checkbox.SetLabel(WORD)
+        self.m_reverse_checkbox.SetLabel(REVERSE)
+        self.m_posix_checkbox.SetLabel(POSIX)
+        self.m_format_replace_checkbox.SetLabel(FORMAT)
+        self.m_fullcase_checkbox.SetLabel(FULLCASE)
+        self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(TEXT)
+        self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(RESULT)
         main_sizer = self.m_tester_panel.GetSizer()
-        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Regex Input"))
-        self.m_find_label.SetLabel(_("Find"))
-        self.m_replace_plugin_checkbox.SetLabel(_("Use replace plugin"))
+        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(REGEX_INPUT)
+        self.m_find_label.SetLabel(FIND)
+        self.m_replace_plugin_checkbox.SetLabel(USE_REPLACE_PLUGIN)
         if self.parent.m_replace_plugin_checkbox.GetValue():
-            self.m_replace_label.SetLabel(_("Replace plugin"))
+            self.m_replace_label.SetLabel(REPLACE_PLUGIN)
         else:
-            self.m_replace_label.SetLabel(_("Replace"))
+            self.m_replace_label.SetLabel(REPLACE)
         self.Fit()
 
     def init_regex_timer(self):
@@ -193,59 +216,6 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         if len(keybindings):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
-
-    def on_textctrl_selectall(self, event):
-        """Selectall content of textctrl."""
-
-        text = self.FindFocus()
-        if isinstance(text, wx.TextCtrl):
-            text.SelectAll()
-        event.Skip()
-
-    def on_close(self, event):
-        """Enable parent Rummage Dialog "Test Regex" button on close."""
-
-        self.stop_regex_timer()
-        event.Skip()
-
-    def on_use(self, event):
-        """Copy regex to parent Rummage Dialog search input."""
-
-        # Disable chain mode if enabled
-        if self.parent.m_chains_checkbox.GetValue():
-            self.parent.m_chains_checkbox.SetValue(False)
-            self.parent.on_chain_toggle(None)
-
-        # Turn off replace plugin if enabled
-        if self.parent.m_replace_plugin_checkbox.GetValue() != self.m_replace_plugin_checkbox.GetValue():
-            self.parent.m_replace_plugin_checkbox.SetValue(self.m_replace_plugin_checkbox.GetValue())
-            self.parent.on_plugin_function_toggle(None)
-
-        # Set "regex search" true if not already
-        if self.parent.m_regex_search_checkbox.GetValue() != self.m_regex_search_checkbox.GetValue():
-            self.parent.m_regex_search_checkbox.SetValue(self.m_regex_search_checkbox.GetValue())
-            self.parent.on_regex_search_toggle(None)
-
-        self.parent.m_searchfor_textbox.SetValue(self.m_regex_text.GetValue())
-        self.parent.m_replace_textbox.SetValue(self.m_replace_text.GetValue())
-        self.parent.m_unicode_checkbox.SetValue(self.m_unicode_checkbox.GetValue())
-        self.parent.m_case_checkbox.SetValue(self.m_case_checkbox.GetValue())
-        self.parent.m_dotmatch_checkbox.SetValue(self.m_dotmatch_checkbox.GetValue())
-        if self.regex_mode in rumcore.REGEX_MODES:
-            self.parent.m_bestmatch_checkbox.SetValue(self.m_bestmatch_checkbox.GetValue())
-            self.parent.m_enhancematch_checkbox.SetValue(self.m_enhancematch_checkbox.GetValue())
-            self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
-            self.parent.m_reverse_checkbox.SetValue(self.m_reverse_checkbox.GetValue())
-            self.parent.m_posix_checkbox.SetValue(self.m_posix_checkbox.GetValue())
-            self.parent.m_format_replace_checkbox.SetValue(self.m_format_replace_checkbox.GetValue())
-            if self.regex_version == 0:
-                self.parent.m_fullcase_checkbox.SetValue(self.m_fullcase_checkbox.GetValue())
-        self.Close()
-
-    def on_cancel(self, event):
-        """Close dialog."""
-
-        self.Close()
 
     def reset_highlights(self):
         """Reset highlights."""
@@ -414,8 +384,8 @@ class RegexTestDialog(gui.RegexTestDialog):
                         0,
                         "TestBuffer.txt",
                         len(text),
-                        ctime(),
-                        ctime(),
+                        time.ctime(),
+                        time.ctime(),
                         rumcore.text_decode.Encoding('unicode', None)
                     )
                     replace_test = self.import_plugin(rpattern)(file_info, rum_flags).replace
@@ -471,6 +441,59 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.regex_event_code += 1
         event.Skip()
 
+    def on_textctrl_selectall(self, event):
+        """Selectall content of textctrl."""
+
+        text = self.FindFocus()
+        if isinstance(text, wx.TextCtrl):
+            text.SelectAll()
+        event.Skip()
+
+    def on_close(self, event):
+        """Enable parent Rummage Dialog "Test Regex" button on close."""
+
+        self.stop_regex_timer()
+        event.Skip()
+
+    def on_use(self, event):
+        """Copy regex to parent Rummage Dialog search input."""
+
+        # Disable chain mode if enabled
+        if self.parent.m_chains_checkbox.GetValue():
+            self.parent.m_chains_checkbox.SetValue(False)
+            self.parent.on_chain_toggle(None)
+
+        # Turn off replace plugin if enabled
+        if self.parent.m_replace_plugin_checkbox.GetValue() != self.m_replace_plugin_checkbox.GetValue():
+            self.parent.m_replace_plugin_checkbox.SetValue(self.m_replace_plugin_checkbox.GetValue())
+            self.parent.on_plugin_function_toggle(None)
+
+        # Set "regex search" true if not already
+        if self.parent.m_regex_search_checkbox.GetValue() != self.m_regex_search_checkbox.GetValue():
+            self.parent.m_regex_search_checkbox.SetValue(self.m_regex_search_checkbox.GetValue())
+            self.parent.on_regex_search_toggle(None)
+
+        self.parent.m_searchfor_textbox.SetValue(self.m_regex_text.GetValue())
+        self.parent.m_replace_textbox.SetValue(self.m_replace_text.GetValue())
+        self.parent.m_unicode_checkbox.SetValue(self.m_unicode_checkbox.GetValue())
+        self.parent.m_case_checkbox.SetValue(self.m_case_checkbox.GetValue())
+        self.parent.m_dotmatch_checkbox.SetValue(self.m_dotmatch_checkbox.GetValue())
+        if self.regex_mode in rumcore.REGEX_MODES:
+            self.parent.m_bestmatch_checkbox.SetValue(self.m_bestmatch_checkbox.GetValue())
+            self.parent.m_enhancematch_checkbox.SetValue(self.m_enhancematch_checkbox.GetValue())
+            self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
+            self.parent.m_reverse_checkbox.SetValue(self.m_reverse_checkbox.GetValue())
+            self.parent.m_posix_checkbox.SetValue(self.m_posix_checkbox.GetValue())
+            self.parent.m_format_replace_checkbox.SetValue(self.m_format_replace_checkbox.GetValue())
+            if self.regex_version == 0:
+                self.parent.m_fullcase_checkbox.SetValue(self.m_fullcase_checkbox.GetValue())
+        self.Close()
+
+    def on_cancel(self, event):
+        """Close dialog."""
+
+        self.Close()
+
     def on_test_changed(self, event):
         """On test change event."""
 
@@ -490,10 +513,10 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Handle plugin function toggle."""
 
         if self.m_replace_plugin_checkbox.GetValue():
-            self.m_replace_label.SetLabel(_("Replace plugin"))
+            self.m_replace_label.SetLabel(REPLACE_PLUGIN)
             self.m_replace_plugin_dir_picker.Show()
         else:
-            self.m_replace_label.SetLabel(_("Replace"))
+            self.m_replace_label.SetLabel(REPLACE)
             self.m_replace_plugin_dir_picker.Hide()
         self.m_tester_panel.GetSizer().Layout()
 

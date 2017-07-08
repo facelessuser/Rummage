@@ -21,9 +21,14 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 from . import gui
-from ..localization import _
+from . import data
+from .localization import _
 from .. import __meta__
-from .. import data
+
+TITLE = _("About")
+CONTACT = _("Contact")
+VERSION = _("Version: %s %s")
+DEVELOPER = _("Developer(s):\n%s")
 
 
 class AboutDialog(gui.AboutDialog):
@@ -34,7 +39,7 @@ class AboutDialog(gui.AboutDialog):
 
         super(AboutDialog, self).__init__(parent)
 
-        self.SetTitle(_("About"))
+        self.SetTitle(TITLE)
 
         self.m_bitmap = wx.StaticBitmap(
             self.m_about_panel,
@@ -45,13 +50,13 @@ class AboutDialog(gui.AboutDialog):
         )
         self.m_app_label.SetLabel(__meta__.__app__)
         self.m_version_label.SetLabel(
-            _("Version: %s %s") % (__meta__.__version__, __meta__.__status__)
+            VERSION % (__meta__.__version__, __meta__.__status__)
         )
         self.m_developers_label.SetLabel(
-            _("Developer(s):\n%s") % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in __meta__.__maintainers__]))
+            DEVELOPER % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in __meta__.__maintainers__]))
         )
 
-        self.m_dev_toggle.SetLabel(_("Contact") + " >>")
+        self.m_dev_toggle.SetLabel(CONTACT + " >>")
 
         self.Fit()
 
@@ -59,10 +64,10 @@ class AboutDialog(gui.AboutDialog):
         """Show/hide contact info on when contact button is toggled."""
 
         if self.m_dev_toggle.GetValue():
-            self.m_dev_toggle.SetLabel(_("Contact") + " <<")
+            self.m_dev_toggle.SetLabel(CONTACT + " <<")
             self.m_developers_label.Show()
         else:
-            self.m_dev_toggle.SetLabel(_("Contact") + " >>")
+            self.m_dev_toggle.SetLabel(CONTACT + " >>")
             self.m_developers_label.Hide()
         self.Fit()
         self.Refresh()

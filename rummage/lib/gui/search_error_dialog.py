@@ -20,10 +20,13 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-from . import gui
-from ..localization import _
-from .custom_app import error
+from .app.custom_app import error
 from .error_text_dialog import ErrorTextDialog
+from .localization import _
+from . import gui
+
+TITLE = _("Errors")
+ERR_COULD_NOT_PROCESS = _("Cound not process %s:\n%s")
 
 
 class SearchErrorDialog(gui.SearchErrorDialog):
@@ -48,7 +51,7 @@ class SearchErrorDialog(gui.SearchErrorDialog):
     def localize(self):
         """Localize dialog."""
 
-        self.SetTitle(_("Errors"))
+        self.SetTitle(TITLE)
         self.Fit()
 
     def show_error(self, text):
@@ -68,7 +71,7 @@ class SearchErrorDialog(gui.SearchErrorDialog):
             else:
                 name = '<NA>'
             error(
-                _("Cound not process %s:\n%s") % (name, e.error[1] + e.error[0])
+                ERR_COULD_NOT_PROCESS % (name, e.error[1] + e.error[0])
             )
             self.m_error_list.set_item_map("%d" % count, e.error, name)
             count += 1

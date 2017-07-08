@@ -19,8 +19,10 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
+from .localization import _
 from . import gui
-from ..localization import _
+
+ERROR = _("Error")
 
 
 class ErrorTextDialog(gui.ErrorTextDialog):
@@ -36,5 +38,5 @@ class ErrorTextDialog(gui.ErrorTextDialog):
     def localize(self):
         """Localize the dialog."""
 
-        self.SetTitle(_("Error"))
+        self.SetTitle(ERROR)
         self.Fit()

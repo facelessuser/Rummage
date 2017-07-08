@@ -20,13 +20,32 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-from . import gui
 from .settings import Settings
 from .editor_dialog import EditorDialog
-from ..localization import _
+from .localization import _
+from . import gui
 from .. import rumcore
 from .. import util
 
+TITLE = _("Preferences")
+EDITOR = _("Editor")
+GENERAL = _("General")
+REGEX_MODULES = _("Regular Expression Modules")
+NOTIFICATIONS = _("Notifications")
+HISTORY = _("History")
+SINGLE_INSTANCE = _("Single Instance (applies to new instances)")
+NOTIFY_POPUP = _("Notification popup")
+ALERT = _("Alert Sound")
+TERM_NOTIFY_PATH = _("Path to terminal-notifier")
+LANGUAGE = _("Language (restart required)")
+RE = _("Use re module")
+BRE = _("Use re module with backrefs")
+REGEX = _("Use regex module")
+BREGEX = _("Use regex module with backrefs")
+REGEX_VER = _("Regex module version to use")
+CHANGE = _("Change")
+CLEAR = _("Clear")
+CLOSE = _("Close")
 RECORDS = _("%d Records")
 
 
@@ -100,26 +119,26 @@ class SettingsDialog(gui.SettingsDialog):
     def localize(self):
         """Localize dialog."""
 
-        self.SetTitle(_("Preferences"))
+        self.SetTitle(TITLE)
         main_sizer = self.m_settings_panel.GetSizer()
-        main_sizer.GetItem(0).GetSizer().GetStaticBox().SetLabel(_("Editor"))
-        main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(_("General"))
-        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Regular Expression Modules"))
-        main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(_("Notifications"))
-        main_sizer.GetItem(4).GetSizer().GetStaticBox().SetLabel(_("History"))
-        self.m_single_checkbox.SetLabel(_("Single Instance (applies to new instances)"))
-        self.m_visual_alert_checkbox.SetLabel(_("Notification popup"))
-        self.m_audio_alert_checkbox.SetLabel(_("Alert Sound"))
-        self.m_term_note_label.SetLabel(_("Path to terminal-notifier"))
-        self.m_language_label.SetLabel(_("Language (restart required)"))
-        self.m_re_radio.SetLabel(_("Use re module"))
-        self.m_bre_radio.SetLabel(_("Use re module with backrefs"))
-        self.m_regex_radio.SetLabel(_("Use regex module"))
-        self.m_bregex_radio.SetLabel(_("Use regex module with backrefs"))
-        self.m_regex_version_label.SetLabel(_("Regex module version to use"))
-        self.m_editor_button.SetLabel(_("change"))
-        self.m_history_clear_button.SetLabel(_("Clear"))
-        self.m_close_button.SetLabel(_("Close"))
+        main_sizer.GetItem(0).GetSizer().GetStaticBox().SetLabel(EDITOR)
+        main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(GENERAL)
+        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(REGEX_MODULES)
+        main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(NOTIFICATIONS)
+        main_sizer.GetItem(4).GetSizer().GetStaticBox().SetLabel(HISTORY)
+        self.m_single_checkbox.SetLabel(SINGLE_INSTANCE)
+        self.m_visual_alert_checkbox.SetLabel(NOTIFY_POPUP)
+        self.m_audio_alert_checkbox.SetLabel(ALERT)
+        self.m_term_note_label.SetLabel(TERM_NOTIFY_PATH)
+        self.m_language_label.SetLabel(LANGUAGE)
+        self.m_re_radio.SetLabel(RE)
+        self.m_bre_radio.SetLabel(BRE)
+        self.m_regex_radio.SetLabel(REGEX)
+        self.m_bregex_radio.SetLabel(BREGEX)
+        self.m_regex_version_label.SetLabel(REGEX_VER)
+        self.m_editor_button.SetLabel(CHANGE)
+        self.m_history_clear_button.SetLabel(CLEAR)
+        self.m_close_button.SetLabel(CLOSE)
         self.Fit()
 
     def history_cleared(self):

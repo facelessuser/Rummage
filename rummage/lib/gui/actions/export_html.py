@@ -2,17 +2,16 @@
 from __future__ import unicode_literals
 import webbrowser
 import re
-from time import ctime
+import time
 import os
 import codecs
 import base64
 import json
 import subprocess
-from ..localization import _
-from ..localization import get_current_domain
 from .. import data
-from .. import util
-from .. import rumcore
+from ..localization import _, get_current_domain
+from ... import util
+from ... import rumcore
 
 
 def html_encode(text):
@@ -34,6 +33,7 @@ def html_encode(text):
             encode_table.get(c, c) for c in text
         )
     )
+
 
 TITLE = html_encode(_("Rummage Results"))
 
@@ -193,9 +193,9 @@ def export_result_list(res, html):
                 "path": html_encode(item[3]),
                 "encoding": item[4],
                 "mod_sort": util.to_ustr(item[5]),
-                "modified": ctime(item[5]),
+                "modified": time.ctime(item[5]),
                 "cre_sort": util.to_ustr(item[6]),
-                "created": ctime(item[6])
+                "created": time.ctime(item[6])
             }
         )
     html.write('</table>')

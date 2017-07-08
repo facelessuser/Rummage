@@ -21,6 +21,7 @@
 - **FIX**: Don't display replace message when aborting replace.
 - **FIX**: Fix limit panel hide logic so it doesn't show a the hidden panel on search.
 - **FIX**: POSIX flag not generating refresh in tester dialog.
+- **FIX**: Unicode issue in preferences' editor dialog.
 
 ## 2.0.5
 

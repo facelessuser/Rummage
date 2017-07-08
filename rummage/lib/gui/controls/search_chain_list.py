@@ -1,8 +1,8 @@
 """
-Search error list.
+Search chain list.
 
 Licensed under MIT
-Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2017 Isaac Muse <isaacmuse@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,28 +23,29 @@ from .dynamic_lists import DynamicList
 from ..localization import _
 from .. import data
 
+NAME = _("Name")
+CHAIN = _("Chain")
 
-class ErrorList(DynamicList):
+
+class SearchChainList(DynamicList):
     """Error list."""
 
     def __init__(self, parent):
         """Initialization."""
 
-        super(ErrorList, self).__init__(
+        super(SearchChainList, self).__init__(
             parent,
             [
-                _("Error"),
-                _("File Name")
+                NAME,
+                CHAIN
             ]
         )
-
-        self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
 
     def create_image_list(self):
         """Create image list."""
 
         self.images = wx.ImageList(16, 16)
-        self.error_symbol = self.images.Add(data.get_bitmap('error.png'))
+        self.glass = self.images.Add(data.get_bitmap('glass.png'))
         self.sort_up = self.images.Add(data.get_bitmap('su.png'))
         self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
         self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
@@ -54,18 +55,4 @@ class ErrorList(DynamicList):
 
         if not absolute:
             item = self.itemIndexMap[item]
-        if col == 0:
-            return self.itemDataMap[item][col][0]
-        else:
-            return self.itemDataMap[item][col]
-
-    def on_dclick(self, event):
-        """Open file at in editor with optional line and column argument."""
-
-        pos = event.GetPosition()
-        item = self.HitTestSubItem(pos)[0]
-        if item != -1:
-            file_name = self.get_map_item(item, col=1)
-            full_error = ''.join(reversed(self.get_map_item(item, col=0)))
-            self.GetParent().GetParent().show_error("%s\n%s" % (file_name, full_error))
-        event.Skip()
+        return self.itemDataMap[item][col]

@@ -1,11 +1,11 @@
 """Export CSV."""
 from __future__ import unicode_literals
-from time import ctime
+import time
 import codecs
 import subprocess
 from ..localization import _
-from .. import util
-from .. import rumcore
+from ... import util
+from ... import rumcore
 
 if util.platform() == "windows":
     from os import startfile
@@ -26,24 +26,16 @@ def csv_encode(text):
 
 
 REGEX_SEARCH = csv_encode(_("Regex Search"))
-
 LITERAL_SEARCH = csv_encode(_("Literal Search"))
-
-
-RESULT_ROW = '%(file)s,%(size)s,%(matches)s,%(path)s,%(encoding)s,%(modified)s,%(created)s\n'
-
-
 RESULT_TABLE_HEADER = ','.join(
     [csv_encode(x) for x in [_('File'), _('Size'), _('Matches'), _('Path'), _('Encoding'), _('Modified'), _('Created')]]
 ) + "\n"
-
-
-RESULT_CONTENT_ROW = '%(file)s,%(line)s,%(matches)s,%(context)s\n'
-
-
 RESULT_CONTENT_TABLE_HEADER = ','.join(
     [csv_encode(x) for x in [_('File'), _('Line'), _('Matches'), _('Context')]]
 ) + "\n"
+
+RESULT_ROW = '%(file)s,%(size)s,%(matches)s,%(path)s,%(encoding)s,%(modified)s,%(created)s\n'
+RESULT_CONTENT_ROW = '%(file)s,%(line)s,%(matches)s,%(context)s\n'
 
 
 def export_result_list(res, csv):
@@ -62,8 +54,8 @@ def export_result_list(res, csv):
                 "matches": csv_encode(util.to_ustr(item[2])),
                 "path": csv_encode(item[3]),
                 "encoding": csv_encode(item[4]),
-                "modified": csv_encode(ctime(item[5])),
-                "created": csv_encode(ctime(item[6]))
+                "modified": csv_encode(time.ctime(item[5])),
+                "created": csv_encode(time.ctime(item[6]))
             }
         )
 

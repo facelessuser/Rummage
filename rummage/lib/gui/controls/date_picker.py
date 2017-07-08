@@ -22,7 +22,7 @@ IN THE SOFTWARE.
 """
 import wx
 import wx.adv
-from .. import util
+from ... import util
 
 
 class DatePicker(wx.adv.GenericDatePickerCtrl):

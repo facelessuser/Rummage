@@ -25,11 +25,11 @@ import codecs
 import json
 import os
 import sys
-from . import simplelog
 import time
 import wx
 import wx.lib.newevent
-from .. import util
+from . import simplelog
+from ... import util
 try:
     import thread
 except ImportError:

@@ -23,12 +23,10 @@ import wx
 import os
 from .platform_window_focus import platform_window_focus
 from .custom_app import PipeApp, set_debug_mode
-from .rummage_dialog import RummageFrame
-from .regex_test_dialog import RegexTestDialog
-from .. import util
+from ... import util
 
 __all__ = (
-    'set_debug_mode', 'RummageApp', 'RummageFrame', 'RegexTestDialog'
+    'set_debug_mode', 'RummageApp'
 )
 
 wx.Log.EnableLogging(False)
@@ -52,7 +50,7 @@ class RummageApp(PipeApp):
         """
 
         frame = self.GetTopWindow()
-        if frame is not None and isinstance(frame, RummageFrame):
+        if frame is not None:
             args = iter(event.data)
             filename = None
             for a in args:

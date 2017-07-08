@@ -23,17 +23,16 @@ import codecs
 import json
 import os
 import traceback
-from ..file_strip.json import sanitize_json
-from .. import notify
+from . import portalocker
+from ..app import custom_app
+from ..app.custom_app import debug, debug_struct, error
+from ..generic_dialogs import errormsg
 from .. import localization
 from ..localization import _
-from .custom_app import debug, debug_struct, error
-from .custom_app import init_app_log, set_debug_mode
-from . generic_dialogs import errormsg
 from .. import data
-from .. import rumcore
-from .. import portalocker
-from .. import util
+from .. import notify
+from ... import rumcore
+from ... import util
 
 SETTINGS_FILE = "rummage.settings"
 CACHE_FILE = "rummage.cache"
@@ -45,6 +44,10 @@ NOTIFY_STYLES = {
     "windows": ["default", "growl"],
     "linux": ["default", "growl"]
 }
+
+ERR_FAILED_SAVE_SETTINGS = _("Failed to save settings file!")
+ERR_FAILED_SAVE_CACHE = _("Failed to save cache file!")
+ERR_FAILED_LOAD_SETTINGS = _("Failed to load settings file!")
 
 
 class Settings(object):
@@ -60,7 +63,7 @@ class Settings(object):
 
         cls.debug = debug_mode
         cls.settings_file, cls.cache_file, log = cls.get_settings_files()
-        init_app_log(log)
+        custom_app.init_app_log(log)
         cls.settings = {}
         cls.cache = {}
         cls.settings_time = None
@@ -72,13 +75,13 @@ class Settings(object):
                 with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
                     assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
                     locked = True
-                    cls.settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
+                    cls.settings = json.loads(f.read())
                     assert portalocker.unlock(f), "Could not unlock settings."
                     locked = False
                 with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
                     assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock cache file."
                     locked = True
-                    cls.cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
+                    cls.cache = json.loads(f.read())
                     assert portalocker.unlock(f), "Could not unlock cache file."
                     locked = False
             except Exception:
@@ -87,11 +90,11 @@ class Settings(object):
                     error(e)
                     if locked:
                         portalocker.unlock(f)
-                    errormsg(_("Failed to load settings file!"))
+                    errormsg(ERR_FAILED_LOAD_SETTINGS)
                 except Exception:
                     print(str(e))
         if cls.debug:
-            set_debug_mode(True)
+            custom_app.set_debug_mode(True)
         localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
         debug_struct(cls.settings)
         debug_struct(cls.cache)
@@ -193,7 +196,7 @@ class Settings(object):
 
         cls.reload_settings()
         cls.settings["debug"] = enable
-        set_debug_mode(enable)
+        custom_app.set_debug_mode(enable)
         cls.save_settings()
 
     @classmethod
@@ -313,13 +316,13 @@ class Settings(object):
                     with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
                         assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
                         locked = True
-                        settings = json.loads(sanitize_json(f.read(), preserve_lines=True))
+                        settings = json.loads(f.read())
                         assert portalocker.unlock(f), "could not unlock settings."
                         locked = False
                     with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
                         assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock cache file."
                         locked = True
-                        cache = json.loads(sanitize_json(f.read(), preserve_lines=True))
+                        cache = json.loads(f.read())
                         assert portalocker.unlock(f), "could not unlock cache file."
                         locked = False
                 except Exception:
@@ -379,7 +382,7 @@ class Settings(object):
         new_search = {}
 
         for entry in searches:
-            name = entry[0]
+            name = entry[0].strip()
             key_name = not_word.sub('', name).replace(' ', '-')
             entry = list(entry)
 
@@ -678,7 +681,7 @@ class Settings(object):
             try:
                 if locked:
                     portalocker.unlock(f)
-                errormsg(_("Failed to save settings file!"))
+                errormsg(ERR_FAILED_SAVE_SETTINGS)
                 error(e)
             except Exception:
                 print(str(e))
@@ -701,7 +704,7 @@ class Settings(object):
             try:
                 if locked:
                     portalocker.unlock(f)
-                errormsg(_("Failed to save cache file!"))
+                errormsg(ERR_FAILED_SAVE_CACHE)
                 error(e)
             except Exception:
                 print(str(e))

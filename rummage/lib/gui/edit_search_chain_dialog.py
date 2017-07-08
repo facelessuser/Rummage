@@ -21,17 +21,27 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import re
-from . import gui
 from .settings import Settings
-from ..localization import _
 from .generic_dialogs import errormsg, yesno
+from .localization import _
+from . import gui
 
-RE_KEY = re.compile(r'[\w-]+')
+TITLE = _("Edit/Create Search Chain")
 OVERWRITE = _("'%s' already exists. Overwrite?")
+ADD = _("Add")
+DELETE = _("Delete")
+UP = _("Up")
+DOWN = _('Down')
+OKAY = _('Apply')
+CLOSE = _('Cancel')
+NAME = _("Name")
+CHAIN = _("Chain")
 ERR_SEARCH_NOT_EXISTS = _("Search '%s' does not exist!")
 ERR_CHAIN_MISSING = _("Please specify a chain name!")
 ERR_CHAIN_FORMAT = _("Chain names can only contain Unicode word chars, '_', and '-'!")
 ERR_CHAIN_EMPTY = _("Chain must contain at least one search!")
+
+RE_KEY = re.compile(r'[\w-]+')
 
 
 class EditSearchChainDialog(gui.EditSearchChainDialog):
@@ -63,15 +73,15 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
     def localize(self):
         """Localize dialog."""
 
-        self.SetTitle(_("Edit/Create Search Chain"))
-        self.m_add_button.SetLabel(_("Add"))
-        self.m_remove_button.SetLabel(_("Delete"))
-        self.m_up_button.SetLabel(_("Up"))
-        self.m_down_button.SetLabel(_('Down'))
-        self.m_apply_button.SetLabel(_('Apply'))
-        self.m_cancel_button.SetLabel(_('Cancel'))
-        self.m_chain_panel.GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(_("Name"))
-        self.m_chain_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(_("Chain"))
+        self.SetTitle(TITLE)
+        self.m_add_button.SetLabel(ADD)
+        self.m_remove_button.SetLabel(DELETE)
+        self.m_up_button.SetLabel(UP)
+        self.m_down_button.SetLabel(DOWN)
+        self.m_apply_button.SetLabel(OKAY)
+        self.m_cancel_button.SetLabel(CLOSE)
+        self.m_chain_panel.GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(NAME)
+        self.m_chain_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(CHAIN)
 
     def load_searches(self):
         """Load search list in wxChoice."""

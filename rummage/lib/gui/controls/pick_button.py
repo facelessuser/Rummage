@@ -1,8 +1,8 @@
 """Picker button class."""
 import wx
 import os
-from .messages import dirpickermsg, filepickermsg
-from .. import util
+from ..messages import dirpickermsg, filepickermsg
+from ... import util
 
 PickChangeEvent, EVT_PICK_CHANGE = wx.lib.newevent.NewEvent()
 

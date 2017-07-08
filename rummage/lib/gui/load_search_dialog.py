@@ -22,9 +22,14 @@ from __future__ import unicode_literals
 import wx
 
 from .settings import Settings
-from . import gui
-from ..localization import _
+from .localization import _
 from .save_search_dialog import SaveSearchDialog
+from . import gui
+
+TITLE = _("Searches")
+REMOVE = _("Remove")
+OKAY = _("Load")
+CLOSE = _("Cancel")
 
 SEARCH_REGEX = _("Regex")
 SEARCH_LITERAL = _("Text")
@@ -66,10 +71,10 @@ class LoadSearchDialog(gui.LoadSearchDialog):
     def localize(self):
         """Localize dialog."""
 
-        self.SetTitle(_("Searches"))
-        self.m_delete_button.SetLabel(_("Remove"))
-        self.m_load_button.SetLabel(_("Load"))
-        self.m_cancel_button.SetLabel(_("Cancel"))
+        self.SetTitle(TITLE)
+        self.m_delete_button.SetLabel(REMOVE)
+        self.m_load_button.SetLabel(OKAY)
+        self.m_cancel_button.SetLabel(CLOSE)
         self.Fit()
 
     def load_searches(self):
@@ -84,6 +89,24 @@ class LoadSearchDialog(gui.LoadSearchDialog):
             self.m_search_list.set_item_map(count, key, s[0], s[1], s[2], s[3], search_type, replace_type)
             count += 1
         self.m_search_list.load_list()
+
+    def edit(self, item):
+        """Edit the saved search."""
+
+        name = self.m_search_list.get_map_item(item, col=0)
+        comment = self.m_search_list.get_map_item(item, col=1)
+        search = self.m_search_list.get_map_item(item, col=2)
+        replace = self.m_search_list.get_map_item(item, col=3)
+        flags = self.m_search_list.get_map_item(item, col=4)
+        is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
+        is_plugin = REPLACE_TYPE[self.m_search_list.get_map_item(item, col=6)] == "Plugin"
+
+        dlg = SaveSearchDialog(self, (name, comment, search, replace, flags, is_regex, is_plugin))
+        dlg.ShowModal()
+        if dlg.saved:
+            self.m_search_list.reset_list()
+            self.load_searches()
+        dlg.Destroy()
 
     def on_load(self, event):
         """Select the search entry for use."""
@@ -150,24 +173,6 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         item = self.m_search_list.HitTestSubItem(pos)[0]
         if item != -1:
             self.edit(item)
-
-    def edit(self, item):
-        """Edit the saved search."""
-
-        name = self.m_search_list.get_map_item(item, col=0)
-        comment = self.m_search_list.get_map_item(item, col=1)
-        search = self.m_search_list.get_map_item(item, col=2)
-        replace = self.m_search_list.get_map_item(item, col=3)
-        flags = self.m_search_list.get_map_item(item, col=4)
-        is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
-        is_plugin = REPLACE_TYPE[self.m_search_list.get_map_item(item, col=6)] == "Plugin"
-
-        dlg = SaveSearchDialog(self, (name, comment, search, replace, flags, is_regex, is_plugin))
-        dlg.ShowModal()
-        if dlg.saved:
-            self.m_search_list.reset_list()
-            self.load_searches()
-        dlg.Destroy()
 
     def on_cancel(self, event):
         """Close dialog."""

@@ -1,7 +1,7 @@
 """Localization."""
 from __future__ import unicode_literals
 import gettext
-from . import util
+from ... import util
 
 lang = None
 current_domain = None

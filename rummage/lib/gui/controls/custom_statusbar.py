@@ -23,7 +23,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 import wx
 import wx.lib.agw.supertooltip
-from .. import util
+from ... import util
 
 if wx.VERSION > (2, 9, 4):  # When will this get fixed? :(
     def monkey_patch():
@@ -35,6 +35,7 @@ if wx.VERSION > (2, 9, 4):  # When will this get fixed? :(
 
         import inspect
         import re
+
         target_line = re.compile(r'([ ]{8})(maxWidth = max\(bmpWidth\+\(textWidth\+self._spacing\*3\), maxWidth\)\n)')
         tt_source = inspect.getsourcelines(wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint)[0]
         count = 0
@@ -147,6 +148,15 @@ class IconTrayExtension(object):
 
     fields = [-1]
 
+    def sb_tray_setup(self):
+        """Setup the status bar with icon tray."""
+
+        self.SetFieldsCount(len(self.fields) + 1)
+        self.SetStatusText('', 0)
+        self.SetStatusWidths(self.fields + [1])
+        self.sb_icons = OrderedDict()
+        self.Bind(wx.EVT_SIZE, self.on_sb_size)
+
     def remove_icon(self, name):
         """Remove an icon from the tray."""
 
@@ -228,15 +238,6 @@ class IconTrayExtension(object):
 
         event.Skip()
         self.place_icons()
-
-    def sb_tray_setup(self):
-        """Setup the status bar with icon tray."""
-
-        self.SetFieldsCount(len(self.fields) + 1)
-        self.SetStatusText('', 0)
-        self.SetStatusWidths(self.fields + [1])
-        self.sb_icons = OrderedDict()
-        self.Bind(wx.EVT_SIZE, self.on_sb_size)
 
 
 class CustomStatusExtension(IconTrayExtension, TimedStatusExtension):

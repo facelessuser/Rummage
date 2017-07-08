@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import codecs
 import threading
-from .. import util
+from ... import util
 
 ALL = 0
 DEBUG = 10
