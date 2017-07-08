@@ -433,27 +433,31 @@ class DebugFrameExtender(object):
         set_debug_console(True)
         # echo out log to console
         log.set_echo(True)
-        if wx.GetApp().stdioWin.frame is None:
-            wx.GetApp().stdioWin.write(log.read(), False)
-        else:
-            wx.GetApp().stdioWin.write("", False)
-        debug("**Debug Console Opened**")
+        app = wx.GetApp()
+        if app.stdioWin is not None:
+            if app.stdioWin.frame is None:
+                app.stdioWin.write(log.read(), False)
+            else:
+                app.stdioWin.write("", False)
+            debug("**Debug Console Opened**")
 
     def toggle_debug_console(self):
         """Open up the debug console if closed or close if opened."""
 
         set_debug_console(not get_debug_console())
+        app = wx.GetApp()
         if get_debug_console():
             # echo out log to console
             log.set_echo(True)
-            wx.GetApp().stdioWin.write(log.read(), False)
-            debug("**Debug Console Opened**")
+            if app.stdioWin is not None:
+                app.stdioWin.write(log.read(), False)
+                debug("**Debug Console Opened**")
         else:
             debug("**Debug Console Closed**")
             # disable echoing of log to console
             log.set_echo(False)
-            if wx.GetApp().stdioWin is not None:
-                wx.GetApp().stdioWin.close()
+            if app.stdioWin is not None:
+                app.stdioWin.close()
 
     def close_debug_console(self):
         """
@@ -467,8 +471,9 @@ class DebugFrameExtender(object):
             debug("**Debug Console Closed**")
             set_debug_console(False)
             log.set_echo(False)
-            if wx.GetApp().stdioWin is not None:
-                wx.GetApp().stdioWin.close()
+            app = wx.GetApp()
+            if app.stdioWin is not None:
+                app.stdioWin.close()
 
 
 def _log_struct(obj, log_func, label="Object"):

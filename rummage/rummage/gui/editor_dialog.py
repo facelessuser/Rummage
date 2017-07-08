@@ -33,6 +33,7 @@ class EditorDialog(gui.EditorDialog):
         """Init EditorDialog object."""
 
         super(EditorDialog, self).__init__(parent)
+
         self.editor = editor
 
         # Ensure OS platform selectall shortcut works
@@ -44,9 +45,8 @@ class EditorDialog(gui.EditorDialog):
             self.m_editor_picker.SetPath(editor[0])
 
         if len(editor) > 1:
-            self.m_arg_list.Clear()
             for x in range(1, len(editor)):
-                self.m_arg_list.Append(editor[x])
+                self.m_arg_list.Insert(editor[x], x - 1)
 
         self.localize()
 
@@ -79,9 +79,8 @@ class EditorDialog(gui.EditorDialog):
             )
         )
         self.m_instructions_label.Wrap(325)
-        main_sizer = self.m_arg_text.GetParent().GetParent().GetSizer()
-        main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(_("Application"))
-        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Arguments"))
+        self.m_editor_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(_("Application"))
+        self.m_editor_panel.GetSizer().GetItem(2).GetSizer().GetStaticBox().SetLabel(_("Arguments"))
         self.Fit()
 
     def set_keybindings(self, keybindings):
@@ -121,74 +120,56 @@ class EditorDialog(gui.EditorDialog):
 
         value = self.m_arg_text.GetValue()
         if value != "":
-            self.m_arg_list.Append(value)
-            value = self.m_arg_text.SetValue("")
+            index = self.m_arg_list.GetSelected()
+            if index == wx.NOT_FOUND:
+                self.m_arg_list.Insert(value, self.m_arg_list.GetCount())
+            else:
+                self.m_arg_list.Insert(value, index)
 
     def on_edit(self, event):
         """Edit argument."""
 
-        value = self.m_arg_list.GetSelection()
-        if value >= 0:
-            dlg = ArgDialog(self, self.m_arg_list.GetString(value))
+        index = self.m_arg_list.GetSelected()
+        if index > wx.NOT_FOUND:
+            dlg = ArgDialog(self, self.m_arg_list.GetString(index))
             dlg.ShowModal()
             string = dlg.get_arg()
             dlg.Destroy()
 
-            items = []
-            for x in range(0, self.m_arg_list.GetCount()):
-                if x == value:
-                    items.append(string)
-                if x != value:
-                    items.append(self.m_arg_list.GetString(x))
-            self.m_arg_list.Clear()
-            for x in items:
-                self.m_arg_list.Append(x)
+            self.m_arg_list.Delete(index)
+            self.m_arg_list.Insert(string, index)
 
     def on_up(self, event):
         """Move argument up."""
 
-        value = self.m_arg_list.GetSelection()
-        if value > 0:
-            string = self.m_arg_list.GetString(value)
-            items = []
-            for x in range(0, self.m_arg_list.GetCount()):
-                if x == value - 1:
-                    items.append(string)
-                if x != value:
-                    items.append(self.m_arg_list.GetString(x))
-            self.m_arg_list.Clear()
-            for x in items:
-                self.m_arg_list.Append(x)
+        index = self.m_arg_list.GetSelected()
+        if index > 0:
+            search = self.m_arg_list.GetString(index)
+            self.m_arg_list.Delete(index)
+            self.m_arg_list.Insert(search, index - 1)
+            self.m_arg_list.Select(index - 1)
 
     def on_down(self, event):
         """Move argument down."""
 
-        value = self.m_arg_list.GetSelection()
         count = self.m_arg_list.GetCount()
-        if value < count - 1:
-            string = self.m_arg_list.GetString(value)
-            items = []
-            for x in range(0, count):
-                if x != value:
-                    items.append(self.m_arg_list.GetString(x))
-                    if x == value + 1:
-                        items.append(string)
-            self.m_arg_list.Clear()
-            for x in items:
-                self.m_arg_list.Append(x)
+        index = self.m_arg_list.GetSelected()
+        if wx.NOT_FOUND < index < count - 1:
+            search = self.m_arg_list.GetString(index)
+            self.m_arg_list.Delete(index)
+            self.m_arg_list.Insert(search, index + 1)
+            self.m_arg_list.Select(index + 1)
 
     def on_remove(self, event):
         """Remove argument."""
 
-        value = self.m_arg_list.GetSelection()
-        if value >= 0:
-            items = []
-            for x in range(0, self.m_arg_list.GetCount()):
-                if x != value:
-                    items.append(self.m_arg_list.GetString(x))
-            self.m_arg_list.Clear()
-            for x in items:
-                self.m_arg_list.Append(x)
+        index = self.m_arg_list.GetSelected()
+        selected = self.m_arg_list.IsSelected(index)
+        if index != wx.NOT_FOUND:
+            self.m_arg_list.Delete(index)
+            count = self.m_arg_list.GetCount()
+            if selected and count and index <= count - 1:
+                self.m_arg_list.Select(index)
 
     def on_apply(self, event):
         """Set editor command with arguments on apply."""

@@ -12,6 +12,8 @@ from rummage.rummage.rumcore import text_decode as td
 from rummage.rummage import epoch_timestamp as epoch
 import codecs
 import datetime
+import tempfile
+import textwrap
 
 
 class TestHelperFunctions(unittest.TestCase):
@@ -54,7 +56,7 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertEqual(rc._re_literal_pattern(r"test", rc.IGNORECASE).flags, re.IGNORECASE | default)
         self.assertEqual(
             rc._re_literal_pattern(r"test", rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE).flags,
-            re.IGNORECASE | default
+            re.IGNORECASE | re.UNICODE
         )
 
     def test_bre_flags(self):
@@ -88,7 +90,7 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertEqual(rc._bre_literal_pattern(r"test", rc.IGNORECASE).flags, bre.IGNORECASE | default)
         self.assertEqual(
             rc._bre_literal_pattern(r"test", rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE).flags,
-            bre.IGNORECASE | default
+            bre.IGNORECASE | bre.UNICODE
         )
 
     def test_regex_flags(self):
@@ -143,9 +145,9 @@ class TestHelperFunctions(unittest.TestCase):
             rc._regex_literal_pattern(
                 r"test",
                 rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE |
-                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.VERSION1
+                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE | rc.VERSION0
             ).flags,
-            regex.IGNORECASE | regex.V0 | regex.ASCII
+            regex.IGNORECASE | regex.V0 | regex.UNICODE | regex.FULLCASE
         )
 
     def test_bregex_flags(self):
@@ -202,9 +204,9 @@ class TestHelperFunctions(unittest.TestCase):
             rc._bregex_literal_pattern(
                 r"test",
                 rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE |
-                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.VERSION1
+                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE | rc.VERSION0
             ).flags,
-            bregex.IGNORECASE | bregex.V0 | bregex.ASCII
+            bregex.IGNORECASE | bregex.V0 | bregex.UNICODE | bregex.FULLCASE
         )
 
     def test_exception(self):
@@ -220,44 +222,34 @@ class TestHelperFunctions(unittest.TestCase):
 
 
 class TestRummageFileContent(unittest.TestCase):
-    """Tests for RummageFileContent."""
+    """Tests for _RummageFileContent."""
 
     def test_string_bin(self):
         """Test passing a binary string."""
 
         encoding = td.Encoding('bin', None)
-        rfc = rc.RummageFileContent("buffer", None, encoding, b'test')
+        rfc = rc._RummageFileContent("buffer", None, encoding, b'test')
         with rfc as bfr:
             text = bfr
         self.assertEqual(rfc.encoding.encode, 'bin')
         self.assertEqual(text, b'test')
 
-    def test_string_utf8(self):
-        """Test passing a binary string with utf-8 encoding."""
+    def test_string_unicode(self):
+        """Test passing a binary string."""
 
-        encoding = td.Encoding('utf-8', None)
-        rfc = rc.RummageFileContent("buffer", None, encoding, b'test')
+        encoding = td.Encoding('unicode', None)
+        rfc = rc._RummageFileContent("buffer", None, encoding, 'test')
         with rfc as bfr:
             text = bfr
-        self.assertEqual(rfc.encoding.encode, 'utf-8')
+        self.assertEqual(rfc.encoding.encode, 'unicode')
         self.assertEqual(text, 'test')
-
-    def test_string_bad_encode(self):
-        """Test passing a binary string with bad encoding."""
-
-        encoding = td.Encoding('bad', None)
-        rfc = rc.RummageFileContent("buffer", None, encoding, b'test')
-        with rfc as bfr:
-            text = bfr
-        self.assertEqual(rfc.encoding.encode, 'bin')
-        self.assertEqual(text, b'test')
 
     def test_bin(self):
         """Test bin file."""
 
         encoding = td.Encoding('bin', None)
         name = "tests/encodings/binary.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with open(name, 'rb') as f:
@@ -270,7 +262,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('utf-8', codecs.BOM_UTF8)
         name = "tests/encodings/utf8_bom.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with codecs.open(name, 'r', encoding='utf-8-sig') as f:
@@ -283,7 +275,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('utf-16-be', codecs.BOM_UTF16_BE)
         name = "tests/encodings/utf16_be_bom.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with codecs.open(name, 'r', encoding='utf-16') as f:
@@ -296,7 +288,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('utf-32-be', codecs.BOM_UTF32_BE)
         name = "tests/encodings/utf32_be_bom.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with codecs.open(name, 'r', encoding='utf-32') as f:
@@ -309,7 +301,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('ascii', None)
         name = "tests/encodings/does_not_exist.txt"
-        rfc = rc.RummageFileContent(name, 10, encoding)
+        rfc = rc._RummageFileContent(name, 10, encoding)
         self.assertRaises(rc.RummageException, rfc.__enter__)
 
     def test_bin_rummageexception(self):
@@ -317,7 +309,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('bin', None)
         name = "tests/encodings/does_not_exist.txt"
-        rfc = rc.RummageFileContent(name, 10, encoding)
+        rfc = rc._RummageFileContent(name, 10, encoding)
         self.assertRaises(rc.RummageException, rfc.__enter__)
 
     def test_wrong(self):
@@ -325,7 +317,7 @@ class TestRummageFileContent(unittest.TestCase):
 
         encoding = td.Encoding('utf-32-be', codecs.BOM_UTF32_BE)
         name = "tests/encodings/utf8.txt"
-        rfc = rc.RummageFileContent(name, os.path.getsize(name), encoding)
+        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
         with rfc as f:
             text = f[:]
         with open(name, 'rb') as f:
@@ -798,20 +790,249 @@ class TestFileSearch(unittest.TestCase):
     def test_literal_search(self):
         """Test for literal search."""
 
-        search_params = rc.SearchParams()
-        search_params.pattern = "search1"
-        search_params.encoding = None
-        search_params.context = (0, 0)
-        search_params.flags = rc.IGNORECASE | rc.LITERAL
+        search_params = rc.Search()
+        search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = None
+        context = (0, 0)
+        flags = 0
+        backup_ext = 'rum-bak',
+        max_count = None
 
         fs = rc._FileSearch(
             search_params,
             self.get_file_attr('tests/searches/searches_unix_ending.txt'),
-            0,
-            None,
-            None
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
         )
 
         results = [r for r in fs.run()]
         print(results)
         self.assertEqual(len(results), 2)
+
+    def test_literal_chain_search(self):
+        """Test for literal search."""
+
+        search_params = rc.Search()
+        search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
+        search_params.add('search2', None, rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = None
+        context = (0, 0)
+        flags = 0
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
+        )
+
+        results = [r for r in fs.run()]
+        print(results)
+        self.assertEqual(len(results), 4)
+
+    def test_literal_chain_replace(self):
+        """Test for literal search and replace."""
+
+        before = textwrap.dedent(
+            '''search1
+            search1
+
+            search2
+            search2
+
+            search3
+            search3
+
+            search1, search2, search3
+            '''
+        )
+
+        after = textwrap.dedent(
+            '''replace1
+            replace1
+
+            replace2
+            replace2
+
+            search3
+            search3
+
+            replace1, replace2, search3
+            '''
+        )
+
+        search_params = rc.Search(True)
+        search_params.add('search1', 'replace1', rc.IGNORECASE | rc.LITERAL)
+        search_params.add('search2', 'replace2', rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = None
+        context = (0, 0)
+        flags = 0
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        f = None
+        try:
+            with tempfile.NamedTemporaryFile('wb', delete=False) as f:
+                f.write(before.encode('utf-8'))
+
+            fs = rc._FileSearch(
+                search_params,
+                self.get_file_attr(f.name),
+                file_id,
+                flags,
+                context,
+                encoding,
+                backup_ext,
+                max_count
+            )
+
+            for result in fs.run():
+                if result.error is not None:
+                    print(''.join(result.error))
+
+            with codecs.open(f.name, 'r', encoding='utf-8') as f:
+                self.assertEqual(f.read(), after)
+        finally:
+            if f is not None:
+                os.remove(f.name)
+
+    def test_literal_binary_search(self):
+        """Test for literal search."""
+
+        search_params = rc.Search()
+        search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = 'bin'
+        context = (0, 0)
+        flags = rc.PROCESS_BINARY
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
+        )
+
+        results = [r for r in fs.run()]
+        print(results)
+        self.assertEqual(len(results), 2)
+
+    def test_literal_chain_binary_search(self):
+        """Test for literal search."""
+
+        search_params = rc.Search()
+        search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
+        search_params.add('search2', None, rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = 'bin'
+        context = (0, 0)
+        flags = rc.PROCESS_BINARY
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
+        )
+
+        results = [r for r in fs.run()]
+        print(results)
+        self.assertEqual(len(results), 4)
+
+    def test_literal_chain_binary_replace(self):
+        """Test for literal search and replace."""
+
+        before = textwrap.dedent(
+            '''search1
+            search1
+
+            search2
+            search2
+
+            search3
+            search3
+
+            search1, search2, search3
+            '''
+        )
+
+        after = textwrap.dedent(
+            '''replace1
+            replace1
+
+            replace2
+            replace2
+
+            search3
+            search3
+
+            replace1, replace2, search3
+            '''
+        )
+
+        search_params = rc.Search(True)
+        search_params.add('search1', 'replace1', rc.IGNORECASE | rc.LITERAL)
+        search_params.add('search2', 'replace2', rc.IGNORECASE | rc.LITERAL)
+
+        file_id = 0
+        encoding = 'bin'
+        context = (0, 0)
+        flags = rc.PROCESS_BINARY
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        f = None
+        try:
+            with tempfile.NamedTemporaryFile('wb', delete=False) as f:
+                f.write(before.encode('utf-8'))
+
+            fs = rc._FileSearch(
+                search_params,
+                self.get_file_attr(f.name),
+                file_id,
+                flags,
+                context,
+                encoding,
+                backup_ext,
+                max_count
+            )
+
+            for result in fs.run():
+                if result.error is not None:
+                    print(''.join(result.error))
+
+            with codecs.open(f.name, 'r', encoding='utf-8') as f:
+                self.assertEqual(f.read(), after)
+        finally:
+            if f is not None:
+                os.remove(f.name)

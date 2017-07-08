@@ -241,7 +241,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
                         if f != best and not f.startswith(best):
                             best = None
                             break
-                if best is not None:
+                if best is not None and best != value:
                     self.update_semaphore = True
                     tc.SetValue(best)
                     tc.SetInsertionPoint(len(best))

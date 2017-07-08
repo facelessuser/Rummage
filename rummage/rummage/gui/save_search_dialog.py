@@ -20,17 +20,23 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
+import re
 from . import gui
 from .settings import Settings, rumcore
-from .generic_dialogs import errormsg
+from .generic_dialogs import errormsg, yesno
 from ..localization import _
 from .. import util
+
+RE_NAME = re.compile(r'[\w-]', re.UNICODE)
+OVERWRITE = _("'%s' already exists. Overwrite?")
+ERR_NO_NAME = _("Please give the search a name!")
+ERR_INVALID_NAME = _("Names can only be Unicode word characters, '_', and '-'")
 
 
 class SaveSearchDialog(gui.SaveSearchDialog):
     """Save search dialog."""
 
-    def __init__(self, parent):
+    def __init__(self, parent, data=None):
         """Init SaveSearchDialog object."""
 
         super(SaveSearchDialog, self).__init__(parent)
@@ -41,9 +47,12 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         )
 
         self.parent = parent
-        self.search = parent.m_searchfor_textbox.GetValue()
-        self.replace = parent.m_replace_textbox.GetValue()
-        self.is_regex = parent.m_regex_search_checkbox.GetValue()
+        self.saved = False
+
+        self.original_name = ""
+        if data:
+            self.original_name = data[0]
+        self.setup(data)
 
         self.localize()
 
@@ -59,11 +68,74 @@ class SaveSearchDialog(gui.SaveSearchDialog):
     def localize(self):
         """Localize the dialog."""
 
-        self.SetTitle(_("Save Search"))
+        self.SetTitle(_("Save Search and Replace"))
         self.m_apply_button.SetLabel(_("Save"))
         self.m_cancel_button.SetLabel(_("Cancel"))
         self.m_name_label.SetLabel(_("Name"))
+        self.m_comment_label.SetLabel(_("Comment"))
+        self.m_search_label.SetLabel(_("Search"))
+        self.m_replace_label.SetLabel(_("Replace"))
+        self.m_flags_label.SetLabel(_("Flags"))
+
         self.Fit()
+
+    def setup(self, data):
+        """Setup."""
+
+        if data is not None:
+            self.m_name_text.SetValue(data[0])
+            if not data[1]:
+                self.m_comment_textbox.SetHint(_("Optional"))
+            else:
+                self.m_comment_textbox.SetValue(data[1])
+            self.m_search_textbox.SetValue(data[2])
+            self.m_replace_textbox.SetValue(data[3])
+            self.m_flags_textbox.SetValue(data[4])
+            self.is_regex = data[5]
+            self.is_plugin = data[6]
+        else:
+            self.m_comment_textbox.SetHint(_("Optional"))
+            self.m_search_textbox.SetValue(self.parent.m_searchfor_textbox.GetValue())
+            self.m_replace_textbox.SetValue(self.parent.m_replace_textbox.GetValue())
+            self.is_regex = self.parent.m_regex_search_checkbox.GetValue()
+            self.is_plugin = self.parent.m_replace_plugin_checkbox.GetValue()
+            flags = self.get_flag_string()
+            self.m_flags_textbox.SetValue(flags)
+        self.m_type_checkbox.SetValue(not self.is_regex)
+        self.m_replace_plugin_checkbox.SetValue(self.is_plugin)
+
+    def get_flag_string(self):
+        """Get flags in a string representation."""
+
+        flags = ""
+
+        mode = Settings.get_regex_mode()
+        version = Settings.get_regex_version()
+
+        if not self.parent.m_case_checkbox.GetValue():
+            flags += "i"
+        if self.parent.m_unicode_checkbox.GetValue():
+            flags += "u"
+        if mode in rumcore.REGEX_MODES and version == 0 and self.parent.m_fullcase_checkbox.GetValue():
+            flags += "f"
+
+        if self.is_regex:
+            if self.parent.m_dotmatch_checkbox.GetValue():
+                flags += "s"
+            if mode in rumcore.REGEX_MODES:
+                if self.parent.m_bestmatch_checkbox.GetValue():
+                    flags += "b"
+                if self.parent.m_enhancematch_checkbox.GetValue():
+                    flags += "e"
+                if self.parent.m_word_checkbox.GetValue():
+                    flags += "w"
+                if self.parent.m_reverse_checkbox.GetValue():
+                    flags += "r"
+                if self.parent.m_posix_checkbox.GetValue():
+                    flags += "p"
+                if self.parent.m_format_replace_checkbox.GetValue():
+                    flags += "F"
+        return flags
 
     def set_keybindings(self, keybindings):
         """Set keybindings for frame."""
@@ -88,39 +160,35 @@ class SaveSearchDialog(gui.SaveSearchDialog):
     def on_apply(self, event):
         """Ensure there is a name, and proceed to add saved regex to settings."""
 
-        value = self.m_name_text.GetValue()
-        if value == "":
-            errormsg(_("Please give the search a name!"))
+        name = self.m_name_text.GetValue()
+        if name == "":
+            errormsg(ERR_NO_NAME)
             return
 
-        flags = ""
-        if not self.parent.m_case_checkbox.GetValue():
-            flags += "i"
-        if self.is_regex:
-            if self.parent.m_dotmatch_checkbox.GetValue():
-                flags += "s"
-            if self.parent.m_unicode_checkbox.GetValue():
-                flags += "u"
-            mode = Settings.get_regex_mode()
-            if mode in rumcore.REGEX_MODES:
-                version = Settings.get_regex_version()
-                if self.parent.m_bestmatch_checkbox.GetValue():
-                    flags += "b"
-                if self.parent.m_enhancematch_checkbox.GetValue():
-                    flags += "e"
-                if self.parent.m_word_checkbox.GetValue():
-                    flags += "w"
-                if self.parent.m_reverse_checkbox.GetValue():
-                    flags += "r"
-                if self.parent.m_posix_checkbox.GetValue():
-                    flags += "p"
-                if version == 0 and self.parent.m_fullcase_checkbox.GetValue():
-                    flags += "f"
-                if self.parent.m_format_replace_checkbox.GetValue():
-                    flags += "F"
+        if RE_NAME.match(name) is None:
+            errormsg(ERR_INVALID_NAME)
+            return
 
-        Settings.add_search(value, self.search, self.replace, flags, self.is_regex)
+        if name in Settings.get_search() and name != self.original_name and not yesno(OVERWRITE % name):
+            return
+
+        comment = self.m_comment_textbox.GetValue()
+        search = self.m_search_textbox.GetValue()
+        replace = self.m_replace_textbox.GetValue()
+        flags = self.m_flags_textbox.GetValue()
+
+        if self.original_name and name != self.original_name:
+            Settings.delete_search(self.original_name)
+
+        Settings.add_search(name, comment, search, replace, flags, self.is_regex, self.is_plugin)
+        self.saved = True
         self.Close()
+
+    def on_toggle(self, event):
+        """Prevent toggling."""
+
+        obj = event.GetEventObject()
+        obj.SetValue(not obj.GetValue())
 
     def on_cancel(self, event):
         """Close dialog."""

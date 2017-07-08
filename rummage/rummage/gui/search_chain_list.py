@@ -1,8 +1,8 @@
 """
-Load search list.
+Search chain list.
 
 Licensed under MIT
-Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2017 Isaac Muse <isaacmuse@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -24,22 +24,17 @@ from ..localization import _
 from .. import data
 
 
-class SavedSearchList(DynamicList):
+class SearchChainList(DynamicList):
     """Error list."""
 
     def __init__(self, parent):
         """Initialization."""
 
-        super(SavedSearchList, self).__init__(
+        super(SearchChainList, self).__init__(
             parent,
             [
                 _("Name"),
-                _("Comment"),
-                _("Search"),
-                _("Replace"),
-                _("Flags/Toggles"),
-                _("Type"),
-                _("Replace Type")
+                _("Chain")
             ]
         )
 
