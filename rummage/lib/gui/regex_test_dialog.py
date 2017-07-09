@@ -35,29 +35,6 @@ from .localization import _
 from .. import rumcore
 from .. import util
 
-TITLE = _("Regex Tester")
-OKAY = _("Use")
-CLOSE = _("Close")
-SELECT_SCRIPT = _("Select replace script")
-REGEX = _("Regex search")
-CASE = _("Search case-sensitive")
-DOT = _("Dot matches newline")
-UNICODE = _("Use Unicode properties")
-BEST_MATCH = _("Best fuzzy match")
-FUZZY_FIT = _("Improve fuzzy fit")
-WORD = _("Unicode word break")
-REVERSE = _("Reverse match")
-POSIX = _("Use POSIX matching")
-FORMAT = _("Format style replacements")
-FULLCASE = _("Full case-folding")
-TEXT = _("Text")
-RESULT = _("Result")
-REGEX_INPUT = _("Regex Input")
-FIND = _("Find")
-USE_REPLACE_PLUGIN = _("Use replace plugin")
-REPLACE_PLUGIN = _("Replace plugin")
-REPLACE = _("Replace")
-
 
 class RegexTestDialog(gui.RegexTestDialog):
     """Regex test dialog."""
@@ -66,6 +43,8 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
+        self.localize()
+
         self.SetIcon(
             data.get_image('rummage_medium.png' if util.platform() == 'linux' else 'rummage_large.png').GetIcon()
         )
@@ -84,7 +63,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         pick_extend(self.m_replace_plugin_dir_picker, PickButton)
         self.m_replace_plugin_dir_picker.pick_init(
             PickButton.FILE_TYPE,
-            SELECT_SCRIPT,
+            self.SELECT_SCRIPT,
             default_path=os.path.join(Settings.get_config_folder(), 'plugins'),
             pick_change_evt=self.on_replace_plugin_dir_changed
         )
@@ -129,7 +108,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             parent.m_replace_textbox.GetValue() if not parent.m_chains_checkbox.GetValue() else ""
         )
 
-        self.localize()
+        self.refresh_localization()
 
         # Ensure good sizing of frame
         best = self.m_tester_panel.GetBestSize()
@@ -140,32 +119,58 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.SetMinSize(self.GetSize())
 
     def localize(self):
+        """Translate strings."""
+
+        self.TITLE = _("Regex Tester")
+        self.OKAY = _("Use")
+        self.CLOSE = _("Close")
+        self.SELECT_SCRIPT = _("Select replace script")
+        self.REGEX = _("Regex search")
+        self.CASE = _("Search case-sensitive")
+        self.DOT = _("Dot matches newline")
+        self.UNICODE = _("Use Unicode properties")
+        self.BEST_MATCH = _("Best fuzzy match")
+        self.FUZZY_FIT = _("Improve fuzzy fit")
+        self.WORD = _("Unicode word break")
+        self.REVERSE = _("Reverse match")
+        self.POSIX = _("Use POSIX matching")
+        self.FORMAT = _("Format style replacements")
+        self.FULLCASE = _("Full case-folding")
+        self.TEXT = _("Text")
+        self.RESULT = _("Result")
+        self.REGEX_INPUT = _("Regex Input")
+        self.FIND = _("Find")
+        self.USE_REPLACE_PLUGIN = _("Use replace plugin")
+        self.REPLACE_PLUGIN = _("Replace plugin")
+        self.REPLACE = _("Replace")
+
+    def refresh_localization(self):
         """Localize dialog."""
 
-        self.SetTitle(TITLE)
-        self.m_use_regex_button.SetLabel(OKAY)
-        self.m_close_button.SetLabel(CLOSE)
-        self.m_regex_search_checkbox.SetLabel(REGEX)
-        self.m_case_checkbox.SetLabel(CASE)
-        self.m_dotmatch_checkbox.SetLabel(DOT)
-        self.m_unicode_checkbox.SetLabel(UNICODE)
-        self.m_bestmatch_checkbox.SetLabel(BEST_MATCH)
-        self.m_enhancematch_checkbox.SetLabel(FUZZY_FIT)
-        self.m_word_checkbox.SetLabel(WORD)
-        self.m_reverse_checkbox.SetLabel(REVERSE)
-        self.m_posix_checkbox.SetLabel(POSIX)
-        self.m_format_replace_checkbox.SetLabel(FORMAT)
-        self.m_fullcase_checkbox.SetLabel(FULLCASE)
-        self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(TEXT)
-        self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(RESULT)
+        self.SetTitle(self.TITLE)
+        self.m_use_regex_button.SetLabel(self.OKAY)
+        self.m_close_button.SetLabel(self.CLOSE)
+        self.m_regex_search_checkbox.SetLabel(self.REGEX)
+        self.m_case_checkbox.SetLabel(self.CASE)
+        self.m_dotmatch_checkbox.SetLabel(self.DOT)
+        self.m_unicode_checkbox.SetLabel(self.UNICODE)
+        self.m_bestmatch_checkbox.SetLabel(self.BEST_MATCH)
+        self.m_enhancematch_checkbox.SetLabel(self.FUZZY_FIT)
+        self.m_word_checkbox.SetLabel(self.WORD)
+        self.m_reverse_checkbox.SetLabel(self.REVERSE)
+        self.m_posix_checkbox.SetLabel(self.POSIX)
+        self.m_format_replace_checkbox.SetLabel(self.FORMAT)
+        self.m_fullcase_checkbox.SetLabel(self.FULLCASE)
+        self.m_test_text.GetContainingSizer().GetStaticBox().SetLabel(self.TEXT)
+        self.m_test_replace_text.GetContainingSizer().GetStaticBox().SetLabel(self.RESULT)
         main_sizer = self.m_tester_panel.GetSizer()
-        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(REGEX_INPUT)
-        self.m_find_label.SetLabel(FIND)
-        self.m_replace_plugin_checkbox.SetLabel(USE_REPLACE_PLUGIN)
+        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(self.REGEX_INPUT)
+        self.m_find_label.SetLabel(self.FIND)
+        self.m_replace_plugin_checkbox.SetLabel(self.USE_REPLACE_PLUGIN)
         if self.parent.m_replace_plugin_checkbox.GetValue():
-            self.m_replace_label.SetLabel(REPLACE_PLUGIN)
+            self.m_replace_label.SetLabel(self.REPLACE_PLUGIN)
         else:
-            self.m_replace_label.SetLabel(REPLACE)
+            self.m_replace_label.SetLabel(self.REPLACE)
         self.Fit()
 
     def init_regex_timer(self):
@@ -513,10 +518,10 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Handle plugin function toggle."""
 
         if self.m_replace_plugin_checkbox.GetValue():
-            self.m_replace_label.SetLabel(REPLACE_PLUGIN)
+            self.m_replace_label.SetLabel(self.REPLACE_PLUGIN)
             self.m_replace_plugin_dir_picker.Show()
         else:
-            self.m_replace_label.SetLabel(REPLACE)
+            self.m_replace_label.SetLabel(self.REPLACE)
             self.m_replace_plugin_dir_picker.Hide()
         self.m_tester_panel.GetSizer().Layout()
 

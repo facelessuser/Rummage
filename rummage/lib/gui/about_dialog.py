@@ -25,11 +25,6 @@ from . import data
 from .localization import _
 from .. import __meta__
 
-TITLE = _("About")
-CONTACT = _("Contact")
-VERSION = _("Version: %s %s")
-DEVELOPER = _("Developer(s):\n%s")
-
 
 class AboutDialog(gui.AboutDialog):
     """About Dialog."""
@@ -38,8 +33,7 @@ class AboutDialog(gui.AboutDialog):
         """Initialize the AboutDialog object."""
 
         super(AboutDialog, self).__init__(parent)
-
-        self.SetTitle(TITLE)
+        self.localize()
 
         self.m_bitmap = wx.StaticBitmap(
             self.m_about_panel,
@@ -48,26 +42,40 @@ class AboutDialog(gui.AboutDialog):
             wx.DefaultPosition,
             wx.Size(64, 64), 0
         )
-        self.m_app_label.SetLabel(__meta__.__app__)
-        self.m_version_label.SetLabel(
-            VERSION % (__meta__.__version__, __meta__.__status__)
-        )
-        self.m_developers_label.SetLabel(
-            DEVELOPER % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in __meta__.__maintainers__]))
-        )
 
-        self.m_dev_toggle.SetLabel(CONTACT + " >>")
+        self.refresh_localization()
 
         self.Fit()
+
+    def localize(self):
+        """Translate strings."""
+
+        self.TITLE = _("About")
+        self.CONTACT = _("Contact")
+        self.VERSION = _("Version: %s %s")
+        self.DEVELOPER = _("Developer(s):\n%s")
+
+    def refresh_localization(self):
+        """Localize."""
+
+        self.SetTitle(self.TITLE)
+        self.m_app_label.SetLabel(__meta__.__app__)
+        self.m_version_label.SetLabel(
+            self.VERSION % (__meta__.__version__, __meta__.__status__)
+        )
+        self.m_developers_label.SetLabel(
+            self.DEVELOPER % ("\n".join(["    %s - %s" % (m[0], m[1]) for m in __meta__.__maintainers__]))
+        )
+        self.m_dev_toggle.SetLabel(self.CONTACT + " >>")
 
     def on_toggle(self, event):
         """Show/hide contact info on when contact button is toggled."""
 
         if self.m_dev_toggle.GetValue():
-            self.m_dev_toggle.SetLabel(CONTACT + " <<")
+            self.m_dev_toggle.SetLabel(self.CONTACT + " <<")
             self.m_developers_label.Show()
         else:
-            self.m_dev_toggle.SetLabel(CONTACT + " >>")
+            self.m_dev_toggle.SetLabel(self.CONTACT + " >>")
             self.m_developers_label.Hide()
         self.Fit()
         self.Refresh()

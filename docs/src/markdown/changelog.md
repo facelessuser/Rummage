@@ -22,6 +22,9 @@
 - **FIX**: Fix limit panel hide logic so it doesn't show a the hidden panel on search.
 - **FIX**: POSIX flag not generating refresh in tester dialog.
 - **FIX**: Unicode issue in preferences' editor dialog.
+- **FIX**: Ensure all localized strings properly get loaded.
+- **FIX**: Ensure initial `on_loaded` event via `CallLater` works properly in Python 2 and 3.
+- **FIX**: Call initial main window resize in `on_loaded` event in some situations, it doesn't work as expected.
 
 ## 2.0.5
 

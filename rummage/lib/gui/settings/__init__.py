@@ -45,10 +45,6 @@ NOTIFY_STYLES = {
     "linux": ["default", "growl"]
 }
 
-ERR_FAILED_SAVE_SETTINGS = _("Failed to save settings file!")
-ERR_FAILED_SAVE_CACHE = _("Failed to save cache file!")
-ERR_FAILED_LOAD_SETTINGS = _("Failed to load settings file!")
-
 
 class Settings(object):
     """Handle settings."""
@@ -58,10 +54,19 @@ class Settings(object):
     debug = False
 
     @classmethod
+    def localize(cls):
+        """Translate strings."""
+
+        cls.ERR_LOAD_SETTINGS_FAILED = _("Failed to load settings file!")
+        cls.ERR_SAVE_SETTINGS_FAILED = _("Failed to save settings file!")
+        cls.ERR_SAVE_CACHE_FAILED = _("Failed to save cache file!")
+
+    @classmethod
     def load_settings(cls, debug_mode):
         """Load the settings."""
 
         cls.debug = debug_mode
+        cls.localize()
         cls.settings_file, cls.cache_file, log = cls.get_settings_files()
         custom_app.init_app_log(log)
         cls.settings = {}
@@ -90,12 +95,13 @@ class Settings(object):
                     error(e)
                     if locked:
                         portalocker.unlock(f)
-                    errormsg(ERR_FAILED_LOAD_SETTINGS)
+                    errormsg(cls.ERR_LOAD_SETTINGS_FAILED)
                 except Exception:
                     print(str(e))
         if cls.debug:
             custom_app.set_debug_mode(True)
         localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
+        cls.localize()
         debug_struct(cls.settings)
         debug_struct(cls.cache)
         cls.init_notify(True)
@@ -681,7 +687,7 @@ class Settings(object):
             try:
                 if locked:
                     portalocker.unlock(f)
-                errormsg(ERR_FAILED_SAVE_SETTINGS)
+                errormsg(cls.ERR_SAVE_SETTINGS_FAILED)
                 error(e)
             except Exception:
                 print(str(e))
@@ -704,7 +710,7 @@ class Settings(object):
             try:
                 if locked:
                     portalocker.unlock(f)
-                errormsg(ERR_FAILED_SAVE_CACHE)
+                errormsg(cls.ERR_SAVE_CACHE_FAILED)
                 error(e)
             except Exception:
                 print(str(e))

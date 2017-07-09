@@ -27,18 +27,6 @@ from .generic_dialogs import errormsg, yesno
 from .localization import _
 from .. import util
 
-TITLE = _("Save Search and Replace")
-OKAY = _("Save")
-CLOSE = _("Cancel")
-NAME = _("Name")
-COMMENT = _("Comment")
-SEARCH = _("Search")
-REPLACE = _("Replace")
-FLAGS = _("Flags")
-OVERWRITE = _("'%s' already exists. Overwrite?")
-ERR_NO_NAME = _("Please give the search a name!")
-ERR_INVALID_NAME = _("Names can only be Unicode word characters, '_', and '-'")
-
 RE_NAME = re.compile(r'[\w-]', re.UNICODE)
 
 
@@ -49,6 +37,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         """Init SaveSearchDialog object."""
 
         super(SaveSearchDialog, self).__init__(parent)
+        self.localize()
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
@@ -63,7 +52,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
             self.original_name = data[0]
         self.setup(data)
 
-        self.localize()
+        self.refresh_localization()
 
         # Ensure good sizing for dialog
         best = self.m_save_panel.GetBestSize()
@@ -75,16 +64,32 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.m_name_text.SetFocus()
 
     def localize(self):
+        """Translate strings."""
+
+        self.TITLE = _("Save Search and Replace")
+        self.OKAY = _("Save")
+        self.CLOSE = _("Cancel")
+        self.NAME = _("Name")
+        self.COMMENT = _("Comment")
+        self.SEARCH = _("Search")
+        self.REPLACE = _("Replace")
+        self.FLAGS = _("Flags")
+        self.OVERWRITE = _("'%s' already exists. Overwrite?")
+        self.ERR_NO_NAME = _("Please give the search a name!")
+        self.ERR_INVALID_NAME = _("Names can only be Unicode word characters, '_', and '-'")
+        self.OPTIONAL_HINT = _("Optional")
+
+    def refresh_localization(self):
         """Localize the dialog."""
 
-        self.SetTitle(TITLE)
-        self.m_apply_button.SetLabel(OKAY)
-        self.m_cancel_button.SetLabel(CLOSE)
-        self.m_name_label.SetLabel(NAME)
-        self.m_comment_label.SetLabel(COMMENT)
-        self.m_search_label.SetLabel(SEARCH)
-        self.m_replace_label.SetLabel(REPLACE)
-        self.m_flags_label.SetLabel(FLAGS)
+        self.SetTitle(self.TITLE)
+        self.m_apply_button.SetLabel(self.OKAY)
+        self.m_cancel_button.SetLabel(self.CLOSE)
+        self.m_name_label.SetLabel(self.NAME)
+        self.m_comment_label.SetLabel(self.COMMENT)
+        self.m_search_label.SetLabel(self.SEARCH)
+        self.m_replace_label.SetLabel(self.REPLACE)
+        self.m_flags_label.SetLabel(self.FLAGS)
 
         self.Fit()
 
@@ -94,7 +99,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         if data is not None:
             self.m_name_text.SetValue(data[0])
             if not data[1]:
-                self.m_comment_textbox.SetHint(_("Optional"))
+                self.m_comment_textbox.SetHint(self.OPTIONAL_HINT)
             else:
                 self.m_comment_textbox.SetValue(data[1])
             self.m_search_textbox.SetValue(data[2])
@@ -103,7 +108,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
             self.is_regex = data[5]
             self.is_plugin = data[6]
         else:
-            self.m_comment_textbox.SetHint(_("Optional"))
+            self.m_comment_textbox.SetHint(self.OPTIONAL_HINT)
             self.m_search_textbox.SetValue(self.parent.m_searchfor_textbox.GetValue())
             self.m_replace_textbox.SetValue(self.parent.m_replace_textbox.GetValue())
             self.is_regex = self.parent.m_regex_search_checkbox.GetValue()
@@ -171,14 +176,14 @@ class SaveSearchDialog(gui.SaveSearchDialog):
 
         name = self.m_name_text.GetValue().strip()
         if name == "":
-            errormsg(ERR_NO_NAME)
+            errormsg(self.ERR_NO_NAME)
             return
 
         if RE_NAME.match(name) is None:
-            errormsg(ERR_INVALID_NAME)
+            errormsg(self.ERR_INVALID_NAME)
             return
 
-        if name in Settings.get_search() and name != self.original_name and not yesno(OVERWRITE % name):
+        if name in Settings.get_search() and name != self.original_name and not yesno(self.OVERWRITE % name):
             return
 
         comment = self.m_comment_textbox.GetValue()

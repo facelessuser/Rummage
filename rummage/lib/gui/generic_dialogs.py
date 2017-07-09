@@ -22,33 +22,42 @@ from __future__ import unicode_literals
 from .localization import _
 from . import messages
 
-YES_NO = _('Yes or no?')
-OKAY = _("Okay")
-CLOSE = _("Cancel")
-INFO = _("INFO")
-WARNING = _("WARNING")
-ERROR = _("ERROR")
 
-
-def yesno(question, title=YES_NO, bitmap=None, yes=OKAY, no=CLOSE):
+def yesno(question, title=None, bitmap=None, yes=None, no=None):
     """Wrapper for the prompt dialog."""
+
+    if title is None:
+        title = _('Yes or no?')
+    if yes is None:
+        yes = _("Okay")
+    if no is None:
+        no = _("Cancel")
 
     return messages.promptmsg(question, title, bitmap, yes, no)
 
 
-def infomsg(msg, title=INFO, bitmap=None):
+def infomsg(msg, title=None, bitmap=None):
     """Wrapper for the info dialog."""
+
+    if title is None:
+        title = _("INFO")
 
     messages.infomsg(msg, title, bitmap)
 
 
-def errormsg(msg, title=ERROR, bitmap=None):
+def errormsg(msg, title=None, bitmap=None):
     """Wrapper for the error dialog that also logs the error."""
+
+    if title is None:
+        title = _("ERROR")
 
     messages.errormsg(msg, title, bitmap)
 
 
-def warnmsg(msg, title=WARNING, bitmap=None):
+def warnmsg(msg, title=None, bitmap=None):
     """Wrapper for the warning dialog."""
+
+    if title is None:
+        title = _("WARNING")
 
     messages.warnmsg(msg, title, bitmap)

@@ -26,8 +26,6 @@ from ..generic_dialogs import errormsg
 from ..localization import _
 from ... import util
 
-ERR_EDITOR_NOT_SET = _("No editor is currently set!")
-
 
 def open_editor(filename, line, col):
     """Open editor with the optional filename, line, and col parameters."""
@@ -36,7 +34,7 @@ def open_editor(filename, line, col):
 
     cmd = Settings.get_editor(filename=filename, line=line, col=col)
     if len(cmd) == 0:
-        errormsg(ERR_EDITOR_NOT_SET)
+        errormsg(_("No editor is currently set!"))
         error("No editor set: %s" % cmd)
         return
     debug(cmd)

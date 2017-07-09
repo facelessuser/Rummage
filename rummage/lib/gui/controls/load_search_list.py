@@ -23,14 +23,6 @@ from .dynamic_lists import DynamicList
 from ..localization import _
 from .. import data
 
-NAME = _("Name")
-COMMENT = _("Comment")
-SEARCH = _("Search")
-REPLACE = _("Replace")
-FLAGS = _("Flags/Toggles")
-TYPE = _("Type")
-REPLACE_TYPE = _("Replace Type")
-
 
 class SavedSearchList(DynamicList):
     """Error list."""
@@ -38,18 +30,31 @@ class SavedSearchList(DynamicList):
     def __init__(self, parent):
         """Initialization."""
 
+        self.localize()
+
         super(SavedSearchList, self).__init__(
             parent,
             [
-                NAME,
-                COMMENT,
-                SEARCH,
-                REPLACE,
-                FLAGS,
-                TYPE,
-                REPLACE_TYPE
+                self.NAME,
+                self.COMMENT,
+                self.SEARCH,
+                self.REPLACE,
+                self.FLAGS,
+                self.TYPE,
+                self.REPLACE_TYPE
             ]
         )
+
+    def localize(self):
+        """Translate strings."""
+
+        self.NAME = _("Name")
+        self.COMMENT = _("Comment")
+        self.SEARCH = _("Search")
+        self.REPLACE = _("Replace")
+        self.FLAGS = _("Flags")
+        self.TYPE = _("Type")
+        self.REPLACE_TYPE = _("Replace Type")
 
     def create_image_list(self):
         """Create image list."""

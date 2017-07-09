@@ -34,9 +34,6 @@ def html_encode(text):
         )
     )
 
-
-TITLE = html_encode(_("Rummage Results"))
-
 HTML_HEADER = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
@@ -76,15 +73,7 @@ RESULT_TABLE_HEADER = '''
 <th>%(modified)s</th>
 <th>%(created)s</th>
 </tr>
-''' % {
-    "file": html_encode(_("File")),
-    "size": html_encode(_("Size")),
-    "matches": html_encode(_("Matches")),
-    "path": html_encode(_("Path")),
-    "encoding": html_encode(_("Encoding")),
-    "modified": html_encode(_("Modified")),
-    "created": html_encode(_("Created"))
-}
+'''
 
 RESULT_CONTENT_ROW = '''
 <tr>
@@ -102,15 +91,7 @@ RESULT_CONTENT_TABLE_HEADER = '''
 <th>%(matches)s</th>
 <th>%(context)s</th>
 </tr>
-''' % {
-    "file": html_encode(_("File")),
-    "line": html_encode(_("Line")),
-    "matches": html_encode(_("Matches")),
-    "context": html_encode(_("Context"))
-}
-
-FILES = html_encode(_("Files"))
-CONTENT = html_encode(_("Content"))
+'''
 
 TABS_START = '''
 <div id="bar">
@@ -128,10 +109,6 @@ TABS_START_SINGLE = '''
 
 <div class="main">
 '''
-
-SEARCH_LABEL_REGEX = html_encode(_("Regex search:"))
-
-SEARCH_LABEL_LITERAL = html_encode(_("Literal search:"))
 
 TABS_END = '''
 <div id="search_div"><label id="search_label">%(label)s %(search)s</label></div>
@@ -165,7 +142,7 @@ select_tab(1)
 
 BODY_START = '''
 <body>
-<h1 id="title"><img src="data:image/bmp;base64,%(icon)s"/>Rummage Results</h1>
+<h1 id="title"><img src="data:image/bmp;base64,%(icon)s"/>%(title)s</h1>
 '''
 
 BODY_END = '''
@@ -181,7 +158,17 @@ def export_result_list(res, html):
         return
     html.write('<div id="tab1">')
     html.write('<table class="sortable">')
-    html.write(RESULT_TABLE_HEADER)
+    html.write(
+        RESULT_TABLE_HEADER % {
+            "file": html_encode(_("File")),
+            "size": html_encode(_("Size")),
+            "matches": html_encode(_("Matches")),
+            "path": html_encode(_("Path")),
+            "encoding": html_encode(_("Encoding")),
+            "modified": html_encode(_("Modified")),
+            "created": html_encode(_("Created"))
+        }
+    )
 
     for item in res.values():
         html.write(
@@ -209,7 +196,14 @@ def export_result_content_list(res, html):
         return
     html.write('<div id="tab2"">')
     html.write('<table class="sortable">')
-    html.write(RESULT_CONTENT_TABLE_HEADER)
+    html.write(
+        RESULT_CONTENT_TABLE_HEADER % {
+            "file": html_encode(_("File")),
+            "line": html_encode(_("Line")),
+            "matches": html_encode(_("Matches")),
+            "context": html_encode(_("Context"))
+        }
+    )
 
     for item in res.values():
         html.write(
@@ -268,6 +262,8 @@ def open_in_browser(name):
 def export(export_html, chain, result_list, result_content_list):
     """Export the results as HTML."""
 
+    title = html_encode(_("Rummage Results"))
+
     with codecs.open(export_html, "w", encoding="utf-8") as html:
         html.write(
             HTML_HEADER % {
@@ -275,24 +271,33 @@ def export(export_html, chain, result_list, result_content_list):
                 "morejs": LOAD_TAB,
                 "css": data.get_file('results.css'),
                 "icon": util.to_ustr(base64.b64encode(data.get_image('glass.png').GetData())),
-                "title": TITLE,
+                "title": title,
                 "lang": get_current_domain()
             }
         )
-        html.write(BODY_START % {"icon": util.to_ustr(base64.b64encode(data.get_image('rummage.png').GetData()))})
+        html.write(
+            BODY_START % {
+                "title": title,
+                "icon": util.to_ustr(base64.b64encode(data.get_image('rummage.png').GetData()))
+            }
+        )
+
         html.write(
             (TABS_START if len(result_content_list) else TABS_START_SINGLE) % {
-                "file_tab": FILES,
-                "content_tab": CONTENT
+                "file_tab": html_encode(_("Files")),
+                "content_tab": html_encode(_("Content"))
             }
         )
         export_result_list(result_list, html)
         export_result_content_list(result_content_list, html)
+
+        search_label_regex = html_encode(_("Regex search:"))
+        search_label_literal = html_encode(_("Literal search:"))
         for pattern, replace, flags in chain:
             html.write(
                 TABS_END % {
                     "search": html_encode(pattern),
-                    "label": SEARCH_LABEL_LITERAL if flags & rumcore.LITERAL else SEARCH_LABEL_REGEX
+                    "label": search_label_literal if flags & rumcore.LITERAL else search_label_regex
                 }
             )
         html.write('</div>')

@@ -24,10 +24,6 @@ from . import gui
 from .localization import _
 from .. import util
 
-TITLE = _("Edit Argument")
-OKAY = _("Apply")
-CLOSE = _("Cancel")
-
 
 class ArgDialog(gui.ArgDialog):
     """Argument Dialog."""
@@ -36,6 +32,8 @@ class ArgDialog(gui.ArgDialog):
         """Init ArgDialog object."""
 
         super(ArgDialog, self).__init__(parent)
+        self.localize()
+        self.refresh_localization()
 
         # Ensure OS platform selectall shortcut works
         self.set_keybindings(
@@ -44,8 +42,6 @@ class ArgDialog(gui.ArgDialog):
 
         self.arg = value
         self.m_arg_text.SetValue(value)
-
-        self.localize()
 
         # Ensure good sizing for frame
         best = self.m_arg_panel.GetBestSize()
@@ -57,11 +53,18 @@ class ArgDialog(gui.ArgDialog):
         self.m_arg_text.SetFocus()
 
     def localize(self):
+        """Translate strings."""
+
+        self.TITLE = _("Edit Argument")
+        self.OKAY = _("Apply")
+        self.CLOSE = _("Cancel")
+
+    def refresh_localization(self):
         """Localize dialog."""
 
-        self.SetTitle(TITLE)
-        self.m_apply_button.SetLabel(OKAY)
-        self.m_cancel_button.SetLabel(CLOSE)
+        self.SetTitle(self.TITLE)
+        self.m_apply_button.SetLabel(self.OKAY)
+        self.m_cancel_button.SetLabel(self.CLOSE)
         self.Fit()
 
     def set_keybindings(self, keybindings):

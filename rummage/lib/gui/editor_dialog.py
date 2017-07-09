@@ -25,24 +25,6 @@ from .localization import _
 from . import gui
 from .. import util
 
-TITLE = _("Configure Editor")
-OKAY = _("Apply")
-CLOSE = _("Cancel")
-ADD = _("Add")
-DELETE = _("Delete")
-EDIT = _("Edit")
-UP = _("Up")
-DOWN = _("Down")
-APPLICATION = _("Application")
-ARGUMENTS = _("Arguments")
-INSTRUCTIONS = _(
-    "Select the application and then set the arguments.\n\n"
-    "Special variables:\n"
-    "{$file} --> file path\n"
-    "{$line} --> line number\n"
-    "{$col} --> column number"
-)
-
 
 class EditorDialog(gui.EditorDialog):
     """EditorDialog."""
@@ -51,6 +33,7 @@ class EditorDialog(gui.EditorDialog):
         """Init EditorDialog object."""
 
         super(EditorDialog, self).__init__(parent)
+        self.localize()
 
         self.editor = editor
 
@@ -66,7 +49,7 @@ class EditorDialog(gui.EditorDialog):
             for x in range(1, len(editor)):
                 self.m_arg_list.Insert(editor[x], x - 1)
 
-        self.localize()
+        self.refresh_localization()
 
         # Ensure good size for frame
         best = self.m_editor_panel.GetBestSize()
@@ -77,20 +60,41 @@ class EditorDialog(gui.EditorDialog):
         self.SetMinSize(self.GetSize())
 
     def localize(self):
+        """Translate strings."""
+
+        self.TITLE = _("Configure Editor")
+        self.OKAY = _("Apply")
+        self.CLOSE = _("Cancel")
+        self.ADD = _("Add")
+        self.DELETE = _("Delete")
+        self.EDIT = _("Edit")
+        self.UP = _("Up")
+        self.DOWN = _("Down")
+        self.APPLICATION = _("Application")
+        self.ARGUMENTS = _("Arguments")
+        self.INSTRUCTIONS = _(
+            "Select the application and then set the arguments.\n\n"
+            "Special variables:\n"
+            "{$file} --> file path\n"
+            "{$line} --> line number\n"
+            "{$col} --> column number"
+        )
+
+    def refresh_localization(self):
         """Localize dialog."""
 
-        self.SetTitle(TITLE)
-        self.m_add_arg_button.SetLabel(ADD)
-        self.m_remove_arg_button.SetLabel(DELETE)
-        self.m_edit_button.SetLabel(EDIT)
-        self.m_up_button.SetLabel(UP)
-        self.m_down_button.SetLabel(DOWN)
-        self.m_apply_button.SetLabel(OKAY)
-        self.m_cancel_button.SetLabel(CLOSE)
-        self.m_instructions_label.SetLabel(INSTRUCTIONS)
+        self.SetTitle(self.TITLE)
+        self.m_add_arg_button.SetLabel(self.ADD)
+        self.m_remove_arg_button.SetLabel(self.DELETE)
+        self.m_edit_button.SetLabel(self.EDIT)
+        self.m_up_button.SetLabel(self.UP)
+        self.m_down_button.SetLabel(self.DOWN)
+        self.m_apply_button.SetLabel(self.OKAY)
+        self.m_cancel_button.SetLabel(self.CLOSE)
+        self.m_instructions_label.SetLabel(self.INSTRUCTIONS)
         self.m_instructions_label.Wrap(325)
-        self.m_editor_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(APPLICATION)
-        self.m_editor_panel.GetSizer().GetItem(2).GetSizer().GetStaticBox().SetLabel(ARGUMENTS)
+        self.m_editor_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(self.APPLICATION)
+        self.m_editor_panel.GetSizer().GetItem(2).GetSizer().GetStaticBox().SetLabel(self.ARGUMENTS)
         self.Fit()
 
     def get_editor(self):

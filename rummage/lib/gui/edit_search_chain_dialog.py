@@ -26,21 +26,6 @@ from .generic_dialogs import errormsg, yesno
 from .localization import _
 from . import gui
 
-TITLE = _("Edit/Create Search Chain")
-OVERWRITE = _("'%s' already exists. Overwrite?")
-ADD = _("Add")
-DELETE = _("Delete")
-UP = _("Up")
-DOWN = _('Down')
-OKAY = _('Apply')
-CLOSE = _('Cancel')
-NAME = _("Name")
-CHAIN = _("Chain")
-ERR_SEARCH_NOT_EXISTS = _("Search '%s' does not exist!")
-ERR_CHAIN_MISSING = _("Please specify a chain name!")
-ERR_CHAIN_FORMAT = _("Chain names can only contain Unicode word chars, '_', and '-'!")
-ERR_CHAIN_EMPTY = _("Chain must contain at least one search!")
-
 RE_KEY = re.compile(r'[\w-]+')
 
 
@@ -51,6 +36,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         """Init SaveSearchDialog object."""
 
         super(EditSearchChainDialog, self).__init__(parent)
+        self.localize()
 
         self.saved = False
         self.search_count = 0
@@ -60,7 +46,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         if chain:
             self.load_chain(chain)
 
-        self.localize()
+        self.refresh_localization()
 
         # Ensure good sizing of frame
         best = self.m_chain_panel.GetBestSize()
@@ -71,17 +57,35 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         self.SetMinSize(self.GetSize())
 
     def localize(self):
+        """Translate strings."""
+
+        self.TITLE = _("Edit/Create Search Chain")
+        self.OVERWRITE = _("'%s' already exists. Overwrite?")
+        self.ADD = _("Add")
+        self.DELETE = _("Delete")
+        self.UP = _("Up")
+        self.DOWN = _('Down')
+        self.OKAY = _('Apply')
+        self.CLOSE = _('Cancel')
+        self.NAME = _("Name")
+        self.CHAIN = _("Chain")
+        self.ERR_SEARCH_NOT_EXISTS = _("Search '%s' does not exist!")
+        self.ERR_CHAIN_MISSING = _("Please specify a chain name!")
+        self.ERR_CHAIN_FORMAT = _("Chain names can only contain Unicode word chars, '_', and '-'!")
+        self.ERR_CHAIN_EMPTY = _("Chain must contain at least one search!")
+
+    def refresh_localization(self):
         """Localize dialog."""
 
-        self.SetTitle(TITLE)
-        self.m_add_button.SetLabel(ADD)
-        self.m_remove_button.SetLabel(DELETE)
-        self.m_up_button.SetLabel(UP)
-        self.m_down_button.SetLabel(DOWN)
-        self.m_apply_button.SetLabel(OKAY)
-        self.m_cancel_button.SetLabel(CLOSE)
-        self.m_chain_panel.GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(NAME)
-        self.m_chain_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(CHAIN)
+        self.SetTitle(self.TITLE)
+        self.m_add_button.SetLabel(self.ADD)
+        self.m_remove_button.SetLabel(self.DELETE)
+        self.m_up_button.SetLabel(self.UP)
+        self.m_down_button.SetLabel(self.DOWN)
+        self.m_apply_button.SetLabel(self.OKAY)
+        self.m_cancel_button.SetLabel(self.CLOSE)
+        self.m_chain_panel.GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(self.NAME)
+        self.m_chain_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(self.CHAIN)
 
     def load_searches(self):
         """Load search list in wxChoice."""
@@ -159,26 +163,26 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         err = False
 
         if not string:
-            errormsg(ERR_CHAIN_MISSING)
+            errormsg(self.ERR_CHAIN_MISSING)
             err = True
         elif RE_KEY.match(string) is None:
-            errormsg(ERR_CHAIN_FORMAT)
+            errormsg(self.ERR_CHAIN_FORMAT)
             err = True
 
-        if not err and string in chains and string != self.original_name and not yesno(OVERWRITE % string):
+        if not err and string in chains and string != self.original_name and not yesno(self.OVERWRITE % string):
             err = True
 
         searches = []
         for index in range(self.m_search_list.GetCount()):
             text = self.m_search_list.GetString(index)
             if text not in self.keys:
-                errormsg(ERR_SEARCH_NOT_EXISTS % text)
+                errormsg(self.ERR_SEARCH_NOT_EXISTS % text)
                 err = True
                 break
             searches.append(text)
 
         if not err and not searches:
-            errormsg(ERR_CHAIN_EMPTY)
+            errormsg(self.ERR_CHAIN_EMPTY)
             err = True
 
         if not err:

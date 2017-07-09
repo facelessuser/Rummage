@@ -27,27 +27,6 @@ from . import gui
 from .. import rumcore
 from .. import util
 
-TITLE = _("Preferences")
-EDITOR = _("Editor")
-GENERAL = _("General")
-REGEX_MODULES = _("Regular Expression Modules")
-NOTIFICATIONS = _("Notifications")
-HISTORY = _("History")
-SINGLE_INSTANCE = _("Single Instance (applies to new instances)")
-NOTIFY_POPUP = _("Notification popup")
-ALERT = _("Alert Sound")
-TERM_NOTIFY_PATH = _("Path to terminal-notifier")
-LANGUAGE = _("Language (restart required)")
-RE = _("Use re module")
-BRE = _("Use re module with backrefs")
-REGEX = _("Use regex module")
-BREGEX = _("Use regex module with backrefs")
-REGEX_VER = _("Regex module version to use")
-CHANGE = _("Change")
-CLEAR = _("Clear")
-CLOSE = _("Close")
-RECORDS = _("%d Records")
-
 
 class SettingsDialog(gui.SettingsDialog):
     """SettingsDialog."""
@@ -56,6 +35,7 @@ class SettingsDialog(gui.SettingsDialog):
         """Init SettingsDialog object."""
 
         super(SettingsDialog, self).__init__(parent)
+        self.localize()
 
         self.history_types = [
             "target",
@@ -73,7 +53,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.editor = Settings.get_editor()
         self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
-        self.m_history_label.SetLabel(RECORDS % history_records)
+        self.m_history_label.SetLabel(self.RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
         self.m_bregex_radio.SetValue(mode == rumcore.BREGEX_MODE)
         self.m_regex_radio.SetValue(mode == rumcore.REGEX_MODE)
@@ -107,7 +87,7 @@ class SettingsDialog(gui.SettingsDialog):
             self.m_term_note_label.Enable(is_native)
             self.m_term_note_picker.Enable(is_native)
 
-        self.localize()
+        self.refresh_localization()
 
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
@@ -117,28 +97,52 @@ class SettingsDialog(gui.SettingsDialog):
         self.SetMinSize(self.GetSize())
 
     def localize(self):
+        """Translage strings."""
+
+        self.TITLE = _("Preferences")
+        self.EDITOR = _("Editor")
+        self.GENERAL = _("General")
+        self.REGEX_MODULES = _("Regular Expression Modules")
+        self.NOTIFICATIONS = _("Notifications")
+        self.HISTORY = _("History")
+        self.SINGLE_INSTANCE = _("Single Instance (applies to new instances)")
+        self.NOTIFY_POPUP = _("Notification popup")
+        self.ALERT = _("Alert Sound")
+        self.TERM_NOTIFY_PATH = _("Path to terminal-notifier")
+        self.LANGUAGE = _("Language (restart required)")
+        self.RE = _("Use re module")
+        self.BRE = _("Use re module with backrefs")
+        self.REGEX = _("Use regex module")
+        self.BREGEX = _("Use regex module with backrefs")
+        self.REGEX_VER = _("Regex module version to use")
+        self.CHANGE = _("Change")
+        self.CLEAR = _("Clear")
+        self.CLOSE = _("Close")
+        self.RECORDS = _("%d Records")
+
+    def refresh_localization(self):
         """Localize dialog."""
 
-        self.SetTitle(TITLE)
+        self.SetTitle(self.TITLE)
         main_sizer = self.m_settings_panel.GetSizer()
-        main_sizer.GetItem(0).GetSizer().GetStaticBox().SetLabel(EDITOR)
-        main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(GENERAL)
-        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(REGEX_MODULES)
-        main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(NOTIFICATIONS)
-        main_sizer.GetItem(4).GetSizer().GetStaticBox().SetLabel(HISTORY)
-        self.m_single_checkbox.SetLabel(SINGLE_INSTANCE)
-        self.m_visual_alert_checkbox.SetLabel(NOTIFY_POPUP)
-        self.m_audio_alert_checkbox.SetLabel(ALERT)
-        self.m_term_note_label.SetLabel(TERM_NOTIFY_PATH)
-        self.m_language_label.SetLabel(LANGUAGE)
-        self.m_re_radio.SetLabel(RE)
-        self.m_bre_radio.SetLabel(BRE)
-        self.m_regex_radio.SetLabel(REGEX)
-        self.m_bregex_radio.SetLabel(BREGEX)
-        self.m_regex_version_label.SetLabel(REGEX_VER)
-        self.m_editor_button.SetLabel(CHANGE)
-        self.m_history_clear_button.SetLabel(CLEAR)
-        self.m_close_button.SetLabel(CLOSE)
+        main_sizer.GetItem(0).GetSizer().GetStaticBox().SetLabel(self.EDITOR)
+        main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(self.GENERAL)
+        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(self.REGEX_MODULES)
+        main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(self.NOTIFICATIONS)
+        main_sizer.GetItem(4).GetSizer().GetStaticBox().SetLabel(self.HISTORY)
+        self.m_single_checkbox.SetLabel(self.SINGLE_INSTANCE)
+        self.m_visual_alert_checkbox.SetLabel(self.NOTIFY_POPUP)
+        self.m_audio_alert_checkbox.SetLabel(self.ALERT)
+        self.m_term_note_label.SetLabel(self.TERM_NOTIFY_PATH)
+        self.m_language_label.SetLabel(self.LANGUAGE)
+        self.m_re_radio.SetLabel(self.RE)
+        self.m_bre_radio.SetLabel(self.BRE)
+        self.m_regex_radio.SetLabel(self.REGEX)
+        self.m_bregex_radio.SetLabel(self.BREGEX)
+        self.m_regex_version_label.SetLabel(self.REGEX_VER)
+        self.m_editor_button.SetLabel(self.CHANGE)
+        self.m_history_clear_button.SetLabel(self.CLEAR)
+        self.m_close_button.SetLabel(self.CLOSE)
         self.Fit()
 
     def history_cleared(self):
@@ -162,7 +166,7 @@ class SettingsDialog(gui.SettingsDialog):
 
         Settings.clear_history_records(self.history_types)
         self.history_records_cleared = True
-        self.m_history_label.SetLabel(RECORDS % 0)
+        self.m_history_label.SetLabel(self.RECORDS % 0)
         self.m_history_clear_button.Enable(False)
 
     def on_term_note_change(self, event):

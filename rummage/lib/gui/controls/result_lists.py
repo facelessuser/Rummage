@@ -29,17 +29,6 @@ from ..localization import _
 from .. import data
 from ... import util
 
-FILE = _("File")
-SIZE = _("Size")
-MATCHES = _("Matches")
-PATH = _("Path")
-ENCODING = _("Encoding")
-MODIFIED = _("Modified")
-CREATED = _("Created")
-LINE = _("Line")
-MATCHES = _("Matches")
-CONTEXT = _("Context")
-
 
 class ResultFileList(DynamicList):
     """ResultFileList."""
@@ -47,22 +36,35 @@ class ResultFileList(DynamicList):
     def __init__(self, parent):
         """Init ResultFileList object."""
 
+        self.localize()
+
         super(ResultFileList, self).__init__(
             parent,
             [
-                FILE,
-                SIZE,
-                MATCHES,
-                PATH,
-                ENCODING,
-                MODIFIED,
-                CREATED
+                self.FILE,
+                self.SIZE,
+                self.MATCHES,
+                self.PATH,
+                self.ENCODING,
+                self.MODIFIED,
+                self.CREATED
             ]
         )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
+
+    def localize(self):
+        """Translate strings."""
+
+        self.FILE = _("File")
+        self.SIZE = _("Size")
+        self.MATCHES = _("Matches")
+        self.PATH = _("Path")
+        self.ENCODING = _("Encoding")
+        self.MODIFIED = _("Modified")
+        self.CREATED = _("Created")
 
     def create_image_list(self):
         """Create the image list."""
@@ -168,19 +170,29 @@ class ResultContentList(DynamicList):
     def __init__(self, parent):
         """Init ResultContentFileList object."""
 
+        self.localize()
+
         super(ResultContentList, self).__init__(
             parent,
             [
-                FILE,
-                LINE,
-                MATCHES,
-                CONTEXT
+                self.FILE,
+                self.LINE,
+                self.MATCHES,
+                self.CONTEXT
             ]
         )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
+
+    def localize(self):
+        """Translate strings."""
+
+        self.FILE = _("File")
+        self.LINE = _("Line")
+        self.MATCHES = _("Matches")
+        self.CONTEXT = _("Context")
 
     def create_image_list(self):
         """Create the image list."""

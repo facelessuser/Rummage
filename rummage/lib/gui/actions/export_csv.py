@@ -10,6 +10,9 @@ from ... import rumcore
 if util.platform() == "windows":
     from os import startfile
 
+RESULT_ROW = '%(file)s,%(size)s,%(matches)s,%(path)s,%(encoding)s,%(modified)s,%(created)s\n'
+RESULT_CONTENT_ROW = '%(file)s,%(line)s,%(matches)s,%(context)s\n'
+
 
 def csv_encode(text):
     """Format text for CSV."""
@@ -25,26 +28,16 @@ def csv_encode(text):
     )
 
 
-REGEX_SEARCH = csv_encode(_("Regex Search"))
-LITERAL_SEARCH = csv_encode(_("Literal Search"))
-RESULT_TABLE_HEADER = ','.join(
-    [csv_encode(x) for x in [_('File'), _('Size'), _('Matches'), _('Path'), _('Encoding'), _('Modified'), _('Created')]]
-) + "\n"
-RESULT_CONTENT_TABLE_HEADER = ','.join(
-    [csv_encode(x) for x in [_('File'), _('Line'), _('Matches'), _('Context')]]
-) + "\n"
-
-RESULT_ROW = '%(file)s,%(size)s,%(matches)s,%(path)s,%(encoding)s,%(modified)s,%(created)s\n'
-RESULT_CONTENT_ROW = '%(file)s,%(line)s,%(matches)s,%(context)s\n'
-
-
 def export_result_list(res, csv):
     """Export result list."""
 
     if len(res) == 0:
         return
 
-    csv.write(RESULT_TABLE_HEADER)
+    columns = (_('File'), _('Size'), _('Matches'), _('Path'), _('Encoding'), _('Modified'), _('Created'))
+    result_table_header = ','.join([csv_encode(x) for x in columns]) + "\n"
+
+    csv.write(result_table_header)
 
     for item in res.values():
         csv.write(
@@ -68,7 +61,10 @@ def export_result_content_list(res, csv):
     if len(res) == 0:
         return
 
-    csv.write(RESULT_CONTENT_TABLE_HEADER)
+    columns = (_('File'), _('Line'), _('Matches'), _('Context'))
+    result_content_table_header = ','.join([csv_encode(x) for x in columns]) + "\n"
+
+    csv.write(result_content_table_header)
 
     for item in res.values():
         csv.write(
@@ -86,11 +82,14 @@ def export_result_content_list(res, csv):
 def export(export_csv, chain, result_list, result_content_list):
     """Export results to CSV."""
 
+    regex_search = csv_encode(_("Regex Search"))
+    literal_search = csv_encode(_("Literal Search"))
+
     with codecs.open(export_csv, "w", encoding="utf-8-sig") as csv:
         for pattern, replace, flags in chain:
             csv.write(
                 "%s,%s\n" % (
-                    (LITERAL_SEARCH if flags & rumcore.LITERAL else REGEX_SEARCH), csv_encode(pattern)
+                    (literal_search if flags & rumcore.LITERAL else regex_search), csv_encode(pattern)
                 )
             )
         csv.write('\n')

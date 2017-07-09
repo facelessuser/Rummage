@@ -23,9 +23,6 @@ from .dynamic_lists import DynamicList
 from ..localization import _
 from .. import data
 
-ERROR = _("Error")
-FILE_NAME = _("File Name")
-
 
 class ErrorList(DynamicList):
     """Error list."""
@@ -33,15 +30,23 @@ class ErrorList(DynamicList):
     def __init__(self, parent):
         """Initialization."""
 
+        self.localize()
+
         super(ErrorList, self).__init__(
             parent,
             [
-                ERROR,
-                FILE_NAME
+                self.ERROR,
+                self.FILE_NAME
             ]
         )
 
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
+
+    def localize(self):
+        """Translate strings."""
+
+        self.ERROR = _("Error")
+        self.FILE_NAME = _("File Name")
 
     def create_image_list(self):
         """Create image list."""

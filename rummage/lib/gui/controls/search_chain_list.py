@@ -23,9 +23,6 @@ from .dynamic_lists import DynamicList
 from ..localization import _
 from .. import data
 
-NAME = _("Name")
-CHAIN = _("Chain")
-
 
 class SearchChainList(DynamicList):
     """Error list."""
@@ -33,13 +30,21 @@ class SearchChainList(DynamicList):
     def __init__(self, parent):
         """Initialization."""
 
+        self.localize()
+
         super(SearchChainList, self).__init__(
             parent,
             [
-                NAME,
-                CHAIN
+                self.NAME,
+                self.CHAIN
             ]
         )
+
+    def localize(self):
+        """Translate strings."""
+
+        self.NAME = _("Name")
+        self.CHAIN = _("Chain")
 
     def create_image_list(self):
         """Create image list."""

@@ -25,9 +25,6 @@ from .error_text_dialog import ErrorTextDialog
 from .localization import _
 from . import gui
 
-TITLE = _("Errors")
-ERR_COULD_NOT_PROCESS = _("Cound not process %s:\n%s")
-
 
 class SearchErrorDialog(gui.SearchErrorDialog):
     """Load search dialog."""
@@ -36,8 +33,8 @@ class SearchErrorDialog(gui.SearchErrorDialog):
         """Init LoadSearchDialog."""
 
         super(SearchErrorDialog, self).__init__(parent)
-
         self.localize()
+        self.refresh_localization()
 
         best = self.m_error_panel.GetBestSize()
         current = self.m_error_panel.GetSize()
@@ -49,9 +46,15 @@ class SearchErrorDialog(gui.SearchErrorDialog):
         self.m_error_list.SetFocus()
 
     def localize(self):
+        """Translate strings."""
+
+        self.TITLE = _("Errors")
+        self.ERR_COULD_NOT_PROCESS = _("Cound not process %s:\n%s")
+
+    def refresh_localization(self):
         """Localize dialog."""
 
-        self.SetTitle(TITLE)
+        self.SetTitle(self.TITLE)
         self.Fit()
 
     def show_error(self, text):
@@ -71,7 +74,7 @@ class SearchErrorDialog(gui.SearchErrorDialog):
             else:
                 name = '<NA>'
             error(
-                ERR_COULD_NOT_PROCESS % (name, e.error[1] + e.error[0])
+                self.ERR_COULD_NOT_PROCESS % (name, e.error[1] + e.error[0])
             )
             self.m_error_list.set_item_map("%d" % count, e.error, name)
             count += 1

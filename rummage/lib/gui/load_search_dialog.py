@@ -26,25 +26,6 @@ from .localization import _
 from .save_search_dialog import SaveSearchDialog
 from . import gui
 
-TITLE = _("Searches")
-REMOVE = _("Remove")
-OKAY = _("Load")
-CLOSE = _("Cancel")
-
-SEARCH_REGEX = _("Regex")
-SEARCH_LITERAL = _("Text")
-SEARCH_TYPE = {
-    SEARCH_LITERAL: "Text",
-    SEARCH_REGEX: "Regex"
-}
-
-REPLACE_PATTERN = _("Pattern")
-REPLACE_PLUGIN = _("Plugin")
-REPLACE_TYPE = {
-    REPLACE_PATTERN: "Pattern",
-    REPLACE_PLUGIN: "Plugin"
-}
-
 
 class LoadSearchDialog(gui.LoadSearchDialog):
     """Load search dialog."""
@@ -53,10 +34,11 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         """Init LoadSearchDialog."""
 
         super(LoadSearchDialog, self).__init__(parent)
-        self.m_search_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
-
-        self.parent = parent
         self.localize()
+        self.refresh_localization()
+
+        self.m_search_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
+        self.parent = parent
 
         best = self.m_load_panel.GetBestSize()
         current = self.m_load_panel.GetSize()
@@ -69,12 +51,34 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.m_search_list.SetFocus()
 
     def localize(self):
+        """Translate strings."""
+
+        self.TITLE = _("Searches")
+        self.REMOVE = _("Remove")
+        self.OKAY = _("Load")
+        self.CLOSE = _("Cancel")
+
+        self.SEARCH_REGEX = _("Regex")
+        self.SEARCH_LITERAL = _("Text")
+        self.SEARCH_TYPE = {
+            self.SEARCH_LITERAL: "Text",
+            self.SEARCH_REGEX: "Regex"
+        }
+
+        self.REPLACE_PATTERN = _("Pattern")
+        self.REPLACE_PLUGIN = _("Plugin")
+        self.REPLACE_TYPE = {
+            self.REPLACE_PATTERN: "Pattern",
+            self.REPLACE_PLUGIN: "Plugin"
+        }
+
+    def refresh_localization(self):
         """Localize dialog."""
 
-        self.SetTitle(TITLE)
-        self.m_delete_button.SetLabel(REMOVE)
-        self.m_load_button.SetLabel(OKAY)
-        self.m_cancel_button.SetLabel(CLOSE)
+        self.SetTitle(self.TITLE)
+        self.m_delete_button.SetLabel(self.REMOVE)
+        self.m_load_button.SetLabel(self.OKAY)
+        self.m_cancel_button.SetLabel(self.CLOSE)
         self.Fit()
 
     def load_searches(self):
@@ -84,8 +88,8 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         searches = Settings.get_search()
         for key in sorted(searches.keys()):
             s = searches[key]
-            search_type = SEARCH_REGEX if s[4] else SEARCH_LITERAL
-            replace_type = REPLACE_PLUGIN if s[5] else REPLACE_PATTERN
+            search_type = self.SEARCH_REGEX if s[4] else self.SEARCH_LITERAL
+            replace_type = self.REPLACE_PLUGIN if s[5] else self.REPLACE_PATTERN
             self.m_search_list.set_item_map(count, key, s[0], s[1], s[2], s[3], search_type, replace_type)
             count += 1
         self.m_search_list.load_list()
@@ -98,8 +102,8 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         search = self.m_search_list.get_map_item(item, col=2)
         replace = self.m_search_list.get_map_item(item, col=3)
         flags = self.m_search_list.get_map_item(item, col=4)
-        is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
-        is_plugin = REPLACE_TYPE[self.m_search_list.get_map_item(item, col=6)] == "Plugin"
+        is_regex = self.SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
+        is_plugin = self.REPLACE_TYPE[self.m_search_list.get_map_item(item, col=6)] == "Plugin"
 
         dlg = SaveSearchDialog(self, (name, comment, search, replace, flags, is_regex, is_plugin))
         dlg.ShowModal()
@@ -117,8 +121,8 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         search = self.m_search_list.get_map_item(item, col=2)
         replace = self.m_search_list.get_map_item(item, col=3)
         flags = self.m_search_list.get_map_item(item, col=4)
-        is_regex = SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
-        is_plugin = REPLACE_TYPE[self.m_search_list.get_map_item(item, col=6)] == "Plugin"
+        is_regex = self.SEARCH_TYPE[self.m_search_list.get_map_item(item, col=5)] == "Regex"
+        is_plugin = self.REPLACE_TYPE[self.m_search_list.get_map_item(item, col=6)] == "Plugin"
 
         # Disable chain mode if enabled
         if self.parent.m_chains_checkbox.GetValue():

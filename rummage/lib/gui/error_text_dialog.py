@@ -22,8 +22,6 @@ from __future__ import unicode_literals
 from .localization import _
 from . import gui
 
-ERROR = _("Error")
-
 
 class ErrorTextDialog(gui.ErrorTextDialog):
     """ErrorText Dialog."""
@@ -33,10 +31,16 @@ class ErrorTextDialog(gui.ErrorTextDialog):
 
         super(ErrorTextDialog, self).__init__(parent)
         self.localize()
+        self.refresh_localization()
         self.m_error_textbox.SetValue(text)
 
     def localize(self):
+        """Translate strings."""
+
+        self.ERROR = _("Error")
+
+    def refresh_localization(self):
         """Localize the dialog."""
 
-        self.SetTitle(ERROR)
+        self.SetTitle(self.ERROR)
         self.Fit()

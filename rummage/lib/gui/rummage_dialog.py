@@ -57,122 +57,6 @@ from .. import rumcore
 from .. import util
 import decimal
 
-# Combo options
-SIZE_ANY = _("any")
-SIZE_GT = _("greater than")
-SIZE_EQ = _("equal to")
-SIZE_LT = _("less than")
-
-TIME_ANY = _("on any")
-TIME_GT = _("after")
-TIME_EQ = _("on")
-TIME_LT = _("before")
-
-# Search/replace button states
-SEARCH_BTN_STOP = _("Stop")
-SEARCH_BTN_SEARCH = _("Search")
-SEARCH_BTN_ABORT = _("Aborting")
-REPLACE_BTN_REPLACE = _("Replace")
-
-# Picker/Save messages
-DIRECTORY_SELECT = _("Select directory to rummage")
-SCRIPT_SELECT = _("Select replace script")
-EXPORT_TO = _("Export to...")
-
-# Dialog messages
-MSG_REPLACE_WARN = _("Are you sure you want to replace all instances?")
-MSG_BACKUPS_DISABLED = _("Backups are currently disabled.")
-
-# Notifications
-NOTIFY_SEARCH_ABORTED = _("Search Aborted")
-NOTIFY_SEARCH_COMPLETED = _("Search Completed")
-NOTIFY_MATCHES_FOUND = _("\n%d matches found!")
-
-# ERRORS
-ERR_NO_LOG = _("Cannot find log file!")
-ERR_EMPTY_SEARCH = _("There is no search to save!")
-ERR_HTML_FAILED = _("There was a problem exporting the HTML!  See the log for more info.")
-ERR_CSV_FAILED = _("There was a problem exporting the CSV!  See the log for more info.")
-ERR_NOTHING_TO_EXPORT = _("There is nothing to export!")
-ERR_SETUP = _("There was an error in setup! Please check the log.")
-ERR_INVALID_SEARCH_PTH = _("Please enter a valid search path!")
-ERR_INVALID_SEARCH = _("Please enter a valid search!")
-ERR_EMPTY_CHAIN = _("There are no searches in this this chain!")
-ERR_MISSING_SEARCH = _("'%s' is not found in saved searches!")
-ERR_INVALID_CHAIN = _("Please enter a valid chain!")
-ERR_INVALID_CHAIN_SEARCH = _("Saved search '%s' does not contain a valid search pattern!")
-ERR_INVALID_FILE_SEARCH = _("Please enter a valid file pattern!")
-ERR_INVALID_EXCLUDE = _("Please enter a valid exlcude directory regex!")
-ERR_INVLAID_SIZE = _("Please enter a valid size!")
-ERR_INVALID_MDATE = _("Please enter a modified date!")
-ERR_INVALID_CDATE = _("Please enter a created date!")
-
-# Status
-INIT_STATUS = _("Searching: 0/0 0% Skipped: 0 Matches: 0")
-UPDATE_STATUS = _("Searching: %d/%d %d%% Skipped: %d Matches: %d")
-FINAL_STATUS = _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s")
-BENCHMARK_STATUS = _("%01.2f seconds")
-
-# Status bar popup
-SB_ERRORS = _("errors")
-SB_TOOLTIP_ERR = _("%d errors\nClick to see errors.")
-
-# Controls
-SEARCH_REPLACE = _("Search and Replace")
-LIMIT_SEARCH = _("Limit Search")
-SEARCH_IN = _("Search in")
-SEARCH_FOR = _("Search for")
-SEARCH_CHAIN = _("Search chain")
-REPLACE_WITH = _("Replace with")
-REPLACE_PLUGIN = _("Replace plugin")
-SIZE_IS = _("Size is")
-MODIFIED = _("Modified")
-CREATED = _("Created")
-EXCLUDE = _("Exclude folders")
-FILE_MATCH = _("Files which match")
-SEARCH_WITH_REGEX = _("Search with regex")
-CASE = _("Search case-sensitive")
-DOTALL = _("Dot matches newline")
-UNICODE = _("Use Unicode properties")
-BOOLEAN = _("Boolean match")
-COUNT_ONLY = _("Count only")
-CREATE_BACKUPS = _("Create backups")
-FORCE = _("Force")
-USE_CHAIN = _("Use chain search")
-USE_PLUGIN = _("Use plugin replace")
-BESTMATCH = _("Best fuzzy match")
-FUZZY_FIT = _("Improve fuzzy fit")
-WORD = _("Unicode word breaks")
-REVERSE = _("Search backwards")
-POSIX = _("Use POSIX matching")
-FORMAT = _("Format style replacements")
-CASEFOLD = _("Full case-folding")
-SUBFOLDERS = _("Include subfolders")
-HIDDEN = _("Include hidden")
-INCLUDE_BINARY = _("Include binary files")
-USE_REGEX = _("Regex")
-TEST_REGEX = _("Test Regex")
-SAVE_SEARCH = _("Save Search")
-LOAD_SEARCH = _("Load Search")
-SEARCH = _("Search")
-
-# Menu
-MENU_EXPORT = _("Export")
-MENU_FILE = _("File")
-MENU_VIEW = _("View")
-MENU_HELP = _("Help")
-MENU_PREFERENCES = _("&Preferences")
-MENU_EXIT = _("&Exit")
-MENU_HTML = _("HTML")
-MENU_CSV = _("CSV")
-MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
-MENU_OPEN_LOG = _("Open Log File")
-MENU_ABOUT = _("&About Rummage")
-MENU_DOCUMENTATION = _("Documentation")
-MENU_HELP_SUPPORT = _("Help and Support")
-MENU_SHOW_LIMIT = _("Show Limit Search Panel")
-MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
-
 _LOCK = threading.Lock()
 _RESULTS = []
 _COMPLETED = 0
@@ -282,20 +166,6 @@ ENCODINGS = [
     "WINDOWS-1258"
 ]
 
-SIZE_LIMIT_I18N = {
-    SIZE_ANY: "any",
-    SIZE_GT: "greater than",
-    SIZE_EQ: "equal to",
-    SIZE_LT: "less than"
-}
-
-TIME_LIMIT_I18N = {
-    TIME_ANY: "on any",
-    TIME_GT: "after",
-    TIME_EQ: "on",
-    TIME_LT: "before"
-}
-
 
 def eng_to_i18n(string, mapping):
     """Convert english to i18n."""
@@ -367,6 +237,8 @@ class RummageThread(threading.Thread):
     def __init__(self, args):
         """Set up Rummage thread with the rumcore object."""
 
+        self.localize()
+
         self.runtime = ""
         self.no_results = 0
         self.running = False
@@ -387,6 +259,11 @@ class RummageThread(threading.Thread):
         )
 
         threading.Thread.__init__(self)
+
+    def localize(self):
+        """Translate strings."""
+
+        self.BENCHMARK_STATUS = _("%01.2f seconds")
 
     def not_none(self, item, alt=None):
         """Return item if not None, else return the alternate."""
@@ -456,7 +333,7 @@ class RummageThread(threading.Thread):
             error(traceback.format_exc())
 
         bench = time() - start
-        runtime = BENCHMARK_STATUS % bench
+        runtime = self.BENCHMARK_STATUS % bench
 
         self.runtime = runtime
         self.running = False
@@ -516,6 +393,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Init the RummageFrame object."""
 
         super(RummageFrame, self).__init__(parent)
+        self.localize()
 
         self.hide_limit_panel = False
 
@@ -560,13 +438,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         pick_button.pick_extend(self.m_searchin_dir_picker, pick_button.PickButton)
         self.m_searchin_dir_picker.pick_init(
             pick_button.PickButton.DIR_TYPE,
-            DIRECTORY_SELECT,
+            self.DIRECTORY_SELECT,
             pick_change_evt=self.on_dir_changed
         )
         pick_button.pick_extend(self.m_replace_plugin_dir_picker, pick_button.PickButton)
         self.m_replace_plugin_dir_picker.pick_init(
             pick_button.PickButton.FILE_TYPE,
-            SCRIPT_SELECT,
+            self.SCRIPT_SELECT,
             default_path=os.path.join(Settings.get_config_folder(), 'plugins'),
             pick_change_evt=self.on_replace_plugin_dir_changed
         )
@@ -580,18 +458,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_progressbar.SetRange(100)
         self.m_progressbar.SetValue(0)
 
-        self.localize()
+        self.refresh_localization()
 
         # Setup the inputs history and replace
         # placeholder objects with actual objecs
         self.setup_inputs()
 
         # Pick optimal size
-        self.optimize_size(True)
         if Settings.get_hide_limit():
             self.hide_limit_panel = True
             self.limit_panel_hide()
-            self.m_hide_limit_menuitem.SetItemLabel(MENU_SHOW_LIMIT)
+            self.m_hide_limit_menuitem.SetItemLabel(self.MENU_SHOW_LIMIT)
 
         self.init_search_path(start_path)
 
@@ -605,82 +482,216 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Linux seems to need the resize to get its control tab
         # order right as we are hiding some items, but doing it
         # now won't work, so we delay it.
-        wx.CallLater(500, self.on_loaded).Start()
+        self.call_later = wx.CallLater(500, self.on_loaded)
+        self.call_later.Start()
 
     def localize(self):
+        """Translate strings."""
+
+        # Combo options
+        self.SIZE_ANY = _("any")
+        self.SIZE_GT = _("greater than")
+        self.SIZE_EQ = _("equal to")
+        self.SIZE_LT = _("less than")
+
+        self.TIME_ANY = _("on any")
+        self.TIME_GT = _("after")
+        self.TIME_EQ = _("on")
+        self.TIME_LT = _("before")
+
+        # Search/replace button states
+        self.SEARCH_BTN_STOP = _("Stop")
+        self.SEARCH_BTN_SEARCH = _("Search")
+        self.SEARCH_BTN_ABORT = _("Aborting")
+        self.REPLACE_BTN_REPLACE = _("Replace")
+
+        # Picker/Save messages
+        self.DIRECTORY_SELECT = _("Select directory to rummage")
+        self.SCRIPT_SELECT = _("Select replace script")
+        self.EXPORT_TO = _("Export to...")
+
+        # Dialog messages
+        self.MSG_REPLACE_WARN = _("Are you sure you want to replace all instances?")
+        self.MSG_BACKUPS_DISABLED = _("Backups are currently disabled.")
+
+        # Notifications
+        self.NOTIFY_SEARCH_ABORTED = _("Search Aborted")
+        self.NOTIFY_SEARCH_COMPLETED = _("Search Completed")
+        self.NOTIFY_MATCHES_FOUND = _("\n%d matches found!")
+
+        # ERRORS
+        self.ERR_NO_LOG = _("Cannot find log file!")
+        self.ERR_EMPTY_SEARCH = _("There is no search to save!")
+        self.ERR_HTML_FAILED = _("There was a problem exporting the HTML!  See the log for more info.")
+        self.ERR_CSV_FAILED = _("There was a problem exporting the CSV!  See the log for more info.")
+        self.ERR_NOTHING_TO_EXPORT = _("There is nothing to export!")
+        self.ERR_SETUP = _("There was an error in setup! Please check the log.")
+        self.ERR_INVALID_SEARCH_PTH = _("Please enter a valid search path!")
+        self.ERR_INVALID_SEARCH = _("Please enter a valid search!")
+        self.ERR_EMPTY_CHAIN = _("There are no searches in this this chain!")
+        self.ERR_MISSING_SEARCH = _("'%s' is not found in saved searches!")
+        self.ERR_INVALID_CHAIN = _("Please enter a valid chain!")
+        self.ERR_INVALID_CHAIN_SEARCH = _("Saved search '%s' does not contain a valid search pattern!")
+        self.ERR_INVALID_FILE_SEARCH = _("Please enter a valid file pattern!")
+        self.ERR_INVALID_EXCLUDE = _("Please enter a valid exlcude directory regex!")
+        self.ERR_INVLAID_SIZE = _("Please enter a valid size!")
+        self.ERR_INVALID_MDATE = _("Please enter a modified date!")
+        self.ERR_INVALID_CDATE = _("Please enter a created date!")
+
+        # Status
+        self.INIT_STATUS = _("Searching: 0/0 0% Skipped: 0 Matches: 0")
+        self.UPDATE_STATUS = _("Searching: %d/%d %d%% Skipped: %d Matches: %d")
+        self.FINAL_STATUS = _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s")
+
+        # Status bar popup
+        self.SB_ERRORS = _("errors")
+        self.SB_TOOLTIP_ERR = _("%d errors\nClick to see errors.")
+
+        # Controls
+        self.SEARCH_REPLACE = _("Search and Replace")
+        self.LIMIT_SEARCH = _("Limit Search")
+        self.SEARCH_IN = _("Search in")
+        self.SEARCH_FOR = _("Search for")
+        self.SEARCH_CHAIN = _("Search chain")
+        self.REPLACE_WITH = _("Replace with")
+        self.REPLACE_PLUGIN = _("Replace plugin")
+        self.SIZE_IS = _("Size is")
+        self.MODIFIED = _("Modified")
+        self.CREATED = _("Created")
+        self.EXCLUDE = _("Exclude folders")
+        self.FILE_MATCH = _("Files which match")
+        self.SEARCH_WITH_REGEX = _("Search with regex")
+        self.CASE = _("Search case-sensitive")
+        self.DOTALL = _("Dot matches newline")
+        self.UNICODE = _("Use Unicode properties")
+        self.BOOLEAN = _("Boolean match")
+        self.COUNT_ONLY = _("Count only")
+        self.CREATE_BACKUPS = _("Create backups")
+        self.FORCE = _("Force")
+        self.USE_CHAIN = _("Use chain search")
+        self.USE_PLUGIN = _("Use plugin replace")
+        self.BESTMATCH = _("Best fuzzy match")
+        self.FUZZY_FIT = _("Improve fuzzy fit")
+        self.WORD = _("Unicode word breaks")
+        self.REVERSE = _("Search backwards")
+        self.POSIX = _("Use POSIX matching")
+        self.FORMAT = _("Format style replacements")
+        self.CASEFOLD = _("Full case-folding")
+        self.SUBFOLDERS = _("Include subfolders")
+        self.HIDDEN = _("Include hidden")
+        self.INCLUDE_BINARY = _("Include binary files")
+        self.USE_REGEX = _("Regex")
+        self.TEST_REGEX = _("Test Regex")
+        self.SAVE_SEARCH = _("Save Search")
+        self.LOAD_SEARCH = _("Load Search")
+        self.SEARCH = _("Search")
+
+        # Menu
+        self.MENU_EXPORT = _("Export")
+        self.MENU_FILE = _("File")
+        self.MENU_VIEW = _("View")
+        self.MENU_HELP = _("Help")
+        self.MENU_PREFERENCES = _("&Preferences")
+        self.MENU_EXIT = _("&Exit")
+        self.MENU_HTML = _("HTML")
+        self.MENU_CSV = _("CSV")
+        self.MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
+        self.MENU_OPEN_LOG = _("Open Log File")
+        self.MENU_ABOUT = _("&About Rummage")
+        self.MENU_DOCUMENTATION = _("Documentation")
+        self.MENU_HELP_SUPPORT = _("Help and Support")
+        self.MENU_SHOW_LIMIT = _("Show Limit Search Panel")
+        self.MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
+
+        # Combo values
+        self.SIZE_LIMIT_I18N = {
+            self.SIZE_ANY: "any",
+            self.SIZE_GT: "greater than",
+            self.SIZE_EQ: "equal to",
+            self.SIZE_LT: "less than"
+        }
+
+        self.TIME_LIMIT_I18N = {
+            self.TIME_ANY: "on any",
+            self.TIME_GT: "after",
+            self.TIME_EQ: "on",
+            self.TIME_LT: "before"
+        }
+
+    def refresh_localization(self):
         """Localize."""
 
         self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(
-            SEARCH_REPLACE
+            self.SEARCH_REPLACE
         )
         self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(
-            LIMIT_SEARCH
+            self.LIMIT_SEARCH
         )
-        self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
-        self.m_replace_button.SetLabel(REPLACE_BTN_REPLACE)
-        self.m_searchin_label.SetLabel(SEARCH_IN)
-        self.m_searchfor_label.SetLabel(SEARCH_FOR)
-        self.m_replace_label.SetLabel(REPLACE_WITH)
-        self.m_size_is_label.SetLabel(SIZE_IS)
-        self.m_modified_label.SetLabel(MODIFIED)
-        self.m_created_label.SetLabel(CREATED)
-        self.m_exclude_label.SetLabel(EXCLUDE)
-        self.m_filematch_label.SetLabel(FILE_MATCH)
-        self.m_regex_search_checkbox.SetLabel(SEARCH_WITH_REGEX)
-        self.m_case_checkbox.SetLabel(CASE)
-        self.m_dotmatch_checkbox.SetLabel(DOTALL)
-        self.m_unicode_checkbox.SetLabel(UNICODE)
+        self.m_search_button.SetLabel(self.SEARCH_BTN_SEARCH)
+        self.m_replace_button.SetLabel(self.REPLACE_BTN_REPLACE)
+        self.m_searchin_label.SetLabel(self.SEARCH_IN)
+        self.m_searchfor_label.SetLabel(self.SEARCH_FOR)
+        self.m_replace_label.SetLabel(self.REPLACE_WITH)
+        self.m_size_is_label.SetLabel(self.SIZE_IS)
+        self.m_modified_label.SetLabel(self.MODIFIED)
+        self.m_created_label.SetLabel(self.CREATED)
+        self.m_exclude_label.SetLabel(self.EXCLUDE)
+        self.m_filematch_label.SetLabel(self.FILE_MATCH)
+        self.m_regex_search_checkbox.SetLabel(self.SEARCH_WITH_REGEX)
+        self.m_case_checkbox.SetLabel(self.CASE)
+        self.m_dotmatch_checkbox.SetLabel(self.DOTALL)
+        self.m_unicode_checkbox.SetLabel(self.UNICODE)
         self.m_force_encode_choice.SetSelection(0)
-        self.m_boolean_checkbox.SetLabel(BOOLEAN)
-        self.m_count_only_checkbox.SetLabel(COUNT_ONLY)
-        self.m_backup_checkbox.SetLabel(CREATE_BACKUPS)
-        self.m_force_encode_checkbox.SetLabel(FORCE)
+        self.m_boolean_checkbox.SetLabel(self.BOOLEAN)
+        self.m_count_only_checkbox.SetLabel(self.COUNT_ONLY)
+        self.m_backup_checkbox.SetLabel(self.CREATE_BACKUPS)
+        self.m_force_encode_checkbox.SetLabel(self.FORCE)
         self.m_force_encode_choice.Clear()
         for x in ENCODINGS:
             self.m_force_encode_choice.Append(x)
-        self.m_chains_checkbox.SetLabel(USE_CHAIN)
-        self.m_replace_plugin_checkbox.SetLabel(USE_PLUGIN)
-        self.m_bestmatch_checkbox.SetLabel(BESTMATCH)
-        self.m_enhancematch_checkbox.SetLabel(FUZZY_FIT)
-        self.m_word_checkbox.SetLabel(WORD)
-        self.m_reverse_checkbox.SetLabel(REVERSE)
-        self.m_posix_checkbox.SetLabel(POSIX)
-        self.m_format_replace_checkbox.SetLabel(FORMAT)
-        self.m_fullcase_checkbox.SetLabel(CASEFOLD)
-        self.m_subfolder_checkbox.SetLabel(SUBFOLDERS)
-        self.m_hidden_checkbox.SetLabel(HIDDEN)
-        self.m_binary_checkbox.SetLabel(INCLUDE_BINARY)
-        self.m_dirregex_checkbox.SetLabel(USE_REGEX)
-        self.m_fileregex_checkbox.SetLabel(USE_REGEX)
-        self.m_regex_test_button.SetLabel(TEST_REGEX)
-        self.m_save_search_button.SetLabel(SAVE_SEARCH)
-        self.m_load_search_button.SetLabel(LOAD_SEARCH)
-        self.m_grep_notebook.SetPageText(0, SEARCH)
+        self.m_chains_checkbox.SetLabel(self.USE_CHAIN)
+        self.m_replace_plugin_checkbox.SetLabel(self.USE_PLUGIN)
+        self.m_bestmatch_checkbox.SetLabel(self.BESTMATCH)
+        self.m_enhancematch_checkbox.SetLabel(self.FUZZY_FIT)
+        self.m_word_checkbox.SetLabel(self.WORD)
+        self.m_reverse_checkbox.SetLabel(self.REVERSE)
+        self.m_posix_checkbox.SetLabel(self.POSIX)
+        self.m_format_replace_checkbox.SetLabel(self.FORMAT)
+        self.m_fullcase_checkbox.SetLabel(self.CASEFOLD)
+        self.m_subfolder_checkbox.SetLabel(self.SUBFOLDERS)
+        self.m_hidden_checkbox.SetLabel(self.HIDDEN)
+        self.m_binary_checkbox.SetLabel(self.INCLUDE_BINARY)
+        self.m_dirregex_checkbox.SetLabel(self.USE_REGEX)
+        self.m_fileregex_checkbox.SetLabel(self.USE_REGEX)
+        self.m_regex_test_button.SetLabel(self.TEST_REGEX)
+        self.m_save_search_button.SetLabel(self.SAVE_SEARCH)
+        self.m_load_search_button.SetLabel(self.LOAD_SEARCH)
+        self.m_grep_notebook.SetPageText(0, self.SEARCH)
         exportid = self.m_menu.FindMenuItem("File", "Export")
-        self.m_menu.SetLabel(exportid, MENU_EXPORT)
-        self.m_menu.SetMenuLabel(0, MENU_FILE)
-        self.m_menu.SetMenuLabel(1, MENU_VIEW)
-        self.m_menu.SetMenuLabel(2, MENU_HELP)
-        self.m_preferences_menuitem.SetItemLabel(MENU_PREFERENCES)
-        self.m_quit_menuitem.SetItemLabel(MENU_EXIT)
-        self.m_export_html_menuitem.SetItemLabel(MENU_HTML)
-        self.m_export_csv_menuitem.SetItemLabel(MENU_CSV)
-        self.m_hide_limit_menuitem.SetItemLabel(MENU_HIDE_LIMIT)
-        self.m_log_menuitem.SetItemLabel(MENU_OPEN_LOG)
-        self.m_about_menuitem.SetItemLabel(MENU_ABOUT)
-        self.m_documentation_menuitem.SetItemLabel(MENU_DOCUMENTATION)
-        self.m_issues_menuitem.SetItemLabel(MENU_HELP_SUPPORT)
+        self.m_menu.SetLabel(exportid, self.MENU_EXPORT)
+        self.m_menu.SetMenuLabel(0, self.MENU_FILE)
+        self.m_menu.SetMenuLabel(1, self.MENU_VIEW)
+        self.m_menu.SetMenuLabel(2, self.MENU_HELP)
+        self.m_preferences_menuitem.SetItemLabel(self.MENU_PREFERENCES)
+        self.m_quit_menuitem.SetItemLabel(self.MENU_EXIT)
+        self.m_export_html_menuitem.SetItemLabel(self.MENU_HTML)
+        self.m_export_csv_menuitem.SetItemLabel(self.MENU_CSV)
+        self.m_hide_limit_menuitem.SetItemLabel(self.MENU_HIDE_LIMIT)
+        self.m_log_menuitem.SetItemLabel(self.MENU_OPEN_LOG)
+        self.m_about_menuitem.SetItemLabel(self.MENU_ABOUT)
+        self.m_documentation_menuitem.SetItemLabel(self.MENU_DOCUMENTATION)
+        self.m_issues_menuitem.SetItemLabel(self.MENU_HELP_SUPPORT)
 
         self.m_logic_choice.Clear()
-        for x in [SIZE_ANY, SIZE_GT, SIZE_EQ, SIZE_LT]:
+        for x in [self.SIZE_ANY, self.SIZE_GT, self.SIZE_EQ, self.SIZE_LT]:
             self.m_logic_choice.Append(x)
 
         self.m_modified_choice.Clear()
-        for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
+        for x in [self.TIME_ANY, self.TIME_GT, self.TIME_EQ, self.TIME_LT]:
             self.m_modified_choice.Append(x)
 
         self.m_created_choice.Clear()
-        for x in [TIME_ANY, TIME_GT, TIME_EQ, TIME_LT]:
+        for x in [self.TIME_ANY, self.TIME_GT, self.TIME_EQ, self.TIME_LT]:
             self.m_created_choice.Append(x)
 
     def init_search_path(self, start_path):
@@ -718,7 +729,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_logic_choice.SetStringSelection(
             eng_to_i18n(
                 Settings.get_search_setting("size_compare_string", "any"),
-                SIZE_LIMIT_I18N
+                self.SIZE_LIMIT_I18N
             )
         )
         self.m_size_text.SetValue(Settings.get_search_setting("size_limit_string", "1000"))
@@ -751,13 +762,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_modified_choice.SetStringSelection(
             eng_to_i18n(
                 Settings.get_search_setting("modified_compare_string", "on any"),
-                TIME_LIMIT_I18N
+                self.TIME_LIMIT_I18N
             )
         )
         self.m_created_choice.SetStringSelection(
             eng_to_i18n(
                 Settings.get_search_setting("created_compare_string", "on any"),
-                TIME_LIMIT_I18N
+                self.TIME_LIMIT_I18N
             )
         )
 
@@ -776,7 +787,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.setup_chains(Settings.get_search_setting("chain", ""))
 
         if self.m_replace_plugin_checkbox.GetValue():
-            self.m_replace_label.SetLabel(REPLACE_PLUGIN)
+            self.m_replace_label.SetLabel(self.REPLACE_PLUGIN)
             self.m_replace_plugin_dir_picker.Show()
             setup_autocomplete_combo(
                 self.m_replace_textbox,
@@ -865,7 +876,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
             self.m_replace_plugin_checkbox.Enable(False)
 
-            self.m_searchfor_label.SetLabel(SEARCH_CHAIN)
+            self.m_searchfor_label.SetLabel(self.SEARCH_CHAIN)
             self.m_replace_label.Enable(False)
             self.m_replace_textbox.Enable(False)
             self.m_replace_plugin_dir_picker.Enable(False)
@@ -888,7 +899,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
             self.m_replace_plugin_checkbox.Enable(True)
 
-            self.m_searchfor_label.SetLabel(SEARCH_FOR)
+            self.m_searchfor_label.SetLabel(self.SEARCH_FOR)
             self.m_searchfor_textbox.Value = ""
             self.m_replace_label.Enable(True)
             self.m_replace_textbox.Enable(True)
@@ -950,17 +961,17 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             return
         self.debounce_search = True
 
-        is_replacing = self.m_replace_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]
-        is_searching = self.m_search_button.GetLabel() in [SEARCH_BTN_STOP, SEARCH_BTN_ABORT]
+        is_replacing = self.m_replace_button.GetLabel() in [self.SEARCH_BTN_STOP, self.SEARCH_BTN_ABORT]
+        is_searching = self.m_search_button.GetLabel() in [self.SEARCH_BTN_STOP, self.SEARCH_BTN_ABORT]
 
         if is_searching or is_replacing:
             # Handle a search or replace request when a search or replace is already running
 
             if self.thread is not None and not self.kill:
                 if is_replacing:
-                    self.m_replace_button.SetLabel(SEARCH_BTN_ABORT)
+                    self.m_replace_button.SetLabel(self.SEARCH_BTN_ABORT)
                 else:
-                    self.m_search_button.SetLabel(SEARCH_BTN_ABORT)
+                    self.m_search_button.SetLabel(self.SEARCH_BTN_ABORT)
                 _ABORT = True
                 self.kill = True
             else:
@@ -969,9 +980,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             # Handle a search or a search & replace request
 
             if replace:
-                message = [MSG_REPLACE_WARN]
+                message = [self.MSG_REPLACE_WARN]
                 if not self.m_backup_checkbox.GetValue():
-                    message.append(MSG_BACKUPS_DISABLED)
+                    message.append(self.MSG_BACKUPS_DISABLED)
 
                 if not yesno(' '.join(message)):
                     self.debounce_search = False
@@ -981,7 +992,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             chain = self.m_searchfor_textbox.Value if is_chain else None
 
             if is_chain and (not chain.strip() or chain not in Settings.get_chains()):
-                errormsg(ERR_INVALID_CHAIN)
+                errormsg(self.ERR_INVALID_CHAIN)
             elif not self.validate_search_inputs(replace=replace, chain=chain):
                 self.do_search(replace=replace, chain=chain is not None)
             self.debounce_search = False
@@ -1011,19 +1022,19 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         except Exception:
             self.clear_plugins()
             error(traceback.format_exc())
-            errormsg(ERR_SETUP)
+            errormsg(self.ERR_SETUP)
             return
 
         # Change button to stop search
         if replace:
-            self.m_replace_button.SetLabel(SEARCH_BTN_STOP)
+            self.m_replace_button.SetLabel(self.SEARCH_BTN_STOP)
             self.m_search_button.Enable(False)
         else:
-            self.m_search_button.SetLabel(SEARCH_BTN_STOP)
+            self.m_search_button.SetLabel(self.SEARCH_BTN_STOP)
             self.m_replace_button.Enable(False)
 
         # Init search status
-        self.m_statusbar.set_status(INIT_STATUS)
+        self.m_statusbar.set_status(self.INIT_STATUS)
 
         # Setup search thread
         self.thread = RummageThread(self.payload)
@@ -1375,9 +1386,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if Settings.get_regex_version() == 0:
             toggles.append(("fullcase_toggle", args.fullcase))
 
-        eng_size = i18n_to_eng(self.m_logic_choice.GetStringSelection(), SIZE_LIMIT_I18N)
-        eng_mod = i18n_to_eng(self.m_modified_choice.GetStringSelection(), TIME_LIMIT_I18N)
-        eng_cre = i18n_to_eng(self.m_created_choice.GetStringSelection(), TIME_LIMIT_I18N)
+        eng_size = i18n_to_eng(self.m_logic_choice.GetStringSelection(), self.SIZE_LIMIT_I18N)
+        eng_mod = i18n_to_eng(self.m_modified_choice.GetStringSelection(), self.TIME_LIMIT_I18N)
+        eng_cre = i18n_to_eng(self.m_created_choice.GetStringSelection(), self.TIME_LIMIT_I18N)
         strings = [
             ("size_compare_string", eng_size),
             ("modified_compare_string", eng_mod),
@@ -1454,7 +1465,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 count = self.update_table(count, completed, total, skipped, *results)
             else:
                 self.m_statusbar.set_status(
-                    UPDATE_STATUS % (
+                    self.UPDATE_STATUS % (
                         completed,
                         total,
                         int(float(completed) / float(total) * 100) if total != 0 else 0,
@@ -1469,14 +1480,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             # Run is finished or has been terminated
             if is_complete:
                 benchmark = self.thread.runtime
-                self.m_search_button.SetLabel(SEARCH_BTN_SEARCH)
-                self.m_replace_button.SetLabel(REPLACE_BTN_REPLACE)
+                self.m_search_button.SetLabel(self.SEARCH_BTN_SEARCH)
+                self.m_replace_button.SetLabel(self.REPLACE_BTN_REPLACE)
                 self.m_search_button.Enable(True)
                 self.m_replace_button.Enable(True)
                 self.clear_plugins()
                 if self.kill:
                     self.m_statusbar.set_status(
-                        FINAL_STATUS % (
+                        self.FINAL_STATUS % (
                             completed,
                             total,
                             int(float(completed) / float(total) * 100) if total != 0 else 0,
@@ -1489,8 +1500,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_progressbar.SetValue(completed)
                     if Settings.get_notify():
                         notify.error(
-                            NOTIFY_SEARCH_ABORTED,
-                            NOTIFY_MATCHES_FOUND % count,
+                            self.NOTIFY_SEARCH_ABORTED,
+                            self.NOTIFY_MATCHES_FOUND % count,
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -1501,7 +1512,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         _ABORT = False
                 else:
                     self.m_statusbar.set_status(
-                        FINAL_STATUS % (
+                        self.FINAL_STATUS % (
                             completed,
                             total,
                             100,
@@ -1514,8 +1525,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_progressbar.SetValue(100)
                     if Settings.get_notify():
                         notify.info(
-                            NOTIFY_SEARCH_COMPLETED,
-                            NOTIFY_MATCHES_FOUND % count,
+                            self.NOTIFY_SEARCH_COMPLETED,
+                            self.NOTIFY_MATCHES_FOUND % count,
                             sound=Settings.get_alert()
                         )
                     elif Settings.get_alert():
@@ -1526,9 +1537,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 if errors:
                     self.error_dlg = SearchErrorDialog(self, errors)
                     self.m_statusbar.set_icon(
-                        SB_ERRORS,
+                        self.SB_ERRORS,
                         data.get_bitmap('error.png'),
-                        msg=SB_TOOLTIP_ERR % len(errors),
+                        msg=self.SB_TOOLTIP_ERR % len(errors),
                         click_left=self.on_error_click
                     )
                 self.m_result_file_list.load_list()
@@ -1560,7 +1571,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if p_value != done:
                 self.m_progressbar.SetValue(actually_done)
         self.m_statusbar.set_status(
-            UPDATE_STATUS % (
+            self.UPDATE_STATUS % (
                 (
                     actually_done, total,
                     int(float(actually_done) / float(total) * 100),
@@ -1579,32 +1590,32 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         msg = ""
 
         if not fail and not os.path.exists(self.m_searchin_text.GetValue()):
-            msg = ERR_INVALID_SEARCH_PTH
+            msg = self.ERR_INVALID_SEARCH_PTH
             fail = True
 
         if chain is None:
             if not fail and self.m_regex_search_checkbox.GetValue():
                 if (self.m_searchfor_textbox.GetValue() == "" and replace) or self.validate_search_regex():
-                    msg = ERR_INVALID_SEARCH
+                    msg = self.ERR_INVALID_SEARCH
                     fail = True
             elif not fail and self.m_searchfor_textbox.GetValue() == "" and replace:
-                msg = ERR_INVALID_SEARCH
+                msg = self.ERR_INVALID_SEARCH
                 fail = True
         else:
             chain_searches = Settings.get_chains().get(chain, {})
             if not chain_searches:
-                msg = ERR_EMPTY_CHAIN
+                msg = self.ERR_EMPTY_CHAIN
                 fail = True
             else:
                 searches = Settings.get_search()
                 for search in chain_searches:
                     s = searches.get(search)
                     if s is None:
-                        msg = ERR_MISSING_SEARCH % search
+                        msg = self.ERR_MISSING_SEARCH % search
                         fail = True
                         break
                     if self.validate_chain_regex(s[1], self.chain_flags(s[3], s[4])):
-                        msg = ERR_INVALID_CHAIN_SEARCH % search
+                        msg = self.ERR_INVALID_CHAIN_SEARCH % search
                         fail = True
                         break
 
@@ -1614,14 +1625,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.m_filematch_textbox.GetValue().strip() == "" or
                     self.validate_regex(self.m_filematch_textbox.Value)
                 ):
-                    msg = ERR_INVALID_FILE_SEARCH
+                    msg = self.ERR_INVALID_FILE_SEARCH
                     fail = True
             elif not fail and self.m_filematch_textbox.GetValue().strip() == "":
-                msg = ERR_INVALID_FILE_SEARCH
+                msg = self.ERR_INVALID_FILE_SEARCH
                 fail = True
             if not fail and self.m_dirregex_checkbox.GetValue():
                 if self.validate_regex(self.m_exclude_textbox.Value):
-                    msg = ERR_INVALID_EXCLUDE
+                    msg = self.ERR_INVALID_EXCLUDE
                     fail = True
 
             try:
@@ -1633,19 +1644,19 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_logic_choice.GetStringSelection() != "any" and
                 value is None
             ):
-                msg = ERR_INVLAID_SIZE
+                msg = self.ERR_INVLAID_SIZE
                 fail = True
             if not fail:
                 try:
                     self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")
                 except Exception:
-                    msg = ERR_INVALID_MDATE
+                    msg = self.ERR_INVALID_MDATE
                     fail = True
             if not fail:
                 try:
                     self.m_created_date_picker.GetValue().Format("%m/%d/%Y")
                 except Exception:
-                    msg = ERR_INVALID_CDATE
+                    msg = self.ERR_INVALID_CDATE
                     fail = True
         if fail:
             errormsg(msg)
@@ -1774,6 +1785,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         Resize window after we are sure everything is loaded (stupid Linux workaround) to fix tab order stuff.
         """
 
+        self.call_later.Stop()
         if self.m_chains_checkbox.GetValue():
             self.m_searchin_text.GetTextCtrl().SetFocus()
         else:
@@ -1782,7 +1794,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         self.Fit()
         self.m_settings_panel.GetSizer().Layout()
-        self.optimize_size(height_only=True)
+        self.optimize_size(first_time=True)
 
     def on_enter_key(self, event):
         """Search on enter."""
@@ -1877,14 +1889,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Handle plugin function toggle."""
 
         if self.m_replace_plugin_checkbox.GetValue():
-            self.m_replace_label.SetLabel(REPLACE_PLUGIN)
+            self.m_replace_label.SetLabel(self.REPLACE_PLUGIN)
             self.m_replace_plugin_dir_picker.Show()
             update_autocomplete(
                 self.m_replace_textbox,
                 "replace_plugin"
             )
         else:
-            self.m_replace_label.SetLabel(REPLACE_WITH)
+            self.m_replace_label.SetLabel(self.REPLACE_WITH)
             self.m_replace_plugin_dir_picker.Hide()
             update_autocomplete(
                 self.m_replace_textbox,
@@ -1925,7 +1937,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         search = self.m_searchfor_textbox.GetValue()
         if search == "":
-            errormsg(ERR_EMPTY_SEARCH)
+            errormsg(self.ERR_EMPTY_SEARCH)
             return
         dlg = SaveSearchDialog(self)
         dlg.ShowModal()
@@ -2029,9 +2041,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             len(self.m_result_file_list.itemDataMap) == 0 and
             len(self.m_result_list.itemDataMap) == 0
         ):
-            errormsg(ERR_NOTHING_TO_EXPORT)
+            errormsg(self.ERR_NOTHING_TO_EXPORT)
             return
-        html_file = filepickermsg(EXPORT_TO, wildcard="*.html", save=True)
+        html_file = filepickermsg(self.EXPORT_TO, wildcard="*.html", save=True)
         if html_file is None:
             return
         try:
@@ -2043,7 +2055,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             )
         except Exception:
             error(traceback.format_exc())
-            errormsg(ERR_HTML_FAILED)
+            errormsg(self.ERR_HTML_FAILED)
 
     def on_export_csv(self, event):
         """Export to CSV."""
@@ -2052,9 +2064,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             len(self.m_result_file_list.itemDataMap) == 0 and
             len(self.m_result_list.itemDataMap) == 0
         ):
-            errormsg(ERR_NOTHING_TO_EXPORT)
+            errormsg(self.ERR_NOTHING_TO_EXPORT)
             return
-        csv_file = filepickermsg(EXPORT_TO, wildcard="*.csv", save=True)
+        csv_file = filepickermsg(self.EXPORT_TO, wildcard="*.csv", save=True)
         if csv_file is None:
             return
         try:
@@ -2066,7 +2078,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             )
         except Exception:
             error(traceback.format_exc())
-            errormsg(ERR_CSV_FAILED)
+            errormsg(self.ERR_CSV_FAILED)
 
     def on_hide_limit(self, event):
         """Hide limit panel."""
@@ -2075,9 +2087,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.limit_panel_hide()
         Settings.set_hide_limit(self.hide_limit_panel)
         if self.hide_limit_panel:
-            self.m_hide_limit_menuitem.SetItemLabel(MENU_SHOW_LIMIT)
+            self.m_hide_limit_menuitem.SetItemLabel(self.MENU_SHOW_LIMIT)
         else:
-            self.m_hide_limit_menuitem.SetItemLabel(MENU_HIDE_LIMIT)
+            self.m_hide_limit_menuitem.SetItemLabel(self.MENU_HIDE_LIMIT)
 
     def on_show_log_file(self, event):
         """Show user files in editor."""
@@ -2089,7 +2101,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         if logfile is None or not os.path.exists(logfile):
             error(traceback.format_exc())
-            errormsg(ERR_NO_LOG)
+            errormsg(self.ERR_NO_LOG)
         else:
             open_editor.open_editor(logfile, 1, 1)
 

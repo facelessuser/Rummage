@@ -25,12 +25,6 @@ from .edit_search_chain_dialog import EditSearchChainDialog
 from .localization import _
 from . import gui
 
-TITLE = _("Search Chains")
-ADD = _("Add")
-EDIT = _("Edit")
-DELETE = _("Delete")
-CLOSE = _("Cancel")
-
 
 class SearchChainDialog(gui.SearchChainDialog):
     """Search chain dialog."""
@@ -39,6 +33,8 @@ class SearchChainDialog(gui.SearchChainDialog):
         """Init SaveSearchDialog object."""
 
         super(SearchChainDialog, self).__init__(parent)
+        self.localize()
+        self.refresh_localization()
 
         self.m_chain_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
 
@@ -54,13 +50,22 @@ class SearchChainDialog(gui.SearchChainDialog):
         self.m_chain_list.SetFocus()
 
     def localize(self):
+        """Translate strings."""
+
+        self.TITLE = _("Search Chains")
+        self.ADD = _("Add")
+        self.EDIT = _("Edit")
+        self.DELETE = _("Delete")
+        self.CLOSE = _("Cancel")
+
+    def refresh_localization(self):
         """Localize."""
 
-        self.SetTitle(TITLE)
-        self.m_add_button.SetLabel(ADD)
-        self.m_edit_button.SetLabel(EDIT)
-        self.m_remove_button.SetLabel(DELETE)
-        self.m_cancel_button.SetLabel(CLOSE)
+        self.SetTitle(self.TITLE)
+        self.m_add_button.SetLabel(self.ADD)
+        self.m_edit_button.SetLabel(self.EDIT)
+        self.m_remove_button.SetLabel(self.DELETE)
+        self.m_cancel_button.SetLabel(self.CLOSE)
 
     def load_chains(self):
         """Populate list with chain entries."""
