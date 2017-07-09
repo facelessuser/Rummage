@@ -77,7 +77,7 @@ Jul 16, 2016
 
 - **FIX**: issue where editor could not be set.
 
-### 1.0.1
+## 1.0.1
 
 Jun 22, 2016
 
