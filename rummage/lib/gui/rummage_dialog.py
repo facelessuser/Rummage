@@ -398,7 +398,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.hide_limit_panel = False
 
         self.SetIcon(
-            data.get_image('rummage_medium.png' if util.platform() == 'linux' else 'rummage_large.png').GetIcon()
+            data.get_image('rummage_large.png').GetIcon()
         )
 
         self.no_pattern = False
