@@ -708,15 +708,54 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
+
+        # Get this windows useable display size
+        display = wx.Display()
+        index = display.GetFromWindow(self)
+        if index != wx.NOT_FOUND:
+            display = wx.Display(index)
+            rect = display.GetClientArea()
+
         if (first_time or offset > 0) and not height_only:
-            sz = wx.Size(mainframe[0], mainframe[1] + offset + 15)
+            debug('----Intial screen resize----')
+            debug('Screen Index: %d' % index)
+            debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
+            width = mainframe[0]
+            height = mainframe[1] + offset + 15
+            debug('Window Size: %d x %d' % (width, height))
+            if width > rect.GetWidth():
+                width = rect.GetWidth()
+                debug('Shrink width')
+            if height > rect.GetHeight():
+                height = rect.GetHeight()
+                debug('Shrink height')
+            sz = wx.Size(width, height)
             if first_time:
                 self.SetMinSize(sz)
             self.SetSize(sz)
         elif height_only:
             min_size = self.GetMinSize()
-            self.SetMinSize(wx.Size(min_size[0], mainframe[1] + offset + 15))
-            self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+            min_width, min_height = min_size[0], mainframe[1] + offset + 15
+
+            if min_height > rect.GetHeight():
+                debug('----Resize Height----')
+                debug('Screen Index: %d' % index)
+                debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
+                debug('Window Min Size: %d x %d' % (min_width, min_height))
+                debug('Shrink min-height')
+                min_height = rect.GetHeight()
+
+            width, height = mainframe[0], mainframe[1] + offset + 15
+            if min_width > rect.GetWidth():
+                debug('----Resize Height----')
+                debug('Screen Index: %d' % index)
+                debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
+                debug('Window Size: %d x %d' % (width, height))
+                debug('Shrink width')
+                width = rect.GetWidth()
+
+            self.SetMinSize(wx.Size(min_width, min_height))
+            self.SetSize(wx.Size(width, height))
         self.Refresh()
 
     def setup_inputs(self):
