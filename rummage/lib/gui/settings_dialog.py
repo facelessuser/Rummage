@@ -21,7 +21,8 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 from .settings import Settings
-from .editor_dialog import EditorDialog
+# from .editor_dialog import EditorDialog
+from .generic_dialogs import yesno
 from .localization import _
 from . import gui
 from .. import rumcore
@@ -119,6 +120,18 @@ class SettingsDialog(gui.SettingsDialog):
         self.CLEAR = _("Clear")
         self.CLOSE = _("Close")
         self.RECORDS = _("%d Records")
+        self.WARN_EDITOR_FORMAT = _(
+            "Editor setting format has changed!\n\n"
+            "Continuing will delete the old setting and require you to\n"
+            "reconfigure the option in the new format.\n\n"
+            "Ensure that you double quote paths and options with spaces,\n"
+            "inlcuding options that contain '{$file}'.\n\n"
+            "Example:\n"
+            "\"/My path/to editor\" --flag --path \"{$file}:{$line}:{$col}\""
+        )
+        self.CONTINUE = _("Continue")
+        self.CANCEL = _("Cancel")
+        self.WARNING_TITLE = _("Warning: Format Change")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -153,12 +166,24 @@ class SettingsDialog(gui.SettingsDialog):
     def on_editor_change(self, event):
         """Show editor dialog and update setting on return."""
 
-        dlg = EditorDialog(self, self.editor)
-        dlg.ShowModal()
-        self.editor = dlg.get_editor()
-        Settings.set_editor(self.editor)
-        self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
-        dlg.Destroy()
+        editor = Settings.get_editor()
+
+        if isinstance(editor, (list, tuple)):
+            # Using old format
+            if not yesno(self.WARN_EDITOR_FORMAT, title=self.WARNING_TITLE, yes=self.CONTINUE, no=self.CANCEL):
+                # Warn user about new format changes
+                return
+            else:
+                # Clear old format
+                Settings.set_editor("")
+                self.m_editor_text.SetValue("")
+
+        # dlg = EditorDialog(self, self.editor)
+        # dlg.ShowModal()
+        # self.editor = dlg.get_editor()
+        # Settings.set_editor(self.editor)
+        # self.m_editor_text.SetValue(self.editor)
+        # dlg.Destroy()
         event.Skip()
 
     def on_clear_history(self, event):
