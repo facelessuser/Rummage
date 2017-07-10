@@ -356,7 +356,13 @@ class Settings(object):
         if isinstance(editor, (list, tuple)):
             # Handle old list format
             return [
-                arg.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col)) for arg in editor
+                arg.replace(
+                    "{$file}", filename
+                ).replace(
+                    "{$line}", str(line)
+                ).replace(
+                    "{$col}", str(col)
+                ) for arg in editor
             ]
         else:
             # New string format
