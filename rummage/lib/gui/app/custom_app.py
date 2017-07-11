@@ -197,8 +197,6 @@ class CustomApp(wx.App):
     def OnExit(self):  # noqa
         """Cleanup instance check."""
 
-        if self.instance is not None:
-            del self.instance
         return 0
 
 
