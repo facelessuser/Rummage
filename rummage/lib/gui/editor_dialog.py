@@ -49,7 +49,7 @@ class EditorDialog(gui.EditorDialog):
         # Ensure good size for frame
         self.Fit()
         self.SetMinSize(wx.Size(400, self.GetSize()[1]))
-        self.m_help_text.Wrap(390)
+        self.m_help_text.Wrap(380)
         self.m_editor_panel.GetSizer().Layout()
         mainframe = self.GetSize()
         self.SetSize(wx.Size(400, mainframe[1] + 15))
