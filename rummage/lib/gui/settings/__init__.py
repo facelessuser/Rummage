@@ -728,3 +728,9 @@ class Settings(object):
                 error(e)
             except Exception:
                 print(str(e))
+
+    @classmethod
+    def unload(cls):
+        """Perfrom needed actions when done with settings."""
+
+        notify.destroy_notifications()

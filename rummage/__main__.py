@@ -78,6 +78,8 @@ def run():
 
     app.MainLoop()
 
+    Settings.unload()
+
     return 0
 
 
