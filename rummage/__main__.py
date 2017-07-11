@@ -78,6 +78,8 @@ def run():
 
     app.MainLoop()
 
+    return 0
+
 
 def main():
     """Main entry point."""
