@@ -36,6 +36,8 @@ class SettingsDialog(gui.SettingsDialog):
         """Init SettingsDialog object."""
 
         super(SettingsDialog, self).__init__(parent)
+        if util.platform() == "windows":
+            self.SetDoubleBuffered(True)
         self.localize()
 
         self.history_types = [

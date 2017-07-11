@@ -393,6 +393,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Init the RummageFrame object."""
 
         super(RummageFrame, self).__init__(parent)
+        if util.platform() == "windows":
+            self.m_settings_panel.SetDoubleBuffered(True)
         self.localize()
 
         self.hide_limit_panel = False

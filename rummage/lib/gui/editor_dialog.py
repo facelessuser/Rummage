@@ -32,6 +32,8 @@ class EditorDialog(gui.EditorDialog):
         """Init EditorDialog object."""
 
         super(EditorDialog, self).__init__(parent)
+        if util.platform() == "windows":
+            self.SetDoubleBuffered(True)
         self.resizing = False
         self.localize()
 
@@ -83,9 +85,9 @@ class EditorDialog(gui.EditorDialog):
             self.m_help_text.SetLabelText(self.HELP)
             self.m_help_text.Wrap(width - 20)
             self.m_editor_panel.GetSizer().Layout()
-            self.Fit()
-            self.SetMaxSize(wx.Size(-1, self.GetSize()[1]))
-            self.SetSize(wx.Size(width, self.GetSize()[1]))
+            height = self.GetBestSize()[1]
+            self.SetMaxSize(wx.Size(-1, height))
+            self.SetSize(wx.Size(width, height))
             self.resizing = False
         event.Skip()
 

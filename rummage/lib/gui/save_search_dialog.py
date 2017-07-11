@@ -37,6 +37,8 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         """Init SaveSearchDialog object."""
 
         super(SaveSearchDialog, self).__init__(parent)
+        if util.platform() == "windows":
+            self.SetDoubleBuffered(True)
         self.localize()
 
         # Ensure OS selectall shortcut works in text inputs

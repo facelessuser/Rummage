@@ -43,6 +43,8 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
+        if util.platform() == "windows":
+            self.SetDoubleBuffered(True)
         self.localize()
 
         self.SetIcon(

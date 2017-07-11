@@ -36,6 +36,8 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         """Init SaveSearchDialog object."""
 
         super(EditSearchChainDialog, self).__init__(parent)
+        if util.platform() == "windows":
+            self.SetDoubleBuffered(True)
         self.localize()
 
         self.saved = False
