@@ -284,6 +284,7 @@ class ArgPipeThread(object):
                         data = ""
                 ctypes.windll.kernel32.DisconnectNamedPipe(p)
                 time.sleep(0.2)
+            ctypes.windll.kernel32.CloseHandle(p)
         else:
             if os.path.exists(self.pipe_name):
                 os.unlink(self.pipe_name)
