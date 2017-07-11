@@ -61,6 +61,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         mainframe = self.GetSize()
         self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
         self.SetMinSize(self.GetSize())
+        self.SetMaxSize(wx.Size(-1, self.GetSize()[1]))
         self.m_name_text.SetFocus()
 
     def localize(self):

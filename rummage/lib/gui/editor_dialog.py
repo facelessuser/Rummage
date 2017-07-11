@@ -20,7 +20,6 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
-from .arg_dialog import ArgDialog
 from .localization import _
 from . import gui
 from .. import util
@@ -29,10 +28,11 @@ from .. import util
 class EditorDialog(gui.EditorDialog):
     """EditorDialog."""
 
-    def __init__(self, parent, editor=[]):
+    def __init__(self, parent, editor=""):
         """Init EditorDialog object."""
 
         super(EditorDialog, self).__init__(parent)
+        self.resizing = False
         self.localize()
 
         self.editor = editor
@@ -42,22 +42,19 @@ class EditorDialog(gui.EditorDialog):
             [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
 
-        if len(editor) != 0:
-            self.m_editor_picker.SetPath(editor[0])
-
-        if len(editor) > 1:
-            for x in range(1, len(editor)):
-                self.m_arg_list.Insert(editor[x], x - 1)
+        self.m_editor_textbox.SetValue(editor)
 
         self.refresh_localization()
 
         # Ensure good size for frame
-        best = self.m_editor_panel.GetBestSize()
-        current = self.m_editor_panel.GetSize()
-        offset = best[1] - current[1]
+        self.Fit()
+        self.SetMinSize(wx.Size(400, self.GetSize()[1]))
+        self.m_help_text.Wrap(390)
+        self.m_editor_panel.GetSizer().Layout()
         mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
-        self.SetMinSize(self.GetSize())
+        self.SetSize(wx.Size(400, mainframe[1] + 15))
+        self.SetMaxSize(wx.Size(-1, self.GetSize()[1]))
+        self.Fit()
 
     def localize(self):
         """Translate strings."""
@@ -65,36 +62,40 @@ class EditorDialog(gui.EditorDialog):
         self.TITLE = _("Configure Editor")
         self.OKAY = _("Apply")
         self.CLOSE = _("Cancel")
-        self.ADD = _("Add")
-        self.DELETE = _("Delete")
-        self.EDIT = _("Edit")
-        self.UP = _("Up")
-        self.DOWN = _("Down")
-        self.APPLICATION = _("Application")
-        self.ARGUMENTS = _("Arguments")
-        self.INSTRUCTIONS = _(
-            "Select the application and then set the arguments.\n\n"
-            "Special variables:\n"
-            "{$file} --> file path\n"
-            "{$line} --> line number\n"
-            "{$col} --> column number"
+        self.HELP = _(
+            "Use the vairable {$file} to insert the file path, "
+            "{$line} to insert the line number, and {$col} to "
+            "insert the line column.\n\n"
+            "Double quote paths and parameters that "
+            "contain spaces. {$file} should be double "
+            "quoted as well.\n\n"
+            "Check your editor's command line options for "
+            "to proper setup."
         )
+
+    def on_resize(self, event):
+        """Handle resize."""
+
+        if not self.resizing:
+            self.resizing = True
+            width = self.GetSize().GetWidth()
+            self.SetMaxSize(wx.Size(-1, -1))
+            self.m_help_text.SetLabelText(self.HELP)
+            self.m_help_text.Wrap(width - 20)
+            self.m_editor_panel.GetSizer().Layout()
+            self.Fit()
+            self.SetMaxSize(wx.Size(-1, self.GetSize()[1]))
+            self.SetSize(wx.Size(width, self.GetSize()[1]))
+            self.resizing = False
+        event.Skip()
 
     def refresh_localization(self):
         """Localize dialog."""
 
         self.SetTitle(self.TITLE)
-        self.m_add_arg_button.SetLabel(self.ADD)
-        self.m_remove_arg_button.SetLabel(self.DELETE)
-        self.m_edit_button.SetLabel(self.EDIT)
-        self.m_up_button.SetLabel(self.UP)
-        self.m_down_button.SetLabel(self.DOWN)
         self.m_apply_button.SetLabel(self.OKAY)
         self.m_cancel_button.SetLabel(self.CLOSE)
-        self.m_instructions_label.SetLabel(self.INSTRUCTIONS)
-        self.m_instructions_label.Wrap(325)
-        self.m_editor_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(self.APPLICATION)
-        self.m_editor_panel.GetSizer().GetItem(2).GetSizer().GetStaticBox().SetLabel(self.ARGUMENTS)
+        self.m_help_text.SetLabelText(self.HELP)
         self.Fit()
 
     def get_editor(self):
@@ -114,17 +115,6 @@ class EditorDialog(gui.EditorDialog):
         if len(keybindings):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
 
-    def add_arg(self):
-        """Add argument."""
-
-        value = self.m_arg_text.GetValue()
-        if value != "":
-            index = self.m_arg_list.GetSelected()
-            if index == wx.NOT_FOUND:
-                self.m_arg_list.Insert(value, self.m_arg_list.GetCount())
-            else:
-                self.m_arg_list.Insert(value, index)
-
     def on_textctrl_selectall(self, event):
         """Selectall for TextCtrl."""
 
@@ -133,76 +123,16 @@ class EditorDialog(gui.EditorDialog):
             text.SelectAll()
         event.Skip()
 
-    def on_arg_enter(self, event):
-        """Add argument on enter key."""
+    def on_test_click(self, event):
+        """Test editor option."""
 
-        self.add_arg()
-        event.Skip()
-
-    def on_add(self, event):
-        """Add argument button event."""
-
-        self.add_arg()
-        event.Skip()
-
-    def on_edit(self, event):
-        """Edit argument."""
-
-        index = self.m_arg_list.GetSelected()
-        if index > wx.NOT_FOUND:
-            dlg = ArgDialog(self, self.m_arg_list.GetString(index))
-            dlg.ShowModal()
-            string = dlg.get_arg()
-            dlg.Destroy()
-
-            self.m_arg_list.Delete(index)
-            self.m_arg_list.Insert(string, index)
-
-    def on_up(self, event):
-        """Move argument up."""
-
-        index = self.m_arg_list.GetSelected()
-        if index > 0:
-            search = self.m_arg_list.GetString(index)
-            self.m_arg_list.Delete(index)
-            self.m_arg_list.Insert(search, index - 1)
-            self.m_arg_list.Select(index - 1)
-
-    def on_down(self, event):
-        """Move argument down."""
-
-        count = self.m_arg_list.GetCount()
-        index = self.m_arg_list.GetSelected()
-        if wx.NOT_FOUND < index < count - 1:
-            search = self.m_arg_list.GetString(index)
-            self.m_arg_list.Delete(index)
-            self.m_arg_list.Insert(search, index + 1)
-            self.m_arg_list.Select(index + 1)
-
-    def on_remove(self, event):
-        """Remove argument."""
-
-        index = self.m_arg_list.GetSelected()
-        selected = self.m_arg_list.IsSelected(index)
-        if index != wx.NOT_FOUND:
-            self.m_arg_list.Delete(index)
-            count = self.m_arg_list.GetCount()
-            if selected and count and index <= count - 1:
-                self.m_arg_list.Select(index)
-
-    def on_apply(self, event):
+    def on_apply_click(self, event):
         """Set editor command with arguments on apply."""
 
-        editor = []
-        app = self.m_editor_picker.GetPath()
-        if app != "":
-            editor.append(app)
-        for x in range(0, self.m_arg_list.GetCount()):
-            editor.append(self.m_arg_list.GetString(x))
-        self.editor = editor
+        self.editor = self.m_editor_textbox.GetValue().strip()
         self.Close()
 
-    def on_cancel(self, event):
+    def on_cancel_click(self, event):
         """Close on cancel."""
 
         self.Close()
