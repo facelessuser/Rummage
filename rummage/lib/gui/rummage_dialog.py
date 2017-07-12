@@ -28,7 +28,6 @@ from time import time
 import os
 import re
 import codecs
-import wx.lib.newevent
 from backrefs import bre, bregex
 from .settings import Settings
 from .actions import export_html
@@ -703,7 +702,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if start_path and os.path.exists(start_path):
             self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
 
-    def optimize_size(self, first_time=False, height_only=False):
+    def optimize_size(self, first_time=False):
         """Optimally resize window."""
 
         best = self.m_settings_panel.GetBestSize()
@@ -718,7 +717,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             display = wx.Display(index)
             rect = display.GetClientArea()
 
-        if (first_time or offset > 0) and not height_only:
+        if first_time:
             debug('----Intial screen resize----')
             debug('Screen Index: %d' % index)
             debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
@@ -735,9 +734,25 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             if first_time:
                 self.SetMinSize(sz)
             self.SetSize(sz)
-        elif height_only:
+        else:
+            increase_width = False
+            increase_height = False
+
             min_size = self.GetMinSize()
             min_width, min_height = min_size[0], mainframe[1] + offset + 15
+            width, height = mainframe[0], mainframe[1]
+
+            if min_width > rect.GetWidth():
+                debug('----Resize Height----')
+                debug('Screen Index: %d' % index)
+                debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
+                debug('Window Size: %d x %d' % (width, height))
+                debug('Shrink width')
+                min_width = rect.GetWidth()
+
+            if min_width > width:
+                increase_width = True
+                width = min_width
 
             if min_height > rect.GetHeight():
                 debug('----Resize Height----')
@@ -747,17 +762,16 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 debug('Shrink min-height')
                 min_height = rect.GetHeight()
 
-            width, height = mainframe[0], mainframe[1] + offset + 15
-            if min_width > rect.GetWidth():
-                debug('----Resize Height----')
-                debug('Screen Index: %d' % index)
-                debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
-                debug('Window Size: %d x %d' % (width, height))
-                debug('Shrink width')
-                width = rect.GetWidth()
+            if min_height > height:
+                increase_height = True
+                height = min_height
+
+            if increase_width or increase_height:
+                self.SetMinSize(wx.Size(-1, -1))
+                self.SetSize(wx.Size(width, height))
 
             self.SetMinSize(wx.Size(min_width, min_height))
-            self.SetSize(wx.Size(width, height))
+
         self.Refresh()
 
     def setup_inputs(self):
@@ -963,7 +977,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 limit_box.ShowItems(False)
                 self.m_settings_panel.GetSizer().Layout()
                 self.Refresh()
-            elif os.path.isdir(pth) and not limit_box.IsShown(0):
+            elif not os.path.isfile(pth) and not limit_box.IsShown(0):
                 limit_box.ShowItems(True)
                 limit_box.Fit(limit_box.GetStaticBox())
                 limit_box.Layout()
@@ -978,13 +992,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Hide the limit panel."""
 
         self.limit_panel_toggle()
-        self.optimize_size(height_only=True)
+        self.optimize_size()
 
     def check_searchin(self):
         """Determine if search in input is a file or not, and hide/show elements accordingly."""
 
         self.limit_panel_toggle()
-        self.optimize_size(height_only=True)
+        self.optimize_size()
 
         pth = self.m_searchin_text.GetValue()
         if not self.searchin_update:
@@ -1918,7 +1932,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         dlg.Destroy()
         self.refresh_regex_options()
         self.m_settings_panel.GetSizer().Layout()
-        self.optimize_size(height_only=True)
+        self.optimize_size()
 
     def on_chain_toggle(self, event):
         """Handle chain toggle event."""
