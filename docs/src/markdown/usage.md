@@ -300,21 +300,20 @@ The preference dialog (found at **File-->Preferences**) is where Rummage keeps s
 
 ### Editor
 
-The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog where you can browse for your editor of choice and manage the arguments to pass to the editor.
+The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files.
 
+<!-- Update -->
 ![Editor Options](/images/editor_options.png)
 
-The editor options dialog has a file picker to select the the editor.  In macOS it may be beneficial to create a shell script or symlink that you can references as the picker won't be able to descend into an `.app` bundle as it is viewed as a file instead of a folder.
+The editor command is sent directly to the shell, so make sure you double quote paths with spaces, and include the special variable `{$file}` in a double quoted parameter as it may contain a path with spaces.
 
-You can then add arguments.  Each argument must be added as a separate entry.  So something like `--file myfile.txt` would be counted as **two** arguments while `--file=myfile` would be counted as one.
-
-As noted in the image above, Rummage provides 3 special variables that can be used to insert the file name, line number, or column number.
+Rummage provides 3 special variables that can be used to insert the file name, line number, or column number. Your editor may or may not support some of these options, but if does, make sure to format the command accordingly.
 
 Argument Variables | Description
 ------------------ | -----------
-\{$file}           | Insert the file name.
-\{$line}           | Insert the line number.
-\{$col}            | Insert the column number.
+`{$file}`          | Insert the file name.
+`{$line}`          | Insert the line number.
+`{$col}`           | Insert the column number.
 
 ### General
 The **General** panel contains a couple of useful settings.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0
+
+XXX, X, 2017
+
+- **NEW**: Editor configurations are now sent through the shell which changes and simplifies the interface to set it up.
+- **FIX**: Clean up of closing events: ensure we return a code, destroy objects, and skip unnecessary actions.
+- **FIX**: Use double buffering on certain windows and panels in Windows to reduce text flickering on resize.
+
 ## 2.1.0
 
 Jul 9, 2017
