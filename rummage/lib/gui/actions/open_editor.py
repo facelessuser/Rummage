@@ -30,34 +30,37 @@ from ... import util
 def open_editor(filename, line, col):
     """Open editor with the optional filename, line, and col parameters."""
 
-    returncode = None
+    fail = False
 
     cmd = Settings.get_editor(filename=filename, line=line, col=col)
-    if len(cmd) == 0:
+    if not cmd:
         errormsg(_("No editor is currently set!"))
         error("No editor set: %s" % cmd)
         return
     debug(cmd)
 
-    if util.platform() == "windows":
-        startupinfo = subprocess.STARTUPINFO()
-        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        process = subprocess.Popen(
-            cmd,
-            startupinfo=startupinfo,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            stdin=subprocess.PIPE,
-            shell=False
-        )
-    else:
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            stdin=subprocess.PIPE,
-            shell=False
-        )
-    process.communicate()
-    returncode = process.returncode
-    return returncode
+    is_string = isinstance(cmd, util.string_type)
+
+    try:
+        if util.platform() == "windows":
+            startupinfo = subprocess.STARTUPINFO()
+            subprocess.Popen(
+                cmd,
+                startupinfo=startupinfo,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                shell=is_string
+            )
+        else:
+            subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                shell=is_string
+            )
+    except Exception:
+        fail = True
+
+    return fail

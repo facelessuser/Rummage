@@ -43,6 +43,8 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Init Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
+        if util.platform() == "windows":
+            self.SetDoubleBuffered(True)
         self.localize()
 
         self.SetIcon(
@@ -111,11 +113,13 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.refresh_localization()
 
         # Ensure good sizing of frame
+        self.m_tester_panel.Fit()
+        self.Fit()
         best = self.m_tester_panel.GetBestSize()
         current = self.m_tester_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset))
         self.SetMinSize(self.GetSize())
 
     def localize(self):

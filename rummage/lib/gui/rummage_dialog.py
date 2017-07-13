@@ -57,6 +57,8 @@ from .. import rumcore
 from .. import util
 import decimal
 
+PostResizeEvent, EVT_POST_RESIZE = wx.lib.newevent.NewEvent()
+
 _LOCK = threading.Lock()
 _RESULTS = []
 _COMPLETED = 0
@@ -393,6 +395,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Init the RummageFrame object."""
 
         super(RummageFrame, self).__init__(parent)
+        self.maximized = False
+        if util.platform() == "windows":
+            self.m_settings_panel.SetDoubleBuffered(True)
         self.localize()
 
         self.hide_limit_panel = False
@@ -402,6 +407,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         )
 
         self.no_pattern = False
+        self.client_size = wx.Size(-1, -1)
         self.paylod = {}
         self.error_dlg = None
         self.debounce_search = False
@@ -429,6 +435,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Update status on when idle
         self.Bind(wx.EVT_IDLE, self.on_idle)
+        self.Bind(wx.EVT_SIZE, self.on_resize)
+        self.Bind(EVT_POST_RESIZE, self.on_post_resize)
 
         # Extend the statusbar
         custom_statusbar.extend_sb(self.m_statusbar)
@@ -701,7 +709,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if start_path and os.path.exists(start_path):
             self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
 
-    def optimize_size(self, first_time=False, height_only=False):
+    def optimize_size(self, first_time=False):
         """Optimally resize window."""
 
         best = self.m_settings_panel.GetBestSize()
@@ -716,46 +724,60 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             display = wx.Display(index)
             rect = display.GetClientArea()
 
-        if (first_time or offset > 0) and not height_only:
+        if first_time:
             debug('----Intial screen resize----')
             debug('Screen Index: %d' % index)
             debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
             width = mainframe[0]
-            height = mainframe[1] + offset + 15
+            height = mainframe[1] + offset
             debug('Window Size: %d x %d' % (width, height))
-            if width > rect.GetWidth():
-                width = rect.GetWidth()
-                debug('Shrink width')
-            if height > rect.GetHeight():
-                height = rect.GetHeight()
-                debug('Shrink height')
+            # if width > rect.GetWidth():
+            #     width = rect.GetWidth()
+            #     debug('Shrink width')
+            # if height > rect.GetHeight():
+            #     height = rect.GetHeight()
+            #     debug('Shrink height')
             sz = wx.Size(width, height)
-            if first_time:
-                self.SetMinSize(sz)
+            self.SetMinSize(sz)
             self.SetSize(sz)
-        elif height_only:
+        else:
+            increase_width = False
+            increase_height = False
+
             min_size = self.GetMinSize()
-            min_width, min_height = min_size[0], mainframe[1] + offset + 15
+            min_width, min_height = min_size[0], mainframe[1] + offset
+            width, height = mainframe[0], mainframe[1]
 
-            if min_height > rect.GetHeight():
-                debug('----Resize Height----')
-                debug('Screen Index: %d' % index)
-                debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
-                debug('Window Min Size: %d x %d' % (min_width, min_height))
-                debug('Shrink min-height')
-                min_height = rect.GetHeight()
+            # if min_width > rect.GetWidth():
+            #     debug('----Resize Height----')
+            #     debug('Screen Index: %d' % index)
+            #     debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
+            #     debug('Window Size: %d x %d' % (width, height))
+            #     debug('Shrink width')
+            #     min_width = rect.GetWidth()
 
-            width, height = mainframe[0], mainframe[1] + offset + 15
-            if min_width > rect.GetWidth():
-                debug('----Resize Height----')
-                debug('Screen Index: %d' % index)
-                debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
-                debug('Window Size: %d x %d' % (width, height))
-                debug('Shrink width')
-                width = rect.GetWidth()
+            if min_width > width:
+                increase_width = True
+                width = min_width
+
+            # if min_height > rect.GetHeight():
+            #     debug('----Resize Height----')
+            #     debug('Screen Index: %d' % index)
+            #     debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
+            #     debug('Window Min Size: %d x %d' % (min_width, min_height))
+            #     debug('Shrink min-height')
+            #     min_height = rect.GetHeight()
+
+            if min_height > height:
+                increase_height = True
+                height = min_height
+
+            if increase_width or increase_height:
+                self.SetMinSize(wx.Size(-1, -1))
+                self.SetSize(wx.Size(width, height))
 
             self.SetMinSize(wx.Size(min_width, min_height))
-            self.SetSize(wx.Size(width, height))
+
         self.Refresh()
 
     def setup_inputs(self):
@@ -896,6 +918,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_posix_checkbox.Hide()
             self.m_format_replace_checkbox.Hide()
             self.m_fullcase_checkbox.Hide()
+        self.m_settings_panel.GetSizer().Layout()
 
     def refresh_chain_mode(self):
         """Refresh chain mode."""
@@ -959,30 +982,35 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             pth = self.m_searchin_text.GetValue()
             if os.path.isfile(pth) and limit_box.IsShown(0):
                 limit_box.ShowItems(False)
+                limit_box.Layout()
                 self.m_settings_panel.GetSizer().Layout()
+                self.m_main_panel.Layout()
                 self.Refresh()
-            elif os.path.isdir(pth) and not limit_box.IsShown(0):
+            elif not os.path.isfile(pth) and not limit_box.IsShown(0):
                 limit_box.ShowItems(True)
                 limit_box.Fit(limit_box.GetStaticBox())
                 limit_box.Layout()
                 self.m_settings_panel.GetSizer().Layout()
+                self.m_main_panel.Layout()
                 self.Refresh()
         elif limit_box.IsShown(0):
             limit_box.ShowItems(False)
+            limit_box.Layout()
             self.m_settings_panel.GetSizer().Layout()
+            self.m_main_panel.Layout()
             self.Refresh()
 
     def limit_panel_hide(self):
         """Hide the limit panel."""
 
         self.limit_panel_toggle()
-        self.optimize_size(height_only=True)
+        self.optimize_size()
 
     def check_searchin(self):
         """Determine if search in input is a file or not, and hide/show elements accordingly."""
 
         self.limit_panel_toggle()
-        self.optimize_size(height_only=True)
+        self.optimize_size()
 
         pth = self.m_searchin_text.GetValue()
         if not self.searchin_update:
@@ -1832,8 +1860,46 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.Refresh()
 
         self.Fit()
+        self.m_settings_panel.Fit()
         self.m_settings_panel.GetSizer().Layout()
+        self.m_main_panel.Fit()
+        self.m_main_panel.GetSizer().Layout()
         self.optimize_size(first_time=True)
+
+    def on_resize(self, event):
+        """
+        On resize check if the client size changed between.
+
+        If the client size changed during resize (or sometime before)
+        it might be because we entered full screen mode.  Maybe we
+        adjusted the windows minsize during fullscreen and it is wrong.
+        So check if client size changed, and if so, run optimize size
+        to be safe.
+        """
+
+        event.Skip()
+        display = wx.Display()
+        index = display.GetFromWindow(self)
+        if index != wx.NOT_FOUND:
+            display = wx.Display(index)
+            rect = display.GetClientArea()
+            client_size = wx.Size(rect.GetWidth(), rect.GetHeight())
+
+            if (
+                client_size[0] != self.client_size[0] or client_size[1] != self.client_size[1] or
+                (self.maximized and not self.IsMaximized())
+            ):
+                self.client_size = client_size
+                evt = PostResizeEvent()
+                self.QueueEvent(evt)
+        if self.IsMaximized():
+            self.maximized = True
+            debug('maximized')
+
+    def on_post_resize(self, event):
+        """Handle after resize event."""
+
+        self.optimize_size()
 
     def on_enter_key(self, event):
         """Search on enter."""
@@ -1916,7 +1982,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         dlg.Destroy()
         self.refresh_regex_options()
         self.m_settings_panel.GetSizer().Layout()
-        self.optimize_size(height_only=True)
+        self.optimize_size()
 
     def on_chain_toggle(self, event):
         """Handle chain toggle event."""

@@ -78,6 +78,10 @@ def run():
 
     app.MainLoop()
 
+    Settings.unload()
+
+    return 0
+
 
 def main():
     """Main entry point."""

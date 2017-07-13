@@ -347,13 +347,27 @@ class Settings(object):
         """Get editor command and replace file, line, and col symbols."""
 
         cls.reload_settings()
-        editor = cls.settings.get("editor", [])
-        if isinstance(editor, dict):
-            editor = editor.get(util.platform(), [])
+        editor = cls.settings.get("editor", "")
 
-        return [
-            arg.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col)) for arg in editor
-        ]
+        # Handle early, old dict format.
+        if isinstance(editor, dict):
+            editor = editor.get(util.platform(), "")
+
+        if isinstance(editor, (list, tuple)):
+            # Handle old list format
+            return [
+                arg.replace(
+                    "{$file}", filename
+                ).replace(
+                    "{$line}", str(line)
+                ).replace(
+                    "{$col}", str(col)
+                ) for arg in editor
+            ]
+        else:
+            # New string format
+            filename = filename.replace('"', '\\"')
+            return editor.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col))
 
     @classmethod
     def set_editor(cls, editor):
@@ -714,3 +728,9 @@ class Settings(object):
                 error(e)
             except Exception:
                 print(str(e))
+
+    @classmethod
+    def unload(cls):
+        """Perfrom needed actions when done with settings."""
+
+        notify.destroy_notifications()

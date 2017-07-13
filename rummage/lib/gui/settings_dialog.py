@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import wx
 from .settings import Settings
 from .editor_dialog import EditorDialog
+from .generic_dialogs import yesno
 from .localization import _
 from . import gui
 from .. import rumcore
@@ -35,6 +36,8 @@ class SettingsDialog(gui.SettingsDialog):
         """Init SettingsDialog object."""
 
         super(SettingsDialog, self).__init__(parent)
+        if util.platform() == "windows":
+            self.SetDoubleBuffered(True)
         self.localize()
 
         self.history_types = [
@@ -51,7 +54,10 @@ class SettingsDialog(gui.SettingsDialog):
         mode = Settings.get_regex_mode()
 
         self.editor = Settings.get_editor()
-        self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
+        if isinstance(self.editor, (tuple, list)):
+            self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
+        else:
+            self.m_editor_text.SetValue(self.editor if self.editor else "")
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
         self.m_history_label.SetLabel(self.RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
@@ -89,12 +95,15 @@ class SettingsDialog(gui.SettingsDialog):
 
         self.refresh_localization()
 
+        self.m_settings_panel.Fit()
+        self.Fit()
         best = self.m_settings_panel.GetBestSize()
         current = self.m_settings_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset))
         self.SetMinSize(self.GetSize())
+        self.SetMaxSize(wx.Size(-1, self.GetSize()[1]))
 
     def localize(self):
         """Translage strings."""
@@ -119,6 +128,18 @@ class SettingsDialog(gui.SettingsDialog):
         self.CLEAR = _("Clear")
         self.CLOSE = _("Close")
         self.RECORDS = _("%d Records")
+        self.WARN_EDITOR_FORMAT = _(
+            "Editor setting format has changed!\n\n"
+            "Continuing will delete the old setting and require you to\n"
+            "reconfigure the option in the new format.\n\n"
+            "Ensure that you double quote paths and options with spaces,\n"
+            "inlcuding options that contain '{$file}'.\n\n"
+            "Example:\n"
+            "\"/My path/to editor\" --flag --path \"{$file}:{$line}:{$col}\""
+        )
+        self.CONTINUE = _("Continue")
+        self.CANCEL = _("Cancel")
+        self.WARNING_TITLE = _("Warning: Format Change")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -153,11 +174,22 @@ class SettingsDialog(gui.SettingsDialog):
     def on_editor_change(self, event):
         """Show editor dialog and update setting on return."""
 
+        if isinstance(self.editor, (list, tuple)):
+            # Using old format
+            if not yesno(self.WARN_EDITOR_FORMAT, title=self.WARNING_TITLE, yes=self.CONTINUE, no=self.CANCEL):
+                # Warn user about new format changes
+                return
+            else:
+                # Clear old format
+                self.editor = ""
+                Settings.set_editor("")
+                self.m_editor_text.SetValue("")
+
         dlg = EditorDialog(self, self.editor)
         dlg.ShowModal()
         self.editor = dlg.get_editor()
         Settings.set_editor(self.editor)
-        self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
+        self.m_editor_text.SetValue(self.editor)
         dlg.Destroy()
         event.Skip()
 

@@ -39,11 +39,13 @@ class SearchChainDialog(gui.SearchChainDialog):
         self.m_chain_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
 
         # Ensure good sizing of frame
+        self.m_chain_panel.Fit()
+        self.Fit()
         best = self.m_chain_panel.GetBestSize()
         current = self.m_chain_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset))
         self.SetMinSize(self.GetSize())
 
         self.load_chains()
