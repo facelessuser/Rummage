@@ -395,6 +395,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Init the RummageFrame object."""
 
         super(RummageFrame, self).__init__(parent)
+        self.maximized = False
         if util.platform() == "windows":
             self.m_settings_panel.SetDoubleBuffered(True)
         self.localize()
@@ -1884,10 +1885,16 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             rect = display.GetClientArea()
             client_size = wx.Size(rect.GetWidth(), rect.GetHeight())
 
-            if client_size[0] != self.client_size[0] or client_size[1] != self.client_size[1]:
+            if (
+                client_size[0] != self.client_size[0] or client_size[1] != self.client_size[1] or
+                (self.maximized and not self.IsMaximized())
+            ):
                 self.client_size = client_size
                 evt = PostResizeEvent()
                 self.QueueEvent(evt)
+        if self.IsMaximized():
+            self.maximized = True
+            debug('maximized')
 
     def on_post_resize(self, event):
         """Handle after resize event."""
