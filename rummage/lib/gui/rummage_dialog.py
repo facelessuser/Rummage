@@ -728,7 +728,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             debug('Screen Index: %d' % index)
             debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
             width = mainframe[0]
-            height = mainframe[1] + offset + 15
+            height = mainframe[1] + offset
             debug('Window Size: %d x %d' % (width, height))
             # if width > rect.GetWidth():
             #     width = rect.GetWidth()
@@ -737,15 +737,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             #     height = rect.GetHeight()
             #     debug('Shrink height')
             sz = wx.Size(width, height)
-            if first_time:
-                self.SetMinSize(sz)
+            self.SetMinSize(sz)
             self.SetSize(sz)
         else:
             increase_width = False
             increase_height = False
 
             min_size = self.GetMinSize()
-            min_width, min_height = min_size[0], mainframe[1] + offset + 15
+            min_width, min_height = min_size[0], mainframe[1] + offset
             width, height = mainframe[0], mainframe[1]
 
             # if min_width > rect.GetWidth():
@@ -918,6 +917,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_posix_checkbox.Hide()
             self.m_format_replace_checkbox.Hide()
             self.m_fullcase_checkbox.Hide()
+        self.m_settings_panel.GetSizer().Layout()
 
     def refresh_chain_mode(self):
         """Refresh chain mode."""
@@ -981,17 +981,22 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             pth = self.m_searchin_text.GetValue()
             if os.path.isfile(pth) and limit_box.IsShown(0):
                 limit_box.ShowItems(False)
+                limit_box.Layout()
                 self.m_settings_panel.GetSizer().Layout()
+                self.m_main_panel.Layout()
                 self.Refresh()
             elif not os.path.isfile(pth) and not limit_box.IsShown(0):
                 limit_box.ShowItems(True)
                 limit_box.Fit(limit_box.GetStaticBox())
                 limit_box.Layout()
                 self.m_settings_panel.GetSizer().Layout()
+                self.m_main_panel.Layout()
                 self.Refresh()
         elif limit_box.IsShown(0):
             limit_box.ShowItems(False)
+            limit_box.Layout()
             self.m_settings_panel.GetSizer().Layout()
+            self.m_main_panel.Layout()
             self.Refresh()
 
     def limit_panel_hide(self):
@@ -1854,7 +1859,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.Refresh()
 
         self.Fit()
+        self.m_settings_panel.Fit()
         self.m_settings_panel.GetSizer().Layout()
+        self.m_main_panel.Fit()
+        self.m_main_panel.GetSizer().Layout()
         self.optimize_size(first_time=True)
 
     def on_resize(self, event):
