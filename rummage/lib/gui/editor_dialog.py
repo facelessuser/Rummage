@@ -51,12 +51,13 @@ class EditorDialog(gui.EditorDialog):
         self.refresh_localization()
 
         # Ensure good size for frame
+        self.m_editor_panel.Fit()
         self.Fit()
         self.SetMinSize(wx.Size(400, self.GetSize()[1]))
         self.m_help_text.Wrap(380)
         self.m_editor_panel.GetSizer().Layout()
         mainframe = self.GetSize()
-        self.SetSize(wx.Size(400, mainframe[1] + 15))
+        self.SetSize(wx.Size(400, mainframe[1]))
         self.SetMaxSize(wx.Size(-1, self.GetSize()[1]))
         self.Fit()
 

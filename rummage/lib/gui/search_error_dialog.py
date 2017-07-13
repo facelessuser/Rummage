@@ -36,11 +36,13 @@ class SearchErrorDialog(gui.SearchErrorDialog):
         self.localize()
         self.refresh_localization()
 
+        self.m_error_panel.Fit()
+        self.Fit()
         best = self.m_error_panel.GetBestSize()
         current = self.m_error_panel.GetSize()
         offset = best[1] - current[1]
         mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset + 15))
+        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset))
         self.SetMinSize(self.GetSize())
         self.load_errors(errors)
         self.m_error_list.SetFocus()
