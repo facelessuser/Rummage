@@ -28,6 +28,7 @@ from time import time
 import os
 import re
 import codecs
+import wx.lib.newevent
 from backrefs import bre, bregex
 from .settings import Settings
 from .actions import export_html
@@ -55,6 +56,8 @@ from .. import __meta__
 from .. import rumcore
 from .. import util
 import decimal
+
+PostResizeEvent, EVT_POST_RESIZE = wx.lib.newevent.NewEvent()
 
 _LOCK = threading.Lock()
 _RESULTS = []
@@ -403,6 +406,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         )
 
         self.no_pattern = False
+        self.client_size = wx.Size(-1, -1)
         self.paylod = {}
         self.error_dlg = None
         self.debounce_search = False
@@ -430,6 +434,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Update status on when idle
         self.Bind(wx.EVT_IDLE, self.on_idle)
+        self.Bind(wx.EVT_SIZE, self.on_resize)
+        self.Bind(EVT_POST_RESIZE, self.on_post_resize)
 
         # Extend the statusbar
         custom_statusbar.extend_sb(self.m_statusbar)
@@ -1850,6 +1856,35 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.Fit()
         self.m_settings_panel.GetSizer().Layout()
         self.optimize_size(first_time=True)
+
+    def on_resize(self, event):
+        """
+        On resize check if the client size changed between.
+
+        If the client size changed during resize (or sometime before)
+        it might be because we entered full screen mode.  Maybe we
+        adjusted the windows minsize during fullscreen and it is wrong.
+        So check if client size changed, and if so, run optimize size
+        to be safe.
+        """
+
+        event.Skip()
+        display = wx.Display()
+        index = display.GetFromWindow(self)
+        if index != wx.NOT_FOUND:
+            display = wx.Display(index)
+            rect = display.GetClientArea()
+            client_size = wx.Size(rect.GetWidth(), rect.GetHeight())
+
+            if client_size[0] != self.client_size[0] or client_size[1] != self.client_size[1]:
+                self.client_size = client_size
+                evt = PostResizeEvent()
+                self.QueueEvent(evt)
+
+    def on_post_resize(self, event):
+        """Handle after resize event."""
+
+        self.optimize_size()
 
     def on_enter_key(self, event):
         """Search on enter."""
