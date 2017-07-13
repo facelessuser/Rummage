@@ -28,6 +28,8 @@ from .. import util
 class EditorDialog(gui.EditorDialog):
     """EditorDialog."""
 
+    WRAP_OFFSET = 40 if util.platform() == "windows" else 20
+
     def __init__(self, parent, editor=""):
         """Init EditorDialog object."""
 
@@ -83,7 +85,7 @@ class EditorDialog(gui.EditorDialog):
             width = self.GetSize().GetWidth()
             self.SetMaxSize(wx.Size(-1, -1))
             self.m_help_text.SetLabelText(self.HELP)
-            self.m_help_text.Wrap(width - 20)
+            self.m_help_text.Wrap(width - self.WRAP_OFFSET)
             self.m_editor_panel.GetSizer().Layout()
             height = self.GetBestSize()[1]
             self.SetMaxSize(wx.Size(-1, height))
