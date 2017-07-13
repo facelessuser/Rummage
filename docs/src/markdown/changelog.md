@@ -7,6 +7,8 @@ XXX, X, 2017
 - **NEW**: Editor configurations are now sent through the shell which changes and simplifies the interface to set it up.
 - **FIX**: Clean up of closing events: ensure we return a code, destroy objects, and skip unnecessary actions.
 - **FIX**: Use double buffering on certain windows and panels in Windows to reduce text flickering on resize.
+- **FIX**: Window is only resized by force on initial load, and if the dialog is ever too small when showing something that was hidden.
+- **FIX**: Revert ensuring window is never bigger than usable size for now.
 
 ## 2.1.0
 

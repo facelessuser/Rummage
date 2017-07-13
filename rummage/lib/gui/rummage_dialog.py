@@ -730,12 +730,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             width = mainframe[0]
             height = mainframe[1] + offset + 15
             debug('Window Size: %d x %d' % (width, height))
-            if width > rect.GetWidth():
-                width = rect.GetWidth()
-                debug('Shrink width')
-            if height > rect.GetHeight():
-                height = rect.GetHeight()
-                debug('Shrink height')
+            # if width > rect.GetWidth():
+            #     width = rect.GetWidth()
+            #     debug('Shrink width')
+            # if height > rect.GetHeight():
+            #     height = rect.GetHeight()
+            #     debug('Shrink height')
             sz = wx.Size(width, height)
             if first_time:
                 self.SetMinSize(sz)
@@ -748,25 +748,25 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             min_width, min_height = min_size[0], mainframe[1] + offset + 15
             width, height = mainframe[0], mainframe[1]
 
-            if min_width > rect.GetWidth():
-                debug('----Resize Height----')
-                debug('Screen Index: %d' % index)
-                debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
-                debug('Window Size: %d x %d' % (width, height))
-                debug('Shrink width')
-                min_width = rect.GetWidth()
+            # if min_width > rect.GetWidth():
+            #     debug('----Resize Height----')
+            #     debug('Screen Index: %d' % index)
+            #     debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
+            #     debug('Window Size: %d x %d' % (width, height))
+            #     debug('Shrink width')
+            #     min_width = rect.GetWidth()
 
             if min_width > width:
                 increase_width = True
                 width = min_width
 
-            if min_height > rect.GetHeight():
-                debug('----Resize Height----')
-                debug('Screen Index: %d' % index)
-                debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
-                debug('Window Min Size: %d x %d' % (min_width, min_height))
-                debug('Shrink min-height')
-                min_height = rect.GetHeight()
+            # if min_height > rect.GetHeight():
+            #     debug('----Resize Height----')
+            #     debug('Screen Index: %d' % index)
+            #     debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
+            #     debug('Window Min Size: %d x %d' % (min_width, min_height))
+            #     debug('Shrink min-height')
+            #     min_height = rect.GetHeight()
 
             if min_height > height:
                 increase_height = True
