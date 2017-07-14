@@ -453,11 +453,27 @@ Paths might vary depending on Ubuntu version etc.
 
 ## Localization
 
-Rummage provides an i18n localization framework to allow support for displaying the UI in other languages. But there is some manual setup required as out of the box, only `en_US` is available. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).
+Rummage provides an i18n localization framework to allow support for displaying the UI in other languages. But there is some manual setup required as out of the box, everything is in English. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).
+
+So to get localization, you must first build the `.mo` files on your system, copy them to your Rummage setting folder, select your desired language in the preference dialog, and restart Rummage.
+
+
+### Build Translations
+
+Download the release source and unzip it.
+
+Compile `.mo` files by running the `tools/localize_me.py` script from the root of the project:
+
+```
+python3 tools/localize_me.py --i18n /Library/Frameworks/Python.framework/Versions/3.6/share/doc/python3.6/examples/Tools/i18n
+```
+
+Modify the `--i18n` path to the appropriate location of the `i18n` folder for your Python.
+
 
 ### Installing Translations
 
-To install translations, just copy the `locale` folder from the release you are using to your user configuration folder.  For a traditional Python installation, this is where you'd find it for each OS:
+To install translations, just copy the `locale` folder (with your compiled `.mo` files) from the release you are using to your user configuration folder.  For a traditional Python installation, this is where you'd find it for each OS:
 
 Windows: `C:\Users\<my_username>\.Rummage`
 macOS: `/Users/<my_username>/.Rummage`
@@ -486,13 +502,7 @@ After installing the localization files, set the language via the `Language` set
     msgstr "<my_translation>"
     ```
 
-- Compile `.mo` files by running the `tools/localize_me.py` script from the root of the project:
-
-    ```
-    python3 tools/localize_me.py --i18n /Library/Frameworks/Python.framework/Versions/3.6/share/doc/python3.6/examples/Tools/i18n
-    ```
-
-    Modify the `--i18n` path to the appropriate location of the `i18n` folder for your Python.
+- Compile by following steps in [Build Translations](#build-translations).
 
 - Commit, push, and pull request.
 
