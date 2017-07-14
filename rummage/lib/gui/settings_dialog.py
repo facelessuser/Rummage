@@ -117,11 +117,11 @@ class SettingsDialog(gui.SettingsDialog):
         """Translage strings."""
 
         self.TITLE = _("Preferences")
-        self.GENERAL = _("General")
-        self.REGEX = _("Regex")
-        self.EDITOR = _("Editor")
-        self.NOTIFICATIONS = _("Notifications")
-        self.HISTORY = _("History")
+        self.GENERAL_TAB = _("General")
+        self.REGEX_TAB = _("Regex")
+        self.EDITOR_TAB = _("Editor")
+        self.NOTIFICATIONS_TAB = _("Notifications")
+        self.HISTORY_TAB = _("History")
         self.SINGLE_INSTANCE = _("Single Instance (applies to new instances)")
         self.NOTIFY_POPUP = _("Notification popup")
         self.ALERT = _("Alert Sound")
@@ -153,11 +153,11 @@ class SettingsDialog(gui.SettingsDialog):
         """Localize dialog."""
 
         self.SetTitle(self.TITLE)
-        self.m_settings_notebook.SetPageText(0, self.GENERAL)
-        self.m_settings_notebook.SetPageText(1, self.REGEX)
-        self.m_settings_notebook.SetPageText(2, self.EDITOR)
-        self.m_settings_notebook.SetPageText(3, self.NOTIFICATIONS)
-        self.m_settings_notebook.SetPageText(4, self.HISTORY)
+        self.m_settings_notebook.SetPageText(0, self.GENERAL_TAB)
+        self.m_settings_notebook.SetPageText(1, self.REGEX_TAB)
+        self.m_settings_notebook.SetPageText(2, self.EDITOR_TAB)
+        self.m_settings_notebook.SetPageText(3, self.NOTIFICATIONS_TAB)
+        self.m_settings_notebook.SetPageText(4, self.HISTORY_TAB)
         self.m_single_checkbox.SetLabel(self.SINGLE_INSTANCE)
         self.m_visual_alert_checkbox.SetLabel(self.NOTIFY_POPUP)
         self.m_audio_alert_checkbox.SetLabel(self.ALERT)
