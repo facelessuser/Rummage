@@ -19,6 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
+import wx
 from .settings import Settings
 from .editor_dialog import EditorDialog
 from .generic_dialogs import yesno
@@ -36,7 +37,12 @@ class SettingsDialog(gui.SettingsDialog):
 
         super(SettingsDialog, self).__init__(parent)
         if util.platform() == "windows":
-            self.SetDoubleBuffered(True)
+            self.m_general_panel.SetDoubleBuffered(True)
+            self.m_regex_panel.SetDoubleBuffered(True)
+            self.m_editor_panel.SetDoubleBuffered(True)
+            self.m_notify_panel.SetDoubleBuffered(True)
+            self.m_history_panel.SetDoubleBuffered(True)
+            self.m_settings_panel.SetDoubleBuffered(True)
         self.localize()
 
         self.history_types = [
@@ -100,9 +106,12 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_editor_panel.Fit()
         self.m_notify_panel.Fit()
         self.m_history_panel.Fit()
+        self.m_settings_notebook.Fit()
         self.m_settings_panel.Fit()
         self.Fit()
-        self.SetMinSize(self.GetSize())
+        if self.GetSize()[1] < 400:
+            self.SetSize(wx.Size(400, self.GetSize()[1]))
+        self.SetMinSize(wx.Size(400, self.GetSize()[1]))
 
     def localize(self):
         """Translage strings."""
