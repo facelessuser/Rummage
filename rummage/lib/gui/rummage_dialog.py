@@ -2079,6 +2079,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         event.Skip()
         if self.error_dlg is not None:
             self.error_dlg.ShowModal()
+            self.Destroy()
 
     def on_regex_search_toggle(self, event):
         """Switch literal/regex history depending on toggle state."""

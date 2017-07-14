@@ -44,7 +44,6 @@ class AboutDialog(gui.AboutDialog):
         )
 
         self.refresh_localization()
-
         self.Fit()
 
     def localize(self):

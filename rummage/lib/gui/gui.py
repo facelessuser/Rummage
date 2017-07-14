@@ -659,76 +659,61 @@ class SettingsDialog ( wx.Dialog ):
 		bSizer7 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_settings_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.TAB_TRAVERSAL )
-		fgSizer17 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		fgSizer17.AddGrowableCol( 0 )
-		fgSizer17.SetFlexibleDirection( wx.BOTH )
-		fgSizer17.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		fgSizer40 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer40.AddGrowableCol( 0 )
+		fgSizer40.AddGrowableRow( 0 )
+		fgSizer40.SetFlexibleDirection( wx.BOTH )
+		fgSizer40.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		sbSizer7 = wx.StaticBoxSizer( wx.StaticBox( self.m_settings_panel, wx.ID_ANY, u"Editor" ), wx.VERTICAL )
+		self.m_settings_notebook = wx.Notebook( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.NB_NOPAGETHEME )
+		self.m_general_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		bSizer16 = wx.BoxSizer( wx.VERTICAL )
 		
-		fgSizer13 = wx.FlexGridSizer( 0, 2, 0, 0 )
-		fgSizer13.AddGrowableCol( 0 )
-		fgSizer13.SetFlexibleDirection( wx.BOTH )
-		fgSizer13.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		
-		self.m_editor_text = wx.TextCtrl( self.m_settings_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
-		fgSizer13.Add( self.m_editor_text, 1, wx.ALL|wx.EXPAND, 5 )
-		
-		self.m_editor_button = wx.Button( self.m_settings_panel, wx.ID_ANY, u"Change", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer13.Add( self.m_editor_button, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		
-		
-		sbSizer7.Add( fgSizer13, 1, wx.EXPAND, 5 )
-		
-		
-		fgSizer17.Add( sbSizer7, 1, wx.EXPAND, 5 )
-		
-		sbSizer8 = wx.StaticBoxSizer( wx.StaticBox( self.m_settings_panel, wx.ID_ANY, u"General" ), wx.VERTICAL )
-		
-		self.m_single_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Single Instance (applies to new instances)", wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer8.Add( self.m_single_checkbox, 0, wx.ALL, 5 )
+		self.m_single_checkbox = wx.CheckBox( self.m_general_panel, wx.ID_ANY, u"Single Instance (applies to new instances)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer16.Add( self.m_single_checkbox, 0, wx.ALL, 5 )
 		
 		fgSizer38 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer38.AddGrowableCol( 1 )
 		fgSizer38.SetFlexibleDirection( wx.BOTH )
 		fgSizer38.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_language_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Language (restart required)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_language_label = wx.StaticText( self.m_general_panel, wx.ID_ANY, u"Language (restart required)", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_language_label.Wrap( -1 )
 		fgSizer38.Add( self.m_language_label, 0, wx.ALL, 5 )
 		
 		m_lang_choiceChoices = []
-		self.m_lang_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_lang_choiceChoices, 0 )
+		self.m_lang_choice = wx.Choice( self.m_general_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_lang_choiceChoices, 0 )
 		self.m_lang_choice.SetSelection( 0 )
 		fgSizer38.Add( self.m_lang_choice, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
 		
-		sbSizer8.Add( fgSizer38, 1, wx.EXPAND, 5 )
+		bSizer16.Add( fgSizer38, 1, wx.EXPAND, 5 )
 		
 		
-		fgSizer17.Add( sbSizer8, 1, wx.EXPAND, 5 )
-		
-		sbSizer12 = wx.StaticBoxSizer( wx.StaticBox( self.m_settings_panel, wx.ID_ANY, u"Regular Expression Modules" ), wx.VERTICAL )
-		
+		self.m_general_panel.SetSizer( bSizer16 )
+		self.m_general_panel.Layout()
+		bSizer16.Fit( self.m_general_panel )
+		self.m_settings_notebook.AddPage( self.m_general_panel, u"General", False )
+		self.m_regex_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer43 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer43.AddGrowableCol( 0 )
 		fgSizer43.SetFlexibleDirection( wx.BOTH )
 		fgSizer43.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_re_radio = wx.RadioButton( self.m_settings_panel, wx.ID_ANY, u"Use re module", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+		self.m_re_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use re module", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
 		self.m_re_radio.SetValue( True ) 
 		fgSizer43.Add( self.m_re_radio, 0, wx.ALL, 5 )
 		
 		
 		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_bre_radio = wx.RadioButton( self.m_settings_panel, wx.ID_ANY, u"Use re module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_bre_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use re module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer43.Add( self.m_bre_radio, 0, wx.ALL, 5 )
 		
 		
 		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_regex_radio = wx.RadioButton( self.m_settings_panel, wx.ID_ANY, u"Use regex module", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_regex_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use regex module", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_regex_radio.Enable( False )
 		
 		fgSizer43.Add( self.m_regex_radio, 0, wx.ALL, 5 )
@@ -736,7 +721,7 @@ class SettingsDialog ( wx.Dialog ):
 		
 		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_bregex_radio = wx.RadioButton( self.m_settings_panel, wx.ID_ANY, u"Use regex module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_bregex_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use regex module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_bregex_radio.Enable( False )
 		
 		fgSizer43.Add( self.m_bregex_radio, 0, wx.ALL, 5 )
@@ -744,89 +729,107 @@ class SettingsDialog ( wx.Dialog ):
 		
 		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_regex_version_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Regex module version to use", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_regex_version_label = wx.StaticText( self.m_regex_panel, wx.ID_ANY, u"Regex module version to use", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_regex_version_label.Wrap( -1 )
 		self.m_regex_version_label.Enable( False )
 		
 		fgSizer43.Add( self.m_regex_version_label, 0, wx.ALL, 5 )
 		
 		m_regex_ver_choiceChoices = [ u"V0", u"V1" ]
-		self.m_regex_ver_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_regex_ver_choiceChoices, 0 )
+		self.m_regex_ver_choice = wx.Choice( self.m_regex_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_regex_ver_choiceChoices, 0 )
 		self.m_regex_ver_choice.SetSelection( 0 )
 		self.m_regex_ver_choice.Enable( False )
 		
 		fgSizer43.Add( self.m_regex_ver_choice, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
 		
 		
-		sbSizer12.Add( fgSizer43, 1, wx.EXPAND, 5 )
+		self.m_regex_panel.SetSizer( fgSizer43 )
+		self.m_regex_panel.Layout()
+		fgSizer43.Fit( self.m_regex_panel )
+		self.m_settings_notebook.AddPage( self.m_regex_panel, u"Regex", False )
+		self.m_editor_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		fgSizer13 = wx.FlexGridSizer( 0, 3, 0, 0 )
+		fgSizer13.AddGrowableCol( 1 )
+		fgSizer13.SetFlexibleDirection( wx.BOTH )
+		fgSizer13.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_editor_label = wx.StaticText( self.m_editor_panel, wx.ID_ANY, u"Editor", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_editor_label.Wrap( -1 )
+		fgSizer13.Add( self.m_editor_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_editor_text = wx.TextCtrl( self.m_editor_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		fgSizer13.Add( self.m_editor_text, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_editor_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Change", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer13.Add( self.m_editor_button, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		
 		
-		fgSizer17.Add( sbSizer12, 1, wx.EXPAND, 5 )
-		
-		sbSizer101 = wx.StaticBoxSizer( wx.StaticBox( self.m_settings_panel, wx.ID_ANY, u"Notifications" ), wx.VERTICAL )
-		
+		self.m_editor_panel.SetSizer( fgSizer13 )
+		self.m_editor_panel.Layout()
+		fgSizer13.Fit( self.m_editor_panel )
+		self.m_settings_notebook.AddPage( self.m_editor_panel, u"Editor", False )
+		self.m_notify_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer35 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer35.AddGrowableCol( 1 )
 		fgSizer35.SetFlexibleDirection( wx.BOTH )
 		fgSizer35.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_visual_alert_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Notification popup", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_visual_alert_checkbox = wx.CheckBox( self.m_notify_panel, wx.ID_ANY, u"Notification popup", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_visual_alert_checkbox.SetValue(True) 
 		fgSizer35.Add( self.m_visual_alert_checkbox, 0, wx.ALL, 5 )
 		
 		m_notify_choiceChoices = []
-		self.m_notify_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_notify_choiceChoices, 0 )
+		self.m_notify_choice = wx.Choice( self.m_notify_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_notify_choiceChoices, 0 )
 		self.m_notify_choice.SetSelection( 0 )
 		fgSizer35.Add( self.m_notify_choice, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
-		self.m_audio_alert_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Alert Sound", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_audio_alert_checkbox = wx.CheckBox( self.m_notify_panel, wx.ID_ANY, u"Alert Sound", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_audio_alert_checkbox.SetValue(True) 
 		fgSizer35.Add( self.m_audio_alert_checkbox, 0, wx.ALL, 5 )
 		
 		
 		fgSizer35.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_term_note_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Path to terminal-notifier", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_term_note_label = wx.StaticText( self.m_notify_panel, wx.ID_ANY, u"Path to terminal-notifier", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_term_note_label.Wrap( -1 )
 		self.m_term_note_label.Enable( False )
-		self.m_term_note_label.Hide()
 		
 		fgSizer35.Add( self.m_term_note_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_term_note_picker = wx.FilePickerCtrl( self.m_settings_panel, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST )
+		self.m_term_note_picker = wx.FilePickerCtrl( self.m_notify_panel, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST )
 		self.m_term_note_picker.Enable( False )
-		self.m_term_note_picker.Hide()
 		
-		fgSizer35.Add( self.m_term_note_picker, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		
-		sbSizer101.Add( fgSizer35, 1, wx.EXPAND, 5 )
+		fgSizer35.Add( self.m_term_note_picker, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 		
 		
-		fgSizer17.Add( sbSizer101, 1, wx.EXPAND, 5 )
-		
-		sbSizer10 = wx.StaticBoxSizer( wx.StaticBox( self.m_settings_panel, wx.ID_ANY, u"History" ), wx.VERTICAL )
-		
+		self.m_notify_panel.SetSizer( fgSizer35 )
+		self.m_notify_panel.Layout()
+		fgSizer35.Fit( self.m_notify_panel )
+		self.m_settings_notebook.AddPage( self.m_notify_panel, u"Notifications", False )
+		self.m_history_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer30 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer30.AddGrowableCol( 0 )
 		fgSizer30.SetFlexibleDirection( wx.BOTH )
 		fgSizer30.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_history_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"0 Records", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_history_label = wx.StaticText( self.m_history_panel, wx.ID_ANY, u"0 Records", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_history_label.Wrap( -1 )
 		fgSizer30.Add( self.m_history_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		
-		self.m_history_clear_button = wx.Button( self.m_settings_panel, wx.ID_ANY, u"Clear", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_history_clear_button = wx.Button( self.m_history_panel, wx.ID_ANY, u"Clear", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer30.Add( self.m_history_clear_button, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
 		
-		sbSizer10.Add( fgSizer30, 1, wx.EXPAND, 5 )
+		self.m_history_panel.SetSizer( fgSizer30 )
+		self.m_history_panel.Layout()
+		fgSizer30.Fit( self.m_history_panel )
+		self.m_settings_notebook.AddPage( self.m_history_panel, u"History", False )
 		
+		fgSizer40.Add( self.m_settings_notebook, 1, wx.EXPAND |wx.ALL, 5 )
 		
-		fgSizer17.Add( sbSizer10, 1, wx.EXPAND, 5 )
-		
-		fgSizer22 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer22 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		fgSizer22.AddGrowableCol( 0 )
+		fgSizer22.AddGrowableCol( 2 )
 		fgSizer22.SetFlexibleDirection( wx.BOTH )
 		fgSizer22.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
@@ -837,12 +840,15 @@ class SettingsDialog ( wx.Dialog ):
 		fgSizer22.Add( self.m_close_button, 0, wx.ALL, 5 )
 		
 		
-		fgSizer17.Add( fgSizer22, 1, wx.EXPAND, 5 )
+		fgSizer22.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
 		
-		self.m_settings_panel.SetSizer( fgSizer17 )
+		fgSizer40.Add( fgSizer22, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_settings_panel.SetSizer( fgSizer40 )
 		self.m_settings_panel.Layout()
-		fgSizer17.Fit( self.m_settings_panel )
+		fgSizer40.Fit( self.m_settings_panel )
 		bSizer7.Add( self.m_settings_panel, 1, wx.EXPAND |wx.ALL, 5 )
 		
 		
@@ -853,7 +859,6 @@ class SettingsDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
-		self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
 		self.m_single_checkbox.Bind( wx.EVT_CHECKBOX, self.on_single_toggle )
 		self.m_lang_choice.Bind( wx.EVT_CHOICE, self.on_language )
 		self.m_re_radio.Bind( wx.EVT_RADIOBUTTON, self.on_re_toggle )
@@ -861,6 +866,7 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_regex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_regex_toggle )
 		self.m_bregex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bregex_toggle )
 		self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
+		self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
 		self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
 		self.m_notify_choice.Bind( wx.EVT_CHOICE, self.on_notify_choice )
 		self.m_audio_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_alert_toggle )
@@ -873,9 +879,6 @@ class SettingsDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
-	def on_editor_change( self, event ):
-		event.Skip()
-	
 	def on_single_toggle( self, event ):
 		event.Skip()
 	
@@ -895,6 +898,9 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_regex_ver_choice( self, event ):
+		event.Skip()
+	
+	def on_editor_change( self, event ):
 		event.Skip()
 	
 	def on_notify_toggle( self, event ):

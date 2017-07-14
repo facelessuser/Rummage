@@ -294,29 +294,13 @@ Rummage allows the exporting of the results to either CSV or HTML.  Simply selec
 
 ## Preferences
 
-![Preferences](/images/preferences.png)
-
-The preference dialog (found at **File-->Preferences**) is where Rummage keeps settings that are not frequently accessed.
-
-### Editor
-
-The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files.
-
-<!-- Update -->
-![Editor Options](/images/editor_options.png)
-
-The editor command is sent directly to the shell, so make sure you double quote paths with spaces, and include the special variable `{$file}` in a double quoted parameter as it may contain a path with spaces.
-
-Rummage provides 3 special variables that can be used to insert the file name, line number, or column number. Your editor may or may not support some of these options, but if does, make sure to format the command accordingly.
-
-Argument Variables | Description
------------------- | -----------
-`{$file}`          | Insert the file name.
-`{$line}`          | Insert the line number.
-`{$col}`           | Insert the column number.
+The preference dialog (found at **File-->Preferences**) is where general application settings are available. The preference dialog organizes settings by tabs.
 
 ### General
-The **General** panel contains a couple of useful settings.
+
+![Preferences: General](/images/settings_general.png)
+
+The **General** tab contains a couple of useful settings.
 
 Single Instance
 : 
@@ -326,15 +310,39 @@ Language
 : 
     Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated but includes most of the needed translations. In order to use locale, you must copy the project's localization files to your user settings directory. See [Localization](#localization) to learn more.
 
-### Regular Expression Modules
+### Regex
 
-The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected.  By default, Rummage will use Re, but if Regex is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes) with your engine of choice as well.
+![Preferences: Regex](/images/settings_regex.png)
 
-If using Regex, you can set it to version (mode) to use. `V0` tries to be completely compatible with Re patterns while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation](https://pypi.python.org/pypi/regex/) to learn more.
+The **Regular Expression Modules** tab is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes).
+
+If using Regex, you can set it to version of your choice. `V0` tries to be completely compatible with Re patterns while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation](https://pypi.python.org/pypi/regex/) to learn more.
+
+### Editor
+
+![Preferences: Editor](/images/settings_editor.png)
+
+The **Editor** tab is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files and click `Apply`.
+
+![Editor Options](/images/editor_options.png)
+
+The editor options dialog has a file picker to select the the editor.  In macOS it may be beneficial to create a shell script or symlink that you can references as the picker won't be able to descend into an `.app` bundle as it is viewed as a file instead of a folder.
+
+You can then add arguments.  Each argument must be added as a separate entry.  So something like `--file myfile.txt` would be counted as **two** arguments while `--file=myfile` would be counted as one.
+
+As noted in the image above, Rummage provides 3 special variables that can be used to insert the file name, line number, or column number.
+
+Argument Variables | Description
+------------------ | -----------
+`{$file}`          | Insert the file name.
+`{$line}`          | Insert the line number.
+`{$col}`           | Insert the column number.
 
 ### Notifications
 
-The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
+![Preferences: Notifications](/images/settings_notify.png)
+
+The **Notification** tab controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
 
 You can also select whether to use the system's built-in notifications or Growl.
 
@@ -363,6 +371,8 @@ Windows
 
 
 ### History
+
+![Preferences: History](/images/settings_history.png)
 
 The **History** panel is where all text box drop down history can be cleared.
 
@@ -445,11 +455,27 @@ Paths might vary depending on Ubuntu version etc.
 
 ## Localization
 
-Rummage provides an i18n localization framework to allow support for displaying the UI in other languages. But there is some manual setup required as out of the box, only `en_US` is available. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).
+Rummage provides an i18n localization framework to allow support for displaying the UI in other languages. But there is some manual setup required as out of the box, everything is in English. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).
+
+So to get localization, you must first build the `.mo` files on your system, copy them to your Rummage setting folder, select your desired language in the preference dialog, and restart Rummage.
+
+
+### Build Translations
+
+Download the release source and unzip it.
+
+Compile `.mo` files by running the `tools/localize_me.py` script from the root of the project:
+
+```
+python3 tools/localize_me.py --i18n /Library/Frameworks/Python.framework/Versions/3.6/share/doc/python3.6/examples/Tools/i18n
+```
+
+Modify the `--i18n` path to the appropriate location of the `i18n` folder for your Python.
+
 
 ### Installing Translations
 
-To install translations, just copy the `locale` folder from the release you are using to your user configuration folder.  For a traditional Python installation, this is where you'd find it for each OS:
+To install translations, just copy the `locale` folder (with your compiled `.mo` files) from the release you are using to your user configuration folder.  For a traditional Python installation, this is where you'd find it for each OS:
 
 Windows: `C:\Users\<my_username>\.Rummage`
 macOS: `/Users/<my_username>/.Rummage`
@@ -478,13 +504,7 @@ After installing the localization files, set the language via the `Language` set
     msgstr "<my_translation>"
     ```
 
-- Compile `.mo` files by running the `tools/localize_me.py` script from the root of the project:
-
-    ```
-    python3 tools/localize_me.py --i18n /Library/Frameworks/Python.framework/Versions/3.6/share/doc/python3.6/examples/Tools/i18n
-    ```
-
-    Modify the `--i18n` path to the appropriate location of the `i18n` folder for your Python.
+- Compile by following steps in [Build Translations](#build-translations).
 
 - Commit, push, and pull request.
 

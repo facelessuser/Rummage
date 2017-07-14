@@ -19,7 +19,6 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import wx
 from .app.custom_app import error
 from .error_text_dialog import ErrorTextDialog
 from .localization import _
@@ -38,11 +37,6 @@ class SearchErrorDialog(gui.SearchErrorDialog):
 
         self.m_error_panel.Fit()
         self.Fit()
-        best = self.m_error_panel.GetBestSize()
-        current = self.m_error_panel.GetSize()
-        offset = best[1] - current[1]
-        mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset))
         self.SetMinSize(self.GetSize())
         self.load_errors(errors)
         self.m_error_list.SetFocus()
