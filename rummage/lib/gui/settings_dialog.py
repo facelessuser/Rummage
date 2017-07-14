@@ -19,7 +19,6 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import wx
 from .settings import Settings
 from .editor_dialog import EditorDialog
 from .generic_dialogs import yesno
@@ -86,32 +85,32 @@ class SettingsDialog(gui.SettingsDialog):
             locale = "en_US"
         self.m_lang_choice.SetStringSelection(locale)
         self.m_term_note_picker.SetPath(Settings.get_term_notifier())
-        if util.platform() == "osx":
+        if util.platform() != "osx":
+            self.m_term_note_label.Hide()
+            self.m_term_note_picker.Hide()
+        else:
             is_native = Settings.get_notify_method() == "default"
-            self.m_term_note_label.Show()
-            self.m_term_note_picker.Show()
             self.m_term_note_label.Enable(is_native)
             self.m_term_note_picker.Enable(is_native)
 
         self.refresh_localization()
 
+        self.m_general_panel.Fit()
+        self.m_regex_panel.Fit()
+        self.m_editor_panel.Fit()
+        self.m_notify_panel.Fit()
+        self.m_history_panel.Fit()
         self.m_settings_panel.Fit()
         self.Fit()
-        best = self.m_settings_panel.GetBestSize()
-        current = self.m_settings_panel.GetSize()
-        offset = best[1] - current[1]
-        mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset))
         self.SetMinSize(self.GetSize())
-        self.SetMaxSize(wx.Size(-1, self.GetSize()[1]))
 
     def localize(self):
         """Translage strings."""
 
         self.TITLE = _("Preferences")
-        self.EDITOR = _("Editor")
         self.GENERAL = _("General")
-        self.REGEX_MODULES = _("Regular Expression Modules")
+        self.REGEX = _("Regex")
+        self.EDITOR = _("Editor")
         self.NOTIFICATIONS = _("Notifications")
         self.HISTORY = _("History")
         self.SINGLE_INSTANCE = _("Single Instance (applies to new instances)")
@@ -145,12 +144,11 @@ class SettingsDialog(gui.SettingsDialog):
         """Localize dialog."""
 
         self.SetTitle(self.TITLE)
-        main_sizer = self.m_settings_panel.GetSizer()
-        main_sizer.GetItem(0).GetSizer().GetStaticBox().SetLabel(self.EDITOR)
-        main_sizer.GetItem(1).GetSizer().GetStaticBox().SetLabel(self.GENERAL)
-        main_sizer.GetItem(2).GetSizer().GetStaticBox().SetLabel(self.REGEX_MODULES)
-        main_sizer.GetItem(3).GetSizer().GetStaticBox().SetLabel(self.NOTIFICATIONS)
-        main_sizer.GetItem(4).GetSizer().GetStaticBox().SetLabel(self.HISTORY)
+        self.m_settings_notebook.SetPageText(0, self.GENERAL)
+        self.m_settings_notebook.SetPageText(1, self.REGEX)
+        self.m_settings_notebook.SetPageText(2, self.EDITOR)
+        self.m_settings_notebook.SetPageText(3, self.NOTIFICATIONS)
+        self.m_settings_notebook.SetPageText(4, self.HISTORY)
         self.m_single_checkbox.SetLabel(self.SINGLE_INSTANCE)
         self.m_visual_alert_checkbox.SetLabel(self.NOTIFY_POPUP)
         self.m_audio_alert_checkbox.SetLabel(self.ALERT)

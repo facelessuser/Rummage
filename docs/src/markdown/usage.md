@@ -294,15 +294,36 @@ Rummage allows the exporting of the results to either CSV or HTML.  Simply selec
 
 ## Preferences
 
-![Preferences](/images/preferences.png)
+The preference dialog (found at **File-->Preferences**) is where general application settings are available. The preference dialog organizes settings by tabs.
 
-The preference dialog (found at **File-->Preferences**) is where Rummage keeps settings that are not frequently accessed.
+### General
+
+![Preferences: General](/images/settings_general.png)
+
+The **General** tab contains a couple of useful settings.
+
+Single Instance
+: 
+    By default, Rummage will allow for multiple windows to be open.  If this option is enabled, the first window will be be the only window to open.  All subsequent instances will pass their arguments to the first and close without showing a window.
+
+Language
+: 
+    Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated but includes most of the needed translations. In order to use locale, you must copy the project's localization files to your user settings directory. See [Localization](#localization) to learn more.
+
+### Regex
+
+![Preferences: Regex](/images/settings_regex.png)
+
+The **Regular Expression Modules** tab is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes).
+
+If using Regex, you can set it to version of your choice. `V0` tries to be completely compatible with Re patterns while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation](https://pypi.python.org/pypi/regex/) to learn more.
 
 ### Editor
 
-The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files.
+![Preferences: Editor](/images/settings_editor.png)
 
-<!-- Update -->
+The **Editor** tab is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files and click `Apply`.
+
 ![Editor Options](/images/editor_options.png)
 
 The editor command is sent directly to the shell, so make sure you double quote paths with spaces, and include the special variable `{$file}` in a double quoted parameter as it may contain a path with spaces.
@@ -315,26 +336,11 @@ Argument Variables | Description
 `{$line}`          | Insert the line number.
 `{$col}`           | Insert the column number.
 
-### General
-The **General** panel contains a couple of useful settings.
-
-Single Instance
-: 
-    By default, Rummage will allow for multiple windows to be open.  If this option is enabled, the first window will be be the only window to open.  All subsequent instances will pass their arguments to the first and close without showing a window.
-
-Language
-: 
-    Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated but includes most of the needed translations. In order to use locale, you must copy the project's localization files to your user settings directory. See [Localization](#localization) to learn more.
-
-### Regular Expression Modules
-
-The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected.  By default, Rummage will use Re, but if Regex is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes) with your engine of choice as well.
-
-If using Regex, you can set it to version (mode) to use. `V0` tries to be completely compatible with Re patterns while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation](https://pypi.python.org/pypi/regex/) to learn more.
-
 ### Notifications
 
-The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
+![Preferences: Notifications](/images/settings_notify.png)
+
+The **Notification** tab controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
 
 You can also select whether to use the system's built-in notifications or Growl.
 
@@ -363,6 +369,8 @@ Windows
 
 
 ### History
+
+![Preferences: History](/images/settings_history.png)
 
 The **History** panel is where all text box drop down history can be cleared.
 

@@ -54,11 +54,6 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         # Ensure good sizing of frame
         self.m_chain_panel.Fit()
         self.Fit()
-        best = self.m_chain_panel.GetBestSize()
-        current = self.m_chain_panel.GetSize()
-        offset = best[1] - current[1]
-        mainframe = self.GetSize()
-        self.SetSize(wx.Size(mainframe[0], mainframe[1] + offset))
         self.SetMinSize(self.GetSize())
 
     def localize(self):

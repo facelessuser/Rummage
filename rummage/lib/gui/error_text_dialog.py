@@ -34,6 +34,9 @@ class ErrorTextDialog(gui.ErrorTextDialog):
         self.refresh_localization()
         self.m_error_textbox.SetValue(text)
 
+        self.m_error_text_panel.Fit()
+        self.Fit()
+
     def localize(self):
         """Translate strings."""
 
@@ -43,4 +46,3 @@ class ErrorTextDialog(gui.ErrorTextDialog):
         """Localize the dialog."""
 
         self.SetTitle(self.ERROR)
-        self.Fit()
