@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Jun 22 2017)
+## Python code generated with wxFormBuilder (version Dec 21 2016)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO "NOT" EDIT THIS FILE!
@@ -666,7 +666,11 @@ class SettingsDialog ( wx.Dialog ):
 		fgSizer40.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
 		self.m_settings_notebook = wx.Notebook( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.NB_NOPAGETHEME )
+		self.m_settings_notebook.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		self.m_general_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_general_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		bSizer16 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_single_checkbox = wx.CheckBox( self.m_general_panel, wx.ID_ANY, u"Single Instance (applies to new instances)", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -695,6 +699,8 @@ class SettingsDialog ( wx.Dialog ):
 		bSizer16.Fit( self.m_general_panel )
 		self.m_settings_notebook.AddPage( self.m_general_panel, u"General", False )
 		self.m_regex_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_regex_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer43 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer43.AddGrowableCol( 0 )
 		fgSizer43.SetFlexibleDirection( wx.BOTH )
@@ -748,6 +754,8 @@ class SettingsDialog ( wx.Dialog ):
 		fgSizer43.Fit( self.m_regex_panel )
 		self.m_settings_notebook.AddPage( self.m_regex_panel, u"Regex", False )
 		self.m_editor_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_editor_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer13 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		fgSizer13.AddGrowableCol( 1 )
 		fgSizer13.SetFlexibleDirection( wx.BOTH )
@@ -769,6 +777,8 @@ class SettingsDialog ( wx.Dialog ):
 		fgSizer13.Fit( self.m_editor_panel )
 		self.m_settings_notebook.AddPage( self.m_editor_panel, u"Editor", False )
 		self.m_notify_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_notify_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer35 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer35.AddGrowableCol( 1 )
 		fgSizer35.SetFlexibleDirection( wx.BOTH )
@@ -807,6 +817,8 @@ class SettingsDialog ( wx.Dialog ):
 		fgSizer35.Fit( self.m_notify_panel )
 		self.m_settings_notebook.AddPage( self.m_notify_panel, u"Notifications", False )
 		self.m_history_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_history_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer30 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer30.AddGrowableCol( 0 )
 		fgSizer30.SetFlexibleDirection( wx.BOTH )
