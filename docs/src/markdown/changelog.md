@@ -2,7 +2,7 @@
 
 ## 2.2.0
 
-XXX, X, 2017
+Jul, 14, 2017
 
 - **NEW**: Redesign of the preferences dialog.
 - **NEW**: Editor configurations are now sent through the shell which changes and simplifies the interface to set it up.
