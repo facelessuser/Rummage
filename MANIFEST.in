@@ -4,7 +4,7 @@ recursive-include rummage/lib/gui/data *.png *.icns *.ico *.js *.css
 recursive-include tests *.txt *.py *.hidden_file *.rum-bak
 recursive-include requirements *.txt
 recursive-include tools *.py
-recursive-include locale *.mo *.po
+recursive-include locale *.po
 include setup.py
 include setup.cfg
 include tox.ini
