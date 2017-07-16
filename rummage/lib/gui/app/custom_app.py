@@ -24,7 +24,6 @@ from __future__ import unicode_literals
 import codecs
 import json
 import os
-import sys
 import time
 import wx
 import wx.lib.newevent
