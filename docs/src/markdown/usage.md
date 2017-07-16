@@ -9,9 +9,11 @@ Rummage also comes with a simple regular expression tester to test out patterns.
 The status bar will show search progress, match counts, and other useful information.
 
 !!! warning "Warning: Replace"
-    When replacing, Rummage will back up the file in `<your file name>.rum-bak`.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you are using version control.
+    When replacing, Rummage will back up the file.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you are using version control.
 
     This is free software, and I am not responsible for files corrupted or lost.
+
+    See [Backups](#backups) to learn more about backups and how to customize backups.
 
 ## Running
 
@@ -382,6 +384,13 @@ Rummage has the option of using a special wrapper called Backrefs around Python'
 
 To learn more about the added back references when using Backrefs, read the official [Backrefs documentation][backrefs].
 
+#### Backups
+
+Rummage by default does a backup of files on replace when `Create backups` is enabled in the main dialog. Backups are saved in the same location as the target file with the unique extension `rum-bak` appended to them.  When `Create backups` is enabled, files with the extension `rum-bak` are ignored in search and replace in order to avoid replacing content in your backup.
+
+If desired, Rummage can be configured to store backups in a sub-folder at the target file's location by setting the `Backup to folder` option in the setting dialog. The backup folder will be named `.rum-bak`.  When this is done, all files in `.rum-bak` will have the `bak` extension. The entire folder `.rum-bak` is excluded from search and replace when `Create backups` is enabled.
+
+If you would like, you can control the backup extension in the settings dialog and/or the backup folder name.  Remember though, when saving backups to a sub-folder, the custom extension will not be applied and `bak` will be used as the whole folder is ignored eliminating the need for a unique extension.
 
 ## File Manager Context Menu
 

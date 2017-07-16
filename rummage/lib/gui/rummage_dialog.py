@@ -256,7 +256,7 @@ class RummageThread(threading.Thread):
             modified=args['modified_compare'],
             created=args['created_compare'],
             size=args['size_compare'],
-            backup_ext=args['backup_ext'],
+            backup_location=args['backup_location'],
             regex_mode=args['regex_mode']
         )
 
@@ -373,9 +373,10 @@ class RummageArgs(object):
         self.unicode = False
         self.boolean = False
         self.backup = True
+        self.backup_folder = False
         self.replace = None
         self.force_encode = None
-        self.backup_ext = None
+        self.backup_location = None
         self.bestmatch = False
         self.enhancematch = False
         self.process_binary = False
@@ -1211,6 +1212,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if args.backup:
             flags |= rumcore.BACKUP
 
+        if args.backup_folder:
+            flags |= rumcore.BACKUP_FOLDER
+
         if args.regex_mode in rumcore.REGEX_MODES:
             if args.bestmatch:
                 flags |= rumcore.BESTMATCH
@@ -1303,10 +1307,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 args.fullcase = self.m_fullcase_checkbox.GetValue()
         args.boolean = self.m_boolean_checkbox.GetValue()
         args.backup = self.m_backup_checkbox.GetValue()
+        args.backup_folder = bool(Settings.get_backup_type())
         args.force_encode = None
         if self.m_force_encode_checkbox.GetValue():
             args.force_encode = self.m_force_encode_choice.GetStringSelection()
-        args.backup_ext = 'rum-bak'
+        args.backup_location = Settings.get_backup_folder() if Settings.get_backup_type() else Settings.get_backup_ext()
         args.recursive = self.m_subfolder_checkbox.GetValue()
         args.pattern = self.m_searchfor_textbox.Value
         args.replace = self.m_replace_textbox.Value if replace else None
@@ -1384,7 +1389,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             'modified_compare': args.modified_compare,
             'created_compare': args.created_compare,
             'size_compare': args.size_compare,
-            'backup_ext': args.backup_ext,
+            'backup_location': args.backup_location,
             'regex_mode': args.regex_mode
         }
 

@@ -45,6 +45,9 @@ NOTIFY_STYLES = {
     "linux": ["default", "growl"]
 }
 
+BACKUP_FILE = 0
+BACKUP_FOLDER = 1
+
 
 class Settings(object):
     """Handle settings."""
@@ -662,6 +665,51 @@ class Settings(object):
             cls.cache[key] = value
 
         cls.save_cache()
+
+    @classmethod
+    def get_backup_type(cls):
+        """Get whether we should use folder backup or file backup."""
+
+        cls.reload_settings()
+        return cls.settings.get('backup_type', BACKUP_FILE)
+
+    @classmethod
+    def set_backup_type(cls, value):
+        """Set backup type."""
+
+        cls.reload_settings()
+        cls.settings['backup_type'] = value
+        cls.save_settings()
+
+    @classmethod
+    def get_backup_ext(cls):
+        """Get backup extension."""
+
+        cls.reload_settings()
+        return cls.settings.get('backup_ext', 'rum-bak')
+
+    @classmethod
+    def set_backup_ext(cls, value):
+        """Get backup extension."""
+
+        cls.reload_settings()
+        cls.settings['backup_ext'] = value
+        cls.save_settings()
+
+    @classmethod
+    def get_backup_folder(cls):
+        """Get backup folder."""
+
+        cls.reload_settings()
+        return cls.settings.get('backup_folder', '.rum-bak')
+
+    @classmethod
+    def set_backup_folder(cls, value):
+        """Get backup folder."""
+
+        cls.reload_settings()
+        cls.settings['backup_folder'] = value
+        cls.save_settings()
 
     @classmethod
     def get_history_record_count(cls, history_types=[]):
