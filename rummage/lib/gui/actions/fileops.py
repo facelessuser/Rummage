@@ -19,6 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
+import os
 from ..settings import Settings
 from ..app.custom_app import error
 from ..generic_dialogs import errormsg
@@ -46,5 +47,8 @@ def reveal(event, target):
         "osx": 'open -R "%s"',
         "linux": 'xdg-open "%s"'
     }
+
+    if util.platform() == "linux":
+        target = os.path.dirname(target)
 
     return util.call(cmd[util.platform()] % target.replace('"', '\\"'))

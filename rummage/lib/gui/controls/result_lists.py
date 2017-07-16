@@ -43,7 +43,7 @@ class ContextMenu(wx.Menu):
         for i in menu:
             menuid = wx.NewId()
             item = wx.MenuItem(self, menuid, i[0])
-            item.Enable(i[2] if len(i) > 2 else True)
+            # item.Enable(i[2] if len(i) > 2 else True)
             self._callbacks[menuid] = i[1]
             self.Append(item)
             self.Bind(wx.EVT_MENU, self.on_callback, item)
