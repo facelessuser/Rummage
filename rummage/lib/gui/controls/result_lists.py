@@ -25,22 +25,10 @@ import decimal
 import os
 import functools
 from .dynamic_lists import DynamicList, USE_SAMPLE_SIZE
-from ..actions.open_editor import open_editor
+from ..actions import fileops
 from ..localization import _
 from .. import data
 from ... import util
-
-
-def reveal(event, target):
-    """Reveal in file manager."""
-
-    cmd = {
-        "windows": 'explorer /select,"%s"',
-        "osx": 'open -R "%s"',
-        "linux": 'xdg-open "%s"'
-    }
-
-    return util.call(cmd[util.platform()] % target.replace('"', '\\"'))
 
 
 class ContextMenu(wx.Menu):
@@ -206,7 +194,7 @@ class ResultFileList(DynamicList):
             path = self.GetItem(item, col=3).GetText()
             line = str(self.get_map_item(item, col=7))
             col = str(self.get_map_item(item, col=8))
-            open_editor(os.path.join(os.path.normpath(path), filename), line, col)
+            fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()
 
     def on_rclick(self, event):
@@ -220,7 +208,7 @@ class ResultFileList(DynamicList):
             target = os.path.join(path, filename)
             enabled = self.GetSelectedItemCount() == 1
             context = [
-                (self.REVEAL_LABEL[util.platform()], functools.partial(reveal, target=target), enabled)
+                (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled)
             ]
             ContextMenu(self, context, pos)
         event.Skip()
@@ -344,5 +332,5 @@ class ResultContentList(DynamicList):
             path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
                 file_row, col=3, absolute=True
             )
-            open_editor(os.path.join(os.path.normpath(path), filename), line, col)
+            fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()

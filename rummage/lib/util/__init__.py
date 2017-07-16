@@ -1,8 +1,10 @@
 """Compatibility module."""
 from __future__ import unicode_literals
 import sys
+import locale
 import functools
 import os
+import copy
 
 PY3 = (3, 0) <= sys.version_info
 
@@ -12,12 +14,6 @@ elif sys.platform == "darwin":
     _PLATFORM = "osx"
 else:
     _PLATFORM = "linux"
-
-# Handle Unicode paths in Python 2.7 on Windows in shell.
-if _PLATFORM == "windows" and not PY3:
-    from . import win_subprocess as subprocess
-else:
-    import subprocess
 
 if PY3:
     string_type = str
@@ -101,8 +97,56 @@ def translate(lang, text):
     return lang.gettext(text) if PY3 else lang.ugettext(text)
 
 
+def to_unicode_argv():
+    """Convert inputs to Unicode."""
+
+    args = copy.copy(sys.argv)
+
+    if not PY3:
+
+        if _PLATFORM == "windows":
+            # Solution copied from http://stackoverflow.com/a/846931/145400
+
+            from ctypes import POINTER, byref, cdll, c_int, windll
+            from ctypes.wintypes import LPCWSTR, LPWSTR
+
+            GetCommandLineW = cdll.kernel32.GetCommandLineW
+            GetCommandLineW.argtypes = []
+            GetCommandLineW.restype = LPCWSTR
+
+            CommandLineToArgvW = windll.shell32.CommandLineToArgvW
+            CommandLineToArgvW.argtypes = [LPCWSTR, POINTER(c_int)]
+            CommandLineToArgvW.restype = POINTER(LPWSTR)
+
+            cmd = GetCommandLineW()
+            argc = c_int(0)
+            argv = CommandLineToArgvW(cmd, byref(argc))
+            if argc.value > 0:
+                # Remove Python executable and commands if present
+                start = argc.value - len(sys.argv)
+                args = [argv[i] for i in xrange(start, argc.value)]
+        else:
+            cli_encoding = sys.stdin.encoding or locale.getpreferredencoding(False)
+            args = [arg.decode(cli_encoding) for arg in sys.argv if isinstance(arg, bstr)]
+    return args
+
+
 def call(cmd):
     """Call command."""
+
+    # Handle Unicode subprocess paths in Python 2.7 on Windows in shell.
+    if _PLATFORM == "windows" and not PY3:
+        from .win_subprocess import Popen, CreateProcess
+        import _subprocess
+
+        # We're going to manually patch this for this instance
+        # and then restore afterwards.  I want to limit side effects
+        # when using with other modules.
+        pre_patched = _subprocess.CreateProcess
+        _subprocess.CreateProcess = CreateProcess
+    else:
+        from subprocess import Popen
+    import subprocess
 
     fail = False
 
@@ -111,7 +155,7 @@ def call(cmd):
     try:
         if _PLATFORM == "windows":
             startupinfo = subprocess.STARTUPINFO()
-            subprocess.Popen(
+            Popen(
                 cmd,
                 startupinfo=startupinfo,
                 stdout=subprocess.PIPE,
@@ -120,7 +164,7 @@ def call(cmd):
                 shell=is_string
             )
         else:
-            subprocess.Popen(
+            Popen(
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -129,5 +173,9 @@ def call(cmd):
             )
     except Exception:
         fail = True
+
+    if _PLATFORM == "windows" and not PY3:
+        # Restore CreateProcess from before our monkey patch
+        _subprocess.CreateProcess = pre_patched
 
     return fail

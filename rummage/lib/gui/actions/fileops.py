@@ -20,7 +20,7 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 from ..settings import Settings
-from ..app.custom_app import debug, error
+from ..app.custom_app import error
 from ..generic_dialogs import errormsg
 from ..localization import _
 from ... import util
@@ -34,6 +34,17 @@ def open_editor(filename, line, col):
         errormsg(_("No editor is currently set!"))
         error("No editor set: %s" % cmd)
         return
-    debug(cmd)
 
     return util.call(cmd)
+
+
+def reveal(event, target):
+    """Reveal in file manager."""
+
+    cmd = {
+        "windows": 'explorer /select,"%s"',
+        "osx": 'open -R "%s"',
+        "linux": 'xdg-open "%s"'
+    }
+
+    return util.call(cmd[util.platform()] % target.replace('"', '\\"'))

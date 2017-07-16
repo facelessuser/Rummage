@@ -341,11 +341,7 @@ class PipeApp(CustomApp):
     def get_sys_args(self):
         """Get system args as unicode."""
 
-        args = []
-        encoding = sys.getfilesystemencoding()
-        for a in sys.argv[1:]:
-            args.append(a.decode(encoding) if isinstance(a, util.bstr) else a)
-        return args
+        return util.to_unicode_argv()[1:]
 
     def send_arg_pipe(self):
         """Send the current arguments down the pipe."""

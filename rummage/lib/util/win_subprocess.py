@@ -161,4 +161,6 @@ class Popen(subprocess.Popen):
             startupinfo, creationflags, False, to_close, p2cread,
             p2cwrite, c2pread, c2pwrite, errread, errwrite)
 
-_subprocess.CreateProcess = CreateProcess
+
+# We're only going to patch this on the specific call
+# _subprocess.CreateProcess = CreateProcess
