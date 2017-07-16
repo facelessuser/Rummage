@@ -356,7 +356,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             False, False,
             None, None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -375,7 +375,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             False, False,
             None, None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -393,7 +393,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             False, False,
             None, None, None,
-            'rum-bak'
+            'rum-bak', False
         )
 
         self.crawl_files(walker)
@@ -411,7 +411,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, False,
             None, None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -430,7 +430,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             None, None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -449,7 +449,7 @@ class TestDirWalker(unittest.TestCase):
             '.hidden', False,
             True, True,
             None, None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -468,7 +468,7 @@ class TestDirWalker(unittest.TestCase):
             '*|-.hidden', False,
             True, True,
             None, None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -487,7 +487,7 @@ class TestDirWalker(unittest.TestCase):
             r'\.hidden', True,
             True, True,
             None, None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -506,7 +506,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             False, False,
             None, None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -526,7 +526,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             False, False,
             None, None, None,
-            None,
+            None, False,
             rc.BRE_MODE
         )
 
@@ -547,7 +547,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             False, False,
             None, None, None,
-            None,
+            None, False,
             rc.REGEX_MODE
         )
 
@@ -568,7 +568,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             False, False,
             None, None, None,
-            None,
+            None, False,
             rc.BREGEX_MODE
         )
 
@@ -589,7 +589,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             False, False,
             None, None, None,
-            None,
+            None, False,
             -1
         )
 
@@ -610,7 +610,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             None, None, None,
-            None
+            None, False
         )
 
         records = 0
@@ -629,7 +629,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             None, None, None,
-            None
+            None, False
         )
 
         walker.kill()
@@ -648,7 +648,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             ("lt", 1), None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -666,7 +666,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             ("gt", 1), None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -684,7 +684,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             ("eq", 0), None, None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -705,7 +705,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')), None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -723,7 +723,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')), None,
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -744,7 +744,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             None, None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')),
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -762,7 +762,7 @@ class TestDirWalker(unittest.TestCase):
             None, False,
             True, True,
             None, None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')),
-            None
+            None, False
         )
 
         self.crawl_files(walker)
@@ -770,6 +770,42 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.errors), 0)
         self.assertEqual(len(self.skipped), 0)
         self.assertEqual(len(self.files), 6)
+
+    def test_backup_folder_no_backup(self):
+        """Test directory search with backup disabled and folder backup."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker_folder_backup',
+            r'*.txt', False,
+            None, False,
+            True, True,
+            None, None, None,
+            None, True
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(len(self.files), 2)
+
+    def test_backup_folder_with_backup(self):
+        """Test directory search with backup disabled and folder backup."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker_folder_backup',
+            r'*.txt', False,
+            None, False,
+            True, True,
+            None, None, None,
+            '.rum-bak', True
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(len(self.files), 1)
 
 
 class TestFileSearch(unittest.TestCase):

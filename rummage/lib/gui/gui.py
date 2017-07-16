@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Dec 21 2016)
+## Python code generated with wxFormBuilder (version Jun 22 2017)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO "NOT" EDIT THIS FILE!
@@ -836,6 +836,53 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_history_panel.Layout()
 		fgSizer30.Fit( self.m_history_panel )
 		self.m_settings_notebook.AddPage( self.m_history_panel, u"History", False )
+		self.m_backup_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_backup_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
+		fgSizer401 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer401.AddGrowableCol( 0 )
+		fgSizer401.SetFlexibleDirection( wx.BOTH )
+		fgSizer401.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		fgSizer41 = wx.FlexGridSizer( 0, 3, 0, 0 )
+		fgSizer41.AddGrowableCol( 1 )
+		fgSizer41.SetFlexibleDirection( wx.BOTH )
+		fgSizer41.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_back_ext_label = wx.StaticText( self.m_backup_panel, wx.ID_ANY, u"Backup extension", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_back_ext_label.Wrap( -1 )
+		fgSizer41.Add( self.m_back_ext_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+		
+		self.m_back_ext_textbox = wx.TextCtrl( self.m_backup_panel, wx.ID_ANY, u"rum-bak", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer41.Add( self.m_back_ext_textbox, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_back_ext_button = wx.Button( self.m_backup_panel, wx.ID_ANY, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer41.Add( self.m_back_ext_button, 0, wx.ALL, 5 )
+		
+		self.m_back_folder_label = wx.StaticText( self.m_backup_panel, wx.ID_ANY, u"Backup folder", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_back_folder_label.Wrap( -1 )
+		fgSizer41.Add( self.m_back_folder_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+		
+		self.m_back_folder_textbox = wx.TextCtrl( self.m_backup_panel, wx.ID_ANY, u".rum-bak", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer41.Add( self.m_back_folder_textbox, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_back_folder_button = wx.Button( self.m_backup_panel, wx.ID_ANY, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer41.Add( self.m_back_folder_button, 0, wx.ALL, 5 )
+		
+		
+		fgSizer401.Add( fgSizer41, 1, wx.EXPAND, 5 )
+		
+		self.m_staticline9 = wx.StaticLine( self.m_backup_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		fgSizer401.Add( self.m_staticline9, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		self.m_back2folder_checkbox = wx.CheckBox( self.m_backup_panel, wx.ID_ANY, u"Backup to folder", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer401.Add( self.m_back2folder_checkbox, 0, wx.ALL, 5 )
+		
+		
+		self.m_backup_panel.SetSizer( fgSizer401 )
+		self.m_backup_panel.Layout()
+		fgSizer401.Fit( self.m_backup_panel )
+		self.m_settings_notebook.AddPage( self.m_backup_panel, u"Backups", False )
 		
 		fgSizer40.Add( self.m_settings_notebook, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -884,6 +931,11 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_audio_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_alert_toggle )
 		self.m_term_note_picker.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_term_note_change )
 		self.m_history_clear_button.Bind( wx.EVT_BUTTON, self.on_clear_history )
+		self.m_back_ext_textbox.Bind( wx.EVT_TEXT, self.on_back_ext_changed )
+		self.m_back_ext_button.Bind( wx.EVT_BUTTON, self.on_back_ext_click )
+		self.m_back_folder_textbox.Bind( wx.EVT_TEXT, self.on_back_folder_changed )
+		self.m_back_folder_button.Bind( wx.EVT_BUTTON, self.on_back_folder_click )
+		self.m_back2folder_checkbox.Bind( wx.EVT_CHECKBOX, self.on_back2folder_toggle )
 		self.m_close_button.Bind( wx.EVT_BUTTON, self.on_cancel )
 	
 	def __del__( self ):
@@ -928,6 +980,21 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_clear_history( self, event ):
+		event.Skip()
+	
+	def on_back_ext_changed( self, event ):
+		event.Skip()
+	
+	def on_back_ext_click( self, event ):
+		event.Skip()
+	
+	def on_back_folder_changed( self, event ):
+		event.Skip()
+	
+	def on_back_folder_click( self, event ):
+		event.Skip()
+	
+	def on_back2folder_toggle( self, event ):
 		event.Skip()
 	
 	def on_cancel( self, event ):

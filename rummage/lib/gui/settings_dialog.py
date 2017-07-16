@@ -20,13 +20,17 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import wx
+import re
 from .settings import Settings
 from .editor_dialog import EditorDialog
-from .generic_dialogs import yesno
+from .generic_dialogs import yesno, errormsg
 from .localization import _
 from . import gui
 from .. import rumcore
 from .. import util
+
+# We really need a better validator
+BACKUP_VALIDATOR = re.compile(r'^[-_a-zA-Z\d.]+$')
 
 
 class SettingsDialog(gui.SettingsDialog):
@@ -43,6 +47,7 @@ class SettingsDialog(gui.SettingsDialog):
             self.m_notify_panel.SetDoubleBuffered(True)
             self.m_history_panel.SetDoubleBuffered(True)
             self.m_settings_panel.SetDoubleBuffered(True)
+            self.m_backup_panel.SetDoubleBuffered(True)
         self.localize()
 
         self.history_types = [
@@ -99,6 +104,14 @@ class SettingsDialog(gui.SettingsDialog):
             self.m_term_note_label.Enable(is_native)
             self.m_term_note_picker.Enable(is_native)
 
+        self.backup_ext = Settings.get_backup_ext()
+        self.backup_folder = Settings.get_backup_folder()
+        self.m_back_ext_textbox.SetValue(self.backup_ext)
+        self.m_back_folder_textbox.SetValue(self.backup_folder)
+        self.m_back2folder_checkbox.SetValue(bool(Settings.get_backup_type()))
+        self.m_back_ext_button.Enable(False)
+        self.m_back_folder_button.Enable(False)
+
         self.refresh_localization()
 
         self.m_general_panel.Fit()
@@ -106,12 +119,13 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_editor_panel.Fit()
         self.m_notify_panel.Fit()
         self.m_history_panel.Fit()
+        self.m_backup_panel.Fit()
         self.m_settings_notebook.Fit()
         self.m_settings_panel.Fit()
         self.Fit()
-        if self.GetSize()[1] < 400:
-            self.SetSize(wx.Size(400, self.GetSize()[1]))
-        self.SetMinSize(wx.Size(400, self.GetSize()[1]))
+        if self.GetSize()[1] < 500:
+            self.SetSize(wx.Size(500, self.GetSize()[1]))
+        self.SetMinSize(wx.Size(500, self.GetSize()[1]))
 
     def localize(self):
         """Translage strings."""
@@ -135,6 +149,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.CHANGE = _("Change")
         self.CLEAR = _("Clear")
         self.CLOSE = _("Close")
+        self.SAVE = _("Save")
         self.RECORDS = _("%d Records")
         self.WARN_EDITOR_FORMAT = _(
             "Editor setting format has changed!\n\n"
@@ -148,6 +163,19 @@ class SettingsDialog(gui.SettingsDialog):
         self.CONTINUE = _("Continue")
         self.CANCEL = _("Cancel")
         self.WARNING_TITLE = _("Warning: Format Change")
+        self.BACK_EXT = _("Backup extension")
+        self.BACK_FOLDER = _("Backup folder")
+        self.BACK_2_FOLDER = _("Backup to folder")
+        self.ERR_INVALID_EXT = _(
+            "Invalid extension! Please enter a valid extension.\n\n"
+            "Extensions must be alphanumeric and can contain\n"
+            "hypens, underscores, and dots."
+        )
+        self.ERR_INVALID_FOLDER = _(
+            "Invalid folder! Please enter a valid folder.\n\n"
+            "Folders must be alphanumeric and can contain\n"
+            "hypens, underscores, and dots."
+        )
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -170,7 +198,12 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_regex_version_label.SetLabel(self.REGEX_VER)
         self.m_editor_button.SetLabel(self.CHANGE)
         self.m_history_clear_button.SetLabel(self.CLEAR)
+        self.m_back_ext_label.SetLabel(self.BACK_EXT)
+        self.m_back_folder_label.SetLabel(self.BACK_FOLDER)
+        self.m_back2folder_checkbox.SetLabel(self.BACK_2_FOLDER)
         self.m_close_button.SetLabel(self.CLOSE)
+        self.m_back_ext_button.SetLabel(self.SAVE)
+        self.m_back_folder_button.SetLabel(self.SAVE)
         self.Fit()
 
     def history_cleared(self):
@@ -252,6 +285,43 @@ class SettingsDialog(gui.SettingsDialog):
         """Set regex version."""
 
         Settings.set_regex_version(self.m_regex_ver_choice.GetSelection())
+
+    def on_back_ext_click(self, event):
+        """Handle on change ext."""
+
+        value = self.m_back_ext_textbox.GetValue()
+        if value and value not in ('.', '..') and BACKUP_VALIDATOR.match(value) is not None:
+            Settings.set_backup_ext(value)
+            self.backup_ext = value
+            self.m_back_ext_button.Enable(False)
+        else:
+            errormsg(self.ERR_INVALID_EXT)
+
+    def on_back_folder_click(self, event):
+        """Handle on change ext."""
+
+        value = self.m_back_folder_textbox.GetValue()
+        if value and value not in ('.', '..') and BACKUP_VALIDATOR.match(value) is not None:
+            Settings.set_backup_folder(value)
+            self.backup_folder = value
+            self.m_back_ext_button.Enable(False)
+        else:
+            errormsg(self.ERR_INVALID_FOLDER)
+
+    def on_back_ext_changed(self, event):
+        """Handle text change event."""
+
+        self.m_back_ext_button.Enable(self.m_back_ext_textbox.GetValue() != self.backup_ext)
+
+    def on_back_folder_changed(self, event):
+        """Handle text change event."""
+
+        self.m_back_folder_button.Enable(self.m_back_folder_textbox.GetValue() != self.backup_folder)
+
+    def on_back2folder_toggle(self, event):
+        """Handle on change folder."""
+
+        Settings.set_backup_type(self.m_back2folder_checkbox.GetValue())
 
     def on_cancel(self, event):
         """Close on cancel."""

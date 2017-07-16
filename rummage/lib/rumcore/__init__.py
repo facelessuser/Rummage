@@ -73,6 +73,7 @@ BOOLEAN = 0x800000          # Just check if file has one match and move on
 PROCESS_BINARY = 0x1000000  # Process binary files
 TRUNCATE_LINES = 0x2000000  # Truncate context lines to 120 chars
 BACKUP = 0x4000000          # Backup files on replace
+BACKUP_FOLDER = 0x8000000   # Backup to folder
 
 RE_MODE = 0
 BRE_MODE = 1
@@ -87,6 +88,7 @@ REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
 TRUNCATE_LENGTH = 120
 
 DEFAULT_BAK = 'rum-bak'
+DEFAULT_FOLDER_BAK = '.rum-bak'
 
 U32 = (
     'u32', 'utf32', 'utf_32'
@@ -489,7 +491,7 @@ class _FileSearch(object):
 
     def __init__(
         self, search_obj, file_obj, file_id, flags, context, encoding,
-        backup_ext, max_count, file_content=None, regex_mode=RE_MODE
+        backup_location, max_count, file_content=None, regex_mode=RE_MODE
     ):
         """Init the file search object."""
 
@@ -504,7 +506,9 @@ class _FileSearch(object):
         self.truncate_lines = bool(self.flags & TRUNCATE_LINES)
         self.process_binary = bool(self.flags & PROCESS_BINARY)
         self.backup = bool(self.flags & BACKUP)
-        self.backup_ext = '.%s' % backup_ext
+        self.backup2folder = bool(self.flags & BACKUP_FOLDER)
+        self.backup_ext = ('.%s' % backup_location) if not self.backup2folder else DEFAULT_BAK
+        self.backup_folder = backup_location if self.backup2folder else DEFAULT_FOLDER_BAK
         self.bom = None
         self.context = (0, 0) if self.truncate_lines else context
 
@@ -786,8 +790,16 @@ class _FileSearch(object):
 
         encoding = self.current_encoding
         if self.backup:
-            backup = file_name + self.backup_ext
-            shutil.copy2(file_name, backup)
+            if self.backup2folder:
+                dirname = os.path.join(os.path.dirname(file_name), self.backup_folder)
+                basename = os.path.basename(file_name)
+                backup = os.path.join(dirname, basename)
+                if not os.path.exists(dirname):
+                    os.makedirs(dirname)
+                shutil.copy2(file_name, backup + '.bak')
+            else:
+                backup = file_name + self.backup_ext
+                shutil.copy2(file_name, backup)
 
         if encoding.bom:
             # Write the bom first, then write in utf format out in the specified order.
@@ -1119,8 +1131,8 @@ class _DirWalker(object):
     def __init__(
         self, directory, file_pattern, file_regex_match,
         folder_exclude, dir_regex_match, recursive,
-        show_hidden, size, modified, created, backup_ext,
-        regex_mode=RE_MODE
+        show_hidden, size, modified, created, backup_location,
+        backup_to_folder=False, regex_mode=RE_MODE
     ):
         """Init the directory walker object."""
 
@@ -1138,10 +1150,13 @@ class _DirWalker(object):
         self.folder_exclude = self._parse_pattern(folder_exclude, dir_regex_match)
         self.recursive = recursive
         self.show_hidden = show_hidden
-        self.backup_ext = None
-        ext = '.%s' % backup_ext if backup_ext else None
-        if ext is not None:
-            self.backup_ext = ext.lower() if util.platform() == "windows" else ext
+        self.backup2folder = backup_to_folder
+        if backup_location:
+            self.backup_ext = ('.%s' % backup_location.lower()) if not self.backup2folder else DEFAULT_BAK
+            self.backup_folder = backup_location if self.backup2folder else DEFAULT_FOLDER_BAK
+        else:
+            self.backup_ext = None
+            self.backup_folder = None
 
     def _parse_pattern(self, string, regex_match):
         r"""Compile or format the inclusion\exclusion pattern."""
@@ -1221,15 +1236,24 @@ class _DirWalker(object):
             size_okay = self._compare_value(self.size, self.current_size)
         return size_okay
 
-    def _is_backup(self, name):
-        """Check if file is a rumcore backup."""
+    def _is_backup(self, name, directory=False):
+        """Check if file or directory is a rumcore backup."""
 
         is_backup = False
-        if self.backup_ext is not None:
-            if util.platform() == "windows":  # pragma: no cover
-                name = name.lower()
-            if name.endswith(self.backup_ext):
-                is_backup = True
+
+        if directory:
+            if self.backup_folder and self.backup2folder:
+                if util.platform() == "windows":  # pragma: no cover
+                    name = name.lower()
+                if name == self.backup_folder:
+                    is_backup = True
+        else:
+            if self.backup_ext and not self.backup2folder:
+                if util.platform() == "windows":  # pragma: no cover
+                    name = name.lower()
+                if name.endswith(self.backup_ext):
+                    is_backup = True
+
         return is_backup
 
     def _valid_file(self, base, name):
@@ -1269,7 +1293,7 @@ class _DirWalker(object):
         valid = True
         if not self.recursive:
             valid = False
-        elif self._is_hidden(os.path.join(base, name)):
+        elif self._is_hidden(os.path.join(base, name)) or self._is_backup(name, True):
             valid = False
         elif self.folder_exclude is not None:
             if self.dir_regex_match:
@@ -1367,7 +1391,7 @@ class Rummage(object):
     def __init__(
         self, target, searches, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None, encoding=None, size=None,
-        modified=None, created=None, backup_ext=DEFAULT_BAK, regex_mode=RE_MODE
+        modified=None, created=None, backup_location=None, regex_mode=RE_MODE
     ):
         """Initialize Rummage object."""
 
@@ -1384,7 +1408,10 @@ class Rummage(object):
         self.context = context
         self.encoding = self._verify_encoding(encoding) if encoding is not None else None
         self.skipped = 0
-        self.backup_ext = backup_ext if backup_ext and isinstance(backup_ext, util.string_type) else DEFAULT_BAK
+
+        self.backup_location = backup_location
+        if not self.backup_location or not isinstance(self.backup_location, util.string_type):
+            self.backup_location = DEFAULT_FOLDER_BAK if bool(self.file_flags & BACKUP_FOLDER) else DEFAULT_BAK
 
         self.buffer_input = bool(self.file_flags & BUFFER_INPUT)
         self.current_encoding = None
@@ -1415,7 +1442,8 @@ class Rummage(object):
                 size,
                 modified,
                 created,
-                self.backup_ext if bool(self.file_flags & BACKUP) else None,
+                self.backup_location if bool(self.file_flags & BACKUP) else None,
+                bool(self.file_flags & BACKUP_FOLDER),
                 self.regex_mode
             )
         elif not self.buffer_input and os.path.isfile(self.target):
@@ -1526,7 +1554,7 @@ class Rummage(object):
                 self.file_flags,
                 self.context,
                 self.encoding,
-                self.backup_ext,
+                self.backup_location,
                 self.max,
                 content_buffer,
                 self.regex_mode
