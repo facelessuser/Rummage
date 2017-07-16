@@ -82,7 +82,7 @@ class ResultFileList(DynamicList):
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
-        self.Bind(wx.EVT_RIGHT_UP, self.on_rclick)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.on_rclick)
 
     def localize(self):
         """Translate strings."""
