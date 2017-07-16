@@ -13,6 +13,12 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
+# Handle Unicode paths in Python 2.7 on Windows in shell.
+if _PLATFORM == "windows" and not PY3:
+    from . import win_subprocess as subprocess
+else:
+    import subprocess
+
 if PY3:
     string_type = str
     ustr = str
@@ -93,3 +99,35 @@ def translate(lang, text):
     """Translate text."""
 
     return lang.gettext(text) if PY3 else lang.ugettext(text)
+
+
+def call(cmd):
+    """Call command."""
+
+    fail = False
+
+    is_string = isinstance(cmd, string_type)
+
+    try:
+        if _PLATFORM == "windows":
+            startupinfo = subprocess.STARTUPINFO()
+            subprocess.Popen(
+                cmd,
+                startupinfo=startupinfo,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                shell=is_string
+            )
+        else:
+            subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                shell=is_string
+            )
+    except Exception:
+        fail = True
+
+    return fail

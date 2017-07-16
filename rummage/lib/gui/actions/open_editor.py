@@ -19,7 +19,6 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import subprocess
 from ..settings import Settings
 from ..app.custom_app import debug, error
 from ..generic_dialogs import errormsg
@@ -30,8 +29,6 @@ from ... import util
 def open_editor(filename, line, col):
     """Open editor with the optional filename, line, and col parameters."""
 
-    fail = False
-
     cmd = Settings.get_editor(filename=filename, line=line, col=col)
     if not cmd:
         errormsg(_("No editor is currently set!"))
@@ -39,28 +36,4 @@ def open_editor(filename, line, col):
         return
     debug(cmd)
 
-    is_string = isinstance(cmd, util.string_type)
-
-    try:
-        if util.platform() == "windows":
-            startupinfo = subprocess.STARTUPINFO()
-            subprocess.Popen(
-                cmd,
-                startupinfo=startupinfo,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                stdin=subprocess.PIPE,
-                shell=is_string
-            )
-        else:
-            subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                stdin=subprocess.PIPE,
-                shell=is_string
-            )
-    except Exception:
-        fail = True
-
-    return fail
+    return util.call(cmd)

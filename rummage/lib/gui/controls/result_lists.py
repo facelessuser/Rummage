@@ -23,7 +23,6 @@ from time import ctime
 import wx
 import decimal
 import os
-import subprocess
 import functools
 from .dynamic_lists import DynamicList, USE_SAMPLE_SIZE
 from ..actions.open_editor import open_editor
@@ -41,7 +40,7 @@ def reveal(event, target):
         "linux": 'xdg-open "%s"'
     }
 
-    subprocess.Popen(cmd[util.platform()] % target.replace('"', '\\"'), shell=True)
+    return util.call(cmd[util.platform()] % target.replace('"', '\\"'))
 
 
 class ContextMenu(wx.Menu):

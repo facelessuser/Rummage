@@ -22,13 +22,14 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 import argparse
 import sys
+import locale
 from .lib import util
 from .lib import __meta__
 from .lib.gui import rummage_dialog
 from .lib.gui.app import rummage_app
 from .lib.gui.settings import Settings
 
-CLI_ENCODING = sys.getfilesystemencoding()
+CLI_ENCODING = sys.stdin.encoding or locale.getpreferredencoding(True)
 
 
 def pyin(value):
