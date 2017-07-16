@@ -23,11 +23,52 @@ from time import ctime
 import wx
 import decimal
 import os
+import subprocess
+import functools
 from .dynamic_lists import DynamicList, USE_SAMPLE_SIZE
 from ..actions.open_editor import open_editor
 from ..localization import _
 from .. import data
 from ... import util
+
+
+def reveal(event, target):
+    """Reveal in file manager."""
+
+    cmd = {
+        "windows": 'explorer /select,"%s"',
+        "osx": 'open -R "%s"',
+        "linux": 'xdg-open "%s"'
+    }
+
+    subprocess.Popen(cmd[util.platform()] % target.replace('"', '\\"'), shell=True)
+
+
+class ContextMenu(wx.Menu):
+    """Context Menu."""
+
+    def __init__(self, parent, menu, pos):
+        """Attach the context menu to to the parent with the defined items."""
+
+        wx.Menu.__init__(self)
+        self._callbacks = {}
+
+        for i in menu:
+            menuid = wx.NewId()
+            item = wx.MenuItem(self, menuid, i[0])
+            item.Enable(i[2] if len(i) > 2 else True)
+            self._callbacks[menuid] = i[1]
+            self.Append(item)
+            self.Bind(wx.EVT_MENU, self.on_callback, item)
+
+        parent.PopupMenu(self, pos)
+
+    def on_callback(self, event):
+        """Execute the menu item callback."""
+
+        menuid = event.GetId()
+        self._callbacks[menuid](event)
+        event.Skip()
 
 
 class ResultFileList(DynamicList):
@@ -54,6 +95,7 @@ class ResultFileList(DynamicList):
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
+        self.Bind(wx.EVT_RIGHT_UP, self.on_rclick)
 
     def localize(self):
         """Translate strings."""
@@ -65,6 +107,11 @@ class ResultFileList(DynamicList):
         self.ENCODING = _("Encoding")
         self.MODIFIED = _("Modified")
         self.CREATED = _("Created")
+        self.REVEAL_LABEL = {
+            "windows": _("Reveal in Explorer"),
+            "osx": _("Reveal in Finder"),
+            "linux": _("Reveal in File Manager")
+        }
 
     def create_image_list(self):
         """Create the image list."""
@@ -161,6 +208,22 @@ class ResultFileList(DynamicList):
             line = str(self.get_map_item(item, col=7))
             col = str(self.get_map_item(item, col=8))
             open_editor(os.path.join(os.path.normpath(path), filename), line, col)
+        event.Skip()
+
+    def on_rclick(self, event):
+        """Show context menu on right click."""
+
+        pos = event.GetPosition()
+        item = self.HitTestSubItem(pos)[0]
+        if item != -1:
+            filename = self.GetItem(item, col=0).GetText()
+            path = self.GetItem(item, col=3).GetText()
+            target = os.path.join(path, filename)
+            enabled = self.GetSelectedItemCount() == 1
+            context = [
+                (self.REVEAL_LABEL[util.platform()], functools.partial(reveal, target=target), enabled)
+            ]
+            ContextMenu(self, context, pos)
         event.Skip()
 
 
