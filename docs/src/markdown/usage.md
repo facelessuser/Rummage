@@ -49,7 +49,7 @@ The second panel, is the **Limit Search** panel.  The **Limit Search** panel con
 
 The **Files** tab is where files with matches are shown after a search completes.  The files are arranged in a sortable table.  Each entry will show the file's name, size, number of matches in the file, the file path, detected file encoding, date/time when the file was created, and date/time of when the file was last modified.
 
-When mousing over an entry, the full path to the file will be shown in the status bar.  If you have the editor option in the preference dialog configured properly, you can double click an entry to open to the first match of that file in your favorite editor.
+When mousing over an entry, the full path to the file will be shown in the status bar.  If you have the editor option in the preference dialog configured properly, you can double click an entry to open to the first match of that file in your favorite editor. Right clicking the entry will bring up a context menu allowing you to reveal the file in your operating system's file manager (Linux will just open parent folder due to limitations on a cross distro solution).
 
 ## Content Tab
 
