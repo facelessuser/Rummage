@@ -19,9 +19,9 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import subprocess
+import os
 from ..settings import Settings
-from ..app.custom_app import debug, error
+from ..app.custom_app import error
 from ..generic_dialogs import errormsg
 from ..localization import _
 from ... import util
@@ -30,37 +30,25 @@ from ... import util
 def open_editor(filename, line, col):
     """Open editor with the optional filename, line, and col parameters."""
 
-    fail = False
-
     cmd = Settings.get_editor(filename=filename, line=line, col=col)
     if not cmd:
         errormsg(_("No editor is currently set!"))
         error("No editor set: %s" % cmd)
         return
-    debug(cmd)
 
-    is_string = isinstance(cmd, util.string_type)
+    return util.call(cmd)
 
-    try:
-        if util.platform() == "windows":
-            startupinfo = subprocess.STARTUPINFO()
-            subprocess.Popen(
-                cmd,
-                startupinfo=startupinfo,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                stdin=subprocess.PIPE,
-                shell=is_string
-            )
-        else:
-            subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                stdin=subprocess.PIPE,
-                shell=is_string
-            )
-    except Exception:
-        fail = True
 
-    return fail
+def reveal(event, target):
+    """Reveal in file manager."""
+
+    cmd = {
+        "windows": 'explorer /select,"%s"',
+        "osx": 'open -R "%s"',
+        "linux": 'xdg-open "%s"'
+    }
+
+    if util.platform() == "linux":
+        target = os.path.dirname(target)
+
+    return util.call(cmd[util.platform()] % target.replace('"', '\\"'))

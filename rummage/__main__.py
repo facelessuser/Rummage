@@ -28,14 +28,6 @@ from .lib.gui import rummage_dialog
 from .lib.gui.app import rummage_app
 from .lib.gui.settings import Settings
 
-CLI_ENCODING = sys.getfilesystemencoding()
-
-
-def pyin(value):
-    """Read in stdin variables."""
-
-    return value.decode(CLI_ENCODING) if isinstance(value, util.bstr) else value
-
 
 def parse_arguments():
     """Parse the arguments."""
@@ -45,11 +37,8 @@ def parse_arguments():
     parser.add_argument('--version', action='version', version=('%(prog)s ' + __meta__.__version__))
     parser.add_argument('--debug', action='store_true', default=False, help=argparse.SUPPRESS)
     parser.add_argument('--no-redirect', action='store_true', default=False, help=argparse.SUPPRESS)
-    parser.add_argument(
-        '--path', default=None, type=pyin,
-        help="Path to search."
-    )
-    return parser.parse_args()
+    parser.add_argument('--path', default=None, help="Path to search.")
+    return parser.parse_args(util.to_unicode_argv()[1:])
 
 
 def run():

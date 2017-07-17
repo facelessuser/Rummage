@@ -69,7 +69,7 @@ class ContextMenu(wx.Menu):
             menuid = wx.NewId()
             item = wx.MenuItem(self, menuid, i[0])
             self._callbacks[menuid] = i[1]
-            self.AppendItem(item)
+            self.Append(item)
             self.Bind(wx.EVT_MENU, self.on_callback, item)
 
         parent.PopupMenu(self, pos)

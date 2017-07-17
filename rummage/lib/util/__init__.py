@@ -1,10 +1,13 @@
 """Compatibility module."""
 from __future__ import unicode_literals
 import sys
+import locale
 import functools
 import os
+import copy
 
 PY3 = (3, 0) <= sys.version_info
+PY2 = (2, 0) <= sys.version_info < (3, 0)
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -93,3 +96,86 @@ def translate(lang, text):
     """Translate text."""
 
     return lang.gettext(text) if PY3 else lang.ugettext(text)
+
+
+def to_unicode_argv():
+    """Convert inputs to Unicode."""
+
+    args = copy.copy(sys.argv)
+
+    if PY2:
+        if _PLATFORM == "windows":
+            # Solution copied from http://stackoverflow.com/a/846931/145400
+
+            from ctypes import POINTER, byref, cdll, c_int, windll
+            from ctypes.wintypes import LPCWSTR, LPWSTR
+
+            GetCommandLineW = cdll.kernel32.GetCommandLineW
+            GetCommandLineW.argtypes = []
+            GetCommandLineW.restype = LPCWSTR
+
+            CommandLineToArgvW = windll.shell32.CommandLineToArgvW
+            CommandLineToArgvW.argtypes = [LPCWSTR, POINTER(c_int)]
+            CommandLineToArgvW.restype = POINTER(LPWSTR)
+
+            cmd = GetCommandLineW()
+            argc = c_int(0)
+            argv = CommandLineToArgvW(cmd, byref(argc))
+            if argc.value > 0:
+                # Remove Python executable and commands if present
+                start = argc.value - len(sys.argv)
+                args = [argv[i] for i in xrange(start, argc.value)]
+        else:
+            cli_encoding = sys.stdin.encoding or locale.getpreferredencoding()
+            args = [arg.decode(cli_encoding) for arg in sys.argv if isinstance(arg, bstr)]
+    return args
+
+
+def call(cmd):
+    """Call command."""
+
+    # Handle Unicode subprocess paths in Python 2.7 on Windows in shell.
+    if _PLATFORM == "windows" and PY2:
+        from .win_subprocess import Popen, CreateProcess
+        import _subprocess
+
+        # We're going to manually patch this for this instance
+        # and then restore afterwards.  I want to limit side effects
+        # when using with other modules.
+        pre_patched = _subprocess.CreateProcess
+        _subprocess.CreateProcess = CreateProcess
+    else:
+        from subprocess import Popen
+    import subprocess
+
+    fail = False
+
+    is_string = isinstance(cmd, string_type)
+
+    try:
+        if _PLATFORM == "windows":
+            startupinfo = subprocess.STARTUPINFO()
+            Popen(
+                cmd,
+                startupinfo=startupinfo,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                shell=is_string
+            )
+        else:
+            Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                shell=is_string
+            )
+    except Exception:
+        fail = True
+
+    if _PLATFORM == "windows" and PY2:
+        # Restore CreateProcess from before our monkey patch
+        _subprocess.CreateProcess = pre_patched
+
+    return fail

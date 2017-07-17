@@ -33,7 +33,7 @@ from backrefs import bre, bregex
 from .settings import Settings
 from .actions import export_html
 from .actions import export_csv
-from .actions import open_editor
+from .actions import fileops
 from .generic_dialogs import errormsg, yesno
 from .app.custom_app import DebugFrameExtender, debug, error, simplelog
 from .controls import custom_statusbar
@@ -2214,7 +2214,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             error(traceback.format_exc())
             errormsg(self.ERR_NO_LOG)
         else:
-            open_editor.open_editor(logfile, 1, 1)
+            fileops.open_editor(logfile, 1, 1)
 
     def on_documentation(self, event):
         """Open documentation site."""

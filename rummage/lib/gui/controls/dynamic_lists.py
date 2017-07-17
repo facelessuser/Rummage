@@ -31,12 +31,17 @@ USE_SAMPLE_SIZE = True
 class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     """Dynamic list."""
 
-    def __init__(self, parent, columns):
+    def __init__(self, parent, columns, single_sel=True):
         """Init the base class DynamicList object."""
+
+        flags = wx.LC_REPORT | wx.LC_VIRTUAL
+
+        if single_sel:
+            flags |= wx.LC_SINGLE_SEL
 
         super(DynamicList, self).__init__(
             parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
-            style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_VIRTUAL
+            style=flags
         )
         self.sort_init = True
         self.column_count = len(columns)
