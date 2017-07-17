@@ -207,11 +207,20 @@ class ResultFileList(DynamicList):
             filename = self.GetItem(item, col=0).GetText()
             path = self.GetItem(item, col=3).GetText()
             target = os.path.join(path, filename)
-            enabled = self.GetSelectedItemCount() == 1
-            context = [
-                (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled)
-            ]
-            ContextMenu(self, context, pos)
+            selected = self.IsSelected(item)
+            select_count = self.GetSelectedItemCount()
+            enabled = not selected or (selected and select_count == 1)
+            # Select if not already
+            if not selected:
+                self.Select(item)
+            # Open menu
+            ContextMenu(
+                self,
+                [
+                    (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled)
+                ],
+                pos
+            )
         event.Skip()
 
 
