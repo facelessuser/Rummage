@@ -126,7 +126,7 @@ def to_unicode_argv():
                 start = argc.value - len(sys.argv)
                 args = [argv[i] for i in xrange(start, argc.value)]
         else:
-            cli_encoding = sys.stdin.encoding or locale.getpreferredencoding(False)
+            cli_encoding = sys.stdin.encoding or locale.getpreferredencoding()
             args = [arg.decode(cli_encoding) for arg in sys.argv if isinstance(arg, bstr)]
     return args
 
