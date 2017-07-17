@@ -2,7 +2,7 @@
 
 ## 2.3.0
 
-Jul X, 2017
+Jul 17, 2017
 
 - **NEW**: Add reveal right click menu option in "File" tab results.
 - **NEW**: Expose backup configuration and allow putting all backups in a folder if desired.
