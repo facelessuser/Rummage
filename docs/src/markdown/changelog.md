@@ -1,8 +1,17 @@
 # Changelog
 
+## 2.3.0
+
+Jul X, 2017
+
+- **NEW**: Add reveal right click menu option in "File" tab results.
+- **NEW**: Expose backup configuration and allow putting all backups in a folder if desired.
+- **FIX**: Windows Unicode input path issues from command line and through the pipe during single instance argument transfer.
+- **FIX**: Windows Unicode issue when calling a shell command to open file in editor.
+
 ## 2.2.0
 
-Jul, 14, 2017
+Jul 14, 2017
 
 - **NEW**: Redesign of the preferences dialog.
 - **NEW**: Editor configurations are now sent through the shell which changes and simplifies the interface to set it up.
