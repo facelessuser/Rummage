@@ -7,6 +7,7 @@ import os
 import copy
 
 PY3 = (3, 0) <= sys.version_info
+PY2 = (2, 0) <= sys.version_info < (3, 0)
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -102,8 +103,7 @@ def to_unicode_argv():
 
     args = copy.copy(sys.argv)
 
-    if not PY3:
-
+    if PY2:
         if _PLATFORM == "windows":
             # Solution copied from http://stackoverflow.com/a/846931/145400
 
@@ -135,7 +135,7 @@ def call(cmd):
     """Call command."""
 
     # Handle Unicode subprocess paths in Python 2.7 on Windows in shell.
-    if _PLATFORM == "windows" and not PY3:
+    if _PLATFORM == "windows" and PY2:
         from .win_subprocess import Popen, CreateProcess
         import _subprocess
 
@@ -174,7 +174,7 @@ def call(cmd):
     except Exception:
         fail = True
 
-    if _PLATFORM == "windows" and not PY3:
+    if _PLATFORM == "windows" and PY2:
         # Restore CreateProcess from before our monkey patch
         _subprocess.CreateProcess = pre_patched
 
