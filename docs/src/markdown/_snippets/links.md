@@ -12,4 +12,4 @@
 [re]: https://docs.python.org/3/library/re.html
 [regex]: https://pypi.python.org/pypi/regex
 [terminal-notifier]: https://github.com/alloy/terminal-notifier
-[wxpython]: http://www.wxpython.org/
+[wxpython]: https://pypi.python.org/pypi/wxPython/
