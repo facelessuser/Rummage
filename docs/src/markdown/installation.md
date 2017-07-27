@@ -55,7 +55,7 @@ Here are a couple of ways to install and upgrade. Keep in mind if you are a Linu
     python -m rummage
     ```
 
-    In general, you may find it more appropriate to use the `pythonm` command instead of `python`.  In some environments, it may be required (see ["Running in Anaconda (macOS)"](#running-in-anaconda-macos)).
+    In general, you may find it more appropriate to use the `pythonw` command instead of `python`.  In some environments, it may be required (see ["Running in Anaconda (macOS)"](#running-in-anaconda-macos)).
 
 ## Running in Virtual Environments (macOS)
 

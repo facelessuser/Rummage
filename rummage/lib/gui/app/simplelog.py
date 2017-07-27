@@ -19,6 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
+import sys
 import codecs
 import threading
 from ... import util
@@ -40,6 +41,7 @@ class Log(object):
         """Init Log object."""
 
         self._lock = threading.Lock()
+        self.encoding = sys.stdout.encoding if sys.stdout.encoding is not None else 'ascii'
         if filemode == "w":
             with codecs.open(filename, "w", "utf-8") as f:
                 f.write("")
@@ -113,7 +115,10 @@ class Log(object):
                 with codecs.open(self.filename, "a", "utf-8") as f:
                     f.write(self.format % {"message": msg})
         if echo and self.echo:
-            print(self.format % {"message": msg})
+            try:
+                print((self.format % {"message": msg}))
+            except UnicodeEncodeError:
+                print((self.format % {"message": msg}).encode(self.encoding, 'replace').decode(self.encoding))
 
     def read(self):
         """Read the log."""

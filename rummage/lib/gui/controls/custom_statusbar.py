@@ -186,7 +186,9 @@ class IconTrayExtension(object):
         if name in self.sb_icons:
             self.hide_tooltip(name)
             self.sb_icons[name].Destroy()
-        self.sb_icons[name] = wx.StaticBitmap(self, label=icon)
+        bmp = wx.StaticBitmap(self)
+        bmp.SetBitmap(label=icon)
+        self.sb_icons[name] = bmp
         if msg is not None:
             ToolTip(self.sb_icons[name], msg)
         if click_left is not None:
