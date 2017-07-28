@@ -1,5 +1,7 @@
 site_name: Rummage Documentation
+site_url: https://facelessuser.github.io/Rummage
 repo_url: https://github.com/facelessuser/Rummage
+edit_uri: tree/master/docs/src/markdown
 site_description: A search and replace tool written in Python.
 copyright: Copyright &copy; 2013 - 2017 <a href="https://github.com/facelessuser">Isaac Muse</a>
 
