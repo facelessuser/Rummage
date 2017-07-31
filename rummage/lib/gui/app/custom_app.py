@@ -398,12 +398,15 @@ class PipeApp(CustomApp):
 class DebugFrameExtender(object):
     """Extend frame with debugger."""
 
-    def set_keybindings(self, keybindings=[], debug_event=None):
+    def set_keybindings(self, keybindings=None, debug_event=None):
         """
         Method to easily set key bindings.
 
         Also sets up debug keybindings and events.
         """
+
+        if keybindings is None:
+            keybindings = []
 
         # Create keybinding to open debug console, bind debug console to ctrl/cmd + ` depending on platform
         # if an event is passed in.

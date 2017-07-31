@@ -712,8 +712,11 @@ class Settings(object):
         cls.save_settings()
 
     @classmethod
-    def get_history_record_count(cls, history_types=[]):
+    def get_history_record_count(cls, history_types=None):
         """Get number of history items saved."""
+
+        if history_types is None:
+            history_types = []
 
         cls.reload_settings()
         count = 0
@@ -722,8 +725,11 @@ class Settings(object):
         return count
 
     @classmethod
-    def clear_history_records(cls, history_types=[]):
+    def clear_history_records(cls, history_types=None):
         """Clear history types."""
+
+        if history_types is None:
+            history_types = []
 
         cls.reload_settings()
         for h in history_types:

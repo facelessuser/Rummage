@@ -1,5 +1,5 @@
 """Created by @vaab at https://gist.github.com/vaab/2ad7051fc193167f15f85ef573e54eb9."""
-## issue: https://bugs.python.org/issue19264
+# issue: https://bugs.python.org/issue19264
 import os
 import ctypes
 import subprocess
@@ -7,9 +7,9 @@ import _subprocess
 from ctypes import byref, windll, c_char_p, c_wchar_p, c_void_p, Structure, sizeof, c_wchar, WinError
 from ctypes.wintypes import BYTE, WORD, LPWSTR, BOOL, DWORD, LPVOID, HANDLE
 
-##
-## Types
-##
+#
+# Types
+#
 
 CREATE_UNICODE_ENVIRONMENT = 0x00000400
 LPCTSTR = c_char_p
@@ -22,16 +22,26 @@ class STARTUPINFOW(Structure):
     """Startup info."""
 
     _fields_ = [
-        ("cb",              DWORD),  ("lpReserved",    LPWSTR),
-        ("lpDesktop",       LPWSTR), ("lpTitle",       LPWSTR),
-        ("dwX",             DWORD),  ("dwY",           DWORD),
-        ("dwXSize",         DWORD),  ("dwYSize",       DWORD),
-        ("dwXCountChars",   DWORD),  ("dwYCountChars", DWORD),
-        ("dwFillAtrribute", DWORD),  ("dwFlags",       DWORD),
-        ("wShowWindow",     WORD),   ("cbReserved2",   WORD),
-        ("lpReserved2",     LPBYTE), ("hStdInput",     HANDLE),
-        ("hStdOutput",      HANDLE), ("hStdError",     HANDLE),
+        ("cb", DWORD),
+        ("lpReserved", LPWSTR),
+        ("lpDesktop", LPWSTR),
+        ("lpTitle", LPWSTR),
+        ("dwX", DWORD),
+        ("dwY", DWORD),
+        ("dwXSize", DWORD),
+        ("dwYSize", DWORD),
+        ("dwXCountChars", DWORD),
+        ("dwYCountChars", DWORD),
+        ("dwFillAtrribute", DWORD),
+        ("dwFlags", DWORD),
+        ("wShowWindow", WORD),
+        ("cbReserved2", WORD),
+        ("lpReserved2", LPBYTE),
+        ("hStdInput", HANDLE),
+        ("hStdOutput", HANDLE),
+        ("hStdError", HANDLE),
     ]
+
 
 LPSTARTUPINFOW = ctypes.POINTER(STARTUPINFOW)
 
@@ -40,9 +50,12 @@ class PROCESS_INFORMATION(Structure):
     """Process info."""
 
     _fields_ = [
-        ("hProcess",         HANDLE), ("hThread",          HANDLE),
-        ("dwProcessId",      DWORD),  ("dwThreadId",       DWORD),
+        ("hProcess", HANDLE),
+        ("hThread", HANDLE),
+        ("dwProcessId", DWORD),
+        ("dwThreadId", DWORD),
     ]
+
 
 LPPROCESS_INFORMATION = ctypes.POINTER(PROCESS_INFORMATION)
 
@@ -78,9 +91,9 @@ CreateProcessW.argtypes = [
 CreateProcessW.restype = BOOL
 
 
-##
-## Patched functions/classes
-##
+#
+# Patched functions/classes
+#
 
 def CreateProcess(executable, args, _p_attr, _t_attr,
                   inherit_handles, creation_flags, env, cwd,
@@ -95,7 +108,7 @@ def CreateProcess(executable, args, _p_attr, _t_attr,
         dwFlags=startup_info.dwFlags,
         wShowWindow=startup_info.wShowWindow,
         cb=sizeof(STARTUPINFOW),
-        ## XXXvlab: not sure of the casting here to ints.
+        # XXXvlab: not sure of the casting here to ints.
         hStdInput=int(startup_info.hStdInput),
         hStdOutput=int(startup_info.hStdOutput),
         hStdError=int(startup_info.hStdError),
@@ -103,10 +116,10 @@ def CreateProcess(executable, args, _p_attr, _t_attr,
 
     wenv = None
     if env is not None:
-        ## LPCWSTR seems to be c_wchar_p, so let's say CWSTR is c_wchar
-        env = (unicode("").join([
-            unicode("%s=%s\0") % (k, v)
-            for k, v in env.items()])) + unicode("\0")
+        # LPCWSTR seems to be c_wchar_p, so let's say CWSTR is c_wchar
+        env = (unicode("").join([  # noqa F821
+            unicode("%s=%s\0") % (k, v)  # noqa F821
+            for k, v in env.items()])) + unicode("\0")  # noqa F821
         wenv = (c_wchar * len(env))()
         wenv.value = env
 
@@ -147,12 +160,12 @@ class Popen(subprocess.Popen):
         if shell:
             startupinfo.dwFlags |= _subprocess.STARTF_USESHOWWINDOW
             startupinfo.wShowWindow = _subprocess.SW_HIDE
-            comspec = os.environ.get("COMSPEC", unicode("cmd.exe"))
-            args = unicode('{} /c "{}"').format(comspec, args)
+            comspec = os.environ.get("COMSPEC", unicode("cmd.exe"))  # noqa F821
+            args = unicode('{} /c "{}"').format(comspec, args)  # noqa F821
             if (_subprocess.GetVersion() >= 0x80000000 or
                     os.path.basename(comspec).lower() == "command.com"):
                 w9xpopen = self._find_w9xpopen()
-                args = unicode('"%s" %s') % (w9xpopen, args)
+                args = unicode('"%s" %s') % (w9xpopen, args)  # noqa F821
                 creationflags |= _subprocess.CREATE_NEW_CONSOLE
 
         super(Popen, self)._execute_child(

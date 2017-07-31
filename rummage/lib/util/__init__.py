@@ -20,11 +20,11 @@ if PY3:
     string_type = str
     ustr = str
     bstr = bytes
-    CommonBrokenPipeError = BrokenPipeError  # noqa
+    CommonBrokenPipeError = BrokenPipeError  # noqa F821
 else:
-    string_type = basestring
-    ustr = unicode
-    bstr = str
+    string_type = basestring  # noqa F821
+    ustr = unicode  # noqa F821
+    bstr = str  # noqa F821
 
     class CommonBrokenPipeError(Exception):
         """
@@ -124,7 +124,7 @@ def to_unicode_argv():
             if argc.value > 0:
                 # Remove Python executable and commands if present
                 start = argc.value - len(sys.argv)
-                args = [argv[i] for i in xrange(start, argc.value)]
+                args = [argv[i] for i in xrange(start, argc.value)]  # noqa F821
         else:
             cli_encoding = sys.stdin.encoding or locale.getpreferredencoding()
             args = [arg.decode(cli_encoding) for arg in sys.argv if isinstance(arg, bstr)]
