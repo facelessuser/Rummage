@@ -41,7 +41,10 @@ class Log(object):
         """Init Log object."""
 
         self._lock = threading.Lock()
-        self.encoding = sys.stdout.encoding if sys.stdout.encoding is not None else 'ascii'
+        try:
+            self.encoding = sys.stdout.encoding if sys.stdout.encoding is not None else 'ascii'
+        except AttributeError:
+            self.encoding = 'ascii'
         if filemode == "w":
             with codecs.open(filename, "w", "utf-8") as f:
                 f.write("")

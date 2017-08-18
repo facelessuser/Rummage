@@ -22,11 +22,17 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 import argparse
 import sys
+import os
 from .lib import util
 from .lib import __meta__
 from .lib.gui import rummage_dialog
 from .lib.gui.app import rummage_app
 from .lib.gui.settings import Settings
+
+# Handle case where pythonw.exe is used and there is not a valid stdout or stderr
+if sys.executable.endswith("pythonw.exe"):
+    sys.stdout = open(os.devnull, "w");
+    sys.stderr = open(os.path.join(os.getenv("TEMP"), "stderr-"+os.path.basename(sys.argv[0])), "w")
 
 
 def parse_arguments():
