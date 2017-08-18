@@ -31,8 +31,8 @@ from .lib.gui.settings import Settings
 
 # Handle case where pythonw.exe is used and there is not a valid stdout or stderr
 if sys.executable.endswith("pythonw.exe"):
-    sys.stdout = open(os.devnull, "w");
-    sys.stderr = open(os.path.join(os.getenv("TEMP"), "stderr-"+os.path.basename(sys.argv[0])), "w")
+    sys.stdout = open(os.devnull, "w")
+    sys.stderr = open(os.devnull, "w")
 
 
 def parse_arguments():
