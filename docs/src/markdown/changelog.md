@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.2
+
+Aug 18, 2017
+
+- **FIX**: Fix Windows `pythonw` failure.
+
 ## 2.3.1
 
 Jul 26, 2017
