@@ -22,10 +22,15 @@ Name                             | Details
     ```
 
     Replace `python2.7-dev` with the Python version you are using.
+    
+    For Fedora 26, you need few dependecies to built wxPython:
+    ```bash
+    sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
+    ```
 
-    If your Linux distribution has `gstreamer` 1.0 available, you can install the dev packages for that instead of the 0.10 version.
+    If your Linux distribution has `gstreamer` 1.0 available, you can install the dev packages (like Fedora distro) for that instead of the 0.10 version.
 
-    Be patient while installing on Linux as Linux must build wxPython while macOS and Windows do not.
+    Be patient while installing rummage on Linux must build wxPython while macOS and Windows do not.
 
     Check out the wxPython document to see if prerequisites have changed: https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites.
 
