@@ -23,7 +23,7 @@ Name                             | Details
 
     Replace `python2.7-dev` with the Python version you are using.
     
-    For Fedora 26, you need few dependecies to built wxPython:
+    For Fedora 26, you need few dependencies to built wxPython:
     
     ```bash
     sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
