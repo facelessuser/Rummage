@@ -29,7 +29,7 @@ Name                             | Details
     sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
     ```
 
-    If your Linux distribution has `gstreamer` 1.0 available (like Fedora distro), you can install the dev packages for that instead of the 0.10 version.
+    If your Linux distribution has `gstreamer` 1.0 available (like the Fedora distro), you can install the dev packages for that instead of the 0.10 version.
 
     Be patient while installing Rummage as Linux must build wxPython while macOS and Windows do not.
 
