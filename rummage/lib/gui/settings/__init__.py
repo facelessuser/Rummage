@@ -39,6 +39,9 @@ CACHE_FILE = "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
+SETTINGS_FMT = '2.0.0'
+CACHE_FMT = '2.0.0'
+
 NOTIFY_STYLES = {
     "osx": ["default", "growl"],
     "windows": ["default", "growl"],
@@ -61,6 +64,7 @@ class Settings(object):
         """Translate strings."""
 
         cls.ERR_LOAD_SETTINGS_FAILED = _("Failed to load settings file!")
+        cls.ERR_LOAD_CACHE_FAILED = _("Failed to load cache file!")
         cls.ERR_SAVE_SETTINGS_FAILED = _("Failed to save settings file!")
         cls.ERR_SAVE_CACHE_FAILED = _("Failed to save cache file!")
 
@@ -72,35 +76,14 @@ class Settings(object):
         cls.localize()
         cls.settings_file, cls.cache_file, log = cls.get_settings_files()
         custom_app.init_app_log(log)
-        cls.settings = {}
-        cls.cache = {}
+        cls.settings = {"__format__": SETTINGS_FMT}
+        cls.cache = {"__format__": CACHE_FMT}
         cls.settings_time = None
         cls.cache_time = None
         cls.get_times()
         if cls.settings_file is not None:
-            try:
-                locked = False
-                with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
-                    assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
-                    locked = True
-                    cls.settings = json.loads(f.read())
-                    assert portalocker.unlock(f), "Could not unlock settings."
-                    locked = False
-                with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
-                    assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock cache file."
-                    locked = True
-                    cls.cache = json.loads(f.read())
-                    assert portalocker.unlock(f), "Could not unlock cache file."
-                    locked = False
-            except Exception:
-                e = traceback.format_exc()
-                try:
-                    error(e)
-                    if locked:
-                        portalocker.unlock(f)
-                    errormsg(cls.ERR_LOAD_SETTINGS_FAILED)
-                except Exception:
-                    print(str(e))
+            cls.open_settings()
+            cls.open_cache()
         if cls.debug:
             custom_app.set_debug_mode(True)
         localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
@@ -281,23 +264,129 @@ class Settings(object):
             log = os.path.join(folder, LOG_FILE)
             cls.fifo = os.path.join(folder, FIFO)
             cls.config_folder = folder
+
+        if not os.path.exists(settings):
+            cls.new_settings(settings)
+        if not os.path.exists(cache):
+            cls.new_cache(cache)
+
+        return settings, cache, log
+
+    @classmethod
+    def open_settings(cls):
+        """Open settings file."""
+
         try:
             locked = False
-            for filename in (settings, cache):
-                if not os.path.exists(filename):
-                    with codecs.open(filename, "w", encoding="utf-8") as f:
-                        assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock file."
-                        locked = True
-                        f.write(json.dumps({}, sort_keys=True, indent=4, separators=(',', ': ')))
-                        assert portalocker.unlock(f), "Could not unlock file."
-                        locked = False
+            with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
+                locked = True
+                cls.settings = json.loads(f.read())
+                assert portalocker.unlock(f), "Could not unlock settings."
+                locked = False
+                cls.update_settings()
+        except Exception:
+            e = traceback.format_exc()
+            try:
+                error(e)
+                if locked:
+                    portalocker.unlock(f)
+                errormsg(cls.ERR_LOAD_SETTINGS_FAILED)
+            except Exception:
+                print(str(e))
+
+    @classmethod
+    def new_settings(cls, settings):
+        """New settings."""
+
+        default_settings = {'__format__': SETTINGS_FMT}
+
+        try:
+            locked = False
+            with codecs.open(settings, "w", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock file."
+                locked = True
+                f.write(json.dumps(default_settings, sort_keys=True, indent=4, separators=(',', ': ')))
+                assert portalocker.unlock(f), "Could not unlock file."
+                locked = False
         except Exception:
             try:
                 if locked:
                     portalocker.unlock(f)
             except Exception:
                 pass
-        return settings, cache, log
+
+        return default_settings
+
+    @classmethod
+    def update_settings(cls):
+        """Update settings."""
+
+        settings_format = cls.settings.get('__format__')
+        if settings_format is None:
+            # Replace invalid settings
+            cls.settings = cls.new_settings(cls.settings_file)
+        if settings_format == '2.0.0':
+            # Upgrade to 2.1.0
+            pass
+
+    @classmethod
+    def open_cache(cls):
+        """Open cache file."""
+
+        try:
+            locked = False
+            with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
+                locked = True
+                cls.cache = json.loads(f.read())
+                assert portalocker.unlock(f), "Could not unlock settings."
+                locked = False
+                cls.update_cache()
+        except Exception:
+            e = traceback.format_exc()
+            try:
+                error(e)
+                if locked:
+                    portalocker.unlock(f)
+                errormsg(cls.ERR_LOAD_CACHE_FAILED)
+            except Exception:
+                print(str(e))
+
+    @classmethod
+    def new_cache(cls, cache):
+        """New cache."""
+
+        default_cache = {'__format__': CACHE_FMT}
+
+        try:
+            locked = False
+            with codecs.open(cache, "w", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock file."
+                locked = True
+                f.write(json.dumps(default_cache, sort_keys=True, indent=4, separators=(',', ': ')))
+                assert portalocker.unlock(f), "Could not unlock file."
+                locked = False
+        except Exception:
+            try:
+                if locked:
+                    portalocker.unlock(f)
+            except Exception:
+                pass
+
+        return default_cache
+
+    @classmethod
+    def update_cache(cls):
+        """Update settings."""
+
+        cache_format = cls.cache.get('__format__')
+        if cache_format is None:
+            # Replace invalid cache
+            cls.cache = cls.new_cache(cls.cache_file)
+        if cache_format == '2.0.0':
+            # Upgrade to 2.1.0
+            pass
 
     @classmethod
     def get_config_folder(cls):
@@ -743,7 +832,7 @@ class Settings(object):
 
         try:
             locked = False
-            cls.settings['__format__'] = '2.0.0'
+            cls.settings['__format__'] = SETTINGS_FMT
             with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
                 assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock settings."
                 locked = True
@@ -766,7 +855,7 @@ class Settings(object):
 
         try:
             locked = False
-            cls.cache['__format__'] = '2.0.0'
+            cls.cache['__format__'] = CACHE_FMT
             with codecs.open(cls.cache_file, "w", encoding="utf-8") as f:
                 assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock cache file."
                 locked = True
