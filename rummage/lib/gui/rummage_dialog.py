@@ -1238,12 +1238,16 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         searches = Settings.get_search()
         for search_name in Settings.get_chains()[chain]:
             search_obj = searches[search_name]
-            if search_obj[5] and replace:
-                replace_obj = self.import_plugin(search_obj[2])
+            if search_obj['is_function'] and replace:
+                replace_obj = self.import_plugin(search_obj['replace'])
             else:
-                replace_obj = search_obj[2]
+                replace_obj = search_obj['replace']
 
-            search_chain.add(search_obj[1], replace_obj, self.chain_flags(search_obj[3], search_obj[4]))
+            search_chain.add(
+                search_obj['search'],
+                replace_obj,
+                self.chain_flags(search_obj['flags'], search_obj['is_regex'])
+            )
 
         debug(search_chain)
 
@@ -1686,7 +1690,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         msg = self.ERR_MISSING_SEARCH % search
                         fail = True
                         break
-                    if self.validate_chain_regex(s[1], self.chain_flags(s[3], s[4])):
+                    if self.validate_chain_regex(s['search'], self.chain_flags(s['flags'], s['is_regex'])):
                         msg = self.ERR_INVALID_CHAIN_SEARCH % search
                         fail = True
                         break

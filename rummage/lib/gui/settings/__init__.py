@@ -34,12 +34,13 @@ from .. import notify
 from ... import rumcore
 from ... import util
 
-SETTINGS_FILE = "rummage.settings"
-CACHE_FILE = "rummage.cache"
+DEV_MODE = True
+SETTINGS_FILE = "rummage_dev.settings" if DEV_MODE else "rummage.settings"
+CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.0.0'
+SETTINGS_FMT = '2.1.0'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -323,12 +324,31 @@ class Settings(object):
         """Update settings."""
 
         settings_format = cls.settings.get('__format__')
-        if settings_format is None:
-            # Replace invalid settings
-            cls.settings = cls.new_settings(cls.settings_file)
-        if settings_format == '2.0.0':
-            # Upgrade to 2.1.0
-            pass
+        # if settings_format is None:
+        #     # Replace invalid settings
+        #     cls.settings = cls.new_settings(cls.settings_file)
+        if settings_format < '2.1.0':
+            searches = cls.settings.get("saved_searches", {})
+
+            # Upgrade versions before format existed
+            # TODO: Remove this in the future
+            if isinstance(searches, list):
+                searches = cls._update_search_object_to_unique(searches)
+
+            for k, v in searches.items():
+                new_search = {
+                    "name": v[0],
+                    "search": v[1],
+                    "replace": v[2],
+                    "flags": v[3],
+                    "is_regex": v[4],
+                    "is_function": v[5]
+                }
+                searches[k] = new_search
+
+            cls.settings["saved_searches"] = searches
+            cls.settings["__format__"] = SETTINGS_FMT
+            cls.save_settings()
 
     @classmethod
     def open_cache(cls):
@@ -525,7 +545,14 @@ class Settings(object):
 
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", {})
-        searches[key] = (name, search, replace, flags, is_regex, is_function)
+        searches[key] = {
+            "name": name,
+            "search": search,
+            "replace": replace,
+            "flags": flags,
+            "is_regex": is_regex,
+            "is_function": is_function
+        }
         cls.settings["saved_searches"] = searches
         cls.save_settings()
 
@@ -535,8 +562,6 @@ class Settings(object):
 
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", {})
-        if isinstance(searches, list):
-            searches = cls._update_search_object_to_unique(searches)
         return searches
 
     @classmethod
