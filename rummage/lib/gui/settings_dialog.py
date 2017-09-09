@@ -321,7 +321,7 @@ class SettingsDialog(gui.SettingsDialog):
     def on_back2folder_toggle(self, event):
         """Handle on change folder."""
 
-        Settings.set_backup_type(self.m_back2folder_checkbox.GetValue())
+        Settings.set_backup_type(int(self.m_back2folder_checkbox.GetValue()))
 
     def on_cancel(self, event):
         """Close on cancel."""

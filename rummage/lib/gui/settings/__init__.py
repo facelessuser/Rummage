@@ -335,6 +335,7 @@ class Settings(object):
             if isinstance(searches, list):
                 searches = cls._update_search_object_to_unique(searches)
 
+            # Convert list to dictionary
             for k, v in searches.items():
                 new_search = {
                     "name": v[0],
@@ -345,8 +346,13 @@ class Settings(object):
                     "is_function": v[5]
                 }
                 searches[k] = new_search
-
             cls.settings["saved_searches"] = searches
+
+            # Ensure backup_type is an integer
+            backup_type = cls.settings.get('backup_type')
+            cls.settings["backup_type"] = 0 if backup_type is None or backup_type is False else 1
+
+            # Update format
             cls.settings["__format__"] = SETTINGS_FMT
             cls.save_settings()
 
