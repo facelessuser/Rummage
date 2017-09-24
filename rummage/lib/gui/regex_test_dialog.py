@@ -271,6 +271,10 @@ class RegexTestDialog(gui.RegexTestDialog):
             """Replace for bregex format."""
             return m.expandf(replace)
 
+        def replace_regex_format(m, replace=None):
+            """Replace for regex format."""
+            return m.expandf(replace)
+
         def replace_regex(m, replace=None):
             """Replace for regex."""
             return self.regex_expand(m, replace)
@@ -404,7 +408,10 @@ class RegexTestDialog(gui.RegexTestDialog):
                         else:
                             replace_test = bregex.compile_replace(test, self.m_replace_text.GetValue())
                     elif self.regex_mode == rumcore.REGEX_MODE:
-                        replace_test = functools.partial(replace_regex, replace=rpattern)
+                        if self.m_format_replace_checkbox.GetValue():
+                            replace_test = functools.partial(replace_regex_format, replace=rpattern)
+                        else:
+                            replace_test = functools.partial(replace_regex, replace=rpattern)
                     elif self.regex_mode == rumcore.BRE_MODE:
                         replace_test = bre.compile_replace(test, self.m_replace_text.GetValue())
                     else:
