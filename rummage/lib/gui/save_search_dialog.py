@@ -147,6 +147,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
                     flags += "r"
                 if self.parent.m_posix_checkbox.GetValue():
                     flags += "p"
+            if mode in rumcore.FORMAT_MODES:
                 if self.parent.m_format_replace_checkbox.GetValue():
                     flags += "F"
         return flags

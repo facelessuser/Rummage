@@ -84,6 +84,7 @@ SEARCH_MASK = 0x1FFFF
 FILE_MASK = 0xFFE0000
 
 REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
+FORMAT_MODES = (REGEX_MODE, BREGEX_MODE, BRE_MODE)
 
 TRUNCATE_LENGTH = 120
 
@@ -731,7 +732,7 @@ class _FileSearch(object):
         else:
             self.is_plugin_replace = False
 
-        self.regex_format_replace = self.regex_mode in REGEX_MODES and bool(flags & FORMATREPLACE)
+        self.regex_format_replace = self.regex_mode in FORMAT_MODES and bool(flags & FORMATREPLACE)
 
         if self.is_binary:
             try:
@@ -763,14 +764,18 @@ class _FileSearch(object):
             else:
                 if self.regex_mode == BREGEX_MODE:
                     pattern = _bregex_pattern(pattern, flags, self.is_binary)
-                    if replace is not None and not bool(flags & FORMATREPLACE) and not self.is_plugin_replace:
-                        self.expand = bregex.compile_replace(pattern, replace)
+                    if replace is not None and not self.is_plugin_replace:
+                        self.expand = bregex.compile_replace(
+                            pattern, replace, (bregex.FORMAT if bool(flags & FORMATREPLACE) else 0)
+                        )
                 elif self.regex_mode == REGEX_MODE:
                     pattern = _regex_pattern(pattern, flags, self.is_binary)
                 elif self.regex_mode == BRE_MODE:
                     pattern = _bre_pattern(pattern, flags, self.is_binary)
                     if replace is not None and not self.is_plugin_replace:
-                        self.expand = bre.compile_replace(pattern, replace)
+                        self.expand = bre.compile_replace(
+                            pattern, replace, (bre.FORMAT if bool(flags & FORMATREPLACE) else 0)
+                        )
                 else:
                     pattern = _re_pattern(pattern, flags, self.is_binary)
                     if replace is not None and not self.is_plugin_replace:
