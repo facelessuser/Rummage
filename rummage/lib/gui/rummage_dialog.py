@@ -68,6 +68,8 @@ _SKIPPED = 0
 _ERRORS = []
 _ABORT = False
 
+RE_FMT = re.compile(r'''\\[^'"]''', re.UNICODE)
+
 LIMIT_COMPARE = {
     0: "any",
     1: "gt",
@@ -1238,7 +1240,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         return flags
 
-    def set_chain_arguments(self, chain, replace):
+    def set_chain_arguments(self, chain, replace, mode):
         """Set the search arguments."""
 
         search_chain = rumcore.Search(replace)
@@ -1250,7 +1252,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             else:
                 replace_obj = search_obj[2]
 
-            search_chain.add(search_obj[1], replace_obj, self.chain_flags(search_obj[3], search_obj[4]))
+            flags = self.chain_flags(search_obj[3], search_obj[4])
+
+            if mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE):
+                replace_obj = RE_FMT.sub(
+                    lambda m: eval("u'%s'" % m.group(0)),
+                    replace_obj
+                )
+
+            search_chain.add(search_obj[1], replace_obj, flags)
 
         debug(search_chain)
 
@@ -1377,15 +1387,23 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Setup chain argument
         if chain:
-            search_chain = self.set_chain_arguments(args.pattern, replace)
+            search_chain = self.set_chain_arguments(args.pattern, replace, args.regex_mode)
         else:
             search_chain = rumcore.Search(args.replace is not None)
             if not self.no_pattern:
                 if self.m_replace_plugin_checkbox.GetValue() and replace:
                     replace = self.import_plugin(args.replace)
+                    search_chain.add(args.pattern, replace, flags & rumcore.SEARCH_MASK)
                 else:
                     replace = args.replace
-                search_chain.add(args.pattern, replace, flags & rumcore.SEARCH_MASK)
+                    if args.regex_mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE):
+                        replace_pattern = RE_FMT.sub(
+                            lambda m: eval("u'%s'" % m.group(0)),
+                            args.replace
+                        )
+                    else:
+                        replace_pattern = replace
+                    search_chain.add(args.pattern, replace_pattern, flags & rumcore.SEARCH_MASK)
 
         self.payload = {
             'target': args.target,

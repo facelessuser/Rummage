@@ -35,6 +35,8 @@ from .localization import _
 from .. import rumcore
 from .. import util
 
+RE_FMT = re.compile(r'''\\[^'"]''', re.UNICODE)
+
 
 class RegexTestDialog(gui.RegexTestDialog):
     """Regex test dialog."""
@@ -408,6 +410,10 @@ class RegexTestDialog(gui.RegexTestDialog):
                         )
                     elif self.regex_mode == rumcore.REGEX_MODE:
                         if self.m_format_replace_checkbox.GetValue():
+                            rpattern = RE_FMT.sub(
+                                lambda m: eval("u'%s'" % m.group(0)),
+                                rpattern
+                            )
                             replace_test = functools.partial(replace_regex_format, replace=rpattern)
                         else:
                             replace_test = functools.partial(replace_regex, replace=rpattern)
