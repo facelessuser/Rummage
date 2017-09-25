@@ -32,6 +32,7 @@ plugins
 POSIX
 PyMdown
 Regex
+Regex's
 regex
 reinstalling
 requesters
