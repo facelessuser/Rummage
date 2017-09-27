@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.3
+
+Sep 27, 2017
+
+- **FIX**: Avoid Backrefs 1.1.0 and 2+ for until 2.1.
+
 ## 2.3.2
 
 Aug 18, 2017
