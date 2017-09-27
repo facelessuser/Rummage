@@ -4,7 +4,7 @@
 
 Sep 27, 2017
 
-- **FIX**: Avoid backrefs 1.1.0 and 2+ for until 2.1.
+- **FIX**: Avoid Backrefs 1.1.0 and 2+ for until 2.1.
 
 ## 2.3.2
 
