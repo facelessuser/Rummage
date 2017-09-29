@@ -68,8 +68,6 @@ _SKIPPED = 0
 _ERRORS = []
 _ABORT = False
 
-RE_FMT = re.compile(r'''\\[^'"]''', re.UNICODE)
-
 LIMIT_COMPARE = {
     0: "any",
     1: "gt",
@@ -1253,12 +1251,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 replace_obj = search_obj[2]
 
             flags = self.chain_flags(search_obj[3], search_obj[4])
+            is_literal = (flags & rumcore.LITERAL)
 
-            if mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE):
-                replace_obj = RE_FMT.sub(
-                    lambda m: eval("u'%s'" % m.group(0)),
-                    replace_obj
-                )
+            if mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE) and not is_literal:
+                replace_obj = util.preprocess_replace(replace_obj, True)
+            elif mode == rumcore.RE_MODE and not is_literal:
+                replace_obj = util.preprocess_replace(replace_obj)
 
             search_chain.add(search_obj[1], replace_obj, flags)
 
@@ -1396,11 +1394,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     search_chain.add(args.pattern, replace, flags & rumcore.SEARCH_MASK)
                 else:
                     replace = args.replace
-                    if args.regex_mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE):
-                        replace_pattern = RE_FMT.sub(
-                            lambda m: eval("u'%s'" % m.group(0)),
-                            args.replace
-                        )
+                    if args.regex_mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE) and args.regexp:
+                        replace_pattern = util.preprocess_replace(args.replace, True)
+                    elif args.regex_mode == rumcore.RE_MODE and args.regexp:
+                        replace_pattern = util.preprocess_replace(args.replace)
                     else:
                         replace_pattern = replace
                     search_chain.add(args.pattern, replace_pattern, flags & rumcore.SEARCH_MASK)

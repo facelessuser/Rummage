@@ -35,8 +35,6 @@ from .localization import _
 from .. import rumcore
 from .. import util
 
-RE_FMT = re.compile(r'''\\[^'"]''', re.UNICODE)
-
 
 class RegexTestDialog(gui.RegexTestDialog):
     """Regex test dialog."""
@@ -184,11 +182,6 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.regex_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.regex_event, self.regex_timer)
 
-    def regex_expand(self, m, replace):
-        """Regex module expand."""
-
-        return m.expandf(replace) if self.m_format_replace_checkbox.GetValue() else m.expand(replace)
-
     def start_regex_timer(self):
         """Start update timer."""
 
@@ -277,7 +270,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         def replace_regex(m, replace=None):
             """Replace for regex."""
-            return self.regex_expand(m, replace)
+            return m.expand(replace)
 
         def replace_re(m, replace=None):
             """Replace for re."""
@@ -410,10 +403,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                         )
                     elif self.regex_mode == rumcore.REGEX_MODE:
                         if self.m_format_replace_checkbox.GetValue():
-                            rpattern = RE_FMT.sub(
-                                lambda m: eval("u'%s'" % m.group(0)),
-                                rpattern
-                            )
+                            rpattern = util.preprocess_replace(rpattern, True)
                             replace_test = functools.partial(replace_regex_format, replace=rpattern)
                         else:
                             replace_test = functools.partial(replace_regex, replace=rpattern)
@@ -424,6 +414,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                             (bre.FORMAT if self.m_format_replace_checkbox.GetValue() else 0)
                         )
                     else:
+                        rpattern = util.preprocess_replace(rpattern)
                         replace_test = functools.partial(replace_re, replace=rpattern)
             except Exception as e:
                 print(e)
