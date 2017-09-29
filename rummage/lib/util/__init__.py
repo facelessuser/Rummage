@@ -61,14 +61,14 @@ if NARROW:
         r'''(\\[abfrtnv\\])|(\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{1,3})'''
     )
     RE_RE = re.compile(
-        r'''(\\\\)|(\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
+        r'''(\\[\\])|(\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
     )
 else:
     RE_FMT = re.compile(
         r'''(\\[abfrtnv\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{1,3})'''
     )
     RE_RE = re.compile(
-        r'''(\\\\)|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
+        r'''(\\[\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
     )
 
 
@@ -183,7 +183,9 @@ def preprocess_replace(string, format_replace=False):
     def replace(m, fmt_repl=format_replace):
         """Replace."""
         if m.group(1):
-            text = BACK_SLASH_TRANSLATION[m.group(2)]
+            text = BACK_SLASH_TRANSLATION[m.group(1)]
+            if not fmt_repl and text == '\\':
+                text = '\\134'
         else:
             if m.group(2):
                 # Unicode (wide and narrow) and bytes
