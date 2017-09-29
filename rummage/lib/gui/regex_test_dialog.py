@@ -75,13 +75,14 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_dotmatch_checkbox.SetValue(parent.m_dotmatch_checkbox.GetValue())
         self.m_unicode_checkbox.SetValue(parent.m_unicode_checkbox.GetValue())
         self.m_replace_plugin_checkbox.SetValue(parent.m_replace_plugin_checkbox.GetValue())
+        if self.regex_mode in rumcore.FORMAT_MODES:
+            self.m_format_replace_checkbox.SetValue(parent.m_format_replace_checkbox.GetValue())
         if self.regex_mode in rumcore.REGEX_MODES:
             self.m_bestmatch_checkbox.SetValue(parent.m_bestmatch_checkbox.GetValue())
             self.m_enhancematch_checkbox.SetValue(parent.m_enhancematch_checkbox.GetValue())
             self.m_word_checkbox.SetValue(parent.m_word_checkbox.GetValue())
             self.m_reverse_checkbox.SetValue(parent.m_reverse_checkbox.GetValue())
             self.m_posix_checkbox.SetValue(parent.m_posix_checkbox.GetValue())
-            self.m_format_replace_checkbox.SetValue(parent.m_format_replace_checkbox.GetValue())
             if self.regex_version == 0:
                 self.m_fullcase_checkbox.SetValue(parent.m_fullcase_checkbox.GetValue())
             else:
@@ -92,7 +93,8 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.m_word_checkbox.Hide()
             self.m_reverse_checkbox.Hide()
             self.m_posix_checkbox.Hide()
-            self.m_format_replace_checkbox.Hide()
+            if self.regex_mode == rumcore.RE_MODE:
+                self.m_format_replace_checkbox.Hide()
             self.m_fullcase_checkbox.Hide()
 
         if not self.parent.m_replace_plugin_checkbox.GetValue():
@@ -180,11 +182,6 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.regex_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.regex_event, self.regex_timer)
 
-    def regex_expand(self, m, replace):
-        """Regex module expand."""
-
-        return m.expandf(replace) if self.m_format_replace_checkbox.GetValue() else m.expand(replace)
-
     def start_regex_timer(self):
         """Start update timer."""
 
@@ -267,17 +264,13 @@ class RegexTestDialog(gui.RegexTestDialog):
             """Replace literal."""
             return replace
 
-        def replace_bregex_format(m, replace=None):
-            """Replace for bregex format."""
-            return m.expandf(replace)
-
         def replace_regex_format(m, replace=None):
             """Replace for regex format."""
             return m.expandf(replace)
 
         def replace_regex(m, replace=None):
             """Replace for regex."""
-            return self.regex_expand(m, replace)
+            return m.expand(replace)
 
         def replace_re(m, replace=None):
             """Replace for re."""
@@ -403,18 +396,25 @@ class RegexTestDialog(gui.RegexTestDialog):
                     if not is_regex:
                         replace_test = functools.partial(replace_literal, replace=rpattern)
                     elif self.regex_mode == rumcore.BREGEX_MODE:
-                        if self.m_format_replace_checkbox.GetValue():
-                            replace_test = functools.partial(replace_bregex_format, replace=rpattern)
-                        else:
-                            replace_test = bregex.compile_replace(test, self.m_replace_text.GetValue())
+                        replace_test = bregex.compile_replace(
+                            test,
+                            rpattern,
+                            bregex.FORMAT if self.m_format_replace_checkbox.GetValue() else 0
+                        )
                     elif self.regex_mode == rumcore.REGEX_MODE:
                         if self.m_format_replace_checkbox.GetValue():
+                            rpattern = util.preprocess_replace(rpattern, True)
                             replace_test = functools.partial(replace_regex_format, replace=rpattern)
                         else:
                             replace_test = functools.partial(replace_regex, replace=rpattern)
                     elif self.regex_mode == rumcore.BRE_MODE:
-                        replace_test = bre.compile_replace(test, self.m_replace_text.GetValue())
+                        replace_test = bre.compile_replace(
+                            test,
+                            rpattern,
+                            (bre.FORMAT if self.m_format_replace_checkbox.GetValue() else 0)
+                        )
                     else:
+                        rpattern = util.preprocess_replace(rpattern)
                         replace_test = functools.partial(replace_re, replace=rpattern)
             except Exception as e:
                 print(e)
@@ -497,9 +497,10 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.parent.m_word_checkbox.SetValue(self.m_word_checkbox.GetValue())
             self.parent.m_reverse_checkbox.SetValue(self.m_reverse_checkbox.GetValue())
             self.parent.m_posix_checkbox.SetValue(self.m_posix_checkbox.GetValue())
-            self.parent.m_format_replace_checkbox.SetValue(self.m_format_replace_checkbox.GetValue())
             if self.regex_version == 0:
                 self.parent.m_fullcase_checkbox.SetValue(self.m_fullcase_checkbox.GetValue())
+        if self.regex_mode in rumcore.FORMAT_MODES:
+            self.parent.m_format_replace_checkbox.SetValue(self.m_format_replace_checkbox.GetValue())
         self.Close()
 
     def on_cancel(self, event):

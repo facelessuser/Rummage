@@ -917,7 +917,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_bestmatch_checkbox.Hide()
             self.m_reverse_checkbox.Hide()
             self.m_posix_checkbox.Hide()
-            self.m_format_replace_checkbox.Hide()
+            if mode == rumcore.BRE_MODE:
+                self.m_format_replace_checkbox.Show()
+            else:
+                self.m_format_replace_checkbox.Hide()
             self.m_fullcase_checkbox.Hide()
         self.m_settings_panel.GetSizer().Layout()
 
@@ -1157,6 +1160,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 flags |= rumcore.REVERSE
             if "p" in string:
                 flags |= rumcore.POSIX
+
+        if regex_mode in rumcore.FORMAT_MODES:
             if "F" in string:
                 flags |= rumcore.FORMATREPLACE
 
@@ -1226,12 +1231,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 flags |= rumcore.REVERSE
             if args.posix:
                 flags |= rumcore.POSIX
+
+        if args.regex_mode in rumcore.FORMAT_MODES:
             if args.formatreplace:
                 flags |= rumcore.FORMATREPLACE
 
         return flags
 
-    def set_chain_arguments(self, chain, replace):
+    def set_chain_arguments(self, chain, replace, mode):
         """Set the search arguments."""
 
         search_chain = rumcore.Search(replace)
@@ -1243,7 +1250,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             else:
                 replace_obj = search_obj[2]
 
-            search_chain.add(search_obj[1], replace_obj, self.chain_flags(search_obj[3], search_obj[4]))
+            flags = self.chain_flags(search_obj[3], search_obj[4])
+            is_literal = (flags & rumcore.LITERAL)
+
+            if mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE) and not is_literal:
+                replace_obj = util.preprocess_replace(replace_obj, True)
+            elif mode == rumcore.RE_MODE and not is_literal:
+                replace_obj = util.preprocess_replace(replace_obj)
+
+            search_chain.add(search_obj[1], replace_obj, flags)
 
         debug(search_chain)
 
@@ -1302,9 +1317,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             args.word = self.m_word_checkbox.GetValue()
             args.reverse = self.m_reverse_checkbox.GetValue()
             args.posix = self.m_posix_checkbox.GetValue()
-            args.formatreplace = self.m_format_replace_checkbox.GetValue()
             if args.regex_version == 0:
                 args.fullcase = self.m_fullcase_checkbox.GetValue()
+        if args.regex_mode in rumcore.FORMAT_MODES:
+            args.formatreplace = self.m_format_replace_checkbox.GetValue()
         args.boolean = self.m_boolean_checkbox.GetValue()
         args.backup = self.m_backup_checkbox.GetValue()
         args.backup_folder = bool(Settings.get_backup_type())
@@ -1369,15 +1385,22 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
         # Setup chain argument
         if chain:
-            search_chain = self.set_chain_arguments(args.pattern, replace)
+            search_chain = self.set_chain_arguments(args.pattern, replace, args.regex_mode)
         else:
             search_chain = rumcore.Search(args.replace is not None)
             if not self.no_pattern:
                 if self.m_replace_plugin_checkbox.GetValue() and replace:
                     replace = self.import_plugin(args.replace)
+                    search_chain.add(args.pattern, replace, flags & rumcore.SEARCH_MASK)
                 else:
                     replace = args.replace
-                search_chain.add(args.pattern, replace, flags & rumcore.SEARCH_MASK)
+                    if args.regex_mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE) and args.regexp:
+                        replace_pattern = util.preprocess_replace(args.replace, True)
+                    elif args.regex_mode == rumcore.RE_MODE and args.regexp:
+                        replace_pattern = util.preprocess_replace(args.replace)
+                    else:
+                        replace_pattern = replace
+                    search_chain.add(args.pattern, replace_pattern, flags & rumcore.SEARCH_MASK)
 
         self.payload = {
             'target': args.target,

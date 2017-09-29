@@ -128,23 +128,23 @@ class RummageFrame ( wx.Frame ):
 		self.m_unicode_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Use Unicode properties", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gbSizer2.Add( self.m_unicode_checkbox, wx.GBPosition( 0, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
+		self.m_format_replace_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gbSizer2.Add( self.m_format_replace_checkbox, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		
 		self.m_bestmatch_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Best fuzzy match", wx.DefaultPosition, wx.DefaultSize, 0 )
-		gbSizer2.Add( self.m_bestmatch_checkbox, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		gbSizer2.Add( self.m_bestmatch_checkbox, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_enhancematch_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Improve fuzzy fit", wx.DefaultPosition, wx.DefaultSize, 0 )
-		gbSizer2.Add( self.m_enhancematch_checkbox, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		gbSizer2.Add( self.m_enhancematch_checkbox, wx.GBPosition( 1, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_word_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Unicode word breaks", wx.DefaultPosition, wx.DefaultSize, 0 )
-		gbSizer2.Add( self.m_word_checkbox, wx.GBPosition( 1, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		gbSizer2.Add( self.m_word_checkbox, wx.GBPosition( 1, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_reverse_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Search backwards", wx.DefaultPosition, wx.DefaultSize, 0 )
-		gbSizer2.Add( self.m_reverse_checkbox, wx.GBPosition( 1, 3 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		gbSizer2.Add( self.m_reverse_checkbox, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_posix_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Use POSIX matching", wx.DefaultPosition, wx.DefaultSize, 0 )
-		gbSizer2.Add( self.m_posix_checkbox, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
-		
-		self.m_format_replace_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
-		gbSizer2.Add( self.m_format_replace_checkbox, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		gbSizer2.Add( self.m_posix_checkbox, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		self.m_fullcase_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Full case-folding", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gbSizer2.Add( self.m_fullcase_checkbox, wx.GBPosition( 2, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
@@ -1100,6 +1100,9 @@ class RegexTestDialog ( wx.Dialog ):
 		self.m_unicode_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Use Unicode properties", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer19.Add( self.m_unicode_checkbox, 0, wx.ALL, 5 )
 		
+		self.m_format_replace_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer19.Add( self.m_format_replace_checkbox, 0, wx.ALL, 5 )
+		
 		self.m_bestmatch_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Best fuzzy match", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer19.Add( self.m_bestmatch_checkbox, 0, wx.ALL, 5 )
 		
@@ -1114,9 +1117,6 @@ class RegexTestDialog ( wx.Dialog ):
 		
 		self.m_posix_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Use POSIX matching", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer19.Add( self.m_posix_checkbox, 0, wx.ALL, 5 )
-		
-		self.m_format_replace_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Format style replacements", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer19.Add( self.m_format_replace_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_fullcase_checkbox = wx.CheckBox( self.m_tester_panel, wx.ID_ANY, u"Full case-folding", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer19.Add( self.m_fullcase_checkbox, 0, wx.ALL, 5 )
@@ -1204,12 +1204,12 @@ class RegexTestDialog ( wx.Dialog ):
 		self.m_case_checkbox.Bind( wx.EVT_CHECKBOX, self.on_case_toggle )
 		self.m_dotmatch_checkbox.Bind( wx.EVT_CHECKBOX, self.on_dot_toggle )
 		self.m_unicode_checkbox.Bind( wx.EVT_CHECKBOX, self.on_unicode_toggle )
+		self.m_format_replace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_format_replace_toggle )
 		self.m_bestmatch_checkbox.Bind( wx.EVT_CHECKBOX, self.on_bestmatch_toggle )
 		self.m_enhancematch_checkbox.Bind( wx.EVT_CHECKBOX, self.on_enhancematch_toggle )
 		self.m_word_checkbox.Bind( wx.EVT_CHECKBOX, self.on_word_toggle )
 		self.m_reverse_checkbox.Bind( wx.EVT_CHECKBOX, self.on_reverse_toggle )
 		self.m_posix_checkbox.Bind( wx.EVT_CHECKBOX, self.on_posix_toggle )
-		self.m_format_replace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_format_replace_toggle )
 		self.m_fullcase_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullcase_toggle )
 		self.m_replace_plugin_checkbox.Bind( wx.EVT_CHECKBOX, self.on_replace_plugin_toggle )
 		self.m_use_regex_button.Bind( wx.EVT_BUTTON, self.on_use )
@@ -1244,6 +1244,9 @@ class RegexTestDialog ( wx.Dialog ):
 	def on_unicode_toggle( self, event ):
 		event.Skip()
 	
+	def on_format_replace_toggle( self, event ):
+		event.Skip()
+	
 	def on_bestmatch_toggle( self, event ):
 		event.Skip()
 	
@@ -1257,9 +1260,6 @@ class RegexTestDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_posix_toggle( self, event ):
-		event.Skip()
-	
-	def on_format_replace_toggle( self, event ):
 		event.Skip()
 	
 	def on_fullcase_toggle( self, event ):

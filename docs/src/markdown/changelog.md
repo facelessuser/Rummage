@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.4.0
+
+- **NEW**: Allow Backrefs' replace references to work with format replaces.
+- **NEW**: Add support for format replace with Re (with Backrefs only).
+- **NEW**: Rummage requires Backrefs 2.1.0.
+- **FIX**: Regex's format replacement (without Backrefs) and Re (without Backrefs) handling of back slashes was incorrect due to the input panel behaving like a Python raw string. Normalize the differences to give the expected feel.
+
 ## 2.3.3
 
 Sep 27, 2017
