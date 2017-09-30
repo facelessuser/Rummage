@@ -1,10 +1,15 @@
 """Compatibility module."""
 from __future__ import unicode_literals
+import re
 import sys
 import locale
 import functools
 import os
 import copy
+import struct
+
+MAXUNICODE = sys.maxunicode
+NARROW = sys.maxunicode == 0xFFFF
 
 PY3 = (3, 0) <= sys.version_info
 PY2 = (2, 0) <= sys.version_info < (3, 0)
@@ -20,11 +25,14 @@ if PY3:
     string_type = str
     ustr = str
     bstr = bytes
+    unichar = chr
+
     CommonBrokenPipeError = BrokenPipeError  # noqa F821
 else:
     string_type = basestring  # noqa F821
     ustr = unicode  # noqa F821
     bstr = str  # noqa F821
+    unichar = unichr  # noqa F821
 
     class CommonBrokenPipeError(Exception):
         """
@@ -35,10 +43,48 @@ else:
         """
 
 
+BACK_SLASH_TRANSLATION = {
+    "\\a": '\a',
+    "\\b": '\b',
+    "\\f": '\f',
+    "\\r": '\r',
+    "\\t": '\t',
+    "\\n": '\n',
+    "\\v": '\v',
+    "\\\\": '\\'
+}
+
+FMT_BRACKETS = ('{', '}')
+
+if NARROW:
+    RE_FMT = re.compile(
+        r'''(\\[abfrtnv\\])|(\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{1,3})'''
+    )
+    RE_RE = re.compile(
+        r'''(\\[\\])|(\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
+    )
+else:
+    RE_FMT = re.compile(
+        r'''(\\[abfrtnv\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{1,3})'''
+    )
+    RE_RE = re.compile(
+        r'''(\\[\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
+    )
+
+
 def platform():
     """Get Platform."""
 
     return _PLATFORM
+
+
+def uchr(i):
+    """Allow getting unicode character on narrow python builds."""
+
+    try:
+        return unichar(i)
+    except ValueError:  # pragma: no cover
+        return struct.pack('i', i).decode('utf-32')
 
 
 def sorted_callback(l, sorter):
@@ -129,6 +175,39 @@ def to_unicode_argv():
             cli_encoding = sys.stdin.encoding or locale.getpreferredencoding()
             args = [arg.decode(cli_encoding) for arg in sys.argv if isinstance(arg, bstr)]
     return args
+
+
+def preprocess_replace(string, format_replace=False):
+    """Process the format string."""
+
+    def replace(m, fmt_repl=format_replace):
+        """Replace."""
+        if m.group(1):
+            if fmt_repl:
+                text = BACK_SLASH_TRANSLATION[m.group(1)]
+            else:
+                text = '\\134'
+        else:
+            if m.group(2):
+                # Unicode (wide and narrow) and bytes
+                value = int(m.group(2)[2:], 16)
+            elif not format_replace and m.group(4):
+                value = int(m.group(4)[2:], 16)
+            elif m.group(3):
+                # Octal
+                value = int(m.group(3)[1:], 8)
+
+            if fmt_repl:
+                text = uchr(value)
+                if text in FMT_BRACKETS:
+                    text = text * 2
+            elif value <= 0xff:
+                text = '\\%03o' % value
+            else:
+                text = uchr(value)
+        return text
+
+    return (RE_FMT if format_replace else RE_RE).sub(replace, string)
 
 
 def call(cmd):

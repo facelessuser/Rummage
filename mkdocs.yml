@@ -64,6 +64,7 @@ markdown_extensions:
   - pymdownx.details:
 
 extra:
+  logo: images/rummage.png
   palette:
     primary: blue
     accent: blue
@@ -74,6 +75,6 @@ extra:
     - type: github
       link: https://github.com/facelessuser
 extra_css:
-  - extra-9b4c72abee.css
+  - extra-21c736e569.css
 extra_javascript:
-  - extra-2aceccb07f.js
+  - extra-4596f9831a.js

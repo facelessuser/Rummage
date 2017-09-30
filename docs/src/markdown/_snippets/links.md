@@ -1,4 +1,5 @@
 [backrefs]: http://facelessuser.github.io/backrefs/
+[backrefs-format]: http://facelessuser.github.io/backrefs/#format-replacements
 [chardet]: https://pypi.python.org/pypi/chardet
 [format-string]: https://docs.python.org/2/library/string.html#format-string-syntax
 [gntp]: https://github.com/kdfm/gntp

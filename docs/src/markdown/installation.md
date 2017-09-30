@@ -6,7 +6,7 @@ Rummage has a few requirements when installing.  These will all be taken care of
 
 Name                             | Details
 -------------------------------- | -------
-[`backrefs` 1.0.1+][backrefs]    | Used to extend the `re` or `regex` regular expression engine with additional back references.
+[`backrefs` 2.1.0+][backrefs]    | Used to extend the `re` or `regex` regular expression engine with additional back references.
 [`gntp`][gntp]                   | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
 [`chardet`\ 3.0.4+][chardet]     | Used for file encoding guessing when an encoding is not specified.
 [`wxPython`\ 4.0.0a3+][wxpython] | The new wxPython 4.0.0 is required for for Rummage to run in Python 2 and Python 3. Classic wxPython support has unfortunately be dropped.
@@ -22,9 +22,9 @@ Name                             | Details
     ```
 
     Replace `python2.7-dev` with the Python version you are using.
-    
+
     For Fedora 26, you need few dependencies to built wxPython:
-    
+
     ```bash
     sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
     ```

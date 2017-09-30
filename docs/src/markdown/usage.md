@@ -35,6 +35,14 @@ You can also run rummage by calling your specific python version like this:
 python3 -m rummage --path mydirectory
 ```
 
+### Regular Expression Libraries Used
+
+Rummage uses the default regular expression library ([Re][re]]) that comes with the version of Python you are using. It also optionally works with the 3rd party [Regex][regex] library as well.
+
+Rummage also provides an optional, wrapper called [Backrefs][backrefs] which augments Re and Regex and adds support for various new back references, and adds some new features.  Additions differ depending on which library Backrefs is augmenting. See [Backrefs' documentation][backrefs] for more info.
+
+To provide a consistent user experience there are a few differences between libraries that are normalized. In Python, there is a difference between how back slashes are handled in strings (`!#py "..."`) and raw strings (`!#py r"..."`). Rummage inputs can be thought of as raw string inputs. Normal Regex replace templates allows for character back references in raw string, replace templates (`\u0057`, `\x057`, etc.), but Re and Regex format replacement templates do not (Regex raw string format templates won't convert normal references like `\n` either). When Backrefs is applied, all replacement templates will support and translate character references, but Rummage will also ensure that normal Re and normal Regex format replace work the same.
+
 ## Search Tab
 
 ![Search Tab](/images/search_tab.png)
@@ -75,12 +83,13 @@ Lastly, Rummage provides buttons to launch a regular expression tester dialog or
 
 Both the Re and Regex engine have a couple of shared flags that are exposed in Rummage. These toggles are found directly under the search and replace text boxes.
 
-Toggle                   | Description
------------------------- | -----------
-Search\ with\ regex      | Alters the behavior of `Search for` and `Replace with`.  When this is checked, both text boxes require regular expression patterns opposed to literal string.
-Search\ case-sensitive   | Forces the search to be case-sensitive.
-Dot\ matches\ newline    | `.` will also match newlines.
-Use\ Unicode\ properties | Changes the behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use use characters from the Unicode property database (will also modify `\l`, `\L`, `\c`, and `\C` in search patterns if using Backrefs with Re).
+Toggle                      | Description
+--------------------------- | -----------
+Search\ with\ regex         | Alters the behavior of `Search for` and `Replace with`.  When this is checked, both text boxes require regular expression patterns opposed to literal string.
+Search\ case-sensitive      | Forces the search to be case-sensitive.
+Dot\ matches\ newline       | `.` will also match newlines.
+Use\ Unicode\ properties    | Changes the behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use use characters from the Unicode property database (will also modify `\l`, `\L`, `\c`, and `\C` in search patterns if using Backrefs with Re).
+Format\ style\ replacements | Replace pattern will use [a string replace format][format-string] for replace. `#!python "{1} {1[-2]} {group_name[-3]}"` etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode [here][backrefs-format]. And remember that Rummage normalizes mentioned differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.
 
 ### Regex Engine Flags
 
@@ -93,7 +102,6 @@ Improve\ fuzzy\ fit         | Makes fuzzy matching attempt to improve the fit of
 Unicode\ word\ breaks       | Will use proper Unicode word breaks and line separators when Unicode is enabled. See Regex documentation for more info.
 Use\ POSIX\ matching        | Use the POSIX standard for regular expression, which is to return the leftmost longest match.
 Search\ backwards           | Search backwards. The result of a reverse search is not necessarily the reverse of a forward search.
-Format\ style\ replacements | Replace pattern will use [Python's string replace format][format-string] for replace. `#!python "{1[-1]} {1[-2]} {1[-3]}"` etc.
 Full\ case-folding          | Use full case folding. For Regex `V0` only as it is enabled by default for `V1`.
 
 ### Rummage Flags

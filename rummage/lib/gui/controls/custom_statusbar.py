@@ -25,7 +25,7 @@ import wx
 import wx.lib.agw.supertooltip
 from ... import util
 
-if wx.VERSION > (2, 9, 4):  # When will this get fixed? :(
+if (2, 9, 4) < wx.VERSION < (4, 0, 0, 'b2'):
     def monkey_patch():
         """
         Monkey patch Supertooltips.
@@ -50,8 +50,9 @@ if wx.VERSION > (2, 9, 4):  # When will this get fixed? :(
                     continue
             tt_source[count] = line[4:]
             count += 1
-        exec(''.join(tt_source))
-        wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint = locals()['OnPaint']  # noqa
+        if found:
+            exec(''.join(tt_source))
+            wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint = locals()['OnPaint']  # noqa
 
     monkey_patch()
 
