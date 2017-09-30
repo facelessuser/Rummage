@@ -183,8 +183,9 @@ def preprocess_replace(string, format_replace=False):
     def replace(m, fmt_repl=format_replace):
         """Replace."""
         if m.group(1):
-            text = BACK_SLASH_TRANSLATION[m.group(1)]
-            if not fmt_repl and text == '\\':
+            if fmt_repl:
+                text = BACK_SLASH_TRANSLATION[m.group(1)]
+            else:
                 text = '\\134'
         else:
             if m.group(2):
