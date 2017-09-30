@@ -8,6 +8,7 @@ Sep 29, 2017
 - **NEW**: Add support for format replace with Re (with Backrefs only).
 - **NEW**: Rummage requires Backrefs 2.1.0+.
 - **FIX**: Regex's format replacement (without Backrefs) and Re (without Backrefs) handling of back slashes Unicode, byte, notation was different that Backrefs and other Regex modes. Normalize the differences to give the expected feel.
+- **FIX**: Ensure replace (in all cases) isn't populated during a search only.
 
 ## 2.3.3
 

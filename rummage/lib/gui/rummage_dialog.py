@@ -1247,16 +1247,19 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             search_obj = searches[search_name]
             if search_obj[5] and replace:
                 replace_obj = self.import_plugin(search_obj[2])
-            else:
+            elif replace:
                 replace_obj = search_obj[2]
+            else:
+                replace_obj = None
 
             flags = self.chain_flags(search_obj[3], search_obj[4])
             is_literal = (flags & rumcore.LITERAL)
 
-            if mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE) and not is_literal:
-                replace_obj = util.preprocess_replace(replace_obj, True)
-            elif mode == rumcore.RE_MODE and not is_literal:
-                replace_obj = util.preprocess_replace(replace_obj)
+            if replace_obj is not None:
+                if mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE) and not is_literal:
+                    replace_obj = util.preprocess_replace(replace_obj, True)
+                elif mode == rumcore.RE_MODE and not is_literal:
+                    replace_obj = util.preprocess_replace(replace_obj)
 
             search_chain.add(search_obj[1], replace_obj, flags)
 
@@ -1390,16 +1393,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             search_chain = rumcore.Search(args.replace is not None)
             if not self.no_pattern:
                 if self.m_replace_plugin_checkbox.GetValue() and replace:
-                    replace = self.import_plugin(args.replace)
-                    search_chain.add(args.pattern, replace, flags & rumcore.SEARCH_MASK)
+                    repl_obj = self.import_plugin(args.replace)
+                    search_chain.add(args.pattern, repl_obj, flags & rumcore.SEARCH_MASK)
                 else:
-                    replace = args.replace
-                    if args.regex_mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE) and args.regexp:
-                        replace_pattern = util.preprocess_replace(args.replace, True)
-                    elif args.regex_mode == rumcore.RE_MODE and args.regexp:
-                        replace_pattern = util.preprocess_replace(args.replace)
-                    else:
-                        replace_pattern = replace
+                    replace_pattern = args.replace
+                    if replace_pattern is not None:
+                        if args.regex_mode == rumcore.REGEX_MODE and (flags & rumcore.FORMATREPLACE) and args.regexp:
+                            replace_pattern = util.preprocess_replace(args.replace, True)
+                        elif args.regex_mode == rumcore.RE_MODE and args.regexp:
+                            replace_pattern = util.preprocess_replace(args.replace)
                     search_chain.add(args.pattern, replace_pattern, flags & rumcore.SEARCH_MASK)
 
         self.payload = {
