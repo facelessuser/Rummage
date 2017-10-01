@@ -21,7 +21,11 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 # from .app.custom_app import error
 from .localization import _
+from .settings import Settings
+from .generic_dialogs import errormsg, infomsg
+from .messages import filepickermsg
 from . import gui
+from .. import util
 
 
 class ExportSettingsDialog(gui.ExportSettingsDialog):
@@ -47,6 +51,10 @@ class ExportSettingsDialog(gui.ExportSettingsDialog):
         self.PATTERNS = _("Search/replace patterns")
         self.CANCEL = _("Close")
         self.EXPORT = _("Export")
+        self.EXPORT_TO = _("Export to...")
+        self.ERR_NO_SELECT = _("No settings are selected!")
+        self.ERR_FAILED_EXPORT = _("Failed to export settings!")
+        self.SUCCESS_EXPORT = _("Settings were successfully exported!")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -62,7 +70,36 @@ class ExportSettingsDialog(gui.ExportSettingsDialog):
     def on_export_click(self, event):
         """Export settings."""
 
-        pass
+        general = self.m_general_settings_checkbox.GetValue()
+        chains = self.m_chains_checkbox.GetValue()
+        patterns = self.m_patterns_checkbox.GetValue()
+
+        if not general and not chains and not patterns:
+            errormsg(self.ERR_NO_SELECT)
+            return
+
+        filename = filepickermsg(self.EXPORT_TO, wildcard="*.json", save=True)
+        if filename is None:
+            return
+
+        settings = Settings.get_settings()
+        export = {}
+
+        for k, v in settings.items():
+            if k == '__format__':
+                export[k] = v
+            elif k == 'chains' and chains:
+                export[k] = v
+            elif k == 'saved_searches' and patterns:
+                export[k] = v
+            elif k not in ('__format__', 'chains', 'saved_searches') and general:
+                export[k] = v
+
+        try:
+            util.write_json(filename, export)
+            infomsg(self.SUCCESS_EXPORT)
+        except Exception:
+            errormsg(self.ERR_FAILED_EXPORT)
 
     def on_cancel_click(self, event):
         """Close window."""

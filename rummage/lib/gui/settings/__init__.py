@@ -23,6 +23,7 @@ import codecs
 import json
 import os
 import traceback
+import copy
 from . import portalocker
 from ..app import custom_app
 from ..app.custom_app import debug, debug_struct, error
@@ -92,6 +93,13 @@ class Settings(object):
         debug_struct(cls.settings)
         debug_struct(cls.cache)
         cls.init_notify(True)
+
+    @classmethod
+    def get_settings(cls):
+        """Get the entire settings object."""
+
+        cls.reload_settings()
+        return copy.deepcopy(cls.settings)
 
     @classmethod
     def is_regex_available(cls):

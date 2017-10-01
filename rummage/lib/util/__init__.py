@@ -7,6 +7,9 @@ import functools
 import os
 import copy
 import struct
+import codecs
+import json
+from .file_strip.json import sanitize_json
 
 MAXUNICODE = sys.maxunicode
 NARROW = sys.maxunicode == 0xFFFF
@@ -142,6 +145,33 @@ def translate(lang, text):
     """Translate text."""
 
     return lang.gettext(text) if PY3 else lang.ugettext(text)
+
+
+def read_json(filename):
+    """Read JSON."""
+
+    try:
+        with codecs.open(filename, "r", encoding='utf-8') as f:
+            content = sanitize_json(f.read(), True)
+        obj = json.loads(content)
+    except Exception:
+        obj = None
+    return obj
+
+
+def write_json(filename, obj):
+    """Write JSON."""
+
+    fail = False
+
+    try:
+        j = json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
+        with codecs.open(filename, 'w', encoding='utf-8') as f:
+            f.write(j + "\n")
+    except Exception:
+        fail = True
+
+    return fail
 
 
 def to_unicode_argv():
