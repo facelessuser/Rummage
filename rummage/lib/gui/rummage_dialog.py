@@ -43,6 +43,8 @@ from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
 from .search_chain_dialog import SearchChainDialog
+from .export_settings_dialog import ExportSettingsDialog
+from .import_settings_dialog import ImportSettingsDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .controls import pick_button
@@ -596,7 +598,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.SEARCH = _("Search")
 
         # Menu
-        self.MENU_EXPORT = _("Export")
+        self.MENU_EXPORT_RESULTS = _("Export Results")
+        self.MENU_EXPORT_SETTINGS = _("Export Settings")
+        self.MENU_IMPORT_SETTINGS = _("Import Settings")
         self.MENU_FILE = _("File")
         self.MENU_VIEW = _("View")
         self.MENU_HELP = _("Help")
@@ -676,8 +680,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_save_search_button.SetLabel(self.SAVE_SEARCH)
         self.m_load_search_button.SetLabel(self.LOAD_SEARCH)
         self.m_grep_notebook.SetPageText(0, self.SEARCH)
-        exportid = self.m_menu.FindMenuItem("File", "Export")
-        self.m_menu.SetLabel(exportid, self.MENU_EXPORT)
+        exportid = self.m_menu.FindMenuItem("File", "Export Results")
+        self.m_menu.SetLabel(exportid, self.MENU_EXPORT_RESULTS)
         self.m_menu.SetMenuLabel(0, self.MENU_FILE)
         self.m_menu.SetMenuLabel(1, self.MENU_VIEW)
         self.m_menu.SetMenuLabel(2, self.MENU_HELP)
@@ -685,6 +689,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_quit_menuitem.SetItemLabel(self.MENU_EXIT)
         self.m_export_html_menuitem.SetItemLabel(self.MENU_HTML)
         self.m_export_csv_menuitem.SetItemLabel(self.MENU_CSV)
+        self.m_export_settings_menuitem.SetItemLabel(self.MENU_EXPORT_SETTINGS)
+        self.m_import_settings_menuitem.SetItemLabel(self.MENU_IMPORT_SETTINGS)
         self.m_hide_limit_menuitem.SetItemLabel(self.MENU_HIDE_LIMIT)
         self.m_log_menuitem.SetItemLabel(self.MENU_OPEN_LOG)
         self.m_about_menuitem.SetItemLabel(self.MENU_ABOUT)
@@ -2215,6 +2221,20 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         except Exception:
             error(traceback.format_exc())
             errormsg(self.ERR_CSV_FAILED)
+
+    def on_export_settings(self, event):
+        """Export settngs."""
+
+        exporter = ExportSettingsDialog(self)
+        exporter.ShowModal()
+        exporter.Destroy()
+
+    def on_import_settings(self, event):
+        """Import settngs."""
+
+        importer = ImportSettingsDialog(self)
+        importer.ShowModal()
+        importer.Destroy()
 
     def on_hide_limit(self, event):
         """Hide limit panel."""
