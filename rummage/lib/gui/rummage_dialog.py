@@ -548,6 +548,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.ERR_INVLAID_SIZE = _("Please enter a valid size!")
         self.ERR_INVALID_MDATE = _("Please enter a modified date!")
         self.ERR_INVALID_CDATE = _("Please enter a created date!")
+        self.ERR_IMPORT = _("There was an error attempting to read the settings file!")
 
         # Status
         self.INIT_STATUS = _("Searching: 0/0 0% Skipped: 0 Matches: 0")
@@ -2232,7 +2233,16 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_import_settings(self, event):
         """Import settngs."""
 
-        importer = ImportSettingsDialog(self)
+        filename = filepickermsg(self.EXPORT_TO, wildcard="*.json", save=False)
+        if filename is None:
+            return
+
+        obj = util.read_json(filename)
+        if obj is None:
+            errormsg(self.ERR_IMPORT)
+            return
+
+        importer = ImportSettingsDialog(self, obj)
         importer.ShowModal()
         importer.Destroy()
 

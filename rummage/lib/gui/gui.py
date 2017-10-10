@@ -1178,6 +1178,110 @@ class ImportSettingsDialog ( wx.Dialog ):
 	
 
 ###########################################################################
+## Class OverwriteDialog
+###########################################################################
+
+class OverwriteDialog ( wx.Dialog ):
+	
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Overwrite", pos = wx.DefaultPosition, size = wx.Size( 300,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
+		
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		
+		bSizer12 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_overwrite_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_overwrite_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
+		fgSizer33 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer33.AddGrowableCol( 0 )
+		fgSizer33.AddGrowableRow( 0 )
+		fgSizer33.AddGrowableRow( 1 )
+		fgSizer33.AddGrowableRow( 2 )
+		fgSizer33.SetFlexibleDirection( wx.BOTH )
+		fgSizer33.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		fgSizer52 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer52.AddGrowableCol( 1 )
+		fgSizer52.AddGrowableRow( 0 )
+		fgSizer52.SetFlexibleDirection( wx.BOTH )
+		fgSizer52.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_bitmap = wx.StaticBitmap( self.m_overwrite_panel, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.Size( 64,64 ), 0 )
+		self.m_bitmap.SetMinSize( wx.Size( 64,64 ) )
+		
+		fgSizer52.Add( self.m_bitmap, 0, wx.ALL, 5 )
+		
+		self.m_message_label = wx.StaticText( self.m_overwrite_panel, wx.ID_ANY, u"Overwrite?", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
+		self.m_message_label.Wrap( -1 )
+		fgSizer52.Add( self.m_message_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		fgSizer33.Add( fgSizer52, 1, wx.EXPAND, 5 )
+		
+		fgSizer53 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer53.AddGrowableCol( 0 )
+		fgSizer53.AddGrowableRow( 0 )
+		fgSizer53.SetFlexibleDirection( wx.BOTH )
+		fgSizer53.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_remember_checkbox = wx.CheckBox( self.m_overwrite_panel, wx.ID_ANY, u"Apply to all", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer53.Add( self.m_remember_checkbox, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		fgSizer33.Add( fgSizer53, 1, wx.EXPAND, 5 )
+		
+		fgSizer34 = wx.FlexGridSizer( 0, 4, 0, 0 )
+		fgSizer34.AddGrowableCol( 0 )
+		fgSizer34.AddGrowableCol( 3 )
+		fgSizer34.AddGrowableRow( 0 )
+		fgSizer34.SetFlexibleDirection( wx.BOTH )
+		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		
+		fgSizer34.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_overwrite_button = wx.Button( self.m_overwrite_panel, wx.ID_ANY, u"Overwrite", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer34.Add( self.m_overwrite_button, 0, wx.ALL, 5 )
+		
+		self.m_cancel_button = wx.Button( self.m_overwrite_panel, wx.ID_ANY, u"Skip", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer34.Add( self.m_cancel_button, 0, wx.ALL, 5 )
+		
+		
+		fgSizer34.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer33.Add( fgSizer34, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_overwrite_panel.SetSizer( fgSizer33 )
+		self.m_overwrite_panel.Layout()
+		fgSizer33.Fit( self.m_overwrite_panel )
+		bSizer12.Add( self.m_overwrite_panel, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( bSizer12 )
+		self.Layout()
+		
+		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.m_overwrite_button.Bind( wx.EVT_BUTTON, self.on_overwrite )
+		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_skip )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_overwrite( self, event ):
+		event.Skip()
+	
+	def on_skip( self, event ):
+		event.Skip()
+	
+
+###########################################################################
 ## Class RegexTestDialog
 ###########################################################################
 

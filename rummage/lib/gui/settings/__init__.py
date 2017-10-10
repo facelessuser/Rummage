@@ -112,10 +112,16 @@ class Settings(object):
         """Set regex support."""
 
         cls.reload_settings()
+        cls._set_regex_mode(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_regex_mode(cls, value):
+        """Set regex support."""
+
         if value in rumcore.REGEX_MODES and not rumcore.REGEX_SUPPORT:
             value = rumcore.REGEX_MODE
         cls.settings["regex_mode"] = value
-        cls.save_settings()
 
     @classmethod
     def get_regex_mode(cls):
@@ -132,9 +138,15 @@ class Settings(object):
         """Get the regex version."""
 
         cls.reload_settings()
+        cls._set_regex_version(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_regex_version(cls, value):
+        """Get the regex version."""
+
         if 0 <= value <= 1:
             cls.settings["regex_version"] = value
-            cls.save_settings()
 
     @classmethod
     def get_regex_version(cls):
@@ -155,8 +167,14 @@ class Settings(object):
         """Set hide limit setting."""
 
         cls.reload_settings()
-        cls.settings["hide_limit"] = hide
+        cls._set_hide_limit(hide)
         cls.save_settings()
+
+    @classmethod
+    def _set_hide_limit(cls, hide):
+        """Set hide limit setting."""
+
+        cls.settings["hide_limit"] = hide
 
     @classmethod
     def get_language(cls):
@@ -173,8 +191,14 @@ class Settings(object):
         """Set locale language."""
 
         cls.reload_settings()
-        cls.settings["locale"] = language
+        cls._set_language(language)
         cls.save_settings()
+
+    @classmethod
+    def _set_language(cls, language):
+        """Set locale language."""
+
+        cls.settings["locale"] = language
 
     @classmethod
     def get_languages(cls):
@@ -500,8 +524,14 @@ class Settings(object):
         """Set editor command."""
 
         cls.reload_settings()
-        cls.settings["editor"] = editor
+        cls._set_editor(editor)
         cls.save_settings()
+
+    @classmethod
+    def _set_editor(cls, editor):
+        """Set editor command."""
+
+        cls.settings["editor"] = editor
 
     @classmethod
     def get_single_instance(cls):
@@ -515,8 +545,14 @@ class Settings(object):
         """Set single instance setting."""
 
         cls.reload_settings()
-        cls.settings["single_instance"] = single
+        cls._set_single_instance(single)
         cls.save_settings()
+
+    @classmethod
+    def _set_single_instance(cls, single):
+        """Set single instance setting."""
+
+        cls.settings["single_instance"] = single
 
     @classmethod
     def _update_search_object_to_unique(cls, searches):
@@ -558,6 +594,13 @@ class Settings(object):
         """Add saved search."""
 
         cls.reload_settings()
+        cls._add_search(key, name, search, replace, flags, is_regex, is_function)
+        cls.save_settings()
+
+    @classmethod
+    def _add_search(cls, key, name, search, replace, flags, is_regex, is_function):
+        """Add saved search."""
+
         searches = cls.settings.get("saved_searches", {})
         searches[key] = {
             "name": name,
@@ -568,7 +611,6 @@ class Settings(object):
             "is_function": is_function
         }
         cls.settings["saved_searches"] = searches
-        cls.save_settings()
 
     @classmethod
     def get_search(cls):
@@ -601,10 +643,16 @@ class Settings(object):
         """Save chain."""
 
         cls.reload_settings()
+        cls._add_chain(key, searches)
+        cls.save_settings()
+
+    @classmethod
+    def _add_chain(cls, key, searches):
+        """Save chain."""
+
         chains = cls.settings.get("chains", {})
         chains[key] = searches[:]
         cls.settings['chains'] = chains
-        cls.save_settings()
 
     @classmethod
     def delete_chain(cls, key):
@@ -629,8 +677,14 @@ class Settings(object):
         """Set alert setting."""
 
         cls.reload_settings()
-        cls.settings["alert_enabled"] = enable
+        cls._set_alert(enable)
         cls.save_settings()
+
+    @classmethod
+    def _set_alert(cls, enable):
+        """Set alert setting."""
+
+        cls.settings["alert_enabled"] = enable
 
     @classmethod
     def init_notify(cls, first_time=False):
@@ -703,8 +757,14 @@ class Settings(object):
         """Set notification setting."""
 
         cls.reload_settings()
-        cls.settings["notify_enabled"] = enable
+        cls._set_notify(enable)
         cls.save_settings()
+
+    @classmethod
+    def _set_notify(cls, enable):
+        """Set notification setting."""
+
+        cls.settings["notify_enabled"] = enable
 
     @classmethod
     def get_platform_notify(cls):
@@ -727,14 +787,18 @@ class Settings(object):
     def set_notify_method(cls, notify_method):
         """Set notification style."""
 
-        if notify_method not in ["native", "growl"]:
-            notify_method = NOTIFY_STYLES[util.platform()][0]
-        if notify_method in ["native"]:
-            notify_method = "native"
         cls.reload_settings()
-        cls.settings["notify_method"] = notify_method
+        cls._set_notify_method(notify_method)
         cls.save_settings()
         cls.init_notify()
+
+    @classmethod
+    def _set_notify_method(cls, notify_method):
+        """Set notification style."""
+
+        if notify_method not in ["native", "growl"]:
+            notify_method = NOTIFY_STYLES[util.platform()][0]
+        cls.settings["notify_method"] = notify_method
 
     @classmethod
     def get_term_notifier(cls):
@@ -748,9 +812,15 @@ class Settings(object):
         """Set term notifier location."""
 
         cls.reload_settings()
-        cls.settings['term_notifier'] = value
+        cls._set_term_notifier(value)
         cls.save_settings()
         cls.init_notify()
+
+    @classmethod
+    def _set_term_notifier(cls, value):
+        """Set term notifier location."""
+
+        cls.settings['term_notifier'] = value
 
     @classmethod
     def get_search_setting(cls, key, default):
@@ -806,8 +876,14 @@ class Settings(object):
         """Set backup type."""
 
         cls.reload_settings()
-        cls.settings['backup_type'] = value
+        cls._set_backup_type(value)
         cls.save_settings()
+
+    @classmethod
+    def _set_backup_type(cls, value):
+        """Set backup type."""
+
+        cls.settings['backup_type'] = value
 
     @classmethod
     def get_backup_ext(cls):
@@ -818,11 +894,17 @@ class Settings(object):
 
     @classmethod
     def set_backup_ext(cls, value):
-        """Get backup extension."""
+        """Set backup extension."""
 
         cls.reload_settings()
-        cls.settings['backup_ext'] = value
+        cls._set_backup_ext(value)
         cls.save_settings()
+
+    @classmethod
+    def _set_backup_ext(cls, value):
+        """Set backup extension."""
+
+        cls.settings['backup_ext'] = value
 
     @classmethod
     def get_backup_folder(cls):
@@ -833,11 +915,17 @@ class Settings(object):
 
     @classmethod
     def set_backup_folder(cls, value):
-        """Get backup folder."""
+        """Set backup folder."""
 
         cls.reload_settings()
-        cls.settings['backup_folder'] = value
+        cls._set_backup_folder(value)
         cls.save_settings()
+
+    @classmethod
+    def _set_backup_folder(cls, value):
+        """Set backup folder."""
+
+        cls.settings['backup_folder'] = value
 
     @classmethod
     def get_history_record_count(cls, history_types=None):
@@ -864,6 +952,77 @@ class Settings(object):
             if cls.cache.get(h, None) is not None:
                 cls.cache[h] = []
         cls.save_cache()
+
+    @classmethod
+    def import_settings(cls, obj):
+        """Import settings."""
+
+        cls.reload_settings()
+
+        # Backup
+        if 'backup_folder' in obj:
+            cls._set_backup_folder(obj['backup_folder'])
+        if 'backup_ext' in obj:
+            cls._set_backup_ext(obj['backup_ext'])
+        if 'backup_type' in obj:
+            cls._set_backup_type(obj['backup_type'])
+
+        # Notifications
+        update_notify = False
+        if 'alert_enabled' in obj:
+            cls._set_alert(obj['alert_enabled'])
+        if 'notify_enabled' in obj:
+            cls._set_notify(obj['notify_enabled'])
+        if 'notify_method' in obj:
+            cls._set_notify_method(obj['notify_method'])
+            update_notify = True
+        if 'term_notifier' in obj:
+            cls._set_term_notifier(obj['term_notifier'])
+            update_notify = True
+
+        # Editor
+        if 'editor' in obj:
+            cls._set_editor(obj['editor'])
+
+        # Single instance
+        if 'single_instance' in obj:
+            cls._set_single_instance(obj['single_instance'])
+
+        # Locale
+        if 'locale' in obj:
+            cls._set_language(obj['locale'])
+
+        # Hide limit panel
+        if 'hide_limit' in obj:
+            cls._set_hide_limit(obj['hide_limit'])
+
+        # Regex
+        if 'regex_mode' in obj:
+            cls._set_regex_mode(obj['regex_mode'])
+        if 'regex_version' in obj:
+            cls._set_regex_version(obj['regex_version'])
+
+        if 'chains' in obj:
+            for k, v in obj['chains'].items():
+                cls._add_chain(k, v)
+
+        if 'saved_searches' in obj:
+            for k, v in obj['saved_searches'].items():
+                cls._add_search(
+                    k,
+                    v['name'],
+                    v['search'],
+                    v['replace'],
+                    v['flags'],
+                    v['is_regex'],
+                    v['is_function']
+                )
+
+        cls.save_settings()
+
+        # Update notifications
+        if update_notify:
+            cls.init_notify()
 
     @classmethod
     def save_settings(cls):

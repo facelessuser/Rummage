@@ -92,7 +92,7 @@ class ExportSettingsDialog(gui.ExportSettingsDialog):
                 export[k] = v
             elif k == 'saved_searches' and patterns:
                 export[k] = v
-            elif k not in ('__format__', 'chains', 'saved_searches') and general:
+            elif k not in ('__format__', 'chains', 'saved_searches', 'debug') and general:
                 export[k] = v
 
         try:
