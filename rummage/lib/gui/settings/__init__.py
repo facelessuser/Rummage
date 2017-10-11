@@ -35,7 +35,7 @@ from .. import notify
 from ... import rumcore
 from ... import util
 
-DEV_MODE = True
+DEV_MODE = False
 SETTINGS_FILE = "rummage_dev.settings" if DEV_MODE else "rummage.settings"
 CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
@@ -366,6 +366,10 @@ class Settings(object):
             # TODO: Remove this in the future
             if isinstance(searches, list):
                 searches = cls._update_search_object_to_unique(searches)
+
+            # Remove old keys
+            if "regex_support" in cls.settings:
+                del cls.settings["regex_support"]
 
             # Convert list to dictionary
             for k, v in searches.items():
