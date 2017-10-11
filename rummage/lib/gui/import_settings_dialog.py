@@ -80,8 +80,15 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         self.CANCEL = _("Close")
         self.IMPORT = _("Import")
         self.ERR_NO_SELECT = _("There are no settings selected for import!")
-        self.IMPORT_FAIL = _("Could not import '%s'")
-        self.IMPORT_DONE = _("Finished import!")
+        self.IMPORT_FAIL = _("ERROR: Could not import key '%s'")
+        self.IMPORT_FAIL_CHAIN = _("ERROR: Could not import chain '%s'")
+        self.IMPORT_FAIL_SEARCH = _("ERROR: Could not import search '%s'")
+        self.IMPORT_SKIP_CHAIN = _("SKIPPED: Chain '%s'")
+        self.IMPORT_SKIP_SEARCH = _("SKIPPED: Search '%s'")
+        self.IMPORT_SUCCESS = _("SUCCESS: Imported '%s'")
+        self.IMPORT_SUCCESS_CHAIN = _("SUCCESS: Imported chain '%s'")
+        self.IMPORT_SUCCESS_SEARCH = _("SUCCESS: Imported search '%s'")
+        self.IMPORT_DONE = _("=== Finished import! ===")
         self.OW_CHAIN = _("Overwrite the chain (%s)?")
         self.OW_SEARCH = _("Overwrite the search (%s)?")
 
@@ -107,7 +114,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         return (
             isinstance(value, int) and
             (minimum is None or value >= minimum) and
-            (maximum is None and value <= maximum)
+            (maximum is None or value <= maximum)
         )
 
     def is_string(self, value):
@@ -190,6 +197,8 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
 
         chains = Settings.get_chains()
         bad_keys = set()
+        skip_keys = set()
+        good_keys = set()
         if not self.is_dict(value):
             value = None
         else:
@@ -199,20 +208,34 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                     continue
 
                 if k in chains and not self.request_overwrite(self.OW_CHAIN % k, CHAIN_TYPE):
-                    bad_keys.add(k)
+                    skip_keys.add(k)
                     continue
 
                 if not self.is_list(v):
                     bad_keys.add(k)
                     continue
 
+                failed = False
                 for chain in v:
                     if not self.is_string(chain) or self.RE_NAME.match(chain) is None:
+                        failed = True
                         bad_keys.add(k)
                         break
+                if failed:
+                    continue
+
+                good_keys.add(k)
 
         for k in bad_keys:
+            self.results.append(self.IMPORT_FAIL_CHAIN % k)
             del value[k]
+
+        for k in skip_keys:
+            self.results.append(self.IMPORT_SKIP_CHAIN % k)
+            del value[k]
+
+        for k in good_keys:
+            self.results.append(self.IMPORT_SUCCESS_CHAIN % k)
 
         if not value:
             value = None
@@ -223,6 +246,8 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
 
         searches = Settings.get_search()
         bad_keys = set()
+        skip_keys = set()
+        good_keys = set()
         if not self.is_dict(value):
             value = None
         else:
@@ -232,7 +257,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                     continue
 
                 if k in searches and not self.request_overwrite(self.OW_SEARCH % k, SEARCH_TYPE):
-                    bad_keys.add(k)
+                    skip_keys.add(k)
                     continue
 
                 if not self.is_dict(v):
@@ -270,8 +295,18 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                 else:
                     v["search"] = self.RE_STRING_REFS.sub(self.tx_refs, v["search"])
 
+                good_keys.add(k)
+
         for k in bad_keys:
+            self.results.append(self.IMPORT_FAIL_SEARCH % k)
             del value[k]
+
+        for k in skip_keys:
+            self.results.append(self.IMPORT_SKIP_SEARCH % k)
+            del value[k]
+
+        for k in good_keys:
+            self.results.append(self.IMPORT_SUCCESS_SEARCH % k)
 
         if not value:
             value = None
@@ -314,7 +349,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
             return
 
         import_obj = {}
-        bad_keys = set()
+        self.results = []
         for k, v in self.settings.items():
             if k == 'chains' and chains:
                 v = self.validate(k, v)
@@ -330,20 +365,17 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
             if v is not None:
                 # Okay to import
                 import_obj[k] = v
+                self.results.append(self.IMPORT_SUCCESS % k)
             else:
                 # Issue with validation
-                bad_keys.add(k)
+                self.results.append(self.IMPORT_FAIL % k)
 
-        if bad_keys:
-            results = '\n'.join([(self.IMPORT_FAIL % k) for k in bad_keys]) + '\n' + self.IMPORT_DONE
-        else:
-            results = self.IMPORT_DONE
-
-        self.m_results_textbox.SetValue(results)
+        self.results.append(self.IMPORT_DONE)
+        self.m_results_textbox.SetValue('\n'.join(self.results))
 
         if import_obj:
             Settings.import_settings(import_obj)
-            self.m_import_button.Enable(False)
+        self.m_import_button.Enable(False)
 
     def on_cancel_click(self, event):
         """Close window."""

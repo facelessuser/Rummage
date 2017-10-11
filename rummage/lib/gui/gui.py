@@ -1125,6 +1125,8 @@ class ImportSettingsDialog ( wx.Dialog ):
 		fgSizer42.Add( self.m_patterns_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_results_textbox = wx.TextCtrl( self.m_import_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
+		self.m_results_textbox.SetMinSize( wx.Size( -1,64 ) )
+		
 		fgSizer42.Add( self.m_results_textbox, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		fgSizer43 = wx.FlexGridSizer( 0, 4, 0, 0 )
