@@ -29,12 +29,12 @@ from .messages import prompt_icon, DEFAULT_ICON_SIZE
 class OverwriteDialog(gui.OverwriteDialog):
     """Overwrite dialog."""
 
-    def __init__(self, parent):
+    def __init__(self, parent, msg=None):
         """Init OverwriteDialog."""
 
         super(OverwriteDialog, self).__init__(parent)
 
-        self.status = False
+        self.action = False
         self.remember = False
         if sys.platform == "darwin":
             bm = prompt_icon.GetBitmap()
@@ -52,7 +52,7 @@ class OverwriteDialog(gui.OverwriteDialog):
             wx.Size(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE), 0
         )
 
-        self.localize()
+        self.localize(msg)
         self.refresh_localization()
 
         self.m_overwrite_panel.Layout()
@@ -60,11 +60,11 @@ class OverwriteDialog(gui.OverwriteDialog):
         self.Fit()
         self.SetMinSize(self.GetSize())
 
-    def localize(self):
+    def localize(self, msg):
         """Translate strings."""
 
         self.TITLE = _("Overwrite")
-        self.MSG = _("Overwrite?")
+        self.MSG = _("Overwrite?") if msg is None else msg
         self.OVERWRITE = _("Overwrite")
         self.SKIP = _("Skip")
         self.APPLY = _("Apply to all")
@@ -82,13 +82,13 @@ class OverwriteDialog(gui.OverwriteDialog):
     def on_overwrite(self, event):
         """Handle on overwrite."""
 
-        self.status = True
+        self.action = True
         self.remember = self.m_remember_checkbox.GetValue()
         self.Close()
 
     def on_skip(self, event):
         """Handle on skip."""
 
-        self.status = False
+        self.action = False
         self.remember = self.m_remember_checkbox.GetValue()
         self.Close()

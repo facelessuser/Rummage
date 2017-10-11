@@ -28,6 +28,9 @@ from . import gui
 from .. import util
 from .overwrite_dialog import OverwriteDialog
 
+CHAIN_TYPE = 0
+SEARCH_TYPE = 1
+
 
 class ImportSettingsDialog(gui.ImportSettingsDialog):
     """Import settings dialog."""
@@ -61,8 +64,10 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         self.Fit()
         self.SetMinSize(self.GetSize())
 
-        self.remember = False
-        self.status = False
+        self.chain_remember = False
+        self.chain_action = False
+        self.search_remember = False
+        self.search_action = False
         self.settings = obj
 
     def localize(self):
@@ -76,7 +81,9 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         self.IMPORT = _("Import")
         self.ERR_NO_SELECT = _("There are no settings selected for import!")
         self.IMPORT_FAIL = _("Could not import '%s'")
-        self.IMPORT_DONE = _('Finished import!')
+        self.IMPORT_DONE = _("Finished import!")
+        self.OW_CHAIN = _("Overwrite the chain (%s)?")
+        self.OW_SEARCH = _("Overwrite the search (%s)?")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -123,17 +130,23 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
 
         return (self.RE_LITERAL_FLAGS if not is_regex else self.RE_REGEXP_FLAGS).match(flags) is not None
 
-    def request_overwrite(self):
+    def request_overwrite(self, msg, ow_type):
         """Request a settings overwrite."""
 
-        if not self.remember:
-            dlg = OverwriteDialog(self)
+        remember = self.search_remember if ow_type == SEARCH_TYPE else self.chain_remember
+
+        if not remember:
+            dlg = OverwriteDialog(self, msg)
             dlg.ShowModal()
-            self.remember = dlg.remember
-            self.status = dlg.status
+            if ow_type == SEARCH_TYPE:
+                self.search_remember = dlg.remember
+                self.search_action = dlg.action
+            else:
+                self.chain_remember = dlg.remember
+                self.chain_action = dlg.action
             dlg.Destroy()
 
-        return self.status
+        return self.search_action if ow_type == SEARCH_TYPE else self.chain_action
 
     def import_bool(self, key, value):
         """Import boolean setting."""
@@ -185,7 +198,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                     bad_keys.add(k)
                     continue
 
-                if k in chains and not self.request_overwrite():
+                if k in chains and not self.request_overwrite(self.OW_CHAIN % k, CHAIN_TYPE):
                     bad_keys.add(k)
                     continue
 
@@ -218,7 +231,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                     bad_keys.add(k)
                     continue
 
-                if k in searches and not self.request_overwrite():
+                if k in searches and not self.request_overwrite(self.OW_SEARCH % k, SEARCH_TYPE):
                     bad_keys.add(k)
                     continue
 
@@ -321,9 +334,12 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                 # Issue with validation
                 bad_keys.add(k)
 
-        self.m_results_textbox.SetValue(
-            '\n'.join([(self.IMPORT_FAIL % k) for k in bad_keys]) + '\n' + self.IMPORT_DONE
-        )
+        if bad_keys:
+            results = '\n'.join([(self.IMPORT_FAIL % k) for k in bad_keys]) + '\n' + self.IMPORT_DONE
+        else:
+            results = self.IMPORT_DONE
+
+        self.m_results_textbox.SetValue(results)
 
         if import_obj:
             Settings.import_settings(import_obj)
