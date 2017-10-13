@@ -520,6 +520,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.DIRECTORY_SELECT = _("Select directory to rummage")
         self.SCRIPT_SELECT = _("Select replace script")
         self.EXPORT_TO = _("Export to...")
+        self.IMPORT_FROM = _("Import from...")
 
         # Dialog messages
         self.MSG_REPLACE_WARN = _("Are you sure you want to replace all instances?")
@@ -2233,7 +2234,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_import_settings(self, event):
         """Import settngs."""
 
-        filename = filepickermsg(self.EXPORT_TO, wildcard="*.json", save=False)
+        filename = filepickermsg(self.IMPORT_FROM, wildcard="(*.json;*.settings)|*.json;*.settings", save=False)
         if filename is None:
             return
 
