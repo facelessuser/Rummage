@@ -386,6 +386,69 @@ Windows
 
 The **History** panel is where all text box drop down history can be cleared.
 
+## Import/Exporting Settings
+
+If desired, Rummage's settings can be exported to a JSON file or imported from a JSON file.  This can be particularly useful for importing regular expression patterns from one system into another system's existing regular expression list. This can also be useful if you have a lot of regular expression patterns you wish to create, and it would be too cumbersome to do it through the GUI.  In the latter case, you could construct the pattern configurations in a JSON file and import all the patterns in one shot.
+
+Import and export are broken up into three types of settings: general settings, chains, and searches. General settings are the basic feature configurations for Rummage.  Chains contains all of your configured pattern chains.  And searches is the actual configured search and replaces.  When exporting, you will be presented with a dialog allowing you to select which categories of settings you wish to export.
+
+![Settings: Export](/images/settings_export.png)
+
+When importing, you will be prompted to select the settings file to import.  Then you will be asked to select one or more settings categories to import.  Rummage will skip any malformed or invalid settings. If you are going to overwrite an existing chain or search, it will prompt you whether to proceed with the overwrite.  Afterwards, it will output the import results in the text box.
+
+![Settings: Export](/images/settings_import.png)
+
+The general settings are meant to be transferred between installations, not specifically configured by hand, so all the supported settings will not be covered here, but the chain and search format will be discussed in details.
+
+The chain format for importing is shown below:
+
+```js
+{
+    "chains": {                 // The key that denotes this setting is the "chains" setting.
+        "a-chain": [            // Unique chain ID.  Must be composed of letters, numbers, underscores, and hyphens.
+            "example-1",        // A list of references to specific unique search IDs.
+            "example-2"
+        ],
+        "another-chain": [
+            "example-3",
+            "example-4"
+        ]
+    }
+}
+```
+
+The search/replace format for importing is show below:
+
+```js
+{
+    "saved_searches": {                                         // The key that denotes this setting is the "chains" setting.
+        "Copyright-update": {                                   // Unique search ID.  Must be composed of letters, numbers, underscores, and hyphens.
+            "flags": "is",                                      // Search and replace flags (covered below).
+            "is_function": false,                               // Boolean stating whether the replace pattern is a function or not.
+            "is_regex": true,                                   // Boolean stating whether the search pattern is a regular expression or literal string.
+            "name": "Copyright update",                         // A more user friendly name or description of the pattern.
+            "replace": "\\g<1>16",                              // The replace pattern, or in case `is_function` is `true`, the path to the Python replace plugin file.
+            "search": "(Copyright \\(c\\) \\d+ - 20)(\\d{2})"   // The search pattern.
+        }
+    }
+}
+```
+
+Below is a table containing valid flags for the `flags` parameter.  Literal searches only allow flags `i`, `u`, and `f`.  Regular expression patterns can use `i`, `u`, `f`, `s`, `b`, `e`, `w`, `r`, `p`, and `F` (though flags are applicable depending on whether you are using Re, Regex, or one of the two with Backrefs).
+
+Flags | Supported\ Libraries                       | Option
+----- | ------------------------------------------ | -----------
+`i`   | All                                        | [Search case-sensitive.](#common-regular-expression-flags)
+`u`   | All                                        | [Use Unicode properties.](#common-regular-expression-flags)
+`s`   | All                                        | [Dot matches newline.](#common-regular-expression-flags)
+`f`   | Regex, Regex\ + \Backrefs                  | [Full case-folding.](#regex-engine-flags)
+`b`   | Regex, Regex\ + \Backrefs                  | [Best fuzzy match.](#regex-engine-flags)
+`e`   | Regex, Regex\ + \Backrefs                  | [Improve fuzzy fit.](#regex-engine-flags)
+`w`   | Regex, Regex\ + \Backrefs                  | [Unicode word breaks.](#regex-engine-flags)
+`r`   | Regex, Regex\ + \Backrefs                  | [Search backwards.](#regex-engine-flags)
+`p`   | Regex, Regex\ + \Backrefs                  | [Use POSIX matching.](#regex-engine-flags)
+`F`   | Regex, Regex\ + \Backrefs, Re\ + \Backrefs | [Format style replacements.](#common-regular-expression-flags)
+
 ## Backrefs (Extended Regex Escapes)
 
 Rummage has the option of using a special wrapper called Backrefs around Python's Re or the 3rd party Regex module. Backrefs was written specifically for use with Rummage and adds various additional back references that are known to some regex engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on the engine being used as one may already have similar support.  You can enable extended back references in the **Preferences** dialog under the [Regular Expressions Module](#regular-expression-modules) panel.
@@ -528,4 +591,4 @@ After installing the localization files, set the language via the `Language` set
 
 I only speak English, so I do not maintain the translations. If the UI changes, someone from the community will need to update them appropriately via pull requests or they will remain out of date.
 
---8<-- "links.md"
+--8<-- "refs.md"
