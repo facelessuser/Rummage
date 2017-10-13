@@ -173,7 +173,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
             if key == "locale" and value not in Settings.get_languages():
                 value = None
             if key == "term_notifier" and util.platform() != "osx":
-                value = None
+                value = ""
         return value
 
     def import_int(self, key, value):
