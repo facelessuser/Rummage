@@ -19,6 +19,7 @@ GitHub
 grepWin
 Homebrew
 inline
+JSON
 macOS
 MERCHANTABILITY
 MkDocs
@@ -32,8 +33,8 @@ plugins
 POSIX
 PyMdown
 Regex
-Regex's
 regex
+Regex's
 reinstalling
 requesters
 resize

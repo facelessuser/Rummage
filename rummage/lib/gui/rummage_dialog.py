@@ -43,6 +43,8 @@ from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
 from .search_chain_dialog import SearchChainDialog
+from .export_settings_dialog import ExportSettingsDialog
+from .import_settings_dialog import ImportSettingsDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .controls import pick_button
@@ -518,6 +520,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.DIRECTORY_SELECT = _("Select directory to rummage")
         self.SCRIPT_SELECT = _("Select replace script")
         self.EXPORT_TO = _("Export to...")
+        self.IMPORT_FROM = _("Import from...")
 
         # Dialog messages
         self.MSG_REPLACE_WARN = _("Are you sure you want to replace all instances?")
@@ -546,6 +549,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.ERR_INVLAID_SIZE = _("Please enter a valid size!")
         self.ERR_INVALID_MDATE = _("Please enter a modified date!")
         self.ERR_INVALID_CDATE = _("Please enter a created date!")
+        self.ERR_IMPORT = _("There was an error attempting to read the settings file!")
 
         # Status
         self.INIT_STATUS = _("Searching: 0/0 0% Skipped: 0 Matches: 0")
@@ -596,7 +600,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.SEARCH = _("Search")
 
         # Menu
-        self.MENU_EXPORT = _("Export")
+        self.MENU_EXPORT_RESULTS = _("Export Results")
+        self.MENU_EXPORT_SETTINGS = _("Export Settings")
+        self.MENU_IMPORT_SETTINGS = _("Import Settings")
         self.MENU_FILE = _("File")
         self.MENU_VIEW = _("View")
         self.MENU_HELP = _("Help")
@@ -676,8 +682,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_save_search_button.SetLabel(self.SAVE_SEARCH)
         self.m_load_search_button.SetLabel(self.LOAD_SEARCH)
         self.m_grep_notebook.SetPageText(0, self.SEARCH)
-        exportid = self.m_menu.FindMenuItem("File", "Export")
-        self.m_menu.SetLabel(exportid, self.MENU_EXPORT)
+        exportid = self.m_menu.FindMenuItem("File", "Export Results")
+        self.m_menu.SetLabel(exportid, self.MENU_EXPORT_RESULTS)
         self.m_menu.SetMenuLabel(0, self.MENU_FILE)
         self.m_menu.SetMenuLabel(1, self.MENU_VIEW)
         self.m_menu.SetMenuLabel(2, self.MENU_HELP)
@@ -685,6 +691,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_quit_menuitem.SetItemLabel(self.MENU_EXIT)
         self.m_export_html_menuitem.SetItemLabel(self.MENU_HTML)
         self.m_export_csv_menuitem.SetItemLabel(self.MENU_CSV)
+        self.m_export_settings_menuitem.SetItemLabel(self.MENU_EXPORT_SETTINGS)
+        self.m_import_settings_menuitem.SetItemLabel(self.MENU_IMPORT_SETTINGS)
         self.m_hide_limit_menuitem.SetItemLabel(self.MENU_HIDE_LIMIT)
         self.m_log_menuitem.SetItemLabel(self.MENU_OPEN_LOG)
         self.m_about_menuitem.SetItemLabel(self.MENU_ABOUT)
@@ -1245,14 +1253,14 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         searches = Settings.get_search()
         for search_name in Settings.get_chains()[chain]:
             search_obj = searches[search_name]
-            if search_obj[5] and replace:
-                replace_obj = self.import_plugin(search_obj[2])
+            if search_obj['is_function'] and replace:
+                replace_obj = self.import_plugin(search_obj['replace'])
             elif replace:
-                replace_obj = search_obj[2]
+                replace_obj = search_obj['replace']
             else:
                 replace_obj = None
 
-            flags = self.chain_flags(search_obj[3], search_obj[4])
+            flags = self.chain_flags(search_obj['flags'], search_obj['is_regex'])
             is_literal = (flags & rumcore.LITERAL)
 
             if replace_obj is not None:
@@ -1261,7 +1269,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 elif mode == rumcore.RE_MODE and not is_literal:
                     replace_obj = util.preprocess_replace(replace_obj)
 
-            search_chain.add(search_obj[1], replace_obj, flags)
+            search_chain.add(search_obj['search'], replace_obj, flags)
 
         debug(search_chain)
 
@@ -1711,7 +1719,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         msg = self.ERR_MISSING_SEARCH % search
                         fail = True
                         break
-                    if self.validate_chain_regex(s[1], self.chain_flags(s[3], s[4])):
+                    if self.validate_chain_regex(s['search'], self.chain_flags(s['flags'], s['is_regex'])):
                         msg = self.ERR_INVALID_CHAIN_SEARCH % search
                         fail = True
                         break
@@ -2215,6 +2223,29 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         except Exception:
             error(traceback.format_exc())
             errormsg(self.ERR_CSV_FAILED)
+
+    def on_export_settings(self, event):
+        """Export settngs."""
+
+        exporter = ExportSettingsDialog(self)
+        exporter.ShowModal()
+        exporter.Destroy()
+
+    def on_import_settings(self, event):
+        """Import settngs."""
+
+        filename = filepickermsg(self.IMPORT_FROM, wildcard="(*.json;*.settings)|*.json;*.settings", save=False)
+        if filename is None:
+            return
+
+        obj = util.read_json(filename)
+        if obj is None:
+            errormsg(self.ERR_IMPORT)
+            return
+
+        importer = ImportSettingsDialog(self, obj)
+        importer.ShowModal()
+        importer.Destroy()
 
     def on_hide_limit(self, event):
         """Hide limit panel."""

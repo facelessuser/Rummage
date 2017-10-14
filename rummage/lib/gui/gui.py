@@ -430,7 +430,15 @@ class RummageFrame ( wx.Frame ):
 		self.m_export_csv_menuitem = wx.MenuItem( self.m_export_submenuitem, wx.ID_ANY, u"CSV", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_export_submenuitem.Append( self.m_export_csv_menuitem )
 		
-		self.m_file_menu.AppendSubMenu( self.m_export_submenuitem, u"Export" )
+		self.m_file_menu.AppendSubMenu( self.m_export_submenuitem, u"Export Results" )
+		
+		self.m_file_menu.AppendSeparator()
+		
+		self.m_export_settings_menuitem = wx.MenuItem( self.m_file_menu, wx.ID_ANY, u"Export Settings", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_file_menu.Append( self.m_export_settings_menuitem )
+		
+		self.m_import_settings_menuitem = wx.MenuItem( self.m_file_menu, wx.ID_ANY, u"Import Settings", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_file_menu.Append( self.m_import_settings_menuitem )
 		
 		self.m_file_menu.AppendSeparator()
 		
@@ -485,6 +493,8 @@ class RummageFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.on_preferences, id = self.m_preferences_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_export_html, id = self.m_export_html_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_export_csv, id = self.m_export_csv_menuitem.GetId() )
+		self.Bind( wx.EVT_MENU, self.on_export_settings, id = self.m_export_settings_menuitem.GetId() )
+		self.Bind( wx.EVT_MENU, self.on_import_settings, id = self.m_import_settings_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_exit, id = self.m_quit_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_hide_limit, id = self.m_hide_limit_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_about, id = self.m_about_menuitem.GetId() )
@@ -540,6 +550,12 @@ class RummageFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_export_csv( self, event ):
+		event.Skip()
+	
+	def on_export_settings( self, event ):
+		event.Skip()
+	
+	def on_import_settings( self, event ):
 		event.Skip()
 	
 	def on_exit( self, event ):
@@ -998,6 +1014,272 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_cancel( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class ExportSettingsDialog
+###########################################################################
+
+class ExportSettingsDialog ( wx.Dialog ):
+	
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Export Settings", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+		
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		
+		bSizer17 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_export_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		fgSizer42 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer42.AddGrowableCol( 0 )
+		fgSizer42.SetFlexibleDirection( wx.BOTH )
+		fgSizer42.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_general_settings_checkbox = wx.CheckBox( self.m_export_panel, wx.ID_ANY, u"General settings", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer42.Add( self.m_general_settings_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_chains_checkbox = wx.CheckBox( self.m_export_panel, wx.ID_ANY, u"Chains", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer42.Add( self.m_chains_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_patterns_checkbox = wx.CheckBox( self.m_export_panel, wx.ID_ANY, u"Search/replace patterns", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer42.Add( self.m_patterns_checkbox, 0, wx.ALL, 5 )
+		
+		fgSizer43 = wx.FlexGridSizer( 0, 4, 0, 0 )
+		fgSizer43.AddGrowableCol( 0 )
+		fgSizer43.AddGrowableCol( 3 )
+		fgSizer43.SetFlexibleDirection( wx.BOTH )
+		fgSizer43.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		
+		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_export_button = wx.Button( self.m_export_panel, wx.ID_ANY, u"Export", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer43.Add( self.m_export_button, 0, wx.ALL, 5 )
+		
+		self.m_close_button = wx.Button( self.m_export_panel, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer43.Add( self.m_close_button, 0, wx.ALL, 5 )
+		
+		
+		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer42.Add( fgSizer43, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_export_panel.SetSizer( fgSizer42 )
+		self.m_export_panel.Layout()
+		fgSizer42.Fit( self.m_export_panel )
+		bSizer17.Add( self.m_export_panel, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( bSizer17 )
+		self.Layout()
+		bSizer17.Fit( self )
+		
+		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.m_export_button.Bind( wx.EVT_BUTTON, self.on_export_click )
+		self.m_close_button.Bind( wx.EVT_BUTTON, self.on_cancel_click )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_export_click( self, event ):
+		event.Skip()
+	
+	def on_cancel_click( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class ImportSettingsDialog
+###########################################################################
+
+class ImportSettingsDialog ( wx.Dialog ):
+	
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Import Settings", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+		
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		
+		bSizer17 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_import_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		fgSizer42 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer42.AddGrowableCol( 0 )
+		fgSizer42.AddGrowableRow( 3 )
+		fgSizer42.SetFlexibleDirection( wx.BOTH )
+		fgSizer42.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_general_settings_checkbox = wx.CheckBox( self.m_import_panel, wx.ID_ANY, u"General settings", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer42.Add( self.m_general_settings_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_chains_checkbox = wx.CheckBox( self.m_import_panel, wx.ID_ANY, u"Chains", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer42.Add( self.m_chains_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_patterns_checkbox = wx.CheckBox( self.m_import_panel, wx.ID_ANY, u"Search/Replace patterns", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer42.Add( self.m_patterns_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_results_textbox = wx.TextCtrl( self.m_import_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
+		self.m_results_textbox.SetMinSize( wx.Size( -1,64 ) )
+		
+		fgSizer42.Add( self.m_results_textbox, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		fgSizer43 = wx.FlexGridSizer( 0, 4, 0, 0 )
+		fgSizer43.AddGrowableCol( 0 )
+		fgSizer43.AddGrowableCol( 3 )
+		fgSizer43.SetFlexibleDirection( wx.BOTH )
+		fgSizer43.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		
+		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_import_button = wx.Button( self.m_import_panel, wx.ID_ANY, u"Import", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer43.Add( self.m_import_button, 0, wx.ALL, 5 )
+		
+		self.m_close_button = wx.Button( self.m_import_panel, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer43.Add( self.m_close_button, 0, wx.ALL, 5 )
+		
+		
+		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer42.Add( fgSizer43, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_import_panel.SetSizer( fgSizer42 )
+		self.m_import_panel.Layout()
+		fgSizer42.Fit( self.m_import_panel )
+		bSizer17.Add( self.m_import_panel, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( bSizer17 )
+		self.Layout()
+		bSizer17.Fit( self )
+		
+		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.m_import_button.Bind( wx.EVT_BUTTON, self.on_import_click )
+		self.m_close_button.Bind( wx.EVT_BUTTON, self.on_cancel_click )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_import_click( self, event ):
+		event.Skip()
+	
+	def on_cancel_click( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class OverwriteDialog
+###########################################################################
+
+class OverwriteDialog ( wx.Dialog ):
+	
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Overwrite", pos = wx.DefaultPosition, size = wx.Size( 300,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
+		
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		
+		bSizer12 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_overwrite_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_overwrite_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
+		fgSizer33 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer33.AddGrowableCol( 0 )
+		fgSizer33.AddGrowableRow( 0 )
+		fgSizer33.AddGrowableRow( 1 )
+		fgSizer33.AddGrowableRow( 2 )
+		fgSizer33.SetFlexibleDirection( wx.BOTH )
+		fgSizer33.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		fgSizer52 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer52.AddGrowableCol( 1 )
+		fgSizer52.AddGrowableRow( 0 )
+		fgSizer52.SetFlexibleDirection( wx.BOTH )
+		fgSizer52.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_bitmap = wx.StaticBitmap( self.m_overwrite_panel, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.Size( 64,64 ), 0 )
+		self.m_bitmap.SetMinSize( wx.Size( 64,64 ) )
+		
+		fgSizer52.Add( self.m_bitmap, 0, wx.ALL, 5 )
+		
+		self.m_message_label = wx.StaticText( self.m_overwrite_panel, wx.ID_ANY, u"Overwrite?", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
+		self.m_message_label.Wrap( -1 )
+		fgSizer52.Add( self.m_message_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		fgSizer33.Add( fgSizer52, 1, wx.EXPAND, 5 )
+		
+		fgSizer53 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer53.AddGrowableCol( 0 )
+		fgSizer53.AddGrowableRow( 0 )
+		fgSizer53.SetFlexibleDirection( wx.BOTH )
+		fgSizer53.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_remember_checkbox = wx.CheckBox( self.m_overwrite_panel, wx.ID_ANY, u"Apply to all", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer53.Add( self.m_remember_checkbox, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		fgSizer33.Add( fgSizer53, 1, wx.EXPAND, 5 )
+		
+		fgSizer34 = wx.FlexGridSizer( 0, 4, 0, 0 )
+		fgSizer34.AddGrowableCol( 0 )
+		fgSizer34.AddGrowableCol( 3 )
+		fgSizer34.AddGrowableRow( 0 )
+		fgSizer34.SetFlexibleDirection( wx.BOTH )
+		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		
+		fgSizer34.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_overwrite_button = wx.Button( self.m_overwrite_panel, wx.ID_ANY, u"Overwrite", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer34.Add( self.m_overwrite_button, 0, wx.ALL, 5 )
+		
+		self.m_cancel_button = wx.Button( self.m_overwrite_panel, wx.ID_ANY, u"Skip", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer34.Add( self.m_cancel_button, 0, wx.ALL, 5 )
+		
+		
+		fgSizer34.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer33.Add( fgSizer34, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_overwrite_panel.SetSizer( fgSizer33 )
+		self.m_overwrite_panel.Layout()
+		fgSizer33.Fit( self.m_overwrite_panel )
+		bSizer12.Add( self.m_overwrite_panel, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( bSizer12 )
+		self.Layout()
+		
+		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.m_overwrite_button.Bind( wx.EVT_BUTTON, self.on_overwrite )
+		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_skip )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_overwrite( self, event ):
+		event.Skip()
+	
+	def on_skip( self, event ):
 		event.Skip()
 	
 

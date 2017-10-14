@@ -85,9 +85,18 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         searches = Settings.get_search()
         for key in sorted(searches.keys()):
             s = searches[key]
-            search_type = self.SEARCH_REGEX if s[4] else self.SEARCH_LITERAL
-            replace_type = self.REPLACE_PLUGIN if s[5] else self.REPLACE_PATTERN
-            self.m_search_list.set_item_map(count, key, s[0], s[1], s[2], s[3], search_type, replace_type)
+            search_type = self.SEARCH_REGEX if s['is_regex'] else self.SEARCH_LITERAL
+            replace_type = self.REPLACE_PLUGIN if s['is_function'] else self.REPLACE_PATTERN
+            self.m_search_list.set_item_map(
+                count,
+                key,
+                s['name'],
+                s['search'],
+                s['replace'],
+                s['flags'],
+                search_type,
+                replace_type
+            )
             count += 1
         self.m_search_list.load_list()
 

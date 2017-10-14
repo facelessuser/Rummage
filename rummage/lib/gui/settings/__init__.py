@@ -23,6 +23,7 @@ import codecs
 import json
 import os
 import traceback
+import copy
 from . import portalocker
 from ..app import custom_app
 from ..app.custom_app import debug, debug_struct, error
@@ -34,10 +35,14 @@ from .. import notify
 from ... import rumcore
 from ... import util
 
-SETTINGS_FILE = "rummage.settings"
-CACHE_FILE = "rummage.cache"
+DEV_MODE = False
+SETTINGS_FILE = "rummage_dev.settings" if DEV_MODE else "rummage.settings"
+CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
+
+SETTINGS_FMT = '2.1.0'
+CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
     "osx": ["default", "growl"],
@@ -61,6 +66,7 @@ class Settings(object):
         """Translate strings."""
 
         cls.ERR_LOAD_SETTINGS_FAILED = _("Failed to load settings file!")
+        cls.ERR_LOAD_CACHE_FAILED = _("Failed to load cache file!")
         cls.ERR_SAVE_SETTINGS_FAILED = _("Failed to save settings file!")
         cls.ERR_SAVE_CACHE_FAILED = _("Failed to save cache file!")
 
@@ -72,35 +78,14 @@ class Settings(object):
         cls.localize()
         cls.settings_file, cls.cache_file, log = cls.get_settings_files()
         custom_app.init_app_log(log)
-        cls.settings = {}
-        cls.cache = {}
+        cls.settings = {"__format__": SETTINGS_FMT}
+        cls.cache = {"__format__": CACHE_FMT}
         cls.settings_time = None
         cls.cache_time = None
         cls.get_times()
         if cls.settings_file is not None:
-            try:
-                locked = False
-                with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
-                    assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
-                    locked = True
-                    cls.settings = json.loads(f.read())
-                    assert portalocker.unlock(f), "Could not unlock settings."
-                    locked = False
-                with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
-                    assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock cache file."
-                    locked = True
-                    cls.cache = json.loads(f.read())
-                    assert portalocker.unlock(f), "Could not unlock cache file."
-                    locked = False
-            except Exception:
-                e = traceback.format_exc()
-                try:
-                    error(e)
-                    if locked:
-                        portalocker.unlock(f)
-                    errormsg(cls.ERR_LOAD_SETTINGS_FAILED)
-                except Exception:
-                    print(str(e))
+            cls.open_settings()
+            cls.open_cache()
         if cls.debug:
             custom_app.set_debug_mode(True)
         localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
@@ -108,6 +93,13 @@ class Settings(object):
         debug_struct(cls.settings)
         debug_struct(cls.cache)
         cls.init_notify(True)
+
+    @classmethod
+    def get_settings(cls):
+        """Get the entire settings object."""
+
+        cls.reload_settings()
+        return copy.deepcopy(cls.settings)
 
     @classmethod
     def is_regex_available(cls):
@@ -120,10 +112,16 @@ class Settings(object):
         """Set regex support."""
 
         cls.reload_settings()
+        cls._set_regex_mode(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_regex_mode(cls, value):
+        """Set regex support."""
+
         if value in rumcore.REGEX_MODES and not rumcore.REGEX_SUPPORT:
             value = rumcore.REGEX_MODE
         cls.settings["regex_mode"] = value
-        cls.save_settings()
 
     @classmethod
     def get_regex_mode(cls):
@@ -140,9 +138,15 @@ class Settings(object):
         """Get the regex version."""
 
         cls.reload_settings()
+        cls._set_regex_version(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_regex_version(cls, value):
+        """Get the regex version."""
+
         if 0 <= value <= 1:
             cls.settings["regex_version"] = value
-            cls.save_settings()
 
     @classmethod
     def get_regex_version(cls):
@@ -163,8 +167,14 @@ class Settings(object):
         """Set hide limit setting."""
 
         cls.reload_settings()
-        cls.settings["hide_limit"] = hide
+        cls._set_hide_limit(hide)
         cls.save_settings()
+
+    @classmethod
+    def _set_hide_limit(cls, hide):
+        """Set hide limit setting."""
+
+        cls.settings["hide_limit"] = hide
 
     @classmethod
     def get_language(cls):
@@ -181,8 +191,14 @@ class Settings(object):
         """Set locale language."""
 
         cls.reload_settings()
-        cls.settings["locale"] = language
+        cls._set_language(language)
         cls.save_settings()
+
+    @classmethod
+    def _set_language(cls, language):
+        """Set locale language."""
+
+        cls.settings["locale"] = language
 
     @classmethod
     def get_languages(cls):
@@ -281,23 +297,158 @@ class Settings(object):
             log = os.path.join(folder, LOG_FILE)
             cls.fifo = os.path.join(folder, FIFO)
             cls.config_folder = folder
+
+        if not os.path.exists(settings):
+            cls.new_settings(settings)
+        if not os.path.exists(cache):
+            cls.new_cache(cache)
+
+        return settings, cache, log
+
+    @classmethod
+    def open_settings(cls):
+        """Open settings file."""
+
         try:
             locked = False
-            for filename in (settings, cache):
-                if not os.path.exists(filename):
-                    with codecs.open(filename, "w", encoding="utf-8") as f:
-                        assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock file."
-                        locked = True
-                        f.write(json.dumps({}, sort_keys=True, indent=4, separators=(',', ': ')))
-                        assert portalocker.unlock(f), "Could not unlock file."
-                        locked = False
+            with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
+                locked = True
+                cls.settings = json.loads(f.read())
+                assert portalocker.unlock(f), "Could not unlock settings."
+                locked = False
+                cls.update_settings()
+        except Exception:
+            e = traceback.format_exc()
+            try:
+                error(e)
+                if locked:
+                    portalocker.unlock(f)
+                errormsg(cls.ERR_LOAD_SETTINGS_FAILED)
+            except Exception:
+                print(str(e))
+
+    @classmethod
+    def new_settings(cls, settings):
+        """New settings."""
+
+        default_settings = {'__format__': SETTINGS_FMT}
+
+        try:
+            locked = False
+            with codecs.open(settings, "w", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock file."
+                locked = True
+                f.write(json.dumps(default_settings, sort_keys=True, indent=4, separators=(',', ': ')))
+                assert portalocker.unlock(f), "Could not unlock file."
+                locked = False
         except Exception:
             try:
                 if locked:
                     portalocker.unlock(f)
             except Exception:
                 pass
-        return settings, cache, log
+
+        return default_settings
+
+    @classmethod
+    def update_settings(cls):
+        """Update settings."""
+
+        settings_format = cls.settings.get('__format__')
+        # if settings_format is None:
+        #     # Replace invalid settings
+        #     cls.settings = cls.new_settings(cls.settings_file)
+        if settings_format < '2.1.0':
+            searches = cls.settings.get("saved_searches", {})
+
+            # Upgrade versions before format existed
+            # TODO: Remove this in the future
+            if isinstance(searches, list):
+                searches = cls._update_search_object_to_unique(searches)
+
+            # Remove old keys
+            if "regex_support" in cls.settings:
+                del cls.settings["regex_support"]
+
+            # Convert list to dictionary
+            for k, v in searches.items():
+                new_search = {
+                    "name": v[0],
+                    "search": v[1],
+                    "replace": v[2],
+                    "flags": v[3],
+                    "is_regex": v[4],
+                    "is_function": v[5]
+                }
+                searches[k] = new_search
+            cls.settings["saved_searches"] = searches
+
+            # Ensure backup_type is an integer
+            backup_type = cls.settings.get('backup_type')
+            cls.settings["backup_type"] = 0 if backup_type is None or backup_type is False else 1
+
+            # Update format
+            cls.settings["__format__"] = SETTINGS_FMT
+            cls.save_settings()
+
+    @classmethod
+    def open_cache(cls):
+        """Open cache file."""
+
+        try:
+            locked = False
+            with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_SH), "Could not lock settings."
+                locked = True
+                cls.cache = json.loads(f.read())
+                assert portalocker.unlock(f), "Could not unlock settings."
+                locked = False
+                cls.update_cache()
+        except Exception:
+            e = traceback.format_exc()
+            try:
+                error(e)
+                if locked:
+                    portalocker.unlock(f)
+                errormsg(cls.ERR_LOAD_CACHE_FAILED)
+            except Exception:
+                print(str(e))
+
+    @classmethod
+    def new_cache(cls, cache):
+        """New cache."""
+
+        default_cache = {'__format__': CACHE_FMT}
+
+        try:
+            locked = False
+            with codecs.open(cache, "w", encoding="utf-8") as f:
+                assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock file."
+                locked = True
+                f.write(json.dumps(default_cache, sort_keys=True, indent=4, separators=(',', ': ')))
+                assert portalocker.unlock(f), "Could not unlock file."
+                locked = False
+        except Exception:
+            try:
+                if locked:
+                    portalocker.unlock(f)
+            except Exception:
+                pass
+
+        return default_cache
+
+    @classmethod
+    def update_cache(cls):
+        """Update settings."""
+
+        cache_format = cls.cache.get('__format__')
+        if cache_format is None:
+            # Replace invalid cache
+            cls.cache = cls.new_cache(cls.cache_file)
+        if cache_format == '2.0.0':
+            # Upgrade to 2.1.0
+            pass
 
     @classmethod
     def get_config_folder(cls):
@@ -377,8 +528,14 @@ class Settings(object):
         """Set editor command."""
 
         cls.reload_settings()
-        cls.settings["editor"] = editor
+        cls._set_editor(editor)
         cls.save_settings()
+
+    @classmethod
+    def _set_editor(cls, editor):
+        """Set editor command."""
+
+        cls.settings["editor"] = editor
 
     @classmethod
     def get_single_instance(cls):
@@ -392,8 +549,14 @@ class Settings(object):
         """Set single instance setting."""
 
         cls.reload_settings()
-        cls.settings["single_instance"] = single
+        cls._set_single_instance(single)
         cls.save_settings()
+
+    @classmethod
+    def _set_single_instance(cls, single):
+        """Set single instance setting."""
+
+        cls.settings["single_instance"] = single
 
     @classmethod
     def _update_search_object_to_unique(cls, searches):
@@ -435,10 +598,23 @@ class Settings(object):
         """Add saved search."""
 
         cls.reload_settings()
-        searches = cls.settings.get("saved_searches", {})
-        searches[key] = (name, search, replace, flags, is_regex, is_function)
-        cls.settings["saved_searches"] = searches
+        cls._add_search(key, name, search, replace, flags, is_regex, is_function)
         cls.save_settings()
+
+    @classmethod
+    def _add_search(cls, key, name, search, replace, flags, is_regex, is_function):
+        """Add saved search."""
+
+        searches = cls.settings.get("saved_searches", {})
+        searches[key] = {
+            "name": name,
+            "search": search,
+            "replace": replace,
+            "flags": flags,
+            "is_regex": is_regex,
+            "is_function": is_function
+        }
+        cls.settings["saved_searches"] = searches
 
     @classmethod
     def get_search(cls):
@@ -446,8 +622,6 @@ class Settings(object):
 
         cls.reload_settings()
         searches = cls.settings.get("saved_searches", {})
-        if isinstance(searches, list):
-            searches = cls._update_search_object_to_unique(searches)
         return searches
 
     @classmethod
@@ -473,10 +647,16 @@ class Settings(object):
         """Save chain."""
 
         cls.reload_settings()
+        cls._add_chain(key, searches)
+        cls.save_settings()
+
+    @classmethod
+    def _add_chain(cls, key, searches):
+        """Save chain."""
+
         chains = cls.settings.get("chains", {})
         chains[key] = searches[:]
         cls.settings['chains'] = chains
-        cls.save_settings()
 
     @classmethod
     def delete_chain(cls, key):
@@ -501,8 +681,14 @@ class Settings(object):
         """Set alert setting."""
 
         cls.reload_settings()
-        cls.settings["alert_enabled"] = enable
+        cls._set_alert(enable)
         cls.save_settings()
+
+    @classmethod
+    def _set_alert(cls, enable):
+        """Set alert setting."""
+
+        cls.settings["alert_enabled"] = enable
 
     @classmethod
     def init_notify(cls, first_time=False):
@@ -575,8 +761,14 @@ class Settings(object):
         """Set notification setting."""
 
         cls.reload_settings()
-        cls.settings["notify_enabled"] = enable
+        cls._set_notify(enable)
         cls.save_settings()
+
+    @classmethod
+    def _set_notify(cls, enable):
+        """Set notification setting."""
+
+        cls.settings["notify_enabled"] = enable
 
     @classmethod
     def get_platform_notify(cls):
@@ -599,14 +791,18 @@ class Settings(object):
     def set_notify_method(cls, notify_method):
         """Set notification style."""
 
-        if notify_method not in ["native", "growl"]:
-            notify_method = NOTIFY_STYLES[util.platform()][0]
-        if notify_method in ["native"]:
-            notify_method = "native"
         cls.reload_settings()
-        cls.settings["notify_method"] = notify_method
+        cls._set_notify_method(notify_method)
         cls.save_settings()
         cls.init_notify()
+
+    @classmethod
+    def _set_notify_method(cls, notify_method):
+        """Set notification style."""
+
+        if notify_method not in ["native", "growl"]:
+            notify_method = NOTIFY_STYLES[util.platform()][0]
+        cls.settings["notify_method"] = notify_method
 
     @classmethod
     def get_term_notifier(cls):
@@ -620,9 +816,15 @@ class Settings(object):
         """Set term notifier location."""
 
         cls.reload_settings()
-        cls.settings['term_notifier'] = value
+        cls._set_term_notifier(value)
         cls.save_settings()
         cls.init_notify()
+
+    @classmethod
+    def _set_term_notifier(cls, value):
+        """Set term notifier location."""
+
+        cls.settings['term_notifier'] = value
 
     @classmethod
     def get_search_setting(cls, key, default):
@@ -678,8 +880,14 @@ class Settings(object):
         """Set backup type."""
 
         cls.reload_settings()
-        cls.settings['backup_type'] = value
+        cls._set_backup_type(value)
         cls.save_settings()
+
+    @classmethod
+    def _set_backup_type(cls, value):
+        """Set backup type."""
+
+        cls.settings['backup_type'] = value
 
     @classmethod
     def get_backup_ext(cls):
@@ -690,11 +898,17 @@ class Settings(object):
 
     @classmethod
     def set_backup_ext(cls, value):
-        """Get backup extension."""
+        """Set backup extension."""
 
         cls.reload_settings()
-        cls.settings['backup_ext'] = value
+        cls._set_backup_ext(value)
         cls.save_settings()
+
+    @classmethod
+    def _set_backup_ext(cls, value):
+        """Set backup extension."""
+
+        cls.settings['backup_ext'] = value
 
     @classmethod
     def get_backup_folder(cls):
@@ -705,11 +919,17 @@ class Settings(object):
 
     @classmethod
     def set_backup_folder(cls, value):
-        """Get backup folder."""
+        """Set backup folder."""
 
         cls.reload_settings()
-        cls.settings['backup_folder'] = value
+        cls._set_backup_folder(value)
         cls.save_settings()
+
+    @classmethod
+    def _set_backup_folder(cls, value):
+        """Set backup folder."""
+
+        cls.settings['backup_folder'] = value
 
     @classmethod
     def get_history_record_count(cls, history_types=None):
@@ -738,12 +958,83 @@ class Settings(object):
         cls.save_cache()
 
     @classmethod
+    def import_settings(cls, obj):
+        """Import settings."""
+
+        cls.reload_settings()
+
+        # Backup
+        if 'backup_folder' in obj:
+            cls._set_backup_folder(obj['backup_folder'])
+        if 'backup_ext' in obj:
+            cls._set_backup_ext(obj['backup_ext'])
+        if 'backup_type' in obj:
+            cls._set_backup_type(obj['backup_type'])
+
+        # Notifications
+        update_notify = False
+        if 'alert_enabled' in obj:
+            cls._set_alert(obj['alert_enabled'])
+        if 'notify_enabled' in obj:
+            cls._set_notify(obj['notify_enabled'])
+        if 'notify_method' in obj:
+            cls._set_notify_method(obj['notify_method'])
+            update_notify = True
+        if 'term_notifier' in obj:
+            cls._set_term_notifier(obj['term_notifier'])
+            update_notify = True
+
+        # Editor
+        if 'editor' in obj:
+            cls._set_editor(obj['editor'])
+
+        # Single instance
+        if 'single_instance' in obj:
+            cls._set_single_instance(obj['single_instance'])
+
+        # Locale
+        if 'locale' in obj:
+            cls._set_language(obj['locale'])
+
+        # Hide limit panel
+        if 'hide_limit' in obj:
+            cls._set_hide_limit(obj['hide_limit'])
+
+        # Regex
+        if 'regex_mode' in obj:
+            cls._set_regex_mode(obj['regex_mode'])
+        if 'regex_version' in obj:
+            cls._set_regex_version(obj['regex_version'])
+
+        if 'chains' in obj:
+            for k, v in obj['chains'].items():
+                cls._add_chain(k, v)
+
+        if 'saved_searches' in obj:
+            for k, v in obj['saved_searches'].items():
+                cls._add_search(
+                    k,
+                    v['name'],
+                    v['search'],
+                    v['replace'],
+                    v['flags'],
+                    v['is_regex'],
+                    v['is_function']
+                )
+
+        cls.save_settings()
+
+        # Update notifications
+        if update_notify:
+            cls.init_notify()
+
+    @classmethod
     def save_settings(cls):
         """Save settings."""
 
         try:
             locked = False
-            cls.settings['__format__'] = '2.0.0'
+            cls.settings['__format__'] = SETTINGS_FMT
             with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
                 assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock settings."
                 locked = True
@@ -766,7 +1057,7 @@ class Settings(object):
 
         try:
             locked = False
-            cls.cache['__format__'] = '2.0.0'
+            cls.cache['__format__'] = CACHE_FMT
             with codecs.open(cls.cache_file, "w", encoding="utf-8") as f:
                 assert portalocker.lock(f, portalocker.LOCK_EX), "Could not lock cache file."
                 locked = True
