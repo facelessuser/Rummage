@@ -45,6 +45,7 @@ from .search_error_dialog import SearchErrorDialog
 from .search_chain_dialog import SearchChainDialog
 from .export_settings_dialog import ExportSettingsDialog
 from .import_settings_dialog import ImportSettingsDialog
+from .support_info_dialog import SupportInfoDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .controls import pick_button
@@ -2276,6 +2277,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Open documentation site."""
 
         webbrowser.open_new_tab(__meta__.__manual__)
+
+    def on_support(self, event):
+        """Open support information dialog."""
+
+        dlg = SupportInfoDialog(self)
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def on_issues(self, event):
         """Open issues site."""
