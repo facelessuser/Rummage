@@ -7,35 +7,50 @@ Copyright (c) 2012 Isaac Muse <isaacmuse@gmail.com>
 import re
 
 LINE_PRESERVE = re.compile(r"\r?\n", re.MULTILINE)
-CPP_PATTERN = re.compile(
-    r'''(?x)
-        (?P<comments>
-            /\*[^*]*\*+(?:[^/*][^*]*\*+)*/  # multi-line comments
-          | \s*//(?:[^\r\n])*               # single line comments
-        )
-      | (?P<code>
-            "(?:\\.|[^"\\])*"               # double quotes
-          | '(?:\\.|[^'\\])*'               # single quotes
-          | .[^/"']*                        # everything else
-        )
-    ''',
-    re.DOTALL
+
+CPP_CODE = r'''
+(?P<code>
+    "(?:\\.|[^"\\])*"               # double quotes
+  | '(?:\\.|[^'\\])*'               # single quotes
+  | .[^/"']*                        # everything else
 )
-PY_PATTERN = re.compile(
-    r'''(?x)
-        (?P<comments>
-            \s*\#(?:[^\r\n])*               # single line comments
-        )
-      | (?P<code>
-            "{3}(?:\\.|[^\\])*"{3}          # triple double quotes
-          | '{3}(?:\\.|[^\\])*'{3}          # triple single quotes
-          | "(?:\\.|[^"\\])*"               # double quotes
-          | '(?:\\.|[^'])*'                 # single quotes
-          | .[^\#"']*                       # everything else
-        )
-    ''',
-    re.DOTALL
+'''
+
+PY_CODE = r'''
+(?P<code>
+    "{3}(?:\\.|[^\\])*"{3}          # triple double quotes
+  | '{3}(?:\\.|[^\\])*'{3}          # triple single quotes
+  | "(?:\\.|[^"\\])*"               # double quotes
+  | '(?:\\.|[^'])*'                 # single quotes
+  | .[^\#"']*                       # everything else
 )
+'''
+
+JSON_CODE = r'''
+(?P<code>
+    "(?:\\.|[^"\\])*"               # double quotes
+  | .[^/"']*                        # everything else
+)
+'''
+
+CPP_COMMENTS = r'''
+(?P<comments>
+    /\*[^*]*\*+(?:[^/*][^*]*\*+)*/  # multi-line comments
+  | \s*//(?:[^\r\n])*               # single line comments
+)
+'''
+
+PY_COMMENTS = r'''
+(?P<comments>
+    \s*\#(?:[^\r\n])*               # single line comments
+)
+'''
+
+CPP_PATTERN = re.compile(r'(?x)%(comments)s|%(code)s' % {"comments": CPP_COMMENTS, "code": CPP_CODE}, re.DOTALL)
+
+PY_PATTERN = re.compile(r'(?x)%(comments)s|%(code)s' % {"comments": PY_COMMENTS, "code": PY_CODE}, re.DOTALL)
+
+JSON_PATTERN = re.compile(r'(?x)%(comments)s|%(code)s' % {"comments": CPP_COMMENTS, "code": JSON_CODE}, re.DOTALL)
 
 
 def _strip_regex(pattern, text, preserve_lines):
@@ -61,6 +76,17 @@ def _cpp(text, preserve_lines=False):
 
     return _strip_regex(
         CPP_PATTERN,
+        text,
+        preserve_lines
+    )
+
+
+@staticmethod
+def _json(text, preserve_lines=False):
+    """C/C++ style comment stripper."""
+
+    return _strip_regex(
+        JSON_PATTERN,
         text,
         preserve_lines
     )
@@ -125,6 +151,7 @@ class Comments(object):
 
 
 Comments.add_style("c", _cpp)
-Comments.add_style("json", _cpp)
+Comments.add_style("json", _json)
 Comments.add_style("cpp", _cpp)
 Comments.add_style("python", _python)
+Comments.add_style("css", _cpp)
