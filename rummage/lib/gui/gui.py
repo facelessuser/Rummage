@@ -462,6 +462,9 @@ class RummageFrame ( wx.Frame ):
 		self.m_documentation_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Documentation", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_help_menu.Append( self.m_documentation_menuitem )
 		
+		self.m_support_info_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Support Info", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_help_menu.Append( self.m_support_info_menuitem )
+		
 		self.m_issues_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Help and Support", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_help_menu.Append( self.m_issues_menuitem )
 		
@@ -499,6 +502,7 @@ class RummageFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.on_hide_limit, id = self.m_hide_limit_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_about, id = self.m_about_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_documentation, id = self.m_documentation_menuitem.GetId() )
+		self.Bind( wx.EVT_MENU, self.on_support, id = self.m_support_info_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_issues, id = self.m_issues_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_show_log_file, id = self.m_log_menuitem.GetId() )
 	
@@ -568,6 +572,9 @@ class RummageFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_documentation( self, event ):
+		event.Skip()
+	
+	def on_support( self, event ):
 		event.Skip()
 	
 	def on_issues( self, event ):
@@ -658,6 +665,72 @@ class AboutDialog ( wx.Dialog ):
 	
 	# Virtual event handlers, overide them in your derived class
 	def on_toggle( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class SupportInfoDialog
+###########################################################################
+
+class SupportInfoDialog ( wx.Dialog ):
+	
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Support Info", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+		
+		self.SetSizeHints( wx.Size( 300,300 ), wx.DefaultSize )
+		
+		bSizer20 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_support_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		fgSizer50 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer50.AddGrowableCol( 0 )
+		fgSizer50.AddGrowableRow( 0 )
+		fgSizer50.SetFlexibleDirection( wx.BOTH )
+		fgSizer50.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_info_textbox = wx.TextCtrl( self.m_support_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
+		fgSizer50.Add( self.m_info_textbox, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		fgSizer51 = wx.FlexGridSizer( 0, 3, 0, 0 )
+		fgSizer51.AddGrowableCol( 0 )
+		fgSizer51.AddGrowableCol( 2 )
+		fgSizer51.SetFlexibleDirection( wx.BOTH )
+		fgSizer51.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		
+		fgSizer51.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_cancel_button = wx.Button( self.m_support_panel, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer51.Add( self.m_cancel_button, 0, wx.ALL, 5 )
+		
+		
+		fgSizer51.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer50.Add( fgSizer51, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_support_panel.SetSizer( fgSizer50 )
+		self.m_support_panel.Layout()
+		fgSizer50.Fit( self.m_support_panel )
+		bSizer20.Add( self.m_support_panel, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( bSizer20 )
+		self.Layout()
+		bSizer20.Fit( self )
+		
+		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_cancel( self, event ):
 		event.Skip()
 	
 
