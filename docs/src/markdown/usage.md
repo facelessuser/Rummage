@@ -386,7 +386,7 @@ Windows
 
 The **History** panel is where all text box drop down history can be cleared.
 
-## Import/Exporting Settings
+## Import/Export Settings
 
 If desired, Rummage's settings can be exported to a JSON file or imported from a JSON file.  This can be particularly useful for importing regular expression patterns from one system into another system's existing regular expression list. This can also be useful if you have a lot of regular expression patterns you wish to create, and it would be too cumbersome to do it through the GUI.  In the latter case, you could construct the pattern configurations in a JSON file and import all the patterns in one shot.
 
