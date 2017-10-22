@@ -2,6 +2,8 @@
 
 ## 3.1.0
 
+Oct 22, 2017
+
 - **NEW**: Add export/import of settings and/or regular expression rules and chains.
 - **NEW**: Add support info dialog to gather info when filing issues.
 
