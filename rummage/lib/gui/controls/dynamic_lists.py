@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import wx
 import wx.lib.mixins.listctrl as listmix
 from ... import util
+from collections import OrderedDict
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
@@ -46,7 +47,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.sort_init = True
         self.column_count = len(columns)
         self.headers = columns
-        self.itemDataMap = {}
+        self.itemDataMap = OrderedDict()
         self.first_resize = True
         self.size_sample = COLUMN_SAMPLE_SIZE
         self.widest_cell = [MINIMUM_COL_SIZE] * self.column_count
@@ -57,7 +58,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.last_idx_sized = -1
         self.create_image_list()
         self.setup_columns()
-        self.itemIndexMap = list(self.itemDataMap.keys())
+        self.itemIndexMap = []
 
     def resize_last_column(self):
         """Resize the last column."""
@@ -96,6 +97,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Set new entry in item map."""
 
         self.itemDataMap[idx] = tuple([a for a in args])
+        self.itemIndexMap.append(idx)
         # Sample the first "size_sample" to determine
         # column width for when table first loads
         if self.size_sample or not USE_SAMPLE_SIZE:
@@ -117,7 +119,8 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Reset the list."""
 
         self.ClearAll()
-        self.itemDataMap = {}
+        self.itemDataMap = OrderedDict()
+        self.itemIndexMap = []
         self.SetItemCount(0)
         self.size_sample = COLUMN_SAMPLE_SIZE
         self.widest_cell = [MINIMUM_COL_SIZE] * self.column_count
@@ -134,7 +137,6 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Load the list of items from the item map."""
 
         self.SetItemCount(len(self.itemDataMap))
-        self.itemIndexMap = list(self.itemDataMap.keys())
         if last:
             if self.sort_init:
                 listmix.ColumnSorterMixin.__init__(self, self.column_count)
@@ -157,10 +159,9 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
         items = list(self.itemDataMap.keys())
         if sorter is not None:
-            util.sorted_callback(items, sorter)
+            util.sorted_callback(self.itemIndexMap, sorter)
         else:
-            items.sort()
-        self.itemIndexMap = items
+            self.itemIndexMap.sort()
 
         # redraw the list
         self.Refresh()
