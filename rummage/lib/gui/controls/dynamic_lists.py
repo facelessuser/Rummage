@@ -157,7 +157,6 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def SortItems(self, sorter=None):
         """Sort items."""
 
-        items = list(self.itemDataMap.keys())
         if sorter is not None:
             util.sorted_callback(self.itemIndexMap, sorter)
         else:
