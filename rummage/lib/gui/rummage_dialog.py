@@ -468,8 +468,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         )
 
         # Replace result panel placeholders with new custom panels
-        self.m_result_file_list.load_list()
-        self.m_result_list.load_list()
+        self.m_result_file_list.set_wait_lock(_LOCK)
+        self.m_result_list.set_wait_lock(_LOCK)
+        self.m_result_file_list.load_list(True)
+        self.m_result_list.load_list(True)
         self.m_grep_notebook.SetSelection(0)
 
         # Set progress bar to 0
@@ -1581,8 +1583,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 if (self.thread.benchmark - self.last_update) > 1.0:
                     self.m_result_file_list.load_list()
                     self.m_result_list.load_list()
-                    self.m_result_file_list.Refresh()
-                    self.m_result_list.Refresh()
+                    # self.m_result_file_list.Refresh()
+                    # self.m_result_list.Refresh()
                     self.thread.update_benchmark()
                     self.last_update = self.thread.benchmark
             else:
@@ -2197,6 +2199,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_export_html(self, event):
         """Export to HTML."""
 
+        if not self.m_result_list.complete or not self.m_result_list.complete:
+            return
+
         if (
             len(self.m_result_file_list.itemDataMap) == 0 and
             len(self.m_result_list.itemDataMap) == 0
@@ -2219,6 +2224,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def on_export_csv(self, event):
         """Export to CSV."""
+
+        if not self.m_result_list.complete or not self.m_result_list.complete:
+            return
 
         if (
             len(self.m_result_file_list.itemDataMap) == 0 and

@@ -29,6 +29,18 @@ COLUMN_SAMPLE_SIZE = 100
 USE_SAMPLE_SIZE = True
 
 
+class DummyLock(object):
+    """A dummy lock that does nothing."""
+
+    def __enter__(self):
+        """Enter."""
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """Exit."""
+        return True
+
+
 class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     """Dynamic list."""
 
@@ -45,6 +57,9 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
             style=flags
         )
         self.sort_init = True
+        self.complete = False
+        self.resize_complete = False
+        self.wait = DummyLock()
         self.column_count = len(columns)
         self.headers = columns
         self.itemDataMap = OrderedDict()
@@ -59,6 +74,11 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.create_image_list()
         self.setup_columns()
         self.itemIndexMap = []
+
+    def set_wait_lock(self, wait_lock):
+        """Set wait lock."""
+
+        self.wait = wait_lock
 
     def resize_last_column(self):
         """Resize the last column."""
@@ -79,14 +99,6 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
             self.InsertColumn(x, self.headers[x])
         for i in range(0, self.column_count):
             self.SetColumnWidth(i, self.widest_cell[i])
-
-    def init_column_size(self):
-        """Setup the initial column size."""
-
-        for i in range(0, self.column_count):
-            self.SetColumnWidth(i, self.widest_cell[i])
-        self.resize_last_column()
-        self.size_sample = 0
 
     def get_column_count(self):
         """Get column count."""
@@ -119,6 +131,8 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Reset the list."""
 
         self.ClearAll()
+        self.complete = False
+        self.resize_complete = False
         self.itemDataMap = OrderedDict()
         self.itemIndexMap = []
         self.SetItemCount(0)
@@ -127,21 +141,21 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.setup_columns()
         self.Refresh()
 
-    def SortListItems(self, col=-1, ascending=1):
-        """Sort list items."""
-
-        if not self.sort_init:
-            super(DynamicList, self).SortListItems(col, ascending)
-
     def load_list(self, last=False):
         """Load the list of items from the item map."""
 
         self.SetItemCount(len(self.itemDataMap))
+        if not self.resize_complete:
+            for i in range(0, self.column_count):
+                self.SetColumnWidth(i, self.widest_cell[i])
+            if not self.size_sample:
+                self.resize_complete = True
         if last:
             if self.sort_init:
                 listmix.ColumnSorterMixin.__init__(self, self.column_count)
                 self.sort_init = False
-            self.init_column_size()
+            self.resize_last_column()
+            self.size_sample = 0
 
     def get_item_text(self, idx, col, absolute=False):
         """Return the text for the given item and col."""
@@ -157,13 +171,14 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def SortItems(self, sorter=None):
         """Sort items."""
 
-        if sorter is not None:
-            util.sorted_callback(self.itemIndexMap, sorter)
-        else:
-            self.itemIndexMap.sort()
+        with self.wait:
+            if sorter is not None:
+                util.sorted_callback(self.itemIndexMap, sorter)
+            else:
+                self.itemIndexMap.sort()
 
-        # redraw the list
-        self.Refresh()
+            # redraw the list
+            self.Refresh()
 
     def OnGetItemText(self, item, col):
         """Override method to return the text for the given item and col."""

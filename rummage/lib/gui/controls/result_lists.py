@@ -142,14 +142,15 @@ class ResultFileList(DynamicList):
     def on_motion(self, event):
         """Display full file path in status bar on item mouseover."""
 
-        pos = event.GetPosition()
-        item = self.HitTestSubItem(pos)[0]
-        if item != -1:
-            actual_item = self.itemIndexMap[item]
-            if actual_item != self.last_moused[0]:
-                d = self.itemDataMap[actual_item]
-                self.last_moused = (actual_item, os.path.join(d[3], d[0]))
-            self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
+        if self.complete:
+            pos = event.GetPosition()
+            item = self.HitTestSubItem(pos)[0]
+            if item != -1:
+                actual_item = self.itemIndexMap[item]
+                if actual_item != self.last_moused[0]:
+                    d = self.itemDataMap[actual_item]
+                    self.last_moused = (actual_item, os.path.join(d[3], d[0]))
+                self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
     def get_item_text(self, item, col, absolute=False):
@@ -188,39 +189,41 @@ class ResultFileList(DynamicList):
     def on_dclick(self, event):
         """Open file at in editor with optional line and column argument."""
 
-        pos = event.GetPosition()
-        item = self.HitTestSubItem(pos)[0]
-        if item != -1:
-            filename = self.GetItem(item, col=0).GetText()
-            path = self.GetItem(item, col=3).GetText()
-            line = str(self.get_map_item(item, col=7))
-            col = str(self.get_map_item(item, col=8))
-            fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
+        with self.wait:
+            pos = event.GetPosition()
+            item = self.HitTestSubItem(pos)[0]
+            if item != -1:
+                filename = self.GetItem(item, col=0).GetText()
+                path = self.GetItem(item, col=3).GetText()
+                line = str(self.get_map_item(item, col=7))
+                col = str(self.get_map_item(item, col=8))
+                fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()
 
     def on_rclick(self, event):
         """Show context menu on right click."""
 
-        pos = event.GetPosition()
-        item = self.HitTestSubItem(pos)[0]
-        if item != -1:
-            filename = self.GetItem(item, col=0).GetText()
-            path = self.GetItem(item, col=3).GetText()
-            target = os.path.join(path, filename)
-            selected = self.IsSelected(item)
-            select_count = self.GetSelectedItemCount()
-            enabled = not selected or (selected and select_count == 1)
-            # Select if not already
-            if not selected:
-                self.Select(item)
-            # Open menu
-            ContextMenu(
-                self,
-                [
-                    (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled)
-                ],
-                pos
-            )
+        with self.wait:
+            pos = event.GetPosition()
+            item = self.HitTestSubItem(pos)[0]
+            if item != -1:
+                filename = self.GetItem(item, col=0).GetText()
+                path = self.GetItem(item, col=3).GetText()
+                target = os.path.join(path, filename)
+                selected = self.IsSelected(item)
+                select_count = self.GetSelectedItemCount()
+                enabled = not selected or (selected and select_count == 1)
+                # Select if not already
+                if not selected:
+                    self.Select(item)
+                # Open menu
+                ContextMenu(
+                    self,
+                    [
+                        (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled)
+                    ],
+                    pos
+                )
         event.Skip()
 
 
@@ -273,14 +276,15 @@ class ResultContentList(DynamicList):
     def on_motion(self, event):
         """Display full file path in status bar on item mouseover."""
 
-        pos = event.GetPosition()
-        item = self.HitTestSubItem(pos)[0]
-        if item != -1:
-            actual_item = self.itemIndexMap[item]
-            if actual_item != self.last_moused[0]:
-                pth = self.itemDataMap[actual_item][0]
-                self.last_moused = (actual_item, os.path.join(pth[1], pth[0]))
-            self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
+        if self.complete:
+            pos = event.GetPosition()
+            item = self.HitTestSubItem(pos)[0]
+            if item != -1:
+                actual_item = self.itemIndexMap[item]
+                if actual_item != self.last_moused[0]:
+                    pth = self.itemDataMap[actual_item][0]
+                    self.last_moused = (actual_item, os.path.join(pth[1], pth[0]))
+                self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
     def get_item_text(self, item, col, absolute=False):
@@ -332,15 +336,16 @@ class ResultContentList(DynamicList):
     def on_dclick(self, event):
         """Open file at in editor with optional line and column argument."""
 
-        pos = event.GetPosition()
-        item = self.HitTestSubItem(pos)[0]
-        if item != -1:
-            filename = self.GetItem(item, col=0).GetText()
-            line = self.GetItem(item, col=1).GetText()
-            file_row = self.get_map_item(item, col=4)
-            col = str(self.get_map_item(item, col=5))
-            path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
-                file_row, col=3, absolute=True
-            )
-            fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
+        while self.wait:
+            pos = event.GetPosition()
+            item = self.HitTestSubItem(pos)[0]
+            if item != -1:
+                filename = self.GetItem(item, col=0).GetText()
+                line = self.GetItem(item, col=1).GetText()
+                file_row = self.get_map_item(item, col=4)
+                col = str(self.get_map_item(item, col=5))
+                path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
+                    file_row, col=3, absolute=True
+                )
+                fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()
