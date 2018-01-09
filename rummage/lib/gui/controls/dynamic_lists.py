@@ -36,7 +36,7 @@ class DummyLock(object):
         """Enter."""
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback):  # noqa: A002
         """Exit."""
         return True
 
