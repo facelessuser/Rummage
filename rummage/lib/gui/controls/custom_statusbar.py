@@ -249,6 +249,9 @@ class CustomStatusExtension(IconTrayExtension, TimedStatusExtension):
     def sb_setup(self, fields):
         """Setup the extention variant of the CustomStatusBar object."""
 
+        if util.platform() == "windows":
+            self.SetDoubleBuffered(True)
+
         self.fields = fields
         self.sb_tray_setup()
         self.sb_time_setup(len(self.fields))
