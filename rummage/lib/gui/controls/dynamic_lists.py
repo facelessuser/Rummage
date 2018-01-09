@@ -43,6 +43,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
             parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
             style=flags
         )
+        self.inserted_columns = False
         self.sort_init = True
         self.column_count = len(columns)
         self.headers = columns
@@ -107,23 +108,36 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Reset the list."""
 
         self.ClearAll()
+        self.inserted_columns = False
         self.itemDataMap = {}
         self.SetItemCount(0)
         self.size_sample = COLUMN_SAMPLE_SIZE
         self.widest_cell = [MINIMUM_COL_SIZE] * self.column_count
         self.Refresh()
 
-    def load_list(self):
+    def SortListItems(self, col=-1, ascending=1):
+        """Sort list items."""
+
+        if not self.sort_init:
+            super(DynamicList, self).SortListItems(col, ascending)
+
+    def load_list(self, last=False):
         """Load the list of items from the item map."""
 
-        for x in range(0, self.column_count):
-            self.InsertColumn(x, self.headers[x])
+        if not self.inserted_columns:
+            self.inserted_columns = True
+            for x in range(0, self.column_count):
+                self.InsertColumn(x, self.headers[x])
+            self.init_column_size()
         self.SetItemCount(len(self.itemDataMap))
-        if self.sort_init:
-            listmix.ColumnSorterMixin.__init__(self, self.column_count)
-            self.sort_init = False
-        self.SortListItems(col=0, ascending=1)
-        self.init_column_size()
+        if last:
+            if self.sort_init:
+                listmix.ColumnSorterMixin.__init__(self, self.column_count)
+                self.sort_init = False
+            self.itemIndexMap = list(self.itemDataMap.keys())
+            self.init_column_size()
+        else:
+            self.itemIndexMap = list(self.itemDataMap.keys())
 
     def get_item_text(self, idx, col, absolute=False):
         """Return the text for the given item and col."""

@@ -319,26 +319,32 @@ class RummageThread(threading.Thread):
                         self.no_results += 1
                     if f.error is not None:
                         _ERRORS.append(f)
+                self.update_benchmark()
             self.update_status()
             wx.WakeUpIdle()
 
             if _ABORT:
                 self.rummage.kill()
 
+    def update_benchmark(self):
+        """Update benchmark."""
+        self.benchmark = time() - self.start
+
     def run(self):
         """Start the Rummage thread benchmark the time."""
 
         global _ABORT
         self.running = True
-        start = time()
+        self.start = time()
+        self.benchmark = 0.0
 
         try:
             self.payload()
         except Exception:
             error(traceback.format_exc())
 
-        bench = time() - start
-        runtime = self.BENCHMARK_STATUS % bench
+        self.update_benchmark()
+        runtime = self.BENCHMARK_STATUS % self.benchmark
 
         self.runtime = runtime
         self.running = False
@@ -1121,6 +1127,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread.setDaemon(True)
 
         # Reset result tables
+        self.last_update = 0.0
+        self.m_grep_notebook.SetSelection(1)
         self.count = 0
         self.m_result_file_list.reset_list()
         self.m_result_list.reset_list()
@@ -1569,6 +1577,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     results = _RESULTS[0:records - count]
                     del _RESULTS[0:records - count]
                 count = self.update_table(count, completed, total, skipped, *results)
+                if (self.thread.benchmark - self.last_update) > 1.0:
+                    self.m_result_file_list.load_list()
+                    self.m_result_list.load_list()
+                    self.m_result_file_list.Refresh()
+                    self.m_result_list.Refresh()
+                    self.thread.update_benchmark()
+                    self.last_update = self.thread.benchmark
             else:
                 self.m_statusbar.set_status(
                     self.UPDATE_STATUS % (
@@ -1648,9 +1663,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         msg=self.SB_TOOLTIP_ERR % len(errors),
                         click_left=self.on_error_click
                     )
-                self.m_result_file_list.load_list()
-                self.m_result_list.load_list()
-                self.m_grep_notebook.SetSelection(1)
+                self.m_result_file_list.load_list(True)
+                self.m_result_list.load_list(True)
                 self.debounce_search = False
                 self.allow_update = False
                 self.thread = None
