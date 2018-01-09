@@ -43,7 +43,6 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
             parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
             style=flags
         )
-        self.inserted_columns = False
         self.sort_init = True
         self.column_count = len(columns)
         self.headers = columns
@@ -57,6 +56,8 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.dc.SetFont(self.GetFont())
         self.last_idx_sized = -1
         self.create_image_list()
+        self.setup_columns()
+        self.itemIndexMap = list(self.itemDataMap.keys())
 
     def resize_last_column(self):
         """Resize the last column."""
@@ -69,6 +70,14 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
                 last_width = self.GetColumnWidth(i)
         if total_width < self.GetSize()[0] - 20:
             self.SetColumnWidth(self.column_count - 1, last_width + self.GetSize()[0] - total_width)
+
+    def setup_columns(self):
+        """Setup columns."""
+
+        for x in range(0, self.column_count):
+            self.InsertColumn(x, self.headers[x])
+        for i in range(0, self.column_count):
+            self.SetColumnWidth(i, self.widest_cell[i])
 
     def init_column_size(self):
         """Setup the initial column size."""
@@ -108,11 +117,11 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Reset the list."""
 
         self.ClearAll()
-        self.inserted_columns = False
         self.itemDataMap = {}
         self.SetItemCount(0)
         self.size_sample = COLUMN_SAMPLE_SIZE
         self.widest_cell = [MINIMUM_COL_SIZE] * self.column_count
+        self.setup_columns()
         self.Refresh()
 
     def SortListItems(self, col=-1, ascending=1):
@@ -124,20 +133,13 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def load_list(self, last=False):
         """Load the list of items from the item map."""
 
-        if not self.inserted_columns:
-            self.inserted_columns = True
-            for x in range(0, self.column_count):
-                self.InsertColumn(x, self.headers[x])
-            self.init_column_size()
         self.SetItemCount(len(self.itemDataMap))
+        self.itemIndexMap = list(self.itemDataMap.keys())
         if last:
             if self.sort_init:
                 listmix.ColumnSorterMixin.__init__(self, self.column_count)
                 self.sort_init = False
-            self.itemIndexMap = list(self.itemDataMap.keys())
             self.init_column_size()
-        else:
-            self.itemIndexMap = list(self.itemDataMap.keys())
 
     def get_item_text(self, idx, col, absolute=False):
         """Return the text for the given item and col."""

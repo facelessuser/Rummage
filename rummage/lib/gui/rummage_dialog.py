@@ -475,6 +475,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         # Set progress bar to 0
         self.m_progressbar.SetRange(100)
         self.m_progressbar.SetValue(0)
+        self.m_progressbar.Hide()
 
         self.refresh_localization()
 
