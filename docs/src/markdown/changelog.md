@@ -4,6 +4,7 @@
 
 - **NEW**: Results update live. Progress has been removed. (#140)
 - **FIX**: Windows status bar flicker.
+- **FIX**: Results not showing when notifications is set to only play audio alerts.
 
 ## 3.1.0
 
