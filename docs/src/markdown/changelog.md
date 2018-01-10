@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.2.0
+
+- **NEW**: Results update live. Progress has been removed. (#140)
+- **FIX**: Windows status bar flicker.
+
 ## 3.1.0
 
 Oct 22, 2017
