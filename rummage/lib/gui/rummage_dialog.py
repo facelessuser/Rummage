@@ -1594,6 +1594,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
             # Run is finished or has been terminated
             if is_complete:
+                kill = self.kill
                 benchmark = self.thread.runtime
                 self.m_search_button.SetLabel(self.SEARCH_BTN_SEARCH)
                 self.m_replace_button.SetLabel(self.REPLACE_BTN_REPLACE)
@@ -1601,47 +1602,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.m_replace_button.Enable(True)
                 self.clear_plugins()
                 if self.kill:
-                    self.m_statusbar.set_status(
-                        self.FINAL_STATUS % (
-                            completed,
-                            total,
-                            int(float(completed) / float(total) * 100) if total != 0 else 0,
-                            skipped,
-                            count,
-                            benchmark
-                        )
-                    )
-                    if Settings.get_notify():
-                        notify.error(
-                            self.NOTIFY_SEARCH_ABORTED,
-                            self.NOTIFY_MATCHES_FOUND % count,
-                            sound=Settings.get_alert()
-                        )
-                    elif Settings.get_alert():
-                        notify.play_alert()
                     self.kill = False
                     global _ABORT
                     if _ABORT:
                         _ABORT = False
-                else:
-                    self.m_statusbar.set_status(
-                        self.FINAL_STATUS % (
-                            completed,
-                            total,
-                            100,
-                            skipped,
-                            count,
-                            benchmark
-                        )
-                    )
-                    if Settings.get_notify():
-                        notify.info(
-                            self.NOTIFY_SEARCH_COMPLETED,
-                            self.NOTIFY_MATCHES_FOUND % count,
-                            sound=Settings.get_alert()
-                        )
-                    elif Settings.get_alert():
-                        notify.play_alert()
                 with _LOCK:
                     errors = _ERRORS[:]
                     del _ERRORS[:]
@@ -1658,6 +1622,26 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                 self.debounce_search = False
                 self.allow_update = False
                 self.thread = None
+
+                self.m_statusbar.set_status(
+                    self.FINAL_STATUS % (
+                        completed,
+                        total,
+                        (int(float(completed) / float(total) * 100) if total != 0 else 0 if kill else 100),
+                        skipped,
+                        count,
+                        benchmark
+                    )
+                )
+                if Settings.get_notify():
+                    notify.error(
+                        (self.NOTIFY_SEARCH_ABORTED if kill else self.NOTIFY_SEARCH_COMPLETED),
+                        self.NOTIFY_MATCHES_FOUND % count,
+                        sound=Settings.get_alert()
+                    )
+                elif Settings.get_alert():
+                    notify.play_alert()
+
             self.checking = False
 
     def update_table(self, count, done, total, skipped, *results):

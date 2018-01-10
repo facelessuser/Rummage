@@ -103,6 +103,12 @@ def send_notify(title, message, sound, level):
         default_notify(title, message, sound)
 
 
+def play_alert():
+    """Play alert sound."""
+
+    alert()
+
+
 ###################################
 # Setup Notifications
 ###################################
