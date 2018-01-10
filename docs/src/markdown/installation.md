@@ -39,11 +39,28 @@ Name                             | Details
 
 Here are a couple of ways to install and upgrade. Keep in mind if you are a Linux user, you have some prerequisites to install before proceeding: see [Requirements](#requirements).
 
-1. Install: `#!bash python pip install rummage`.
+1. Install:
 
-2. To upgrade: `#!bash python install --upgrade rummage`.
+    ```bash
+    pip install rummage
+    ```
 
-3. If developing on Rummage, you can clone the project, and install the requirements with the following command:
+    Or upgrade:
+
+    ```bash
+    pip install --upgrade rummage
+    ```
+
+2. Then you can run it from the command line with (assuming your Python scripts/bin folder is in your system path):
+
+    ```bash
+    rummage
+    ```
+
+    !!! warning
+        It is recommended to run the console script `rummage` and not `python -m rummage` as using using `python -m` will look for modules in your current working directory first and may load unexpected things.  Though this is find if you are running it in a folder without Python modules.
+
+4. If developing on Rummage, you can clone the project, and install the requirements with the following command:
 
     ```bash
     pip install -r requirements/project.txt`
@@ -55,7 +72,7 @@ Here are a couple of ways to install and upgrade. Keep in mind if you are a Linu
     pip install --editable .
     ```
 
-    You could also just optionally run the package locally, skipping the actual install of Rummage. You can run the project by issuing the following command from the root folder:
+    When developing, you often want to run the local module, not the one installed. You can do this from the project's root folder and running:
 
     ```
     python -m rummage

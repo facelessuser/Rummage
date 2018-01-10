@@ -4,8 +4,20 @@ repo_url: https://github.com/facelessuser/Rummage
 edit_uri: tree/master/docs/src/markdown
 site_description: A search and replace tool written in Python.
 copyright: |
-  Copyright &copy; 2013 - 2017 <a href="https://github.com/facelessuser">Isaac Muse</a>
+  Copyright &copy; 2013 - 2018 <a href="https://github.com/facelessuser">Isaac Muse</a>
   <br><span class="md-footer-custom-text">emoji provided free by </span><a href="http://www.emojione.com">EmojiOne</a>
+
+docs_dir: docs/src/markdown
+theme:
+  name: material
+  custom_dir: docs/theme
+  palette:
+    primary: blue
+    accent: blue
+  logo: images/rummage.png
+  font:
+    text: Roboto
+    code: Roboto Mono
 
 pages:
   - Rummage: index.md
@@ -14,10 +26,6 @@ pages:
   - Contributing &amp; Support: contributing.md
   - Changelog: changelog.md
   - License: license.md
-
-theme: material
-docs_dir: docs/src/markdown
-theme_dir: docs/theme
 
 markdown_extensions:
   - markdown.extensions.toc:
@@ -31,6 +39,7 @@ markdown_extensions:
   - markdown.extensions.def_list:
   - markdown.extensions.tables:
   - markdown.extensions.abbr:
+  - markdown.extensions.footnotes:
   - pymdownx.extrarawhtml:
   - pymdownx.superfences:
   - pymdownx.highlight:
@@ -40,10 +49,17 @@ markdown_extensions:
           lang: php
           options:
             startinline: true
+        - name: pycon3
+          lang: pycon
+          options:
+            python3: true
   - pymdownx.inlinehilite:
   - pymdownx.magiclink:
       repo_url_shortener: true
-      base_repo_url: https://github.com/facelessuser/Rummage
+      repo_url_shorthand: true
+      social_url_shorthand: true
+      user: facelessuser
+      repo: Rummage
   - pymdownx.tilde:
   - pymdownx.caret:
   - pymdownx.smartsymbols:
@@ -54,11 +70,7 @@ markdown_extensions:
       nbsp: True
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.progressbar:
-  - pymdownx.arithmatex:
-  - pymdownx.mark:
-  - pymdownx.plainhtml:
-      strip_attributes: ''
+  - pymdownx.striphtml:
   - pymdownx.snippets:
       base_path: docs/src/markdown/_snippets
   - pymdownx.keys:
@@ -66,17 +78,10 @@ markdown_extensions:
   - pymdownx.details:
 
 extra:
-  logo: images/rummage.png
-  palette:
-    primary: blue
-    accent: blue
-  font:
-    text: Roboto
-    code: Roboto Mono
   social:
     - type: github
       link: https://github.com/facelessuser
 extra_css:
-  - extra-00833721db.css
+  - extra-4e53a56959.css
 extra_javascript:
-  - extra-4596f9831a.js
+  - extra-d8800ea088.js
