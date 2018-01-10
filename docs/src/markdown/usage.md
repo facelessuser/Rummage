@@ -29,19 +29,13 @@ Or specify a path:
 rummage --path mydirectory
 ```
 
-You can also run rummage by calling your specific python version like this:
-
-```bash
-python3 -m rummage --path mydirectory
-```
-
 ### Regular Expression Libraries Used
 
-Rummage uses the default regular expression library ([Re][re]]) that comes with the version of Python you are using. It also optionally works with the 3rd party [Regex][regex] library as well.
+Rummage uses the default regular expression library ([Re][re]) that comes with the version of Python you are using. It also optionally works with the 3rd party [Regex][regex] library as well.
 
 Rummage also provides an optional, wrapper called [Backrefs][backrefs] which augments Re and Regex and adds support for various new back references, and adds some new features.  Additions differ depending on which library Backrefs is augmenting. See [Backrefs' documentation][backrefs] for more info.
 
-To provide a consistent user experience there are a few differences between libraries that are normalized. In Python, there is a difference between how back slashes are handled in strings (`!#py "..."`) and raw strings (`!#py r"..."`). Rummage inputs can be thought of as raw string inputs. Normal Regex replace templates allows for character back references in raw string, replace templates (`\u0057`, `\x057`, etc.), but Re and Regex format replacement templates do not (Regex raw string format templates won't convert normal references like `\n` either). When Backrefs is applied, all replacement templates will support and translate character references, but Rummage will also ensure that normal Re and normal Regex format replace work the same.
+To provide a consistent user experience there are a few differences between libraries that are normalized. In Python, there is a difference between how back slashes are handled in strings (`#!py3 "..."`) and raw strings (`#!py3 r"..."`). Rummage inputs can be thought of as raw string inputs. Normal Regex replace templates allows for character back references in raw string, replace templates (`\u0057`, `\x057`, etc.), but Re and Regex format replacement templates do not (Regex raw string format templates won't convert normal references like `\n` either). When Backrefs is applied, all replacement templates will support and translate character references, but Rummage will also ensure that normal Re and normal Regex format replace work the same.
 
 ## Search Tab
 
@@ -89,7 +83,7 @@ Search\ with\ regex         | Alters the behavior of `Search for` and `Replace w
 Search\ case-sensitive      | Forces the search to be case-sensitive.
 Dot\ matches\ newline       | `.` will also match newlines.
 Use\ Unicode\ properties    | Changes the behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use use characters from the Unicode property database (will also modify `\l`, `\L`, `\c`, and `\C` in search patterns if using Backrefs with Re).
-Format\ style\ replacements | Replace pattern will use [a string replace format][format-string] for replace. `#!python "{1} {1[-2]} {group_name[-3]}"` etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode [here][backrefs-format]. And remember that Rummage normalizes mentioned differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.
+Format\ style\ replacements | Replace pattern will use [a string replace format][format-string] for replace. `#!py3 "{1} {1[-2]} {group_name[-3]}"` etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode [here][backrefs-format]. And remember that Rummage normalizes mentioned differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.
 
 ### Regex Engine Flags
 
@@ -165,9 +159,9 @@ To use search chains you must put Rummage in "search chain" mode by selecting th
 
 Regular expressions are great, but some times regular expressions aren't enough.  If you are dealing with a replace task that requires logic that cannot be represented in a simple replace pattern, you can create a "replace plugin".
 
-Simply create a Python script with a Replace class derived from the `ReplacePlugin` class found in `rumcore` at: `#!py from rummage.lib import rumcore`.  The plugin file must include a function called `get_replace` that returns the needed class.
+Simply create a Python script with a Replace class derived from the `ReplacePlugin` class found in `rumcore` at: `#!py3 from rummage.lib import rumcore`.  The plugin file must include a function called `get_replace` that returns the needed class.
 
-```py
+```py3
 class ReplacePlugin(object):
     """Rummage replace plugin."""
 
@@ -209,14 +203,14 @@ class ReplacePlugin(object):
 
 The `file_info` property is a named tuple providing information about the current file such as name, size, creation date, etc.
 
-```py
+```py3
 class FileInfoRecord(namedtuple('FileInfoRecord', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
     """A record for tracking file info."""
 ```
 
 The `flags` property seen above contains only Rummage search related flags (the flags are abstracted at this level and are converted to the appropriate regular expression flags later).
 
-```py
+```py3
 # Common regular expression flags (re|regex)
 IGNORECASE = 0x1  # (?i)
 DOTALL = 0x2      # (?s)
@@ -251,7 +245,7 @@ The main dialog's `Replace with` text box will become the `Replace plugin` text 
 ??? settings "Example Plugin"
     In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is assumed this is not a binary replace.
 
-    ```py
+    ```py3
     from __future__ import unicode_literals
     from rummage.lib import rumcore
     import os
@@ -517,7 +511,7 @@ Paths might vary depending on Ubuntu version etc.
 
 - Create an executable file called `Rummage Here...` in `~/.local/share/nautilus/scripts/` with the following content (RUMMAGE_PATH should be the binary created when installing rummage in Python which is usually `/usr/local/bin/rummage`).
 
-    ```py
+    ```py3
     #!/usr/bin/python
     import os
     import subprocess
