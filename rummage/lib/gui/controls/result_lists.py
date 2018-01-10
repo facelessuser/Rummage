@@ -203,6 +203,8 @@ class ResultFileList(DynamicList):
     def on_rclick(self, event):
         """Show context menu on right click."""
 
+        target = None
+        enabled = False
         with self.wait:
             pos = event.GetPosition()
             item = self.HitTestSubItem(pos)[0]
@@ -216,14 +218,15 @@ class ResultFileList(DynamicList):
                 # Select if not already
                 if not selected:
                     self.Select(item)
-                # Open menu
-                ContextMenu(
-                    self,
-                    [
-                        (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled)
-                    ],
-                    pos
-                )
+        if target is not None:
+            # Open menu
+            ContextMenu(
+                self,
+                [
+                    (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled)
+                ],
+                pos
+            )
         event.Skip()
 
 
