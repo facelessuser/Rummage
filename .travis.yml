@@ -1,5 +1,7 @@
 sudo: required
+
 language: python
+
 matrix:
   include:
   - python: 2.7
@@ -12,20 +14,25 @@ matrix:
     env: TOXENV=py36-unittests
   - python: 3.6
     env: TOXENV=lint
-  - python: 2.7
+  - python: 3.6
     env: TOXENV=documents
+
 addons:
   apt:
     packages:
     - aspell
     - aspell-en
+
 install:
 - pip install tox
 - pip install codecov
+
 script:
 - tox
+
 after_success:
 - codecov
+
 deploy:
   - provider: pypi
     user: facelessuser
