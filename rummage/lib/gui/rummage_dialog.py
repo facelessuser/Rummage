@@ -474,11 +474,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_result_list.load_list(True)
         self.m_grep_notebook.SetSelection(0)
 
-        # Set progress bar to 0
-        self.m_progressbar.SetRange(100)
-        self.m_progressbar.SetValue(0)
-        self.m_progressbar.Hide()
-
         self.refresh_localization()
 
         # Setup the inputs history and replace
@@ -1092,8 +1087,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread = None
 
         # Reset status
-        self.m_progressbar.SetRange(100)
-        self.m_progressbar.SetValue(0)
         self.m_statusbar.set_status("")
 
         # Delete old plugins
@@ -1597,8 +1590,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         count
                     )
                 )
-                self.m_progressbar.SetRange(total if total else 100)
-                self.m_progressbar.SetValue(completed)
             self.count = count
 
             # Run is finished or has been terminated
@@ -1620,8 +1611,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                             benchmark
                         )
                     )
-                    self.m_progressbar.SetRange(total)
-                    self.m_progressbar.SetValue(completed)
                     if Settings.get_notify():
                         notify.error(
                             self.NOTIFY_SEARCH_ABORTED,
@@ -1645,8 +1634,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                             benchmark
                         )
                     )
-                    self.m_progressbar.SetRange(100)
-                    self.m_progressbar.SetValue(100)
                     if Settings.get_notify():
                         notify.info(
                             self.NOTIFY_SEARCH_COMPLETED,
@@ -1676,8 +1663,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def update_table(self, count, done, total, skipped, *results):
         """Update the result lists with current search results."""
 
-        p_range = self.m_progressbar.GetRange()
-        p_value = self.m_progressbar.GetValue()
         actually_done = done - 1 if done > 0 else 0
         for f in results:
             self.m_result_file_list.set_match(f, self.no_pattern)
@@ -1688,11 +1673,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_result_list.set_match(f)
             count += 1
 
-        if total != 0:
-            if p_range != total:
-                self.m_progressbar.SetRange(total)
-            if p_value != done:
-                self.m_progressbar.SetValue(actually_done)
         self.m_statusbar.set_status(
             self.UPDATE_STATUS % (
                 (
