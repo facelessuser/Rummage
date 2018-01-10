@@ -51,7 +51,7 @@ class RummageFrame ( wx.Frame ):
 		
 		bSizer10 = wx.BoxSizer( wx.VERTICAL )
 		
-		fgSizer2 = wx.FlexGridSizer( 5, 1, 0, 0 )
+		fgSizer2 = wx.FlexGridSizer( 3, 1, 0, 0 )
 		fgSizer2.AddGrowableCol( 0 )
 		fgSizer2.SetFlexibleDirection( wx.BOTH )
 		fgSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -348,10 +348,6 @@ class RummageFrame ( wx.Frame ):
 		
 		
 		fgSizer2.Add( sbSizer4, 1, wx.EXPAND, 5 )
-		
-		self.m_progressbar = wx.Gauge( self.m_settings_panel, wx.ID_ANY, 100, wx.DefaultPosition, wx.Size( -1,5 ), wx.GA_HORIZONTAL )
-		self.m_progressbar.SetValue( 0 ) 
-		fgSizer2.Add( self.m_progressbar, 0, wx.ALIGN_CENTER|wx.ALL|wx.EXPAND, 5 )
 		
 		fgSizer38 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		fgSizer38.AddGrowableCol( 0 )

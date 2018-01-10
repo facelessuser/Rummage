@@ -319,26 +319,32 @@ class RummageThread(threading.Thread):
                         self.no_results += 1
                     if f.error is not None:
                         _ERRORS.append(f)
+                self.update_benchmark()
             self.update_status()
             wx.WakeUpIdle()
 
             if _ABORT:
                 self.rummage.kill()
 
+    def update_benchmark(self):
+        """Update benchmark."""
+        self.benchmark = time() - self.start
+
     def run(self):
         """Start the Rummage thread benchmark the time."""
 
         global _ABORT
         self.running = True
-        start = time()
+        self.start = time()
+        self.benchmark = 0.0
 
         try:
             self.payload()
         except Exception:
             error(traceback.format_exc())
 
-        bench = time() - start
-        runtime = self.BENCHMARK_STATUS % bench
+        self.update_benchmark()
+        runtime = self.BENCHMARK_STATUS % self.benchmark
 
         self.runtime = runtime
         self.running = False
@@ -462,13 +468,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         )
 
         # Replace result panel placeholders with new custom panels
-        self.m_result_file_list.load_list()
-        self.m_result_list.load_list()
+        self.m_result_file_list.set_wait_lock(_LOCK)
+        self.m_result_list.set_wait_lock(_LOCK)
+        self.m_result_file_list.load_list(True)
+        self.m_result_list.load_list(True)
         self.m_grep_notebook.SetSelection(0)
-
-        # Set progress bar to 0
-        self.m_progressbar.SetRange(100)
-        self.m_progressbar.SetValue(0)
 
         self.refresh_localization()
 
@@ -1083,8 +1087,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread = None
 
         # Reset status
-        self.m_progressbar.SetRange(100)
-        self.m_progressbar.SetValue(0)
         self.m_statusbar.set_status("")
 
         # Delete old plugins
@@ -1121,6 +1123,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.thread.setDaemon(True)
 
         # Reset result tables
+        self.last_update = 0.0
+        self.m_grep_notebook.SetSelection(1)
         self.count = 0
         self.m_result_file_list.reset_list()
         self.m_result_list.reset_list()
@@ -1569,6 +1573,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     results = _RESULTS[0:records - count]
                     del _RESULTS[0:records - count]
                 count = self.update_table(count, completed, total, skipped, *results)
+                if (self.thread.benchmark - self.last_update) > 1.0:
+                    self.m_result_file_list.load_list()
+                    self.m_result_list.load_list()
+                    # self.m_result_file_list.Refresh()
+                    # self.m_result_list.Refresh()
+                    self.thread.update_benchmark()
+                    self.last_update = self.thread.benchmark
             else:
                 self.m_statusbar.set_status(
                     self.UPDATE_STATUS % (
@@ -1579,8 +1590,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         count
                     )
                 )
-                self.m_progressbar.SetRange(total if total else 100)
-                self.m_progressbar.SetValue(completed)
             self.count = count
 
             # Run is finished or has been terminated
@@ -1602,8 +1611,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                             benchmark
                         )
                     )
-                    self.m_progressbar.SetRange(total)
-                    self.m_progressbar.SetValue(completed)
                     if Settings.get_notify():
                         notify.error(
                             self.NOTIFY_SEARCH_ABORTED,
@@ -1627,8 +1634,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                             benchmark
                         )
                     )
-                    self.m_progressbar.SetRange(100)
-                    self.m_progressbar.SetValue(100)
                     if Settings.get_notify():
                         notify.info(
                             self.NOTIFY_SEARCH_COMPLETED,
@@ -1648,9 +1653,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                         msg=self.SB_TOOLTIP_ERR % len(errors),
                         click_left=self.on_error_click
                     )
-                self.m_result_file_list.load_list()
-                self.m_result_list.load_list()
-                self.m_grep_notebook.SetSelection(1)
+                self.m_result_file_list.load_list(True)
+                self.m_result_list.load_list(True)
                 self.debounce_search = False
                 self.allow_update = False
                 self.thread = None
@@ -1659,8 +1663,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def update_table(self, count, done, total, skipped, *results):
         """Update the result lists with current search results."""
 
-        p_range = self.m_progressbar.GetRange()
-        p_value = self.m_progressbar.GetValue()
         actually_done = done - 1 if done > 0 else 0
         for f in results:
             self.m_result_file_list.set_match(f, self.no_pattern)
@@ -1671,11 +1673,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.m_result_list.set_match(f)
             count += 1
 
-        if total != 0:
-            if p_range != total:
-                self.m_progressbar.SetRange(total)
-            if p_value != done:
-                self.m_progressbar.SetValue(actually_done)
         self.m_statusbar.set_status(
             self.UPDATE_STATUS % (
                 (
@@ -2182,6 +2179,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_export_html(self, event):
         """Export to HTML."""
 
+        if not self.m_result_list.complete or not self.m_result_list.complete:
+            return
+
         if (
             len(self.m_result_file_list.itemDataMap) == 0 and
             len(self.m_result_list.itemDataMap) == 0
@@ -2204,6 +2204,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
 
     def on_export_csv(self, event):
         """Export to CSV."""
+
+        if not self.m_result_list.complete or not self.m_result_list.complete:
+            return
 
         if (
             len(self.m_result_file_list.itemDataMap) == 0 and
