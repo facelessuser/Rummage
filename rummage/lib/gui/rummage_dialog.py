@@ -1634,7 +1634,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     )
                 )
                 if Settings.get_notify():
-                    notify.error(
+                    message_type = 'error' if kill else 'info'
+                    getattr(notify, message_type)(
                         (self.NOTIFY_SEARCH_ABORTED if kill else self.NOTIFY_SEARCH_COMPLETED),
                         self.NOTIFY_MATCHES_FOUND % count,
                         sound=Settings.get_alert()

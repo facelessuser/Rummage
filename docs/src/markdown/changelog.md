@@ -1,6 +1,14 @@
 # Changelog
 
+## 3.2.1
+
+Jan 10, 2018
+
+- **FIX**: Complete message should not be of "error" type.
+
 ## 3.2.0
+
+Jan 10, 2018
 
 - **NEW**: Results update live. Progress has been removed. (#140)
 - **FIX**: Windows status bar flicker.
