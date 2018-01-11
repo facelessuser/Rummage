@@ -157,9 +157,21 @@ To use search chains you must put Rummage in "search chain" mode by selecting th
 
 ### Replace plugins
 
-Regular expressions are great, but some times regular expressions aren't enough.  If you are dealing with a replace task that requires logic that cannot be represented in a simple replace pattern, you can create a "replace plugin".
+Regular expressions are great, but sometimes regular expressions aren't enough.  If you are dealing with a replace task that requires logic that cannot be represented in a simple replace pattern, you can create a "replace plugin".
 
-Simply create a Python script with a Replace class derived from the `ReplacePlugin` class found in `rumcore` at: `#!py3 from rummage.lib import rumcore`.  The plugin file must include a function called `get_replace` that returns the needed class.
+Replace plugins are written in Python and are loaded by first selecting the `Use plugin replace` check box in the main dialog.
+
+![Enable Replace Plugin](/images/plugin_toggle.png)
+
+Then the main dialog's `Replace with` text box will become the `Replace plugin` text box with an associated file picker.  Here you can point to your replace plugin file.
+
+![Enable Replace Plugin](/images/plugin_input.png)
+
+#### Writing a Plugin
+
+Replace plugins should contain two things. The first is a plugin class derived from the `rummage.lib.rumcore.ReplacePlugin`.  The second is a function called `get_replace` that returns your class.
+
+The plugin class is fairly straight forward and is shown below.
 
 ```py3
 class ReplacePlugin(object):
@@ -201,14 +213,16 @@ class ReplacePlugin(object):
         return m.group(0)
 ```
 
-The `file_info` property is a named tuple providing information about the current file such as name, size, creation date, etc.
+`ReplacePlugin`'s `replace` function will receive the parameter `m` which is either a `regex` or `re` match object (depending on what regular expression engine is selected). The return value must be either a Unicode string or byte string (for binary files).
+
+The `ReplacePlugin`'s `file_info` property is a named tuple providing information about the current file such as name, size, creation date, etc.
 
 ```py3
 class FileInfoRecord(namedtuple('FileInfoRecord', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
     """A record for tracking file info."""
 ```
 
-The `flags` property seen above contains only Rummage search related flags (the flags are abstracted at this level and are converted to the appropriate regular expression flags later).
+The `ReplacePlugin`'s `flags` property contains only Rummage search related flags (the flags are abstracted at this level and are converted to the appropriate regular expression flags later). They can also be accessed from `rummage.lib.rumcore`. The flags are shown below.
 
 ```py3
 # Common regular expression flags (re|regex)
@@ -233,17 +247,8 @@ POSIX = 0x2000          # (?p)
 LITERAL = 0x10000           # Literal search
 ```
 
-To use replace plugins, simply check the `Use plugin replace` check box in the main dialog.
-
-![Enable Replace Plugin](/images/plugin_toggle.png)
-
-The main dialog's `Replace with` text box will become the `Replace plugin` text box with an associated file picker.  Here you can point to your replace plugin file.
-
-![Enable Replace Plugin](/images/plugin_input.png)
-
-
-??? settings "Example Plugin"
-    In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is assumed this is not a binary replace.
+!!! example "Example Plugin"
+    In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is assumed this is not a binary replace, so a Unicode string is returned.
 
     ```py3
     from __future__ import unicode_literals
