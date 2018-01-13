@@ -9,6 +9,7 @@ import copy
 import struct
 import codecs
 import json
+from itertools import groupby
 from encodings.aliases import aliases
 from .file_strip.json import sanitize_json
 
@@ -175,6 +176,20 @@ def write_json(filename, obj):
     return fail
 
 
+def numeric_sort(text):
+    """Sort numbers in strings as actual numbers."""
+
+    final_text = []
+    for digit, g in groupby(text, lambda x: x.isdigit()):
+        val = "".join(g)
+        if digit:
+            final_text.append(int(val))
+        else:
+            final_text.append(val)
+
+    return final_text
+
+
 def normalize_encoding_name(original_name):
     """Normalize the encoding names."""
 
@@ -198,7 +213,7 @@ def get_encodings():
         if value is not None and value not in exclude:
             elist.add(value)
     elist = list(elist)
-    elist.sort()
+    elist = sorted(elist, key=numeric_sort)
     return elist
 
 
