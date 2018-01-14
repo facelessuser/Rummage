@@ -728,7 +728,10 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         encode_val = util.normalize_encoding_name(Settings.get_search_setting("force_encode", "ASCII"))
         if encode_val is None:
             encode_val == "ASCII"
-        index = self.m_force_encode_choice.FindString(encode_val)
+        try:
+            index = ENCODINGS.index(encode_val)
+        except ValueError:
+            index == wx.NOT_FOUND
         if index != wx.NOT_FOUND:
             self.m_force_encode_choice.SetSelection(index)
         self.m_bestmatch_checkbox.SetValue(Settings.get_search_setting("bestmatch_toggle", False))
