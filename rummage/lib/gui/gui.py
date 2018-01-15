@@ -170,7 +170,7 @@ class RummageFrame ( wx.Frame ):
 		fgSizer40.Add( self.m_force_encode_checkbox, 0, wx.ALL, 5 )
 		
 		m_force_encode_choiceChoices = []
-		self.m_force_encode_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_force_encode_choiceChoices, wx.CB_SORT )
+		self.m_force_encode_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_force_encode_choiceChoices, 0 )
 		self.m_force_encode_choice.SetSelection( 0 )
 		fgSizer40.Add( self.m_force_encode_choice, 0, wx.ALL|wx.EXPAND, 5 )
 		

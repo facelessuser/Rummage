@@ -78,98 +78,7 @@ LIMIT_COMPARE = {
     3: "lt"
 }
 
-ENCODINGS = [
-    "ASCII",
-    "BIG5",
-    "BIG5-HKSCS",
-    "BIN",
-    "CP037",
-    "CP154",
-    "CP424",
-    "CP437",
-    "CP500",
-    "CP720",
-    "CP737",
-    "CP775",
-    "CP850",
-    "CP852",
-    "CP855",
-    "CP856",
-    "CP857",
-    "CP858",
-    "CP860",
-    "CP861",
-    "CP862",
-    "CP863",
-    "CP864",
-    "CP865",
-    "CP866",
-    "CP869",
-    "CP874",
-    "CP875",
-    "CP949",
-    "CP950",
-    "CP1006",
-    "CP1026",
-    "CP1140",
-    "EUC-JP",
-    "EUC-JIS-2004",
-    "EUC-JISX0213",
-    "EUC-KR",
-    "GB2312",
-    "GBK",
-    "GB18030",
-    "HZ",
-    "ISO-2022-JP",
-    "ISO-2022-JP-1",
-    "ISO-2022-JP-2",
-    "ISO-2022-JP-2004",
-    "ISO-2022-JP-3",
-    "ISO-2022-JP-ext",
-    "ISO-2022-KR",
-    "ISO-8859-2",
-    "ISO-8859-3",
-    "ISO-8859-4",
-    "ISO-8859-5",
-    "ISO-8859-6",
-    "ISO-8859-7",
-    "ISO-8859-8",
-    "ISO-8859-9",
-    "ISO-8859-10",
-    "ISO-8859-13",
-    "ISO-8859-14",
-    "ISO-8859-15",
-    "ISO-8859-16",
-    "JOHAB",
-    "KOI8-R",
-    "KOI8-U",
-    "LATIN-1",
-    "MAC-CYRILLIC",
-    "MAC-GREEK",
-    "MAC-ICELAND",
-    "MAC-LATIN2",
-    "MAC-ROMAN",
-    "MAC-TURKISH",
-    "MS-KANJI",
-    "SHIFT-JIS",
-    "SHIFT-JIS-2004",
-    "SHIFT-JISX0213",
-    "UTF-32-BE",
-    "UTF-32-LE",
-    "UTF-16-BE",
-    "UTF-16-LE",
-    "UTF-7",
-    "UTF-8",
-    "WINDOWS-1250",
-    "WINDOWS-1251",
-    "WINDOWS-1252",
-    "WINDOWS-1253",
-    "WINDOWS-1254",
-    "WINDOWS-1255",
-    "WINDOWS-1256",
-    "WINDOWS-1257",
-    "WINDOWS-1258"
-]
+ENCODINGS = util.get_encodings()
 
 
 def eng_to_i18n(string, mapping):
@@ -816,7 +725,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_count_only_checkbox.SetValue(Settings.get_search_setting("count_only_toggle", False))
         self.m_backup_checkbox.SetValue(Settings.get_search_setting("backup_toggle", True))
         self.m_force_encode_checkbox.SetValue(Settings.get_search_setting("force_encode_toggle", False))
-        encode_val = Settings.get_search_setting("force_encode", "ASCII")
+        encode_val = util.normalize_encoding_name(Settings.get_search_setting("force_encode", "ASCII"))
+        if encode_val is None:
+            encode_val == "ASCII"
         index = self.m_force_encode_choice.FindString(encode_val)
         if index != wx.NOT_FOUND:
             self.m_force_encode_choice.SetSelection(index)
