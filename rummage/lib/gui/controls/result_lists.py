@@ -339,7 +339,7 @@ class ResultContentList(DynamicList):
     def on_dclick(self, event):
         """Open file at in editor with optional line and column argument."""
 
-        while self.wait:
+        with self.wait:
             pos = event.GetPosition()
             item = self.HitTestSubItem(pos)[0]
             if item != -1:
