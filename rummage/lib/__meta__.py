@@ -9,3 +9,4 @@ __status__ = version_info[3]
 __maintainers__ = [("Isaac Muse", "IsaacMuse@gmail.com")]
 __help__ = "https://github.com/facelessuser/Rummage/issues"
 __manual__ = "http://facelessuser.github.io/Rummage/"
+__changelog__ = "https://facelessuser.github.io/Rummage/changelog/"

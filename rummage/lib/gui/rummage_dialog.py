@@ -528,6 +528,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.MENU_OPEN_LOG = _("Open Log File")
         self.MENU_ABOUT = _("&About Rummage")
         self.MENU_DOCUMENTATION = _("Documentation")
+        self.MENU_CHANGELOG = _("Changelog")
         self.MENU_HELP_SUPPORT = _("Help and Support")
         self.MENU_SHOW_LIMIT = _("Show Limit Search Panel")
         self.MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
@@ -611,6 +612,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_log_menuitem.SetItemLabel(self.MENU_OPEN_LOG)
         self.m_about_menuitem.SetItemLabel(self.MENU_ABOUT)
         self.m_documentation_menuitem.SetItemLabel(self.MENU_DOCUMENTATION)
+        self.m_changelog_menuitem.SetItemLabel(self.MENU_CHANGELOG)
         self.m_issues_menuitem.SetItemLabel(self.MENU_HELP_SUPPORT)
 
         self.m_logic_choice.Clear()
@@ -2176,6 +2178,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Open documentation site."""
 
         webbrowser.open_new_tab(__meta__.__manual__)
+
+    def on_changelog(self, event):
+        """Open documentation site."""
+
+        webbrowser.open_new_tab(__meta__.__changelog__)
 
     def on_support(self, event):
         """Open support information dialog."""
