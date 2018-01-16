@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.3.0
+
+- **NEW**: Add changelog link in menu for quick reference.
+- **NEW**: Encoding list is generated from the Python installation being used.
+
 ## 3.2.1
 
 Jan 10, 2018

@@ -9,6 +9,8 @@ import copy
 import struct
 import codecs
 import json
+from itertools import groupby
+from encodings.aliases import aliases
 from .file_strip.json import sanitize_json
 
 MAXUNICODE = sys.maxunicode
@@ -172,6 +174,47 @@ def write_json(filename, obj):
         fail = True
 
     return fail
+
+
+def numeric_sort(text):
+    """Sort numbers in strings as actual numbers."""
+
+    final_text = []
+    for digit, g in groupby(text, lambda x: x.isdigit()):
+        val = "".join(g)
+        if digit:
+            final_text.append(int(val))
+        else:
+            final_text.append(val)
+
+    return final_text
+
+
+def normalize_encoding_name(original_name):
+    """Normalize the encoding names."""
+
+    name = None
+    try:
+        name = codecs.lookup(original_name).name.upper().replace('_', '-')
+    except LookupError as e:
+        if original_name.upper() == 'BIN':
+            name = 'BIN'
+    return name
+
+
+def get_encodings():
+    """Get list of all encodings."""
+
+    exclude = ('BASE64', 'BZ2', 'HEX', 'QUOPRI', 'ROT-13', 'UU', 'ZLIB')
+    elist = set()
+    elist.add('BIN')
+    for k in aliases.keys():
+        value = normalize_encoding_name(k)
+        if value is not None and value not in exclude:
+            elist.add(value)
+    elist = list(elist)
+    elist = sorted(elist, key=numeric_sort)
+    return elist
 
 
 def to_unicode_argv():

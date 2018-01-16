@@ -170,7 +170,7 @@ class RummageFrame ( wx.Frame ):
 		fgSizer40.Add( self.m_force_encode_checkbox, 0, wx.ALL, 5 )
 		
 		m_force_encode_choiceChoices = []
-		self.m_force_encode_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_force_encode_choiceChoices, wx.CB_SORT )
+		self.m_force_encode_choice = wx.Choice( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_force_encode_choiceChoices, 0 )
 		self.m_force_encode_choice.SetSelection( 0 )
 		fgSizer40.Add( self.m_force_encode_choice, 0, wx.ALL|wx.EXPAND, 5 )
 		
@@ -458,6 +458,9 @@ class RummageFrame ( wx.Frame ):
 		self.m_documentation_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Documentation", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_help_menu.Append( self.m_documentation_menuitem )
 		
+		self.m_changelog_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Changelog", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_help_menu.Append( self.m_changelog_menuitem )
+		
 		self.m_support_info_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Support Info", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_help_menu.Append( self.m_support_info_menuitem )
 		
@@ -498,6 +501,7 @@ class RummageFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.on_hide_limit, id = self.m_hide_limit_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_about, id = self.m_about_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_documentation, id = self.m_documentation_menuitem.GetId() )
+		self.Bind( wx.EVT_MENU, self.on_changelog, id = self.m_changelog_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_support, id = self.m_support_info_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_issues, id = self.m_issues_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_show_log_file, id = self.m_log_menuitem.GetId() )
@@ -568,6 +572,9 @@ class RummageFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_documentation( self, event ):
+		event.Skip()
+	
+	def on_changelog( self, event ):
 		event.Skip()
 	
 	def on_support( self, event ):
