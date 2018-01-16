@@ -4,6 +4,7 @@
 
 - **NEW**: Add changelog link in menu for quick reference.
 - **NEW**: Encoding list is generated from the Python installation being used.
+- **FIX**: Infinite loop on result double click in content list.
 
 ## 3.2.1
 
