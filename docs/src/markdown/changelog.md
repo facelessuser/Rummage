@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.0
+
+- **NEW**: Add extension column in results.
+- **FIX**: Result item hover not showing file name in status bar.
+
 ## 3.3.0
 
 - **NEW**: Add changelog link in menu for quick reference.

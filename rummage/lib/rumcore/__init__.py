@@ -316,7 +316,7 @@ class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'size', 'modified', '
     """File Attributes."""
 
 
-class FileInfoRecord(namedtuple('FileInfoRecord', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
+class FileInfoRecord(namedtuple('FileInfoRecord', ['id', 'name', 'size', 'modified', 'created', 'encoding', 'ext'])):
     """A record for tracking file info."""
 
 
@@ -869,7 +869,8 @@ class _FileSearch(object):
             file_obj.size,
             file_obj.modified,
             file_obj.created,
-            self.current_encoding.encode.upper()
+            self.current_encoding.encode.upper(),
+            os.path.splitext(file_obj.name)[1].lower().lstrip('.')
         )
 
         return file_info, error
@@ -1120,6 +1121,7 @@ class _FileSearch(object):
                 FileInfoRecord(
                     self.idx,
                     self.file_obj.name,
+                    None,
                     None,
                     None,
                     None,

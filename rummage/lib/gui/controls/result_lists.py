@@ -30,6 +30,26 @@ from ..localization import _
 from .. import data
 from ... import util
 
+CONTENT_PATH = 0
+CONTENT_LINE = 1
+CONTENT_MATCH = 2
+CONTENT_EXT = 3
+CONTENT_TEXT = 4
+CONTENT_KEY = 5
+CONTENT_COL = 6
+CONTENT_ENC = 7
+
+FILE_NAME = 0
+FILE_MATCH = 1
+FILE_EXT = 2
+FILE_SIZE = 3
+FILE_PATH = 4
+FILE_ENC = 5
+FILE_MOD = 6
+FILE_CRE = 7
+FILE_LINE = 8
+FILE_COL = 9
+
 
 class ContextMenu(wx.Menu):
     """Context Menu."""
@@ -71,8 +91,9 @@ class ResultFileList(DynamicList):
             parent,
             [
                 self.FILE,
-                self.SIZE,
                 self.MATCHES,
+                self.EXTENSION,
+                self.SIZE,
                 self.PATH,
                 self.ENCODING,
                 self.MODIFIED,
@@ -91,6 +112,7 @@ class ResultFileList(DynamicList):
         self.FILE = _("File")
         self.SIZE = _("Size")
         self.MATCHES = _("Matches")
+        self.EXTENSION = _('Extensions')
         self.PATH = _("Path")
         self.ENCODING = _("Encoding")
         self.MODIFIED = _("Modified")
@@ -117,9 +139,16 @@ class ResultFileList(DynamicList):
         if file_search:
             self.set_item_map(
                 obj.name,
-                os.path.basename(obj.name), decimal.Decimal(obj.size) / decimal.Decimal(1024), 0,
-                os.path.dirname(obj.name), '', obj.modified,
-                obj.created, 1, 1
+                os.path.basename(obj.name),
+                0,
+                obj.ext,
+                decimal.Decimal(obj.size) / decimal.Decimal(1024),
+                os.path.dirname(obj.name),
+                '',
+                obj.modified,
+                obj.created,
+                1,
+                1
             )
         else:
             item_id = "%d" % obj.info.id
@@ -128,9 +157,16 @@ class ResultFileList(DynamicList):
             else:
                 self.set_item_map(
                     item_id,
-                    os.path.basename(obj.info.name), decimal.Decimal(obj.info.size) / decimal.Decimal(1024), 1,
-                    os.path.dirname(obj.info.name), obj.info.encoding, obj.info.modified,
-                    obj.info.created, obj.match.lineno, obj.match.colno
+                    os.path.basename(obj.info.name),
+                    1,
+                    obj.info.ext,
+                    decimal.Decimal(obj.info.size) / decimal.Decimal(1024),
+                    os.path.dirname(obj.info.name),
+                    obj.info.encoding,
+                    obj.info.modified,
+                    obj.info.created,
+                    obj.match.lineno,
+                    obj.match.colno
                 )
 
     def on_enter_window(self, event):
@@ -149,7 +185,7 @@ class ResultFileList(DynamicList):
                 actual_item = self.itemIndexMap[item]
                 if actual_item != self.last_moused[0]:
                     d = self.itemDataMap[actual_item]
-                    self.last_moused = (actual_item, os.path.join(d[3], d[0]))
+                    self.last_moused = (actual_item, os.path.join(d[FILE_PATH], d[FILE_NAME]))
                 self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
@@ -158,9 +194,9 @@ class ResultFileList(DynamicList):
 
         if not absolute:
             item = self.itemIndexMap[item]
-        if col == 1:
-            return '%.2fKB' % round(self.itemDataMap[item][col], 2)
-        elif col in [5, 6]:
+        if col == FILE_SIZE:
+            return '%.2fKB' % round(self.itemDataMap[item][FILE_SIZE], 2)
+        elif col in (FILE_MOD, FILE_CRE):
             return ctime(self.itemDataMap[item][col])
         else:
             return util.to_ustr(self.itemDataMap[item][col])
@@ -168,23 +204,23 @@ class ResultFileList(DynamicList):
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
 
-        encoding = self.itemDataMap[self.itemIndexMap[item]][4]
+        encoding = self.itemDataMap[self.itemIndexMap[item]][FILE_ENC]
         return 1 if encoding == "BIN" else 0
 
     def increment_match_count(self, idx):
         """Increment the match count of the given item."""
 
         entry = list(self.itemDataMap[idx])
-        entry[2] += 1
+        entry[FILE_MATCH] += 1
         self.itemDataMap[idx] = tuple(entry)
         # Sample the first "size_sample" to determine
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
-            text = self.get_item_text(idx, 2, True)
+            text = self.get_item_text(idx, FILE_MATCH, True)
             lw = self.dc.GetFullTextExtent(text)[0]
             width = lw + 30
-            if width > self.widest_cell[2]:
-                self.widest_cell[2] = width
+            if width > self.widest_cell[FILE_MATCH]:
+                self.widest_cell[FILE_MATCH] = width
 
     def on_dclick(self, event):
         """Open file at in editor with optional line and column argument."""
@@ -194,9 +230,9 @@ class ResultFileList(DynamicList):
             item = self.HitTestSubItem(pos)[0]
             if item != -1:
                 filename = self.GetItem(item, col=0).GetText()
-                path = self.GetItem(item, col=3).GetText()
-                line = str(self.get_map_item(item, col=7))
-                col = str(self.get_map_item(item, col=8))
+                path = self.GetItem(item, col=FILE_PATH).GetText()
+                line = str(self.get_map_item(item, col=FILE_LINE))
+                col = str(self.get_map_item(item, col=FILE_COL))
                 fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()
 
@@ -209,8 +245,8 @@ class ResultFileList(DynamicList):
             pos = event.GetPosition()
             item = self.HitTestSubItem(pos)[0]
             if item != -1:
-                filename = self.GetItem(item, col=0).GetText()
-                path = self.GetItem(item, col=3).GetText()
+                filename = self.GetItem(item, col=FILE_NAME).GetText()
+                path = self.GetItem(item, col=FILE_PATH).GetText()
                 target = os.path.join(path, filename)
                 selected = self.IsSelected(item)
                 select_count = self.GetSelectedItemCount()
@@ -244,6 +280,7 @@ class ResultContentList(DynamicList):
                 self.FILE,
                 self.LINE,
                 self.MATCHES,
+                self.EXTENSION,
                 self.CONTEXT
             ]
         )
@@ -258,6 +295,7 @@ class ResultContentList(DynamicList):
         self.FILE = _("File")
         self.LINE = _("Line")
         self.MATCHES = _("Matches")
+        self.EXTENSION = _("Extension")
         self.CONTEXT = _("Context")
 
     def create_image_list(self):
@@ -285,7 +323,7 @@ class ResultContentList(DynamicList):
             if item != -1:
                 actual_item = self.itemIndexMap[item]
                 if actual_item != self.last_moused[0]:
-                    pth = self.itemDataMap[actual_item][0]
+                    pth = self.itemDataMap[actual_item][CONTENT_PATH]
                     self.last_moused = (actual_item, os.path.join(pth[1], pth[0]))
                 self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
@@ -295,8 +333,8 @@ class ResultContentList(DynamicList):
 
         if not absolute:
             item = self.itemIndexMap[item]
-        if col == 0:
-            return util.to_ustr(self.itemDataMap[item][col][0])
+        if col == CONTENT_PATH:
+            return util.to_ustr(self.itemDataMap[item][CONTENT_PATH][0])
         else:
             return util.to_ustr(self.itemDataMap[item][col])
 
@@ -304,16 +342,16 @@ class ResultContentList(DynamicList):
         """Increment the match count of the given item."""
 
         entry = list(self.itemDataMap[idx])
-        entry[2] += 1
+        entry[CONTENT_MATCH] += 1
         self.itemDataMap[idx] = tuple(entry)
         # Sample the first "size_sample" to determine
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
-            text = self.get_item_text(idx, 2, True)
+            text = self.get_item_text(idx, CONTENT_MATCH, True)
             lw = self.dc.GetFullTextExtent(text)[0]
             width = lw + 30
-            if width > self.widest_cell[2]:
-                self.widest_cell[2] = width
+            if width > self.widest_cell[CONTENT_MATCH]:
+                self.widest_cell[CONTENT_MATCH] = width
 
     def set_match(self, obj):
         """Set the match."""
@@ -325,15 +363,19 @@ class ResultContentList(DynamicList):
             self.set_item_map(
                 item_id,
                 (os.path.basename(obj.info.name), os.path.dirname(obj.info.name)),
-                obj.match.lineno, 1,
+                obj.match.lineno,
+                1,
+                obj.info.ext,
                 obj.match.lines.replace("\r", "").split("\n")[0],
-                "%d" % obj.info.id, obj.match.colno, obj.info.encoding
+                "%d" % obj.info.id,
+                obj.match.colno,
+                obj.info.encoding
             )
 
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
 
-        encoding = self.itemDataMap[self.itemIndexMap[item]][6]
+        encoding = self.itemDataMap[self.itemIndexMap[item]][CONTENT_ENC]
         return 1 if encoding == "BIN" else 0
 
     def on_dclick(self, event):
@@ -343,12 +385,12 @@ class ResultContentList(DynamicList):
             pos = event.GetPosition()
             item = self.HitTestSubItem(pos)[0]
             if item != -1:
-                filename = self.GetItem(item, col=0).GetText()
-                line = self.GetItem(item, col=1).GetText()
-                file_row = self.get_map_item(item, col=4)
-                col = str(self.get_map_item(item, col=5))
+                filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                line = self.GetItem(item, col=CONTENT_LINE).GetText()
+                file_row = self.get_map_item(item, col=CONTENT_KEY)
+                col = str(self.get_map_item(item, col=CONTENT_COL))
                 path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
-                    file_row, col=3, absolute=True
+                    file_row, col=FILE_PATH, absolute=True
                 )
                 fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()
