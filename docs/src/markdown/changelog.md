@@ -3,6 +3,7 @@
 ## 3.4.0
 
 - **NEW**: Add extension column in results.
+- **NEW**: Status now just shows `[ACTIVE]` or `[DONE]` instead of a misleading percentage.
 - **FIX**: Result item hover not showing file name in status bar.
 
 ## 3.3.0

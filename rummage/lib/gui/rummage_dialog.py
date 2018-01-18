@@ -466,9 +466,9 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.ERR_IMPORT = _("There was an error attempting to read the settings file!")
 
         # Status
-        self.INIT_STATUS = _("Searching: 0/0 0% Skipped: 0 Matches: 0")
-        self.UPDATE_STATUS = _("Searching: %d/%d %d%% Skipped: %d Matches: %d")
-        self.FINAL_STATUS = _("Searching: %d/%d %d%% Skipped: %d Matches: %d Benchmark: %s")
+        self.INIT_STATUS = _("Searching: 0/0 [ACTIVE] Skipped: 0 Matches: 0")
+        self.UPDATE_STATUS = _("Searching: %d/%d [ACTIVE] Skipped: %d Matches: %d")
+        self.FINAL_STATUS = _("Searching: %d/%d [DONE] Skipped: %d Matches: %d Benchmark: %s")
 
         # Status bar popup
         self.SB_ERRORS = _("errors")
@@ -1498,7 +1498,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.UPDATE_STATUS % (
                         completed,
                         total,
-                        int(float(completed) / float(total) * 100) if total != 0 else 0,
                         skipped,
                         count
                     )
@@ -1540,7 +1539,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
                     self.FINAL_STATUS % (
                         completed,
                         total,
-                        (int(float(completed) / float(total) * 100) if total != 0 else 0 if kill else 100),
                         skipped,
                         count,
                         benchmark
@@ -1575,7 +1573,6 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             self.UPDATE_STATUS % (
                 (
                     actually_done, total,
-                    int(float(actually_done) / float(total) * 100),
                     skipped,
                     count
                 ) if total != 0 else (0, 0, 0, 0, 0)
