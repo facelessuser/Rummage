@@ -816,6 +816,7 @@ class TestFileSearch(unittest.TestCase):
 
         return rc.FileAttrRecord(
             name,
+            os.path.splitext(name)[1].lower().lstrip('.'),
             os.path.getsize(name),
             rc.getmtime(name),
             rc.getctime(name),
