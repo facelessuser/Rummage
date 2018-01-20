@@ -53,7 +53,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.parent = parent
         self.regex_mode = Settings.get_regex_mode()
         self.regex_version = Settings.get_regex_version()
-        self.imported_plugin = {}
+        self.imported_plugin = None
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
@@ -99,6 +99,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         if not self.parent.m_replace_plugin_checkbox.GetValue():
             self.m_replace_plugin_dir_picker.Hide()
+            self.m_reload_button.Hide()
 
         self.regex_event_code = -1
         self.testing = False
@@ -146,6 +147,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.USE_REPLACE_PLUGIN = _("Use replace plugin")
         self.REPLACE_PLUGIN = _("Replace plugin")
         self.REPLACE = _("Replace")
+        self.RELOAD = _("Reload")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -174,6 +176,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.m_replace_label.SetLabel(self.REPLACE_PLUGIN)
         else:
             self.m_replace_label.SetLabel(self.REPLACE)
+        self.m_reload_button.SetLabel(self.RELOAD)
         self.Fit()
 
     def init_regex_timer(self):
@@ -235,9 +238,10 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         import imp
 
-        if script not in self.imported_plugin:
-            self.imported_plugin = {}
-            module = imp.new_module(script)
+        if self.imported_plugin is None or script != self.imported_plugin[0]:
+            self.imported_plugin = None
+            module = imp.new_module(os.path.splitext(os.path.basename(script))[0])
+            module.__dict__['__file__'] = script
             with open(script, 'rb') as f:
                 encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py')
             with codecs.open(script, 'r', encoding=encoding.encode) as f:
@@ -252,9 +256,9 @@ class RegexTestDialog(gui.RegexTestDialog):
 
             # Don't let the module get garbage collected
             # We will remove references when we are done with it.
-            self.imported_plugin[script] = module
+            self.imported_plugin = (script, module)
 
-        return self.imported_plugin[script].get_replace()
+        return self.imported_plugin[1].get_replace()
 
     def test_regex(self):
         """Test and highlight search results in content buffer."""
@@ -386,6 +390,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     file_info = rumcore.FileInfoRecord(
                         0,
                         "TestBuffer.txt",
+                        "txt",
                         len(text),
                         time.ctime(),
                         time.ctime(),
@@ -416,9 +421,11 @@ class RegexTestDialog(gui.RegexTestDialog):
                     else:
                         rpattern = util.preprocess_replace(rpattern)
                         replace_test = functools.partial(replace_re, replace=rpattern)
-            except Exception as e:
-                print(e)
-                pass
+            except Exception:
+                self.imported_plugin = None
+                self.testing = False
+                print(str(traceback.format_exc()))
+                return
 
             try:
                 # Reset Colors
@@ -529,9 +536,11 @@ class RegexTestDialog(gui.RegexTestDialog):
         if self.m_replace_plugin_checkbox.GetValue():
             self.m_replace_label.SetLabel(self.REPLACE_PLUGIN)
             self.m_replace_plugin_dir_picker.Show()
+            self.m_reload_button.Show()
         else:
             self.m_replace_label.SetLabel(self.REPLACE)
             self.m_replace_plugin_dir_picker.Hide()
+            self.m_reload_button.Hide()
         self.m_tester_panel.GetSizer().Layout()
 
         self.regex_start_event(event)
@@ -545,6 +554,12 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.regex_start_event(event)
         else:
             self.regex_start_event(event)
+
+    def on_reload_click(self, event):
+        """On script reload click."""
+
+        self.imported_plugin = None
+        self.regex_start_event(event)
 
     on_regex_changed = regex_start_event
 

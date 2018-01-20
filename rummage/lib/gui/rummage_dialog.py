@@ -1199,7 +1199,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         import imp
 
         if script not in self.imported_plugins:
-            module = imp.new_module(script)
+            module = imp.new_module(os.path.splitext(os.path.basename(script))[0])
+            module.__dict__['__file__'] = script
             with open(script, 'rb') as f:
                 encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py')
             with codecs.open(script, 'r', encoding=encoding.encode) as f:
