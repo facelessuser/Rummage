@@ -1572,10 +1572,11 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_statusbar.set_status(
             self.UPDATE_STATUS % (
                 (
-                    actually_done, total,
+                    actually_done,
+                    total,
                     skipped,
                     count
-                ) if total != 0 else (0, 0, 0, 0, 0)
+                ) if total != 0 else (0, 0, 0, 0)
             )
         )
         return count
