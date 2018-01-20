@@ -165,6 +165,8 @@ Replace plugins are written in Python and are loaded by first selecting the `Use
 
 Then the main dialog's `Replace with` text box will become the `Replace plugin` text box with an associated file picker.  Here you can point to your replace plugin file.
 
+Replace plugins aren't meant to be full, complex modules that import lots of other relative files.  They are meant to be a single, compact script, but inside that script, you can import anything that is *already* installed in your Python environment.
+
 ![Enable Replace Plugin](/images/plugin_input.png)
 
 #### Writing a Plugin
