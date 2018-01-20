@@ -20,7 +20,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 from __future__ import absolute_import
-from .lib import safe_import
+from .lib import safe_import  # noqa: F401
 import sys
 import argparse
 import os

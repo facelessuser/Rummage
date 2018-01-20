@@ -196,7 +196,7 @@ def normalize_encoding_name(original_name):
     name = None
     try:
         name = codecs.lookup(original_name).name.upper().replace('_', '-')
-    except LookupError as e:
+    except LookupError:
         if original_name.upper() == 'BIN':
             name = 'BIN'
     return name
