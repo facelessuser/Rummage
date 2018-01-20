@@ -12,32 +12,41 @@ Name                             | Details
 [`wxPython`\ 4.0.0a3+][wxpython] | The new wxPython 4.0.0 is required for for Rummage to run in Python 2 and Python 3. Classic wxPython support has unfortunately be dropped.
 [`regex`\ 2015.07.19+][regex]    | **regex** is usage is completely optional, but it is included for those who wish to use it. Regex is a great regular expression engine that adds some nice features such as fuzzy searching, nested char sets, better Unicode support, and more.
 
-!!! warning "Linux Prerequisites"
-    In traditional Linux fashion, there is a little extra work that needs to be done prior to installing.  Linux requires some prerequisites so that it can build wxPython during installation.
+## Linux Prerequisites
 
-    Example is for Ubuntu:
+Prerequisites are related to wxPython, the graphical interface for Rummage. For Windows and macOS, there are no prerequisites as wxPython provides pre-built wheels for these operating systems, so Rummage can be installed directly and quickly with `pip`. Only Linux requires additional work before installing, but check out the wxPython documentation to learn how to build manually if you have reasons to do so.  The rest of this section refers exclusively to Linux, and mainly from an Ubuntu perspective as that is usually the distro I test on.
 
-    ```bash
-    sudo apt-get install dpkg-dev build-essential python2.7-dev libwebkitgtk-dev libjpeg-dev libtiff-dev libgtk2.0-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev
-    ```
+!!! info "Read First!"
 
-    Replace `python2.7-dev` with the Python version you are using.
+    WxPython is a separate project from Rummage, so this documentation may not always be up to date when it comes to the prerequisites for wxPython.
 
-    For Fedora 26, you need few dependencies to built wxPython:
+    Please check the wxPython prerequisites before installing. Particularly under [this section](https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites), you should find information about Linux Prerequisites.
 
-    ```bash
-    sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
-    ```
+    I usually try to keep Ubuntu info up to date, but if you find it is outdated, please let me know.  I rely on the community for other distros.
 
-    If your Linux distribution has `gstreamer` 1.0 available (like the Fedora distro), you can install the dev packages for that instead of the 0.10 version.
+Here are some last known prerequisite for a couple of distros. **Remember, they might be out of date**.
 
-    Be patient while installing Rummage as Linux must build wxPython while macOS and Windows do not.
+Example is for Ubuntu:
 
-    Check out the wxPython document to see if prerequisites have changed: https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites.
+```bash
+sudo apt-get install python3.5-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libgtk2.0-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
+```
+
+Replace `python3.5-dev` with the Python version you are using.
+
+For Fedora 26, it has been reported that you need fewer dependencies to build wxPython; I have not personally confirmed this.
+
+```bash
+sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
+```
+
+If your Linux distribution has `gstreamer` 1.0 available (like the Fedora distro), you can install the dev packages for that instead of the 0.10 version.
+
+After getting all the correct prerequisites, you should be able to install Rummage with `pip`. Be patient while installing Rummage. Linux must build wxPython while macOS and Windows do not. If installing with `pip`, you may be waiting a long time with no real indication of how far along the process is.  If `pip` doesn't work, you can look into building and installing manually.  If you find any of this information, please feel free to offer a pull request or create an issue on GitHub to at least report the problem.
 
 ## Installation
 
-Here are a couple of ways to install and upgrade. Keep in mind if you are a Linux user, you have some prerequisites to install before proceeding: see [Requirements](#requirements).
+Here are a couple of ways to install and upgrade. Keep in mind if you are a Linux user, you have some [prerequisites](#linux-prerequisites) to install before proceeding.
 
 1. Install:
 
@@ -57,8 +66,12 @@ Here are a couple of ways to install and upgrade. Keep in mind if you are a Linu
     rummage
     ```
 
-    !!! warning
-        It is recommended to run the console script `rummage` and not `python -m rummage` as using using `python -m` will look for modules in your current working directory first and may load unexpected things.  Though this is find if you are running it in a folder without Python modules.
+    This is the safest, recommended way to run rummage and will prevent it from loading any Python libraries from your current working directory.
+
+    In some environments it may make sense to run rummage with `python -m rummage` or `pythonw -m rummage` (`pythonw` being the preferred for a GUI script like this).  In some environments, it may be required (see ["Running in Anaconda (macOS)"](#running-in-anaconda-macos)).
+
+    !!! Note "python(w) -m rummage"
+        In general, Rummage uses relative imports and removes the current local directory from the import path to prevent Python from accidentally overwriting an expected module with a local one. In general, it should be safe to use `python -m rummage` or `pythonw -m rummage` most anywhere.  The only module that is imported before this change is `sys`, but there isn't really a way to avoid this.  Using global `rummage` command will always be the safest.
 
 4. If developing on Rummage, you can clone the project, and install the requirements with the following command:
 
@@ -66,13 +79,7 @@ Here are a couple of ways to install and upgrade. Keep in mind if you are a Linu
     pip install -r requirements/project.txt`
     ```
 
-    You can then run the command below. This method will allow you to instantly see your changes between iterations without reinstalling which is great for developing.  If you want to do this in a virtual machine, you can as well.  Like the first method, you should then be able to access Rummage from the command line via `rummage` or `rummage --path mydirectory`.
-
-    ```bash
-    pip install --editable .
-    ```
-
-    When developing, you often want to run the local module, not the one installed. You can do this from the project's root folder and running:
+    When developing, you often want to run the local module, not the one installed. You can do this from the project's root folder by running:
 
     ```
     python -m rummage
