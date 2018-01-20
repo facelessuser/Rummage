@@ -227,15 +227,10 @@ class ResultFileList(DynamicList):
     def on_dclick(self, event):
         """Open file at in editor with optional line and column argument."""
 
-        with self.wait:
-            pos = event.GetPosition()
-            item = self.HitTestSubItem(pos)[0]
-            if item != -1:
-                filename = self.GetItem(item, col=0).GetText()
-                path = self.GetItem(item, col=FILE_PATH).GetText()
-                line = str(self.get_map_item(item, col=FILE_LINE))
-                col = str(self.get_map_item(item, col=FILE_COL))
-                fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
+        pos = event.GetPosition()
+        item = self.HitTestSubItem(pos)[0]
+        if item != -1:
+            self.open_editor(event, item)
         event.Skip()
 
     def open_editor(self, event, item):
