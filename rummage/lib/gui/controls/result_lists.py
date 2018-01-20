@@ -98,7 +98,8 @@ class ResultFileList(DynamicList):
                 self.ENCODING,
                 self.MODIFIED,
                 self.CREATED
-            ]
+            ],
+            False
         )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
@@ -117,6 +118,7 @@ class ResultFileList(DynamicList):
         self.ENCODING = _("Encoding")
         self.MODIFIED = _("Modified")
         self.CREATED = _("Created")
+        self.EDITOR_LABEL = _("Open in Editor")
         self.REVEAL_LABEL = {
             "windows": _("Reveal in Explorer"),
             "osx": _("Reveal in Finder"),
@@ -236,6 +238,33 @@ class ResultFileList(DynamicList):
                 fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()
 
+    def open_editor(self, event, item):
+        """Open file(s) in editor."""
+
+        if item != -1:
+            target = None
+            with self.wait:
+                filename = self.GetItem(item, col=FILE_NAME).GetText()
+                path = self.GetItem(item, col=FILE_PATH).GetText()
+                target = os.path.join(path, filename)
+                line = str(self.get_map_item(item, col=FILE_LINE))
+                col = str(self.get_map_item(item, col=FILE_COL))
+            if target:
+                fileops.open_editor(target, line, col)
+        else:
+            item = self.GetFirstSelected()
+            while item != -1:
+                target = None
+                with self.wait:
+                    filename = self.GetItem(item, col=FILE_NAME).GetText()
+                    path = self.GetItem(item, col=FILE_PATH).GetText()
+                    target = os.path.join(path, filename)
+                    line = str(self.get_map_item(item, col=FILE_LINE))
+                    col = str(self.get_map_item(item, col=FILE_COL))
+                if target:
+                    fileops.open_editor(target, line, col)
+                item = self.GetNextSelected(item)
+
     def on_rclick(self, event):
         """Show context menu on right click."""
 
@@ -253,13 +282,20 @@ class ResultFileList(DynamicList):
                 enabled = not selected or (selected and select_count == 1)
                 # Select if not already
                 if not selected:
-                    self.Select(item)
+                    s = self.GetFirstSelected()
+                    while s != -1:
+                        if s != item:
+                            self.Select(s, False)
+                        s = self.GetNextSelected(s)
         if target is not None:
+            if not enabled:
+                item = -1
             # Open menu
             ContextMenu(
                 self,
                 [
-                    (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled)
+                    (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
+                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), True)
                 ],
                 pos
             )
@@ -282,7 +318,7 @@ class ResultContentList(DynamicList):
                 self.MATCHES,
                 self.EXTENSION,
                 self.CONTEXT
-            ]
+            ],
         )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
