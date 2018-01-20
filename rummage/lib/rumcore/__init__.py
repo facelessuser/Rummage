@@ -312,6 +312,10 @@ class RummageException(Exception):
     """Rummage exception."""
 
 
+class RummageTestException(Exception):
+    """Rummage exception."""
+
+
 class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'ext', 'size', 'modified', 'created', 'skipped', 'error'])):
     """File Attributes."""
 
@@ -386,6 +390,20 @@ class ReplacePlugin(object):
         self.file_info = file_info
         self.flags = flags
         self.on_init()
+
+    def _test(self, m):  # pragma: no cover
+        """
+        Used for testing and capturing the exception.
+
+        Needs to raise the RummageTestException.
+        This should not be touched by the user.
+        """
+
+        try:
+            return self.replace(m)
+        except Exception:
+            import traceback
+            raise RummageTestException(util.ustr(traceback.format_exc()))
 
     def on_init(self):
         """Override this function to add initialization setup."""

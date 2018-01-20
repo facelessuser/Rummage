@@ -403,7 +403,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                         time.ctime(),
                         rumcore.text_decode.Encoding('unicode', None)
                     )
-                    replace_test = self.import_plugin(rpattern)(file_info, rum_flags).replace
+                    replace_test = self.import_plugin(rpattern)(file_info, rum_flags)._test
                 elif rpattern:
                     if not is_regex:
                         replace_test = functools.partial(replace_literal, replace=rpattern)
