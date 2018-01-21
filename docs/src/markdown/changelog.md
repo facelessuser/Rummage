@@ -2,6 +2,7 @@
 
 ## 3.4.0
 
+- **NEW**: Require latest backrefs 3.0.1.
 - **NEW**: Add extension column in results.
 - **NEW**: Status now just shows `[ACTIVE]` or `[DONE]` instead of a misleading percentage.
 - **NEW**: Can now multi-select and mass open files in your editor.
