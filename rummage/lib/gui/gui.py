@@ -1405,7 +1405,7 @@ class RegexTestDialog ( wx.Dialog ):
 		fgSizer41.SetFlexibleDirection( wx.BOTH )
 		fgSizer41.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		fgSizer39 = wx.FlexGridSizer( 0, 3, 0, 0 )
+		fgSizer39 = wx.FlexGridSizer( 0, 4, 0, 0 )
 		fgSizer39.AddGrowableCol( 1 )
 		fgSizer39.SetFlexibleDirection( wx.HORIZONTAL )
 		fgSizer39.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -1420,6 +1420,9 @@ class RegexTestDialog ( wx.Dialog ):
 		
 		fgSizer39.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
+		
+		fgSizer39.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
 		self.m_replace_label = wx.StaticText( self.m_tester_panel, wx.ID_ANY, u"Replace", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_replace_label.Wrap( -1 )
 		fgSizer39.Add( self.m_replace_label, 0, wx.ALL|wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -1429,6 +1432,9 @@ class RegexTestDialog ( wx.Dialog ):
 		
 		self.m_replace_plugin_dir_picker = wx.Button( self.m_tester_panel, wx.ID_ANY, u"...", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
 		fgSizer39.Add( self.m_replace_plugin_dir_picker, 0, wx.ALL, 5 )
+		
+		self.m_reload_button = wx.Button( self.m_tester_panel, wx.ID_ANY, u"Reload", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
+		fgSizer39.Add( self.m_reload_button, 0, wx.ALL, 5 )
 		
 		
 		fgSizer41.Add( fgSizer39, 1, wx.EXPAND, 5 )
@@ -1558,6 +1564,7 @@ class RegexTestDialog ( wx.Dialog ):
 		self.m_test_text.Bind( wx.EVT_TEXT, self.on_test_changed )
 		self.m_regex_text.Bind( wx.EVT_TEXT, self.on_regex_changed )
 		self.m_replace_text.Bind( wx.EVT_TEXT, self.on_replace_changed )
+		self.m_reload_button.Bind( wx.EVT_BUTTON, self.on_reload_click )
 		self.m_regex_search_checkbox.Bind( wx.EVT_CHECKBOX, self.on_regex_toggle )
 		self.m_case_checkbox.Bind( wx.EVT_CHECKBOX, self.on_case_toggle )
 		self.m_dotmatch_checkbox.Bind( wx.EVT_CHECKBOX, self.on_dot_toggle )
@@ -1588,6 +1595,9 @@ class RegexTestDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_replace_changed( self, event ):
+		event.Skip()
+	
+	def on_reload_click( self, event ):
 		event.Skip()
 	
 	def on_regex_toggle( self, event ):

@@ -40,6 +40,7 @@ macOS
 multi
 plugin
 plugins
+pre
 regex
 reinstalling
 requesters

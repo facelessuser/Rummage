@@ -312,11 +312,15 @@ class RummageException(Exception):
     """Rummage exception."""
 
 
-class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'size', 'modified', 'created', 'skipped', 'error'])):
+class RummageTestException(Exception):
+    """Rummage exception."""
+
+
+class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'ext', 'size', 'modified', 'created', 'skipped', 'error'])):
     """File Attributes."""
 
 
-class FileInfoRecord(namedtuple('FileInfoRecord', ['id', 'name', 'size', 'modified', 'created', 'encoding'])):
+class FileInfoRecord(namedtuple('FileInfoRecord', ['id', 'name', 'ext', 'size', 'modified', 'created', 'encoding'])):
     """A record for tracking file info."""
 
 
@@ -386,6 +390,20 @@ class ReplacePlugin(object):
         self.file_info = file_info
         self.flags = flags
         self.on_init()
+
+    def _test(self, m):  # pragma: no cover
+        """
+        Used for testing and capturing the exception.
+
+        Needs to raise the RummageTestException.
+        This should not be touched by the user.
+        """
+
+        try:
+            return self.replace(m)
+        except Exception:
+            import traceback
+            raise RummageTestException(util.ustr(traceback.format_exc()))
 
     def on_init(self):
         """Override this function to add initialization setup."""
@@ -866,6 +884,7 @@ class _FileSearch(object):
         file_info = FileInfoRecord(
             self.idx,
             file_obj.name,
+            os.path.splitext(file_obj.name)[1].lower().lstrip('.'),
             file_obj.size,
             file_obj.modified,
             file_obj.created,
@@ -1123,6 +1142,7 @@ class _FileSearch(object):
                     None,
                     None,
                     None,
+                    None,
                     None
                 ),
                 None,
@@ -1340,6 +1360,7 @@ class _DirWalker(object):
                         None,
                         None,
                         None,
+                        None,
                         False,
                         get_exception()
                     )
@@ -1359,13 +1380,16 @@ class _DirWalker(object):
                             None,
                             None,
                             None,
+                            None,
                             False,
                             get_exception()
                         )
 
                     if valid:
+                        filename = os.path.join(base, name)
                         yield FileAttrRecord(
-                            os.path.join(base, name),
+                            filename,
+                            os.path.splitext(filename)[1].lower().lstrip('.'),
                             self.current_size,
                             self.modified_time,
                             self.created_time,
@@ -1373,7 +1397,7 @@ class _DirWalker(object):
                             None
                         )
                     else:
-                        yield FileAttrRecord(os.path.join(base, name), None, None, None, True, None)
+                        yield FileAttrRecord(os.path.join(base, name), None, None, None, None, True, None)
 
                     if self.abort:
                         break
@@ -1456,6 +1480,7 @@ class Rummage(object):
                 self.files.append(
                     FileAttrRecord(
                         self.target,
+                        os.path.splitext(self.target).lower().lstrip('.'),
                         os.path.getsize(self.target),
                         getmtime(self.target),
                         getctime(self.target),
@@ -1469,12 +1494,14 @@ class Rummage(object):
                     None,
                     None,
                     None,
+                    None,
                     False,
                     get_exception()
                 )
         elif self.buffer_input:
             self.files.append(
                 FileAttrRecord(
+                    None,
                     None,
                     len(self.target),
                     ctime(),

@@ -65,7 +65,7 @@ setup(
     install_requires=[
         "gntp>=1.0.2",
         "chardet>=3.0.4",
-        "backrefs>=2.1,<3.0",
+        "backrefs>=3.0.1,<4.0",
         "regex",
         "wxpython>=4.0.0a3"
     ],

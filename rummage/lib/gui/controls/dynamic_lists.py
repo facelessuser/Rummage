@@ -156,6 +156,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
                 self.sort_init = False
             self.resize_last_column()
             self.size_sample = 0
+            self.complete = True
 
     def get_item_text(self, idx, col, absolute=False):
         """Return the text for the given item and col."""

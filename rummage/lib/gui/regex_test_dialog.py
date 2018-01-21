@@ -36,6 +36,10 @@ from .. import rumcore
 from .. import util
 
 
+class PluginException(Exception):
+    """Plugin exception."""
+
+
 class RegexTestDialog(gui.RegexTestDialog):
     """Regex test dialog."""
 
@@ -53,7 +57,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.parent = parent
         self.regex_mode = Settings.get_regex_mode()
         self.regex_version = Settings.get_regex_version()
-        self.imported_plugin = {}
+        self.imported_plugin = None
 
         # Ensure OS selectall shortcut works in text inputs
         self.set_keybindings(
@@ -99,6 +103,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         if not self.parent.m_replace_plugin_checkbox.GetValue():
             self.m_replace_plugin_dir_picker.Hide()
+            self.m_reload_button.Hide()
 
         self.regex_event_code = -1
         self.testing = False
@@ -146,6 +151,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.USE_REPLACE_PLUGIN = _("Use replace plugin")
         self.REPLACE_PLUGIN = _("Replace plugin")
         self.REPLACE = _("Replace")
+        self.RELOAD = _("Reload")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -174,6 +180,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.m_replace_label.SetLabel(self.REPLACE_PLUGIN)
         else:
             self.m_replace_label.SetLabel(self.REPLACE)
+        self.m_reload_button.SetLabel(self.RELOAD)
         self.Fit()
 
     def init_regex_timer(self):
@@ -235,26 +242,30 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         import imp
 
-        if script not in self.imported_plugin:
-            self.imported_plugin = {}
-            module = imp.new_module(script)
-            with open(script, 'rb') as f:
-                encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py')
-            with codecs.open(script, 'r', encoding=encoding.encode) as f:
-                exec(
-                    compile(
-                        f.read(),
-                        script,
-                        'exec'
-                    ),
-                    module.__dict__
-                )
+        try:
+            if self.imported_plugin is None or script != self.imported_plugin[0]:
+                self.imported_plugin = None
+                module = imp.new_module(os.path.splitext(os.path.basename(script))[0])
+                module.__dict__['__file__'] = script
+                with open(script, 'rb') as f:
+                    encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py')
+                with codecs.open(script, 'r', encoding=encoding.encode) as f:
+                    exec(
+                        compile(
+                            f.read(),
+                            script,
+                            'exec'
+                        ),
+                        module.__dict__
+                    )
 
-            # Don't let the module get garbage collected
-            # We will remove references when we are done with it.
-            self.imported_plugin[script] = module
+                # Don't let the module get garbage collected
+                # We will remove references when we are done with it.
+                self.imported_plugin = (script, module)
 
-        return self.imported_plugin[script].get_replace()
+            return self.imported_plugin[1].get_replace()
+        except Exception:
+            raise PluginException(util.ustr(traceback.format_exc()))
 
     def test_regex(self):
         """Test and highlight search results in content buffer."""
@@ -367,12 +378,12 @@ class RegexTestDialog(gui.RegexTestDialog):
                     test = bre.compile_search(search_text, flags)
                 else:
                     test = re.compile(search_text, flags)
-            except Exception:
+            except Exception as e:
                 self.reset_highlights()
-                self.m_test_replace_text.SetValue(
-                    self.m_test_text.GetValue() if self.m_replace_text.GetValue() else ''
-                )
                 self.testing = False
+                text = util.ustr(e)
+                self.m_test_replace_text.SetValue(text)
+                self.m_test_replace_text.SetStyle(0, len(text), wx.TextAttr(wx.Colour(0xFF, 0, 0)))
                 return
 
             text = self.m_test_text.GetValue()
@@ -386,12 +397,13 @@ class RegexTestDialog(gui.RegexTestDialog):
                     file_info = rumcore.FileInfoRecord(
                         0,
                         "TestBuffer.txt",
+                        "txt",
                         len(text),
                         time.ctime(),
                         time.ctime(),
                         rumcore.text_decode.Encoding('unicode', None)
                     )
-                    replace_test = self.import_plugin(rpattern)(file_info, rum_flags).replace
+                    replace_test = self.import_plugin(rpattern)(file_info, rum_flags)._test
                 elif rpattern:
                     if not is_regex:
                         replace_test = functools.partial(replace_literal, replace=rpattern)
@@ -416,9 +428,20 @@ class RegexTestDialog(gui.RegexTestDialog):
                     else:
                         rpattern = util.preprocess_replace(rpattern)
                         replace_test = functools.partial(replace_re, replace=rpattern)
+            except PluginException:
+                self.imported_plugin = None
+                self.testing = False
+                text = util.ustr(traceback.format_exc())
+                self.m_test_replace_text.SetValue(text)
+                self.m_test_replace_text.SetStyle(0, len(text), wx.TextAttr(wx.Colour(0xFF, 0, 0)))
+                return
             except Exception as e:
-                print(e)
-                pass
+                self.imported_plugin = None
+                self.testing = False
+                text = util.ustr(e)
+                self.m_test_replace_text.SetValue(text)
+                self.m_test_replace_text.SetStyle(0, len(text), wx.TextAttr(wx.Colour(0xFF, 0, 0)))
+                return
 
             try:
                 # Reset Colors
@@ -426,23 +449,36 @@ class RegexTestDialog(gui.RegexTestDialog):
 
                 new_text = []
                 offset = 0
-                for m in test.finditer(text):
-                    try:
-                        if replace_test:
-                            new_text.append(text[offset:m.start(0)])
-                            new_text.append(replace_test(m))
-                            offset = m.end(0)
-                    except Exception as e:
-                        print(e)
-                        replace_test = None
-                    self.m_test_text.SetStyle(
-                        m.start(0),
-                        m.end(0),
-                        wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(0xFF, 0xCC, 0x00))
-                    )
+                errors = False
+                try:
+                    for m in test.finditer(text):
+                        try:
+                            if replace_test:
+                                new_text.append(text[offset:m.start(0)])
+                                new_text.append(replace_test(m))
+                                offset = m.end(0)
+                        except Exception as e:
+                            if not errors:
+                                new_text = [util.ustr(e)]
+                                replace_test = None
+                                errors = True
+                        self.m_test_text.SetStyle(
+                            m.start(0),
+                            m.end(0),
+                            wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(0xFF, 0xCC, 0x00))
+                        )
+                except Exception as e:
+                    new_text = [util.ustr(e)]
+                    replace_test = None
+                    errors = True
                 if replace_test:
                     new_text.append(text[offset:])
-                self.m_test_replace_text.SetValue(''.join(new_text))
+                new_text = ''.join(new_text)
+                self.m_test_replace_text.SetValue(new_text)
+                if errors:
+                    self.m_test_replace_text.SetStyle(0, len(new_text), wx.TextAttr(wx.Colour(0xFF, 0, 0)))
+                else:
+                    self.m_test_replace_text.SetStyle(0, len(new_text), wx.TextAttr(wx.Colour(0, 0, 0)))
 
             except Exception:
                 print(str(traceback.format_exc()))
@@ -529,9 +565,11 @@ class RegexTestDialog(gui.RegexTestDialog):
         if self.m_replace_plugin_checkbox.GetValue():
             self.m_replace_label.SetLabel(self.REPLACE_PLUGIN)
             self.m_replace_plugin_dir_picker.Show()
+            self.m_reload_button.Show()
         else:
             self.m_replace_label.SetLabel(self.REPLACE)
             self.m_replace_plugin_dir_picker.Hide()
+            self.m_reload_button.Hide()
         self.m_tester_panel.GetSizer().Layout()
 
         self.regex_start_event(event)
@@ -545,6 +583,12 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.regex_start_event(event)
         else:
             self.regex_start_event(event)
+
+    def on_reload_click(self, event):
+        """On script reload click."""
+
+        self.imported_plugin = None
+        self.regex_start_event(event)
 
     on_regex_changed = regex_start_event
 

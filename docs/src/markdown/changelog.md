@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.4.0
+
+- **NEW**: Require latest Backrefs 3.0.1.
+- **NEW**: Add extension column in results.
+- **NEW**: Status now just shows `[ACTIVE]` or `[DONE]` instead of a misleading percentage.
+- **NEW**: Can now multi-select and mass open files in your editor.
+- **NEW**: Better error feedback in regex tester.
+- **NEW**: Remove current directory from Python path when opening Rummage to prevent it from importing local libraries when launched inside a Python project.  This mainly affects `python -m rummage` and `pythonw -m rummage` launching.
+- **FIX**: Result item hover not showing file name in status bar.
+- **FIX**: Warnings in plugin system.
+
 ## 3.3.0
 
 - **NEW**: Add changelog link in menu for quick reference.
