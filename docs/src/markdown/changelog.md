@@ -2,6 +2,8 @@
 
 ## 3.4.0
 
+Jan 22, 2018
+
 - **NEW**: Require latest Backrefs 3.0.1.
 - **NEW**: Add extension column in results.
 - **NEW**: Status now just shows `[ACTIVE]` or `[DONE]` instead of a misleading percentage.
@@ -12,6 +14,8 @@
 - **FIX**: Warnings in plugin system.
 
 ## 3.3.0
+
+Jan 17, 2018
 
 - **NEW**: Add changelog link in menu for quick reference.
 - **NEW**: Encoding list is generated from the Python installation being used.
