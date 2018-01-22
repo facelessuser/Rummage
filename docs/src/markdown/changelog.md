@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.1
+
+Jan 22, 2018
+
+- **FIX**: Regression where installed CLI command would fail on launch.
+
 ## 3.4.0
 
 Jan 22, 2018
