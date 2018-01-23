@@ -34,7 +34,8 @@ from .settings import Settings
 from .actions import export_html
 from .actions import export_csv
 from .actions import fileops
-from .generic_dialogs import errormsg, yesno
+from .actions import updates
+from .generic_dialogs import errormsg, yesno, infomsg
 from .app.custom_app import DebugFrameExtender, debug, error, simplelog
 from .controls import custom_statusbar
 from .regex_test_dialog import RegexTestDialog
@@ -336,6 +337,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.kill = False
         self.thread = None
         self.allow_update = False
+        self.checking_updates = False
         self.imported_plugins = {}
         if start_path is None:
             start_path = util.getcwd()
@@ -512,6 +514,8 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.SAVE_SEARCH = _("Save Search")
         self.LOAD_SEARCH = _("Load Search")
         self.SEARCH = _("Search")
+        self.UP_TO_DATE = _("Current version is %s. Rummage is up to date!")
+        self.NOT_UP_TO_DATE = _("There is an update available: %s.")
 
         # Menu
         self.MENU_EXPORT_RESULTS = _("Export Results")
@@ -527,6 +531,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
         self.MENU_OPEN_LOG = _("Open Log File")
         self.MENU_ABOUT = _("&About Rummage")
+        self.MENU_UPDATE = _("Check for Updates")
         self.MENU_DOCUMENTATION = _("Documentation")
         self.MENU_CHANGELOG = _("Changelog")
         self.MENU_HELP_SUPPORT = _("Help and Support")
@@ -611,6 +616,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_hide_limit_menuitem.SetItemLabel(self.MENU_HIDE_LIMIT)
         self.m_log_menuitem.SetItemLabel(self.MENU_OPEN_LOG)
         self.m_about_menuitem.SetItemLabel(self.MENU_ABOUT)
+        self.m_update_menuitem.SetItemLabel(self.MENU_UPDATE)
         self.m_documentation_menuitem.SetItemLabel(self.MENU_DOCUMENTATION)
         self.m_changelog_menuitem.SetItemLabel(self.MENU_CHANGELOG)
         self.m_issues_menuitem.SetItemLabel(self.MENU_HELP_SUPPORT)
@@ -2003,6 +2009,13 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
     def on_idle(self, event):
         """On idle event."""
 
+        if not self.checking_updates and not self.allow_update:
+            self.checking_updates = True
+            if Settings.get_update_check_needed():
+                self.on_check_update(None)
+            self.checking_updates = False
+
+        # Update progress
         self.check_updates()
         event.Skip()
 
@@ -2172,6 +2185,15 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             errormsg(self.ERR_NO_LOG)
         else:
             fileops.open_editor(logfile, 1, 1)
+
+    def on_check_update(self, event):
+        """Check for update."""
+
+        new_ver = updates.check_update()
+        if new_ver is None:  # and event is not None:
+            infomsg(self.UP_TO_DATE % __meta__.__version__)
+        else:
+            infomsg(self.NOT_UP_TO_DATE % new_ver)
 
     def on_documentation(self, event):
         """Open documentation site."""

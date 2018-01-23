@@ -111,6 +111,8 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_back2folder_checkbox.SetValue(bool(Settings.get_backup_type()))
         self.m_back_ext_button.Enable(False)
         self.m_back_folder_button.Enable(False)
+        self.m_update_checkbox.SetValue(bool(Settings.get_check_updates()))
+        self.m_prerelease_checkbox.SetValue(bool(Settings.get_prerelease()))
 
         self.refresh_localization()
 
@@ -176,6 +178,8 @@ class SettingsDialog(gui.SettingsDialog):
             "Folders must be alphanumeric and can contain\n"
             "hypens, underscores, and dots."
         )
+        self.CHECK_UPDATES = _("Check updates daily")
+        self.PRERELEASES = _("Include pre-releases")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -204,6 +208,8 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_close_button.SetLabel(self.CLOSE)
         self.m_back_ext_button.SetLabel(self.SAVE)
         self.m_back_folder_button.SetLabel(self.SAVE)
+        self.m_update_checkbox.SetLabel(self.CHECK_UPDATES)
+        self.m_prerelease_checkbox.SetLabel(self.PRERELEASES)
         self.Fit()
 
     def history_cleared(self):
@@ -231,6 +237,18 @@ class SettingsDialog(gui.SettingsDialog):
         Settings.set_editor(self.editor)
         self.m_editor_text.SetValue(self.editor)
         dlg.Destroy()
+        event.Skip()
+
+    def on_update_toggle(self, event):
+        """Update toggle."""
+
+        Settings.set_check_updates(self.m_update_checkbox.GetValue())
+        event.Skip()
+
+    def on_prerelease_toggle(self, event):
+        """Prerelease toggle."""
+
+        Settings.set_prerelease(self.m_update_checkbox.GetValue())
         event.Skip()
 
     def on_clear_history(self, event):

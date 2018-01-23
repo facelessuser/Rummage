@@ -27,6 +27,7 @@ else:
     _PLATFORM = "linux"
 
 if PY3:
+    from urllib.request import urlopen
     string_type = str
     ustr = str
     bstr = bytes
@@ -34,6 +35,7 @@ if PY3:
 
     CommonBrokenPipeError = BrokenPipeError  # noqa F821
 else:
+    from urllib2 import urlopen
     string_type = basestring  # noqa F821
     ustr = unicode  # noqa F821
     bstr = str  # noqa F821

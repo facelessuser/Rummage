@@ -24,6 +24,7 @@ import json
 import os
 import traceback
 import copy
+from datetime import datetime
 from . import portalocker
 from ..app import custom_app
 from ..app.custom_app import debug, debug_struct, error
@@ -932,6 +933,70 @@ class Settings(object):
         cls.settings['backup_folder'] = value
 
     @classmethod
+    def get_update_check_needed(cls):
+        """Check if update check is needed."""
+
+        needed = False
+        cls.reload_settings()
+        if cls.settings.get('check_updates', False):
+            timestamp = cls.settings.get('last_update_check', None)
+            if timestamp is None:
+                needed = True
+                dt2 = datetime.now()
+            else:
+                dt1 = datetime.strptime(timestamp, "%Y-%m-%d %H:%M")
+                dt2 = datetime.now()
+                diff = dt2 - dt1
+                if diff.days > 2:
+                    needed = True
+        if needed:
+            cls.settings['last_update_check'] = dt2.strftime("%Y-%m-%d %H:%M")
+            cls.save_settings()
+        return needed
+
+    @classmethod
+    def _set_check_updates(cls, value):
+        """Set check updates."""
+
+        cls.settings['check_updates'] = value
+
+    @classmethod
+    def set_check_updates(cls, value):
+        """Set check updates."""
+
+        cls.reload_settings()
+        cls._set_check_updates(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_check_updates(cls):
+        """Get check upates."""
+
+        cls.reload_settings()
+        return cls.settings.get('check_updates', False)
+
+    @classmethod
+    def _set_prerelease(cls, value):
+        """Set check updates."""
+
+        cls.settings['check_prerelease'] = value
+
+    @classmethod
+    def set_prerelease(cls, value):
+        """Set prerelease."""
+
+        cls.reload_settings()
+        cls._set_prerelease(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_prerelease(cls):
+        """Get check upates."""
+
+        cls.reload_settings()
+        return cls.settings.get('check_prerelease', False)
+
+    @classmethod
     def get_history_record_count(cls, history_types=None):
         """Get number of history items saved."""
 
@@ -970,6 +1035,12 @@ class Settings(object):
             cls._set_backup_ext(obj['backup_ext'])
         if 'backup_type' in obj:
             cls._set_backup_type(obj['backup_type'])
+
+        # Updates
+        if 'check_updates' in obj:
+            cls._set_check_updates(obj['check_updates'])
+        if 'check_prerelease' in obj:
+            cls._set_prerelease(obj['check_prerelease'])
 
         # Notifications
         update_notify = False
