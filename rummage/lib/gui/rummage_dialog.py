@@ -29,7 +29,7 @@ import os
 import re
 import codecs
 import wx.lib.newevent
-from backrefs import bre, bregex
+from backrefs import bre
 from .settings import Settings
 from .actions import export_html
 from .actions import export_csv
@@ -59,6 +59,10 @@ from .. import __meta__
 from .. import rumcore
 from .. import util
 import decimal
+if rumcore.REGEX_SUPPORT:
+    from backrefs import bregex
+else:
+    bregex = None
 
 PostResizeEvent, EVT_POST_RESIZE = wx.lib.newevent.NewEvent()
 

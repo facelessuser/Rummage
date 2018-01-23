@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.4.3
+
+Jan 23, 2018
+
+- **FIX**: Import of `bregex` when `regex` is not installed.
+- **FIX**: Backwards search did not reassemble text proper.
+
 ## 3.4.2
 
 Jan 23, 2018

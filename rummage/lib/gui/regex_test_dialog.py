@@ -26,7 +26,8 @@ import os
 import functools
 import codecs
 import time
-from backrefs import bre, bregex
+from backrefs import bre
+from collections import deque
 from . import gui
 from .controls.pick_button import PickButton, pick_extend
 from .settings import Settings
@@ -34,6 +35,10 @@ from . import data
 from .localization import _
 from .. import rumcore
 from .. import util
+if rumcore.REGEX_SUPPORT:
+    from backrefs import bregex
+else:
+    bregex = None
 
 
 class PluginException(Exception):
@@ -140,7 +145,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.BEST_MATCH = _("Best fuzzy match")
         self.FUZZY_FIT = _("Improve fuzzy fit")
         self.WORD = _("Unicode word break")
-        self.REVERSE = _("Reverse match")
+        self.REVERSE = _("Search backwards")
         self.POSIX = _("Use POSIX matching")
         self.FORMAT = _("Format style replacements")
         self.FULLCASE = _("Full case-folding")
@@ -295,6 +300,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     self.m_test_text.GetLastPosition(),
                     wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
                 )
+                self.m_test_replace_text.SetValue(self.m_test_text.GetValue())
                 self.testing = False
                 return
 
@@ -447,16 +453,25 @@ class RegexTestDialog(gui.RegexTestDialog):
                 # Reset Colors
                 self.reset_highlights()
 
-                new_text = []
-                offset = 0
+                if rumcore.REGEX_SUPPORT and isinstance(test, bregex._REGEX_TYPE):
+                    reverse = bool(test.flags & regex.REVERSE)
+                else:
+                    reverse = False
+                new_text = deque()
+                offset = len(text) if reverse else 0
                 errors = False
                 try:
                     for m in test.finditer(text):
                         try:
                             if replace_test:
-                                new_text.append(text[offset:m.start(0)])
-                                new_text.append(replace_test(m))
-                                offset = m.end(0)
+                                if reverse:
+                                    new_text.appendleft(text[m.end(0):offset])
+                                    new_text.appendleft(replace_test(m))
+                                    offset = m.start(0)
+                                else:
+                                    new_text.append(text[offset:m.start(0)])
+                                    new_text.append(replace_test(m))
+                                    offset = m.end(0)
                         except Exception as e:
                             if not errors:
                                 new_text = [util.ustr(e)]
@@ -472,8 +487,11 @@ class RegexTestDialog(gui.RegexTestDialog):
                     replace_test = None
                     errors = True
                 if replace_test:
-                    new_text.append(text[offset:])
-                new_text = ''.join(new_text)
+                    if reverse:
+                        new_text.appendleft(text[:offset])
+                    else:
+                        new_text.append(text[offset:])
+                new_text = ''.join(list(new_text))
                 self.m_test_replace_text.SetValue(new_text)
                 if errors:
                     self.m_test_replace_text.SetStyle(0, len(new_text), wx.TextAttr(wx.Colour(0xFF, 0, 0)))
