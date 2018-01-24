@@ -28,6 +28,7 @@ import os
 import time
 import wx
 import wx.lib.newevent
+from filelock import FileLock
 from ... import util
 try:
     import thread
@@ -47,7 +48,6 @@ if util.platform() == "windows":
 PipeEvent, EVT_PIPE_ARGS = wx.lib.newevent.NewEvent()
 
 log = None
-last_level = wx.LOG_Error
 DEBUG_MODE = False
 
 
@@ -161,6 +161,8 @@ class ArgPipeThread(object):
                 file_handle, ctypes.c_wchar_p(data), len(data), ctypes.byref(bytes_written), None
             )
             ctypes.windll.kernel32.CloseHandle(file_handle)
+            file_handle = None
+
         else:
             # It's okay if the pipe is broken, our goal is just to break the
             # wait loop for recieving pipe data.
@@ -311,6 +313,7 @@ class PipeApp(CustomApp):
             while running:
                 running = self.pipe_thread.IsRunning()
                 time.sleep(0.1)
+            self.pipe_thread = None
         return CustomApp.OnExit(self)
 
     def on_pipe_args(self, event):
@@ -327,30 +330,32 @@ class CustomLog(wx.Log):
 
         self.format = "%(message)s"
         self.file_name = log_file
+        self.file_lock = FileLock(self.file_name + '.lock')
 
         try:
-            self.log_file = codecs.open(log_file, 'w', encoding='utf-8')
-        except Exception:
-            self.log_file = None
+            with self.file_lock.acquire(1):
+                with codecs.open(self.file_name, "w", "utf-8") as f:
+                    f.write("")
+        except Exception as e:
+            self.file_name = None
 
         self.no_redirect = no_redirect
 
         super(CustomLog, self).__init__()
 
-    def get_log_file(self):
-        """Get log file path and name."""
-
-        return self.file_name
-
     def DoLogText(self, msg):
         """Log the text."""
 
         try:
-            if self.log_file:
-                self.log_file.write(msg)
+            if self.file_name is not None:
+                with self.file_lock.acquire(1):
+                    with codecs.open(self.file_name, 'a', encoding='utf-8') as f:
+                        f.write(msg)
+            else:
+                msg = "[ERROR] Could not acquire lock for log!\n" + msg
         except Exception:
-            pass
-        if self.no_redirect:
+            self.file_name = None
+        if self.no_redirect and sys.stdout:
             try:
                 sys.stdout.write(
                     (self.format % {"message": msg})
@@ -360,6 +365,18 @@ class CustomLog(wx.Log):
                     (self.format % {"message": msg}).encode(self.encoding, 'replace').decode(self.encoding)
                 )
 
+    def DoLogTextAtLevel(self, level, msg):
+        """Perform log at level."""
+
+        if level == wx.LOG_Info:
+            self._debug(msg)
+        elif level == wx.LOG_FatalError:
+            self._critical(msg)
+        elif level == wx.LOG_Warning:
+            self._warning(msg)
+        elif level == wx.LOG_Error:
+            self._error(msg)
+
     def formatter(self, lvl, log_fmt, msg, msg_fmt=None):
         """Special formatters for log message."""
 
@@ -368,126 +385,102 @@ class CustomLog(wx.Log):
             "message": util.to_ustr(msg if msg_fmt is None else msg_fmt(msg))
         }
 
-    def _log_struct(self, obj, log_func, label="Object"):
-        """Base logger to log a dict in pretty print format."""
-
-        log_func(obj, log_fmt="%(loglevel)s: " + label + ": %(message)s\n", msg_fmt=json_fmt)
-
     def _log(self, msg):
         """Base logger."""
 
         return self.format % {"message": msg}
 
-    def _debug(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
+    def _debug(self, msg, log_fmt="%(loglevel)s: %(message)s\n"):
         """Debug level log."""
 
-        if self.GetLogLevel() <= wx.LOG_Debug:
-            self.DoLogText(self._log(self.formatter("DEBUG", log_fmt, msg, msg_fmt)))
+        self.DoLogText(self._log(self.formatter("DEBUG", log_fmt, msg)))
 
-    def _info(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
-        """Info level log."""
-
-        if self.GetLogLevel() <= wx.LOG_Info:
-            self.DoLogText(self._log(self.formatter("INFO", log_fmt, msg, msg_fmt)))
-
-    def _critical(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
+    def _critical(self, msg, log_fmt="%(loglevel)s: %(message)s\n"):
         """Critical level log."""
 
-        if self.GetLogLevel() <= wx.LOG_FatalError:
-            self.DoLogText(self._log(self.formatter("CRITICAL", log_fmt, msg, msg_fmt)))
+        self.DoLogText(self._log(self.formatter("CRITICAL", log_fmt, msg)))
 
-    def _warning(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
+    def _warning(self, msg, log_fmt="%(loglevel)s: %(message)s\n"):
         """Warning level log."""
 
-        if self.GetLogLevel() <= wx.LOG_Warning:
-            self.DoLogText(self._log(self.formatter("WARNING", log_fmt, msg, msg_fmt)))
+        self.DoLogText(self._log(self.formatter("WARNING", log_fmt, msg)))
 
-    def _error(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
+    def _error(self, msg, log_fmt="%(loglevel)s: %(message)s\n"):
         """Error level log."""
 
-        if self.GetLogLevel() <= wx.LOG_Error:
-            self.DoLogText(self._log(self.formatter("ERROR", log_fmt, msg, msg_fmt)))
-
-    def close_log(self):
-        """Close log file."""
-
-        if self.log_file:
-            self.log_file.close()
+        self.DoLogText(self._log(self.formatter("ERROR", log_fmt, msg)))
 
 
-def debug(*args, **kwargs):
+def debug(msg):
     """Log wrapper for debug."""
 
-    log._debug(*args, **kwargs)
+    log.DoLogTextAtLevel(wx.LOG_Info, util.ustr(msg))
 
 
-def info(*args, **kwargs):
-    """Log wrapper for info."""
-
-    log._info(*args, **kwargs)
-
-
-def critical(*args, **kwargs):
+def critical(msg):
     """Log wrapper for critical."""
 
-    log._critical(*args, **kwargs)
+    log.DoLogTextAtLevel(wx.LOG_FatalError, util.ustr(msg))
 
 
-def warning(*args, **kwargs):
+def warning(msg):
     """Log wrapper for warning."""
 
-    log._warning(*args, **kwargs)
+    log.DoLogTextAtLevel(wx.LOG_Warning, util.ustr(msg))
 
 
-def error(*args, **kwargs):
+def error(msg):
     """Log wrapper for error."""
 
-    log._error(*args, **kwargs)
+    log.DoLogTextAtLevel(wx.LOG_Error, util.ustr(msg))
 
 
-def json_fmt(obj):
+def json_fmt(obj, label):
     """Format the dict as JSON."""
 
-    return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
+    return label + json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': ')) + '\n'
+
+
+def _log_struct(obj, log_func, label="Object"):
+    """Base logger to log a dict in pretty print format."""
+
+    log_func(json_fmt(obj, label))
 
 
 def debug_struct(obj, label="Object"):
     """Debug level dict log."""
 
-    log._log_struct(obj, log._debug, label)
-
-
-def info_struct(obj, label="Object"):
-    """Info level dict log."""
-
-    log._log_struct(obj, log._info, label)
+    if wx.Log.GetLogLevel() <= wx.LOG_Info:
+        _log_struct(obj, debug, label)
 
 
 def critical_struct(obj, label="Object"):
     """Critical level dict log."""
 
-    log._log_struct(obj, log._critical, label)
+    if wx.Log.GetLogLevel() <= wx.LOG_FatalError:
+        _log_struct(obj, critical, label)
 
 
 def warning_struct(obj, label="Object"):
     """Warning level dict log."""
 
-    log._log_struct(obj, log._warning, label)
+    if wx.Log.GetLogLevel() <= wx.LOG_Warning:
+        _log_struct(obj, warning, label)
 
 
 def error_struct(obj, label="Object"):
     """Error level dict log."""
 
-    log._log_struct(obj, log._error, label)
+    if wx.Log.GetLogLevel() <= wx.LOG_Error:
+        log._log_struct(obj, error, label)
 
 
 def init_app_log(name, no_redirect=False, level=wx.LOG_Error):
     """Init the app log."""
 
     global log
-    global last_level
-    if level != wx.LOG_Debug:
-        last_level = level
+    wx.Log.EnableLogging(True)
+    wx.Log.SetLogLevel(level)
     log = CustomLog(name, no_redirect)
     wx.Log.SetActiveTarget(log)
 
@@ -510,17 +503,11 @@ def set_debug_mode(value):
     """Set whether the app is in debug mode."""
 
     global DEBUG_MODE
-    global last_level
     DEBUG_MODE = bool(value)
-    current_level = log.GetLogLevel()
     if DEBUG_MODE:
-        if current_level > wx.LOG_Debug:
-            last_level = current_level
-        log.SetLogLevel(wx.LOG_Debug)
+        wx.Log.SetLogLevel(wx.LOG_Info)
     elif not DEBUG_MODE:
-        if last_level == wx.LOG_Debug:
-            last_level = wx.LOG_Error
-        log.SetLogLevel(last_level)
+        wx.Log.SetLogLevel(wx.LOG_Error)
 
 
 def get_debug_mode():
