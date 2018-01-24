@@ -19,7 +19,6 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import wx
 import os
 from .platform_window_focus import platform_window_focus
 from .custom_app import PipeApp, set_debug_mode
@@ -27,33 +26,29 @@ from ... import util
 from .. import rummage_dialog
 from ..settings import Settings
 
-__all__ = (
-    'RummageApp'
-)
-
-wx.Log.EnableLogging(False)
+__all__ = ('RummageApp',)
 
 
 class RummageApp(PipeApp):
     """RummageApp."""
 
-    def __init__(self, argv, *args, **kwargs):
+    def __init__(self, argv):
         """Init RummageApp object."""
 
         self.debug_mode = argv.debug
         self.path = argv.path if argv.path is not None else None
 
-        Settings.load_settings(self.debug_mode)
+        Settings.load_settings(self.debug_mode, argv.no_redirect)
         single_instance = Settings.get_single_instance()
 
         if self.debug_mode:
             set_debug_mode(True)
 
+        kwargs = {}
         kwargs["single_instance_name"] = "Rummage" if single_instance else None
         kwargs["pipe_name"] = Settings.get_fifo() if single_instance else None
-        kwargs["redirect"] = not argv.no_redirect
 
-        PipeApp.__init__(self, *args, **kwargs)
+        PipeApp.__init__(self, **kwargs)
 
     def OnInit(self):
         """Call on initialization."""

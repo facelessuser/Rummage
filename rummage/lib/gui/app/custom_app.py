@@ -22,12 +22,12 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import codecs
+import sys
 import json
 import os
 import time
 import wx
 import wx.lib.newevent
-from . import simplelog
 from ... import util
 try:
     import thread
@@ -47,88 +47,12 @@ if util.platform() == "windows":
 PipeEvent, EVT_PIPE_ARGS = wx.lib.newevent.NewEvent()
 
 log = None
-last_level = simplelog.ERROR
+last_level = wx.LOG_Error
 DEBUG_MODE = False
-DEBUG_CONSOLE = False
-
-
-class GuiLog(wx.PyOnDemandOutputWindow):
-    """GUI logging."""
-
-    def __init__(self, title="Debug Console"):
-        """Init the PyOnDemandOutputWindow object."""
-
-        # wx.PyOnDemandOutputWindow is old class style
-        # Cannot use super with old class styles
-        wx.PyOnDemandOutputWindow.__init__(self, title)
-
-    def CreateOutputWindow(self, st):  # noqa
-        """Create the logging console."""
-
-        self.frame = wx.Frame(self.parent, -1, self.title, self.pos, self.size, style=wx.DEFAULT_FRAME_STYLE)
-        self.text = wx.TextCtrl(self.frame, -1, "", style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH)
-        self.text.AppendText(st)
-        self.frame.Show(True)
-        self.frame.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-
-        # Create debug keybinding to open debug console
-        debugid = wx.NewId()
-        self.frame.Bind(wx.EVT_MENU, self.debug_close, id=debugid)
-        mod = wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL
-        accel_tbl = wx.AcceleratorTable(
-            [(mod, ord('`'), debugid)]
-        )
-        self.frame.SetAcceleratorTable(accel_tbl)
-
-    def debug_close(self, event):
-        """Close debug frame."""
-
-        self.frame.Close()
-
-    def write(self, text, echo=True):
-        """Write to log, and if console is open, echo to it as well."""
-
-        if self.frame is None:
-            if not wx.IsMainThread():
-                if echo:
-                    wx.CallAfter(gui_log, text)
-                if get_debug_console():
-                    wx.CallAfter(self.CreateOutputWindow, text)
-            else:
-                if echo:
-                    gui_log(text)
-                if get_debug_console():
-                    self.CreateOutputWindow(text)
-        else:
-            if not wx.IsMainThread():
-                if echo:
-                    wx.CallAfter(gui_log, text)
-                if get_debug_console():
-                    wx.CallAfter(self.text.AppendText, text)
-            else:
-                if echo:
-                    gui_log(text)
-                if get_debug_console():
-                    self.text.AppendText(text)
-
-    def OnCloseWindow(self, event):  # noqa
-        """Close logging console."""
-
-        if self.frame is not None:
-            self.frame.Destroy()
-        self.frame = None
-        self.text = None
-        self.parent = None
-        if get_debug_console():
-            set_debug_console(False)
-            log.set_echo(False)
-            debug("**Debug Console Closed**\n")
 
 
 class CustomApp(wx.App):
     """Custom app that adds a number of features."""
-
-    outputWindowClass = GuiLog
 
     def __init__(self, *args, **kwargs):
         """
@@ -395,88 +319,130 @@ class PipeApp(CustomApp):
         event.Skip()
 
 
-class DebugFrameExtender(object):
-    """Extend frame with debugger."""
+class CustomLog(wx.Log):
+    """Logger."""
 
-    def set_keybindings(self, keybindings=None, debug_event=None):
-        """
-        Method to easily set key bindings.
+    def __init__(self, log_file, no_redirect):
+        """Initialize."""
 
-        Also sets up debug keybindings and events.
-        """
+        self.format = "%(message)s"
+        self.file_name = log_file
 
-        if keybindings is None:
-            keybindings = []
+        try:
+            self.log_file = codecs.open(log_file, 'w', encoding='utf-8')
+        except Exception:
+            self.log_file = None
 
-        # Create keybinding to open debug console, bind debug console to ctrl/cmd + ` depending on platform
-        # if an event is passed in.
-        tbl = []
-        bindings = keybindings
-        if debug_event is not None:
-            mod = wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL
-            bindings.append((mod, ord('`'), debug_event))
+        self.no_redirect = no_redirect
 
-        for binding in keybindings:
-            keyid = wx.NewId()
-            self.Bind(wx.EVT_MENU, binding[2], id=keyid)
-            tbl.append((binding[0], binding[1], keyid))
+        super(CustomLog, self).__init__()
 
-        if len(bindings):
-            self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
+    def get_log_file(self):
+        """Get log file path and name."""
 
-    def open_debug_console(self):
-        """Open the debug console."""
+        return self.file_name
 
-        set_debug_console(True)
-        # echo out log to console
-        log.set_echo(True)
-        app = wx.GetApp()
-        if app.stdioWin is not None:
-            if app.stdioWin.frame is None:
-                app.stdioWin.write(log.read(), False)
-            else:
-                app.stdioWin.write("", False)
-            debug("**Debug Console Opened**")
+    def DoLogText(self, msg):
+        """Log the text."""
 
-    def toggle_debug_console(self):
-        """Open up the debug console if closed or close if opened."""
+        try:
+            if self.log_file:
+                self.log_file.write(msg)
+        except Exception:
+            pass
+        if self.no_redirect:
+            try:
+                sys.stdout.write(
+                    (self.format % {"message": msg})
+                )
+            except UnicodeEncodeError:
+                sys.stdout.write(
+                    (self.format % {"message": msg}).encode(self.encoding, 'replace').decode(self.encoding)
+                )
 
-        set_debug_console(not get_debug_console())
-        app = wx.GetApp()
-        if get_debug_console():
-            # echo out log to console
-            log.set_echo(True)
-            if app.stdioWin is not None:
-                app.stdioWin.write(log.read(), False)
-                debug("**Debug Console Opened**")
-        else:
-            debug("**Debug Console Closed**")
-            # disable echoing of log to console
-            log.set_echo(False)
-            if app.stdioWin is not None:
-                app.stdioWin.close()
+    def formatter(self, lvl, log_fmt, msg, msg_fmt=None):
+        """Special formatters for log message."""
 
-    def close_debug_console(self):
-        """
-        On close, ensure that console is closes.
+        return log_fmt % {
+            "loglevel": lvl,
+            "message": util.to_ustr(msg if msg_fmt is None else msg_fmt(msg))
+        }
 
-        Also, make sure echo is off in case logging
-        occurs after App closing.
-        """
+    def _log_struct(self, obj, log_func, label="Object"):
+        """Base logger to log a dict in pretty print format."""
 
-        if get_debug_console():
-            debug("**Debug Console Closed**")
-            set_debug_console(False)
-            log.set_echo(False)
-            app = wx.GetApp()
-            if app.stdioWin is not None:
-                app.stdioWin.close()
+        log_func(obj, log_fmt="%(loglevel)s: " + label + ": %(message)s\n", msg_fmt=json_fmt)
+
+    def _log(self, msg):
+        """Base logger."""
+
+        return self.format % {"message": msg}
+
+    def _debug(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
+        """Debug level log."""
+
+        if self.GetLogLevel() <= wx.LOG_Debug:
+            self.DoLogText(self._log(self.formatter("DEBUG", log_fmt, msg, msg_fmt)))
+
+    def _info(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
+        """Info level log."""
+
+        if self.GetLogLevel() <= wx.LOG_Info:
+            self.DoLogText(self._log(self.formatter("INFO", log_fmt, msg, msg_fmt)))
+
+    def _critical(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
+        """Critical level log."""
+
+        if self.GetLogLevel() <= wx.LOG_FatalError:
+            self.DoLogText(self._log(self.formatter("CRITICAL", log_fmt, msg, msg_fmt)))
+
+    def _warning(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
+        """Warning level log."""
+
+        if self.GetLogLevel() <= wx.LOG_Warning:
+            self.DoLogText(self._log(self.formatter("WARNING", log_fmt, msg, msg_fmt)))
+
+    def _error(self, msg, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
+        """Error level log."""
+
+        if self.GetLogLevel() <= wx.LOG_Error:
+            self.DoLogText(self._log(self.formatter("ERROR", log_fmt, msg, msg_fmt)))
+
+    def close_log(self):
+        """Close log file."""
+
+        if self.log_file:
+            self.log_file.close()
 
 
-def _log_struct(obj, log_func, label="Object"):
-    """Base logger to log a dict in pretty print format."""
+def debug(*args, **kwargs):
+    """Log wrapper for debug."""
 
-    log_func(obj, log_fmt="%(loglevel)s: " + label + ": %(message)s\n", msg_fmt=json_fmt)
+    log._debug(*args, **kwargs)
+
+
+def info(*args, **kwargs):
+    """Log wrapper for info."""
+
+    log._info(*args, **kwargs)
+
+
+def critical(*args, **kwargs):
+    """Log wrapper for critical."""
+
+    log._critical(*args, **kwargs)
+
+
+def warning(*args, **kwargs):
+    """Log wrapper for warning."""
+
+    log._warning(*args, **kwargs)
+
+
+def error(*args, **kwargs):
+    """Log wrapper for error."""
+
+    log._error(*args, **kwargs)
 
 
 def json_fmt(obj):
@@ -485,82 +451,59 @@ def json_fmt(obj):
     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
 
 
-def gui_log(msg):
-    """Logger used in the GUI frames."""
-
-    log._log(msg, echo=False)
-
-
-def debug(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
-    """Debug level log."""
-
-    if get_debug_mode():
-        log.debug(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
-
-
-def info(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
-    """Info level log."""
-
-    log.info(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
-
-
-def critical(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
-    """Critical level log."""
-
-    log.critical(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
-
-
-def warning(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
-    """Warning level log."""
-
-    log.warning(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
-
-
-def error(msg, echo=True, log_fmt="%(loglevel)s: %(message)s\n", msg_fmt=None):
-    """Error level log."""
-
-    log.error(msg, echo=echo, log_fmt=log_fmt, msg_fmt=msg_fmt)
-
-
 def debug_struct(obj, label="Object"):
     """Debug level dict log."""
 
-    _log_struct(obj, debug, label)
+    log._log_struct(obj, log._debug, label)
 
 
 def info_struct(obj, label="Object"):
     """Info level dict log."""
 
-    _log_struct(obj, info, label)
+    log._log_struct(obj, log._info, label)
 
 
 def critical_struct(obj, label="Object"):
     """Critical level dict log."""
 
-    _log_struct(obj, critical, label)
+    log._log_struct(obj, log._critical, label)
 
 
 def warning_struct(obj, label="Object"):
     """Warning level dict log."""
 
-    _log_struct(obj, warning, label)
+    log._log_struct(obj, log._warning, label)
 
 
 def error_struct(obj, label="Object"):
     """Error level dict log."""
 
-    _log_struct(obj, error, label)
+    log._log_struct(obj, log._error, label)
 
 
-def init_app_log(name, level=simplelog.ERROR):
+def init_app_log(name, no_redirect=False, level=wx.LOG_Error):
     """Init the app log."""
 
     global log
     global last_level
-    if level != simplelog.DEBUG:
+    if level != wx.LOG_Debug:
         last_level = level
-    simplelog.init_global_log(name, level=last_level)
-    log = simplelog.get_global_log()
+    log = CustomLog(name, no_redirect)
+    wx.Log.SetActiveTarget(log)
+
+
+def get_log_file():
+    """Get log file path."""
+
+    return log.get_log_file()
+
+
+def close_log():
+    """Close the log."""
+
+    global log
+    if log:
+        log.close_log()
 
 
 def set_debug_mode(value):
@@ -569,31 +512,18 @@ def set_debug_mode(value):
     global DEBUG_MODE
     global last_level
     DEBUG_MODE = bool(value)
-    current_level = log.get_level()
+    current_level = log.GetLogLevel()
     if DEBUG_MODE:
-        if current_level > simplelog.DEBUG:
+        if current_level > wx.LOG_Debug:
             last_level = current_level
-        log.set_level(simplelog.DEBUG)
+        log.SetLogLevel(wx.LOG_Debug)
     elif not DEBUG_MODE:
-        if last_level == simplelog.DEBUG:
-            last_level = simplelog.ERROR
-        log.set_level(last_level)
-
-
-def set_debug_console(value):
-    """Set debug console enable."""
-
-    global DEBUG_CONSOLE
-    DEBUG_CONSOLE = bool(value)
+        if last_level == wx.LOG_Debug:
+            last_level = wx.LOG_Error
+        log.SetLogLevel(last_level)
 
 
 def get_debug_mode():
     """Get the debug mode."""
 
     return DEBUG_MODE
-
-
-def get_debug_console():
-    """Get debug console mode."""
-
-    return DEBUG_CONSOLE

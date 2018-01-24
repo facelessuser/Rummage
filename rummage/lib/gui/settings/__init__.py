@@ -71,13 +71,13 @@ class Settings(object):
         cls.ERR_SAVE_CACHE_FAILED = _("Failed to save cache file!")
 
     @classmethod
-    def load_settings(cls, debug_mode):
+    def load_settings(cls, debug_mode, no_redirect):
         """Load the settings."""
 
         cls.debug = debug_mode
         cls.localize()
         cls.settings_file, cls.cache_file, log = cls.get_settings_files()
-        custom_app.init_app_log(log)
+        custom_app.init_app_log(log, no_redirect)
         cls.settings = {"__format__": SETTINGS_FMT}
         cls.cache = {"__format__": CACHE_FMT}
         cls.settings_time = None
@@ -1079,3 +1079,4 @@ class Settings(object):
         """Perfrom needed actions when done with settings."""
 
         notify.destroy_notifications()
+        custom_app.close_log()
