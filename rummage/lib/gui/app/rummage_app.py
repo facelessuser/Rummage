@@ -24,9 +24,11 @@ import os
 from .platform_window_focus import platform_window_focus
 from .custom_app import PipeApp, set_debug_mode
 from ... import util
+from .. import rummage_dialog
+from ..settings import Settings
 
 __all__ = (
-    'set_debug_mode', 'RummageApp'
+    'RummageApp'
 )
 
 wx.Log.EnableLogging(False)
@@ -35,10 +37,43 @@ wx.Log.EnableLogging(False)
 class RummageApp(PipeApp):
     """RummageApp."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, argv, *args, **kwargs):
         """Init RummageApp object."""
 
+        self.debug_mode = argv.debug
+        self.path = argv.path if argv.path is not None else None
+
+        Settings.load_settings(self.debug_mode)
+        single_instance = Settings.get_single_instance()
+
+        if self.debug_mode:
+            set_debug_mode(True)
+
+        kwargs["single_instance_name"] = "Rummage" if single_instance else None
+        kwargs["pipe_name"] = Settings.get_fifo() if single_instance else None
+        kwargs["redirect"] = not argv.no_redirect
+
         PipeApp.__init__(self, *args, **kwargs)
+
+    def OnInit(self):
+        """Call on initialization."""
+
+        PipeApp.OnInit(self)
+
+        if self.single_instance is None or self.is_instance_okay():
+            rummage_dialog.RummageFrame(
+                None,
+                self.path,
+                self.debug_mode
+            ).Show()
+        return True
+
+    def OnExit(self):
+        """Handle exit."""
+
+        value = PipeApp.OnExit(self)
+        Settings.unload()
+        return value
 
     def on_pipe_args(self, event):
         """
