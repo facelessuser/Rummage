@@ -54,68 +54,45 @@ DEBUG_MODE = False
 class CustomApp(wx.App):
     """Custom app that adds a number of features."""
 
-    def __init__(self, *args, **kwargs):
-        """
-        Init the custom app.
+    def __init__(self, **kwargs):
+        """Init the custom app."""
 
-        Provide two new inputs:
-            single_instance_name: this creates an instance id with the name given
-                                  this will allow you to check if this is the only
-                                  instance currently open with the same name.
-            callback: A callback you can do if instance checks out
-        """
-
+        self.instance_okay = True
         self.instance = None
-        self.custom_init(*args, **kwargs)
-        if "single_instance_name" in kwargs:
-            del kwargs["single_instance_name"]
-        if "callback" in kwargs:
-            del kwargs["callback"]
-        wx.App.__init__(self, *args, **kwargs)
-
-    def custom_init(self, *args, **kwargs):
-        """Parse for new inputs and store them because they must be removed."""
-
+        self.log = None
+        self.log_name = None
         self.single_instance = None
-        self.init_callback = None
-        instance_name = kwargs.get("single_instance_name", None)
-        callback = kwargs.get("callback", None)
-        if instance_name is not None and isinstance(instance_name, util.string_type):
-            self.single_instance = instance_name
-        if callback is not None and hasattr(callback, '__call__'):
-            self.init_callback = callback
+        wx.App.__init__(self, **kwargs)
 
-    def ensure_single_instance(self, name):
+    def setup_logging(self, log, debug, no_redirect):
+        """Setup logging."""
+
+        self.log_name = log
+        wx.Log.EnableLogging(True)
+        wx.Log.SetLogLevel(wx.LOG_Info if debug else wx.LOG_Error)
+        if no_redirect:
+            self.log = CustomLog(self.log_name, no_redirect)
+        else:
+            if debug:
+                self.RedirectStdio()
+            self.log = CustomLogGui(self.log_name, debug)
+        wx.Log.SetActiveTarget(self.log)
+
+    def ensure_single_instance(self, single_instance):
         """Check to see if this is the only instance."""
 
-        self.name = "%s-%s" % (self.single_instance, wx.GetUserId())
-        self.instance = wx.SingleInstanceChecker(self.name)
-        if self.instance.IsAnotherRunning():
-            # wx.MessageBox("Only one instance allowed!", "ERROR", wx.OK | wx.ICON_ERROR)
-            return False
-        return True
+        if single_instance is None or not isinstance(single_instance, util.string_type):
+            self.name = "%s-%s" % (self.single_instance, wx.GetUserId())
+            self.instance = wx.SingleInstanceChecker(self.name)
+            if self.instance.IsAnotherRunning():
+                self.instance_okay = False
+
+        return self.instance_okay
 
     def is_instance_okay(self):
         """Return whether this is the only instance."""
 
         return self.instance_okay
-
-    def OnInit(self):  # noqa
-        """
-        Execute callback if instance is okay.
-
-        Store instance check variable.
-        """
-
-        self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
-
-        self.instance_okay = True
-        if self.single_instance is not None:
-            if not self.ensure_single_instance(self.single_instance):
-                self.instance_okay = False
-        if self.init_callback is not None and self.instance_okay:
-            self.init_callback()
-        return True
 
     def OnExit(self):  # noqa
         """Cleanup instance check."""
@@ -235,32 +212,26 @@ class ArgPipeThread(object):
 class PipeApp(CustomApp):
     """Pip app variant that allows the app to be sent data via a pipe."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """Parse pipe args."""
 
         self.active_pipe = False
         self.pipe_thread = None
-        self.pipe_name = kwargs.get("pipe_name", None)
-        if "pipe_name" in kwargs:
-            del kwargs["pipe_name"]
-        CustomApp.__init__(self, *args, **kwargs)
+        self.pipe_name = None
+        CustomApp.__init__(self, **kwargs)
 
-    def OnInit(self):  # noqa
-        """
-        Check if this is the first instance, and if so, start the pipe listener.
+    def setup_pipe(self, pipe_name):
+        """Setup pipe."""
 
-        If not, send the current args to the pipe to be read
-        by the first instance.
-        """
-
-        CustomApp.OnInit(self)
-        self.Bind(EVT_PIPE_ARGS, self.on_pipe_args)
-        if self.pipe_name is not None:
-            if self.is_instance_okay():
-                self.receive_arg_pipe()
-            else:
-                self.send_arg_pipe()
-                return False
+        if pipe_name is not None and isinstance(pipe_name, util.string_type):
+            self.pipe_name = pipe_name
+            self.Bind(EVT_PIPE_ARGS, self.on_pipe_args)
+            if self.pipe_name is not None:
+                if self.is_instance_okay():
+                    self.receive_arg_pipe()
+                else:
+                    self.send_arg_pipe()
+                    return False
         return True
 
     def get_sys_args(self):
@@ -411,28 +382,114 @@ class CustomLog(wx.Log):
         self.DoLogText(self._log(self.formatter("ERROR", log_fmt, msg)))
 
 
+class CustomLogGui(wx.LogGui):
+    """Logger."""
+
+    def __init__(self, log_file, debug=False):
+        """Initialize."""
+
+        self.format = "%(message)s"
+        self.file_name = log_file
+        self.file_lock = FileLock(self.file_name + '.lock')
+        self.debug = debug
+
+        try:
+            with self.file_lock.acquire(1):
+                with codecs.open(self.file_name, "w", "utf-8") as f:
+                    f.write("")
+        except Exception as e:
+            self.file_name = None
+
+        super(CustomLogGui, self).__init__()
+
+    def DoLogText(self, msg):
+        """Log the text."""
+
+        try:
+            if self.file_name is not None:
+                with self.file_lock.acquire(1):
+                    with codecs.open(self.file_name, 'a', encoding='utf-8') as f:
+                        f.write(msg)
+            else:
+                msg = "[ERROR] Could not acquire lock for log!\n" + msg
+        except Exception:
+            self.file_name = None
+
+        if self.debug:
+            sys.stdout.write(
+                (self.format % {"message": msg})
+            )
+
+        super(CustomLogGui, self).DoLogText(msg)
+
+    def DoLogTextAtLevel(self, level, msg):
+        """Perform log at level."""
+
+        if level == wx.LOG_Info:
+            self._debug(msg)
+        elif level == wx.LOG_FatalError:
+            self._critical(msg)
+        elif level == wx.LOG_Warning:
+            self._warning(msg)
+        elif level == wx.LOG_Error:
+            self._error(msg)
+
+    def formatter(self, lvl, log_fmt, msg, msg_fmt=None):
+        """Special formatters for log message."""
+
+        return log_fmt % {
+            "loglevel": lvl,
+            "message": util.to_ustr(msg if msg_fmt is None else msg_fmt(msg))
+        }
+
+    def _log(self, msg):
+        """Base logger."""
+
+        return self.format % {"message": msg}
+
+    def _debug(self, msg, log_fmt="%(loglevel)s: %(message)s\n"):
+        """Debug level log."""
+
+        self.DoLogText(self._log(self.formatter("DEBUG", log_fmt, msg)))
+
+    def _critical(self, msg, log_fmt="%(loglevel)s: %(message)s\n"):
+        """Critical level log."""
+
+        self.DoLogText(self._log(self.formatter("CRITICAL", log_fmt, msg)))
+
+    def _warning(self, msg, log_fmt="%(loglevel)s: %(message)s\n"):
+        """Warning level log."""
+
+        self.DoLogText(self._log(self.formatter("WARNING", log_fmt, msg)))
+
+    def _error(self, msg, log_fmt="%(loglevel)s: %(message)s\n"):
+        """Error level log."""
+
+        self.DoLogText(self._log(self.formatter("ERROR", log_fmt, msg)))
+
+
 def debug(msg):
     """Log wrapper for debug."""
 
-    log.DoLogTextAtLevel(wx.LOG_Info, util.ustr(msg))
+    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_Info, util.ustr(msg))
 
 
 def critical(msg):
     """Log wrapper for critical."""
 
-    log.DoLogTextAtLevel(wx.LOG_FatalError, util.ustr(msg))
+    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_FatalError, util.ustr(msg))
 
 
 def warning(msg):
     """Log wrapper for warning."""
 
-    log.DoLogTextAtLevel(wx.LOG_Warning, util.ustr(msg))
+    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_Warning, util.ustr(msg))
 
 
 def error(msg):
     """Log wrapper for error."""
 
-    log.DoLogTextAtLevel(wx.LOG_Error, util.ustr(msg))
+    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_Error, util.ustr(msg))
 
 
 def json_fmt(obj, label):
@@ -475,39 +532,11 @@ def error_struct(obj, label="Object"):
         log._log_struct(obj, error, label)
 
 
-def init_app_log(name, no_redirect=False, level=wx.LOG_Error):
-    """Init the app log."""
-
-    global log
-    wx.Log.EnableLogging(True)
-    wx.Log.SetLogLevel(level)
-    log = CustomLog(name, no_redirect)
-    wx.Log.SetActiveTarget(log)
-
-
 def get_log_file():
     """Get log file path."""
 
-    return log.get_log_file()
-
-
-def close_log():
-    """Close the log."""
-
-    global log
-    if log:
-        log.close_log()
-
-
-def set_debug_mode(value):
-    """Set whether the app is in debug mode."""
-
-    global DEBUG_MODE
-    DEBUG_MODE = bool(value)
-    if DEBUG_MODE:
-        wx.Log.SetLogLevel(wx.LOG_Info)
-    elif not DEBUG_MODE:
-        wx.Log.SetLogLevel(wx.LOG_Error)
+    app = wx.GetApp()
+    return app.log_name if app.log_name else None
 
 
 def get_debug_mode():

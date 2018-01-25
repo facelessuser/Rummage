@@ -21,10 +21,11 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import os
 from .platform_window_focus import platform_window_focus
-from .custom_app import PipeApp, set_debug_mode
+from .custom_app import PipeApp
 from ... import util
 from .. import rummage_dialog
 from ..settings import Settings
+import wx
 
 __all__ = ('RummageApp',)
 
@@ -32,29 +33,35 @@ __all__ = ('RummageApp',)
 class RummageApp(PipeApp):
     """RummageApp."""
 
-    def __init__(self, argv):
+    def __init__(self, argv, **kwargs):
         """Init RummageApp object."""
 
         self.debug_mode = argv.debug
         self.path = argv.path if argv.path is not None else None
-
-        Settings.load_settings(self.debug_mode, argv.no_redirect)
-        single_instance = Settings.get_single_instance()
-
-        if self.debug_mode:
-            set_debug_mode(True)
-
-        kwargs = {}
-        kwargs["single_instance_name"] = "Rummage" if single_instance else None
-        kwargs["pipe_name"] = Settings.get_fifo() if single_instance else None
+        self.no_redirect = argv.no_redirect
 
         PipeApp.__init__(self, **kwargs)
 
     def OnInit(self):
         """Call on initialization."""
 
-        PipeApp.OnInit(self)
+        self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
 
+        # Setup log, setting, and cache file, and start logging
+        Settings.setup_setting_files()
+        log = Settings.get_log_file()
+        self.setup_logging(log, self.debug_mode, self.no_redirect)
+
+        # Load up the settings and setup single instance
+        Settings.load_settings()
+        single_instance = Settings.get_single_instance()
+        if not self.ensure_single_instance("Rummage" if single_instance else None):
+            return False
+
+        if not self.setup_pipe(Settings.get_fifo() if single_instance else None):
+            return False
+
+        # Setup app.
         if self.single_instance is None or self.is_instance_okay():
             rummage_dialog.RummageFrame(
                 None,

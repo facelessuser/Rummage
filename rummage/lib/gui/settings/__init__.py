@@ -70,25 +70,22 @@ class Settings(object):
         cls.ERR_SAVE_CACHE_FAILED = _("Failed to save cache file!")
 
     @classmethod
-    def load_settings(cls, debug_mode, no_redirect):
+    def load_settings(cls):
         """Load the settings."""
 
-        cls.debug = debug_mode
+        # cls.debug = debug_mode
         cls.localize()
-        cls.settings_file, cls.cache_file, log = cls.get_settings_files()
-        custom_app.init_app_log(log, no_redirect)
+        cls.setup_setting_files()
         cls.settings = {"__format__": SETTINGS_FMT}
         cls.cache = {"__format__": CACHE_FMT}
         cls.settings_time = None
         cls.cache_time = None
         cls.get_times()
         if cls.settings_file is not None:
-            cls.settings_lock = FileLock(cls.settings_file + '.lock')
-            cls.cache_lock = FileLock(cls.cache_file + '.lock')
             cls.open_settings()
             cls.open_cache()
-        if cls.debug:
-            custom_app.set_debug_mode(True)
+        # if cls.debug:
+        #     custom_app.set_debug_mode(True)
         localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
         cls.localize()
         debug_struct(cls.settings)
@@ -101,6 +98,12 @@ class Settings(object):
 
         cls.reload_settings()
         return copy.deepcopy(cls.settings)
+
+    @classmethod
+    def get_log_file(cls):
+        """Get location of log file."""
+
+        return cls.log
 
     @classmethod
     def is_regex_available(cls):
@@ -253,7 +256,7 @@ class Settings(object):
         return changed
 
     @classmethod
-    def get_settings_files(cls):
+    def setup_setting_files(cls):
         """Get settings, cache, log, and fifo location."""
 
         platform = util.platform()
@@ -265,9 +268,9 @@ class Settings(object):
             plugin_folder = os.path.join(folder, 'plugins')
             if not os.path.exists(plugin_folder):
                 os.mkdir(plugin_folder)
-            settings = os.path.join(folder, SETTINGS_FILE)
-            cache = os.path.join(folder, CACHE_FILE)
-            log = os.path.join(folder, LOG_FILE)
+            cls.settings_file = os.path.join(folder, SETTINGS_FILE)
+            cls.cache_file = os.path.join(folder, CACHE_FILE)
+            cls.log = os.path.join(folder, LOG_FILE)
             cls.fifo = os.path.join(folder, '\\\\.\\pipe\\rummage')
             cls.config_folder = folder
         elif platform == "osx":
@@ -281,9 +284,9 @@ class Settings(object):
             plugin_folder = os.path.join(folder, 'plugins')
             if not os.path.exists(plugin_folder):
                 os.mkdir(plugin_folder)
-            settings = os.path.join(folder, SETTINGS_FILE)
-            cache = os.path.join(folder, CACHE_FILE)
-            log = os.path.join(folder, LOG_FILE)
+            cls.settings_file = os.path.join(folder, SETTINGS_FILE)
+            cls.cache_file = os.path.join(folder, CACHE_FILE)
+            cls.log = os.path.join(folder, LOG_FILE)
             cls.fifo = os.path.join(folder, FIFO)
             cls.config_folder = folder
         elif platform == "linux":
@@ -293,18 +296,19 @@ class Settings(object):
             plugin_folder = os.path.join(folder, 'plugins')
             if not os.path.exists(plugin_folder):
                 os.mkdir(plugin_folder)
-            settings = os.path.join(folder, SETTINGS_FILE)
-            cache = os.path.join(folder, CACHE_FILE)
-            log = os.path.join(folder, LOG_FILE)
+            cls.settings_file = os.path.join(folder, SETTINGS_FILE)
+            cls.cache_file = os.path.join(folder, CACHE_FILE)
+            cls.log = os.path.join(folder, LOG_FILE)
             cls.fifo = os.path.join(folder, FIFO)
             cls.config_folder = folder
 
-        if not os.path.exists(settings):
-            cls.new_settings(settings)
-        if not os.path.exists(cache):
-            cls.new_cache(cache)
+        cls.settings_lock = FileLock(cls.settings_file + '.lock')
+        cls.cache_lock = FileLock(cls.cache_file + '.lock')
 
-        return settings, cache, log
+        if not os.path.exists(cls.settings_file):
+            cls.new_settings(cls.settings_file)
+        if not os.path.exists(cls.cache_file):
+            cls.new_cache(cls.cache_file)
 
     @classmethod
     def open_settings(cls):
