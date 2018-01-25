@@ -19,26 +19,62 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-import wx
 import os
 from .platform_window_focus import platform_window_focus
-from .custom_app import PipeApp, set_debug_mode
+from .custom_app import PipeApp
 from ... import util
+from .. import rummage_dialog
+from ..settings import Settings
+import wx
 
-__all__ = (
-    'set_debug_mode', 'RummageApp'
-)
-
-wx.Log.EnableLogging(False)
+__all__ = ('RummageApp',)
 
 
 class RummageApp(PipeApp):
     """RummageApp."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, argv, **kwargs):
         """Init RummageApp object."""
 
-        PipeApp.__init__(self, *args, **kwargs)
+        self.debug_mode = argv.debug
+        self.path = argv.path if argv.path is not None else None
+        self.no_redirect = argv.no_redirect
+
+        PipeApp.__init__(self, **kwargs)
+
+    def OnInit(self):
+        """Call on initialization."""
+
+        self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+
+        # Setup log, setting, and cache file, and start logging
+        Settings.setup_setting_files()
+        log = Settings.get_log_file()
+        self.setup_logging(log, self.debug_mode, self.no_redirect)
+
+        # Load up the settings and setup single instance
+        Settings.load_settings()
+        single_instance = Settings.get_single_instance()
+        if not self.ensure_single_instance("Rummage" if single_instance else None):
+            return False
+
+        if not self.setup_pipe(Settings.get_fifo() if single_instance else None):
+            return False
+
+        # Setup app.
+        if self.single_instance is None or self.is_instance_okay():
+            rummage_dialog.RummageFrame(
+                None,
+                self.path,
+                self.debug_mode
+            ).Show()
+        return True
+
+    def OnExit(self):
+        """Handle exit."""
+
+        Settings.unload()
+        return PipeApp.OnExit(self)
 
     def on_pipe_args(self, event):
         """

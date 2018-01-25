@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.4.3
+
+Jan 23, 2018
+
+- **FIX**: Import of `bregex` when `regex` is not installed.
+- **FIX**: Backwards search did not reassemble text proper.
+
+## 3.4.2
+
+Jan 23, 2018
+
+- **FIX**: Require Backrefs 3.0.2 which fixes a minor Bregex cache purge issue.
+
 ## 3.4.1
 
 Jan 22, 2018

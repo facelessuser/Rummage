@@ -30,16 +30,18 @@ import sre_parse
 from collections import namedtuple
 from fnmatch import fnmatch
 from time import ctime
-from backrefs import bre, bregex
+from backrefs import bre
 from collections import deque
 from . import text_decode
 from .file_times import getmtime, getctime
 from .file_hidden import is_hidden
 from .. import util
-if bregex.REGEX_SUPPORT:
+try:
+    from backrefs import bregex
     import regex
-
-REGEX_SUPPORT = bregex.REGEX_SUPPORT
+    REGEX_SUPPORT = True
+except ImportError:  # pragma: no cover
+    REGEX_SUPPORT = False
 
 # Common regex flags (re|regex)
 IGNORECASE = 0x1  # (?i)
@@ -524,6 +526,7 @@ class _FileSearch(object):
         self.count_only = bool(self.flags & COUNT_ONLY)
         self.truncate_lines = bool(self.flags & TRUNCATE_LINES)
         self.process_binary = bool(self.flags & PROCESS_BINARY)
+        self.reverse = False
         self.backup = bool(self.flags & BACKUP)
         self.backup2folder = bool(self.flags & BACKUP_FOLDER)
         self.backup_ext = ('.%s' % backup_location) if not self.backup2folder else DEFAULT_BAK
@@ -800,6 +803,13 @@ class _FileSearch(object):
                         template = sre_parse.parse_template(replace, pattern)
                         self.expand = lambda m, t=template: sre_parse.expand_template(t, m)
 
+            if REGEX_SUPPORT and isinstance(pattern, bregex._REGEX_TYPE):
+                self.reverse = bool(pattern.flags & regex.REVERSE)
+            else:
+                self.reverse = False
+
+            self.text_offset = len(file_content) if self.reverse else 0
+
             for m in pattern.finditer(file_content):
                 yield m
 
@@ -931,13 +941,22 @@ class _FileSearch(object):
                         file_info = file_info._replace(encoding=self.current_encoding.encode.upper())
 
                     if not skip:
-                        offset = 0
 
                         pattern, replace, flags = self.search_obj[0]
+                        if REGEX_SUPPORT and isinstance(pattern, bregex._REGEX_TYPE):
+                            self.reverse = bool(pattern.flags & regex.REVERSE)
+                        else:
+                            self.reverse = False
+
                         for m in self._findall(rum_buff, pattern, replace, flags, file_info):
-                            text.append(rum_buff[offset:m.start(0)])
-                            text.append(self.expand_match(m))
-                            offset = m.end(0)
+                            if self.reverse:
+                                text.appendleft(rum_buff[m.end(0):self.text_offset])
+                                text.appendleft(self.expand_match(m))
+                                self.text_offset = m.start(0)
+                            else:
+                                text.append(rum_buff[self.text_offset:m.start(0)])
+                                text.append(self.expand_match(m))
+                                self.text_offset = m.end(0)
 
                             yield FileRecord(
                                 file_info,
@@ -959,21 +978,29 @@ class _FileSearch(object):
 
                         # Grab the rest of the file if we found things to replace.
                         if not self.abort and (text or len(self.search_obj) > 1):
-                            text.append(rum_buff[offset:])
+                            if self.reverse:
+                                text.appendleft(rum_buff[:self.text_offset])
+                            else:
+                                text.append(rum_buff[self.text_offset:])
 
                 # Additional chained replaces
                 count = 1
-                if not self.abort and len(self.search_obj) > 1:
+                if not skip and not self.abort and len(self.search_obj) > 1:
 
                     for pattern, replace, flags in self.search_obj[1:]:
+
                         text2 = (b'' if self.is_binary else '').join(text)
                         text = deque()
-                        offset = 0
 
                         for m in self._findall(text2, pattern, replace, flags, file_info):
-                            text.append(text2[offset:m.start(0)])
-                            text.append(self.expand_match(m))
-                            offset = m.end(0)
+                            if self.reverse:
+                                text.appendleft(text2[m.end(0):self.text_offset])
+                                text.appendleft(self.expand_match(m))
+                                self.text_offset = m.start(0)
+                            else:
+                                text.append(text2[self.text_offset:m.start(0)])
+                                text.append(self.expand_match(m))
+                                self.text_offset = m.end(0)
 
                             yield FileRecord(
                                 file_info,
@@ -997,7 +1024,10 @@ class _FileSearch(object):
 
                         # Grab the rest of the file if we found things to replace.
                         if not self.abort and (text or count < len(self.search_obj)):
-                            text.append(text2[offset:])
+                            if self.reverse:
+                                text.appendleft(text2[:self.text_offset])
+                            else:
+                                text.append(text2[self.text_offset:])
 
                         if self.abort:
                             break
@@ -1480,7 +1510,7 @@ class Rummage(object):
                 self.files.append(
                     FileAttrRecord(
                         self.target,
-                        os.path.splitext(self.target).lower().lstrip('.'),
+                        os.path.splitext(self.target)[1].lower().lstrip('.'),
                         os.path.getsize(self.target),
                         getmtime(self.target),
                         getctime(self.target),

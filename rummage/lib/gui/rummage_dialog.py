@@ -29,14 +29,14 @@ import os
 import re
 import codecs
 import wx.lib.newevent
-from backrefs import bre, bregex
+from backrefs import bre
 from .settings import Settings
 from .actions import export_html
 from .actions import export_csv
 from .actions import fileops
 from .actions import updates
 from .generic_dialogs import errormsg, yesno, infomsg
-from .app.custom_app import DebugFrameExtender, debug, error, simplelog
+from .app.custom_app import debug, error, get_log_file
 from .controls import custom_statusbar
 from .regex_test_dialog import RegexTestDialog
 from .controls.autocomplete_combo import AutoCompleteCombo
@@ -60,6 +60,10 @@ from .. import __meta__
 from .. import rumcore
 from .. import util
 import decimal
+if rumcore.REGEX_SUPPORT:
+    from backrefs import bregex
+else:
+    bregex = None
 
 PostResizeEvent, EVT_POST_RESIZE = wx.lib.newevent.NewEvent()
 
@@ -308,7 +312,7 @@ class RummageArgs(object):
         self.formatreplace = False
 
 
-class RummageFrame(gui.RummageFrame, DebugFrameExtender):
+class RummageFrame(gui.RummageFrame):
     """Rummage Frame."""
 
     def __init__(self, parent, start_path, debug_mode=False):
@@ -342,16 +346,12 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         if start_path is None:
             start_path = util.getcwd()
 
-        if debug_mode:
-            self.open_debug_console()
-
         # Setup debugging
         self.set_keybindings(
             [
                 (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
                 (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
-            ],
-            debug_event=(self.on_debug_console if debug_mode else None)
+            ]
         )
 
         # Update status on when idle
@@ -632,6 +632,27 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         self.m_created_choice.Clear()
         for x in [self.TIME_ANY, self.TIME_GT, self.TIME_EQ, self.TIME_LT]:
             self.m_created_choice.Append(x)
+
+    def set_keybindings(self, keybindings=None):
+        """
+        Method to easily set key bindings.
+
+        Also sets up debug keybindings and events.
+        """
+
+        if keybindings is None:
+            keybindings = []
+
+        # Add keybindings.
+        tbl = []
+        bindings = keybindings
+        for binding in keybindings:
+            keyid = wx.NewId()
+            self.Bind(wx.EVT_MENU, binding[2], id=keyid)
+            tbl.append((binding[0], binding[1], keyid))
+
+        if len(bindings):
+            self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
 
     def init_search_path(self, start_path):
         """Initialize the search path input."""
@@ -2063,21 +2084,16 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
             update_autocomplete(self.m_exclude_textbox, "folder_exclude")
         event.Skip()
 
-    def on_debug_console(self, event):
-        """Show debug console."""
-
-        self.toggle_debug_console()
-
     def on_close(self, event):
-        """Ensure thread is stopped, notifications are destroyed, debug console is closed."""
+        """Ensure thread is stopped, notifications are destroyed."""
 
+        event.Skip()
         global _ABORT
 
         if self.thread is not None:
             _ABORT = True
+        self.m_statusbar.kill_timers()
         notify.destroy_notifications()
-        self.close_debug_console()
-        event.Skip()
 
     def on_test_regex(self, event):
         """Show regex test dialog."""
@@ -2176,7 +2192,7 @@ class RummageFrame(gui.RummageFrame, DebugFrameExtender):
         """Show user files in editor."""
 
         try:
-            logfile = simplelog.get_global_log().filename
+            logfile = get_log_file()
         except Exception:
             logfile = None
 
