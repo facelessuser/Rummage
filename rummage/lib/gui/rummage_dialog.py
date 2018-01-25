@@ -28,6 +28,7 @@ from time import time
 import os
 import re
 import codecs
+from datetime import datetime
 import wx.lib.newevent
 from backrefs import bre
 from .settings import Settings
@@ -340,6 +341,12 @@ class RummageFrame(gui.RummageFrame):
         self.checking = False
         self.kill = False
         self.thread = None
+        self.last_update = 0.0
+        last = Settings.get_last_update_check()
+        try:
+            self.last_update_check = datetime.strptime(last, "%Y-%m-%d %H:%M") if last is not None else last
+        except Exception:
+            self.last_update_check = None
         self.allow_update = False
         self.checking_updates = False
         self.imported_plugins = {}
@@ -1496,7 +1503,7 @@ class RummageFrame(gui.RummageFrame):
             "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search"
         )
 
-    def check_updates(self):
+    def check_progress(self):
         """Check if updates to the result lists can be done."""
 
         if not self.checking and self.allow_update:
@@ -2031,13 +2038,26 @@ class RummageFrame(gui.RummageFrame):
         """On idle event."""
 
         if not self.checking_updates and not self.allow_update:
-            self.checking_updates = True
-            if Settings.get_update_check_needed():
-                self.on_check_update(None)
+            self.checking_updates = False
+            check = False
+            current = datetime.now()
+            if self.last_update_check is None:
+                check = True
+            else:
+                diff = current - self.last_update_check
+                if diff.days >= 1:
+                    check = True
+            if check:
+                check_updates, prerelease = Settings.get_update_options()
+                if check_updates:
+                    self.update_request(prerelease, True)
+                else:
+                    Settings.set_last_update_check(current.strftime("%Y-%m-%d %H:%M"))
+                    self.last_update_check = current
             self.checking_updates = False
 
         # Update progress
-        self.check_updates()
+        self.check_progress()
         event.Skip()
 
     def on_error_click(self, event):
@@ -2202,14 +2222,23 @@ class RummageFrame(gui.RummageFrame):
         else:
             fileops.open_editor(logfile, 1, 1)
 
+    def update_request(self, prerelease, hide_no_update=False):
+        """Perform update request."""
+
+        current = datetime.now()
+        Settings.set_last_update_check(current.strftime("%Y-%m-%d %H:%M"))
+        self.last_update_check = current
+
+        new_ver = updates.check_update(pre=prerelease)
+        if new_ver is None and not hide_no_update:
+            infomsg(self.UP_TO_DATE % __meta__.__version__)
+        elif new_ver is not None:
+            infomsg(self.NOT_UP_TO_DATE % new_ver)
+
     def on_check_update(self, event):
         """Check for update."""
 
-        new_ver = updates.check_update()
-        if new_ver is None:  # and event is not None:
-            infomsg(self.UP_TO_DATE % __meta__.__version__)
-        else:
-            infomsg(self.NOT_UP_TO_DATE % new_ver)
+        self.update_request(Settings.get_prerelease())
 
     def on_documentation(self, event):
         """Open documentation site."""

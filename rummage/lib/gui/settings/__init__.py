@@ -23,7 +23,6 @@ import codecs
 import json
 import os
 import copy
-from datetime import datetime
 from filelock import FileLock
 from ..app import custom_app
 from ..app.custom_app import debug, debug_struct, error
@@ -897,26 +896,19 @@ class Settings(object):
         cls.settings['backup_folder'] = value
 
     @classmethod
-    def get_update_check_needed(cls):
-        """Check if update check is needed."""
+    def get_last_update_check(cls):
+        """Get the last time an update check was performed."""
 
-        needed = False
         cls.reload_settings()
-        if cls.settings.get('check_updates', False):
-            timestamp = cls.settings.get('last_update_check', None)
-            if timestamp is None:
-                needed = True
-                dt2 = datetime.now()
-            else:
-                dt1 = datetime.strptime(timestamp, "%Y-%m-%d %H:%M")
-                dt2 = datetime.now()
-                diff = dt2 - dt1
-                if diff.days > 2:
-                    needed = True
-        if needed:
-            cls.settings['last_update_check'] = dt2.strftime("%Y-%m-%d %H:%M")
-            cls.save_settings()
-        return needed
+        return cls.settings.get('last_update_check', None)
+
+    @classmethod
+    def set_last_update_check(cls, value):
+        """Get the last time an update check was performed."""
+
+        cls.reload_settings()
+        cls.settings['last_update_check'] = value
+        cls.save_settings()
 
     @classmethod
     def _set_check_updates(cls, value):
@@ -959,6 +951,13 @@ class Settings(object):
 
         cls.reload_settings()
         return cls.settings.get('check_prerelease', False)
+
+    @classmethod
+    def get_update_options(cls):
+        """Get the update options."""
+
+        cls.reload_settings()
+        return cls.settings.get('check_updates', False), cls.settings.get('check_prerelease', False)
 
     @classmethod
     def get_history_record_count(cls, history_types=None):

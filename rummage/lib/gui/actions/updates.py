@@ -1,6 +1,6 @@
+"""Perform a check for latest versions on PyPI."""
 from __future__ import unicode_literals
 from ... import __version__
-import sys
 import json
 import re
 from ... import util
@@ -21,24 +21,27 @@ def parse_version(ver, pre=False):
         return (0, 0, 0, 'alpha', 0, 0)
     micro = int(m.group('micro')) if m.group('micro') else 0
 
-    return (int(m.group('major')), int(m.group('minor')), micro, rtype, pre_post)
+    return (int(m.group('major')), int(m.group('minor')), micro, rtype, 0)
 
 
 def check_update(pre=False):
     """Check for module update."""
 
     latest_ver = None
+    latest_ver_str = None
     url = 'http://pypi.python.org/pypi/rummage/json'
     try:
         response = util.urlopen(url, timeout=5)
         data = json.loads(response.read().decode('utf-8'))
         latest = (0, 0, 0, 'alpha', 0)
+        latest_str = None
         for ver in data['releases'].keys():
             ver_info = parse_version(ver)
             if ver_info > latest:
                 latest = ver_info
+                latest_str = ver
         if __version__.version_info < latest:
-            latest_ver = latest
+            latest_ver_str = latest_str
     except Exception as e:
         pass
-    return latest_ver
+    return latest_ver_str
