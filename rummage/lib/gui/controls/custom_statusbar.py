@@ -60,7 +60,7 @@ if (2, 9, 4) < wx.VERSION < (4, 0, 0, 'b2'):
 class ContextMenu(wx.Menu):
     """Context Menu."""
 
-    def __init__(self, parent, menu, pos):
+    def __init__(self, menu):
         """Attach the context menu to to the parent with the defined items."""
 
         wx.Menu.__init__(self)
@@ -72,8 +72,6 @@ class ContextMenu(wx.Menu):
             self._callbacks[menuid] = i[1]
             self.Append(item)
             self.Bind(wx.EVT_MENU, self.on_callback, item)
-
-        parent.PopupMenu(self, pos)
 
     def on_callback(self, event):
         """Execute the menu item callback."""
@@ -161,10 +159,13 @@ class TimedStatusExtension(object):
         """Kill timer event."""
 
         self.kill = True
-        for x in self.text_timer:
+        count = 0
+        for x in self.text_timer[:]:
             if x.IsRunning():
                 x.Stop()
-                x.Destroy()
+            x.Destroy()
+            del self.text_timer[count]
+            count += 1
 
 
 class IconTrayExtension(object):
@@ -231,7 +232,10 @@ class IconTrayExtension(object):
         """Show context menu on icon in tray."""
 
         self.hide_tooltip(name)
-        ContextMenu(self, context, self.sb_icons[name].GetPosition())
+        pos = self.sb_icons[name].GetPosition()
+        menu = ContextMenu(context)
+        self.PopupMenu(menu, pos)
+        menu.Destroy()
 
     def place_icons(self, resize=False):
         """Calculate new icon position and icon tray size."""
@@ -265,6 +269,15 @@ class IconTrayExtension(object):
         event.Skip()
         self.place_icons()
 
+    def destroy_icons(self):
+        """Destroy Icons."""
+
+        icons = []
+        for name in self.sb_icons.keys():
+            icons.append(name)
+        for name in icons:
+            self.remove_icon(name)
+
 
 class CustomStatusExtension(IconTrayExtension, TimedStatusExtension):
     """Custom status extension."""
@@ -278,6 +291,12 @@ class CustomStatusExtension(IconTrayExtension, TimedStatusExtension):
         self.fields = fields
         self.sb_tray_setup()
         self.sb_time_setup(len(self.fields))
+
+    def tear_down(self):
+        """Tear down dynamic stuff."""
+
+        self.kill_timers()
+        self.destroy_icons()
 
 
 class CustomStatusBar(wx.StatusBar, CustomStatusExtension):

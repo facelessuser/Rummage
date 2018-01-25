@@ -2079,7 +2079,7 @@ class RummageFrame(gui.RummageFrame):
 
         if self.thread is not None:
             _ABORT = True
-        self.m_statusbar.kill_timers()
+        self.m_statusbar.tear_down()
         notify.destroy_notifications()
 
     def on_test_regex(self, event):
