@@ -27,7 +27,6 @@ def parse_version(ver, pre=False):
 def check_update(pre=False):
     """Check for module update."""
 
-    latest_ver = None
     latest_ver_str = None
     url = 'http://pypi.python.org/pypi/rummage/json'
     try:
