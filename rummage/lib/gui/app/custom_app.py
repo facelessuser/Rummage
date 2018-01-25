@@ -69,7 +69,6 @@ class CustomApp(wx.App):
 
         self.log_name = log
         wx.Log.EnableLogging(True)
-        wx.Log.SetLogLevel(wx.LOG_Info if debug else wx.LOG_Error)
         if no_redirect:
             self.log = CustomLog(self.log_name, no_redirect)
         else:
@@ -77,6 +76,7 @@ class CustomApp(wx.App):
                 self.RedirectStdio()
             self.log = CustomLogGui(self.log_name, debug)
         wx.Log.SetActiveTarget(self.log)
+        wx.Log.SetLogLevel(wx.LOG_Info if debug else wx.LOG_Error)
 
     def ensure_single_instance(self, single_instance):
         """Check to see if this is the only instance."""
@@ -334,13 +334,15 @@ class CustomLog(wx.Log):
     def DoLogTextAtLevel(self, level, msg):
         """Perform log at level."""
 
-        if level == wx.LOG_Info:
+        current = self.GetLogLevel()
+
+        if level <= current and level == wx.LOG_Info:
             self._debug(msg)
-        elif level == wx.LOG_FatalError:
+        elif level <= current and level == wx.LOG_FatalError:
             self._critical(msg)
-        elif level == wx.LOG_Warning:
+        elif level <= current and level == wx.LOG_Warning:
             self._warning(msg)
-        elif level == wx.LOG_Error:
+        elif level <= current and level == wx.LOG_Error:
             self._error(msg)
 
     def formatter(self, lvl, log_fmt, msg, msg_fmt=None):
@@ -420,13 +422,15 @@ class CustomLogGui(wx.LogGui):
     def DoLogTextAtLevel(self, level, msg):
         """Perform log at level."""
 
-        if level == wx.LOG_Info:
+        current = self.GetLogLevel()
+
+        if level <= current and level == wx.LOG_Info:
             self._debug(msg)
-        elif level == wx.LOG_FatalError:
+        elif level <= current and level == wx.LOG_FatalError:
             self._critical(msg)
-        elif level == wx.LOG_Warning:
+        elif level <= current and level == wx.LOG_Warning:
             self._warning(msg)
-        elif level == wx.LOG_Error:
+        elif level <= current and level == wx.LOG_Error:
             self._error(msg)
 
     def formatter(self, lvl, log_fmt, msg, msg_fmt=None):
