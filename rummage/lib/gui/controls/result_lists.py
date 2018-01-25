@@ -329,6 +329,19 @@ class ResultContentList(DynamicList):
         self.EXTENSION = _("Extension")
         self.CONTEXT = _("Context")
 
+    def GetSecondarySortValues(self, col, key1, key2):
+        """Get secondary sort values."""
+
+        if col == CONTENT_LINE:
+            return (self.itemDataMap[key1][CONTENT_PATH], self.itemDataMap[key2][CONTENT_PATH])
+        elif col == CONTENT_PATH:
+            return (self.itemDataMap[key1][CONTENT_LINE], self.itemDataMap[key2][CONTENT_LINE])
+        else:
+            return (
+                (self.itemDataMap[key1][CONTENT_PATH], self.itemDataMap[key1][CONTENT_LINE]),
+                (self.itemDataMap[key2][CONTENT_PATH], self.itemDataMap[key2][CONTENT_LINE])
+            )
+
     def create_image_list(self):
         """Create the image list."""
 
