@@ -23,7 +23,6 @@ from __future__ import absolute_import
 from .lib import safe_import  # noqa: F401
 import sys
 import argparse
-import os
 from .lib import util
 from .lib import __meta__
 from .lib.gui.app import rummage_app
