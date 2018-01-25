@@ -2078,6 +2078,7 @@ class RummageFrame(gui.RummageFrame):
 
         if self.thread is not None:
             _ABORT = True
+        self.m_statusbar.kill_timers()
         notify.destroy_notifications()
         event.Skip()
 
