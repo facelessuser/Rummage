@@ -22,15 +22,12 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 from .lib import safe_import  # noqa: F401
 import sys
-import argparse
 import os
+import argparse
 from .lib import util
 from .lib import __meta__
-from .lib.gui import rummage_dialog
 from .lib.gui.app import rummage_app
-from .lib.gui.settings import Settings
 
-# Handle case where pythonw.exe is used and there is not a valid stdout or stderr
 if sys.executable.endswith("pythonw.exe"):
     sys.stdout = open(os.devnull, "w")
     sys.stderr = open(os.devnull, "w")
@@ -52,29 +49,8 @@ def run():
     """Configure environment, start the app, and launch the appropriate frame."""
 
     args = parse_arguments()
-
-    Settings.load_settings(args.debug)
-    single_instance = Settings.get_single_instance()
-
-    if args.debug:
-        rummage_app.set_debug_mode(True)
-
-    app = rummage_app.RummageApp(
-        redirect=not args.no_redirect,
-        single_instance_name="Rummage" if single_instance else None,
-        pipe_name=Settings.get_fifo() if single_instance else None
-    )
-
-    if not single_instance or app.is_instance_okay():
-        rummage_dialog.RummageFrame(
-            None,
-            args.path if args.path is not None else None,
-            debug_mode=args.debug
-        ).Show()
-
+    app = rummage_app.RummageApp(args)
     app.MainLoop()
-
-    Settings.unload()
 
     return 0
 

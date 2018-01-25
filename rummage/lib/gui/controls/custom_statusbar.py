@@ -105,6 +105,8 @@ class ToolTip(wx.lib.agw.supertooltip.SuperToolTip):
 class TimedStatusExtension(object):
     """Timed status in status bar."""
 
+    kill = False
+
     def set_timed_status(self, text, index=0):
         """
         Set the status for a short time.
@@ -112,6 +114,9 @@ class TimedStatusExtension(object):
         Save the previous status for restore
         when the timed status completes.
         """
+
+        if self.kill:
+            return
 
         if self.text_timer[index].IsRunning():
             self.text_timer[index].Stop()
@@ -122,6 +127,9 @@ class TimedStatusExtension(object):
 
     def sb_time_setup(self, field_count):
         """Setup timer for timed status."""
+
+        if self.kill:
+            return
 
         self.field_count = field_count
         self.saved_text = [""] * field_count
@@ -134,14 +142,29 @@ class TimedStatusExtension(object):
     def clear_text(self, event, index):
         """Clear the status."""
 
+        if self.kill:
+            return
+
         self.SetStatusText(self.saved_text, index)
 
     def set_status(self, text, index=0):
         """Set the status."""
 
+        if self.kill:
+            return
+
         if self.text_timer[index].IsRunning():
             self.text_timer[index].Stop()
         self.SetStatusText(text, index)
+
+    def kill_timers(self):
+        """Kill timer event."""
+
+        self.kill = True
+        for x in self.text_timer:
+            if x.IsRunning():
+                x.Stop()
+                x.Destroy()
 
 
 class IconTrayExtension(object):
