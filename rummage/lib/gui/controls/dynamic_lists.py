@@ -56,6 +56,14 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
             parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
             style=flags
         )
+        if not single_sel:
+            # Select all
+            self.set_keybindings(
+                [
+                    (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.select_all)
+                ]
+            )
+
         self.sort_init = True
         self.complete = False
         self.resize_complete = False
@@ -74,6 +82,38 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.create_image_list()
         self.setup_columns()
         self.itemIndexMap = []
+
+    def set_keybindings(self, keybindings=None):
+        """
+        Method to easily set key bindings.
+
+        Also sets up debug keybindings and events.
+        """
+
+        if keybindings is None:
+            keybindings = []
+
+        # Add keybindings.
+        tbl = []
+        bindings = keybindings
+        for binding in keybindings:
+            keyid = wx.NewId()
+            self.Bind(wx.EVT_MENU, binding[2], id=keyid)
+            tbl.append((binding[0], binding[1], keyid))
+
+        if len(bindings):
+            self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
+
+    def select_all(self, event):
+        """Select all items."""
+
+        with self.wait:
+            item = self.GetNextItem(-1)
+            while item != -1:
+                if not self.IsSelected(item):
+                    self.Select(item)
+                item = self.GetNextItem(item)
+        event.Skip()
 
     def set_wait_lock(self, wait_lock):
         """Set wait lock."""

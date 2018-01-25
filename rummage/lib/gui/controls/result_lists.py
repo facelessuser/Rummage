@@ -52,6 +52,10 @@ FILE_COL = 9
 
 BULK_MAX = 20
 
+COPY_NAME = 0
+COPY_PATH = 1
+COPY_CONTENT = 2
+
 
 class ContextMenu(wx.Menu):
     """Context Menu."""
@@ -63,13 +67,16 @@ class ContextMenu(wx.Menu):
         self._callbacks = {}
 
         for i in menu:
-            menuid = wx.NewId()
-            item = wx.MenuItem(self, menuid, i[0])
-            self._callbacks[menuid] = i[1]
-            self.Append(item)
-            if len(i) > 2 and not i[2]:
-                self.Enable(menuid, False)
-            self.Bind(wx.EVT_MENU, self.on_callback, item)
+            if i is not None:
+                menuid = wx.NewId()
+                item = wx.MenuItem(self, menuid, i[0])
+                self._callbacks[menuid] = i[1]
+                self.Append(item)
+                if len(i) > 2 and not i[2]:
+                    self.Enable(menuid, False)
+                self.Bind(wx.EVT_MENU, self.on_callback, item)
+            else:
+                self.AppendSeparator()
 
     def on_callback(self, event):
         """Execute the menu item callback."""
@@ -124,6 +131,8 @@ class ResultFileList(DynamicList):
             "osx": _("Reveal in Finder"),
             "linux": _("Reveal in File Manager")
         }
+        self.COPY_NAME = _("Copy File Names")
+        self.COPY_PATH = _("Copy File Paths")
 
     def create_image_list(self):
         """Create the image list."""
@@ -260,6 +269,28 @@ class ResultFileList(DynamicList):
                     fileops.open_editor(target, line, col)
                 item = self.GetNextSelected(item)
 
+    def copy(self, event, col):
+        """Copy the content time from the result list."""
+
+        copy_bfr = []
+
+        item = self.GetFirstSelected()
+        while item != -1:
+            with self.wait:
+                if col == FILE_NAME:
+                    copy_bfr.append(self.GetItem(item, col=FILE_NAME).GetText())
+                elif col == FILE_PATH:
+                    copy_bfr.append(self.GetItem(item, col=FILE_PATH).GetText())
+            item = self.GetNextSelected(item)
+
+        if copy_bfr:
+            if wx.TheClipboard.Open():
+                try:
+                    wx.TheClipboard.SetData(wx.TextDataObject('\n'.join(copy_bfr)))
+                except Exception:
+                    pass
+                wx.TheClipboard.Close()
+
     def on_rclick(self, event):
         """Show context menu on right click."""
 
@@ -290,6 +321,9 @@ class ResultFileList(DynamicList):
             # Open menu
             menu = ContextMenu(
                 [
+                    (self.COPY_NAME, functools.partial(self.copy, col=FILE_NAME), True),
+                    (self.COPY_PATH, functools.partial(self.copy, col=FILE_PATH), True),
+                    None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
                     (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
                 ]
@@ -338,6 +372,9 @@ class ResultContentList(DynamicList):
             "osx": _("Reveal in Finder"),
             "linux": _("Reveal in File Manager")
         }
+        self.COPY_NAME = _("Copy File Names")
+        self.COPY_PATH = _("Copy File Paths")
+        self.COPY_CONTENT = _("Copy File Content")
 
     def GetSecondarySortValues(self, col, key1, key2):
         """Get secondary sort values."""
@@ -484,6 +521,37 @@ class ResultContentList(DynamicList):
                     fileops.open_editor(target, line, col)
                 item = self.GetNextSelected(item)
 
+    def copy(self, event, col, from_file_tab=False):
+        """Copy the content time from the result list."""
+
+        parent = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list
+        copy_bfr = []
+
+        item = self.GetFirstSelected()
+        while item != -1:
+            with self.wait:
+                if col == CONTENT_PATH:
+                    if from_file_tab:
+                        file_row = self.get_map_item(item, col=CONTENT_KEY)
+                        path = parent.get_map_item(
+                            file_row, col=FILE_PATH, absolute=True
+                        )
+                        filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                        copy_bfr.append(os.path.join(path, filename))
+                    else:
+                        copy_bfr.append(self.GetItem(item, col=CONTENT_PATH).GetText())
+                else:
+                    copy_bfr.append(self.GetItem(item, col=CONTENT_TEXT).GetText())
+            item = self.GetNextSelected(item)
+
+        if copy_bfr:
+            if wx.TheClipboard.Open():
+                try:
+                    wx.TheClipboard.SetData(wx.TextDataObject('\n'.join(copy_bfr)))
+                except Exception:
+                    pass
+                wx.TheClipboard.Close()
+
     def on_rclick(self, event):
         """Show context menu on right click."""
 
@@ -517,6 +585,10 @@ class ResultContentList(DynamicList):
             # Open menu
             menu = ContextMenu(
                 [
+                    (self.COPY_NAME, functools.partial(self.copy, col=CONTENT_PATH), True),
+                    (self.COPY_PATH, functools.partial(self.copy, col=CONTENT_PATH, from_file_tab=True), True),
+                    (self.COPY_CONTENT, functools.partial(self.copy, col=CONTENT_TEXT), True),
+                    None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
                     (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
                 ]
