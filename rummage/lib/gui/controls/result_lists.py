@@ -56,7 +56,7 @@ BULK_MAX = 20
 class ContextMenu(wx.Menu):
     """Context Menu."""
 
-    def __init__(self, parent, menu, pos):
+    def __init__(self, menu):
         """Attach the context menu to to the parent with the defined items."""
 
         wx.Menu.__init__(self)
@@ -70,8 +70,6 @@ class ContextMenu(wx.Menu):
             if len(i) > 2 and not i[2]:
                 self.Enable(menuid, False)
             self.Bind(wx.EVT_MENU, self.on_callback, item)
-
-        parent.PopupMenu(self, pos)
 
     def on_callback(self, event):
         """Execute the menu item callback."""
@@ -290,14 +288,14 @@ class ResultFileList(DynamicList):
             if not enabled:
                 item = -1
             # Open menu
-            ContextMenu(
-                self,
+            menu = ContextMenu(
                 [
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
                     (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
-                ],
-                pos
+                ]
             )
+            self.PopupMenu(menu, pos)
+            menu.Destroy()
         event.Skip()
 
 
@@ -517,12 +515,12 @@ class ResultContentList(DynamicList):
             if not enabled:
                 item = -1
             # Open menu
-            ContextMenu(
-                self,
+            menu = ContextMenu(
                 [
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
                     (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
-                ],
-                pos
+                ]
             )
+            self.PopupMenu(menu, pos)
+            menu.Destroy()
         event.Skip()
