@@ -302,7 +302,7 @@ class CustomLog(wx.Log):
             with self.file_lock.acquire(1):
                 with codecs.open(self.file_name, "w", "utf-8") as f:
                     f.write("")
-        except Exception as e:
+        except Exception:
             self.file_name = None
 
         self.no_redirect = no_redirect
@@ -392,7 +392,7 @@ class CustomLogGui(wx.LogGui):
             with self.file_lock.acquire(1):
                 with codecs.open(self.file_name, "w", "utf-8") as f:
                     f.write("")
-        except Exception as e:
+        except Exception:
             self.file_name = None
 
         wx.LogGui.__init__(self)
