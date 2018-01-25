@@ -50,6 +50,8 @@ FILE_CRE = 7
 FILE_LINE = 8
 FILE_COL = 9
 
+BULK_MAX = 20
+
 
 class ContextMenu(wx.Menu):
     """Context Menu."""
@@ -265,6 +267,7 @@ class ResultFileList(DynamicList):
 
         target = None
         enabled = False
+        bulk_enabled = False
         with self.wait:
             pos = event.GetPosition()
             item = self.HitTestSubItem(pos)[0]
@@ -275,6 +278,7 @@ class ResultFileList(DynamicList):
                 selected = self.IsSelected(item)
                 select_count = self.GetSelectedItemCount()
                 enabled = not selected or (selected and select_count == 1)
+                bulk_enabled = not selected or (selected and select_count <= BULK_MAX)
                 # Select if not already
                 if not selected:
                     s = self.GetFirstSelected()
@@ -290,7 +294,7 @@ class ResultFileList(DynamicList):
                 self,
                 [
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
-                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), True)
+                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
                 ],
                 pos
             )
@@ -314,11 +318,13 @@ class ResultContentList(DynamicList):
                 self.EXTENSION,
                 self.CONTEXT
             ],
+            False
         )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.on_rclick)
 
     def localize(self):
         """Translate strings."""
@@ -328,6 +334,25 @@ class ResultContentList(DynamicList):
         self.MATCHES = _("Matches")
         self.EXTENSION = _("Extension")
         self.CONTEXT = _("Context")
+        self.EDITOR_LABEL = _("Open in Editor")
+        self.REVEAL_LABEL = {
+            "windows": _("Reveal in Explorer"),
+            "osx": _("Reveal in Finder"),
+            "linux": _("Reveal in File Manager")
+        }
+
+    def GetSecondarySortValues(self, col, key1, key2):
+        """Get secondary sort values."""
+
+        if col == CONTENT_LINE:
+            return (self.itemDataMap[key1][CONTENT_PATH], self.itemDataMap[key2][CONTENT_PATH])
+        elif col == CONTENT_PATH:
+            return (self.itemDataMap[key1][CONTENT_LINE], self.itemDataMap[key2][CONTENT_LINE])
+        else:
+            return (
+                (self.itemDataMap[key1][CONTENT_PATH], self.itemDataMap[key1][CONTENT_LINE]),
+                (self.itemDataMap[key2][CONTENT_PATH], self.itemDataMap[key2][CONTENT_LINE])
+            )
 
     def create_image_list(self):
         """Create the image list."""
@@ -424,4 +449,80 @@ class ResultContentList(DynamicList):
                     file_row, col=FILE_PATH, absolute=True
                 )
                 fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
+        event.Skip()
+
+    def open_editor(self, event, item):
+        """Open file(s) in editor."""
+
+        if item != -1:
+            target = None
+            with self.wait:
+                file_row = self.get_map_item(item, col=CONTENT_KEY)
+                filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
+                    file_row, col=FILE_PATH, absolute=True
+                )
+                target = os.path.join(path, filename)
+                line = self.GetItem(item, col=CONTENT_LINE).GetText()
+                col = str(self.get_map_item(item, col=CONTENT_COL))
+            if target:
+                fileops.open_editor(target, line, col)
+        else:
+            found = set()
+            item = self.GetFirstSelected()
+            while item != -1:
+                target = None
+                with self.wait:
+                    file_row = self.get_map_item(item, col=CONTENT_KEY)
+                    filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                    path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
+                        file_row, col=FILE_PATH, absolute=True
+                    )
+                    target = os.path.join(path, filename)
+                    line = self.GetItem(item, col=CONTENT_LINE).GetText()
+                    col = str(self.get_map_item(item, col=CONTENT_COL))
+                if target and target not in found:
+                    found.add(target)
+                    fileops.open_editor(target, line, col)
+                item = self.GetNextSelected(item)
+
+    def on_rclick(self, event):
+        """Show context menu on right click."""
+
+        target = None
+        enabled = False
+        bulk_enabled = False
+        with self.wait:
+            pos = event.GetPosition()
+            item = self.HitTestSubItem(pos)[0]
+            if item != -1:
+                file_row = self.get_map_item(item, col=CONTENT_KEY)
+                filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
+                    file_row, col=FILE_PATH, absolute=True
+                )
+                target = os.path.join(path, filename)
+                selected = self.IsSelected(item)
+                select_count = self.GetSelectedItemCount()
+                enabled = not selected or (selected and select_count == 1)
+                bulk_enabled = not selected or (selected and select_count <= BULK_MAX)
+                # Select if not already
+                if not selected:
+                    s = self.GetFirstSelected()
+                    while s != -1:
+                        if s != item:
+                            self.Select(s, False)
+                        s = self.GetNextSelected(s)
+        if target is not None:
+            if not enabled:
+                item = -1
+            # Open menu
+            ContextMenu(
+                self,
+                [
+                    (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
+                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
+                ],
+                pos
+            )
         event.Skip()
