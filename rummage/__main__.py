@@ -27,6 +27,10 @@ from .lib import util
 from .lib import __meta__
 from .lib.gui.app import rummage_app
 
+if sys.executable.endswith("pythonw.exe"):
+    sys.stdout = open(os.devnull, "w")
+    sys.stderr = open(os.devnull, "w")
+
 
 def parse_arguments():
     """Parse the arguments."""
