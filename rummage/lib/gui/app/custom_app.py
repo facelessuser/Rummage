@@ -94,11 +94,6 @@ class CustomApp(wx.App):
 
         return self.instance_okay
 
-    def OnExit(self):  # noqa
-        """Cleanup instance check."""
-
-        return 0
-
 
 class ArgPipeThread(object):
     """Argument pipe thread for receiving arguments from another instance."""
@@ -285,7 +280,7 @@ class PipeApp(CustomApp):
                 running = self.pipe_thread.IsRunning()
                 time.sleep(0.1)
             self.pipe_thread = None
-        return CustomApp.OnExit(self)
+        return wx.App.OnExit(self)
 
     def on_pipe_args(self, event):
         """An overridable event for when pipe arguments are received."""
@@ -312,7 +307,7 @@ class CustomLog(wx.Log):
 
         self.no_redirect = no_redirect
 
-        super(CustomLog, self).__init__()
+        wx.Log.__init__(self)
 
     def DoLogText(self, msg):
         """Log the text."""
@@ -400,7 +395,7 @@ class CustomLogGui(wx.LogGui):
         except Exception as e:
             self.file_name = None
 
-        super(CustomLogGui, self).__init__()
+        wx.LogGui.__init__(self)
 
     def DoLogText(self, msg):
         """Log the text."""
@@ -420,7 +415,7 @@ class CustomLogGui(wx.LogGui):
                 (self.format % {"message": msg})
             )
 
-        super(CustomLogGui, self).DoLogText(msg)
+        wx.LogGui.DoLogText(self, msg)
 
     def DoLogTextAtLevel(self, level, msg):
         """Perform log at level."""

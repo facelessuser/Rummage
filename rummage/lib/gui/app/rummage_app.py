@@ -73,9 +73,8 @@ class RummageApp(PipeApp):
     def OnExit(self):
         """Handle exit."""
 
-        value = PipeApp.OnExit(self)
         Settings.unload()
-        return value
+        return PipeApp.OnExit(self)
 
     def on_pipe_args(self, event):
         """

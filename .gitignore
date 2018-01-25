@@ -50,3 +50,4 @@ site/*
 .cache
 
 *.patch
+.idea/*

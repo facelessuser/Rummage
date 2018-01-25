@@ -2074,13 +2074,13 @@ class RummageFrame(gui.RummageFrame):
     def on_close(self, event):
         """Ensure thread is stopped, notifications are destroyed."""
 
+        event.Skip()
         global _ABORT
 
         if self.thread is not None:
             _ABORT = True
         self.m_statusbar.kill_timers()
         notify.destroy_notifications()
-        event.Skip()
 
     def on_test_regex(self, event):
         """Show regex test dialog."""
