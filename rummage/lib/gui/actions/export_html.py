@@ -55,8 +55,9 @@ HTML_HEADER = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w
 RESULT_ROW = '''
 <tr>
 <td>%(file)s</td>
-<td sorttable_customkey="%(size_sort)s">%(size)s</td>
 <td>%(matches)s</td>
+<td>%(extensions)s</td>
+<td sorttable_customkey="%(size_sort)s">%(size)s</td>
 <td>%(path)s</td>
 <td>%(encoding)s</td>
 <td sorttable_customkey="%(mod_sort)s">%(modified)s</td>
@@ -67,8 +68,9 @@ RESULT_ROW = '''
 RESULT_TABLE_HEADER = '''
 <tr>
 <th>%(file)s</th>
-<th>%(size)s</th>
 <th>%(matches)s</th>
+<th>%(extensions)s</th>
+<th>%(size)s</th>
 <th>%(path)s</th>
 <th>%(encoding)s</th>
 <th>%(modified)s</th>
@@ -81,6 +83,7 @@ RESULT_CONTENT_ROW = '''
 <td sorttable_customkey="%(file_sort)s">%(file)s</td>
 <td>%(line)s</td>
 <td>%(matches)s</td>
+<td>%(extensions)s</td>
 <td>%(context)s</td>
 </tr>
 '''
@@ -90,6 +93,7 @@ RESULT_CONTENT_TABLE_HEADER = '''
 <th>%(file)s</th>
 <th>%(line)s</th>
 <th>%(matches)s</th>
+<th>%(extensions)s</th>
 <th>%(context)s</th>
 </tr>
 '''
@@ -162,8 +166,9 @@ def export_result_list(res, html):
     html.write(
         RESULT_TABLE_HEADER % {
             "file": html_encode(_("File")),
-            "size": html_encode(_("Size")),
             "matches": html_encode(_("Matches")),
+            "extensions": html_encode(_("Extensions")),
+            "size": html_encode(_("Size")),
             "path": html_encode(_("Path")),
             "encoding": html_encode(_("Encoding")),
             "modified": html_encode(_("Modified")),
@@ -175,15 +180,16 @@ def export_result_list(res, html):
         html.write(
             RESULT_ROW % {
                 "file": html_encode(item[0]),
-                "size_sort": util.to_ustr(item[1]),
-                "size": '%.2fKB' % item[1],
-                "matches": util.to_ustr(item[2]),
-                "path": html_encode(item[3]),
-                "encoding": item[4],
-                "mod_sort": util.to_ustr(item[5]),
-                "modified": time.ctime(item[5]),
-                "cre_sort": util.to_ustr(item[6]),
-                "created": time.ctime(item[6])
+                "matches": util.to_ustr(item[1]),
+                "extensions": html_encode(item[2]),
+                "size_sort": util.to_ustr(item[3]),
+                "size": '%.2fKB' % item[3],
+                "path": html_encode(item[4]),
+                "encoding": item[5],
+                "mod_sort": util.to_ustr(item[6]),
+                "modified": time.ctime(item[6]),
+                "cre_sort": util.to_ustr(item[7]),
+                "created": time.ctime(item[7])
             }
         )
     html.write('</table>')
@@ -202,6 +208,7 @@ def export_result_content_list(res, html):
             "file": html_encode(_("File")),
             "line": html_encode(_("Line")),
             "matches": html_encode(_("Matches")),
+            "extensions": html_encode(_("Extensions")),
             "context": html_encode(_("Context"))
         }
     )
@@ -213,7 +220,8 @@ def export_result_content_list(res, html):
                 "file": html_encode(item[0][0]),
                 "line": util.to_ustr(item[1]),
                 "matches": util.to_ustr(item[2]),
-                "context": html_encode(item[3])
+                "extensions": html_encode(item[3]),
+                "context": html_encode(item[4])
             }
         )
     html.write('</table>')

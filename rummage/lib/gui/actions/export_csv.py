@@ -10,8 +10,8 @@ from ... import rumcore
 if util.platform() == "windows":
     from os import startfile
 
-RESULT_ROW = '%(file)s,%(size)s,%(matches)s,%(path)s,%(encoding)s,%(modified)s,%(created)s\n'
-RESULT_CONTENT_ROW = '%(file)s,%(line)s,%(matches)s,%(context)s\n'
+RESULT_ROW = '%(file)s,%(matches)s,%(extensions)s,%(size)s,%(path)s,%(encoding)s,%(modified)s,%(created)s\n'
+RESULT_CONTENT_ROW = '%(file)s,%(line)s,%(matches)s,%(extensions)s,%(context)s\n'
 
 
 def csv_encode(text):
@@ -34,7 +34,9 @@ def export_result_list(res, csv):
     if len(res) == 0:
         return
 
-    columns = (_('File'), _('Size'), _('Matches'), _('Path'), _('Encoding'), _('Modified'), _('Created'))
+    columns = (
+        _('File'), _('Matches'), _('Extensions'), _('Size'), _('Path'), _('Encoding'), _('Modified'), _('Created')
+    )
     result_table_header = ','.join([csv_encode(x) for x in columns]) + "\n"
 
     csv.write(result_table_header)
@@ -43,12 +45,13 @@ def export_result_list(res, csv):
         csv.write(
             RESULT_ROW % {
                 "file": csv_encode(item[0]),
-                "size": csv_encode('%.2fKB' % item[1]),
-                "matches": csv_encode(util.to_ustr(item[2])),
-                "path": csv_encode(item[3]),
-                "encoding": csv_encode(item[4]),
-                "modified": csv_encode(time.ctime(item[5])),
-                "created": csv_encode(time.ctime(item[6]))
+                "matches": csv_encode(util.to_ustr(item[1])),
+                "extensions": csv_encode(item[2]),
+                "size": csv_encode('%.2fKB' % item[3]),
+                "path": csv_encode(item[4]),
+                "encoding": csv_encode(item[5]),
+                "modified": csv_encode(time.ctime(item[6])),
+                "created": csv_encode(time.ctime(item[7]))
             }
         )
 
@@ -61,7 +64,7 @@ def export_result_content_list(res, csv):
     if len(res) == 0:
         return
 
-    columns = (_('File'), _('Line'), _('Matches'), _('Context'))
+    columns = (_('File'), _('Line'), _('Matches'), _('Extensions'), _('Context'))
     result_content_table_header = ','.join([csv_encode(x) for x in columns]) + "\n"
 
     csv.write(result_content_table_header)
@@ -72,7 +75,8 @@ def export_result_content_list(res, csv):
                 "file": csv_encode(item[0][0]),
                 "line": csv_encode(util.to_ustr(item[1])),
                 "matches": csv_encode(util.to_ustr(item[2])),
-                "context": csv_encode(item[3])
+                "extensions": csv_encode(item[3]),
+                "context": csv_encode(item[4])
             }
         )
 
