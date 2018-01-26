@@ -453,6 +453,9 @@ class RummageFrame ( wx.Frame ):
 		self.m_about_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ABOUT, u"&About Rummage", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_help_menu.Append( self.m_about_menuitem )
 		
+		self.m_update_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Check for Updates", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_help_menu.Append( self.m_update_menuitem )
+		
 		self.m_help_menu.AppendSeparator()
 		
 		self.m_documentation_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Documentation", wx.EmptyString, wx.ITEM_NORMAL )
@@ -500,6 +503,7 @@ class RummageFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.on_exit, id = self.m_quit_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_hide_limit, id = self.m_hide_limit_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_about, id = self.m_about_menuitem.GetId() )
+		self.Bind( wx.EVT_MENU, self.on_check_update, id = self.m_update_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_documentation, id = self.m_documentation_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_changelog, id = self.m_changelog_menuitem.GetId() )
 		self.Bind( wx.EVT_MENU, self.on_support, id = self.m_support_info_menuitem.GetId() )
@@ -569,6 +573,9 @@ class RummageFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_about( self, event ):
+		event.Skip()
+	
+	def on_check_update( self, event ):
 		event.Skip()
 	
 	def on_documentation( self, event ):
@@ -763,10 +770,16 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_general_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_general_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
-		bSizer16 = wx.BoxSizer( wx.VERTICAL )
+		fgSizer52 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer52.AddGrowableCol( 0 )
+		fgSizer52.SetFlexibleDirection( wx.BOTH )
+		fgSizer52.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
 		self.m_single_checkbox = wx.CheckBox( self.m_general_panel, wx.ID_ANY, u"Single Instance (applies to new instances)", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer16.Add( self.m_single_checkbox, 0, wx.ALL, 5 )
+		fgSizer52.Add( self.m_single_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_staticline10 = wx.StaticLine( self.m_general_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		fgSizer52.Add( self.m_staticline10, 0, wx.EXPAND |wx.ALL, 5 )
 		
 		fgSizer38 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer38.AddGrowableCol( 1 )
@@ -783,12 +796,31 @@ class SettingsDialog ( wx.Dialog ):
 		fgSizer38.Add( self.m_lang_choice, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
 		
-		bSizer16.Add( fgSizer38, 1, wx.EXPAND, 5 )
+		fgSizer52.Add( fgSizer38, 1, wx.EXPAND, 5 )
+		
+		self.m_staticline91 = wx.StaticLine( self.m_general_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		fgSizer52.Add( self.m_staticline91, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		fgSizer54 = wx.FlexGridSizer( 0, 3, 0, 0 )
+		fgSizer54.SetFlexibleDirection( wx.BOTH )
+		fgSizer54.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_update_checkbox = wx.CheckBox( self.m_general_panel, wx.ID_ANY, u"Check for updates daily", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer54.Add( self.m_update_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_prerelease_checkbox = wx.CheckBox( self.m_general_panel, wx.ID_ANY, u"Include prereleases", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer54.Add( self.m_prerelease_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_check_update_button = wx.Button( self.m_general_panel, wx.ID_ANY, u"Check Now", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer54.Add( self.m_check_update_button, 0, wx.ALL, 5 )
 		
 		
-		self.m_general_panel.SetSizer( bSizer16 )
+		fgSizer52.Add( fgSizer54, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_general_panel.SetSizer( fgSizer52 )
 		self.m_general_panel.Layout()
-		bSizer16.Fit( self.m_general_panel )
+		fgSizer52.Fit( self.m_general_panel )
 		self.m_settings_notebook.AddPage( self.m_general_panel, u"General", False )
 		self.m_regex_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_regex_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
@@ -1012,6 +1044,9 @@ class SettingsDialog ( wx.Dialog ):
 		# Connect Events
 		self.m_single_checkbox.Bind( wx.EVT_CHECKBOX, self.on_single_toggle )
 		self.m_lang_choice.Bind( wx.EVT_CHOICE, self.on_language )
+		self.m_update_checkbox.Bind( wx.EVT_CHECKBOX, self.on_update_toggle )
+		self.m_prerelease_checkbox.Bind( wx.EVT_CHECKBOX, self.on_prerelease_toggle )
+		self.m_check_update_button.Bind( wx.EVT_BUTTON, self.on_check )
 		self.m_re_radio.Bind( wx.EVT_RADIOBUTTON, self.on_re_toggle )
 		self.m_bre_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bre_toggle )
 		self.m_regex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_regex_toggle )
@@ -1039,6 +1074,15 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_language( self, event ):
+		event.Skip()
+	
+	def on_update_toggle( self, event ):
+		event.Skip()
+	
+	def on_prerelease_toggle( self, event ):
+		event.Skip()
+	
+	def on_check( self, event ):
 		event.Skip()
 	
 	def on_re_toggle( self, event ):
