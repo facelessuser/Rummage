@@ -20,11 +20,13 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import os
+import time
 from ..settings import Settings
 from ..app.custom_app import error
-from ..generic_dialogs import errormsg
+from ..generic_dialogs import errormsg, infomsg
 from ..localization import _
 from ... import util
+from . import checksum
 
 
 def open_editor(filename, line, col):
@@ -52,3 +54,19 @@ def reveal(event, target):
         target = os.path.dirname(target)
 
     return util.call(cmd[util.platform()] % target.replace('"', '\\"'))
+
+
+def get_checksum(event, h, target):
+    """Checksum file."""
+
+    with open(target, 'rb') as f:
+        if h in checksum.VALID_HASH:
+            alg = checksum.get_hash(h)
+        hasher = checksum.HashThread(f, alg)
+        hasher.start()
+        while hasher.is_alive():
+            time.sleep(0.5)
+            # debug('working')
+        if hasher.error:
+            errormsg(hasher.error)
+        infomsg(util.ustr(alg.hexdigest()))

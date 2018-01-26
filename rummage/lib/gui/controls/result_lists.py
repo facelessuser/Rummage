@@ -29,6 +29,7 @@ from ..actions import fileops
 from ..localization import _
 from .. import data
 from ... import util
+from ..actions import checksum
 
 CONTENT_PATH = 0
 CONTENT_LINE = 1
@@ -67,16 +68,21 @@ class ContextMenu(wx.Menu):
         self._callbacks = {}
 
         for i in menu:
-            if i is not None:
-                menuid = wx.NewId()
-                item = wx.MenuItem(self, menuid, i[0])
-                self._callbacks[menuid] = i[1]
-                self.Append(item)
-                if len(i) > 2 and not i[2]:
-                    self.Enable(menuid, False)
-                self.Bind(wx.EVT_MENU, self.on_callback, item)
-            else:
+            if i is None:
                 self.AppendSeparator()
+            elif i is not None:
+                if isinstance(i[1], wx.Menu):
+                    item = self.AppendSubMenu(i[1], i[0])
+                    if len(i) > 2 and not i[2]:
+                        self.Enable(item.GetId(), False)
+                else:
+                    menuid = wx.NewId()
+                    item = wx.MenuItem(self, menuid, i[0])
+                    self._callbacks[menuid] = i[1]
+                    self.Append(item)
+                    if len(i) > 2 and not i[2]:
+                        self.Enable(menuid, False)
+                    self.Bind(wx.EVT_MENU, self.on_callback, item)
 
     def on_callback(self, event):
         """Execute the menu item callback."""
@@ -133,6 +139,7 @@ class ResultFileList(DynamicList):
         }
         self.COPY_NAME = _("Copy File Names")
         self.COPY_PATH = _("Copy File Paths")
+        self.CHECKSUM_LABEL = _("Checksum")
 
     def create_image_list(self):
         """Create the image list."""
@@ -318,6 +325,12 @@ class ResultFileList(DynamicList):
         if target is not None:
             if not enabled:
                 item = -1
+
+            hash_entries = []
+            for h in checksum.VALID_HASH:
+                hash_entries.append((h, functools.partial(fileops.get_checksum, h=h, target=target)))
+            checksum_menu = ContextMenu(hash_entries)
+
             # Open menu
             menu = ContextMenu(
                 [
@@ -325,7 +338,8 @@ class ResultFileList(DynamicList):
                     (self.COPY_PATH, functools.partial(self.copy, col=FILE_PATH), True),
                     None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
-                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
+                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled),
+                    (self.CHECKSUM_LABEL, checksum_menu, (enabled and self.complete))
                 ]
             )
             self.PopupMenu(menu, pos)
@@ -375,6 +389,7 @@ class ResultContentList(DynamicList):
         self.COPY_NAME = _("Copy File Names")
         self.COPY_PATH = _("Copy File Paths")
         self.COPY_CONTENT = _("Copy File Content")
+        self.CHECKSUM_LABEL = _("Checksum")
 
     def GetSecondarySortValues(self, col, key1, key2):
         """Get secondary sort values."""
@@ -582,6 +597,12 @@ class ResultContentList(DynamicList):
         if target is not None:
             if not enabled:
                 item = -1
+
+            hash_entries = []
+            for h in checksum.VALID_HASH:
+                hash_entries.append((h, functools.partial(fileops.get_checksum, h=h, target=target)))
+            checksum_menu = ContextMenu(hash_entries)
+
             # Open menu
             menu = ContextMenu(
                 [
@@ -590,7 +611,8 @@ class ResultContentList(DynamicList):
                     (self.COPY_CONTENT, functools.partial(self.copy, col=CONTENT_TEXT), True),
                     None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
-                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
+                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled),
+                    (self.CHECKSUM_LABEL, checksum_menu, (enabled and self.complete))
                 ]
             )
             self.PopupMenu(menu, pos)
