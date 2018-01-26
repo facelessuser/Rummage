@@ -69,4 +69,5 @@ def get_checksum(event, h, target):
             # debug('working')
         if hasher.error:
             errormsg(hasher.error)
-        infomsg(util.ustr(alg.hexdigest()))
+        else:
+            infomsg(util.ustr(alg.hexdigest()))

@@ -65,31 +65,27 @@ class ContextMenu(wx.Menu):
         """Attach the context menu to to the parent with the defined items."""
 
         wx.Menu.__init__(self)
-        self._callbacks = {}
+        self.create_menu(self, menu)
 
+    def create_menu(self, parent, menu):
+        """Create menu."""
         for i in menu:
             if i is None:
-                self.AppendSeparator()
+                parent.AppendSeparator()
             elif i is not None:
-                if isinstance(i[1], wx.Menu):
-                    item = self.AppendSubMenu(i[1], i[0])
+                if isinstance(i[1], list):
+                    submenu = wx.Menu()
+                    self.create_menu(submenu, i[1])
+                    item = parent.AppendSubMenu(submenu, i[0])
                     if len(i) > 2 and not i[2]:
-                        self.Enable(item.GetId(), False)
+                        parent.Enable(item.GetId(), False)
                 else:
                     menuid = wx.NewId()
                     item = wx.MenuItem(self, menuid, i[0])
-                    self._callbacks[menuid] = i[1]
-                    self.Append(item)
+                    parent.Append(item)
                     if len(i) > 2 and not i[2]:
-                        self.Enable(menuid, False)
-                    self.Bind(wx.EVT_MENU, self.on_callback, item)
-
-    def on_callback(self, event):
-        """Execute the menu item callback."""
-
-        menuid = event.GetId()
-        self._callbacks[menuid](event)
-        event.Skip()
+                        parent.Enable(menuid, False)
+                    self.Bind(wx.EVT_MENU, i[1], item)
 
 
 class ResultFileList(DynamicList):
@@ -329,17 +325,16 @@ class ResultFileList(DynamicList):
             hash_entries = []
             for h in checksum.VALID_HASH:
                 hash_entries.append((h, functools.partial(fileops.get_checksum, h=h, target=target)))
-            checksum_menu = ContextMenu(hash_entries)
 
             # Open menu
             menu = ContextMenu(
                 [
-                    (self.COPY_NAME, functools.partial(self.copy, col=FILE_NAME), True),
-                    (self.COPY_PATH, functools.partial(self.copy, col=FILE_PATH), True),
+                    (self.COPY_NAME, functools.partial(self.copy, col=FILE_NAME)),
+                    (self.COPY_PATH, functools.partial(self.copy, col=FILE_PATH)),
                     None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
                     (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled),
-                    (self.CHECKSUM_LABEL, checksum_menu, (enabled and self.complete))
+                    (self.CHECKSUM_LABEL, hash_entries, (enabled and self.complete))
                 ]
             )
             self.PopupMenu(menu, pos)
@@ -601,18 +596,17 @@ class ResultContentList(DynamicList):
             hash_entries = []
             for h in checksum.VALID_HASH:
                 hash_entries.append((h, functools.partial(fileops.get_checksum, h=h, target=target)))
-            checksum_menu = ContextMenu(hash_entries)
 
             # Open menu
             menu = ContextMenu(
                 [
-                    (self.COPY_NAME, functools.partial(self.copy, col=CONTENT_PATH), True),
-                    (self.COPY_PATH, functools.partial(self.copy, col=CONTENT_PATH, from_file_tab=True), True),
-                    (self.COPY_CONTENT, functools.partial(self.copy, col=CONTENT_TEXT), True),
+                    (self.COPY_NAME, functools.partial(self.copy, col=CONTENT_PATH)),
+                    (self.COPY_PATH, functools.partial(self.copy, col=CONTENT_PATH, from_file_tab=True)),
+                    (self.COPY_CONTENT, functools.partial(self.copy, col=CONTENT_TEXT)),
                     None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
                     (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled),
-                    (self.CHECKSUM_LABEL, checksum_menu, (enabled and self.complete))
+                    (self.CHECKSUM_LABEL, hash_entries, (enabled and self.complete))
                 ]
             )
             self.PopupMenu(menu, pos)
