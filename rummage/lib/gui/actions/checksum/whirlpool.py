@@ -798,7 +798,7 @@ def processBuffer(ctx):
     return
 
 
-def test_whirlpool_hash():
+if __name__ == "__main__":
     # Tests
     assert whirlpool(b'The quick brown fox jumps over the lazy dog').hexdigest() == \
         'b97de512e91e3828b40d2b0fdce9ceb3c4a71f9bea8d88e75c4fa854df36725fd2b52eb6544edcacd6f8beddfea403cb55ae31f03ad62a5ef54e42ee82c3fb35'

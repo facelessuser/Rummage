@@ -743,9 +743,8 @@ def tiger_finalize(tig):
         tiger_compress(bytearray([c for c in temp]), tig.res)
 
 
-def test_tiger_hash():
-    # TODO: Re-generate hashes with default endian
-    # Tests
+if __name__ == "__main__":
+    BIG_ENDIAN = False
     assert tiger(b'').hexdigest() == \
         '24f0130c63ac933216166e76b1bb925ff373de2d49584e7a'
     assert tiger(b'abc').hexdigest() == \
@@ -782,3 +781,41 @@ def test_tiger_hash():
     test.update(b'The quick brown fox jumps over the lazy dog')
     assert test.hexdigest() == \
         "33b3d0fbc7b8a2559b7b4689357d928c7202768b4c655f49"
+
+    BIG_ENDIAN = True
+    assert tiger(b'').hexdigest() == \
+        '3293ac630c13f0245f92bbb1766e16167a4e58492dde73f3'
+    assert tiger(b'abc').hexdigest() == \
+        '2aab1484e8c158f2bfb8c5ff41b57a525129131c957b5f93'
+    assert tiger(b'Tiger').hexdigest() == \
+        'dd00230799f5009fec6debc838bb6a27df2b9d6f110c7937'
+    assert tiger(b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-").hexdigest() == \
+        'f71c8583902afb879edfe610f82c0d4786a3a534504486b5'
+    assert tiger(b"ABCDEFGHIJKLMNOPQRSTUVWXYZ=abcdefghijklmnopqrstuvwxyz+0123456789").hexdigest() == \
+        '48ceeb6308b87d46e95d656112cdf18d97915f9765658957'
+    assert tiger(b"Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham").hexdigest() == \
+        '8a866829040a410c729ad23f5ada711603b3cdd357e4c15e'
+    assert tiger(
+        b"Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham, "
+        b"proceedings of Fast Software Encryption 3, Cambridge."
+    ).hexdigest() == \
+        'ce55a6afd591f5ebac547ff84f89227f9331dab0b611c889'
+    assert tiger(
+        b"Tiger - A Fast New Hash Function, by Ross Anderson and"
+        b" Eli Biham, proceedings of Fast Software Encryption 3, Cambridge, 1996."
+    ).hexdigest() == \
+        '631abdd103eb9a3d245b6dfd4d77b257fc7439501d1568dd'
+    assert tiger(
+        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01"
+        b"23456789+-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345"
+        b"6789+-"
+    ).hexdigest() == \
+        'c54034e5b43eb8005848a7e0ae6aac76e4ff590ae715fd25'
+    # Chunked
+    test = tiger(b'The quick brown fox jumps over the lazy dog')
+    test.update(b'The quick brown fox jumps over the lazy dog')
+    test.update(b'The quick brown fox jumps over the lazy dog')
+    test.update(b'The quick brown fox jumps over the lazy dog')
+    test.update(b'The quick brown fox jumps over the lazy dog')
+    assert test.hexdigest() == \
+        "55a2b8c7fbd0b3338c927d3589467b9b495f654c8b760272"
