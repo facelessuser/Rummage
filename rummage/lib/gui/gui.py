@@ -801,7 +801,7 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_staticline91 = wx.StaticLine( self.m_general_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		fgSizer52.Add( self.m_staticline91, 0, wx.EXPAND |wx.ALL, 5 )
 		
-		fgSizer54 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer54 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		fgSizer54.SetFlexibleDirection( wx.BOTH )
 		fgSizer54.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
@@ -810,6 +810,9 @@ class SettingsDialog ( wx.Dialog ):
 		
 		self.m_prerelease_checkbox = wx.CheckBox( self.m_general_panel, wx.ID_ANY, u"Include prereleases", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer54.Add( self.m_prerelease_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_check_update_button = wx.Button( self.m_general_panel, wx.ID_ANY, u"Check Now", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer54.Add( self.m_check_update_button, 0, wx.ALL, 5 )
 		
 		
 		fgSizer52.Add( fgSizer54, 1, wx.EXPAND, 5 )
@@ -1043,6 +1046,7 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_lang_choice.Bind( wx.EVT_CHOICE, self.on_language )
 		self.m_update_checkbox.Bind( wx.EVT_CHECKBOX, self.on_update_toggle )
 		self.m_prerelease_checkbox.Bind( wx.EVT_CHECKBOX, self.on_prerelease_toggle )
+		self.m_check_update_button.Bind( wx.EVT_BUTTON, self.on_check )
 		self.m_re_radio.Bind( wx.EVT_RADIOBUTTON, self.on_re_toggle )
 		self.m_bre_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bre_toggle )
 		self.m_regex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_regex_toggle )
@@ -1076,6 +1080,9 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_prerelease_toggle( self, event ):
+		event.Skip()
+	
+	def on_check( self, event ):
 		event.Skip()
 	
 	def on_re_toggle( self, event ):

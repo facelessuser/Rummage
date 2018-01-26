@@ -180,6 +180,7 @@ class SettingsDialog(gui.SettingsDialog):
         )
         self.CHECK_UPDATES = _("Check updates daily")
         self.PRERELEASES = _("Include pre-releases")
+        self.CHECK_NOW = _("Check now")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -210,12 +211,18 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_back_folder_button.SetLabel(self.SAVE)
         self.m_update_checkbox.SetLabel(self.CHECK_UPDATES)
         self.m_prerelease_checkbox.SetLabel(self.PRERELEASES)
+        self.m_check_update_button.SetLabel(self.CHECK_NOW)
         self.Fit()
 
     def history_cleared(self):
         """Return if history was cleared."""
 
         return self.history_records_cleared
+
+    def on_check(self, event):
+        """Check updates."""
+
+        self.GetParent().update_request(Settings.get_prerelease())
 
     def on_editor_change(self, event):
         """Show editor dialog and update setting on return."""
