@@ -584,7 +584,7 @@ class ResultContentList(DynamicList):
                 if col == CONTENT_PATH:
                     if from_file_tab:
                         file_row = self.get_map_item(item, col=CONTENT_KEY)
-                        path = self.main_window.get_map_item(
+                        path = self.main_window.m_result_file_list.get_map_item(
                             file_row, col=FILE_PATH, absolute=True
                         )
                         filename = self.GetItem(item, col=CONTENT_PATH).GetText()
@@ -612,7 +612,7 @@ class ResultContentList(DynamicList):
             while item != -1:
                 if self.IsSelected(item):
                     file_row = self.get_map_item(item, col=CONTENT_KEY)
-                    path = self.main_window.get_map_item(
+                    path = self.main_window.m_result_file_list.get_map_item(
                         file_row, col=FILE_PATH, absolute=True
                     )
                     filename = self.GetItem(item, col=CONTENT_PATH).GetText()
