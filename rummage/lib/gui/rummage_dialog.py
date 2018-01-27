@@ -48,6 +48,7 @@ from .search_chain_dialog import SearchChainDialog
 from .export_settings_dialog import ExportSettingsDialog
 from .import_settings_dialog import ImportSettingsDialog
 from .support_info_dialog import SupportInfoDialog
+from .checksum_dialog import ChecksumDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .controls import pick_button
@@ -1899,6 +1900,13 @@ class RummageFrame(gui.RummageFrame):
             text.SelectAll()
         event.Skip()
 
+    def on_checksum(self, event, h, target):
+        """Handle checksum request."""
+
+        dlg = ChecksumDialog(self, target, h)
+        dlg.ShowModal()
+        dlg.Destroy()
+
     def on_chain_click(self, event):
         """Chain button click."""
 
@@ -2107,13 +2115,13 @@ class RummageFrame(gui.RummageFrame):
     def on_close(self, event):
         """Ensure thread is stopped, notifications are destroyed."""
 
-        event.Skip()
         global _ABORT
 
         if self.thread is not None:
             _ABORT = True
         self.m_statusbar.tear_down()
         notify.destroy_notifications()
+        event.Skip()
 
     def on_test_regex(self, event):
         """Show regex test dialog."""

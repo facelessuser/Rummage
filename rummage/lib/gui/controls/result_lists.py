@@ -29,6 +29,7 @@ from ..actions import fileops
 from ..localization import _
 from .. import data
 from ... import util
+from ..actions import checksum
 
 CONTENT_PATH = 0
 CONTENT_LINE = 1
@@ -64,26 +65,30 @@ class ContextMenu(wx.Menu):
         """Attach the context menu to to the parent with the defined items."""
 
         wx.Menu.__init__(self)
-        self._callbacks = {}
+        self.create_menu(self, menu)
 
+    def create_menu(self, parent, menu):
+        """Create menu."""
         for i in menu:
-            if i is not None:
-                menuid = wx.NewId()
-                item = wx.MenuItem(self, menuid, i[0])
-                self._callbacks[menuid] = i[1]
-                self.Append(item)
-                if len(i) > 2 and not i[2]:
-                    self.Enable(menuid, False)
-                self.Bind(wx.EVT_MENU, self.on_callback, item)
-            else:
-                self.AppendSeparator()
-
-    def on_callback(self, event):
-        """Execute the menu item callback."""
-
-        menuid = event.GetId()
-        self._callbacks[menuid](event)
-        event.Skip()
+            if i is None:
+                parent.AppendSeparator()
+            elif i is not None:
+                if isinstance(i[1], list):
+                    submenu = wx.Menu()
+                    self.create_menu(submenu, i[1])
+                    item = parent.AppendSubMenu(submenu, i[0])
+                    if len(i) > 2 and not i[2]:
+                        parent.Enable(item.GetId(), False)
+                else:
+                    menuid = wx.NewId()
+                    item = wx.MenuItem(self, menuid, i[0])
+                    parent.Append(item)
+                    if len(i) > 2 and not i[2]:
+                        parent.Enable(menuid, False)
+                    if util.platform() == 'windows':
+                        self.Bind(wx.EVT_MENU, i[1], item)
+                    else:
+                        parent.Bind(wx.EVT_MENU, i[1], item)
 
 
 class ResultFileList(DynamicList):
@@ -133,6 +138,7 @@ class ResultFileList(DynamicList):
         }
         self.COPY_NAME = _("Copy File Names")
         self.COPY_PATH = _("Copy File Paths")
+        self.CHECKSUM_LABEL = _("Checksum")
 
     def create_image_list(self):
         """Create the image list."""
@@ -197,7 +203,7 @@ class ResultFileList(DynamicList):
                 if actual_item != self.last_moused[0]:
                     d = self.itemDataMap[actual_item]
                     self.last_moused = (actual_item, os.path.join(d[FILE_PATH], d[FILE_NAME]))
-                self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
+                self.main_window.m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
     def get_item_text(self, item, col, absolute=False):
@@ -291,6 +297,16 @@ class ResultFileList(DynamicList):
                     pass
                 wx.TheClipboard.Close()
 
+    def open_hash(self, event, target, h):
+        """
+        Open hash.
+
+        Due to the layout, we get circular dependencies if we try and include ChecksumDialog here.
+        So we have the call occor from the parent.
+        """
+
+        self.main_window.on_checksum(event, target, h)
+
     def on_rclick(self, event):
         """Show context menu on right click."""
 
@@ -318,14 +334,20 @@ class ResultFileList(DynamicList):
         if target is not None:
             if not enabled:
                 item = -1
+
+            hash_entries = []
+            for h in checksum.VALID_HASH:
+                hash_entries.append((h, functools.partial(self.open_hash, h=h, target=target)))
+
             # Open menu
             menu = ContextMenu(
                 [
-                    (self.COPY_NAME, functools.partial(self.copy, col=FILE_NAME), True),
-                    (self.COPY_PATH, functools.partial(self.copy, col=FILE_PATH), True),
+                    (self.COPY_NAME, functools.partial(self.copy, col=FILE_NAME)),
+                    (self.COPY_PATH, functools.partial(self.copy, col=FILE_PATH)),
                     None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
-                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
+                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled),
+                    (self.CHECKSUM_LABEL, hash_entries, (enabled and self.complete))
                 ]
             )
             self.PopupMenu(menu, pos)
@@ -375,6 +397,7 @@ class ResultContentList(DynamicList):
         self.COPY_NAME = _("Copy File Names")
         self.COPY_PATH = _("Copy File Paths")
         self.COPY_CONTENT = _("Copy File Content")
+        self.CHECKSUM_LABEL = _("Checksum")
 
     def GetSecondarySortValues(self, col, key1, key2):
         """Get secondary sort values."""
@@ -416,7 +439,7 @@ class ResultContentList(DynamicList):
                 if actual_item != self.last_moused[0]:
                     pth = self.itemDataMap[actual_item][CONTENT_PATH]
                     self.last_moused = (actual_item, os.path.join(pth[1], pth[0]))
-                self.GetParent().GetParent().GetParent().GetParent().m_statusbar.set_timed_status(self.last_moused[1])
+                self.main_window.m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
     def get_item_text(self, item, col, absolute=False):
@@ -480,7 +503,7 @@ class ResultContentList(DynamicList):
                 line = self.GetItem(item, col=CONTENT_LINE).GetText()
                 file_row = self.get_map_item(item, col=CONTENT_KEY)
                 col = str(self.get_map_item(item, col=CONTENT_COL))
-                path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
+                path = self.main_window.m_result_file_list.get_map_item(
                     file_row, col=FILE_PATH, absolute=True
                 )
                 fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
@@ -494,7 +517,7 @@ class ResultContentList(DynamicList):
             with self.wait:
                 file_row = self.get_map_item(item, col=CONTENT_KEY)
                 filename = self.GetItem(item, col=CONTENT_PATH).GetText()
-                path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
+                path = self.main_window.m_result_file_list.get_map_item(
                     file_row, col=FILE_PATH, absolute=True
                 )
                 target = os.path.join(path, filename)
@@ -510,7 +533,7 @@ class ResultContentList(DynamicList):
                 with self.wait:
                     file_row = self.get_map_item(item, col=CONTENT_KEY)
                     filename = self.GetItem(item, col=CONTENT_PATH).GetText()
-                    path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
+                    path = self.main_window.m_result_file_list.get_map_item(
                         file_row, col=FILE_PATH, absolute=True
                     )
                     target = os.path.join(path, filename)
@@ -524,7 +547,6 @@ class ResultContentList(DynamicList):
     def copy(self, event, col, from_file_tab=False):
         """Copy the content time from the result list."""
 
-        parent = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list
         copy_bfr = []
 
         item = self.GetFirstSelected()
@@ -533,7 +555,7 @@ class ResultContentList(DynamicList):
                 if col == CONTENT_PATH:
                     if from_file_tab:
                         file_row = self.get_map_item(item, col=CONTENT_KEY)
-                        path = parent.get_map_item(
+                        path = self.main_window.get_map_item(
                             file_row, col=FILE_PATH, absolute=True
                         )
                         filename = self.GetItem(item, col=CONTENT_PATH).GetText()
@@ -564,7 +586,7 @@ class ResultContentList(DynamicList):
             if item != -1:
                 file_row = self.get_map_item(item, col=CONTENT_KEY)
                 filename = self.GetItem(item, col=CONTENT_PATH).GetText()
-                path = self.GetParent().GetParent().GetParent().GetParent().m_result_file_list.get_map_item(
+                path = self.main_window.m_result_file_list.get_map_item(
                     file_row, col=FILE_PATH, absolute=True
                 )
                 target = os.path.join(path, filename)
@@ -582,15 +604,21 @@ class ResultContentList(DynamicList):
         if target is not None:
             if not enabled:
                 item = -1
+
+            hash_entries = []
+            for h in checksum.VALID_HASH:
+                hash_entries.append((h, functools.partial(self.main_window.on_checksum, h=h, target=target)))
+
             # Open menu
             menu = ContextMenu(
                 [
-                    (self.COPY_NAME, functools.partial(self.copy, col=CONTENT_PATH), True),
-                    (self.COPY_PATH, functools.partial(self.copy, col=CONTENT_PATH, from_file_tab=True), True),
-                    (self.COPY_CONTENT, functools.partial(self.copy, col=CONTENT_TEXT), True),
+                    (self.COPY_NAME, functools.partial(self.copy, col=CONTENT_PATH)),
+                    (self.COPY_PATH, functools.partial(self.copy, col=CONTENT_PATH, from_file_tab=True)),
+                    (self.COPY_CONTENT, functools.partial(self.copy, col=CONTENT_TEXT)),
                     None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
-                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled)
+                    (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled),
+                    (self.CHECKSUM_LABEL, hash_entries, (enabled and self.complete))
                 ]
             )
             self.PopupMenu(menu, pos)

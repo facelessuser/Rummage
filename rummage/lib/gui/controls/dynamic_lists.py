@@ -64,6 +64,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
                 ]
             )
 
+        self.main_window = self.GetParent().GetParent().GetParent().GetParent()
         self.sort_init = True
         self.complete = False
         self.resize_complete = False
