@@ -595,6 +595,88 @@ class RummageFrame ( wx.Frame ):
 	
 
 ###########################################################################
+## Class GenericProgressDialog
+###########################################################################
+
+class GenericProgressDialog ( wx.Dialog ):
+	
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Generic Progress", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+		
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		
+		bSizer21 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_panel26 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		bSizer22 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_progress_label = wx.StaticText( self.m_panel26, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_progress_label.Wrap( -1 )
+		bSizer22.Add( self.m_progress_label, 0, wx.ALL, 5 )
+		
+		self.m_progress = wx.Gauge( self.m_panel26, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
+		self.m_progress.SetValue( 0 ) 
+		bSizer22.Add( self.m_progress, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		fgSizer56 = wx.FlexGridSizer( 0, 4, 0, 0 )
+		fgSizer56.AddGrowableCol( 0 )
+		fgSizer56.AddGrowableCol( 3 )
+		fgSizer56.SetFlexibleDirection( wx.BOTH )
+		fgSizer56.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		
+		fgSizer56.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_okay_button = wx.Button( self.m_panel26, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer56.Add( self.m_okay_button, 0, wx.ALL, 5 )
+		
+		self.m_cancel_button = wx.Button( self.m_panel26, wx.ID_ANY, u"Abort", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer56.Add( self.m_cancel_button, 0, wx.ALL, 5 )
+		
+		
+		fgSizer56.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		bSizer22.Add( fgSizer56, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_panel26.SetSizer( bSizer22 )
+		self.m_panel26.Layout()
+		bSizer22.Fit( self.m_panel26 )
+		bSizer21.Add( self.m_panel26, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( bSizer21 )
+		self.Layout()
+		bSizer21.Fit( self )
+		
+		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.on_close )
+		self.Bind( wx.EVT_IDLE, self.on_idle )
+		self.m_okay_button.Bind( wx.EVT_BUTTON, self.on_okay_click )
+		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel_click )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_close( self, event ):
+		event.Skip()
+	
+	def on_idle( self, event ):
+		event.Skip()
+	
+	def on_okay_click( self, event ):
+		event.Skip()
+	
+	def on_cancel_click( self, event ):
+		event.Skip()
+	
+
+###########################################################################
 ## Class ChecksumDialog
 ###########################################################################
 
