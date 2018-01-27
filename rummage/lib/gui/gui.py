@@ -607,23 +607,27 @@ class ChecksumDialog ( wx.Dialog ):
 		
 		bSizer20 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_panel25 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		fgSizer54 = wx.FlexGridSizer( 4, 1, 0, 0 )
+		self.m_hash_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		fgSizer54 = wx.FlexGridSizer( 5, 1, 0, 0 )
 		fgSizer54.AddGrowableCol( 0 )
-		fgSizer54.AddGrowableRow( 1 )
+		fgSizer54.AddGrowableRow( 2 )
 		fgSizer54.SetFlexibleDirection( wx.BOTH )
 		fgSizer54.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_hash_label = wx.StaticText( self.m_panel25, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_file_label = wx.StaticText( self.m_hash_panel, wx.ID_ANY, u"File.ext", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_file_label.Wrap( -1 )
+		fgSizer54.Add( self.m_file_label, 0, wx.ALL, 5 )
+		
+		self.m_hash_label = wx.StaticText( self.m_hash_panel, wx.ID_ANY, u"Hash:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_hash_label.Wrap( -1 )
 		fgSizer54.Add( self.m_hash_label, 0, wx.ALL, 5 )
 		
-		self.m_hash_textbox = wx.TextCtrl( self.m_panel25, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
+		self.m_hash_textbox = wx.TextCtrl( self.m_hash_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
 		self.m_hash_textbox.SetMinSize( wx.Size( 200,50 ) )
 		
 		fgSizer54.Add( self.m_hash_textbox, 1, wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_hash_progress = wx.Gauge( self.m_panel25, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
+		self.m_hash_progress = wx.Gauge( self.m_hash_panel, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
 		self.m_hash_progress.SetValue( 0 ) 
 		fgSizer54.Add( self.m_hash_progress, 0, wx.ALL|wx.EXPAND, 5 )
 		
@@ -636,10 +640,10 @@ class ChecksumDialog ( wx.Dialog ):
 		
 		fgSizer55.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_okay_button = wx.Button( self.m_panel25, wx.ID_ANY, u"Okay", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_okay_button = wx.Button( self.m_hash_panel, wx.ID_ANY, u"Okay", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer55.Add( self.m_okay_button, 0, wx.ALL, 5 )
 		
-		self.m_cancel_button = wx.Button( self.m_panel25, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_cancel_button = wx.Button( self.m_hash_panel, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer55.Add( self.m_cancel_button, 0, wx.ALL, 5 )
 		
 		
@@ -649,10 +653,10 @@ class ChecksumDialog ( wx.Dialog ):
 		fgSizer54.Add( fgSizer55, 1, wx.EXPAND, 5 )
 		
 		
-		self.m_panel25.SetSizer( fgSizer54 )
-		self.m_panel25.Layout()
-		fgSizer54.Fit( self.m_panel25 )
-		bSizer20.Add( self.m_panel25, 1, wx.EXPAND |wx.ALL, 5 )
+		self.m_hash_panel.SetSizer( fgSizer54 )
+		self.m_hash_panel.Layout()
+		fgSizer54.Fit( self.m_hash_panel )
+		bSizer20.Add( self.m_hash_panel, 1, wx.EXPAND |wx.ALL, 5 )
 		
 		
 		self.SetSizer( bSizer20 )
@@ -664,6 +668,8 @@ class ChecksumDialog ( wx.Dialog ):
 		# Connect Events
 		self.Bind( wx.EVT_CLOSE, self.on_close )
 		self.Bind( wx.EVT_IDLE, self.on_idle )
+		self.m_okay_button.Bind( wx.EVT_BUTTON, self.on_okay_click )
+		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel_click )
 	
 	def __del__( self ):
 		pass
@@ -674,6 +680,12 @@ class ChecksumDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_idle( self, event ):
+		event.Skip()
+	
+	def on_okay_click( self, event ):
+		event.Skip()
+	
+	def on_cancel_click( self, event ):
 		event.Skip()
 	
 

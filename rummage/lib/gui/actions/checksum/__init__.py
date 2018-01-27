@@ -36,7 +36,13 @@ class HashThread(threading.Thread):
         self.obj = obj
         self.abort = False
         self.error = None
+        self.count = 0
         threading.Thread.__init__(self)
+
+    def kill(self):
+        """Kill the thread."""
+
+        self.abort = True
 
     def run(self):
         """Run command."""
@@ -47,6 +53,7 @@ class HashThread(threading.Thread):
                 while chunk and not self.abort:
                     self.obj.update(chunk)
                     chunk = m.read(4096)
+                    self.count += len(chunk)
         except Exception:
             self.error = util.ustr(traceback.format_exc())
 
