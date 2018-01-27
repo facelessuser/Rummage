@@ -38,6 +38,7 @@ class ChecksumDialog(gui.ChecksumDialog):
         self.hashing = False
         self.algorithm = algorithm
         self.target = target
+        self.handling = False
 
         super(ChecksumDialog, self).__init__(parent)
         if util.platform() == "windows":
@@ -57,6 +58,8 @@ class ChecksumDialog(gui.ChecksumDialog):
 
     def start_hash(self):
         """Start hashing file."""
+
+        self.m_okay_button.Enable(False)
 
         try:
             self.file = open(self.target, 'rb')
@@ -103,7 +106,8 @@ class ChecksumDialog(gui.ChecksumDialog):
     def on_idle(self, event):
         """Handle idle events (process progress)."""
 
-        if self.hashing:
+        if self.hashing and not self.handling:
+            self.handling = True
             count = self.hasher.count
             ratio = float(count) / float(self.total)
             percent = int(ratio * 100)
@@ -121,7 +125,9 @@ class ChecksumDialog(gui.ChecksumDialog):
                     else:
                         self.m_hash_textbox.SetValue(util.ustr(self.alg.hexdigest()))
                 self.m_cancel_button.Enable(False)
+                self.m_okay_button.Enable(True)
                 self.hasher = None
+            self.handling = False
 
         if not self.hashing and self.file:
             self.file.close()

@@ -595,26 +595,26 @@ class RummageFrame ( wx.Frame ):
 	
 
 ###########################################################################
-## Class GenericProgressDialog
+## Class DeleteDialog
 ###########################################################################
 
-class GenericProgressDialog ( wx.Dialog ):
+class DeleteDialog ( wx.Dialog ):
 	
 	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Generic Progress", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Delete", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
 		
 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		
 		bSizer21 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_panel26 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_progress_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer22 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_progress_label = wx.StaticText( self.m_panel26, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_progress_label = wx.StaticText( self.m_progress_panel, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_progress_label.Wrap( -1 )
 		bSizer22.Add( self.m_progress_label, 0, wx.ALL, 5 )
 		
-		self.m_progress = wx.Gauge( self.m_panel26, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
+		self.m_progress = wx.Gauge( self.m_progress_panel, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
 		self.m_progress.SetValue( 0 ) 
 		bSizer22.Add( self.m_progress, 0, wx.ALL|wx.EXPAND, 5 )
 		
@@ -627,10 +627,10 @@ class GenericProgressDialog ( wx.Dialog ):
 		
 		fgSizer56.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_okay_button = wx.Button( self.m_panel26, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_okay_button = wx.Button( self.m_progress_panel, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer56.Add( self.m_okay_button, 0, wx.ALL, 5 )
 		
-		self.m_cancel_button = wx.Button( self.m_panel26, wx.ID_ANY, u"Abort", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_cancel_button = wx.Button( self.m_progress_panel, wx.ID_ANY, u"Abort", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer56.Add( self.m_cancel_button, 0, wx.ALL, 5 )
 		
 		
@@ -640,10 +640,10 @@ class GenericProgressDialog ( wx.Dialog ):
 		bSizer22.Add( fgSizer56, 1, wx.EXPAND, 5 )
 		
 		
-		self.m_panel26.SetSizer( bSizer22 )
-		self.m_panel26.Layout()
-		bSizer22.Fit( self.m_panel26 )
-		bSizer21.Add( self.m_panel26, 1, wx.EXPAND |wx.ALL, 5 )
+		self.m_progress_panel.SetSizer( bSizer22 )
+		self.m_progress_panel.Layout()
+		bSizer22.Fit( self.m_progress_panel )
+		bSizer21.Add( self.m_progress_panel, 1, wx.EXPAND |wx.ALL, 5 )
 		
 		
 		self.SetSizer( bSizer21 )

@@ -49,6 +49,7 @@ from .export_settings_dialog import ExportSettingsDialog
 from .import_settings_dialog import ImportSettingsDialog
 from .support_info_dialog import SupportInfoDialog
 from .checksum_dialog import ChecksumDialog
+from .delete_dialog import DeleteDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .controls import pick_button
@@ -1904,6 +1905,14 @@ class RummageFrame(gui.RummageFrame):
         """Handle checksum request."""
 
         dlg = ChecksumDialog(self, target, h)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def on_delete_files(self, event, recycle, listctrl):
+        """Delete files in the list control."""
+
+        files = listctrl.get_selected_files()
+        dlg = DeleteDialog(self, files, recycle)
         dlg.ShowModal()
         dlg.Destroy()
 
