@@ -525,6 +525,8 @@ class RummageFrame(gui.RummageFrame):
         self.SEARCH = _("Search")
         self.UP_TO_DATE = _("Current version is %s. Rummage is up to date!")
         self.NOT_UP_TO_DATE = _("There is an update available: %s.")
+        self.DELETE = _("Are you sure you want to delete the files?")
+        self.RECYCLE = _("Are you sure you want to recycle the files?")
 
         # Menu
         self.MENU_EXPORT_RESULTS = _("Export Results")
@@ -1904,12 +1906,15 @@ class RummageFrame(gui.RummageFrame):
     def on_checksum(self, event, h, target):
         """Handle checksum request."""
 
-        dlg = ChecksumDialog(self, target, h)
+        dlg = ChecksumDialog(self, h, target)
         dlg.ShowModal()
         dlg.Destroy()
 
     def on_delete_files(self, event, recycle, listctrl):
         """Delete files in the list control."""
+
+        if not yesno(self.RECYCLE if recycle else self.DELETE):
+            return
 
         files = listctrl.get_selected_files()
         dlg = DeleteDialog(self, files, recycle)

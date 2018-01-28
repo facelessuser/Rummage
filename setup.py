@@ -68,7 +68,8 @@ setup(
         "backrefs>=3.0.2,<4.0",
         "regex",
         "wxpython>=4.0.0a3",
-        "filelock"
+        "filelock",
+        "send2trash"
     ],
     zip_safe=False,
     entry_points=entry_points,

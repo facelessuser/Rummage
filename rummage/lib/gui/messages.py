@@ -33,6 +33,11 @@ INFO = 0
 PROMPT = 1
 WARN = 2
 ERROR = 3
+PROMPT_ALL = 4
+PROMPT_CANCEL = 5
+PROMPT3_ALL = 6
+
+PROMPTS = (PROMPT, PROMPT_CANCEL)
 
 # Icons
 DEFAULT_ICON_SIZE = 64
@@ -1083,7 +1088,10 @@ class MessageIcon(namedtuple('MessageIcon', ['bitmap', 'width', 'height'])):
 class Messages(wx.Dialog):
     """Simple message dialog."""
 
-    def __init__(self, parent, text, title=wx.EmptyString, style=INFO, bitmap=None, yes="Okay", no="Cancel"):
+    def __init__(
+        self, parent, text, title=wx.EmptyString, style=INFO, bitmap=None,
+        yes="Okay", no="Cancel", cancel="Cancel", checkbox="Apply to all", checked=None
+    ):
         """Init Messages object."""
 
         m = HAS_CAPTION.match(text)
@@ -1094,7 +1102,7 @@ class Messages(wx.Dialog):
             caption = None
             msg = text
 
-        self.answer = wx.ID_CANCEL if style == PROMPT else wx.ID_OK
+        self.answer = wx.ID_CANCEL if style in PROMPTS else wx.ID_OK
 
         wx.Dialog.__init__(
             self, parent, id=wx.ID_ANY, title=title, pos=wx.DefaultPosition,
@@ -1105,13 +1113,23 @@ class Messages(wx.Dialog):
         b_dialog_sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.m_message_panel = wx.Panel(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL)
-        fg_panel_sizer = wx.FlexGridSizer(2, 1, 0, 0)
+        if checked is not None:
+            fg_panel_sizer = wx.FlexGridSizer(3, 1, 0, 0)
+        else:
+            fg_panel_sizer = wx.FlexGridSizer(2, 1, 0, 0)
         fg_panel_sizer.AddGrowableCol(0)
         fg_panel_sizer.AddGrowableRow(0)
         fg_panel_sizer.SetFlexibleDirection(wx.BOTH)
         fg_panel_sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
         self._setup_message(fg_panel_sizer, msg, caption, style, bitmap)
+
+        if checked is not None:
+            self.m_prompt_checkbox = wx.CheckBox(
+                self.m_message_panel, wx.ID_ANY, checkbox, wx.DefaultPosition, wx.DefaultSize, 0
+            )
+            self.m_prompt_checkbox.SetValue(checked)
+            fg_panel_sizer.Add(self.m_prompt_checkbox, 1, wx.ALL, 5)
 
         fg_button_row_sizer = wx.FlexGridSizer(0, 3, 0, 0)
         fg_button_row_sizer.AddGrowableCol(0)
@@ -1120,7 +1138,7 @@ class Messages(wx.Dialog):
         fg_button_row_sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
         fg_button_row_sizer.Add((0, 0), 1, wx.EXPAND, 5)
 
-        self._setup_buttons(fg_button_row_sizer, style, yes, no)
+        self._setup_buttons(fg_button_row_sizer, style, yes, no, cancel)
 
         fg_button_row_sizer.Add((0, 0), 1, wx.EXPAND, 5)
         fg_panel_sizer.Add(fg_button_row_sizer, 1, wx.EXPAND, 5)
@@ -1138,21 +1156,38 @@ class Messages(wx.Dialog):
         self.Bind(wx.EVT_CHAR_HOOK, self.on_char_hook)
         self.m_accept_button.SetFocus()
 
-    def _setup_buttons(self, fg_button_row_sizer, style, yes, no):
+    def _setup_buttons(self, fg_button_row_sizer, style, yes, no, cancel):
         """Setup the appropriate buttons for the dialog."""
-
-        fg_button_sizer = wx.FlexGridSizer(0, 2, 0, 0) if style == PROMPT else wx.FlexGridSizer(0, 1, 0, 0)
+        if style == PROMPT:
+            fg_button_sizer = wx.FlexGridSizer(0, 2, 0, 0)
+        elif style == PROMPT_CANCEL:
+            fg_button_sizer = wx.FlexGridSizer(0, 3, 0, 0)
+        else:
+            fg_button_sizer = wx.FlexGridSizer(0, 1, 0, 0)
         fg_button_sizer.SetFlexibleDirection(wx.BOTH)
         fg_button_sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
+
+        self.m_accept_button = wx.Button(self.m_message_panel, wx.ID_ANY, yes, wx.DefaultPosition, wx.DefaultSize, 0)
+        fg_button_sizer.Add(self.m_accept_button, 0, wx.ALL, 5)
+        self.m_accept_button.Bind(wx.EVT_BUTTON, self.on_accept)
 
         if style == PROMPT:
             self.m_cancel_button = wx.Button(self.m_message_panel, wx.ID_ANY, no, wx.DefaultPosition, wx.DefaultSize, 0)
             fg_button_sizer.Add(self.m_cancel_button, 0, wx.ALL, 5)
             self.m_cancel_button.Bind(wx.EVT_BUTTON, self.on_cancel)
 
-        self.m_accept_button = wx.Button(self.m_message_panel, wx.ID_ANY, yes, wx.DefaultPosition, wx.DefaultSize, 0)
-        fg_button_sizer.Add(self.m_accept_button, 0, wx.ALL, 5)
-        self.m_accept_button.Bind(wx.EVT_BUTTON, self.on_accept)
+        elif style == PROMPT_CANCEL:
+            self.m_reject_button = wx.Button(
+                self.m_message_panel, wx.ID_ANY, no, wx.DefaultPosition, wx.DefaultSize, 0
+            )
+            fg_button_sizer.Add(self.m_reject_button, 0, wx.ALL, 5)
+            self.m_reject_button.Bind(wx.EVT_BUTTON, self.on_reject)
+
+            self.m_cancel_button = wx.Button(
+                self.m_message_panel, wx.ID_ANY, cancel, wx.DefaultPosition, wx.DefaultSize, 0
+            )
+            fg_button_sizer.Add(self.m_cancel_button, 0, wx.ALL, 5)
+            self.m_cancel_button.Bind(wx.EVT_BUTTON, self.on_cancel)
 
         fg_button_row_sizer.Add(fg_button_sizer, 1, wx.EXPAND, 5)
 
@@ -1223,11 +1258,12 @@ class Messages(wx.Dialog):
         if bitmap is not None:
             icon = bitmap
         else:
+            icn = None
             if style == ERROR:
                 icn = error_icon
             elif style == WARN:
                 icn = warn_icon
-            elif style == PROMPT:
+            elif style in PROMPTS:
                 icn = prompt_icon
             elif style == INFO:
                 icn = info_icon
@@ -1263,6 +1299,12 @@ class Messages(wx.Dialog):
         """Set cancel status."""
 
         self.answer = wx.ID_CANCEL
+        self.EndModal(self.answer)
+
+    def on_reject(self, event):
+        """Set reject status."""
+
+        self.answer = wx.ID_NO
         self.EndModal(self.answer)
 
     def on_accept(self, event):
@@ -1304,13 +1346,51 @@ def dirpickermsg(msg, default_path=""):
     return select
 
 
-def promptmsg(question, caption='PROMPT', bitmap=None, yes="Okay", no="Cancel"):
+def prompt3msg(
+    question, caption='PROMPT', bitmap=None, yes="Okay", no="No", cancel="Cancel",
+    checkbox="Apply to all", checked=None
+):
     """Prompt with "yes" "no" type object."""
 
-    dlg = Messages(None, question, caption, style=PROMPT, yes=yes, no=no, bitmap=bitmap)
-    result = dlg.ShowModal() == wx.ID_OK
+    dlg = Messages(
+        None, question, caption, style=PROMPT_CANCEL, yes=yes, no=no, cancel=cancel,
+        bitmap=bitmap, checkbox=checkbox, checked=checked
+    )
+
+    result = dlg.ShowModal()
+    if result == wx.ID_OK:
+        result == wx.ID_YES
+
+    if checked is not None:
+        check_value = dlg.m_prompt_checkbox.GetValue()
     dlg.Destroy()
-    return result
+
+    if checked is not None:
+        return result, check_value
+    else:
+        return result
+
+
+def promptmsg(
+    question, caption='PROMPT', bitmap=None, yes="Okay", no="Cancel",
+    checkbox="Apply to all", checked=None
+):
+    """Prompt with "yes" "no" type object."""
+
+    dlg = Messages(
+        None, question, caption, style=PROMPT, yes=yes, no=no,
+        bitmap=bitmap, checkbox=checkbox, checked=checked
+    )
+
+    result = dlg.ShowModal() == wx.ID_OK
+    if checked is not None:
+        check_value = dlg.m_prompt_checkbox.GetValue()
+    dlg.Destroy()
+
+    if checked is not None:
+        return result, check_value
+    else:
+        return result
 
 
 def infomsg(msg, title="INFO", bitmap=None):

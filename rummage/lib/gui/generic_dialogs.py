@@ -23,7 +23,7 @@ from .localization import _
 from . import messages
 
 
-def yesno(question, title=None, bitmap=None, yes=None, no=None):
+def yesno(question, title=None, bitmap=None, yes=None, no=None, checkbox=None, checked=None):
     """Wrapper for the prompt dialog."""
 
     if title is None:
@@ -32,8 +32,29 @@ def yesno(question, title=None, bitmap=None, yes=None, no=None):
         yes = _("Okay")
     if no is None:
         no = _("Cancel")
+    if checkbox is None:
+        checkbox = _("Apply to all")
 
-    return messages.promptmsg(question, title, bitmap, yes, no)
+    return messages.promptmsg(question, title, bitmap, yes, no, checkbox, checked)
+
+
+def yesno_cancel(
+    question, title=None, bitmap=None, yes=None, no=None, cancel=None, checkbox=None, checked=None
+):
+    """Wrapper for the prompt dialog."""
+
+    if title is None:
+        title = _('Yes or no?')
+    if yes is None:
+        yes = _("Yes")
+    if no is None:
+        no = _("No")
+    if cancel is None:
+        cancel = _("Cancel")
+    if checkbox is None:
+        checkbox = _("Apply to all")
+
+    return messages.prompt3msg(question, title, bitmap, yes, no, cancel, checkbox, checked)
 
 
 def infomsg(msg, title=None, bitmap=None):

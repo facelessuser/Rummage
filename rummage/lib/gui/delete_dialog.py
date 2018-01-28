@@ -19,13 +19,14 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
+import wx
 import os
 import time
 import threading
 from .localization import _
 from . import gui
 from .. import util
-from .generic_dialogs import errormsg, yesno
+from .generic_dialogs import errormsg, yesno_cancel
 from send2trash import send2trash
 
 ACTION_DELETE = 1
@@ -64,10 +65,11 @@ class DeleteThread(threading.Thread):
                 if self.response is True:
                     self.response = None
                     try:
-                        if self.recycle:
-                            send2trash(self.trouble_file)
-                        else:
-                            os.remove(self.trouble_file)
+                        if os.path.exists(self.trouble_file):
+                            if self.recycle:
+                                send2trash(self.trouble_file)
+                            else:
+                                os.remove(self.trouble_file)
                         deleted = True
                         self.trouble_file = None
                     except Exception:
@@ -83,10 +85,11 @@ class DeleteThread(threading.Thread):
         for f in self.files:
             # Handle normal case
             try:
-                if self.recycle:
-                    send2trash(f)
-                else:
-                    os.remove(f)
+                if os.path.exists(f):
+                    if self.recycle:
+                        send2trash(f)
+                    else:
+                        os.remove(f)
                 self.count += 1
             except Exception:
                 self.trouble_file = f
@@ -94,9 +97,7 @@ class DeleteThread(threading.Thread):
             # Handle retry case
             if self.trouble_file:
                 deleted = self.retry()
-                if not deleted:
-                    self.errors.append(f)
-                else:
+                if deleted:
                     self.count += 1
 
             # Handle abort
@@ -119,6 +120,7 @@ class DeleteDialog(gui.DeleteDialog):
         self.message = None
         self.processing = False
         self.handling = False
+        self.skipall = False
 
         super(DeleteDialog, self).__init__(parent)
         if util.platform() == "windows":
@@ -162,10 +164,12 @@ class DeleteDialog(gui.DeleteDialog):
         self.OKAY = _("Close")
         self.ABORT = _("Abort")
         self.ERROR = _("Could not delete %d files!")
-        self.RETRY = _("Could not delete '%s'!\n\nTry again?")
+        self.RETRY = _("Retry?\n\nCould not delete '%s'!")
         self.RETRY_TITLE = _("Retry?")
         self.RETRY_BUTTON = _("Retry")
         self.SKIP_BUTTON = _("Skip")
+        self.SKIP_ALL_BUTTON = _("Skip all")
+        self.FAIL = _("Could not delete %d files!")
 
     def refresh_localization(self, title=None):
         """Localize."""
@@ -201,15 +205,23 @@ class DeleteDialog(gui.DeleteDialog):
 
             if self.thread.request is True:
                 self.thread.request = False
-                if yesno(
-                    self.RETRY % self.thread.trouble_file,
-                    title=self.RETRY_TITLE,
-                    yes=self.RETRY_BUTTON,
-                    no=self.SKIP_BUTTON
-                ):
-                    self.thread.response = True
-                else:
+                if self.skipall:
                     self.thread.response = False
+                else:
+                    result = yesno_cancel(
+                        self.RETRY % self.thread.trouble_file,
+                        title=self.RETRY_TITLE,
+                        yes=self.RETRY_BUTTON,
+                        no=self.SKIP_BUTTON,
+                        cancel=self.SKIP_ALL_BUTTON
+                    )
+                    if result == wx.ID_CANCEL:
+                        self.skipall = True
+                        self.thread.response = False
+                    elif result == wx.ID_NO:
+                        self.thread.response = False
+                    else:
+                        self.thread.response = True
 
             if not self.thread.is_alive():
                 self.processing = False
@@ -218,7 +230,7 @@ class DeleteDialog(gui.DeleteDialog):
 
                 if not self.thread.abort:
                     if self.thread.errors:
-                        errormsg("Could not delete %d files!" % (self.total - self.thread.count))
+                        errormsg(self.FAIL % (self.total - self.thread.count))
                 self.m_cancel_button.Enable(False)
                 self.m_okay_button.Enable(True)
                 self.thread = None

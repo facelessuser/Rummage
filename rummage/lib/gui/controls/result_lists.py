@@ -140,7 +140,7 @@ class ResultFileList(DynamicList):
         self.COPY_PATH = _("Copy File Paths")
         self.CHECKSUM_LABEL = _("Checksum")
         self.DELETE_LABEL = _("Delete")
-        self.RECYCLE_LABEL = _("Recycle")
+        self.RECYCLE_LABEL = _("Send to Trash")
 
     def create_image_list(self):
         """Create the image list."""
@@ -299,16 +299,6 @@ class ResultFileList(DynamicList):
                     pass
                 wx.TheClipboard.Close()
 
-    def open_hash(self, event, target, h):
-        """
-        Open hash.
-
-        Due to the layout, we get circular dependencies if we try and include ChecksumDialog here.
-        So we have the call occor from the parent.
-        """
-
-        self.main_window.on_checksum(event, target, h)
-
     def get_selected_files(self):
         """Get selected files filtering out duplicates."""
 
@@ -353,7 +343,7 @@ class ResultFileList(DynamicList):
 
             hash_entries = []
             for h in checksum.VALID_HASH:
-                hash_entries.append((h, functools.partial(self.open_hash, h=h, target=target)))
+                hash_entries.append((h, functools.partial(self.main_window.on_checksum, h=h, target=target)))
 
             # Open menu
             menu = ContextMenu(
@@ -426,7 +416,7 @@ class ResultContentList(DynamicList):
         self.COPY_CONTENT = _("Copy File Content")
         self.CHECKSUM_LABEL = _("Checksum")
         self.DELETE_LABEL = _("Delete")
-        self.RECYCLE_LABEL = _("Recycle")
+        self.RECYCLE_LABEL = _("Send to Trash")
 
     def GetSecondarySortValues(self, col, key1, key2):
         """Get secondary sort values."""
