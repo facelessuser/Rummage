@@ -51,7 +51,9 @@ The second panel, is the **Limit Search** panel.  The **Limit Search** panel con
 
 The **Files** tab is where files with matches are shown after a search completes.  The files are arranged in a sortable table.  Each entry will show the file's name, size, number of matches in the file, the file path, detected file encoding, date/time when the file was created, and date/time of when the file was last modified.
 
-When mousing over an entry, the full path to the file will be shown in the status bar.  If you have the editor option in the preference dialog configured properly, you can double click an entry to open to the first match of that file in your favorite editor. Right clicking the entry will bring up a context menu allowing you to reveal the file in your operating system's file manager (Linux will just open parent folder due to limitations on a cross distro solution).
+When mousing over an entry, the full path to the file will be shown in the status bar.  If you have the editor option in the preference dialog configured properly, you can double click an entry to open to the first match of that file in your favorite editor.
+
+Right clicking the entries will bring up a context menu as well allowing you to reveal the file in your operating system's file manager, delete files, copy file paths, and calculate the checksum of a file (available checksum options will vary depending on your Python system).
 
 ## Content Tab
 
@@ -60,6 +62,8 @@ When mousing over an entry, the full path to the file will be shown in the statu
 The **Content** tab shows each match in a file individually. The entries will be arranged in a sortable table. Each entry shows the file's name, the line on which the match was found, the number of matches on that line, and the content of the line.  Long lines will be truncated.
 
 When mousing over an entry, the full path to the file will be shown in the status bar.  If you have the editor option in the preference dialog configured properly, you can double click an entry to open to that specific match of that file in your favorite editor.
+
+Right clicking the entries will bring up a context menu as well allowing you to reveal the file in your operating system's file manager, delete files, copy file paths, and calculate the checksum of a file (available checksum options will vary depending on your Python system).
 
 ## Search &amp; Replace Panel
 

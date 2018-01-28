@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Setup package."""
 from setuptools import setup, find_packages
+import sys
 import os
 import imp
 import traceback
@@ -27,6 +28,17 @@ def get_version():
         fp.close()
 
 
+def get_requirements():
+    """Load list of dependencies."""
+
+    install_requires = []
+    with open("requirements/project.txt") as f:
+        for line in f:
+            if not line.startswith("#"):
+                install_requires.append(line.strip())
+    return install_requires
+
+
 VER, DEVSTATUS = get_version()
 
 LONG_DESC = '''
@@ -48,7 +60,8 @@ Please read about `support and contributing`_ before creating issues.
 
 entry_points = {
     'gui_scripts': [
-        'rummage=rummage.__main__:main'
+        'rummage=rummage.__main__:main',
+        'rummage%d.%d=rummage.__main__:main' % sys.version_info[:2]
     ]
 }
 
@@ -62,15 +75,7 @@ setup(
     author_email='Isaac.Muse@gmail.com',
     url='https://github.com/facelessuser/Rummage',
     packages=find_packages(exclude=['tests', 'tools']),
-    install_requires=[
-        "gntp>=1.0.2",
-        "chardet>=3.0.4",
-        "backrefs>=3.0.2,<4.0",
-        "regex",
-        "wxpython>=4.0.0a3",
-        "filelock",
-        "send2trash"
-    ],
+    install_requires=get_requirements(),
     zip_safe=False,
     entry_points=entry_points,
     package_data={
