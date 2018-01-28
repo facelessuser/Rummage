@@ -49,6 +49,7 @@ from .export_settings_dialog import ExportSettingsDialog
 from .import_settings_dialog import ImportSettingsDialog
 from .support_info_dialog import SupportInfoDialog
 from .checksum_dialog import ChecksumDialog
+from .delete_dialog import DeleteDialog
 from .settings_dialog import SettingsDialog
 from .about_dialog import AboutDialog
 from .controls import pick_button
@@ -524,6 +525,8 @@ class RummageFrame(gui.RummageFrame):
         self.SEARCH = _("Search")
         self.UP_TO_DATE = _("Current version is %s. Rummage is up to date!")
         self.NOT_UP_TO_DATE = _("There is an update available: %s.")
+        self.DELETE = _("Are you sure you want to delete the files?")
+        self.RECYCLE = _("Are you sure you want to recycle the files?")
 
         # Menu
         self.MENU_EXPORT_RESULTS = _("Export Results")
@@ -1903,9 +1906,56 @@ class RummageFrame(gui.RummageFrame):
     def on_checksum(self, event, h, target):
         """Handle checksum request."""
 
-        dlg = ChecksumDialog(self, target, h)
+        dlg = ChecksumDialog(self, h, target)
         dlg.ShowModal()
         dlg.Destroy()
+
+    def on_delete_files(self, event, recycle, listctrl):
+        """Delete files in the list control."""
+
+        if not yesno(self.RECYCLE if recycle else self.DELETE):
+            return
+
+        files = listctrl.get_selected_files()
+        dlg = DeleteDialog(self, files, recycle)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+        self.m_result_list.deselect_all(None)
+        self.m_result_file_list.deselect_all(None)
+
+        # Remove entries from table that no longer exist while rebuilding table index
+        if self.m_result_list.GetItemCount():
+            remove = set()
+            new_index = []
+            for i in self.m_result_list.itemIndexMap:
+                v = self.m_result_list.itemDataMap[i]
+                if not os.path.exists(os.path.join(v[0][1], v[0][0])):
+                    del self.m_result_list.itemDataMap[i]
+                    remove.add(v[5])
+                else:
+                    new_index.append(i)
+            self.m_result_list.itemIndexMap = new_index
+
+            new_index = []
+            for i in self.m_result_file_list.itemIndexMap:
+                if i in remove:
+                    del self.m_result_file_list.itemDataMap[i]
+                else:
+                    new_index.append(i)
+            self.m_result_file_list.itemIndexMap = new_index
+
+            self.m_result_list.SetItemCount(len(self.m_result_list.itemDataMap))
+            self.m_result_file_list.SetItemCount(len(self.m_result_file_list.itemDataMap))
+        else:
+            new_index = []
+            for i in self.m_result_file_list.itemIndexMap:
+                if not os.path.exists(i):
+                    del self.m_result_file_list.itemDataMap[i]
+                else:
+                    new_index.append(i)
+            self.m_result_file_list.itemIndexMap = new_index
+            self.m_result_file_list.SetItemCount(len(self.m_result_file_list.itemDataMap))
 
     def on_chain_click(self, event):
         """Chain button click."""

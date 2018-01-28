@@ -139,6 +139,8 @@ class ResultFileList(DynamicList):
         self.COPY_NAME = _("Copy File Names")
         self.COPY_PATH = _("Copy File Paths")
         self.CHECKSUM_LABEL = _("Checksum")
+        self.DELETE_LABEL = _("Delete")
+        self.RECYCLE_LABEL = _("Send to Trash")
 
     def create_image_list(self):
         """Create the image list."""
@@ -297,15 +299,19 @@ class ResultFileList(DynamicList):
                     pass
                 wx.TheClipboard.Close()
 
-    def open_hash(self, event, target, h):
-        """
-        Open hash.
+    def get_selected_files(self):
+        """Get selected files filtering out duplicates."""
 
-        Due to the layout, we get circular dependencies if we try and include ChecksumDialog here.
-        So we have the call occor from the parent.
-        """
-
-        self.main_window.on_checksum(event, target, h)
+        files = set()
+        with self.wait:
+            item = self.GetNextItem(-1)
+            while item != -1:
+                if self.IsSelected(item):
+                    filename = self.GetItem(item, col=FILE_NAME).GetText()
+                    path = self.GetItem(item, col=FILE_PATH).GetText()
+                    files.add(os.path.join(path, filename))
+                item = self.GetNextItem(item)
+        return sorted(list(files))
 
     def on_rclick(self, event):
         """Show context menu on right click."""
@@ -337,7 +343,7 @@ class ResultFileList(DynamicList):
 
             hash_entries = []
             for h in checksum.VALID_HASH:
-                hash_entries.append((h, functools.partial(self.open_hash, h=h, target=target)))
+                hash_entries.append((h, functools.partial(self.main_window.on_checksum, h=h, target=target)))
 
             # Open menu
             menu = ContextMenu(
@@ -347,7 +353,18 @@ class ResultFileList(DynamicList):
                     None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
                     (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled),
-                    (self.CHECKSUM_LABEL, hash_entries, (enabled and self.complete))
+                    (self.CHECKSUM_LABEL, hash_entries, (enabled and self.complete)),
+                    None,
+                    (
+                        self.DELETE_LABEL,
+                        functools.partial(self.main_window.on_delete_files, recycle=False, listctrl=self),
+                        self.complete
+                    ),
+                    (
+                        self.RECYCLE_LABEL,
+                        functools.partial(self.main_window.on_delete_files, recycle=True, listctrl=self),
+                        self.complete
+                    )
                 ]
             )
             self.PopupMenu(menu, pos)
@@ -398,6 +415,8 @@ class ResultContentList(DynamicList):
         self.COPY_PATH = _("Copy File Paths")
         self.COPY_CONTENT = _("Copy File Content")
         self.CHECKSUM_LABEL = _("Checksum")
+        self.DELETE_LABEL = _("Delete")
+        self.RECYCLE_LABEL = _("Send to Trash")
 
     def GetSecondarySortValues(self, col, key1, key2):
         """Get secondary sort values."""
@@ -555,7 +574,7 @@ class ResultContentList(DynamicList):
                 if col == CONTENT_PATH:
                     if from_file_tab:
                         file_row = self.get_map_item(item, col=CONTENT_KEY)
-                        path = self.main_window.get_map_item(
+                        path = self.main_window.m_result_file_list.get_map_item(
                             file_row, col=FILE_PATH, absolute=True
                         )
                         filename = self.GetItem(item, col=CONTENT_PATH).GetText()
@@ -573,6 +592,23 @@ class ResultContentList(DynamicList):
                 except Exception:
                     pass
                 wx.TheClipboard.Close()
+
+    def get_selected_files(self):
+        """Get selected files filtering out duplicates."""
+
+        files = set()
+        with self.wait:
+            item = self.GetNextItem(-1)
+            while item != -1:
+                if self.IsSelected(item):
+                    file_row = self.get_map_item(item, col=CONTENT_KEY)
+                    path = self.main_window.m_result_file_list.get_map_item(
+                        file_row, col=FILE_PATH, absolute=True
+                    )
+                    filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                    files.add(os.path.join(path, filename))
+                item = self.GetNextItem(item)
+        return sorted(list(files))
 
     def on_rclick(self, event):
         """Show context menu on right click."""
@@ -618,7 +654,18 @@ class ResultContentList(DynamicList):
                     None,
                     (self.REVEAL_LABEL[util.platform()], functools.partial(fileops.reveal, target=target), enabled),
                     (self.EDITOR_LABEL, functools.partial(self.open_editor, item=item), bulk_enabled),
-                    (self.CHECKSUM_LABEL, hash_entries, (enabled and self.complete))
+                    (self.CHECKSUM_LABEL, hash_entries, (enabled and self.complete)),
+                    None,
+                    (
+                        self.DELETE_LABEL,
+                        functools.partial(self.main_window.on_delete_files, recycle=False, listctrl=self),
+                        self.complete
+                    ),
+                    (
+                        self.RECYCLE_LABEL,
+                        functools.partial(self.main_window.on_delete_files, recycle=True, listctrl=self),
+                        self.complete
+                    )
                 ]
             )
             self.PopupMenu(menu, pos)

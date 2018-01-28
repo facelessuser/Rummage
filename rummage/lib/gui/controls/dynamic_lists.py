@@ -116,6 +116,18 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
                 item = self.GetNextItem(item)
         event.Skip()
 
+    def deselect_all(self, event):
+        """Deselect all items."""
+
+        with self.wait:
+            item = self.GetNextItem(-1)
+            while item != -1:
+                if self.IsSelected(item):
+                    self.Select(item, False)
+                item = self.GetNextItem(item)
+        if event:
+            event.Skip()
+
     def set_wait_lock(self, wait_lock):
         """Set wait lock."""
 
