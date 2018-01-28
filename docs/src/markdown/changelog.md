@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.5.0
+
+- **NEW**: Add context menu to content tab just like file tab with all the same entries.
+- **NEW**: Add copy commands to context menus to copy selected file names, paths, or content of match (content tab only).
+- **NEW**: Add "delete" and "send to trash" options to context menu.
+- **NEW**: Add checksum/hash options to context menu.
+- **NEW**: Add feature to check for updates. Also add auto update check (disabled by default).
+- **NEW**: Install command line as tool as `rummage` and `rummageX.X` where X.X is the major and minor version of the Python in use.
+- **FIX**: Fix some leaky objects. Ensure all items are destroyed.
+- **FIX**: Rework main application object to fix related issues.
+- **FIX**: Limit bulk file open to 20 items to prevent issues when open massive amount of files at once.
+- **FIX**: Regression with exports due to recent column addition and order change.
+
 ## 3.4.3
 
 Jan 23, 2018
