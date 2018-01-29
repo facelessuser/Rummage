@@ -6,16 +6,19 @@ Rummage has a few requirements when installing.  These will all be taken care of
 
 Name                             | Details
 -------------------------------- | -------
-[`backrefs` 3.0.1+][backrefs]    | Used to extend the `re` or `regex` regular expression engine with additional back references.
+[`backrefs`\ 3.0.1+][backrefs]   | Used to extend the `re` or `regex` regular expression engine with additional back references.
 [`gntp`][gntp]                   | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
 [`chardet`\ 3.0.4+][chardet]     | Used for file encoding guessing when an encoding is not specified.
 [`wxPython`\ 4.0.0a3+][wxpython] | The new wxPython 4.0.0 is required for for Rummage to run in Python 2 and Python 3. Classic wxPython support has unfortunately be dropped.
-[`regex`\ 2015.07.19+][regex]    | **regex** is usage is completely optional, but it is included for those who wish to use it. Regex is a great regular expression engine that adds some nice features such as fuzzy searching, nested char sets, better Unicode support, and more.
+[`regex`\ 2015.07.19+][regex]    | **regex** usage is completely optional, but it is included for those who wish to use it. Regex is a great regular expression engine that adds some nice features such as fuzzy searching, nested char sets, better Unicode support, and more.
 [`filelock`][filelock]           | Used for file locking to allow different instances of Rummage to access the same file.
+[send2trash][send2trash]         | Used for sending files to trash/recycle bin on each platform.
 
 ## Linux Prerequisites
 
 Prerequisites are related to wxPython, the graphical interface for Rummage. For Windows and macOS, there are no prerequisites as wxPython provides pre-built wheels for these operating systems, so Rummage can be installed directly and quickly with `pip`. Only Linux requires additional work before installing, but check out the wxPython documentation to learn how to build manually if you have reasons to do so.  The rest of this section refers exclusively to Linux, and mainly from an Ubuntu perspective as that is usually the distro I test on.
+
+The latest wxPython Phoenix builds with GTK3 by default, so the example below will install GTK3 related dependencies. You can use GTK2 if you build wxPython manually.
 
 !!! info "Read First!"
 
@@ -30,7 +33,7 @@ Here are some last known prerequisite for a couple of distros. **Remember, they 
 Example is for Ubuntu:
 
 ```bash
-sudo apt-get install python3.5-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libgtk2.0-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
+sudo apt-get install python3.5-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
 ```
 
 Replace `python3.5-dev` with the Python version you are using.
