@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.6.0
+
+- **NEW**: Rummage will use `cchardet` by default if found.
+- **FIX**: Binary test should be applied before BOM check.
+- **FIX**: Search error list destroying parent/main dialog when closed. Also ensure destruction of error list dialog on main window closing.
+
 ## 3.5.0
 
 - **NEW**: Add context menu to content tab just like file tab with all the same entries.
