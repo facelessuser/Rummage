@@ -2124,7 +2124,7 @@ class RummageFrame(gui.RummageFrame):
         event.Skip()
         if self.error_dlg is not None:
             self.error_dlg.ShowModal()
-            self.Destroy()
+            self.error_dlg.Close()
 
     def on_regex_search_toggle(self, event):
         """Switch literal/regex history depending on toggle state."""
@@ -2169,6 +2169,9 @@ class RummageFrame(gui.RummageFrame):
 
         if self.thread is not None:
             _ABORT = True
+        if self.error_dlg is not None:
+            self.error_dlg.Destroy()
+            self.error_dlg = None
         self.m_statusbar.tear_down()
         notify.destroy_notifications()
         event.Skip()
