@@ -48,6 +48,17 @@ If your Linux distribution has `gstreamer` 1.0 available (like the Fedora distro
 
 After getting all the correct prerequisites, you should be able to install Rummage with `pip`. Be patient while installing Rummage. Linux must build wxPython while macOS and Windows do not. If installing with `pip`, you may be waiting a long time with no real indication of how far along the process is.  If `pip` doesn't work, you can look into building and installing manually.  If you find any of this information, please feel free to offer a pull request or create an issue on GitHub to at least report the problem.
 
+## macOS Prerequisites
+
+On macOS, Rummage uses either pure Python modules, or modules that provide wheels. What this means is that no C code compilation is required to install Rummage; therefore, no prior steps are needed. But if you want to install `regex`, there will be some C code compilation during install via `pip`.
+
+To install modules like `regex`, you will need to have Xcode installed.
+
+1. Download Xcode from the Mac App Store.
+2. Navigate to Xcode > Preferences > Downloads tab.
+3. Click the button to install the Command Line Tools.
+4. Open Terminal (Applications/Terminal) and run `xcode-select –install`. You will be prompted to install the Xcode Command Line Tools.
+
 ## Installation
 
 Here are a couple of ways to install and upgrade. Keep in mind if you are a Linux user, you have some [prerequisites](#linux-prerequisites) to install before proceeding.
