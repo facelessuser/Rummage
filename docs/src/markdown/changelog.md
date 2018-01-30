@@ -4,7 +4,6 @@
 
 - **NEW**: Rummage will use `cchardet` by default if found.
 - **FIX**: Binary test should be applied before BOM check.
-- **FIX**: Search error list destroying parent/main dialog when closed. Also ensure destruction of error list dialog on main window closing.
 
 ## 3.5.0
 
