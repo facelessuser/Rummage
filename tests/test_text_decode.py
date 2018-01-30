@@ -210,15 +210,43 @@ class TestChardetSguess(unittest.TestCase):
 
     @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
     @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
-    def test_confidence_pass_guess(self, mock_detect, mock_small):
-        """Test result with an encoding with acceptable confidence."""
+    def test_confidence_pass_guess_default(self, mock_detect, mock_small):
+        """Test result with an encoding with acceptable confidence with the default detector."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": "utf-8", "confidence": 1.0}
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
         encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.CDetect')
+    def test_confidence_pass_guess_chardet(self, mock_detect, mock_small):
+        """Test result with an encoding with acceptable confidence with chardet."""
+
+        instance = mock_detect.return_value
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
+        mock_small.return_value = False
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string, clib=False)
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.CCDetect')
+    def test_confidence_pass_guess_cchardet(self, mock_detect, mock_small):
+        """Test result with an encoding with acceptable confidence with cchardet."""
+
+        instance = mock_detect.return_value
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
+        mock_small.return_value = False
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string, clib=True)
         self.assertEqual(encoding.encode, 'utf-8')
         self.assertEqual(encoding.bom, None)
 
@@ -228,7 +256,7 @@ class TestChardetSguess(unittest.TestCase):
         """Test result with an encoding with unacceptable confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": "utf-8", "confidence": 0.4}
+        instance.result = {"encoding": "utf-8", "confidence": 0.4}
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
@@ -242,7 +270,7 @@ class TestChardetSguess(unittest.TestCase):
         """Test result with an encoding that is None confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": None, "confidence": 0.4}
+        instance.result = {"encoding": None, "confidence": 0.4}
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
@@ -256,7 +284,7 @@ class TestChardetSguess(unittest.TestCase):
         """Test result with no encoding match."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = None
+        instance.result = None
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
@@ -287,7 +315,7 @@ class TestChardetGuess(unittest.TestCase):
         """Test result with an encoding with acceptable confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": "utf-8", "confidence": 1.0}
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
         mock_small.return_value = False
         encoding = text_decode.guess('tests/encodings/utf8.txt')
         self.assertEqual(encoding.encode, 'utf-8')
@@ -299,7 +327,7 @@ class TestChardetGuess(unittest.TestCase):
         """Test result with an encoding with unacceptable confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": "utf-8", "confidence": 0.4}
+        instance.result = {"encoding": "utf-8", "confidence": 0.4}
         mock_small.return_value = False
         encoding = text_decode.guess('tests/encodings/utf8.txt')
         self.assertEqual(encoding.encode, 'bin')
@@ -311,7 +339,7 @@ class TestChardetGuess(unittest.TestCase):
         """Test result with an encoding that is None confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": None, "confidence": 0.4}
+        instance.result = {"encoding": None, "confidence": 0.4}
         mock_small.return_value = False
         encoding = text_decode.guess('tests/encodings/utf8.txt')
         self.assertEqual(encoding.encode, 'bin')
@@ -323,7 +351,7 @@ class TestChardetGuess(unittest.TestCase):
         """Test result with no encoding match."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = None
+        instance.result = None
         mock_small.return_value = False
         encoding = text_decode.guess('tests/encodings/utf8.txt')
         self.assertEqual(encoding.encode, 'bin')

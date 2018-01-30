@@ -20,18 +20,19 @@ IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 import codecs
-import contextlib
-import mmap
 import os
 import re
 import functools
-# import traceback
-from chardet.universaldetector import UniversalDetector
 from collections import namedtuple
-
-# For some reason we can only mock this
-# if we assign it to a variable
-DetectEncoding = UniversalDetector
+# import traceback
+try:
+    from cchardet import UniversalDetector as CCDetect
+    from chardet.universaldetector import UniversalDetector as CDetect
+    DetectEncoding = CCDetect
+except ImportError:
+    from chardet.universaldetector import UniversalDetector as CDetect
+    DetectEncoding = CDetect
+    CCDetect = None
 
 # 30 MB: maybe this should be lower for Python?
 MAX_GUESS_SIZE = 31457280
@@ -59,6 +60,14 @@ RE_UTF_BOM = re.compile(
 RE_PY_ENCODE = re.compile(
     br'^[^\r\n]*?coding[:=]\s*([-\w.]+)|[^\r\n]*?\r?\n[^\r\n]*?coding[:=]\s*([-\w.]+)'
 )
+
+RE_HTML_ENCODE = re.compile(
+    br'''(?xi)
+    <\s*meta(?!\s*(?:name|value)\s*=)(?:[^>]*?content\s*=[\s"']*)?(?:[^>]*?)[\s"';]*charset\s*=[\s"']*([^\s"'/>]*)
+    '''
+)
+
+RE_XML_ENCODE = re.compile(br'''(?i)^<\?xml[^>]*encoding=(['"])(.*?)\1[^>]*\?>''')
 
 RE_IS_BIN = re.compile(
     br'\x00{2}'
@@ -118,6 +127,60 @@ def verify_encode(file_obj, encoding, blocks=1, chunk_size=4096):
     return good
 
 
+def _has_xml_encode(content):
+    """Check XML encoding."""
+
+    encode = None
+
+    m = RE_XML_ENCODE.match(content)
+
+    if m:
+        enc = m.group(2).decode('ascii')
+
+        try:
+            codecs.getencoder(enc)
+            encode = Encoding(enc, None)
+        except LookupError:
+            pass
+
+    if encode is None:
+        encode = Encoding('utf-8', None)
+    return encode
+
+
+def _has_html_encode(content):
+    """Check HTML encoding."""
+
+    encode = None
+
+    m = RE_XML_ENCODE.match(content)
+
+    if m:
+        enc = m.group(2).decode('ascii')
+
+        try:
+            codecs.getencoder(enc)
+            encode = Encoding(enc, None)
+        except LookupError:
+            pass
+
+    if encode is None:
+        m = RE_HTML_ENCODE.match(content)
+
+        if m:
+            enc = m.group(1).decode('ascii')
+
+            try:
+                codecs.getencoder(enc)
+                encode = Encoding(enc, None)
+            except LookupError:
+                pass
+
+    if encode is None:
+        encode = Encoding('utf-8', None)
+    return encode
+
+
 def _has_py_encode(content):
     """Check python encoding."""
 
@@ -150,6 +213,11 @@ def _special_encode_check(content, ext):
     encode = None
     if ext in ('.py', '.pyw'):
         encode = _has_py_encode(content)
+    elif ext in ('.html', '.htm', '.xhtml'):
+        encode = _has_html_encode(content)
+    elif ext in ('.xml',):
+        encode = _has_xml_encode(content)
+
     return encode
 
 
@@ -214,36 +282,49 @@ def has_bom(content):
     return bom
 
 
-def _detect_encoding(f, ext, file_size):
+def _detect_encoding(f, ext, file_size, clib=None):
     """Guess using chardet and using memory map."""
 
+    # Check start of file if there is a high likely hood of being a binary file.
     encoding = None
-    with contextlib.closing(mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)) as m:
+    header = f.read(1024)
+
+    if _is_binary(header):
+        encoding = Encoding('bin', None)
+
+    if encoding is None:
         # Check for boms
-        encoding = has_bom(m.read(4))
-        m.seek(0)
+        encoding = has_bom(header)
+
         # Check start of file if there is a high likely hood of being a binary file.
-        if encoding is None and _is_binary(m.read(1024)):
+        if encoding is None and _is_binary(header):
             encoding = Encoding('bin', None)
-        m.seek(0)
         # Check file extensions
         if encoding is None:
-            encoding = _special_encode_check(m, ext)
+            encoding = _special_encode_check(header, ext)
         # If content is very small, let's try and do a a utf-8 and ascii check
         # before giving it to chardet.  Chardet doesn't work well on small buffers.
         if encoding is None and _is_very_small(file_size):
-            encoding = _simple_detect(m)
+            encoding = _simple_detect(header)
         # Well, we tried everything else, lets give it to chardet and cross our fingers.
         if encoding is None:
+            if clib is None:
+                detector = DetectEncoding()
+            elif clib is True and CCDetect is not None:
+                detector = CCDetect()
+            else:
+                detector = CDetect()
             enc = None
             conf = None
-            detector = DetectEncoding()
-            m.seek(0)
-            for chunk in iter(functools.partial(f.read, 4096), b""):
-                detector.feed(chunk)
-                if detector.done:
-                    break
-            result = detector.close()
+            detector.feed(header)
+            if not detector.done:
+                for chunk in iter(functools.partial(f.read, 4096), b""):
+                    detector.feed(chunk)
+                    if detector.done:
+
+                        break
+            detector.close()
+            result = detector.result
 
             if result is not None:
                 enc = result['encoding']
@@ -259,39 +340,48 @@ def _detect_encoding(f, ext, file_size):
     return encoding
 
 
-def _detect_bfr_encoding(bfr, buffer_size):
+def _detect_bfr_encoding(bfr, buffer_size, clib=None):
     """Guess using chardet."""
 
-    encoding = has_bom(bfr[:4])
-    if encoding is None and _is_binary(bfr[:1024]):
+    encoding = None
+    header = bfr[:1024]
+    if _is_binary(header):
         encoding = Encoding('bin', None)
-    if encoding is None and _is_very_small(buffer_size):
-        encoding = _simple_detect(bfr)
     if encoding is None:
-        enc = None
-        conf = None
-        detector = DetectEncoding()
-        start = 0
-        end = start + 1024
-        while start < buffer_size:
-            detector.feed(bfr[start:end])
-            start = end
+        encoding = has_bom(bfr[:4])
+        if encoding is None and _is_very_small(buffer_size):
+            encoding = _simple_detect(bfr)
+        if encoding is None:
+            if clib is None:
+                detector = DetectEncoding()
+            elif clib is True and CCDetect is not None:
+                detector = CCDetect()
+            else:
+                detector = CDetect()
+            enc = None
+            conf = None
+            start = 0
             end = start + 1024
-            if detector.done:
-                break
-        result = detector.close()
+            while start < buffer_size:
+                detector.feed(bfr[start:end])
+                start = end
+                end = start + 1024
+                if detector.done:
+                    break
+            detector.close()
+            result = detector.result
 
-        if result is not None:
-            enc = result['encoding']
-            conf = result['confidence']
+            if result is not None:
+                enc = result['encoding']
+                conf = result['confidence']
 
-        if enc is not None and conf >= CONFIDENCE_MAP.get(enc, MIN_CONFIDENCE):
-            encoding = Encoding(
-                enc,
-                None
-            )
-        else:
-            encoding = Encoding('bin', None)
+            if enc is not None and conf >= CONFIDENCE_MAP.get(enc, MIN_CONFIDENCE):
+                encoding = Encoding(
+                    enc,
+                    None
+                )
+            else:
+                encoding = Encoding('bin', None)
     return encoding
 
 
@@ -308,7 +398,29 @@ def inspect_bom(filename):
     return encoding
 
 
-def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096):
+def is_binary(filename, process_large_binary=False, clib=None):  # pragma: no cover
+    """Check if file is binary."""
+
+    binary = False
+    try:
+        file_size = os.path.getsize(filename)
+        # If the file is really big, lets just call it binary.
+        # We dont' have time to let Python chug through a massive file.
+        if not process_large_binary or not _is_very_large(file_size):
+            with open(filename, "rb") as f:
+                # Check start of file if there is a high likely hood of being a binary file.
+                if _is_binary(f.read(1024), clib=clib):
+                    encoding = Encoding('bin', None)
+                    if encoding is not None:
+                        binary = True
+        else:
+            binary = True
+    except Exception:
+        binary = True
+    return binary
+
+
+def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096, clib=None):
     """Guess the encoding and decode the content of the file."""
 
     encoding = None
@@ -323,7 +435,7 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096):
                 if file_size == 0:
                     encoding = Encoding('ascii', None)
                 else:
-                    encoding = _detect_encoding(f, ext, file_size)
+                    encoding = _detect_encoding(f, ext, file_size, clib=clib)
 
                 if verify and encoding.encode != 'bin':
                     if not verify_encode(f, encoding.encode, verify_blocks, verify_block_size):
@@ -338,7 +450,7 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096):
     return encoding
 
 
-def sguess(bfr):
+def sguess(bfr, clib=None):
     """Guess the encoding of the buffer."""
 
     encoding = None
@@ -349,7 +461,7 @@ def sguess(bfr):
             if buffer_size == 0:
                 encoding = Encoding('ascii', None)
             else:
-                encoding = _detect_bfr_encoding(bfr, buffer_size)
+                encoding = _detect_bfr_encoding(bfr, buffer_size, clib=clib)
         else:
             encoding = Encoding('bin', None)
 

@@ -593,7 +593,7 @@ class _FileSearch(object):
     def _get_line_context(self, content, m, line_map):
         """Get context info about the line."""
 
-        win_end = b'\r\n' if self.is_binary else '\r\n'
+        win_end = '\r\n'
 
         before, after = self.context
         row = self._get_row(m.start(), line_map)
@@ -869,9 +869,9 @@ class _FileSearch(object):
             if string_buffer:
                 self.current_encoding = text_decode.Encoding('unicode' if self.is_unicode_buffer else 'bin', None)
                 self.is_binary = not self.is_unicode_buffer
-            elif self.encoding is not None:
+            elif self.encoding is not None:  # or text_decode.is_binary(file_obj.name):
                 if self.encoding == 'bin':
-                    self.current_encoding = text_decode.Encoding(self.encoding, None)
+                    self.current_encoding = text_decode.Encoding('bin', None)
                     self.is_binary = True
                 elif self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
                     bom = text_decode.inspect_bom(file_obj.name)
