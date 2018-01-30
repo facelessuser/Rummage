@@ -57,7 +57,7 @@ To install modules like `regex`, you will need to have Xcode installed.
 1. Download Xcode from the Mac App Store.
 2. Navigate to Xcode > Preferences > Downloads tab.
 3. Click the button to install the Command Line Tools.
-4. Open Terminal (Applications/Terminal) and run `xcode-select –install`. You will be prompted to install the Xcode Command Line Tools.
+4. Open Terminal (Applications/Terminal) and run `xcode-select --install`. You will be prompted to install the Xcode Command Line Tools.
 
 ## Installation
 
