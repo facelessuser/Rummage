@@ -18,6 +18,7 @@
 - **FIX**: Rework main application object to fix related issues.
 - **FIX**: Limit bulk file open to 20 items to prevent issues when open massive amount of files at once.
 - **FIX**: Regression with exports due to recent column addition and order change.
+- **FIX**: Binary test should be applied before BOM check.
 
 ## 3.4.3
 
