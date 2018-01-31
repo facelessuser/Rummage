@@ -35,7 +35,10 @@ SEARCH_TYPE = 1
 class ImportSettingsDialog(gui.ImportSettingsDialog):
     """Import settings dialog."""
 
-    BOOLEAN = ("alert_enabled", "debug", "hide_limit", "notify_enabled", "single_instance")
+    BOOLEAN = (
+        "alert_enabled", "check_updates", "check_prerelease", "debug",
+        "hide_limit", "notify_enabled", "single_instance"
+    )
     STRING = ("backup_ext", "backup_folder", "term_notifier", "editor", "notify_method")
     INTEGER = ("backup_type", "chardet_mode", "regex_mode", "regex_version")
     RE_LITERAL_FLAGS = re.compile(r'[iuf]*')
@@ -184,10 +187,10 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         if key == 'backup_type':
             minimum = 0
             maximum = 1
-        elif key in "regex_mode":
+        elif key == "regex_mode":
             minimum = 0
             maximum = 3
-        elif key in "regex_version":
+        elif key == "regex_version":
             minimum = 0
             maximum = 1
         elif key == 'chardet_mode':
@@ -360,7 +363,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                 v = self.validate(k, v)
             elif k == 'saved_searches' and patterns:
                 v = self.validate(k, v)
-            elif k not in ('__format__', 'chains', 'saved_searches', 'debug') and general:
+            elif k not in ('__format__', 'chains', 'saved_searches', 'last_update_check', 'debug') and general:
                 v = self.validate(k, v)
             else:
                 # Non-valid key, or we don't want to import it
