@@ -255,7 +255,7 @@ class SettingsDialog(gui.SettingsDialog):
     def on_prerelease_toggle(self, event):
         """Prerelease toggle."""
 
-        Settings.set_prerelease(self.m_update_checkbox.GetValue())
+        Settings.set_prerelease(self.m_prerelease_checkbox.GetValue())
         event.Skip()
 
     def on_clear_history(self, event):
