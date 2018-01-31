@@ -37,7 +37,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
 
     BOOLEAN = ("alert_enabled", "debug", "hide_limit", "notify_enabled", "single_instance")
     STRING = ("backup_ext", "backup_folder", "term_notifier", "editor", "notify_method")
-    INTEGER = ("backup_type", "regex_mode", "regex_version")
+    INTEGER = ("backup_type", "chardet_mode", "regex_mode", "regex_version")
     RE_LITERAL_FLAGS = re.compile(r'[iuf]*')
     RE_REGEXP_FLAGS = re.compile(r'[iufsbewrpF]*')
     RE_STRING_REFS = re.compile(r'[\a\b\f\r\t\n\v]')
@@ -190,6 +190,9 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         elif key in "regex_version":
             minimum = 0
             maximum = 1
+        elif key == 'chardet_mode':
+            minimum = 0
+            maximum = 2
         if not self.is_integer(value, minimum, maximum):
             value = None
         return value

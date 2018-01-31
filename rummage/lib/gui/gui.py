@@ -1054,6 +1054,39 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_regex_panel.Layout()
 		fgSizer43.Fit( self.m_regex_panel )
 		self.m_settings_notebook.AddPage( self.m_regex_panel, u"Regex", False )
+		self.m_encoding_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_encoding_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
+		fgSizer57 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer57.AddGrowableCol( 0 )
+		fgSizer57.AddGrowableRow( 1 )
+		fgSizer57.SetFlexibleDirection( wx.BOTH )
+		fgSizer57.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		fgSizer58 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer58.SetFlexibleDirection( wx.BOTH )
+		fgSizer58.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_encoding_label = wx.StaticText( self.m_encoding_panel, wx.ID_ANY, u"Encoding Detection", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_encoding_label.Wrap( -1 )
+		fgSizer58.Add( self.m_encoding_label, 0, wx.ALL, 5 )
+		
+		m_encoding_choiceChoices = []
+		self.m_encoding_choice = wx.Choice( self.m_encoding_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_encoding_choiceChoices, 0 )
+		self.m_encoding_choice.SetSelection( 0 )
+		fgSizer58.Add( self.m_encoding_choice, 0, wx.ALL, 5 )
+		
+		
+		fgSizer57.Add( fgSizer58, 1, wx.EXPAND, 5 )
+		
+		self.m_filetype_listctrl = wx.ListCtrl( self.m_encoding_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_ICON|wx.LC_REPORT )
+		fgSizer57.Add( self.m_filetype_listctrl, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.m_encoding_panel.SetSizer( fgSizer57 )
+		self.m_encoding_panel.Layout()
+		fgSizer57.Fit( self.m_encoding_panel )
+		self.m_settings_notebook.AddPage( self.m_encoding_panel, u"Encoding", False )
 		self.m_editor_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_editor_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
@@ -1229,6 +1262,7 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_regex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_regex_toggle )
 		self.m_bregex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bregex_toggle )
 		self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
+		self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
 		self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
 		self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
 		self.m_notify_choice.Bind( wx.EVT_CHOICE, self.on_notify_choice )
@@ -1275,6 +1309,9 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_regex_ver_choice( self, event ):
+		event.Skip()
+	
+	def on_chardet( self, event ):
 		event.Skip()
 	
 	def on_editor_change( self, event ):

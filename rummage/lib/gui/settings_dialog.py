@@ -61,7 +61,6 @@ class SettingsDialog(gui.SettingsDialog):
         ]
         history_records = Settings.get_history_record_count(self.history_types)
         self.history_records_cleared = False
-        mode = Settings.get_regex_mode()
 
         self.editor = Settings.get_editor()
         if isinstance(self.editor, (tuple, list)):
@@ -71,6 +70,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
         self.m_history_label.SetLabel(self.RECORDS % history_records)
         self.m_history_clear_button.Enable(history_records > 0)
+        mode = Settings.get_regex_mode()
         self.m_bregex_radio.SetValue(mode == rumcore.BREGEX_MODE)
         self.m_regex_radio.SetValue(mode == rumcore.REGEX_MODE)
         self.m_bre_radio.SetValue(mode == rumcore.BRE_MODE)
@@ -118,6 +118,7 @@ class SettingsDialog(gui.SettingsDialog):
 
         self.m_general_panel.Fit()
         self.m_regex_panel.Fit()
+        self.m_encoding_panel.Fit()
         self.m_editor_panel.Fit()
         self.m_notify_panel.Fit()
         self.m_history_panel.Fit()
@@ -125,9 +126,9 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_settings_notebook.Fit()
         self.m_settings_panel.Fit()
         self.Fit()
-        if self.GetSize()[1] < 500:
-            self.SetSize(wx.Size(500, self.GetSize()[1]))
-        self.SetMinSize(wx.Size(500, self.GetSize()[1]))
+        if self.GetSize()[1] < 550:
+            self.SetSize(wx.Size(550, self.GetSize()[1]))
+        self.SetMinSize(wx.Size(550, self.GetSize()[1]))
 
     def localize(self):
         """Translage strings."""
@@ -181,6 +182,14 @@ class SettingsDialog(gui.SettingsDialog):
         self.CHECK_UPDATES = _("Check updates daily")
         self.PRERELEASES = _("Include pre-releases")
         self.CHECK_NOW = _("Check now")
+        self.ENCODING = _("Encoding")
+        self.CHARDET_CHOICE = [
+            _("Fastest"),
+            _("chardet (pure python)"),
+            _("cchardet (C)")
+        ]
+        self.FILE_TYPE = _("File type")
+        self.EXTENSIONS = _("Extensions")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -188,9 +197,10 @@ class SettingsDialog(gui.SettingsDialog):
         self.SetTitle(self.TITLE)
         self.m_settings_notebook.SetPageText(0, self.GENERAL_TAB)
         self.m_settings_notebook.SetPageText(1, self.REGEX_TAB)
-        self.m_settings_notebook.SetPageText(2, self.EDITOR_TAB)
-        self.m_settings_notebook.SetPageText(3, self.NOTIFICATIONS_TAB)
-        self.m_settings_notebook.SetPageText(4, self.HISTORY_TAB)
+        self.m_settings_notebook.SetPageText(2, self.ENCODING)
+        self.m_settings_notebook.SetPageText(3, self.EDITOR_TAB)
+        self.m_settings_notebook.SetPageText(4, self.NOTIFICATIONS_TAB)
+        self.m_settings_notebook.SetPageText(5, self.HISTORY_TAB)
         self.m_single_checkbox.SetLabel(self.SINGLE_INSTANCE)
         self.m_visual_alert_checkbox.SetLabel(self.NOTIFY_POPUP)
         self.m_audio_alert_checkbox.SetLabel(self.ALERT)
@@ -212,12 +222,25 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_update_checkbox.SetLabel(self.CHECK_UPDATES)
         self.m_prerelease_checkbox.SetLabel(self.PRERELEASES)
         self.m_check_update_button.SetLabel(self.CHECK_NOW)
+
+        encoding = Settings.get_chardet_mode()
+        cchardet_available = Settings.is_cchardet_available()
+        options = self.CHARDET_CHOICE if cchardet_available else self.CHARDET_CHOICE[:1]
+        for x in options:
+            self.m_encoding_choice.Append(x)
+        self.m_encoding_choice.SetSelection(encoding)
+
         self.Fit()
 
     def history_cleared(self):
         """Return if history was cleared."""
 
         return self.history_records_cleared
+
+    def on_chardet(self, event):
+        """Handle chardet selection."""
+
+        Settings.set_chardet_mode(self.m_encoding_choice.GetCurrentSelection())
 
     def on_check(self, event):
         """Check updates."""

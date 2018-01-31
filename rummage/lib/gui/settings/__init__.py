@@ -32,6 +32,7 @@ from ..localization import _
 from .. import data
 from .. import notify
 from ... import rumcore
+from ...rumcore import text_decode
 from ... import util
 
 DEV_MODE = False
@@ -51,6 +52,10 @@ NOTIFY_STYLES = {
 
 BACKUP_FILE = 0
 BACKUP_FOLDER = 1
+
+CHARDET_DEFAULT = 0
+CHARDET_PYTHON = 1
+CHARDET_CLIB = 2
 
 
 class Settings(object):
@@ -110,6 +115,38 @@ class Settings(object):
         """Check if regex support is available."""
 
         return rumcore.REGEX_SUPPORT
+
+    @classmethod
+    def is_cchardet_available(cls):
+        """Check if cchardet is available."""
+
+        return text_decode.CCDetect is not None
+
+    @classmethod
+    def set_chardet_mode(cls, value):
+        """Set chardet mode."""
+
+        cls.reload_settings()
+        cls._set_chardet_mode(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_chardet_mode(cls, value):
+        """Set chardet mode."""
+
+        if text_decode.CCDetect is None or value > CHARDET_CLIB:
+            value = CHARDET_DEFAULT
+        cls.settings["chardet_mode"] = value
+
+    @classmethod
+    def get_chardet_mode(cls):
+        """See if regex support is enabled."""
+
+        cls.reload_settings()
+        value = cls.settings.get('chardet_mode', CHARDET_DEFAULT)
+        if text_decode.CCDetect is None or value > CHARDET_CLIB:
+            value = CHARDET_DEFAULT
+        return value
 
     @classmethod
     def set_regex_mode(cls, value):
@@ -998,6 +1035,10 @@ class Settings(object):
             cls._set_backup_ext(obj['backup_ext'])
         if 'backup_type' in obj:
             cls._set_backup_type(obj['backup_type'])
+
+        # Chardet
+        if 'chardet_mode' in obj:
+            cls._set_chardet_mode(obj['chardet_mode'])
 
         # Updates
         if 'check_updates' in obj:

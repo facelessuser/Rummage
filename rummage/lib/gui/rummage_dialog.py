@@ -177,7 +177,8 @@ class RummageThread(threading.Thread):
             created=args['created_compare'],
             size=args['size_compare'],
             backup_location=args['backup_location'],
-            regex_mode=args['regex_mode']
+            regex_mode=args['regex_mode'],
+            cchardet=args['cchardet']
         )
 
         threading.Thread.__init__(self)
@@ -313,6 +314,7 @@ class RummageArgs(object):
         self.regex_mode = rumcore.RE_MODE
         self.regex_version = 0
         self.formatreplace = False
+        self.cchardet = None
 
 
 class RummageFrame(gui.RummageFrame):
@@ -1299,6 +1301,14 @@ class RummageFrame(gui.RummageFrame):
         args.recursive = self.m_subfolder_checkbox.GetValue()
         args.pattern = self.m_searchfor_textbox.Value
         args.replace = self.m_replace_textbox.Value if replace else None
+        chardet_mode = Settings.get_chardet_mode()
+        if chardet_mode == 0:
+            chardet_mode = None
+        elif chardet_mode == 1:
+            chardet_mode = False
+        else:
+            chardet_mode = True
+        args.cchardet = chardet_mode
 
         # Limit Options
         if os.path.isdir(args.target):
@@ -1380,7 +1390,8 @@ class RummageFrame(gui.RummageFrame):
             'created_compare': args.created_compare,
             'size_compare': args.size_compare,
             'backup_location': args.backup_location,
-            'regex_mode': args.regex_mode
+            'regex_mode': args.regex_mode,
+            'cchardet': args.cchardet
         }
 
         # Save GUI history
