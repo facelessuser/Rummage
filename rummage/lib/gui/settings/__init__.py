@@ -65,6 +65,7 @@ DEFAULT_SETTINGS = {
     "backup_folder": ".rum-bak",
     "backup_type": BACKUP_FILE,
     "chains": {},
+    "chardet_mode": CHARDET_DEFAULT,
     "check_prerelease": False,
     "check_updates": False,
     "editor": "",
