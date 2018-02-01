@@ -513,12 +513,12 @@ class _FileSearch(object):
     def __init__(
         self, search_obj, file_obj, file_id, flags, context, encoding,
         backup_location, max_count, file_content=None, regex_mode=RE_MODE,
-        cchardet=None
+        encoding_options=None
     ):
         """Init the file search object."""
 
         self.abort = False
-        self.cchardet = cchardet
+        self.encoding_options = encoding_options
         self.search_obj = search_obj
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
@@ -872,7 +872,7 @@ class _FileSearch(object):
                 self.current_encoding = text_decode.Encoding('unicode' if self.is_unicode_buffer else 'bin', None)
                 self.is_binary = not self.is_unicode_buffer
             elif self.encoding is not None:
-                if self.encoding == 'bin':  # or text_decode.is_binary(file_obj.name, clib=self.cchardet):
+                if self.encoding == 'bin':  # or text_decode.is_binary(file_obj.name, clib=self.encoding_options):
                     self.current_encoding = text_decode.Encoding('bin', None)
                     self.is_binary = True
                 elif self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
@@ -885,7 +885,9 @@ class _FileSearch(object):
                     self.current_encoding = text_decode.Encoding(self.encoding, None)
             else:
                 # Guess encoding and decode file
-                encoding = text_decode.guess(file_obj.name, verify=False, clib=self.cchardet)
+                encoding = text_decode.guess(
+                    file_obj.name, verify=False, encoding_options=self.encoding_options
+                )
                 if encoding is not None:
                     if encoding.encode == "bin":
                         self.is_binary = True
@@ -1453,7 +1455,7 @@ class Rummage(object):
         self, target, searches, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None, encoding=None, size=None,
         modified=None, created=None, backup_location=None, regex_mode=RE_MODE,
-        cchardet=None
+        encoding_options=None
     ):
         """Initialize Rummage object."""
 
@@ -1464,9 +1466,9 @@ class Rummage(object):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
 
-        if cchardet is True and text_decode.CCDetect is None:
-            cchardet = None
-        self.cchardet = cchardet
+        if encoding_options is None:
+            encoding_options = text_decode.DEFAULT_ENCODING_OPTIONS
+        self.encoding_options = encoding_options
 
         self.search_params = searches
         self.file_flags = flags & FILE_MASK
@@ -1626,7 +1628,7 @@ class Rummage(object):
                 self.max,
                 content_buffer,
                 self.regex_mode,
-                self.cchardet
+                self.encoding_options
             )
             for rec in self.searcher.run():
                 if rec.error is None:

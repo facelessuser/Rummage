@@ -232,7 +232,7 @@ class TestChardetSguess(unittest.TestCase):
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
-        encoding = text_decode.sguess(string, clib=False)
+        encoding = text_decode.sguess(string, encoding_options={'chardet_mode': text_decode.CHARDET_PYTHON})
         self.assertEqual(encoding.encode, 'utf-8')
         self.assertEqual(encoding.bom, None)
 
@@ -246,7 +246,7 @@ class TestChardetSguess(unittest.TestCase):
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
-        encoding = text_decode.sguess(string, clib=True)
+        encoding = text_decode.sguess(string, encoding_options={'chardet_mode': text_decode.CHARDET_CLIB})
         self.assertEqual(encoding.encode, 'utf-8')
         self.assertEqual(encoding.bom, None)
 

@@ -40,7 +40,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         "hide_limit", "notify_enabled", "single_instance"
     )
     STRING = ("backup_ext", "backup_folder", "term_notifier", "editor", "notify_method")
-    INTEGER = ("backup_type", "chardet_mode", "regex_mode", "regex_version")
+    INTEGER = ("backup_type", "regex_mode", "regex_version")
     RE_LITERAL_FLAGS = re.compile(r'[iuf]*')
     RE_REGEXP_FLAGS = re.compile(r'[iufsbewrpF]*')
     RE_STRING_REFS = re.compile(r'[\a\b\f\r\t\n\v]')
@@ -200,6 +200,46 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
             value = None
         return value
 
+    def import_encoding_options(self, key, value):
+        """Import encoding options."""
+
+        bad_keys = set()
+        good_keys = set()
+        new_value = {}
+        if not self.is_dict(value):
+            new_value = None
+            bad_keys.add('encoding_options')
+        else:
+            for k, v in value.items():
+                if k == "chardet_mode":
+                    value = self.import_int(k, v)
+                    if value is not None:
+                        good_keys.add('encoding_options.%s' % k)
+                    else:
+                        bad_keys.add('encoding_options.%s' % k)
+                    new_value[k] = v
+                    continue
+
+                if not self.is_list(v):
+                    bad_keys.add(k)
+                    continue
+
+                for i in v:
+                    if not self.is_string(i):
+                        bad_keys.add('encoding_options.%s' % k)
+                        break
+
+                new_value[k] = v
+                good_keys.add('encoding_options.%s' % k)
+
+        for k in bad_keys:
+            self.results.append(self.IMPORT_FAIL_CHAIN % k)
+
+        for k in good_keys:
+            self.results.append(self.IMPORT_SUCCESS_CHAIN % k)
+
+        return new_value
+
     def import_chain(self, key, value):
         """Import chain setting."""
 
@@ -336,6 +376,9 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
 
         elif key in self.INTEGER:
             value = self.import_int(key, value)
+
+        elif key == 'encoding_options':
+            value = self.import_encoding_options(key, value)
 
         elif key == "chains":
             value = self.import_chain(key, value)
