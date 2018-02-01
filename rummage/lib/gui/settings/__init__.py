@@ -53,6 +53,28 @@ BACKUP_FILE = 0
 BACKUP_FOLDER = 1
 
 
+DEFAULT_SETTINGS = {
+    "__format__": SETTINGS_FMT,
+    "alert_enabled": True,
+    "backup_ext": "rum-bak",
+    "backup_folder": ".rum-bak",
+    "backup_type": BACKUP_FILE,
+    "chains": {},
+    "check_prerelease": False,
+    "check_updates": False,
+    "editor": "",
+    "hide_limit": False,
+    "locale": "en_US",
+    "notify_enabled": True,
+    "notify_method": "default",
+    "regex_mode": rumcore.RE_MODE,
+    "regex_version": 0,
+    "saved_searches": {},
+    "single_instance": False,
+    "term_notifier": ""
+}
+
+
 class Settings(object):
     """Handle settings."""
 
@@ -84,8 +106,6 @@ class Settings(object):
         if cls.settings_file is not None:
             cls.open_settings()
             cls.open_cache()
-        # if cls.debug:
-        #     custom_app.set_debug_mode(True)
         localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
         cls.localize()
         debug_struct(cls.settings)
@@ -314,16 +334,14 @@ class Settings(object):
     def open_settings(cls):
         """Open settings file."""
 
-        success = False
         try:
             with cls.settings_lock.acquire(2):
                 with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
                     cls.settings = json.loads(f.read())
-            success = True
         except Exception:
             errormsg(cls.ERR_LOAD_SETTINGS_FAILED)
-        if success:
-            cls.update_settings()
+
+        cls.update_settings()
 
     @classmethod
     def new_settings(cls, settings):
@@ -345,11 +363,13 @@ class Settings(object):
     def update_settings(cls):
         """Update settings."""
 
+        updated = False
         settings_format = cls.settings.get('__format__')
         # if settings_format is None:
         #     # Replace invalid settings
         #     cls.settings = cls.new_settings(cls.settings_file)
         if settings_format < '2.1.0':
+            updated = True
             searches = cls.settings.get("saved_searches", {})
 
             # Upgrade versions before format existed
@@ -380,6 +400,14 @@ class Settings(object):
 
             # Update format
             cls.settings["__format__"] = SETTINGS_FMT
+
+        # Update settings with any missing values
+        for k, v in DEFAULT_SETTINGS.items():
+            if k not in cls.settings:
+                updated = True
+                cls.settings[k] = copy.copy(v)
+
+        if updated:
             cls.save_settings()
 
     @classmethod
