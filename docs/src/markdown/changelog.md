@@ -3,7 +3,8 @@
 ## 3.6.0
 
 - **NEW**: Rummage will use `cchardet` by default if found.
-- **FIX**: Binary test should be applied before BOM check.
+- **NEW**: Expose way to specify `cchardet` being used.
+- **NEW**: Expose special file type encoding handling, and allow user to modify extension list. Covers: `bin`, `python`, `html`, and `xml`.
 
 ## 3.5.0
 
