@@ -23,6 +23,7 @@ import wx
 import re
 from .settings import Settings
 from .editor_dialog import EditorDialog
+from .file_ext_dialog import FileExtDialog
 from .generic_dialogs import yesno, errormsg
 from .localization import _
 from . import gui
@@ -31,6 +32,9 @@ from .. import util
 
 # We really need a better validator
 BACKUP_VALIDATOR = re.compile(r'^[-_a-zA-Z\d.]+$')
+
+MINIMUM_COL_SIZE = 100
+COLUMN_SAMPLE_SIZE = 100
 
 
 class SettingsDialog(gui.SettingsDialog):
@@ -61,6 +65,7 @@ class SettingsDialog(gui.SettingsDialog):
         ]
         history_records = Settings.get_history_record_count(self.history_types)
         self.history_records_cleared = False
+        self.dc = wx.ClientDC(self.m_filetype_listctrl)
 
         self.editor = Settings.get_editor()
         if isinstance(self.editor, (tuple, list)):
@@ -130,6 +135,8 @@ class SettingsDialog(gui.SettingsDialog):
             self.SetSize(wx.Size(550, self.GetSize()[1]))
         self.SetMinSize(wx.Size(550, self.GetSize()[1]))
 
+        self.size_columns()
+
     def localize(self):
         """Translage strings."""
 
@@ -190,6 +197,7 @@ class SettingsDialog(gui.SettingsDialog):
         ]
         self.FILE_TYPE = _("File type")
         self.EXTENSIONS = _("Extensions")
+        self.SPECIAL = _("Special file types:")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -222,6 +230,9 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_update_checkbox.SetLabel(self.CHECK_UPDATES)
         self.m_prerelease_checkbox.SetLabel(self.PRERELEASES)
         self.m_check_update_button.SetLabel(self.CHECK_NOW)
+        self.m_filetype_label.SetLabel(self.SPECIAL)
+        self.m_filetype_listctrl.InsertColumn(0, self.FILE_TYPE)
+        self.m_filetype_listctrl.InsertColumn(1, self.EXTENSIONS)
 
         encoding = Settings.get_chardet_mode()
         cchardet_available = Settings.is_cchardet_available()
@@ -230,7 +241,36 @@ class SettingsDialog(gui.SettingsDialog):
             self.m_encoding_choice.Append(x)
         self.m_encoding_choice.SetSelection(encoding)
 
+        encoding_ext = Settings.get_encoding_ext()
+        keys = sorted(encoding_ext.keys())
+        idx = 0
+        for key in keys:
+            self.m_filetype_listctrl.InsertItem(idx, key)
+            self.m_filetype_listctrl.SetItem(idx, 1, ', '.join(encoding_ext[key]))
+            idx += 1
+
         self.Fit()
+
+    def size_columns(self):
+        """Size columns."""
+
+        columns = self.m_filetype_listctrl.GetColumnCount()
+        widest_cell = [MINIMUM_COL_SIZE] * columns
+
+        for idx in range(self.m_filetype_listctrl.GetItemCount()):
+            for x in range(columns):
+                text = self.m_filetype_listctrl.GetItemText(idx, x)
+                lw = self.dc.GetFullTextExtent(text)[0]
+                width = lw + 30
+                if width > widest_cell[x]:
+                    widest_cell[x] = width
+        total_size = 0
+        for x in range(len(widest_cell)):
+            total_size += widest_cell[x]
+            self.m_filetype_listctrl.SetColumnWidth(x, widest_cell[x])
+
+        if total_size < self.m_filetype_listctrl.GetSize()[0] - 20:
+            self.SetColumnWidth(1, widest_cell[-1] + self.m_filetype_listctrl.GetSize()[0] - total_size)
 
     def history_cleared(self):
         """Return if history was cleared."""
@@ -375,6 +415,24 @@ class SettingsDialog(gui.SettingsDialog):
         """Close on cancel."""
 
         self.Close()
+
+    def on_dclick(self, event):
+        """Handle double click."""
+
+        pos = event.GetPosition()
+        item = self.m_filetype_listctrl.HitTestSubItem(pos)[0]
+        if item != -1:
+            key = self.m_filetype_listctrl.GetItemText(item, 0)
+            extensions = self.m_filetype_listctrl.GetItemText(item, 1)
+            dlg = FileExtDialog(self, extensions)
+            dlg.ShowModal()
+            value = dlg.extensions
+            dlg.Destroy()
+            if extensions != value:
+                Settings.set_encoding_ext({key: value.split(', ')})
+                self.m_filetype_listctrl.SetItem(item, 1, value)
+                self.size_columns()
+        event.Skip()
 
     def on_change_module(self, event):
         """Change the module."""
