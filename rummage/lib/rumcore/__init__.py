@@ -872,7 +872,7 @@ class _FileSearch(object):
                 self.current_encoding = text_decode.Encoding('unicode' if self.is_unicode_buffer else 'bin', None)
                 self.is_binary = not self.is_unicode_buffer
             elif self.encoding is not None:
-                if self.encoding == 'bin':  # or text_decode.is_binary(file_obj.name, clib=self.encoding_options):
+                if self.encoding == 'bin':
                     self.current_encoding = text_decode.Encoding('bin', None)
                     self.is_binary = True
                 elif self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
