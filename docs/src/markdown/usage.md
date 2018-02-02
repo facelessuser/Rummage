@@ -538,6 +538,12 @@ Paths might vary depending on Ubuntu version etc.
 
 - Restart of Nautilus may or may not be needed, but context menu item should appear under `Scripts` and should work on files and folders.
 
+## Checking for Updates
+
+Rummage has a feature available from the menu to check for updates. In the settings, you can also enable checking for updates daily and even control whether it checks for prereleases. But there is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
+
+Details are nice, but what you actually want to know is probably how to get this working. It is actually quite easy. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed bundle location. If you are using something like macports, then you'll probably have to research to find out how to do the same thing.
+
 ## Localization
 
 Rummage provides an i18n localization framework to allow support for displaying the UI in other languages. But there is some manual setup required as out of the box, everything is in English. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).

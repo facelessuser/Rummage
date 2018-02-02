@@ -20,6 +20,7 @@ NONINFRINGEMENT
 OS's
 OSD
 Oct
+OpenSSL
 POSIX
 Plugin
 PyMdown
@@ -45,10 +46,12 @@ emoji
 grepWin
 inline
 macOS
+macports
 multi
 plugin
 plugins
 pre
+prereleases
 regex
 reinstalling
 requesters
