@@ -43,7 +43,12 @@ MIN_CONFIDENCE = 0.5
 CONFIDENCE_MAP = {
 }
 
+CHARDET_DEFAULT = 0
+CHARDET_PYTHON = 1
+CHARDET_CLIB = 2
+
 DEFAULT_ENCODING_OPTIONS = {
+    "chardet_mode": CHARDET_DEFAULT,
     "bin": [
         ".bin", ".jpg", ".jpeg", ".png", ".gif", ".ttf", ".tga", ".dds",
         ".ico", ".eot", ".pdf", ".swf", ".jar", ".zip", ".exe"
@@ -52,10 +57,6 @@ DEFAULT_ENCODING_OPTIONS = {
     "html": [".html", ".htm", ".xhtml"],
     "xml": [".xml"]
 }
-
-CHARDET_DEFAULT = 0
-CHARDET_PYTHON = 1
-CHARDET_CLIB = 2
 
 RE_UTF_BOM = re.compile(
     b'^(?:(' +
