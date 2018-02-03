@@ -304,7 +304,7 @@ Include\ binary\ files | Forces Rummage to search binary files.
 
 Rummage allows the exporting of the results to either CSV or HTML.  Simply select **File-->Export** and pick either **CSV** or **HTML**.  The HTML output will be styled similar to the GUI interface with the results in tables with sortable columns.
 
-!!! note "Note":
+!!! info "Large Result Sets":
     Really, really large sets of results will probably be best suited for CSV as a browser may have a hard time loading the entire data set at once.
 
 ## Preferences
@@ -330,6 +330,11 @@ Updates
     Controls whether Rummage will check for new updates daily and allows controlling whether you want to be notified of prereleases as well. A button has also been provided to check for updates right away after configuring your update settings.
 
     The check is only a check for new versions and doesn't perform an upgrade.  Rummage must be upgraded via `pip` from command line.
+
+    !!! info "Update Issues: Python 3.6+ on macOS"
+        There is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
+
+        To get access again to the default certificates is actually quite easy. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed bundle location. If you are using something like macports, then you'll probably have to research to find out how to do the same thing.
 
 ### Regex
 
@@ -382,7 +387,7 @@ Ubuntu
    - Growl: [Support for Linux][growl-linux].
    - Native: OSD via `notify-send`.
 
-    !!! Note "Note"
+    !!! info "Other Distros"
         Though Rummage should run on any Linux distro, the native dialog option was built around Ubuntu's native notifications called OSD.  Notifications will not work on other distros that do not use OSD *unless* they use Growl.  Even without Growl, other distros will probably still get the audible cue, but as each distro varies, it is difficult to be certain.  As notifications are not crucial to usage, this is minor concern.
 
 macOS
@@ -390,7 +395,7 @@ macOS
     - Growl: [Support for macOS][growl-macos].
     - Native: Notification Center via [terminal-notifier][terminal-notifier]. Path to `terminal-notifier` must be configured.
 
-    !!! Note "Note"
+    !!! info "Configuring macOS Native"
         When selecting `native` on macOS, an option to select the path to terminal notifier will be available since native dialogs rely on `terminal-notifier` to send notifications to the Notification Center. This must be configured or *native* notifications will not work.
 
         When selecting the `terminal-notifier` path, you can select either the binary directly or the `.<app` bundle (depending on how you installed `terminal-notifier`).  When selecting the `.app` bundle, Rummage will know how to access the binary inside the bundle.
@@ -559,12 +564,6 @@ Paths might vary depending on Ubuntu version etc.
     ```
 
 - Restart of Nautilus may or may not be needed, but context menu item should appear under `Scripts` and should work on files and folders.
-
-## Checking for Updates
-
-Rummage has a feature available from the menu to check for updates. In the settings, you can also enable checking for updates daily and even control whether it checks for prereleases. But there is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
-
-Details are nice, but what you actually want to know is probably how to get this working. It is actually quite easy. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed bundle location. If you are using something like macports, then you'll probably have to research to find out how to do the same thing.
 
 ## Localization
 
