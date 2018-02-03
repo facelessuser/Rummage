@@ -44,6 +44,20 @@ class TestBom(unittest.TestCase):
         self.assertEqual(bom.encode, 'utf-32-le')
         self.assertEqual(bom.bom, codecs.BOM_UTF32_LE)
 
+    def test_10646_UC4_3412(self):
+        """Test 10646_UC4_3412 BOM detection."""
+
+        bom = text_decode.inspect_bom('tests/encodings/10646_UC4_3412.txt')
+        self.assertEqual(bom.encode, 'bin')
+        self.assertEqual(bom.bom, None)
+
+    def test_10646_UC4_2143(self):
+        """Test 10646_UC4_2143 BOM detection."""
+
+        bom = text_decode.inspect_bom('tests/encodings/10646_UC4_2143.txt')
+        self.assertEqual(bom.encode, 'bin')
+        self.assertEqual(bom.bom, None)
+
     def test_no_bom(self):
         """Test that files with no BOM return as None."""
 
@@ -137,7 +151,7 @@ class TestPyEncodingGuess(unittest.TestCase):
         self.assertEqual(encoding.bom, None)
 
         encoding = text_decode.guess('tests/encodings/utf16_be_bad.xml')
-        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.encode, 'bin')
         self.assertEqual(encoding.bom, None)
 
     def test_binary_ext_guess(self):

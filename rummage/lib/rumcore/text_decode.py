@@ -47,6 +47,14 @@ CHARDET_DEFAULT = 0
 CHARDET_PYTHON = 1
 CHARDET_CLIB = 2
 
+# Middle endian encodings
+# Python won't really be able to process these,
+# but we'll identify them and most likely fallback to bin.
+BOM_10646_UC4_3412 = b'\xFE\xFF\x00\x00'
+BOM_10646_UC4_2143 = b'\x00\x00\xFF\xFE'
+ENCODING_10646_UC4_3412 = "X-ISO-10646-UCS-4-3412"
+ENCODING_10646_UC4_2143 = "X-ISO-10646-UCS-4-2143"
+
 DEFAULT_ENCODING_OPTIONS = {
     "chardet_mode": CHARDET_DEFAULT,
     "bin": [
@@ -57,20 +65,6 @@ DEFAULT_ENCODING_OPTIONS = {
     "html": [".html", ".htm", ".xhtml"],
     "xml": [".xml"]
 }
-
-RE_UTF_BOM = re.compile(
-    b'^(?:(' +
-    codecs.BOM_UTF8 +
-    b')[\x00-\xFF]?|(' +
-    codecs.BOM_UTF32_BE +
-    b')|(' +
-    codecs.BOM_UTF32_LE +
-    b')|(' +
-    codecs.BOM_UTF16_BE +
-    b')|(' +
-    codecs.BOM_UTF16_LE +
-    b'))'
-)
 
 RE_XML_START = re.compile(
     b'^(?:(' +
@@ -98,10 +92,6 @@ RE_HTML_ENCODE = re.compile(
 
 RE_XML_ENCODE = re.compile(br'''(?i)^<\?xml[^>]*encoding=(['"])(.*?)\1[^>]*\?>''')
 RE_XML_ENCODE_U = re.compile(r'''(?i)^<\?xml[^>]*encoding=(['"])(.*?)\1[^>]*\?>''')
-
-RE_IS_BIN = re.compile(
-    br'\x00{2}'
-)
 
 RE_BAD_ASCII = re.compile(
     b'''(?x)
@@ -278,7 +268,7 @@ def _is_binary_ext(ext, ext_list):
 def _is_binary(content):
     """Search for triple null."""
 
-    return RE_IS_BIN.search(content) is not None
+    return b'\x00' in content
 
 
 def _is_ascii(content):
@@ -321,18 +311,30 @@ def has_bom(content):
     """Check for UTF8, UTF16, and UTF32 BOMS."""
 
     bom = None
-    m = RE_UTF_BOM.match(content)
-    if m is not None:
-        if m.group(1):
-            bom = Encoding('utf-8', codecs.BOM_UTF8)
-        elif m.group(2):
-            bom = Encoding('utf-32-be', codecs.BOM_UTF32_BE)
-        elif m.group(3):
-            bom = Encoding('utf-32-le', codecs.BOM_UTF32_LE)
-        elif m.group(4):
-            bom = Encoding('utf-16-be', codecs.BOM_UTF16_BE)
-        elif m.group(5):
-            bom = Encoding('utf-16-le', codecs.BOM_UTF16_LE)
+    if content.startswith(codecs.BOM_UTF8):
+        bom = Encoding('utf-8', codecs.BOM_UTF8)
+    elif content == codecs.BOM_UTF32_BE:
+        bom = Encoding('utf-32-be', codecs.BOM_UTF32_BE)
+    elif content == codecs.BOM_UTF32_LE:
+        bom = Encoding('utf-32-le', codecs.BOM_UTF32_LE)
+    elif content == BOM_10646_UC4_3412:
+        bom = Encoding(ENCODING_10646_UC4_3412, BOM_10646_UC4_3412)
+    elif content == BOM_10646_UC4_2143:
+        bom = Encoding(ENCODING_10646_UC4_2143, BOM_10646_UC4_2143)
+    elif content.startswith(codecs.BOM_UTF16_BE):
+        bom = Encoding('utf-16-be', codecs.BOM_UTF16_BE)
+    elif content.startswith(codecs.BOM_UTF16_LE):
+        bom = Encoding('utf-16-le', codecs.BOM_UTF16_LE)
+
+    # It is doubtful we have an encoder that can handle these middle endian
+    # encodings, but lets give it a try and default to bin if nothing is found.
+    # Not sure who'd use these encodings anyways.
+    if bom and bom.encode in (ENCODING_10646_UC4_2143, ENCODING_10646_UC4_3412):
+        try:
+            codecs.getencoder(bom.encode)
+        except Exception:
+            bom = Encoding('bin', None)
+
     return bom
 
 
@@ -359,6 +361,7 @@ def _detect_encoding(f, ext, file_size, encoding_options=None):
         # Check start of file if there is a high likely hood of being a binary file.
         if encoding is None and _is_binary(header):
             encoding = Encoding('bin', None)
+
         # If content is very small, let's try and do a a utf-8 and ascii check
         # before giving it to chardet.  Chardet doesn't work well on small buffers.
         if encoding is None and _is_very_small(file_size):
