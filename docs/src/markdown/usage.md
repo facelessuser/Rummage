@@ -2,11 +2,11 @@
 
 ## Overview
 
-Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, and Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search and replace options are all contained in the **Search** tab.  When a search has been completed, general info about the matches found in files will be displayed in the **Files** tab, and more detailed context information will be displayed in the **Content** tab.
+Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, and Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search and replace options are all contained in the **Search** tab.  As matches are found, general info about the matches will be displayed in the **Files** and **Content** tab.
 
 Rummage also comes with a simple regular expression tester to test out patterns. It also provides a feature where patterns can be saved for later and/or frequent use.
 
-The status bar will show search progress, match counts, and other useful information.
+The status bar will show search status such as match counts and other useful information.
 
 !!! warning "Warning: Replace"
     When replacing, Rummage will back up the file.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you are using version control.
