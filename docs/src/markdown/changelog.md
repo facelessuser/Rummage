@@ -10,6 +10,8 @@
 
 ## 3.5.0
 
+Feb 1, 2018
+
 - **NEW**: Add context menu to content tab just like file tab with all the same entries.
 - **NEW**: Add copy commands to context menus to copy selected file names, paths, or content of match (content tab only).
 - **NEW**: Add "delete" and "send to trash" options to context menu.

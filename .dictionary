@@ -10,6 +10,7 @@ CSV
 Changelog
 Chardet
 EmojiOne
+Feb
 GTK
 GitHub
 Homebrew
@@ -20,6 +21,7 @@ NONINFRINGEMENT
 OS's
 OSD
 Oct
+OpenSSL
 POSIX
 Plugin
 PyMdown
@@ -47,6 +49,7 @@ endian
 grepWin
 inline
 macOS
+macports
 multi
 plugin
 plugins
