@@ -1,6 +1,7 @@
 API
 Automator
 BOM
+BOMs
 Backrefs
 Bre
 Bregex
@@ -42,6 +43,7 @@ distros
 dotfiles
 dropdown
 emoji
+endian
 grepWin
 inline
 macOS
