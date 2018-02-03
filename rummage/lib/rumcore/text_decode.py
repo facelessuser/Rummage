@@ -61,7 +61,7 @@ DEFAULT_ENCODING_OPTIONS = {
 RE_UTF_BOM = re.compile(
     b'^(?:(' +
     codecs.BOM_UTF8 +
-    b')[\x00-\xFF]{,2}|(' +
+    b')[\x00-\xFF]?|(' +
     codecs.BOM_UTF32_BE +
     b')|(' +
     codecs.BOM_UTF32_LE +
@@ -69,6 +69,20 @@ RE_UTF_BOM = re.compile(
     codecs.BOM_UTF16_BE +
     b')|(' +
     codecs.BOM_UTF16_LE +
+    b'))'
+)
+
+RE_XML_START = re.compile(
+    b'^(?:(' +
+    b'<\\?xml[^>]+?>' +  # ASCII like
+    b')|(' +
+    re.escape('<?xml'.encode('utf-32-be')) + b'.+?' + re.escape('>'.encode('utf-32-be')) +
+    b')|(' +
+    re.escape('<?xml'.encode('utf-32-le')) + b'.+?' + re.escape('>'.encode('utf-32-le')) +
+    b')|(' +
+    re.escape('<?xml'.encode('utf-16-be')) + b'.+?' + re.escape('>'.encode('utf-16-be')) +
+    b')|(' +
+    re.escape('<?xml'.encode('utf-16-le')) + b'.+?' + re.escape('>'.encode('utf-16-le')) +
     b'))'
 )
 
@@ -83,6 +97,7 @@ RE_HTML_ENCODE = re.compile(
 )
 
 RE_XML_ENCODE = re.compile(br'''(?i)^<\?xml[^>]*encoding=(['"])(.*?)\1[^>]*\?>''')
+RE_XML_ENCODE_U = re.compile(r'''(?i)^<\?xml[^>]*encoding=(['"])(.*?)\1[^>]*\?>''')
 
 RE_IS_BIN = re.compile(
     br'\x00{2}'
@@ -99,18 +114,18 @@ RE_BAD_ASCII = re.compile(
 
 RE_BAD_UTF8 = re.compile(
     b'''(?x)
-    [\xE0-\xEF].{0,1}([^\x80-\xBF]|$) |
-    [\xF0-\xF7].{0,2}([^\x80-\xBF]|$) |
-    [\xF8-\xFB].{0,3}([^\x80-\xBF]|$) |
-    [\xFC-\xFD].{0,4}([^\x80-\xBF]|$) |
-    [\xFE-\xFE].{0,5}([^\x80-\xBF]|$) |
-    [\x00-\x7F][\x80-\xBF]            |
-    [\xC0-\xDF].[\x80-\xBF]           |
-    [\xE0-\xEF]..[\x80-\xBF]          |
-    [\xF0-\xF7]...[\x80-\xBF]         |
-    [\xF8-\xFB]....[\x80-\xBF]        |
-    [\xFC-\xFD].....[\x80-\xBF]       |
-    [\xFE-\xFE]......[\x80-\xBF]      |
+    [\xE0-\xEF].{0,1}(?:[^\x80-\xBF]|$) |
+    [\xF0-\xF7].{0,2}(?:[^\x80-\xBF]|$) |
+    [\xF8-\xFB].{0,3}(?:[^\x80-\xBF]|$) |
+    [\xFC-\xFD].{0,4}(?:[^\x80-\xBF]|$) |
+    [\xFE-\xFE].{0,5}(?:[^\x80-\xBF]|$) |
+    [\x00-\x7F][\x80-\xBF]              |
+    [\xC0-\xDF].[\x80-\xBF]             |
+    [\xE0-\xEF]..[\x80-\xBF]            |
+    [\xF0-\xF7]...[\x80-\xBF]           |
+    [\xF8-\xFB]....[\x80-\xBF]          |
+    [\xFC-\xFD].....[\x80-\xBF]         |
+    [\xFE-\xFE]......[\x80-\xBF]        |
     ^[\x80-\xBF]
     '''
 )
@@ -147,19 +162,46 @@ def _has_xml_encode(content):
 
     encode = None
 
-    m = RE_XML_ENCODE.match(content)
-
+    m = RE_XML_START.match(content)
     if m:
-        enc = m.group(2).decode('ascii')
+        if m.group(1):
+            m2 = RE_XML_ENCODE.match(m.group(1))
 
-        try:
-            codecs.getencoder(enc)
-            encode = Encoding(enc, None)
-        except LookupError:
-            pass
+            if m2:
+                enc = m2.group(2).decode('ascii')
 
-    if encode is None:
-        encode = Encoding('utf-8', None)
+                try:
+                    codecs.getencoder(enc)
+                    encode = Encoding(enc, None)
+                except LookupError:
+                    pass
+        else:
+            if m.group(2):
+                enc = 'utf-32-be'
+                text = m.group(2)
+            elif m.group(3):
+                enc = 'utf-32-le'
+                text = m.group(3)
+            elif m.group(4):
+                enc = 'utf-16-be'
+                text = m.group(4)
+            elif m.group(5):
+                enc = 'utf-16-le'
+                text = m.group(5)
+            try:
+                m2 = RE_XML_ENCODE_U.match(text.decode(enc))
+            except Exception:  # pragma: no cover
+                m2 = None
+
+            if m2:
+                enc = m2.group(2)
+
+                try:
+                    codecs.getencoder(enc)
+                    encode = Encoding(enc, None)
+                except Exception:
+                    pass
+
     return encode
 
 
@@ -168,31 +210,19 @@ def _has_html_encode(content):
 
     encode = None
 
-    m = RE_XML_ENCODE.match(content)
-
+    # Look for meta charset
+    m = RE_HTML_ENCODE.search(content)
     if m:
-        enc = m.group(2).decode('ascii')
+        enc = m.group(1).decode('ascii')
 
         try:
             codecs.getencoder(enc)
             encode = Encoding(enc, None)
         except LookupError:
             pass
+    else:
+        encode = _has_xml_encode(content)
 
-    if encode is None:
-        m = RE_HTML_ENCODE.search(content)
-
-        if m:
-            enc = m.group(1).decode('ascii')
-
-            try:
-                codecs.getencoder(enc)
-                encode = Encoding(enc, None)
-            except LookupError:
-                pass
-
-    if encode is None:
-        encode = Encoding('utf-8', None)
     return encode
 
 

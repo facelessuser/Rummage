@@ -86,7 +86,7 @@ class TestPyEncodingGuess(unittest.TestCase):
         """Test HTML guess."""
 
         encoding = text_decode.guess('tests/encodings/no_encode.html')
-        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.encode, 'ascii')
         self.assertEqual(encoding.bom, None)
 
         encoding = text_decode.guess('tests/encodings/encode.html')
@@ -94,7 +94,7 @@ class TestPyEncodingGuess(unittest.TestCase):
         self.assertEqual(encoding.bom, None)
 
         encoding = text_decode.guess('tests/encodings/bad_encode.html')
-        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.encode, 'ascii')
         self.assertEqual(encoding.bom, None)
 
         encoding = text_decode.guess('tests/encodings/xml_encode.xhtml')
@@ -102,14 +102,14 @@ class TestPyEncodingGuess(unittest.TestCase):
         self.assertEqual(encoding.bom, None)
 
         encoding = text_decode.guess('tests/encodings/bad_xml_encode.xhtml')
-        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.encode, 'ascii')
         self.assertEqual(encoding.bom, None)
 
     def test_xml_guess(self):
         """Test XML guess."""
 
         encoding = text_decode.guess('tests/encodings/no_encode.xml')
-        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.encode, 'ascii')
         self.assertEqual(encoding.bom, None)
 
         encoding = text_decode.guess('tests/encodings/encode.xml')
@@ -117,6 +117,26 @@ class TestPyEncodingGuess(unittest.TestCase):
         self.assertEqual(encoding.bom, None)
 
         encoding = text_decode.guess('tests/encodings/bad_encode.xml')
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf16_be.xml')
+        self.assertEqual(encoding.encode, 'utf-16-be')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf16_le.xml')
+        self.assertEqual(encoding.encode, 'utf-16-le')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf32_be.xml')
+        self.assertEqual(encoding.encode, 'utf-32-be')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf32_le.xml')
+        self.assertEqual(encoding.encode, 'utf-32-le')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf16_be_bad.xml')
         self.assertEqual(encoding.encode, 'utf-8')
         self.assertEqual(encoding.bom, None)
 
