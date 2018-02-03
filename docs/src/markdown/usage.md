@@ -325,19 +325,35 @@ Language
 : 
     Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated but includes most of the needed translations. In order to use locale, you must copy the project's localization files to your user settings directory. See [Localization](#localization) to learn more.
 
+Updates
+: 
+    Controls whether Rummage will check for new updates daily and allows controlling whether you want to be notified of prereleases as well. A button has also been provided to check for updates right away after configuring your update settings.
+
+    The check is only a check for new versions and doesn't perform an upgrade.  Rummage must be upgraded via `pip` from command line.
+
 ### Regex
 
 ![Preferences: Regex](/images/settings_regex.png)
 
-The **Regular Expression Modules** tab is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes).
+The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes).
 
 If using Regex, you can set it to version of your choice. `V0` tries to be completely compatible with Re patterns while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation](https://pypi.python.org/pypi/regex/) to learn more.
+
+### Encoding
+
+![Preferences: Encoding](/images/settings_encoding.png)
+
+The **Encoding** panel is where you can tweak encoding detection. You can change the default encoding detection used (assuming you have both Chardet and cChardet installed). By default, Rummage will use the fastest (cChardet).
+
+Special encoding file type considerations are also exposed here. File extensions assigned to either HTML, XML, or Python will use special logic to look for encoding declarations in the file's header, while file extensions assigned to binary will shortcut the encoding selection to binary. Just double click the file type whose extensions you would like to modify.
+
+Remember that encoding detection is far from bulletproof and can pick an incorrect encoding. While during searches it might not be as big an issue, it is strongly suggested you use a forced encoding when performing replaces.
 
 ### Editor
 
 ![Preferences: Editor](/images/settings_editor.png)
 
-The **Editor** tab is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files and click `Apply`.
+The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files and click `Apply`.
 
 ![Editor Options](/images/editor_options.png)
 
@@ -357,7 +373,7 @@ Argument Variables | Description
 
 ![Preferences: Notifications](/images/settings_notify.png)
 
-The **Notification** tab controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
+The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
 
 You can also select whether to use the system's built-in notifications or Growl.
 
@@ -389,7 +405,13 @@ Windows
 
 ![Preferences: History](/images/settings_history.png)
 
-The **History** panel is where all text box drop down history can be cleared.
+The **History** panel is where all text box, drop down history can be cleared.
+
+### Backups
+
+![Preferences: Backups](/images/settings_backup.png)
+
+The **Backups** panel allows you to configure where Rummage creates backups. You can control whether backups are all placed in the same folder as the original source, or if they are put into a subfolder. You can also configure the name of the subfolder used or the extension used when not writing to a subfolder.
 
 ## Import/Export Settings
 

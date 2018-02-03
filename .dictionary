@@ -51,12 +51,14 @@ multi
 plugin
 plugins
 pre
+prereleases
 regex
 reinstalling
 requesters
 resize
 resized
 sortable
+subfolder
 subfolders
 sublicense
 symlink
