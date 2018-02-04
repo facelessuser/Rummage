@@ -1,5 +1,6 @@
 [backrefs]: http://facelessuser.github.io/backrefs/
 [backrefs-format]: http://facelessuser.github.io/backrefs/#format-replacements
+[cchardet]: https://pypi.python.org/pypi/cchardet
 [chardet]: https://pypi.python.org/pypi/chardet
 [filelock]: https://pypi.python.org/pypi/filelock/
 [format-string]: https://docs.python.org/2/library/string.html#format-string-syntax

@@ -85,6 +85,16 @@ class SupportInfoDialog(gui.SupportInfoDialog):
         self.m_cancel_button.SetLabel(self.CLOSE)
         self.Fit()
 
+    def on_copy(self, event):
+        """Handle copy event."""
+
+        if wx.TheClipboard.Open():
+            try:
+                wx.TheClipboard.SetData(wx.TextDataObject(self.info))
+            except Exception:
+                pass
+            wx.TheClipboard.Close()
+
     def on_cancel(self, event):
         """Close dialog."""
 
@@ -122,23 +132,37 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             info["chardet"] = 'Version could not be acquired!'
 
         try:
+            import cchardet
+            info["cchardet"] = format_version(cchardet.version, '__version__')
+        except Exception:
+            info["cchardet"] = 'Version could not be acquired!'
+
+        try:
+            import filelock
+            info["filelock"] = format_version(filelock, '__version__')
+        except Exception:
+            info["filelock"] = 'Version could not be acquired!'
+
+        try:
             import gntp.version
             info["gntp"] = format_version(gntp.version, '__version__')
         except Exception:
             info["gntp"] = 'Version could not be acquired!'
 
-        msg = textwrap.dedent(
+        self.info = textwrap.dedent(
             """\
             - Arch: %(arch)s
             - Platform: %(platform)s
             - Python: %(python)s (%(py_type)s)
             - Rummage: %(rummage)s %(status)s
-            - Regex: %(regex)s
-            - Backrefs: %(backrefs)s
             - WxPython: %(wxpython)s
+            - Backrefs: %(backrefs)s
             - Chardet: %(chardet)s
+            - cChardet: %(cchardet)s
+            - Regex: %(regex)s
+            - Filelock: %(filelock)s
             - Gntp: %(gntp)s
             """ % info
         )
 
-        self.m_info_textbox.SetValue(msg)
+        self.m_info_textbox.SetValue(self.info)

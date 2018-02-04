@@ -7,6 +7,7 @@
 - **NEW**: Expose special file type encoding handling, and allow user to modify extension list. Covers: `bin`, `python`, `html`, and `xml`.
 - **NEW**: Detect middle endian 32 bit BOMs (even if Python has no encoder to actually handle them so we'll just default to binary).
 - **NEW**: Speed up and tweak binary detection.
+- **NEW**: Add copy button to support info dialog and ensure support info is read only.
 
 ## 3.5.0
 

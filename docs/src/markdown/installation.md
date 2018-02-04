@@ -6,13 +6,19 @@ Rummage has a few requirements when installing.  These will all be taken care of
 
 Name                             | Details
 -------------------------------- | -------
-[`backrefs`\ 3.0.1+][backrefs]   | Used to extend the `re` or `regex` regular expression engine with additional back references.
-[`gntp`][gntp]                   | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
-[`chardet`\ 3.0.4+][chardet]     | Used for file encoding guessing when an encoding is not specified.
 [`wxPython`\ 4.0.0a3+][wxpython] | The new wxPython 4.0.0 is required for for Rummage to run in Python 2 and Python 3. Classic wxPython support has unfortunately be dropped.
-[`regex`\ 2015.07.19+][regex]    | **regex** usage is completely optional, but it is included for those who wish to use it. Regex is a great regular expression engine that adds some nice features such as fuzzy searching, nested char sets, better Unicode support, and more.
+[`backrefs`\ 3.0.3+][backrefs]   | Used to extend the `re` or `regex` regular expression engine with additional back references.
+[`chardet`\ 3.0.4+][chardet]     | Used for file encoding guessing when an encoding is not specified.
 [`filelock`][filelock]           | Used for file locking to allow different instances of Rummage to access the same file.
-[send2trash][send2trash]         | Used for sending files to trash/recycle bin on each platform.
+[`gntp`][gntp]                   | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
+[`send2trash`][send2trash]       | Used for sending files to trash/recycle bin on each platform.
+
+Some optional modules that can be manually installed.
+
+Name                   | Details
+---------------------- | -------
+[`regex`][regex]       | **regex** usage is completely optional, but it is included for those who wish to use it. Regex is a great regular expression engine that adds some nice features such as fuzzy searching, nested char sets, better Unicode support, and more.
+[`cchardet`][cchardet] | `cchardet` is high speed universal character encoding detector. Much faster than `chardet`.
 
 ## Linux Prerequisites
 
