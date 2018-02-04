@@ -608,6 +608,8 @@ class DeleteDialog ( wx.Dialog ):
 		bSizer21 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_progress_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_progress_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		bSizer22 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_progress_label = wx.StaticText( self.m_progress_panel, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -690,6 +692,8 @@ class ChecksumDialog ( wx.Dialog ):
 		bSizer20 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_hash_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_hash_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer54 = wx.FlexGridSizer( 5, 1, 0, 0 )
 		fgSizer54.AddGrowableCol( 0 )
 		fgSizer54.AddGrowableRow( 2 )
@@ -869,16 +873,18 @@ class SupportInfoDialog ( wx.Dialog ):
 		bSizer20 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_support_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_support_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer50 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer50.AddGrowableCol( 0 )
 		fgSizer50.AddGrowableRow( 0 )
 		fgSizer50.SetFlexibleDirection( wx.BOTH )
 		fgSizer50.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_info_textbox = wx.TextCtrl( self.m_support_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
+		self.m_info_textbox = wx.TextCtrl( self.m_support_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
 		fgSizer50.Add( self.m_info_textbox, 1, wx.ALL|wx.EXPAND, 5 )
 		
-		fgSizer51 = wx.FlexGridSizer( 0, 3, 0, 0 )
+		fgSizer51 = wx.FlexGridSizer( 0, 4, 0, 0 )
 		fgSizer51.AddGrowableCol( 0 )
 		fgSizer51.AddGrowableCol( 2 )
 		fgSizer51.SetFlexibleDirection( wx.BOTH )
@@ -886,6 +892,9 @@ class SupportInfoDialog ( wx.Dialog ):
 		
 		
 		fgSizer51.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_copy_button = wx.Button( self.m_support_panel, wx.ID_ANY, u"Copy", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer51.Add( self.m_copy_button, 0, wx.ALL, 5 )
 		
 		self.m_cancel_button = wx.Button( self.m_support_panel, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer51.Add( self.m_cancel_button, 0, wx.ALL, 5 )
@@ -910,6 +919,7 @@ class SupportInfoDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.m_copy_button.Bind( wx.EVT_BUTTON, self.on_copy )
 		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel )
 	
 	def __del__( self ):
@@ -917,6 +927,9 @@ class SupportInfoDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def on_copy( self, event ):
+		event.Skip()
+	
 	def on_cancel( self, event ):
 		event.Skip()
 	
@@ -1459,6 +1472,8 @@ class ExportSettingsDialog ( wx.Dialog ):
 		bSizer17 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_export_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_export_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer42 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer42.AddGrowableCol( 0 )
 		fgSizer42.SetFlexibleDirection( wx.BOTH )
@@ -1537,6 +1552,8 @@ class ImportSettingsDialog ( wx.Dialog ):
 		bSizer17 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_import_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_import_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer42 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer42.AddGrowableCol( 0 )
 		fgSizer42.AddGrowableRow( 3 )
@@ -2230,6 +2247,8 @@ class SearchChainDialog ( wx.Dialog ):
 		bSizer16 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_chain_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_chain_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer38 = wx.FlexGridSizer( 2, 1, 0, 0 )
 		fgSizer38.AddGrowableCol( 0 )
 		fgSizer38.AddGrowableRow( 0 )
@@ -2317,6 +2336,8 @@ class EditSearchChainDialog ( wx.Dialog ):
 		bSizer16 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_chain_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_chain_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer38 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer38.AddGrowableCol( 0 )
 		fgSizer38.AddGrowableRow( 1 )
@@ -2449,6 +2470,8 @@ class SearchErrorDialog ( wx.Dialog ):
 		bSizer13 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_error_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_error_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer40 = wx.FlexGridSizer( 1, 1, 0, 0 )
 		fgSizer40.AddGrowableCol( 0 )
 		fgSizer40.AddGrowableRow( 0 )
@@ -2488,6 +2511,8 @@ class ErrorTextDialog ( wx.Dialog ):
 		bSizer14 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_error_text_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_error_text_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		bSizer15 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_error_textbox = wx.TextCtrl( self.m_error_text_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.TE_MULTILINE )
@@ -2523,6 +2548,8 @@ class EditorDialog ( wx.Dialog ):
 		bSizer17 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_editor_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_editor_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
 		fgSizer40 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer40.AddGrowableCol( 0 )
 		fgSizer40.SetFlexibleDirection( wx.BOTH )
