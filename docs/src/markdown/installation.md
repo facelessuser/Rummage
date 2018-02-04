@@ -4,14 +4,14 @@
 
 Rummage has a few requirements when installing.  These will all be taken care of when installing via `pip`.
 
-Name                             | Details
--------------------------------- | -------
-[`wxPython`\ 4.0.0a3+][wxpython] | The new wxPython 4.0.0 is required for for Rummage to run in Python 2 and Python 3. Classic wxPython support has unfortunately be dropped.
-[`backrefs`\ 3.0.3+][backrefs]   | Used to extend the `re` or `regex` regular expression engine with additional back references.
-[`chardet`\ 3.0.4+][chardet]     | Used for file encoding guessing when an encoding is not specified.
-[`filelock`][filelock]           | Used for file locking to allow different instances of Rummage to access the same file.
-[`gntp`][gntp]                   | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
-[`send2trash`][send2trash]       | Used for sending files to trash/recycle bin on each platform.
+Name                           | Details
+------------------------------ | -------
+[`wxPython`\ 4.0.1+][wxpython] | The new wxPython Phoenix 4.0.0 is required for for Rummage to run in Python 2 and Python 3.
+[`backrefs`\ 3.0.3+][backrefs] | Used to extend the `re` or `regex` regular expression engine with additional back references.
+[`chardet`\ 3.0.4+][chardet]   | Used for file encoding guessing when an encoding is not specified.
+[`filelock`][filelock]         | Used for file locking to allow different instances of Rummage to access the same file.
+[`gntp`][gntp]                 | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
+[`send2trash`][send2trash]     | Used for sending files to trash/recycle bin on each platform.
 
 Some optional modules that can be manually installed.
 
