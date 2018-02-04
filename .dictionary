@@ -1,6 +1,7 @@
 API
 Automator
 BOM
+BOMs
 Backrefs
 Bre
 Bregex
@@ -31,6 +32,7 @@ Sep
 Tox
 UI
 Xcode
+cChardet
 changelog
 checksum
 dev
@@ -43,6 +45,7 @@ distros
 dotfiles
 dropdown
 emoji
+endian
 grepWin
 inline
 macOS
@@ -58,6 +61,7 @@ requesters
 resize
 resized
 sortable
+subfolder
 subfolders
 sublicense
 symlink

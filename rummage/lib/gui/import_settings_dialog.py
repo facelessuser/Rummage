@@ -193,9 +193,52 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         elif key == "regex_version":
             minimum = 0
             maximum = 1
+        elif key == 'chardet_mode':
+            minimum = 0
+            maximum = 2
         if not self.is_integer(value, minimum, maximum):
             value = None
         return value
+
+    def import_encoding_options(self, key, value):
+        """Import encoding options."""
+
+        bad_keys = set()
+        good_keys = set()
+        new_value = {}
+        if not self.is_dict(value):
+            new_value = None
+            bad_keys.add('encoding_options')
+        else:
+            for k, v in value.items():
+                if k == "chardet_mode":
+                    value = self.import_int(k, v)
+                    if value is not None:
+                        good_keys.add('encoding_options.%s' % k)
+                    else:
+                        bad_keys.add('encoding_options.%s' % k)
+                    new_value[k] = v
+                    continue
+
+                if not self.is_list(v):
+                    bad_keys.add(k)
+                    continue
+
+                for i in v:
+                    if not self.is_string(i):
+                        bad_keys.add('encoding_options.%s' % k)
+                        break
+
+                new_value[k] = v
+                good_keys.add('encoding_options.%s' % k)
+
+        for k in bad_keys:
+            self.results.append(self.IMPORT_FAIL_CHAIN % k)
+
+        for k in good_keys:
+            self.results.append(self.IMPORT_SUCCESS_CHAIN % k)
+
+        return new_value
 
     def import_chain(self, key, value):
         """Import chain setting."""
@@ -333,6 +376,9 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
 
         elif key in self.INTEGER:
             value = self.import_int(key, value)
+
+        elif key == 'encoding_options':
+            value = self.import_encoding_options(key, value)
 
         elif key == "chains":
             value = self.import_chain(key, value)

@@ -32,6 +32,7 @@ from ..localization import _
 from .. import data
 from .. import notify
 from ... import rumcore
+from ...rumcore import text_decode
 from ... import util
 
 DEV_MODE = False
@@ -52,7 +53,6 @@ NOTIFY_STYLES = {
 BACKUP_FILE = 0
 BACKUP_FOLDER = 1
 
-
 DEFAULT_SETTINGS = {
     "__format__": SETTINGS_FMT,
     "alert_enabled": True,
@@ -71,7 +71,8 @@ DEFAULT_SETTINGS = {
     "regex_version": 0,
     "saved_searches": {},
     "single_instance": False,
-    "term_notifier": ""
+    "term_notifier": "",
+    "encoding_options": copy.deepcopy(text_decode.DEFAULT_ENCODING_OPTIONS)
 }
 
 
@@ -130,6 +131,80 @@ class Settings(object):
         """Check if regex support is available."""
 
         return rumcore.REGEX_SUPPORT
+
+    @classmethod
+    def is_cchardet_available(cls):
+        """Check if cchardet is available."""
+
+        return text_decode.CCDetect is not None
+
+    @classmethod
+    def set_chardet_mode(cls, value):
+        """Set chardet mode."""
+
+        cls.reload_settings()
+        cls._set_chardet_mode(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_chardet_mode(cls, value):
+        """Set chardet mode."""
+
+        if not cls.is_cchardet_available() or value > text_decode.CHARDET_CLIB:
+            value = text_decode.CHARDET_DEFAULT
+        if 'encoding_options' not in cls.settings:
+            cls.settings['encoding_options'] = copy.deepcopy(text_decode.DEFAULT_ENCODING_OPTIONS)
+        cls.settings["encoding_options"]['chardet_mode'] = value
+
+    @classmethod
+    def get_chardet_mode(cls):
+        """See if regex support is enabled."""
+
+        cls.reload_settings()
+        value = cls.settings.get('encoding_options', {}).get('chardet_mode', text_decode.CHARDET_DEFAULT)
+        if text_decode.CCDetect is None or value > text_decode.CHARDET_CLIB:
+            value = text_decode.CHARDET_DEFAULT
+        return value
+
+    @classmethod
+    def _set_encoding_ext(cls, values):
+        """Set encoding options."""
+
+        if 'encoding_options' not in cls.settings:
+            cls.settings['encoding_options'] = copy.deepcopy(text_decode.DEFAULT_ENCODING_OPTIONS)
+
+        for k, v in values.items():
+            if k != 'chardet_mode' and k in text_decode.DEFAULT_ENCODING_OPTIONS:
+                cls.settings['encoding_options'][k] = v[:]
+
+    @classmethod
+    def set_encoding_ext(cls, values):
+        """Set chardet mode."""
+
+        cls.reload_settings()
+        cls._set_encoding_ext(values)
+        cls.save_settings()
+
+    @classmethod
+    def get_encoding_ext(cls):
+        """Get encoding extensions."""
+
+        cls.reload_settings()
+        value = cls.settings.get('encoding_options', {})
+        options = {}
+        for k, v in value.items():
+            if k != "chardet_mode":
+                options[k] = v[:]
+        return options
+
+    @classmethod
+    def get_encoding_options(cls):
+        """Get encoding extensions."""
+
+        cls.reload_settings()
+        options = cls.get_encoding_ext()
+        options['chardet_mode'] = cls.get_chardet_mode()
+        return options
 
     @classmethod
     def set_regex_mode(cls, value):
@@ -405,7 +480,12 @@ class Settings(object):
         for k, v in DEFAULT_SETTINGS.items():
             if k not in cls.settings:
                 updated = True
-                cls.settings[k] = copy.copy(v)
+                cls.settings[k] = copy.deepcopy(v)
+            elif k == 'encoding_options':
+                for k1, v1 in v.items():
+                    if k1 not in cls.settings[k]:
+                        updated = True
+                        cls.settings[k][k1] = copy.copy(v1)
 
         if updated:
             cls.save_settings()
@@ -1032,6 +1112,11 @@ class Settings(object):
             cls._set_check_updates(obj['check_updates'])
         if 'check_prerelease' in obj:
             cls._set_prerelease(obj['check_prerelease'])
+
+        if 'encoding_options' in obj:
+            if 'chardet_mode' in obj['encoding_options']:
+                cls._set_chardet_mode(obj['encoding_options']['chardet_mode'])
+            cls._set_encoding_ext(obj['encoding_options'])
 
         # Notifications
         update_notify = False

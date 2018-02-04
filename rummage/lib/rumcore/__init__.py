@@ -512,11 +512,13 @@ class _FileSearch(object):
 
     def __init__(
         self, search_obj, file_obj, file_id, flags, context, encoding,
-        backup_location, max_count, file_content=None, regex_mode=RE_MODE
+        backup_location, max_count, file_content=None, regex_mode=RE_MODE,
+        encoding_options=None
     ):
         """Init the file search object."""
 
         self.abort = False
+        self.encoding_options = encoding_options
         self.search_obj = search_obj
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
@@ -593,7 +595,7 @@ class _FileSearch(object):
     def _get_line_context(self, content, m, line_map):
         """Get context info about the line."""
 
-        win_end = b'\r\n' if self.is_binary else '\r\n'
+        win_end = '\r\n'
 
         before, after = self.context
         row = self._get_row(m.start(), line_map)
@@ -871,7 +873,7 @@ class _FileSearch(object):
                 self.is_binary = not self.is_unicode_buffer
             elif self.encoding is not None:
                 if self.encoding == 'bin':
-                    self.current_encoding = text_decode.Encoding(self.encoding, None)
+                    self.current_encoding = text_decode.Encoding('bin', None)
                     self.is_binary = True
                 elif self.encoding.startswith(('utf-8', 'utf-16', 'utf-32')):
                     bom = text_decode.inspect_bom(file_obj.name)
@@ -883,7 +885,9 @@ class _FileSearch(object):
                     self.current_encoding = text_decode.Encoding(self.encoding, None)
             else:
                 # Guess encoding and decode file
-                encoding = text_decode.guess(file_obj.name, verify=False)
+                encoding = text_decode.guess(
+                    file_obj.name, verify=False, encoding_options=self.encoding_options
+                )
                 if encoding is not None:
                     if encoding.encode == "bin":
                         self.is_binary = True
@@ -1450,7 +1454,8 @@ class Rummage(object):
     def __init__(
         self, target, searches, file_pattern=None, folder_exclude=None,
         flags=0, context=(0, 0), max_count=None, encoding=None, size=None,
-        modified=None, created=None, backup_location=None, regex_mode=RE_MODE
+        modified=None, created=None, backup_location=None, regex_mode=RE_MODE,
+        encoding_options=None
     ):
         """Initialize Rummage object."""
 
@@ -1461,8 +1466,11 @@ class Rummage(object):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
 
-        self.search_params = searches
+        if encoding_options is None:
+            encoding_options = text_decode.DEFAULT_ENCODING_OPTIONS
+        self.encoding_options = encoding_options
 
+        self.search_params = searches
         self.file_flags = flags & FILE_MASK
         self.context = context
         self.encoding = self._verify_encoding(encoding) if encoding is not None else None
@@ -1619,7 +1627,8 @@ class Rummage(object):
                 self.backup_location,
                 self.max,
                 content_buffer,
-                self.regex_mode
+                self.regex_mode,
+                self.encoding_options
             )
             for rec in self.searcher.run():
                 if rec.error is None:

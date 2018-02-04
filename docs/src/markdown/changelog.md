@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.6.0
+
+- **NEW**: Rummage will use `cchardet` by default if found.
+- **NEW**: Expose way to specify `cchardet` being used.
+- **NEW**: Expose special file type encoding handling, and allow user to modify extension list. Covers: `bin`, `python`, `html`, and `xml`.
+- **NEW**: Detect middle endian 32 bit BOMs (even if Python has no encoder to actually handle them so we'll just default to binary).
+- **NEW**: Speed up and tweak binary detection.
+
 ## 3.5.0
 
 Feb 1, 2018

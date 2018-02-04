@@ -2,11 +2,11 @@
 
 ## Overview
 
-Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, and Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search and replace options are all contained in the **Search** tab.  When a search has been completed, general info about the matches found in files will be displayed in the **Files** tab, and more detailed context information will be displayed in the **Content** tab.
+Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, and Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search and replace options are all contained in the **Search** tab.  As matches are found, general info about the matches will be displayed in the **Files** and **Content** tab.
 
 Rummage also comes with a simple regular expression tester to test out patterns. It also provides a feature where patterns can be saved for later and/or frequent use.
 
-The status bar will show search progress, match counts, and other useful information.
+The status bar will show search status such as match counts and other useful information.
 
 !!! warning "Warning: Replace"
     When replacing, Rummage will back up the file.  If the copy fails, it should terminate the replace for that file.  You can disable backups if you like, but if you aren't careful with your patterns, you may remove unwanted text that you won't be able to recover unless you are using version control.
@@ -304,7 +304,7 @@ Include\ binary\ files | Forces Rummage to search binary files.
 
 Rummage allows the exporting of the results to either CSV or HTML.  Simply select **File-->Export** and pick either **CSV** or **HTML**.  The HTML output will be styled similar to the GUI interface with the results in tables with sortable columns.
 
-!!! note "Note":
+!!! info "Large Result Sets":
     Really, really large sets of results will probably be best suited for CSV as a browser may have a hard time loading the entire data set at once.
 
 ## Preferences
@@ -325,19 +325,40 @@ Language
 : 
     Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated but includes most of the needed translations. In order to use locale, you must copy the project's localization files to your user settings directory. See [Localization](#localization) to learn more.
 
+Updates
+: 
+    Controls whether Rummage will check for new updates daily and allows controlling whether you want to be notified of prereleases as well. A button has also been provided to check for updates right away after configuring your update settings.
+
+    The check is only a check for new versions and doesn't perform an upgrade.  Rummage must be upgraded via `pip` from command line.
+
+    !!! info "Update Issues: Python 3.6+ on macOS"
+        There is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
+
+        To get access again to the default certificates is actually quite easy. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed bundle location. If you are using something like macports, then you'll probably have to research to find out how to do the same thing.
+
 ### Regex
 
 ![Preferences: Regex](/images/settings_regex.png)
 
-The **Regular Expression Modules** tab is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes).
+The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes).
 
 If using Regex, you can set it to version of your choice. `V0` tries to be completely compatible with Re patterns while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation](https://pypi.python.org/pypi/regex/) to learn more.
+
+### Encoding
+
+![Preferences: Encoding](/images/settings_encoding.png)
+
+The **Encoding** panel is where you can tweak encoding detection. You can change the default encoding detection used (assuming you have both Chardet and cChardet installed). By default, Rummage will use the fastest (cChardet).
+
+Special encoding file type considerations are also exposed here. File extensions assigned to either HTML, XML, or Python will use special logic to look for encoding declarations in the file's header, while file extensions assigned to binary will shortcut the encoding selection to binary. Just double click the file type whose extensions you would like to modify.
+
+Remember that encoding detection is far from bulletproof and can pick an incorrect encoding. While during searches it might not be as big an issue, it is strongly suggested you use a forced encoding when performing replaces.
 
 ### Editor
 
 ![Preferences: Editor](/images/settings_editor.png)
 
-The **Editor** tab is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files and click `Apply`.
+The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files and click `Apply`.
 
 ![Editor Options](/images/editor_options.png)
 
@@ -357,7 +378,7 @@ Argument Variables | Description
 
 ![Preferences: Notifications](/images/settings_notify.png)
 
-The **Notification** tab controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
+The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
 
 You can also select whether to use the system's built-in notifications or Growl.
 
@@ -366,7 +387,7 @@ Ubuntu
    - Growl: [Support for Linux][growl-linux].
    - Native: OSD via `notify-send`.
 
-    !!! Note "Note"
+    !!! info "Other Distros"
         Though Rummage should run on any Linux distro, the native dialog option was built around Ubuntu's native notifications called OSD.  Notifications will not work on other distros that do not use OSD *unless* they use Growl.  Even without Growl, other distros will probably still get the audible cue, but as each distro varies, it is difficult to be certain.  As notifications are not crucial to usage, this is minor concern.
 
 macOS
@@ -374,7 +395,7 @@ macOS
     - Growl: [Support for macOS][growl-macos].
     - Native: Notification Center via [terminal-notifier][terminal-notifier]. Path to `terminal-notifier` must be configured.
 
-    !!! Note "Note"
+    !!! info "Configuring macOS Native"
         When selecting `native` on macOS, an option to select the path to terminal notifier will be available since native dialogs rely on `terminal-notifier` to send notifications to the Notification Center. This must be configured or *native* notifications will not work.
 
         When selecting the `terminal-notifier` path, you can select either the binary directly or the `.<app` bundle (depending on how you installed `terminal-notifier`).  When selecting the `.app` bundle, Rummage will know how to access the binary inside the bundle.
@@ -389,7 +410,13 @@ Windows
 
 ![Preferences: History](/images/settings_history.png)
 
-The **History** panel is where all text box drop down history can be cleared.
+The **History** panel is where all text box, drop down history can be cleared.
+
+### Backups
+
+![Preferences: Backups](/images/settings_backup.png)
+
+The **Backups** panel allows you to configure where Rummage creates backups. You can control whether backups are all placed in the same folder as the original source, or if they are put into a subfolder. You can also configure the name of the subfolder used or the extension used when not writing to a subfolder.
 
 ## Import/Export Settings
 
@@ -537,12 +564,6 @@ Paths might vary depending on Ubuntu version etc.
     ```
 
 - Restart of Nautilus may or may not be needed, but context menu item should appear under `Scripts` and should work on files and folders.
-
-## Checking for Updates
-
-Rummage has a feature available from the menu to check for updates. In the settings, you can also enable checking for updates daily and even control whether it checks for prereleases. But there is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
-
-Details are nice, but what you actually want to know is probably how to get this working. It is actually quite easy. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed bundle location. If you are using something like macports, then you'll probably have to research to find out how to do the same thing.
 
 ## Localization
 

@@ -44,6 +44,20 @@ class TestBom(unittest.TestCase):
         self.assertEqual(bom.encode, 'utf-32-le')
         self.assertEqual(bom.bom, codecs.BOM_UTF32_LE)
 
+    def test_10646_UC4_3412(self):
+        """Test 10646_UC4_3412 BOM detection."""
+
+        bom = text_decode.inspect_bom('tests/encodings/10646_UC4_3412.txt')
+        self.assertEqual(bom.encode, 'bin')
+        self.assertEqual(bom.bom, None)
+
+    def test_10646_UC4_2143(self):
+        """Test 10646_UC4_2143 BOM detection."""
+
+        bom = text_decode.inspect_bom('tests/encodings/10646_UC4_2143.txt')
+        self.assertEqual(bom.encode, 'bin')
+        self.assertEqual(bom.bom, None)
+
     def test_no_bom(self):
         """Test that files with no BOM return as None."""
 
@@ -81,6 +95,71 @@ class TestValidateEncoding(unittest.TestCase):
 
 class TestPyEncodingGuess(unittest.TestCase):
     """Test Python file encoding guess."""
+
+    def test_html_guess(self):
+        """Test HTML guess."""
+
+        encoding = text_decode.guess('tests/encodings/no_encode.html')
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/encode.html')
+        self.assertEqual(encoding.encode, 'ISO-8859-1')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/bad_encode.html')
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/xml_encode.xhtml')
+        self.assertEqual(encoding.encode, 'ISO-8859-1')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/bad_xml_encode.xhtml')
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+    def test_xml_guess(self):
+        """Test XML guess."""
+
+        encoding = text_decode.guess('tests/encodings/no_encode.xml')
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/encode.xml')
+        self.assertEqual(encoding.encode, 'ISO-8859-1')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/bad_encode.xml')
+        self.assertEqual(encoding.encode, 'ascii')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf16_be.xml')
+        self.assertEqual(encoding.encode, 'utf-16-be')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf16_le.xml')
+        self.assertEqual(encoding.encode, 'utf-16-le')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf32_be.xml')
+        self.assertEqual(encoding.encode, 'utf-32-be')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf32_le.xml')
+        self.assertEqual(encoding.encode, 'utf-32-le')
+        self.assertEqual(encoding.bom, None)
+
+        encoding = text_decode.guess('tests/encodings/utf16_be_bad.xml')
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)
+
+    def test_binary_ext_guess(self):
+        """Test XML guess."""
+
+        encoding = text_decode.guess('tests/encodings/binary.bin')
+        self.assertEqual(encoding.encode, 'bin')
+        self.assertEqual(encoding.bom, None)
 
     def test_py_default_ascii_file(self):
         """Test default Python file."""
@@ -210,15 +289,43 @@ class TestChardetSguess(unittest.TestCase):
 
     @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
     @mock.patch('rummage.lib.rumcore.text_decode.DetectEncoding')
-    def test_confidence_pass_guess(self, mock_detect, mock_small):
-        """Test result with an encoding with acceptable confidence."""
+    def test_confidence_pass_guess_default(self, mock_detect, mock_small):
+        """Test result with an encoding with acceptable confidence with the default detector."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": "utf-8", "confidence": 1.0}
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
         encoding = text_decode.sguess(string)
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.CDetect')
+    def test_confidence_pass_guess_chardet(self, mock_detect, mock_small):
+        """Test result with an encoding with acceptable confidence with chardet."""
+
+        instance = mock_detect.return_value
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
+        mock_small.return_value = False
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string, encoding_options={'chardet_mode': text_decode.CHARDET_PYTHON})
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.CCDetect')
+    def test_confidence_pass_guess_cchardet(self, mock_detect, mock_small):
+        """Test result with an encoding with acceptable confidence with cchardet."""
+
+        instance = mock_detect.return_value
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
+        mock_small.return_value = False
+        with open('tests/encodings/utf8.txt', 'rb') as f:
+            string = f.read()
+        encoding = text_decode.sguess(string, encoding_options={'chardet_mode': text_decode.CHARDET_CLIB})
         self.assertEqual(encoding.encode, 'utf-8')
         self.assertEqual(encoding.bom, None)
 
@@ -228,7 +335,7 @@ class TestChardetSguess(unittest.TestCase):
         """Test result with an encoding with unacceptable confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": "utf-8", "confidence": 0.4}
+        instance.result = {"encoding": "utf-8", "confidence": 0.4}
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
@@ -242,7 +349,7 @@ class TestChardetSguess(unittest.TestCase):
         """Test result with an encoding that is None confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": None, "confidence": 0.4}
+        instance.result = {"encoding": None, "confidence": 0.4}
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
@@ -256,7 +363,7 @@ class TestChardetSguess(unittest.TestCase):
         """Test result with no encoding match."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = None
+        instance.result = None
         mock_small.return_value = False
         with open('tests/encodings/utf8.txt', 'rb') as f:
             string = f.read()
@@ -287,9 +394,37 @@ class TestChardetGuess(unittest.TestCase):
         """Test result with an encoding with acceptable confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": "utf-8", "confidence": 1.0}
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
         mock_small.return_value = False
         encoding = text_decode.guess('tests/encodings/utf8.txt')
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.CDetect')
+    def test_confidence_pass_guess_chardet(self, mock_detect, mock_small):
+        """Test result with an encoding with acceptable confidence."""
+
+        instance = mock_detect.return_value
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
+        mock_small.return_value = False
+        encoding = text_decode.guess(
+            'tests/encodings/utf8.txt', encoding_options={'chardet_mode': text_decode.CHARDET_PYTHON}
+        )
+        self.assertEqual(encoding.encode, 'utf-8')
+        self.assertEqual(encoding.bom, None)
+
+    @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
+    @mock.patch('rummage.lib.rumcore.text_decode.CCDetect')
+    def test_confidence_pass_guess_cchardet(self, mock_detect, mock_small):
+        """Test result with an encoding with acceptable confidence."""
+
+        instance = mock_detect.return_value
+        instance.result = {"encoding": "utf-8", "confidence": 1.0}
+        mock_small.return_value = False
+        encoding = text_decode.guess(
+            'tests/encodings/utf8.txt', encoding_options={'chardet_mode': text_decode.CHARDET_CLIB}
+        )
         self.assertEqual(encoding.encode, 'utf-8')
         self.assertEqual(encoding.bom, None)
 
@@ -299,7 +434,7 @@ class TestChardetGuess(unittest.TestCase):
         """Test result with an encoding with unacceptable confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": "utf-8", "confidence": 0.4}
+        instance.result = {"encoding": "utf-8", "confidence": 0.4}
         mock_small.return_value = False
         encoding = text_decode.guess('tests/encodings/utf8.txt')
         self.assertEqual(encoding.encode, 'bin')
@@ -311,7 +446,7 @@ class TestChardetGuess(unittest.TestCase):
         """Test result with an encoding that is None confidence."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = {"encoding": None, "confidence": 0.4}
+        instance.result = {"encoding": None, "confidence": 0.4}
         mock_small.return_value = False
         encoding = text_decode.guess('tests/encodings/utf8.txt')
         self.assertEqual(encoding.encode, 'bin')
@@ -323,7 +458,7 @@ class TestChardetGuess(unittest.TestCase):
         """Test result with no encoding match."""
 
         instance = mock_detect.return_value
-        instance.close.return_value = None
+        instance.result = None
         mock_small.return_value = False
         encoding = text_decode.guess('tests/encodings/utf8.txt')
         self.assertEqual(encoding.encode, 'bin')

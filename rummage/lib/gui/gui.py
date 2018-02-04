@@ -1054,6 +1054,43 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_regex_panel.Layout()
 		fgSizer43.Fit( self.m_regex_panel )
 		self.m_settings_notebook.AddPage( self.m_regex_panel, u"Regex", False )
+		self.m_encoding_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_encoding_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
+		fgSizer57 = wx.FlexGridSizer( 3, 1, 0, 0 )
+		fgSizer57.AddGrowableCol( 0 )
+		fgSizer57.AddGrowableRow( 2 )
+		fgSizer57.SetFlexibleDirection( wx.BOTH )
+		fgSizer57.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		fgSizer58 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer58.SetFlexibleDirection( wx.BOTH )
+		fgSizer58.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_encoding_label = wx.StaticText( self.m_encoding_panel, wx.ID_ANY, u"Encoding Detection", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_encoding_label.Wrap( -1 )
+		fgSizer58.Add( self.m_encoding_label, 0, wx.ALL, 5 )
+		
+		m_encoding_choiceChoices = []
+		self.m_encoding_choice = wx.Choice( self.m_encoding_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_encoding_choiceChoices, 0 )
+		self.m_encoding_choice.SetSelection( 0 )
+		fgSizer58.Add( self.m_encoding_choice, 0, wx.ALL, 5 )
+		
+		
+		fgSizer57.Add( fgSizer58, 1, wx.EXPAND, 5 )
+		
+		self.m_filetype_label = wx.StaticText( self.m_encoding_panel, wx.ID_ANY, u"Special file types:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_filetype_label.Wrap( -1 )
+		fgSizer57.Add( self.m_filetype_label, 0, wx.ALL, 5 )
+		
+		self.m_filetype_listctrl = wx.ListCtrl( self.m_encoding_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT )
+		fgSizer57.Add( self.m_filetype_listctrl, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.m_encoding_panel.SetSizer( fgSizer57 )
+		self.m_encoding_panel.Layout()
+		fgSizer57.Fit( self.m_encoding_panel )
+		self.m_settings_notebook.AddPage( self.m_encoding_panel, u"Encoding", False )
 		self.m_editor_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_editor_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
@@ -1229,6 +1266,8 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_regex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_regex_toggle )
 		self.m_bregex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bregex_toggle )
 		self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
+		self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
+		self.m_filetype_listctrl.Bind( wx.EVT_LEFT_DCLICK, self.on_dclick )
 		self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
 		self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
 		self.m_notify_choice.Bind( wx.EVT_CHOICE, self.on_notify_choice )
@@ -1277,6 +1316,12 @@ class SettingsDialog ( wx.Dialog ):
 	def on_regex_ver_choice( self, event ):
 		event.Skip()
 	
+	def on_chardet( self, event ):
+		event.Skip()
+	
+	def on_dclick( self, event ):
+		event.Skip()
+	
 	def on_editor_change( self, event ):
 		event.Skip()
 	
@@ -1311,6 +1356,92 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_cancel( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class FileExtDialog
+###########################################################################
+
+class FileExtDialog ( wx.Dialog ):
+	
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"File Extensions", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+		
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		
+		bSizer23 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_ext_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_ext_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
+		fgSizer61 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer61.AddGrowableCol( 0 )
+		fgSizer61.SetFlexibleDirection( wx.BOTH )
+		fgSizer61.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		fgSizer60 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer60.AddGrowableCol( 1 )
+		fgSizer60.SetFlexibleDirection( wx.BOTH )
+		fgSizer60.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_ext_label = wx.StaticText( self.m_ext_panel, wx.ID_ANY, u"Extensions", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_ext_label.Wrap( -1 )
+		fgSizer60.Add( self.m_ext_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_ext_textbox = wx.TextCtrl( self.m_ext_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer60.Add( self.m_ext_textbox, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		fgSizer61.Add( fgSizer60, 1, wx.EXPAND, 5 )
+		
+		fgSizer64 = wx.FlexGridSizer( 1, 4, 0, 0 )
+		fgSizer64.AddGrowableCol( 0 )
+		fgSizer64.AddGrowableCol( 3 )
+		fgSizer64.SetFlexibleDirection( wx.BOTH )
+		fgSizer64.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		
+		fgSizer64.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_okay_button = wx.Button( self.m_ext_panel, wx.ID_ANY, u"Okay", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer64.Add( self.m_okay_button, 0, wx.ALL, 5 )
+		
+		self.m_cancel_button = wx.Button( self.m_ext_panel, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer64.Add( self.m_cancel_button, 0, wx.ALL, 5 )
+		
+		
+		fgSizer64.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer61.Add( fgSizer64, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_ext_panel.SetSizer( fgSizer61 )
+		self.m_ext_panel.Layout()
+		fgSizer61.Fit( self.m_ext_panel )
+		bSizer23.Add( self.m_ext_panel, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( bSizer23 )
+		self.Layout()
+		bSizer23.Fit( self )
+		
+		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.m_okay_button.Bind( wx.EVT_BUTTON, self.on_okay_click )
+		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel_click )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_okay_click( self, event ):
+		event.Skip()
+	
+	def on_cancel_click( self, event ):
 		event.Skip()
 	
 
