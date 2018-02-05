@@ -107,7 +107,7 @@ class Settings(object):
         if cls.settings_file is not None:
             cls.open_settings()
             cls.open_cache()
-        localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
+        localization.setup('rummage', cls.get_language())
         cls.localize()
         debug_struct(cls.settings)
         debug_struct(cls.cache)
@@ -304,7 +304,7 @@ class Settings(object):
         """Return languages."""
 
         languages = []
-        base = os.path.join(cls.config_folder, "locale")
+        base = localization.locale_path
         if os.path.exists(base):
             for file_obj in os.listdir(base):
                 if os.path.isdir(os.path.join(base, file_obj)):
