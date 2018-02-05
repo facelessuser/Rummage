@@ -1,10 +1,12 @@
 """Localization."""
 from __future__ import unicode_literals
 import gettext
+import os
 from ... import util
 
 lang = None
 current_domain = None
+locale_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'locale')
 
 
 def _(text):
@@ -13,14 +15,14 @@ def _(text):
     return util.translate(lang, text) if lang is not None else text
 
 
-def setup(domain, pth, language=None):
+def setup(domain, language=None):
     """Setup a language."""
 
     global lang
     global current_domain
     if language is not None:
         try:
-            lang = gettext.translation(domain, pth, languages=[language])
+            lang = gettext.translation(domain, locale_path, languages=[language])
             lang.install()
             current_domain = domain
         except Exception:

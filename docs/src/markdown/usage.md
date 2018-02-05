@@ -567,60 +567,58 @@ Paths might vary depending on Ubuntu version etc.
 
 ## Localization
 
-Rummage provides an i18n localization framework to allow support for displaying the UI in other languages. But there is some manual setup required as out of the box, everything is in English. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).
+Rummage provides an i18n localization framework to allow support for displaying the UI in other languages. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).
 
-So to get localization, you must first build the `.mo` files on your system, copy them to your Rummage setting folder, select your desired language in the preference dialog, and restart Rummage.
+Translations should be compiled and included by default requiring no additional steps starting in version 3.6.0.
 
+I only speak English, so I do not maintain the translations. If the UI changes, someone from the community will need to update them appropriately via pull requests or they will remain out of date.
+
+### Editing Existing Translations
+
+Translations are stored at `rummage/lib/gui/localization/locale/<LANGUAGE>/LC_MESSAGES/rummage.po`. Just edit the `rummage.po` for the appropriate `<LANGUAGE>`.
+
+Inside each `.po` file there will be a `msgid` for each unique translatable string.  Each `msgid` represents the actual US English text that is shown in Rummage. Underneath each `msgid`, you'll also find a `msgstr` which represents the translation for the `msgid`. Just edit the corresponding `msgstr` for each `msgid` in the existing `rummage.po` file.
+
+```
+msgid "About"
+msgstr "<my_translation>"
+```
+
+### Generate New Template from Source
+
+In the Python source, you'll notice that translatable strings are represented as `_("some text")`. `_` is the function that retrieves the proper translations. In order to provide translations, we have to build up a template of all of these strings in a `.pot` file.  This is done by running:
+
+```
+python setup.py extract_messages
+```
+
+This will scan the Python source and generate a template at `rummage/lib/gui/localization/locale/rummage.pot`.
+
+If you update the source in a way that requires generating a new `.pot` file, then you will most likely need to update existing `.po` files as well. There is no need to specify the input `.pot` file as it is already specified in `setup.cfg`..
+
+```
+python setup.py update_catalog -l en_US -o rummage/lib/gui/localization/locale/en_US/rummage.po
+```
+
+Currently this must be performed on each `.po` file, but this may get automated in the future if/when we support more than the two languages we currently support. See Babel's documentation on [`extract_messages`][babel_extract_messages] and [`update_catalog`][babel_update_catalog] for more info.
+
+### Create New Translations
+To create a translation `.po` file to edit, you can create your language folders as `rummage/lib/gui/localization/locale/<LANGUAGE>/LC_MESSAGES`.  Once the folder path is created you need to initialize a `.po` file. So assuming a path like `rummage/lib/gui/localization/locale/en_US/LC_MESSAGES` we would run:
+
+```
+python setup.py init_catalog -l en_US -o rummage/lib/gui/localization/locale/en_US/rummage.po
+```
+
+There is no need to specify the input `.pot` file as it is already specified in `setup.cfg`. See Babel's documentation on [`init_catalog`][babel_init_catalog] for more info.
 
 ### Build Translations
 
-Download the release source and unzip it.
-
-Compile `.mo` files by running the `tools/localize_me.py` script from the root of the project:
+Building translations is also pretty easy:
 
 ```
-python3 tools/localize_me.py --i18n /Library/Frameworks/Python.framework/Versions/3.6/share/doc/python3.6/examples/Tools/i18n
+python setup.py compile_catalog
 ```
 
-Modify the `--i18n` path to the appropriate location of the `i18n` folder for your Python.
-
-
-### Installing Translations
-
-To install translations, just copy the `locale` folder (with your compiled `.mo` files) from the release you are using to your user configuration folder.  For a traditional Python installation, this is where you'd find it for each OS:
-
-Windows: `C:\Users\<my_username>\.Rummage`
-macOS: `/Users/<my_username>/.Rummage`
-Linux: `/home/<my_username>/.config/Rummage`
-
-Unless the UI changes by adding new untranslated strings, you can keep using the same translations.
-
-After installing the localization files, set the language via the `Language` setting in the settings [General panel](#general).
-
-### Adding New Translations
-
-- Clone the project and create a new folder under `locale` with the appropriate locale name.
-- Create another folder under the one you just created called `LC_MESSAGES`.
-- Copy `locale/messages.po` to `locale/<my_LOCALE>/LC_MESSAGES/rummage.po`.
-- Edit the copied file changing things like:
-
-    ```
-    msgid "About"
-    msgstr ""
-    ```
-
-    To:
-
-    ```
-    msgid "About"
-    msgstr "<my_translation>"
-    ```
-
-- Compile by following steps in [Build Translations](#build-translations).
-
-- Commit, push, and pull request.
-
-
-I only speak English, so I do not maintain the translations. If the UI changes, someone from the community will need to update them appropriately via pull requests or they will remain out of date.
+This should build `.mo` files for all languages.  See Babel's documentation on [`compile_catalog`][babel_compile_catalog] for more info.
 
 --8<-- "refs.md"

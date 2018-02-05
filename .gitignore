@@ -52,3 +52,4 @@ site/*
 *.patch
 .idea/*
 .pytest_cache/*
+.eggs/*

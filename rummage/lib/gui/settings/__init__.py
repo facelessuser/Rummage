@@ -107,7 +107,7 @@ class Settings(object):
         if cls.settings_file is not None:
             cls.open_settings()
             cls.open_cache()
-        localization.setup('rummage', os.path.join(cls.config_folder, "locale"), cls.get_language())
+        localization.setup('rummage', cls.get_language())
         cls.localize()
         debug_struct(cls.settings)
         debug_struct(cls.cache)
@@ -304,7 +304,7 @@ class Settings(object):
         """Return languages."""
 
         languages = []
-        base = os.path.join(cls.config_folder, "locale")
+        base = localization.locale_path
         if os.path.exists(base):
             for file_obj in os.listdir(base):
                 if os.path.isdir(os.path.join(base, file_obj)):
@@ -769,9 +769,9 @@ class Settings(object):
         pth = cls.get_config_folder()
 
         # Clean up old images
-        png = os.path.join(pth, "Rummage-notify.png")
-        icon = os.path.join(pth, "Rummage-notify.ico")
-        icns = os.path.join(pth, "Rummage-notify.icns")
+        png = os.path.join(pth, "rum-notify.png")
+        icon = os.path.join(pth, "rum-notify.ico")
+        icns = os.path.join(pth, "rum-notify.icns")
         for img in (png, icon, icns):
             try:
                 if os.path.exists(img):
@@ -779,30 +779,17 @@ class Settings(object):
             except Exception:
                 pass
 
-        # New file names
-        png = os.path.join(pth, "rum-notify.png")
-        icon = os.path.join(pth, "rum-notify.ico")
-        icns = os.path.join(pth, "rum-notify.icns")
+        png = os.path.join(data.RESOURCE_PATH, "rummage_hires.png")
+        icon = os.path.join(data.RESOURCE_PATH, "rummage_tray.ico")
+        icns = os.path.join(data.RESOURCE_PATH, "rummage.icns")
 
-        try:
-            if not os.path.exists(png):
-                with open(png, "wb") as f:
-                    f.write(data.get_image('rummage_hires.png').GetData())
-        except Exception:
+        if not os.path.exists(png):
             png = None
 
-        try:
-            if not os.path.exists(icon):
-                with open(icon, "wb") as f:
-                    f.write(data.get_image('rummage_tray.ico').GetData())
-        except Exception:
+        if not os.path.exists(icon):
             icon = None
 
-        try:
-            if not os.path.exists(icns):
-                with open(icns, "wb") as f:
-                    f.write(data.get_image('rummage.icns').GetData())
-        except Exception:
+        if not os.path.exists(icns):
             icns = None
 
         # Set up notifications
