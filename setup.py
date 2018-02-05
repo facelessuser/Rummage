@@ -3,10 +3,21 @@
 """Setup package."""
 from setuptools import setup, find_packages
 from setuptools.command.sdist import sdist
+from setuptools.command.build_py import build_py
 import sys
 import os
 import imp
 import traceback
+
+
+class BuildPy(build_py):
+    """Custom ``build_py`` command to always build mo files for wheels."""
+
+    def run(self):
+        """Run the python build process."""
+
+        self.run_command('compile_catalog')
+        build_py.run(self)
 
 
 class Sdist(sdist):
@@ -78,7 +89,10 @@ entry_points = {
 
 setup(
     name='rummage',
-    cmdclass={'sdist': Sdist},
+    cmdclass={
+        'build_py': BuildPy,
+        'sdist': Sdist
+    },
     version=VER,
     keywords='grep search find replace gui',
     description='A GUI search and replace app.',
