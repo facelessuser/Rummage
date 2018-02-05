@@ -21,12 +21,18 @@ class BuildPy(build_py):
 
 
 class Sdist(sdist):
-    """Custom `sdist` command to ensure that mo files are always created."""
+    """Custom `sdist` command to ensure that we don't include `.m0` files in source."""
+
+    def _clean_mo_files(self, path):
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                if f.lower().endswith('.mo'):
+                    os.remove(os.path.join(root, f))
 
     def run(self):
         """Run the sdist build process."""
 
-        self.run_command('compile_catalog')
+        self._clean_mo_files("rummage/lib/gui/localization/locale")
         sdist.run(self)
 
 
