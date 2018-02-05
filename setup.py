@@ -3,7 +3,6 @@
 """Setup package."""
 from setuptools import setup, find_packages
 from setuptools.command.sdist import sdist
-from babel.messages import frontend as babel
 import sys
 import os
 import imp
@@ -79,12 +78,7 @@ entry_points = {
 
 setup(
     name='rummage',
-    cmdclass={
-        'extract_messages': babel.extract_messages,
-        'compile_catalog': babel.compile_catalog,
-        'init_catalog': babel.init_catalog,
-        'sdist': Sdist
-    },
+    cmdclass={'sdist': Sdist},
     version=VER,
     keywords='grep search find replace gui',
     description='A GUI search and replace app.',
