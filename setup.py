@@ -97,9 +97,7 @@ setup(
     install_requires=get_requirements("requirements/project.txt"),
     zip_safe=False,
     entry_points=entry_points,
-    package_data={
-        'rummage.lib.gui.data': ['*.css', '*.js', '*.png', '*.ico', '*.icns']
-    },
+    include_package_data=True,
     license='MIT License',
     classifiers=[
         'Development Status :: %s' % DEVSTATUS,
