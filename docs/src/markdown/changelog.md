@@ -9,6 +9,7 @@
 - **NEW**: Speed up and tweak binary detection.
 - **NEW**: Add copy button to support info dialog and ensure support info is read only.
 - **NEW**: Don't copy notification icons to user folder for use, but use the packaged icons directly from library.
+- **NEW**: Provide better support for localization.  Build current language translation on install and bundle in library directly.
 
 ## 3.5.0
 

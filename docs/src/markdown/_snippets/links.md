@@ -1,3 +1,7 @@
+[babel_compile_catalog]: http://babel.pocoo.org/en/latest/setup.html#compile-catalog
+[babel_extract_messages]: http://babel.pocoo.org/en/latest/setup.html#extract-messages
+[babel_init_catalog]: http://babel.pocoo.org/en/latest/setup.html#init-catalog
+[babel_update_catalog]: http://babel.pocoo.org/en/latest/setup.html#update-catalog
 [backrefs]: http://facelessuser.github.io/backrefs/
 [backrefs-format]: http://facelessuser.github.io/backrefs/#format-replacements
 [cchardet]: https://pypi.python.org/pypi/cchardet
