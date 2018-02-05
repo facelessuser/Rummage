@@ -2,10 +2,22 @@
 # -*- coding: utf-8 -*-
 """Setup package."""
 from setuptools import setup, find_packages
+from setuptools.command.sdist import sdist
+from babel.messages import frontend as babel
 import sys
 import os
 import imp
 import traceback
+
+
+class Sdist(sdist):
+    """Custom `sdist` command to ensure that mo files are always created."""
+
+    def run(self):
+        """Run the sdist build process."""
+
+        self.run_command('compile_catalog')
+        sdist.run(self)
 
 
 def get_version():
@@ -28,11 +40,11 @@ def get_version():
         fp.close()
 
 
-def get_requirements():
+def get_requirements(req):
     """Load list of dependencies."""
 
     install_requires = []
-    with open("requirements/project.txt") as f:
+    with open(req) as f:
         for line in f:
             if not line.startswith("#"):
                 install_requires.append(line.strip())
@@ -67,6 +79,12 @@ entry_points = {
 
 setup(
     name='rummage',
+    cmdclass={
+        'extract_messages': babel.extract_messages,
+        'compile_catalog': babel.compile_catalog,
+        'init_catalog': babel.init_catalog,
+        'sdist': Sdist
+    },
     version=VER,
     keywords='grep search find replace gui',
     description='A GUI search and replace app.',
@@ -75,7 +93,8 @@ setup(
     author_email='Isaac.Muse@gmail.com',
     url='https://github.com/facelessuser/Rummage',
     packages=find_packages(exclude=['tests', 'tools']),
-    install_requires=get_requirements(),
+    setup_requires=get_requirements("requirements/setup.txt"),
+    install_requires=get_requirements("requirements/project.txt"),
     zip_safe=False,
     entry_points=entry_points,
     package_data={
