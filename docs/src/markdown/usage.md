@@ -323,7 +323,7 @@ Single Instance
 
 Language
 : 
-    Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated but includes most of the needed translations. In order to use locale, you must copy the project's localization files to your user settings directory. See [Localization](#localization) to learn more.
+    Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated but includes a fair bit of the needed translations. See [Localization](#localization) to learn more about improving current translations or adding additional translations.
 
 Updates
 : 
@@ -567,7 +567,7 @@ Paths might vary depending on Ubuntu version etc.
 
 ## Localization
 
-Rummage provides an i18n localization framework to allow support for displaying the UI in other languages. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).
+Rummage provides an i18n localization framework to allow support for displaying the UI in other locales. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).
 
 Translations should be compiled and included by default requiring no additional steps starting in version 3.6.0.
 
@@ -575,7 +575,7 @@ I only speak English, so I do not maintain the translations. If the UI changes, 
 
 ### Editing Existing Translations
 
-Translations are stored at `rummage/lib/gui/localization/locale/<LANGUAGE>/LC_MESSAGES/rummage.po`. Just edit the `rummage.po` for the appropriate `<LANGUAGE>`.
+Translations are stored at `rummage/lib/gui/localization/locale/<LOCALE>/LC_MESSAGES/rummage.po`. Just edit the `rummage.po` for the appropriate `<LOCALE>`.
 
 Inside each `.po` file there will be a `msgid` for each unique translatable string.  Each `msgid` represents the actual US English text that is shown in Rummage. Underneath each `msgid`, you'll also find a `msgstr` which represents the translation for the `msgid`. Just edit the corresponding `msgstr` for each `msgid` in the existing `rummage.po` file.
 
@@ -594,22 +594,35 @@ python setup.py extract_messages
 
 This will scan the Python source and generate a template at `rummage/lib/gui/localization/locale/rummage.pot`.
 
-If you update the source in a way that requires generating a new `.pot` file, then you will most likely need to update existing `.po` files as well. There is no need to specify the input `.pot` file as it is already specified in `setup.cfg`..
+If you update the source in a way that requires generating a new `.pot` file, then you will most likely need to update existing `.po` files as well. See [Update Translation Files](#update-translation-files) to see how.
+
+See Babel's documentation on [`extract_messages`][babel_extract_messages] for more info.
+
+### Update Translation Files
+
+When new strings are added in the source, or strings are changed, you will need to re-generate the `.pot` file and then update the `.po` files. This should update all `.po` files.
 
 ```
-python setup.py update_catalog -l en_US -o rummage/lib/gui/localization/locale/en_US/rummage.po
+python setup.py update_catalog
 ```
 
-Currently this must be performed on each `.po` file, but this may get automated in the future if/when we support more than the two languages we currently support. See Babel's documentation on [`extract_messages`][babel_extract_messages] and [`update_catalog`][babel_update_catalog] for more info.
+If you need to only update a specific `.po` file:
+
+```
+python setup.py update_catalog -l en_US
+```
+
+See Babel's documentation on [`update_catalog`][babel_update_catalog] for more info.
 
 ### Create New Translations
-To create a translation `.po` file to edit, you can create your language folders as `rummage/lib/gui/localization/locale/<LANGUAGE>/LC_MESSAGES`.  Once the folder path is created you need to initialize a `.po` file. So assuming a path like `rummage/lib/gui/localization/locale/en_US/LC_MESSAGES` we would run:
+
+To create a translation `.po` file to edit, all you need to do is run the command below specifying your locale. The command should create a `.po` file to edit and the associated directory structure.
 
 ```
-python setup.py init_catalog -l en_US -o rummage/lib/gui/localization/locale/en_US/rummage.po
+python setup.py init_catalog -l en_US
 ```
 
-There is no need to specify the input `.pot` file as it is already specified in `setup.cfg`. See Babel's documentation on [`init_catalog`][babel_init_catalog] for more info.
+See Babel's documentation on [`init_catalog`][babel_init_catalog] for more info.
 
 ### Build Translations
 
