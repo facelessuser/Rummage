@@ -769,9 +769,9 @@ class Settings(object):
         pth = cls.get_config_folder()
 
         # Clean up old images
-        png = os.path.join(pth, "Rummage-notify.png")
-        icon = os.path.join(pth, "Rummage-notify.ico")
-        icns = os.path.join(pth, "Rummage-notify.icns")
+        png = os.path.join(pth, "rum-notify.png")
+        icon = os.path.join(pth, "rum-notify.ico")
+        icns = os.path.join(pth, "rum-notify.icns")
         for img in (png, icon, icns):
             try:
                 if os.path.exists(img):
@@ -779,30 +779,17 @@ class Settings(object):
             except Exception:
                 pass
 
-        # New file names
-        png = os.path.join(pth, "rum-notify.png")
-        icon = os.path.join(pth, "rum-notify.ico")
-        icns = os.path.join(pth, "rum-notify.icns")
+        png = os.path.join(data.RESOURCE_PATH, "rummage_hires.png")
+        icon = os.path.join(data.RESOURCE_PATH, "rummage_tray.ico")
+        icns = os.path.join(data.RESOURCE_PATH, "rummage.icns")
 
-        try:
-            if not os.path.exists(png):
-                with open(png, "wb") as f:
-                    f.write(data.get_image('rummage_hires.png').GetData())
-        except Exception:
+        if not os.path.exists(png):
             png = None
 
-        try:
-            if not os.path.exists(icon):
-                with open(icon, "wb") as f:
-                    f.write(data.get_image('rummage_tray.ico').GetData())
-        except Exception:
+        if not os.path.exists(icon):
             icon = None
 
-        try:
-            if not os.path.exists(icns):
-                with open(icns, "wb") as f:
-                    f.write(data.get_image('rummage.icns').GetData())
-        except Exception:
+        if not os.path.exists(icns):
             icns = None
 
         # Set up notifications

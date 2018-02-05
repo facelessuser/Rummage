@@ -8,6 +8,7 @@
 - **NEW**: Detect middle endian 32 bit BOMs (even if Python has no encoder to actually handle them so we'll just default to binary).
 - **NEW**: Speed up and tweak binary detection.
 - **NEW**: Add copy button to support info dialog and ensure support info is read only.
+- **NEW**: Don't copy notification icons to user folder for use, but use the packaged icons directly from library.
 
 ## 3.5.0
 
