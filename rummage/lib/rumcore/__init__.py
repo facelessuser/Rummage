@@ -401,7 +401,12 @@ class Wildcard2Regex(object):
         self.pattern = pattern
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
-        self.engine = regex if regex_mode in REGEX_MODES else re
+        self.is_regex = regex_mode in REGEX_MODES
+        if self.is_regex:
+            self.engine = regex
+        else:
+            self.engine = re
+
         self.flags = 0
         if regex_mode:
             self.flags |= self.engine.V0
@@ -471,7 +476,7 @@ class Wildcard2Regex(object):
         return value
 
     def translate(self):
-        """Translate fnmatch pattern counting `|` as a separator."""
+        """Translate fnmatch pattern counting `|` as a separator and `-` as a negative pattern."""
 
         result = []
         exclude_result = []
@@ -518,14 +523,12 @@ class Wildcard2Regex(object):
                     current.append('\\[')
             else:
                 current.append(self.engine.escape(c))
-        if util.PY36:
+        if util.PY36 or self.is_regex:
             pattern = r'(?s:%s)\Z' % ''.join(result)
             exclude_pattern = r'(?s:%s)\Z' % ''.join(exclude_result)
         else:
             pattern = r'(?ms)(?:%s)\Z' % ''.join(result)
             exclude_pattern = r'(?ms)(?:%s)\Z' % ''.join(exclude_result)
-
-        print(pattern, exclude_pattern)
 
         return self.engine.compile(pattern, self.flags), self.engine.compile(exclude_pattern, self.flags)
 
@@ -1427,7 +1430,7 @@ class _DirWalker(object):
                         string, re.IGNORECASE | (re.ASCII if util.PY3 else 0)
                     )
         elif string is not None:
-            pattern, exclude_pattern = Wildcard2Regex(string, self.regex_mode).translate()
+            pattern, exclude_pattern = Wildcard2Regex(string).translate()
         return pattern, exclude_pattern
 
     def _is_hidden(self, path):
