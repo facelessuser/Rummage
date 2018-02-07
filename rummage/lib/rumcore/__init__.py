@@ -27,8 +27,9 @@ import os
 import re
 import shutil
 import sre_parse
+import unicodedata
+import backrefs
 from collections import namedtuple
-from fnmatch import fnmatch
 from time import ctime
 from backrefs import bre
 from collections import deque
@@ -92,6 +93,10 @@ TRUNCATE_LENGTH = 120
 
 DEFAULT_BAK = 'rum-bak'
 DEFAULT_FOLDER_BAK = '.rum-bak'
+
+_OCTAL = frozenset(('0', '1', '2', '3', '4', '5', '6', '7'))
+_STANDARD_ESCAPES = frozenset(('a', 'b', 'f', 'n', 'r', 't', 'v'))
+_CHAR_ESCAPES = frozenset(('u', 'U', 'x'))
 
 U32 = (
     'u32', 'utf32', 'utf_32'
@@ -340,6 +345,206 @@ class BufferRecord(namedtuple('BufferRecord', ['content', 'error'])):
 
 class ErrorRecord(namedtuple('ErrorRecord', ['error'])):
     """A record for non-file related errors."""
+
+
+class _StringIter(object):
+    """Preprocess replace tokens."""
+
+    def __init__(self, string):
+        """Initialize."""
+
+        self.string = string
+        self.max_index = len(string) - 1
+        self.index = 0
+
+    def __iter__(self):
+        """Iterate."""
+
+        return self
+
+    def __next__(self):
+        """Python 3 iterator compatible next."""
+
+        return self.iternext()
+
+    def previous(self):
+        """Get previous char."""
+
+        return self.string[self.index - 1]
+
+    def rewind(self, count):
+        """Rewind index."""
+
+        self.index -= count
+
+    def iternext(self):
+        """Iterate through characters of the string."""
+
+        if self.index > self.max_index:
+            raise StopIteration
+
+        char = self.string[self.index]
+        self.index += 1
+
+        return char
+
+    # Python 2 iterator compatible next.
+    next = __next__  # noqa A002
+
+
+class Wildcard2Regex(object):
+    """Translate fnmatch pattern to regex."""
+
+    def __init__(self, pattern, regex_mode=RE_MODE, case_sensitive=False):
+        """Initialize."""
+
+        self.pattern = pattern
+        if (
+            (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or
+            (RE_MODE > regex_mode > BREGEX_MODE)
+        ):  # pragma: no cover
+            regex_mode = RE_MODE
+        self.is_regex = regex_mode in REGEX_MODES
+        if self.is_regex:  # pragma: no cover
+            self.engine = regex
+        else:
+            self.engine = re
+
+        self.flags = 0
+        if regex_mode:  # pragma: no cover
+            self.flags |= self.engine.V0
+        if not case_sensitive:
+            self.flags |= self.engine.I
+
+    def _sequence(self, i):
+        """Handle fnmatch character group."""
+
+        result = ['[']
+
+        c = next(i)
+        if c == '!':
+            # Handle negate char
+            result.append('^')
+            c = next(i)
+        if c == '^':
+            # Escape regular expression negate character
+            result.append('\\' + c)
+            c = next(i)
+        elif c == ']':
+            # Handle closing as first character
+            result.append(c)
+            c = next(i)
+
+        end_stored = False
+        while c != ']':
+            if c == '\\':
+                subindex = i.index
+                try:
+                    result.append(self._references(i))
+                    if i.previous() == ']':
+                        end_stored = True
+                        break
+                except StopIteration:
+                    i.rewind(i.index - subindex)
+                    result.append('\\\\')
+            else:
+                result.append(c)
+            c = next(i)
+
+        if not end_stored:
+            result.append(']')
+
+        return ''.join(result)
+
+    def _references(self, i):
+        """Handle references."""
+
+        index = i.index
+        value = ''
+        c = next(i)
+        if c in 'N':
+            try:
+                c = next(i)
+                if c != '{':
+                    raise SyntaxError("Missing '{' in named character format at %d!" % (i.index - 1))
+                name = []
+                c = next(i)
+                while c != '}':
+                    name.append(c)
+                    c = next(i)
+            except StopIteration:
+                raise SyntaxError('Incomplete named character at %d!' % (index - 1))
+            nval = ord(unicodedata.lookup(''.join(name)))
+            value = '\\%03o' % nval if nval <= 0xFF else backrefs.util.uchr(nval)
+        elif c in _OCTAL or c in _STANDARD_ESCAPES or c in _CHAR_ESCAPES:
+            value = '\\' + c
+        else:
+            value = '\\\\' + c
+        return value
+
+    def translate(self):
+        """Translate fnmatch pattern counting `|` as a separator and `-` as a negative pattern."""
+
+        result = []
+        exclude_result = []
+
+        if self.pattern[0] == '-':
+            current = exclude_result
+            pattern = self.pattern[1:]
+            current.append('')
+        else:
+            current = result
+            pattern = self.pattern
+            current.append('')
+
+        i = _StringIter(pattern)
+        iter(i)
+        for c in i:
+            if c == '*':
+                current.append('.*')
+            elif c == '?':
+                current.append('.')
+            elif c == '|':
+                try:
+                    c = next(i)
+                    if c == '-':
+                        current = exclude_result
+                    else:
+                        current = result
+                        i.rewind(1)
+                except StopIteration:
+                    # No need to append | as we are at the end.
+                    current = result
+                # Only append if we've already started the pattern
+                # This is to avoid adding a leading | to something
+                # like the exclude pattern on transition from normal
+                # to exclude pattern.
+                if current:
+                    current.append('|')
+            elif c == '\\':
+                index = i.index
+                try:
+                    current.append(self._references(i))
+                except StopIteration:
+                    i.rewind(i.index - index)
+                    current.append('\\\\')
+            elif c == '[':
+                index = i.index
+                try:
+                    current.append(self._sequence(i))
+                except StopIteration:
+                    i.rewind(i.index - index)
+                    current.append('\\[')
+            else:
+                current.append(self.engine.escape(c))
+        if util.PY36 or self.is_regex:
+            pattern = r'(?s:%s)\Z' % ''.join(result)
+            exclude_pattern = r'(?s:%s)\Z' % ''.join(exclude_result)
+        else:
+            pattern = r'(?ms)(?:%s)\Z' % ''.join(result)
+            exclude_pattern = r'(?ms)(?:%s)\Z' % ''.join(exclude_result)
+
+        return self.engine.compile(pattern, self.flags), self.engine.compile(exclude_pattern, self.flags)
 
 
 class Search(object):
@@ -1203,10 +1408,8 @@ class _DirWalker(object):
         self.size = (size[0], size[1]) if size is not None else size
         self.modified = modified
         self.created = created
-        self.file_pattern = self._parse_pattern(file_pattern, file_regex_match)
-        self.file_regex_match = file_regex_match
-        self.dir_regex_match = dir_regex_match
-        self.folder_exclude = self._parse_pattern(folder_exclude, dir_regex_match)
+        self.file_pattern, self.exclude_file_pattern = self._parse_pattern(file_pattern, file_regex_match)
+        self.folder_exclude, self.negated_folder_exclude = self._parse_pattern(folder_exclude, dir_regex_match)
         self.recursive = recursive
         self.show_hidden = show_hidden
         self.backup2folder = backup_to_folder
@@ -1221,24 +1424,28 @@ class _DirWalker(object):
         r"""Compile or format the inclusion\exclusion pattern."""
 
         pattern = None
-        if string is not None:
-            if self.regex_mode == BREGEX_MODE:
-                pattern = bregex.compile_search(
-                    string, bregex.IGNORECASE
-                ) if regex_match else [f.lower() for f in string.split("|")]
-            elif self.regex_mode == REGEX_MODE:
-                pattern = regex.compile(
-                    string, regex.IGNORECASE | regex.ASCII
-                ) if regex_match else [f.lower() for f in string.split("|")]
-            elif self.regex_mode == BRE_MODE:
-                pattern = bre.compile_search(
-                    string, bre.IGNORECASE | (bre.ASCII if util.PY3 else 0)
-                ) if regex_match else [f.lower() for f in string.split("|")]
-            else:
-                pattern = re.compile(
-                    string, re.IGNORECASE | (re.ASCII if util.PY3 else 0)
-                ) if regex_match else [f.lower() for f in string.split("|")]
-        return pattern
+        exclude_pattern = None
+        if regex_match:
+            if string is not None:
+                if self.regex_mode == BREGEX_MODE:
+                    pattern = bregex.compile_search(
+                        string, bregex.IGNORECASE
+                    )
+                elif self.regex_mode == REGEX_MODE:
+                    pattern = regex.compile(
+                        string, regex.IGNORECASE | regex.ASCII
+                    )
+                elif self.regex_mode == BRE_MODE:
+                    pattern = bre.compile_search(
+                        string, bre.IGNORECASE | (bre.ASCII if util.PY3 else 0)
+                    )
+                else:
+                    pattern = re.compile(
+                        string, re.IGNORECASE | (re.ASCII if util.PY3 else 0)
+                    )
+        elif string is not None:
+            pattern, exclude_pattern = Wildcard2Regex(string).translate()
+        return pattern, exclude_pattern
 
     def _is_hidden(self, path):
         """Check if file is hidden."""
@@ -1324,22 +1531,9 @@ class _DirWalker(object):
             not self._is_hidden(os.path.join(base, name)) and
             not self._is_backup(name)
         ):
-            if self.file_regex_match:
-                valid = True if self.file_pattern.match(name) is not None else False
-            else:
-                matched = False
-                exclude = False
-                for p in self.file_pattern:
-                    if len(p) > 1 and p[0] == "-":
-                        if fnmatch(name.lower(), p[1:]):
-                            exclude = True
-                            break
-                    elif fnmatch(name.lower(), p):
-                        matched = True
-                if exclude:
-                    valid = False
-                elif matched:
-                    valid = True
+            valid = self.file_pattern.match(name) is not None
+            if self.exclude_file_pattern and self.exclude_file_pattern.match(name) is not None:
+                valid = False
             if valid:
                 valid = self._is_size_okay(os.path.join(base, name))
             if valid:
@@ -1355,22 +1549,9 @@ class _DirWalker(object):
         elif self._is_hidden(os.path.join(base, name)) or self._is_backup(name, True):
             valid = False
         elif self.folder_exclude is not None:
-            if self.dir_regex_match:
-                valid = False if self.folder_exclude.match(name) is not None else True
-            else:
-                matched = False
-                exclude = False
-                for p in self.folder_exclude:
-                    if len(p) > 1 and p[0] == "-":
-                        if fnmatch(name.lower(), p[1:]):
-                            matched = True
-                            break
-                    elif fnmatch(name.lower(), p):
-                        exclude = True
-                if matched:
-                    valid = True
-                elif exclude:
-                    valid = False
+            valid = self.folder_exclude.match(name) is None
+            if self.negated_folder_exclude is not None and self.negated_folder_exclude.match(name) is not None:
+                valid = True
         return valid
 
     def kill(self):

@@ -1,6 +1,7 @@
 """Tests for rumcore."""
 from __future__ import unicode_literals
 import unittest
+import pytest
 import os
 import re
 import regex
@@ -14,6 +15,113 @@ from rummage.lib import rumcore as rc
 from rummage.lib import util
 from rummage.lib.util import epoch_timestamp as epoch
 from rummage.lib.rumcore import text_decode as td
+
+
+class TestWildcard(unittest.TestCase):
+    """Test wildcard pattern parsing."""
+
+    def test_wildcard_parsing(self):
+        """Test wildcard parsing."""
+
+        p1, p2 = rc.Wildcard2Regex(r'*test[a-z]?|*test2[a-z]?|-test[!a-z]|-test[!-|a-z]').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:.*test[a-z].|.*test2[a-z].)\Z')
+            self.assertEqual(p2.pattern, r'(?s:test[^a-z]|test[^-|a-z])\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:.*test[a-z].|.*test2[a-z].)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:test[^a-z]|test[^-|a-z])\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'test[]][!][][]').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test[]][^][]\[\])\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test[]][^][]\[\])\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'test[!]').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test\[\!\])\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test\[\!\])\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'|test|').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:|test|)\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:|test|)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'-|-test|-').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:)\Z')
+            self.assertEqual(p2.pattern, r'(?s:|test|)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:|test|)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'test[^chars]').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test[\^chars])\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test[\^chars])\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+    def test_wildcard_character_notation(self):
+        """Test wildcard character notations."""
+
+        p1, p2 = rc.Wildcard2Regex(r'test\x70\u0070\160\N{LATIN SMALL LETTER P}').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test\x70\u0070\160\160)\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test\x70\u0070\160\160)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'test[\x70][\u0070][\160][\N{LATIN SMALL LETTER P}]').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test[\x70][\u0070][\160][\160])\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test[\x70][\u0070][\160][\160])\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'test\t\m').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test\t\\m)\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test\t\\m)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'test[\]test').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test[\\]test)\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test[\\]test)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex('test[\\').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test\[\\)\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test\[\\)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        with pytest.raises(SyntaxError):
+            rc.Wildcard2Regex(r'test\N').translate()
+
+        with pytest.raises(SyntaxError):
+            rc.Wildcard2Regex(r'test\Nx').translate()
+
+        with pytest.raises(SyntaxError):
+            rc.Wildcard2Regex(r'test\N{').translate()
 
 
 class TestHelperFunctions(unittest.TestCase):

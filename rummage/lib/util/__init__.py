@@ -18,6 +18,7 @@ NARROW = sys.maxunicode == 0xFFFF
 
 PY3 = (3, 0) <= sys.version_info
 PY2 = (2, 0) <= sys.version_info < (3, 0)
+PY36 = (3, 6) <= sys.version_info
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
