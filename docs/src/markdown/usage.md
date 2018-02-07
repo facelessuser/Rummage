@@ -284,19 +284,54 @@ LITERAL = 0x10000           # Literal search
 
 The limit search pattern contains inputs and toggles to filter which files will be searched.  Some people may like to set up the filters and hide the panel.  If this is desired, you can select in the window's menu **View-->Hide Limit Search Panel**, and the panel will be hidden.
 
+!!! tip "Tip"
+    If you don't specify a search pattern, Rummage will use your file filter and just show files that match your file filter pattern.
+
 Limiter                | Description
 ---------------------- |------------
 Size\ of               | Limits files that are searched by size in Kilobytes.  Files are limited by whether they are greater than, less than, or equal to the specified size.  Setting the dropdown to `any` disables the filter and allows any file size to be searched. It is recommended to cap search sizes in projects with very large files for the best performances.  The more complex the search pattern, the longer it will take to search a really large file.
 Modified               | Limits the files to be searched by the modified timestamp.  It contains a date picker and time picker that are used to specify the target date and time. Files are limited by whether their timestamp comes before, after, or on specified date time.  Setting the dropdown to `on any` will disable the filter and allow a file with any timestamp to be searched.
 Created                | Limits the files to be searched by the creation timestamp.  It contains a date picker and time picker that are used to specify the target date and time. Files are limited by whether their timestamp comes before, after, or on specified date time.  Setting the dropdown to `on any` will disable the filter and allow a file with any timestamp to be searched.
-Files\ which\ match    | Specifies a file pattern for files that should be searched.  Multiple file patterns can be specified with `;` used as a separator. If the Regex toggle to the text box's right is selected, the file pattern must be a regular expression pattern.  You can select previously used patterns by expanding the dropdown panel for the input.
-Exclude\ folders       | Specifies a directory exclude pattern to filter out folders that are not to be crawled.  Multiple file patterns can be specified with `;` used as a separator.  If the Regex toggle to the text box's right is selected, the file pattern must be a regular expression pattern.  You can select previously used patterns by expanding the dropdown panel for the input.
+Files\ which\ match    | Specifies a file pattern for files that should be searched.  Multiple file patterns can be specified with `|` used as a separator. If the Regex toggle to the text box's right is selected, the file pattern must be a regular expression pattern.  You can select previously used patterns by expanding the dropdown panel for the input.
+Exclude\ folders       | Specifies a directory exclude pattern to filter out folders that are not to be crawled.  Multiple file patterns can be specified with `|` used as a separator.  If the Regex toggle to the text box's right is selected, the file pattern must be a regular expression pattern.  You can select previously used patterns by expanding the dropdown panel for the input.
 Include\ subfolders    | Indicates that folders should be recursively searched.
 Include\ hidden        | The given OS's native hidden files, folders and dotfiles will be included in the search.
 Include\ binary\ files | Forces Rummage to search binary files.
 
-!!! tip "Tip"
-    If you don't specify a search pattern, Rummage will use your file filter and just show files that match your file filter pattern.
+
+### File Patterns
+
+When the `Regex` check box is selected to the right of `Exclude folders` or `Files which match`, the currently configured regular expression engine will be used, and the patterns will be configured for case insensitive matching. If you don't select the `Regex`, those patterns will be a simple wildcard pattern instead of a regular expression pattern, and the wildcard matches will also be case insensitive. The wildcard syntax mimics Python's [fnmatch module][fnmatch], but with two additions.
+
+Pattern  | Meaning
+-------- | -------
+`*`      | Matches everything.
+`?`      | Matches any single character.
+`[seq]`  | Matches any character in seq.
+`[!seq]` | Matches any character not in seq.
+`|`      | Separates multiple patterns.
+`-`      | If used at the start of a pattern, the pattern is treated as an exception to other applied patterns.
+
+You can also use Python notation for specifying characters to make things like Unicode character input easier. So you can use `\x70`, `\u0070`, `\160`, for bytes, Unicode, or octal style character notation. You can also use Unicode names: `\N{unicode name}`.
+
+!!! example "Example Patterns"
+
+    Used in the `Files which match` box, this would match all Python files of `.py` extensions excluding `__init__.py`:
+
+    ```
+    *.py|-__init__.py
+    ```
+
+    Keep in mind that `-` patterns augment logic of other patterns, you can't just specify `-__init__.py` as it is more an exception to non `-` matches as shown above.
+
+    Used in the `Exclude folders`, this would exclude all folders with `name` followed by a single digit, except `name3` which we will always be included.
+
+    ```
+    name[0-9]|-name3
+    ```
+
+    If you need to escape `-` or `|`, you can put them in a sequence: `[-|]`. Remember to place `-` at the beginning of a sequence as `-` is also used to specify character ranges: `[a-z]`.
+
 
 ## Export to CSV or HTML
 
