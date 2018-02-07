@@ -399,21 +399,24 @@ class Wildcard2Regex(object):
         """Initialize."""
 
         self.pattern = pattern
-        if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode > BREGEX_MODE):
+        if (
+            (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or
+            (RE_MODE > regex_mode > BREGEX_MODE)
+        ):  # pragma: no cover
             regex_mode = RE_MODE
         self.is_regex = regex_mode in REGEX_MODES
-        if self.is_regex:
+        if self.is_regex:  # pragma: no cover
             self.engine = regex
         else:
             self.engine = re
 
         self.flags = 0
-        if regex_mode:
+        if regex_mode:  # pragma: no cover
             self.flags |= self.engine.V0
         if not case_sensitive:
             self.flags |= self.engine.I
 
-    def _character_group(self, i):
+    def _sequence(self, i):
         """Handle fnmatch character group."""
 
         result = ['[']
@@ -437,7 +440,7 @@ class Wildcard2Regex(object):
             if c == '\\':
                 subindex = i.index
                 try:
-                    result.append(self.references(i))
+                    result.append(self._references(i))
                     if i.previous() == ']':
                         end_stored = True
                         break
@@ -453,20 +456,24 @@ class Wildcard2Regex(object):
 
         return ''.join(result)
 
-    def references(self, i):
+    def _references(self, i):
         """Handle references."""
 
+        index = i.index
         value = ''
         c = next(i)
         if c in 'N':
-            c = next(i)
-            if c != '{':
-                raise SyntaxError('Invalid named character format at %d!' % (i.index - 1))
-            name = []
-            c = next(i)
-            while c != '}':
-                name.append(c)
+            try:
                 c = next(i)
+                if c != '{':
+                    raise SyntaxError("Missing '{' in named character format at %d!" % (i.index - 1))
+                name = []
+                c = next(i)
+                while c != '}':
+                    name.append(c)
+                    c = next(i)
+            except StopIteration:
+                raise SyntaxError('Incomplete named character at %d!' % (index - 1))
             nval = ord(unicodedata.lookup(''.join(name)))
             value = '\\%03o' % nval if nval <= 0xFF else backrefs.util.uchr(nval)
         elif c in _OCTAL or c in _STANDARD_ESCAPES or c in _CHAR_ESCAPES:
@@ -481,43 +488,50 @@ class Wildcard2Regex(object):
         result = []
         exclude_result = []
 
-        exclude_mode = self.pattern[0] == '-'
-        skip_first = exclude_mode
+        if self.pattern[0] == '-':
+            current = exclude_result
+            pattern = self.pattern[1:]
+            current.append('')
+        else:
+            current = result
+            pattern = self.pattern
+            current.append('')
 
-        i = _StringIter(self.pattern)
+        i = _StringIter(pattern)
         iter(i)
         for c in i:
-            if skip_first:
-                skip_first = False
-                continue
-            current = exclude_result if exclude_mode else result
             if c == '*':
                 current.append('.*')
             elif c == '?':
                 current.append('.')
             elif c == '|':
-                current.append(c)
                 try:
                     c = next(i)
                     if c == '-':
-                        exclude_mode = True
+                        current = exclude_result
                     else:
-                        exclude_mode = False
+                        current = result
                         i.rewind(1)
                 except StopIteration:
-                    i.rewind(1)
-                    exclude_mode = False
+                    # No need to append | as we are at the end.
+                    current = result
+                # Only append if we've already started the pattern
+                # This is to avoid adding a leading | to something
+                # like the exclude pattern on transition from normal
+                # to exclude pattern.
+                if current:
+                    current.append('|')
             elif c == '\\':
                 index = i.index
                 try:
-                    current.append(self.references(i))
+                    current.append(self._references(i))
                 except StopIteration:
                     i.rewind(i.index - index)
                     current.append('\\\\')
             elif c == '[':
                 index = i.index
                 try:
-                    current.append(self._character_group(i))
+                    current.append(self._sequence(i))
                 except StopIteration:
                     i.rewind(i.index - index)
                     current.append('\\[')
