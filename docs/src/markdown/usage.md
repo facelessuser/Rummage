@@ -301,7 +301,7 @@ Include\ binary\ files | Forces Rummage to search binary files.
 
 ### File Patterns
 
-If you don't select the `Regex` checkbox to the right of `Exclude folders` or `Files which match`, those patterns will be simple wildcard patterns instead of regular expressions. The wildcard syntax mimics Python's [fnmatch module][fnmatch], but with two additions.
+If you don't select the `Regex` check box to the right of `Exclude folders` or `Files which match`, those patterns will be simple wildcard patterns instead of regular expressions. The wildcard syntax mimics Python's [fnmatch module][fnmatch], but with two additions.
 
 Pattern  | Meaning
 -------- | -------
