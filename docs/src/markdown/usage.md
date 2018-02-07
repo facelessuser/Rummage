@@ -310,19 +310,21 @@ Pattern  | Meaning
 `[seq]`  | Matches any character in seq.
 `[!seq]` | Matches any character not in seq.
 `|`      | Separates multiple patterns.
-`-`      | If used at the start of a pattern, the meaning is changed to exclude (or include in the case of `Exclude folders`).
+`-`      | If used at the start of a pattern, the pattern is treated as an exception to other applied patterns.
 
 You can also use Python notation for specifying characters to make things like Unicode character input easier. So you can use `\x70`, `\u0070`, `\160`, for bytes, Unicode, or octal style character notation. You can also use Unicode names: `\N{unicode name}`.
 
 !!! example "Example Patterns"
 
-    This would match all Python files of `.py` extensions excluding `__init__.py`:
+    Used in the `Files which match` box, this would match all Python files of `.py` extensions excluding `__init__.py`:
 
     ```
     *.py|-__init__.py
     ```
 
-    This would exclude all folders with `name` followed by a single digit number, except `name3` which we will always include.
+    Keep in mind that `-` patterns augment logic of other patterns, you can't just specify `-__init__.py` as it is more an exception to non `-` matches as shown above.
+
+    Used in the `Exclude folders`, this would exclude all folders with `name` followed by a single digit, except `name3` which we will always be included.
 
     ```
     name[0-9]|-name3
