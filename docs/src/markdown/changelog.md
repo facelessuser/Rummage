@@ -10,6 +10,9 @@
 - **NEW**: Add copy button to support info dialog and ensure support info is read only.
 - **NEW**: Don't copy notification icons to user folder for use, but use the packaged icons directly from library.
 - **NEW**: Provide better support for localization.  Build current language translation on install and bundle in library directly.
+- **FIX**: Wildcard pattern splitting on `|` inside a sequence.
+- **FIX**: Wildcard patterns not allowing character tokens such as `\x70`, `\u0070`, `\N{unicode name}`, `\160`, and standard escapes like `\t` etc.
+- **FIX**: Incorrect documentation on wildcard patterns.
 
 ## 3.5.0
 

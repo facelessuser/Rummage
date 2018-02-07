@@ -31,6 +31,7 @@ Rummage's
 Sep
 Tox
 UI
+Wildcard
 Xcode
 cChardet
 changelog
@@ -46,6 +47,7 @@ dotfiles
 dropdown
 emoji
 endian
+fnmatch
 grepWin
 inline
 macOS
@@ -69,4 +71,5 @@ taskbar
 timestamp
 tuple
 wiki
+wildcard
 wxPython
