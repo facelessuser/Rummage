@@ -13,9 +13,6 @@ from itertools import groupby
 from encodings.aliases import aliases
 from .file_strip.json import sanitize_json
 
-MAXUNICODE = sys.maxunicode
-NARROW = sys.maxunicode == 0xFFFF
-
 PY3 = (3, 0) <= sys.version_info
 PY2 = (2, 0) <= sys.version_info < (3, 0)
 PY36 = (3, 6) <= sys.version_info
@@ -64,20 +61,17 @@ BACK_SLASH_TRANSLATION = {
 
 FMT_BRACKETS = ('{', '}')
 
-if NARROW:
-    RE_FMT = re.compile(
-        r'''(\\[abfrtnv\\])|(\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{1,3})'''
-    )
-    RE_RE = re.compile(
-        r'''(\\[\\])|(\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
-    )
-else:
-    RE_FMT = re.compile(
-        r'''(\\[abfrtnv\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{1,3})'''
-    )
-    RE_RE = re.compile(
-        r'''(\\[\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
-    )
+RE_FMT = re.compile(
+    r'''(\\[abfrtnv\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{1,3})'''
+)
+
+RE_RE = re.compile(
+    r'''(\\[\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
+)
+
+RE_SEARCH_27 = re.compile(
+    r'''(\\[\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4})'''
+)
 
 
 def platform():
@@ -251,6 +245,29 @@ def to_unicode_argv():
             cli_encoding = sys.stdin.encoding or locale.getpreferredencoding()
             args = [arg.decode(cli_encoding) for arg in sys.argv if isinstance(arg, bstr)]
     return args
+
+
+def preprocess_search(string):
+    """Preprocess search string."""
+
+    if not PY2 or not string:
+        return string
+
+    def replace(m):
+        """Replace."""
+        if m.group(1):
+            return m.group(1)
+        else:
+            # Unicode (wide and narrow) and bytes
+            value = int(m.group(2)[2:], 16)
+
+            if value <= 0xff:
+                text = '\\%03o' % value
+            else:
+                text = uchr(value)
+        return text
+
+    return RE_SEARCH_27.sub(replace, string)
 
 
 def preprocess_replace(string, format_replace=False):
