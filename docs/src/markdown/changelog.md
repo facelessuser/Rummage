@@ -30,6 +30,7 @@ Feb 1, 2018
 - **FIX**: Limit bulk file open to 20 items to prevent issues when open massive amount of files at once.
 - **FIX**: Regression with exports due to recent column addition and order change.
 - **FIX**: Search error list destroying parent/main dialog when closed. Also ensure destruction of error list dialog on main window closing.
+- **FIX**: Python 2.7 not processing Unicode escapes in search patterns.
 
 ## 3.4.3
 
