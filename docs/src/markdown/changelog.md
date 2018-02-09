@@ -14,6 +14,7 @@
 - **FIX**: Wildcard patterns not allowing character tokens such as `\x70`, `\u0070`, `\N{unicode name}`, `\160`, and standard escapes like `\t` etc.
 - **FIX**: Incorrect documentation on wildcard patterns.
 - **FIX**: Python 2.7 not translating Unicode escapes #196.
+- **FIX**: Require Backrefs 3.0.4.
 
 ## 3.5.0
 
