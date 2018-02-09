@@ -376,6 +376,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     search_text = engine.escape(self.m_regex_text.GetValue())
 
             try:
+                search_text = util.preprocess_search(search_text)
                 if self.regex_mode == rumcore.BREGEX_MODE:
                     test = bregex.compile_search(search_text, flags)
                 elif self.regex_mode == rumcore.REGEX_MODE:

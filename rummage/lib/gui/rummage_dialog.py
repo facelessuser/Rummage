@@ -1227,7 +1227,7 @@ class RummageFrame(gui.RummageFrame):
                 elif mode == rumcore.RE_MODE and not is_literal:
                     replace_obj = util.preprocess_replace(replace_obj)
 
-            search_chain.add(search_obj['search'], replace_obj, flags)
+            search_chain.add(util.preprocess_search(search_obj['search']), replace_obj, flags)
 
         debug(search_chain)
 
@@ -1370,14 +1370,14 @@ class RummageFrame(gui.RummageFrame):
                             replace_pattern = util.preprocess_replace(args.replace, True)
                         elif args.regex_mode == rumcore.RE_MODE and args.regexp:
                             replace_pattern = util.preprocess_replace(args.replace)
-                    search_chain.add(args.pattern, replace_pattern, flags & rumcore.SEARCH_MASK)
+                    search_chain.add(util.preprocess_search(args.pattern), replace_pattern, flags & rumcore.SEARCH_MASK)
 
         self.payload = {
             'target': args.target,
             'chain': search_chain,
             'flags': flags & rumcore.FILE_MASK,
-            'filepattern': args.filepattern,
-            'directory_exclude': args.directory_exclude,
+            'filepattern': util.preprocess_search(args.filepattern),
+            'directory_exclude': util.preprocess_search(args.directory_exclude),
             'force_encode': args.force_encode,
             'modified_compare': args.modified_compare,
             'created_compare': args.created_compare,
@@ -1656,7 +1656,9 @@ class RummageFrame(gui.RummageFrame):
                         msg = self.ERR_MISSING_SEARCH % search
                         fail = True
                         break
-                    if self.validate_chain_regex(s['search'], self.chain_flags(s['flags'], s['is_regex'])):
+                    if self.validate_chain_regex(
+                        util.preprocess_search(s['search']), self.chain_flags(s['flags'], s['is_regex'])
+                    ):
                         msg = self.ERR_INVALID_CHAIN_SEARCH % search
                         fail = True
                         break
@@ -1747,7 +1749,7 @@ class RummageFrame(gui.RummageFrame):
                 flags |= engine.IGNORECASE
             if self.m_unicode_checkbox.GetValue():
                 flags |= engine.UNICODE
-        return self.validate_regex(self.m_searchfor_textbox.Value, flags)
+        return self.validate_regex(util.preprocess_search(self.m_searchfor_textbox.Value), flags)
 
     def validate_chain_regex(self, pattern, cflags):
         """Validate chain regex."""

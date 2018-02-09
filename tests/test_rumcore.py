@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for rumcore."""
 from __future__ import unicode_literals
 import unittest
@@ -112,6 +113,30 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p2.pattern, r'(?s:)\Z')
         else:
             self.assertEqual(p1.pattern, r'(?ms)(?:test\[\\)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'test\33test').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test\033test)\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test\033test)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'test\33').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:test\033)\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:test\033)\Z')
+            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
+
+        p1, p2 = rc.Wildcard2Regex(r'test\400').translate()
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:testĀ)\Z')
+            self.assertEqual(p2.pattern, r'(?s:)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:testĀ)\Z')
             self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
 
         with pytest.raises(SyntaxError):

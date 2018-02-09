@@ -466,17 +466,34 @@ class Wildcard2Regex(object):
             try:
                 c = next(i)
                 if c != '{':
-                    raise SyntaxError("Missing '{' in named character format at %d!" % (i.index - 1))
+                    raise SyntaxError("Missing '{' in named Unicode character format at position %d!" % (i.index - 1))
                 name = []
                 c = next(i)
                 while c != '}':
                     name.append(c)
                     c = next(i)
             except StopIteration:
-                raise SyntaxError('Incomplete named character at %d!' % (index - 1))
+                raise SyntaxError('Incomplete named Unicode character at position %d!' % (index - 1))
             nval = ord(unicodedata.lookup(''.join(name)))
             value = '\\%03o' % nval if nval <= 0xFF else backrefs.util.uchr(nval)
-        elif c in _OCTAL or c in _STANDARD_ESCAPES or c in _CHAR_ESCAPES:
+        elif c in _OCTAL:
+            digit = [c]
+            try:
+                for x in range(2):
+                    c = next(i)
+                    if c in _OCTAL:
+                        digit.append(c)
+                    else:
+                        i.rewind(1)
+                        break
+            except StopIteration:
+                pass
+            digit = int(''.join(digit), 8)
+            if digit <= 0xFF:
+                value = '\\%03o' % digit
+            else:
+                value = backrefs.util.uchr(digit)
+        elif c in _STANDARD_ESCAPES or c in _CHAR_ESCAPES:
             value = '\\' + c
         else:
             value = '\\\\' + c
@@ -1408,8 +1425,10 @@ class _DirWalker(object):
         self.size = (size[0], size[1]) if size is not None else size
         self.modified = modified
         self.created = created
-        self.file_pattern, self.exclude_file_pattern = self._parse_pattern(file_pattern, file_regex_match)
-        self.folder_exclude, self.negated_folder_exclude = self._parse_pattern(folder_exclude, dir_regex_match)
+        self.file_pattern = file_pattern
+        self.file_regex_match = file_regex_match
+        self.folder_exclude = folder_exclude
+        self.dir_regex_match = dir_regex_match
         self.recursive = recursive
         self.show_hidden = show_hidden
         self.backup2folder = backup_to_folder
@@ -1527,12 +1546,12 @@ class _DirWalker(object):
 
         valid = False
         if (
-            self.file_pattern is not None and
+            self.re_file_pattern is not None and
             not self._is_hidden(os.path.join(base, name)) and
             not self._is_backup(name)
         ):
-            valid = self.file_pattern.match(name) is not None
-            if self.exclude_file_pattern and self.exclude_file_pattern.match(name) is not None:
+            valid = self.re_file_pattern.match(name) is not None
+            if self.re_exclude_file_pattern and self.re_exclude_file_pattern.match(name) is not None:
                 valid = False
             if valid:
                 valid = self._is_size_okay(os.path.join(base, name))
@@ -1548,9 +1567,9 @@ class _DirWalker(object):
             valid = False
         elif self._is_hidden(os.path.join(base, name)) or self._is_backup(name, True):
             valid = False
-        elif self.folder_exclude is not None:
-            valid = self.folder_exclude.match(name) is None
-            if self.negated_folder_exclude is not None and self.negated_folder_exclude.match(name) is not None:
+        elif self.re_folder_exclude is not None:
+            valid = self.re_folder_exclude.match(name) is None
+            if self.re_negated_folder_exclude is not None and self.re_negated_folder_exclude.match(name) is not None:
                 valid = True
         return valid
 
@@ -1619,10 +1638,21 @@ class _DirWalker(object):
             if self.abort:
                 break
 
+    def compile_search_patterns(self):
+        """Compile search patterns."""
+
+        self.re_file_pattern, self.re_exclude_file_pattern = self._parse_pattern(
+            self.file_pattern, self.file_regex_match
+        )
+        self.re_folder_exclude, self.re_negated_folder_exclude = self._parse_pattern(
+            self.folder_exclude, self.dir_regex_match
+        )
+
     def run(self):
         """Run the directory walker."""
 
         try:
+            self.compile_search_patterns()
             for f in self.walk():
                 yield f
         except Exception:  # pragma: no cover
