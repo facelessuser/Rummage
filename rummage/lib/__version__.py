@@ -1,7 +1,7 @@
 """Version."""
 
 #   (major, minor, micro, release type, pre-release build, post-release build)
-version_info = (3, 6, 0, 'beta', 3, 0)
+version_info = (3, 6, 0, 'beta', 4, 0)
 
 
 def _version():
