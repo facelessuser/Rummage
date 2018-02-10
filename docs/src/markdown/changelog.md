@@ -14,7 +14,11 @@
 - **FIX**: Wildcard patterns not allowing character tokens such as `\x70`, `\u0070`, `\N{unicode name}`, `\160`, and standard escapes like `\t` etc.
 - **FIX**: Incorrect documentation on wildcard patterns.
 - **FIX**: Python 2.7 not translating Unicode escapes #196.
-- **FIX**: Require Backrefs 3.0.4.
+- **FIX**: Require Backrefs 3.0.5.
+- **FIX**: Crashes in Python 2.7 related to not handling 32 bit Unicode in the GUI properly on narrow systems.
+- **FIX**: Python 2.7 will translate 32 bit characters to escaped surrogate pairs on narrow systems.
+- **FIX**: Tester will replace 32 bit Unicode characters with escaped surrogate pairs place holder in results.
+- **FIX**: Rework highlighting in tester dialog to properly highlight 32 bit characters.
 
 ## 3.5.0
 
