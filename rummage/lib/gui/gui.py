@@ -1761,7 +1761,7 @@ class RegexTestDialog ( wx.Dialog ):
 		
 		sbSizer111 = wx.StaticBoxSizer( wx.StaticBox( self.m_tester_panel, wx.ID_ANY, u"Result" ), wx.VERTICAL )
 		
-		self.m_test_replace_text = wx.TextCtrl( self.m_tester_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_RICH2 )
+		self.m_test_replace_text = wx.TextCtrl( self.m_tester_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_DONTWRAP|wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_RICH2 )
 		sbSizer111.Add( self.m_test_replace_text, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
