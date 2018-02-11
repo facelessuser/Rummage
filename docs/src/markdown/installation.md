@@ -7,7 +7,7 @@ Rummage has a few requirements when installing.  These will all be taken care of
 Name                           | Details
 ------------------------------ | -------
 [`wxPython`\ 4.0.1+][wxpython] | The new wxPython Phoenix 4.0.0 is required for for Rummage to run in Python 2 and Python 3.
-[`backrefs`\ 3.0.5+][backrefs] | Used to extend the `re` or `regex` regular expression engine with additional back references.
+[`backrefs`\ 3.1.0+][backrefs] | Used to extend the `re` or `regex` regular expression engine with additional back references.
 [`chardet`\ 3.0.4+][chardet]   | Used for file encoding guessing when an encoding is not specified.
 [`filelock`][filelock]         | Used for file locking to allow different instances of Rummage to access the same file.
 [`gntp`][gntp]                 | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
