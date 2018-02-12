@@ -97,6 +97,7 @@ DEFAULT_FOLDER_BAK = '.rum-bak'
 _OCTAL = frozenset(('0', '1', '2', '3', '4', '5', '6', '7'))
 _STANDARD_ESCAPES = frozenset(('a', 'b', 'f', 'n', 'r', 't', 'v'))
 _CHAR_ESCAPES = frozenset(('u', 'U', 'x'))
+_SET_OPERATORS = frozenset(('&', '~', '|'))
 
 U32 = (
     'u32', 'utf32', 'utf_32'
@@ -430,14 +431,31 @@ class Wildcard2Regex(object):
             # Escape regular expression negate character
             result.append('\\' + c)
             c = next(i)
+        if c in ('-', '['):
+            # Escape opening bracket or hyphen
+            result.append('\\' + c)
+            c = next(i)
         elif c == ']':
             # Handle closing as first character
             result.append(c)
             c = next(i)
 
         end_stored = False
+        escape_hypen = -1
         while c != ']':
-            if c == '\\':
+            if c == '-':
+                if i.index - 1 > escape_hypen:
+                    # Found a range delimiter.
+                    # Mark the next two characters as needing to be escaped if hypens.
+                    # The next character would be the end char range (s-e),
+                    # and the one after that would be the potential start char range
+                    # of a new range (s-es-e), so neither can be legitimate range delimiters.
+                    result.append(c)
+                    escape_hypen = i.index + 1
+                else:
+                    result.append('\\' + c)
+            elif c == '\\':
+                # Handle escapes
                 subindex = i.index
                 try:
                     result.append(self._references(i))
@@ -447,7 +465,11 @@ class Wildcard2Regex(object):
                 except StopIteration:
                     i.rewind(i.index - subindex)
                     result.append('\\\\')
+            elif c in _SET_OPERATORS:
+                # Escape &, |, and ~ to avoid &&, ||, and ~~
+                result.append('\\' + c)
             else:
+                # Anything else
                 result.append(c)
             c = next(i)
 
@@ -463,6 +485,7 @@ class Wildcard2Regex(object):
         value = ''
         c = next(i)
         if c in 'N':
+            # \N{name}
             try:
                 c = next(i)
                 if c != '{':
@@ -477,6 +500,7 @@ class Wildcard2Regex(object):
             nval = ord(unicodedata.lookup(''.join(name)))
             value = '\\%03o' % nval if nval <= 0xFF else backrefs.util.uchr(nval)
         elif c in _OCTAL:
+            # \octal
             digit = [c]
             try:
                 for x in range(2):
@@ -494,8 +518,13 @@ class Wildcard2Regex(object):
             else:
                 value = backrefs.util.uchr(digit)
         elif c in _STANDARD_ESCAPES or c in _CHAR_ESCAPES:
+            # \n, \v, etc. and \u, \U, \x etc.
             value = '\\' + c
+        elif c in _SET_OPERATORS or c == '-':
+            value = '\\\\'
+            i.rewind(1)
         else:
+            # Anything else
             value = '\\\\' + c
         return value
 
