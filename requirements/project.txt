@@ -1,6 +1,6 @@
 gntp>=1.0.2
 chardet>=3.0.4
-backrefs>=3.0.4,<4.0
+backrefs>=3.1.0,<4.0
 wxpython>=4.0.1
 filelock
 send2trash

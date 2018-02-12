@@ -54,6 +54,19 @@ class RegexTestDialog(gui.RegexTestDialog):
         super(RegexTestDialog, self).__init__(None)
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
+
+        test_attr = self.m_test_text.GetDefaultStyle()
+        self.highlight_attr = test_attr.Merge(
+            test_attr,
+            wx.TextAttr(wx.NullColour, colBack=wx.Colour(0xFF, 0xCC, 0x00))
+        )
+        self.test_attr = test_attr.Merge(
+            test_attr,
+            wx.TextAttr(wx.NullColour, colBack=wx.Colour(0xFF, 0xFF, 0xFF))
+        )
+        self.replace_attr = self.m_replace_text.GetDefaultStyle()
+        self.error_attr = self.replace_attr.Merge(self.replace_attr, wx.TextAttr(wx.Colour(0xFF, 0, 0)))
+
         self.localize()
 
         self.SetIcon(
@@ -238,8 +251,8 @@ class RegexTestDialog(gui.RegexTestDialog):
         # Reset Colors
         self.m_test_text.SetStyle(
             0,
-            self.m_test_text.GetLastPosition(),
-            wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
+            util.ulen(self.m_test_text.GetValue()),
+            self.test_attr
         )
 
     def import_plugin(self, script):
@@ -295,12 +308,10 @@ class RegexTestDialog(gui.RegexTestDialog):
         if not self.testing:
             self.testing = True
             if self.m_regex_text.GetValue() == "":
-                self.m_test_text.SetStyle(
-                    0,
-                    self.m_test_text.GetLastPosition(),
-                    wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(255, 255, 255))
-                )
-                self.m_test_replace_text.SetValue(self.m_test_text.GetValue())
+                self.reset_highlights()
+                self.m_test_replace_text.Clear()
+                self.m_test_replace_text.SetDefaultStyle(self.replace_attr)
+                self.m_test_replace_text.SetValue(util.replace_surrogates(self.m_test_text.GetValue()))
                 self.testing = False
                 return
 
@@ -376,7 +387,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     search_text = engine.escape(self.m_regex_text.GetValue())
 
             try:
-                search_text = util.preprocess_search(search_text)
+                search_text = util.preprocess_search(search_text, self.regex_mode, not is_regex)
                 if self.regex_mode == rumcore.BREGEX_MODE:
                     test = bregex.compile_search(search_text, flags)
                 elif self.regex_mode == rumcore.REGEX_MODE:
@@ -389,8 +400,9 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.reset_highlights()
                 self.testing = False
                 text = util.ustr(e)
+                self.m_test_replace_text.Clear()
+                self.m_test_replace_text.SetDefaultStyle(self.error_attr)
                 self.m_test_replace_text.SetValue(text)
-                self.m_test_replace_text.SetStyle(0, len(text), wx.TextAttr(wx.Colour(0xFF, 0, 0)))
                 return
 
             text = self.m_test_text.GetValue()
@@ -439,15 +451,17 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.imported_plugin = None
                 self.testing = False
                 text = util.ustr(traceback.format_exc())
+                self.m_test_replace_text.Clear()
+                self.m_test_replace_text.SetDefaultStyle(self.error_attr)
                 self.m_test_replace_text.SetValue(text)
-                self.m_test_replace_text.SetStyle(0, len(text), wx.TextAttr(wx.Colour(0xFF, 0, 0)))
                 return
             except Exception as e:
                 self.imported_plugin = None
                 self.testing = False
                 text = util.ustr(e)
+                self.m_test_replace_text.Clear()
+                self.m_test_replace_text.SetDefaultStyle(self.error_attr)
                 self.m_test_replace_text.SetValue(text)
-                self.m_test_replace_text.SetStyle(0, len(text), wx.TextAttr(wx.Colour(0xFF, 0, 0)))
                 return
 
             try:
@@ -460,28 +474,40 @@ class RegexTestDialog(gui.RegexTestDialog):
                     reverse = False
                 new_text = deque()
                 offset = len(text) if reverse else 0
+                byte_start = util.ulen(text) if reverse else 0
+                byte_end = byte_start
                 errors = False
                 try:
                     for m in test.finditer(text):
                         try:
+                            if reverse:
+                                value = text[m.end(0):offset]
+                                byte_end = byte_start - util.ulen(value)
+                                byte_start = byte_end - util.ulen(m.group(0))
+                                offset = m.start(0)
+                            else:
+                                value = text[offset:m.start(0)]
+                                byte_start = byte_end + util.ulen(value)
+                                byte_end = byte_start + util.ulen(m.group(0))
+                                offset = m.end(0)
                             if replace_test:
                                 if reverse:
-                                    new_text.appendleft(text[m.end(0):offset])
+                                    new_text.appendleft(value)
                                     new_text.appendleft(replace_test(m))
-                                    offset = m.start(0)
                                 else:
-                                    new_text.append(text[offset:m.start(0)])
+                                    new_text.append(value)
                                     new_text.append(replace_test(m))
-                                    offset = m.end(0)
+
                         except Exception as e:
                             if not errors:
                                 new_text = [util.ustr(e)]
                                 replace_test = None
                                 errors = True
+
                         self.m_test_text.SetStyle(
-                            m.start(0),
-                            m.end(0),
-                            wx.TextAttr(wx.Colour(0, 0, 0), colBack=wx.Colour(0xFF, 0xCC, 0x00))
+                            byte_start,
+                            byte_end,
+                            self.highlight_attr
                         )
                 except Exception as e:
                     new_text = [util.ustr(e)]
@@ -492,12 +518,10 @@ class RegexTestDialog(gui.RegexTestDialog):
                         new_text.appendleft(text[:offset])
                     else:
                         new_text.append(text[offset:])
-                new_text = ''.join(list(new_text))
-                self.m_test_replace_text.SetValue(new_text)
-                if errors:
-                    self.m_test_replace_text.SetStyle(0, len(new_text), wx.TextAttr(wx.Colour(0xFF, 0, 0)))
-                else:
-                    self.m_test_replace_text.SetStyle(0, len(new_text), wx.TextAttr(wx.Colour(0, 0, 0)))
+                value = ''.join(list(new_text))
+                self.m_test_replace_text.Clear()
+                self.m_test_replace_text.SetDefaultStyle(self.error_attr if errors else self.replace_attr)
+                self.m_test_replace_text.SetValue(util.replace_surrogates(value))
 
             except Exception:
                 print(str(traceback.format_exc()))
@@ -596,6 +620,12 @@ class RegexTestDialog(gui.RegexTestDialog):
     def on_replace_changed(self, event):
         """On replace pattern change."""
 
+        if util.PY2 and util.NARROW:
+            old_string = self.m_replace_text.GetValue()
+            new_string = util.replace_surrogates(old_string, pattern=True)
+            if new_string != old_string:
+                self.m_replace_text.ChangeValue(new_string)
+
         if self.m_replace_plugin_checkbox.GetValue():
             pth = self.m_replace_text.GetValue()
             if os.path.exists(pth) and os.path.isfile(pth):
@@ -609,7 +639,15 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.imported_plugin = None
         self.regex_start_event(event)
 
-    on_regex_changed = regex_start_event
+    def on_regex_changed(self, event):
+        """On regex changed."""
+
+        if util.PY2 and util.NARROW:
+            old_string = self.m_regex_text.GetValue()
+            new_string = util.replace_surrogates(old_string, pattern=True)
+            if new_string != old_string:
+                self.m_regex_text.ChangeValue(new_string)
+        self.regex_start_event(event)
 
     on_regex_toggle = regex_start_event
 

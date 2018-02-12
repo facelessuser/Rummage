@@ -16,6 +16,7 @@ from .file_strip.json import sanitize_json
 PY3 = (3, 0) <= sys.version_info
 PY2 = (2, 0) <= sys.version_info < (3, 0)
 PY36 = (3, 6) <= sys.version_info
+NARROW = sys.maxunicode == 0xFFFF
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -59,6 +60,8 @@ BACK_SLASH_TRANSLATION = {
     "\\\\": '\\'
 }
 
+RE_SURROGATES = re.compile(r'([\ud800-\udbff])([\udc00-\udfff])')
+
 FMT_BRACKETS = ('{', '}')
 
 RE_FMT = re.compile(
@@ -87,6 +90,39 @@ def uchr(i):
         return unichar(i)
     except ValueError:  # pragma: no cover
         return struct.pack('i', i).decode('utf-32')
+
+
+def char_size(c):
+    """Get UTF8 char size."""
+
+    value = ord(c)
+    # Python 2 will return surrogates,
+    # so each will get counted separately
+    if value <= 0xffff:
+        return 1
+    elif value <= 0x10ffff:
+        return 2
+    raise ValueError('Invalid code point')
+
+
+def ulen(string):
+    """Get length of string in bytes."""
+
+    return sum(char_size(c) for c in string)
+
+
+def replace_surrogates(string, pattern=False):
+    """Return escaped surrogates on PY2 narrow builds."""
+
+    def repl(m):
+        """Replace."""
+
+        if not pattern:
+            return "<%s>" % m.group(0).encode('unicode-escape')
+        else:
+            return "%s%s" % (m.group(1).encode('unicode-escape'), m.group(2).encode('unicode-escape'))
+
+    return RE_SURROGATES.sub(repl, string) if PY2 and NARROW else string
 
 
 def sorted_callback(l, sorter):
@@ -247,10 +283,10 @@ def to_unicode_argv():
     return args
 
 
-def preprocess_search(string):
+def preprocess_search(string, mode=0, literal=False):
     """Preprocess search string."""
 
-    if not PY2 or not string:
+    if not PY2 or not string or mode != 0 or literal:
         return string
 
     def replace(m):
