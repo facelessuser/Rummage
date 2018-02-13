@@ -95,9 +95,10 @@ DEFAULT_BAK = 'rum-bak'
 DEFAULT_FOLDER_BAK = '.rum-bak'
 
 _OCTAL = frozenset(('0', '1', '2', '3', '4', '5', '6', '7'))
-_STANDARD_ESCAPES = frozenset(('a', 'b', 'f', 'n', 'r', 't', 'v'))
+_STANDARD_ESCAPES = frozenset(('a', 'b', 'f', 'n', 'r', 't', 'v', '\\'))
 _CHAR_ESCAPES = frozenset(('u', 'U', 'x'))
 _SET_OPERATORS = frozenset(('&', '~', '|'))
+_WILDCARD_CHARS = frozenset(('-', '[', ']', '*', '?', '|'))
 
 U32 = (
     'u32', 'utf32', 'utf_32'
@@ -520,7 +521,7 @@ class Wildcard2Regex(object):
         elif c in _STANDARD_ESCAPES or c in _CHAR_ESCAPES:
             # \n, \v, etc. and \u, \U, \x etc.
             value = '\\' + c
-        elif c in _SET_OPERATORS or c == '-':
+        elif c in _SET_OPERATORS or c in _WILDCARD_CHARS:
             value = '\\\\'
             i.rewind(1)
         else:

@@ -78,6 +78,23 @@ class TestWildcard(unittest.TestCase):
         else:
             self.assertEqual(p1.pattern, r'(?ms)(?:test[\^\\-\\\&])\Z')
 
+        p1 = rc.Wildcard2Regex(r'\*\?\|\[\]').translate()[0]
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:\\.*\\.\\|\\[\\])\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:\\.*\\.\\|\\[\\])\Z')
+
+        p1 = rc.Wildcard2Regex(r'\\u0300').translate()[0]
+        if util.PY36:
+            self.assertEqual(p1.pattern, r'(?s:\\u0300)\Z')
+        else:
+            self.assertEqual(p1.pattern, r'(?ms)(?:\\u0300)\Z')
+
+        self.assertTrue(rc.Wildcard2Regex(r'test\test').translate()[0].match('test\test') is not None)
+        self.assertTrue(rc.Wildcard2Regex(r'test\\test').translate()[0].match('test\\test') is not None)
+        self.assertTrue(rc.Wildcard2Regex(r'test\m').translate()[0].match('test\\m') is not None)
+        self.assertTrue(rc.Wildcard2Regex(r'test\[a-z]').translate()[0].match('test\\b') is not None)
+        self.assertTrue(rc.Wildcard2Regex(r'test\\[a-z]').translate()[0].match('test\\b') is not None)
         self.assertTrue(rc.Wildcard2Regex('[[]').translate()[0].match('[') is not None)
         self.assertTrue(rc.Wildcard2Regex('[a&&b]').translate()[0].match('&') is not None)
         self.assertTrue(rc.Wildcard2Regex('[a||b]').translate()[0].match('|') is not None)
