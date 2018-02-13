@@ -88,7 +88,7 @@ class TestWildcard(unittest.TestCase):
         if util.PY36:
             self.assertEqual(p1.pattern, r'(?s:\\u0300)\Z')
         else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:\\.*\\.\\[\\])\Z')
+            self.assertEqual(p1.pattern, r'(?ms)(?:\\u0300)\Z')
 
         self.assertTrue(rc.Wildcard2Regex(r'test\test').translate()[0].match('test\test') is not None)
         self.assertTrue(rc.Wildcard2Regex(r'test\\test').translate()[0].match('test\\test') is not None)
