@@ -50,7 +50,6 @@ class SettingsDialog(gui.SettingsDialog):
             self.m_editor_panel.SetDoubleBuffered(True)
             self.m_notify_panel.SetDoubleBuffered(True)
             self.m_history_panel.SetDoubleBuffered(True)
-            self.m_settings_panel.SetDoubleBuffered(True)
             self.m_backup_panel.SetDoubleBuffered(True)
         self.localize()
 
