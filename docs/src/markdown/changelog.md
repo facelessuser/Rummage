@@ -19,6 +19,7 @@
 - **FIX**: Python 2.7 will translate 32 bit characters to escaped surrogate pairs on narrow systems.
 - **FIX**: Tester will replace 32 bit Unicode characters with escaped surrogate pairs place holder in results.
 - **FIX**: Rework highlighting in tester dialog to properly highlight 32 bit characters.
+- **FIX**: Single instance regression.
 
 ## 3.5.0
 
