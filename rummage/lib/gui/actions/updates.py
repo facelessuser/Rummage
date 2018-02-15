@@ -21,6 +21,10 @@ def parse_version(ver, pre=False):
         return (0, 0, 0, 'alpha', 0, 0)
     micro = int(m.group('micro')) if m.group('micro') else 0
 
+    if util.PY2 and int(m.group('major')) > 3:
+        # Python 2 will only be supported up to 3.X.X
+        return (0, 0, 0, 'alpha', 0, 0)
+
     return (int(m.group('major')), int(m.group('minor')), micro, rtype, 0)
 
 
