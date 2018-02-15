@@ -543,7 +543,7 @@ If you would like, you can control the backup extension in the settings dialog a
     - Content of script:
 
         ```
-        (/Library/Frameworks/Python.framework/Versions/2.7/bin/rummage --path "$1")>/dev/null 2>&1 &
+        (/Library/Frameworks/Python.framework/Versions/3.6/bin/rummage --path "$1")>/dev/null 2>&1 &
         ```
 
         This is just an example. You will need to determine the location of your Python install.
@@ -552,7 +552,10 @@ If you would like, you can control the backup extension in the settings dialog a
 
 ### Windows
 
-- Create a file `rummage.reg` and put the following in it (replace &lt;rummage_path&gt; path with the actual path to   `rummage.exe` that is created in your Python Script folder on installation).  Remember to escape backslashes appropriately.  This isn't a guide in how to do registry editing proper, so only edit the registry if you are certain of what you are doing.
+- Create a file `rummage.reg` with the content from one of the entries below. Replace `<python_install_path>` with the actual path to your Python directory (usually something like: `c:\Python35`).  Remember to escape backslashes appropriately. Also note that we quote `%1` to allow spaces in the command line argument. Paths may vary, and it is left up to the user to discover where their Python install directory is.
+
+    !!! warning
+        This isn't a guide in how to do registry editing proper, so only edit the registry if you are certain of what you are doing.
 
     ```ini
     Windows Registry Editor Version 5.00
@@ -561,13 +564,34 @@ If you would like, you can control the backup extension in the settings dialog a
     @=""
 
     [HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...\command]
-    @="\"<rummage_path>\" \"--path\" \"%1\""
+    @="<python_install_path>\\Scripts\\rummage.exe --path \"%1\""
 
     [HKEY_CLASSES_ROOT\*\shell\Rummage Here...]
     @=""
 
     [HKEY_CLASSES_ROOT\*\shell\Rummage Here...\command]
-    @="\"<rummage_path>\" \"--path\" \"%1\""
+    @="<python_install_path>\\Scripts\\rummage.exe --path \"%1\""
+
+    ```
+
+    Optionally, you can also include the Rummage icon beside your context menu entry by adding a few additional lines:
+
+    ```ini
+    Windows Registry Editor Version 5.00
+
+    [HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...]
+    @=""
+    "Icon"="<python_install_path>\\Lib\\site-packages\\rummage\\lib\\gui\\data\\rummage.ico"
+
+    [HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...\command]
+    @="<python_install_path>\\Scripts\\rummage.exe --path \"%1\""
+
+    [HKEY_CLASSES_ROOT\*\shell\Rummage Here...]
+    @=""
+    "Icon"="<python_install_path>\\Lib\\site-packages\\rummage\\lib\\gui\\data\\rummage.ico"
+
+    [HKEY_CLASSES_ROOT\*\shell\Rummage Here...\command]
+    @="<python_install_path>\\Scripts\\rummage.exe --path \"%1\""
 
     ```
 
