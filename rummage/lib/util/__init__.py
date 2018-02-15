@@ -2,9 +2,6 @@
 from __future__ import unicode_literals
 import re
 import sys
-import functools
-import os
-import struct
 import codecs
 import json
 import subprocess
@@ -22,12 +19,6 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
-from urllib.request import urlopen # noqa F401
-string_type = str
-ustr = str
-bstr = bytes
-unichar = chr
-
 
 BACK_SLASH_TRANSLATION = {
     "\\a": '\a',
@@ -39,8 +30,6 @@ BACK_SLASH_TRANSLATION = {
     "\\v": '\v',
     "\\\\": '\\'
 }
-
-RE_SURROGATES = re.compile(r'([\ud800-\udbff])([\udc00-\udfff])')
 
 FMT_BRACKETS = ('{', '}')
 
@@ -57,15 +46,6 @@ def platform():
     """Get Platform."""
 
     return _PLATFORM
-
-
-def uchr(i):
-    """Allow getting unicode character on narrow python builds."""
-
-    try:
-        return unichar(i)
-    except ValueError:  # pragma: no cover
-        return struct.pack('i', i).decode('utf-32')
 
 
 def char_size(c):
@@ -85,53 +65,23 @@ def ulen(string):
     return sum(char_size(c) for c in string)
 
 
-def sorted_callback(l, sorter):
-    """Use a callback with sort in a PY3 way."""
-
-    l.sort(key=functools.cmp_to_key(sorter))
-
-
-def to_ascii_bytes(string):
-    """Convert unicode to ascii byte string."""
-
-    return bytes(string, 'ascii')
-
-
 def to_ustr(obj):
     """Convert to string."""
 
-    if isinstance(obj, ustr):
+    if isinstance(obj, str):
         return obj
-    elif isinstance(obj, bstr):
-        return ustr(obj, 'utf-8')
+    elif isinstance(obj, bytes):
+        return str(obj, 'utf-8')
     else:
-        return ustr(obj)
+        return str(obj)
 
 
 def to_bstr(obj):
     """Convert to byte string."""
 
-    if not isinstance(obj, string_type):
+    if not isinstance(obj, (str, bytes)):
         raise TypeError('Must be a string!')
-    return obj.encode('utf-8') if isinstance(obj, ustr) else obj
-
-
-def getcwd():
-    """Get the current working directory."""
-
-    return os.getcwd()
-
-
-def iternext(item):
-    """Iterate to next."""
-
-    return item.__next__()
-
-
-def translate(lang, text):
-    """Translate text."""
-
-    return lang.gettext(text)
+    return obj.encode('utf-8') if isinstance(obj, str) else obj
 
 
 def read_json(filename):
@@ -223,13 +173,13 @@ def preprocess_replace(string, format_replace=False):
                 value = int(m.group(3)[1:], 8)
 
             if fmt_repl:
-                text = uchr(value)
+                text = chr(value)
                 if text in FMT_BRACKETS:
                     text = text * 2
             elif value <= 0xff:
                 text = '\\%03o' % value
             else:
-                text = uchr(value)
+                text = chr(value)
         return text
 
     return (RE_FMT if format_replace else RE_RE).sub(replace, string)
@@ -240,7 +190,7 @@ def call(cmd):
 
     fail = False
 
-    is_string = isinstance(cmd, string_type)
+    is_string = isinstance(cmd, (str, bytes))
 
     try:
         if _PLATFORM == "windows":

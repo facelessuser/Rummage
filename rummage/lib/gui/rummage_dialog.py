@@ -355,7 +355,7 @@ class RummageFrame(gui.RummageFrame):
         self.checking_updates = False
         self.imported_plugins = {}
         if start_path is None:
-            start_path = util.getcwd()
+            start_path = os.getcwd()
 
         # Setup debugging
         self.set_keybindings(

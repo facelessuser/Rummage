@@ -182,12 +182,6 @@ class TestWildcard(unittest.TestCase):
 class TestHelperFunctions(unittest.TestCase):
     """Test helper functions."""
 
-    def test_to_ascii(self):
-        """Test unicode coversion to ascii."""
-
-        unicode_string = "test"
-        self.assertTrue(isinstance(util.to_ascii_bytes(unicode_string), util.bstr))
-
     def test_re_flags(self):
         """Test the re flag settings."""
 

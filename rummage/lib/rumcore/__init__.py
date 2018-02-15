@@ -390,9 +390,6 @@ class _StringIter(object):
 
         return char
 
-    # Python 2 iterator compatible next.
-    next = __next__  # noqa A002
-
 
 class Wildcard2Regex(object):
     """Translate fnmatch pattern to regex."""
@@ -657,7 +654,7 @@ class ReplacePlugin(object):
             return self.replace(m)
         except Exception:
             import traceback
-            raise RummageTestException(util.ustr(traceback.format_exc()))
+            raise RummageTestException(str(traceback.format_exc()))
 
     def on_init(self):
         """Override this function to add initialization setup."""
@@ -798,7 +795,7 @@ class _FileSearch(object):
         self.file_content = file_content
         self.is_binary = False
         self.current_encoding = None
-        self.is_unicode_buffer = self.file_content is not None and isinstance(self.file_content, util.ustr)
+        self.is_unicode_buffer = self.file_content is not None and isinstance(self.file_content, str)
 
     def _get_binary_context(self, content, m):
         """Get context info for binary file."""
@@ -1000,7 +997,7 @@ class _FileSearch(object):
 
         if (
             replace_pattern is not None and
-            not isinstance(replace_pattern, util.string_type)
+            not isinstance(replace_pattern, (str, bytes))
         ):
             replace_pattern = replace_pattern(file_info, flags)
             self.is_plugin_replace = True
@@ -1011,12 +1008,12 @@ class _FileSearch(object):
 
         if self.is_binary:
             try:
-                pattern = util.to_ascii_bytes(search_pattern)
+                pattern = bytes(search_pattern, 'ascii')
             except UnicodeEncodeError:
                 raise RummageException('Unicode chars in binary search pattern')
             if replace_pattern is not None and not self.is_plugin_replace:
                 try:
-                    replace = util.to_ascii_bytes(replace_pattern)
+                    replace = bytes(replace_pattern, 'ascii')
                 except UnicodeEncodeError:
                     raise RummageException('Unicode chars in binary replace pattern')
         else:
@@ -1718,7 +1715,7 @@ class Rummage(object):
         self.skipped = 0
 
         self.backup_location = backup_location
-        if not self.backup_location or not isinstance(self.backup_location, util.string_type):
+        if not self.backup_location or not isinstance(self.backup_location, str):
             self.backup_location = DEFAULT_FOLDER_BAK if bool(self.file_flags & BACKUP_FOLDER) else DEFAULT_BAK
 
         self.buffer_input = bool(self.file_flags & BUFFER_INPUT)

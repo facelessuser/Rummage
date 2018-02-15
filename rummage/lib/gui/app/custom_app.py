@@ -81,7 +81,7 @@ class CustomApp(wx.App):
     def ensure_single_instance(self, single_instance):
         """Check to see if this is the only instance."""
 
-        if single_instance is None or not isinstance(single_instance, util.string_type):
+        if single_instance is None or not isinstance(single_instance, str):
             self.name = "%s-%s" % (self.single_instance, wx.GetUserId())
             self.instance = wx.SingleInstanceChecker(self.name)
             if self.instance.IsAnotherRunning():
@@ -218,7 +218,7 @@ class PipeApp(CustomApp):
     def setup_pipe(self, pipe_name):
         """Setup pipe."""
 
-        if pipe_name is not None and isinstance(pipe_name, util.string_type):
+        if pipe_name is not None and isinstance(pipe_name, str):
             self.pipe_name = pipe_name
             self.Bind(EVT_PIPE_ARGS, self.on_pipe_args)
             if self.pipe_name is not None:
@@ -470,25 +470,25 @@ class CustomLogGui(wx.LogGui):
 def debug(msg):
     """Log wrapper for debug."""
 
-    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_Info, util.ustr(msg))
+    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_Info, str(msg))
 
 
 def critical(msg):
     """Log wrapper for critical."""
 
-    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_FatalError, util.ustr(msg))
+    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_FatalError, str(msg))
 
 
 def warning(msg):
     """Log wrapper for warning."""
 
-    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_Warning, util.ustr(msg))
+    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_Warning, str(msg))
 
 
 def error(msg):
     """Log wrapper for error."""
 
-    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_Error, util.ustr(msg))
+    wx.Log.GetActiveTarget().DoLogTextAtLevel(wx.LOG_Error, str(msg))
 
 
 def json_fmt(obj, label):

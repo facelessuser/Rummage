@@ -92,13 +92,13 @@ class RummageApp(PipeApp):
             for a in args:
                 if a == "--path":
                     try:
-                        a = util.iternext(args)
+                        a = next(args)
                         filename = a
                         break
                     except StopIteration:
                         break
             if filename is None:
-                cwd = os.getcwdu()
+                cwd = os.getcwd()
                 filename = cwd
             if filename:
                 frame.m_searchin_text.safe_set_value(filename)
@@ -121,7 +121,7 @@ class RummageApp(PipeApp):
                 except StopIteration:
                     break
         if not path_arg_found:
-            args.extend(['--path', util.getcwd()])
+            args.extend(['--path', os.getcwd()])
 
         return args
 

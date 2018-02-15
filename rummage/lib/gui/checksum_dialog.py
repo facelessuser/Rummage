@@ -123,7 +123,7 @@ class ChecksumDialog(gui.ChecksumDialog):
                     if self.hasher.error:
                         errormsg(self.hasher.error)
                     else:
-                        self.m_hash_textbox.SetValue(util.ustr(self.alg.hexdigest()))
+                        self.m_hash_textbox.SetValue(str(self.alg.hexdigest()))
                 self.m_cancel_button.Enable(False)
                 self.m_okay_button.Enable(True)
                 self.hasher = None

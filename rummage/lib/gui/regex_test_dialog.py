@@ -283,7 +283,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
             return self.imported_plugin[1].get_replace()
         except Exception:
-            raise PluginException(util.ustr(traceback.format_exc()))
+            raise PluginException(str(traceback.format_exc()))
 
     def test_regex(self):
         """Test and highlight search results in content buffer."""
@@ -397,7 +397,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             except Exception as e:
                 self.reset_highlights()
                 self.testing = False
-                text = util.ustr(e)
+                text = str(e)
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr)
                 self.m_test_replace_text.SetValue(text)
@@ -448,7 +448,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             except PluginException:
                 self.imported_plugin = None
                 self.testing = False
-                text = util.ustr(traceback.format_exc())
+                text = str(traceback.format_exc())
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr)
                 self.m_test_replace_text.SetValue(text)
@@ -456,7 +456,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             except Exception as e:
                 self.imported_plugin = None
                 self.testing = False
-                text = util.ustr(e)
+                text = str(e)
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr)
                 self.m_test_replace_text.SetValue(text)
@@ -498,7 +498,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
                         except Exception as e:
                             if not errors:
-                                new_text = [util.ustr(e)]
+                                new_text = [str(e)]
                                 replace_test = None
                                 errors = True
 
@@ -508,7 +508,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                             self.highlight_attr
                         )
                 except Exception as e:
-                    new_text = [util.ustr(e)]
+                    new_text = [str(e)]
                     replace_test = None
                     errors = True
                 if replace_test:

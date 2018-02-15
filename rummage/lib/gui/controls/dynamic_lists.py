@@ -21,6 +21,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import wx.lib.mixins.listctrl as listmix
+import functools
 from ... import util
 from collections import OrderedDict
 
@@ -227,7 +228,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
         with self.wait:
             if sorter is not None:
-                util.sorted_callback(self.itemIndexMap, sorter)
+                self.itemIndexMap.sort(key=functools.cmp_to_key(sorter))
             else:
                 self.itemIndexMap.sort()
 

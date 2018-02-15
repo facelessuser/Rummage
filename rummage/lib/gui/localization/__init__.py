@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 import gettext
 import os
-from ... import util
 
 lang = None
 current_domain = None
@@ -12,7 +11,7 @@ locale_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'locale')
 def _(text):
     """Unicode gettext."""
 
-    return util.translate(lang, text) if lang is not None else text
+    return lang.gettext(text) if lang is not None else text
 
 
 def setup(domain, language=None):
