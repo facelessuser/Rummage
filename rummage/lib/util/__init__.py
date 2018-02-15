@@ -2,10 +2,8 @@
 from __future__ import unicode_literals
 import re
 import sys
-import locale
 import functools
 import os
-import copy
 import struct
 import codecs
 import json
