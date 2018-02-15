@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.0
+
+- **NEW**: Drop Python 2.7 support.
+
 ## 3.6.0
 
 - **NEW**: Rummage will use `cchardet` by default if found.

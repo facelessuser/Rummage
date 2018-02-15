@@ -6,7 +6,7 @@ Rummage has a few requirements when installing.  These will all be taken care of
 
 Name                           | Details
 ------------------------------ | -------
-[`wxPython`\ 4.0.1+][wxpython] | The new wxPython Phoenix 4.0.0 is required for for Rummage to run in Python 2 and Python 3.
+[`wxPython`\ 4.0.1+][wxpython] | The new wxPython Phoenix 4.0.0 is required for the GUI.
 [`backrefs`\ 3.1.2+][backrefs] | Used to extend the `re` or `regex` regular expression engine with additional back references.
 [`chardet`\ 3.0.4+][chardet]   | Used for file encoding guessing when an encoding is not specified.
 [`filelock`][filelock]         | Used for file locking to allow different instances of Rummage to access the same file.

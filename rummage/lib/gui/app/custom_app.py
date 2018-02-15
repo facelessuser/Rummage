@@ -144,7 +144,7 @@ class ArgPipeThread(object):
                         pipeout.write('\n')
                     except IOError:
                         pass
-            except util.CommonBrokenPipeError:
+            except BrokenPipeError:
                 pass
 
     def IsRunning(self):  # noqa
@@ -232,7 +232,7 @@ class PipeApp(CustomApp):
     def get_sys_args(self):
         """Get system args as unicode."""
 
-        return util.to_unicode_argv()[1:]
+        return sys.argv[1:]
 
     def send_arg_pipe(self):
         """Send the current arguments down the pipe."""

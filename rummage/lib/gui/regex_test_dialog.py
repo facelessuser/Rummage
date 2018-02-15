@@ -311,7 +311,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.reset_highlights()
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.replace_attr)
-                self.m_test_replace_text.SetValue(util.replace_surrogates(self.m_test_text.GetValue()))
+                self.m_test_replace_text.SetValue(self.m_test_text.GetValue())
                 self.testing = False
                 return
 
@@ -375,8 +375,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     flags |= engine.UNICODE
                     rum_flags |= rumcore.UNICODE
                 else:
-                    if util.PY3:
-                        flags |= engine.ASCII
+                    flags |= engine.ASCII
                     rum_flags |= rumcore.ASCII
                 if is_regex:
                     if self.m_dotmatch_checkbox.GetValue():
@@ -387,7 +386,6 @@ class RegexTestDialog(gui.RegexTestDialog):
                     search_text = engine.escape(self.m_regex_text.GetValue())
 
             try:
-                search_text = util.preprocess_search(search_text, self.regex_mode, not is_regex)
                 if self.regex_mode == rumcore.BREGEX_MODE:
                     test = bregex.compile_search(search_text, flags)
                 elif self.regex_mode == rumcore.REGEX_MODE:
@@ -521,7 +519,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 value = ''.join(list(new_text))
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr if errors else self.replace_attr)
-                self.m_test_replace_text.SetValue(util.replace_surrogates(value))
+                self.m_test_replace_text.SetValue(value)
 
             except Exception:
                 print(str(traceback.format_exc()))
@@ -620,12 +618,6 @@ class RegexTestDialog(gui.RegexTestDialog):
     def on_replace_changed(self, event):
         """On replace pattern change."""
 
-        if util.PY2 and util.NARROW:
-            old_string = self.m_replace_text.GetValue()
-            new_string = util.replace_surrogates(old_string, pattern=True)
-            if new_string != old_string:
-                self.m_replace_text.ChangeValue(new_string)
-
         if self.m_replace_plugin_checkbox.GetValue():
             pth = self.m_replace_text.GetValue()
             if os.path.exists(pth) and os.path.isfile(pth):
@@ -642,11 +634,6 @@ class RegexTestDialog(gui.RegexTestDialog):
     def on_regex_changed(self, event):
         """On regex changed."""
 
-        if util.PY2 and util.NARROW:
-            old_string = self.m_regex_text.GetValue()
-            new_string = util.replace_surrogates(old_string, pattern=True)
-            if new_string != old_string:
-                self.m_regex_text.ChangeValue(new_string)
         self.regex_start_event(event)
 
     on_regex_toggle = regex_start_event

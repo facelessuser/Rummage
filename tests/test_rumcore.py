@@ -191,10 +191,7 @@ class TestHelperFunctions(unittest.TestCase):
     def test_re_flags(self):
         """Test the re flag settings."""
 
-        if util.PY3:
-            default = re.ASCII
-        else:
-            default = 0
+        default = re.ASCII
 
         self.assertEqual(rc._re_pattern(r"test").flags, default)
         self.assertEqual(rc._re_pattern(r"test", rc.MULTILINE).flags, re.MULTILINE | default)
@@ -210,10 +207,7 @@ class TestHelperFunctions(unittest.TestCase):
     def test_re_literal_flags(self):
         """Test the literal re flags."""
 
-        if util.PY3:
-            default = re.ASCII
-        else:
-            default = 0
+        default = re.ASCII
 
         self.assertEqual(rc._re_literal_pattern(r"test").flags, default)
         self.assertEqual(rc._re_literal_pattern(r"test", rc.IGNORECASE).flags, re.IGNORECASE | default)
@@ -225,10 +219,7 @@ class TestHelperFunctions(unittest.TestCase):
     def test_bre_flags(self):
         """Test the bre flag settings."""
 
-        if util.PY3:
-            default = re.ASCII
-        else:
-            default = 0
+        default = re.ASCII
 
         self.assertEqual(rc._bre_pattern(r"test").flags, default)
         self.assertEqual(rc._bre_pattern(r"test", rc.MULTILINE).flags, bre.MULTILINE | default)
@@ -244,10 +235,7 @@ class TestHelperFunctions(unittest.TestCase):
     def test_bre_literal_flags(self):
         """Test the literal bre flags."""
 
-        if util.PY3:
-            default = re.ASCII
-        else:
-            default = 0
+        default = re.ASCII
 
         self.assertEqual(rc._bre_literal_pattern(r"test").flags, default)
         self.assertEqual(rc._bre_literal_pattern(r"test", rc.IGNORECASE).flags, bre.IGNORECASE | default)

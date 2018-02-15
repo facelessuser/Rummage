@@ -159,7 +159,7 @@ def _re_pattern(pattern, rum_flags=0, binary=False):
         flags |= re.DOTALL
     if not binary and rum_flags & UNICODE:
         flags |= re.UNICODE
-    elif util.PY3:
+    else:
         flags |= re.ASCII
     return re.compile(pattern, flags)
 
@@ -172,7 +172,7 @@ def _re_literal_pattern(pattern, rum_flags=0, binary=False):
         flags |= re.IGNORECASE
     if not binary and rum_flags & UNICODE:
         flags |= re.UNICODE
-    elif util.PY3:
+    else:
         flags |= re.ASCII
     return re.compile(re.escape(pattern), flags)
 
@@ -189,7 +189,7 @@ def _bre_pattern(pattern, rum_flags=0, binary=False):
         flags |= bre.DOTALL
     if not binary and rum_flags & UNICODE:
         flags |= bre.UNICODE
-    elif util.PY3:
+    else:
         flags |= bre.ASCII
     return bre.compile_search(pattern, flags)
 
@@ -202,7 +202,7 @@ def _bre_literal_pattern(pattern, rum_flags=0, binary=False):
         flags |= bre.IGNORECASE
     if not binary and rum_flags & UNICODE:
         flags |= bre.UNICODE
-    elif util.PY3:
+    else:
         flags |= bre.ASCII
     return bre.compile_search(bre.escape(pattern), flags)
 
@@ -1486,11 +1486,11 @@ class _DirWalker(object):
                     )
                 elif self.regex_mode == BRE_MODE:
                     pattern = bre.compile_search(
-                        string, bre.IGNORECASE | (bre.ASCII if util.PY3 else 0)
+                        string, bre.IGNORECASE | bre.ASCII
                     )
                 else:
                     pattern = re.compile(
-                        string, re.IGNORECASE | (re.ASCII if util.PY3 else 0)
+                        string, re.IGNORECASE | re.ASCII
                     )
         elif string is not None:
             pattern, exclude_pattern = Wildcard2Regex(string).translate()
