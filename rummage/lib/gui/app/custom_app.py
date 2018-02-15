@@ -81,7 +81,7 @@ class CustomApp(wx.App):
     def ensure_single_instance(self, single_instance):
         """Check to see if this is the only instance."""
 
-        if single_instance is None or not isinstance(single_instance, util.string_type):
+        if single_instance is not None and isinstance(single_instance, util.string_type):
             self.name = "%s-%s" % (self.single_instance, wx.GetUserId())
             self.instance = wx.SingleInstanceChecker(self.name)
             if self.instance.IsAnotherRunning():

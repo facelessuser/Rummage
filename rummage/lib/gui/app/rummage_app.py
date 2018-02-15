@@ -55,7 +55,9 @@ class RummageApp(PipeApp):
         # Load up the settings and setup single instance
         Settings.load_settings()
         single_instance = Settings.get_single_instance()
-        if not self.ensure_single_instance("Rummage" if single_instance else None):
+        if single_instance and not self.ensure_single_instance("Rummage"):
+            self.setup_pipe(Settings.get_fifo())
+            self.send_arg_pipe()
             return False
 
         if not self.setup_pipe(Settings.get_fifo() if single_instance else None):
@@ -98,7 +100,7 @@ class RummageApp(PipeApp):
                     except StopIteration:
                         break
             if filename is None:
-                cwd = os.getcwdu()
+                cwd = util.getcwd()
                 filename = cwd
             if filename:
                 frame.m_searchin_text.safe_set_value(filename)
