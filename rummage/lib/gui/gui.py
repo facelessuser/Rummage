@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Jun 22 2017)
+## Python code generated with wxFormBuilder (version Jan 25 2018)
 ## http://www.wxformbuilder.org/
 ##
-## PLEASE DO "NOT" EDIT THIS FILE!
+## PLEASE DO *NOT* EDIT THIS FILE!
 ###########################################################################
 
 import wx
-import wx.adv
 import wx.xrc
 from .controls.autocomplete_combo import AutoCompleteCombo
 from .controls.date_picker import DatePicker
@@ -2633,3 +2632,5 @@ class EditorDialog ( wx.Dialog ):
 	
 	def on_cancel_click( self, event ):
 		event.Skip()
+	
+
