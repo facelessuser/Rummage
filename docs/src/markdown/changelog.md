@@ -3,6 +3,7 @@
 ## 4.0.0
 
 - **NEW**: Drop Python 2.7 support.
+- **NEW**: Lines are calculated incrementally as needed opposed to all up front.
 
 ## 3.6.0
 
