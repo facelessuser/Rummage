@@ -24,7 +24,6 @@ from .lib import safe_import  # noqa: F401
 import sys
 import os
 import argparse
-from .lib import util
 from .lib import __meta__
 from .lib.gui.app import rummage_app
 
@@ -42,7 +41,7 @@ def parse_arguments():
     parser.add_argument('--debug', action='store_true', default=False, help=argparse.SUPPRESS)
     parser.add_argument('--no-redirect', action='store_true', default=False, help=argparse.SUPPRESS)
     parser.add_argument('--path', default=None, help="Path to search.")
-    return parser.parse_args(util.to_unicode_argv()[1:])
+    return parser.parse_args(sys.argv[1:])
 
 
 def run():

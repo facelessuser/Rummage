@@ -2,19 +2,13 @@
 from __future__ import unicode_literals
 import re
 import sys
-import locale
-import functools
-import os
-import copy
-import struct
 import codecs
 import json
+import subprocess
 from itertools import groupby
 from encodings.aliases import aliases
 from .file_strip.json import sanitize_json
 
-PY3 = (3, 0) <= sys.version_info
-PY2 = (2, 0) <= sys.version_info < (3, 0)
 PY36 = (3, 6) <= sys.version_info
 NARROW = sys.maxunicode == 0xFFFF
 
@@ -24,29 +18,6 @@ elif sys.platform == "darwin":
     _PLATFORM = "osx"
 else:
     _PLATFORM = "linux"
-
-if PY3:
-    from urllib.request import urlopen # noqa F401
-    string_type = str
-    ustr = str
-    bstr = bytes
-    unichar = chr
-
-    CommonBrokenPipeError = BrokenPipeError  # noqa F821
-else:
-    from urllib2 import urlopen # noqa F401
-    string_type = basestring  # noqa F821
-    ustr = unicode  # noqa F821
-    bstr = str  # noqa F821
-    unichar = unichr  # noqa F821
-
-    class CommonBrokenPipeError(Exception):
-        """
-        Broken Pipe Error.
-
-        Include this for consistency, but we won't actually
-        capture this in PY2.
-        """
 
 
 BACK_SLASH_TRANSLATION = {
@@ -60,8 +31,6 @@ BACK_SLASH_TRANSLATION = {
     "\\\\": '\\'
 }
 
-RE_SURROGATES = re.compile(r'([\ud800-\udbff])([\udc00-\udfff])')
-
 FMT_BRACKETS = ('{', '}')
 
 RE_FMT = re.compile(
@@ -72,10 +41,6 @@ RE_RE = re.compile(
     r'''(\\[\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
 )
 
-RE_SEARCH_27 = re.compile(
-    r'''(\\[\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4})'''
-)
-
 
 def platform():
     """Get Platform."""
@@ -83,21 +48,10 @@ def platform():
     return _PLATFORM
 
 
-def uchr(i):
-    """Allow getting unicode character on narrow python builds."""
-
-    try:
-        return unichar(i)
-    except ValueError:  # pragma: no cover
-        return struct.pack('i', i).decode('utf-32')
-
-
 def char_size(c):
     """Get UTF8 char size."""
 
     value = ord(c)
-    # Python 2 will return surrogates,
-    # so each will get counted separately
     if value <= 0xffff:
         return 1
     elif value <= 0x10ffff:
@@ -111,75 +65,23 @@ def ulen(string):
     return sum(char_size(c) for c in string)
 
 
-def replace_surrogates(string, pattern=False):
-    """Return escaped surrogates on PY2 narrow builds."""
-
-    def repl(m):
-        """Replace."""
-
-        if not pattern:
-            return "<%s>" % m.group(0).encode('unicode-escape')
-        else:
-            return "%s%s" % (m.group(1).encode('unicode-escape'), m.group(2).encode('unicode-escape'))
-
-    return RE_SURROGATES.sub(repl, string) if PY2 and NARROW else string
-
-
-def sorted_callback(l, sorter):
-    """Use a callback with sort in a PY2/PY3 way."""
-
-    if PY3:
-        l.sort(key=functools.cmp_to_key(sorter))
-    else:
-        l.sort(sorter)
-
-
-def to_ascii_bytes(string):
-    """Convert unicode to ascii byte string."""
-
-    return bytes(string, 'ascii') if PY3 else bytes(string)
-
-
 def to_ustr(obj):
     """Convert to string."""
 
-    if isinstance(obj, ustr):
+    if isinstance(obj, str):
         return obj
-    elif isinstance(obj, bstr):
-        return ustr(obj, 'utf-8')
+    elif isinstance(obj, bytes):
+        return str(obj, 'utf-8')
     else:
-        return ustr(obj)
+        return str(obj)
 
 
 def to_bstr(obj):
     """Convert to byte string."""
 
-    assert isinstance(obj, string_type), TypeError
-    return obj.encode('utf-8') if isinstance(obj, ustr) else obj
-
-
-def getcwd():
-    """Get the current working directory."""
-
-    if PY3:
-        return os.getcwd()
-    else:
-        return os.getcwdu()
-
-
-def iternext(item):
-    """Iterate to next."""
-
-    if PY3:
-        return item.__next__()
-    else:
-        return item.next()
-
-
-def translate(lang, text):
-    """Translate text."""
-
-    return lang.gettext(text) if PY3 else lang.ugettext(text)
+    if not isinstance(obj, (str, bytes)):
+        raise TypeError('Must be a string!')
+    return obj.encode('utf-8') if isinstance(obj, str) else obj
 
 
 def read_json(filename):
@@ -250,62 +152,6 @@ def get_encodings():
     return elist
 
 
-def to_unicode_argv():
-    """Convert inputs to Unicode."""
-
-    args = copy.copy(sys.argv)
-
-    if PY2:
-        if _PLATFORM == "windows":
-            # Solution copied from http://stackoverflow.com/a/846931/145400
-
-            from ctypes import POINTER, byref, cdll, c_int, windll
-            from ctypes.wintypes import LPCWSTR, LPWSTR
-
-            GetCommandLineW = cdll.kernel32.GetCommandLineW
-            GetCommandLineW.argtypes = []
-            GetCommandLineW.restype = LPCWSTR
-
-            CommandLineToArgvW = windll.shell32.CommandLineToArgvW
-            CommandLineToArgvW.argtypes = [LPCWSTR, POINTER(c_int)]
-            CommandLineToArgvW.restype = POINTER(LPWSTR)
-
-            cmd = GetCommandLineW()
-            argc = c_int(0)
-            argv = CommandLineToArgvW(cmd, byref(argc))
-            if argc.value > 0:
-                # Remove Python executable and commands if present
-                start = argc.value - len(sys.argv)
-                args = [argv[i] for i in xrange(start, argc.value)]  # noqa F821
-        else:
-            cli_encoding = sys.stdin.encoding or locale.getpreferredencoding()
-            args = [arg.decode(cli_encoding) for arg in sys.argv if isinstance(arg, bstr)]
-    return args
-
-
-def preprocess_search(string, mode=0, literal=False):
-    """Preprocess search string."""
-
-    if not PY2 or not string or mode != 0 or literal:
-        return string
-
-    def replace(m):
-        """Replace."""
-        if m.group(1):
-            return m.group(1)
-        else:
-            # Unicode (wide and narrow) and bytes
-            value = int(m.group(2)[2:], 16)
-
-            if value <= 0xff:
-                text = '\\%03o' % value
-            else:
-                text = uchr(value)
-        return text
-
-    return RE_SEARCH_27.sub(replace, string)
-
-
 def preprocess_replace(string, format_replace=False):
     """Process the format string."""
 
@@ -327,13 +173,13 @@ def preprocess_replace(string, format_replace=False):
                 value = int(m.group(3)[1:], 8)
 
             if fmt_repl:
-                text = uchr(value)
+                text = chr(value)
                 if text in FMT_BRACKETS:
                     text = text * 2
             elif value <= 0xff:
                 text = '\\%03o' % value
             else:
-                text = uchr(value)
+                text = chr(value)
         return text
 
     return (RE_FMT if format_replace else RE_RE).sub(replace, string)
@@ -342,28 +188,14 @@ def preprocess_replace(string, format_replace=False):
 def call(cmd):
     """Call command."""
 
-    # Handle Unicode subprocess paths in Python 2.7 on Windows in shell.
-    if _PLATFORM == "windows" and PY2:
-        from .win_subprocess import Popen, CreateProcess
-        import _subprocess
-
-        # We're going to manually patch this for this instance
-        # and then restore afterwards.  I want to limit side effects
-        # when using with other modules.
-        pre_patched = _subprocess.CreateProcess
-        _subprocess.CreateProcess = CreateProcess
-    else:
-        from subprocess import Popen
-    import subprocess
-
     fail = False
 
-    is_string = isinstance(cmd, string_type)
+    is_string = isinstance(cmd, (str, bytes))
 
     try:
         if _PLATFORM == "windows":
             startupinfo = subprocess.STARTUPINFO()
-            Popen(
+            subprocess.Popen(
                 cmd,
                 startupinfo=startupinfo,
                 stdout=subprocess.PIPE,
@@ -372,7 +204,7 @@ def call(cmd):
                 shell=is_string
             )
         else:
-            Popen(
+            subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -381,9 +213,5 @@ def call(cmd):
             )
     except Exception:
         fail = True
-
-    if _PLATFORM == "windows" and PY2:
-        # Restore CreateProcess from before our monkey patch
-        _subprocess.CreateProcess = pre_patched
 
     return fail

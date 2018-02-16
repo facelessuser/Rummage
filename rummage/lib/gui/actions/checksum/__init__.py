@@ -8,7 +8,6 @@ import mmap
 from . import whirlpool
 from . import tiger
 from . import sum_hashes
-from .... import util
 
 DEFAULT_CHECKSUM = "md5"
 VALID_HASH = []
@@ -55,7 +54,7 @@ class HashThread(threading.Thread):
                     chunk = m.read(4096)
                     self.count += len(chunk)
         except Exception:
-            self.error = util.ustr(traceback.format_exc())
+            self.error = str(traceback.format_exc())
 
 
 class ZlibAlgorithm(object):

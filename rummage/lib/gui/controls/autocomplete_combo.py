@@ -211,13 +211,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
     def on_changed_callback(self, event):
         """Handle callback."""
 
-        if util.PY2 and util.NARROW:
-            tc = self.GetTextCtrl()
-            old_string = tc.GetValue()
-            new_string = util.replace_surrogates(old_string, pattern=True)
-            if new_string != old_string:
-                tc.ChangeValue(new_string)
-
         if self.changed_callback is not None:
             self.changed_callback()
         event.Skip()
@@ -228,11 +221,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
         found = False
         if not self.update_semaphore:
             tc = self.GetTextCtrl()
-            if util.PY2 and util.NARROW:
-                old_string = tc.GetValue()
-                new_string = util.replace_surrogates(old_string, pattern=True)
-                if new_string != old_string:
-                    tc.ChangeValue(new_string)
             value = tc.GetValue()
             found_items = []
             for choice in sorted(self.choices):

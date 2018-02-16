@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.0
+
+- **NEW**: Drop Python 2.7 support.
+
 ## 3.6.0
 
 Feb 15, 2018
