@@ -384,11 +384,11 @@ class _StringIter(object):
     def iternext(self):
         """Iterate through characters of the string."""
 
-        if self.index > self.max_index:
+        try:
+            char = self.string[self.index]
+            self.index += 1
+        except IndexError:  # pragma: no cover
             raise StopIteration
-
-        char = self.string[self.index]
-        self.index += 1
 
         return char
 
