@@ -128,6 +128,8 @@ U8 = (
     'u8', 'utf', 'utf8', 'utf_8', 'utf_8_sig', 'utf-8-sig'
 )
 
+RE_LINE_ENDINGS = re.compile(r'(?:\r\n|\r|\n)')
+
 
 def get_exception():
     """Capture exception and traceback separately."""
@@ -337,7 +339,7 @@ class FileRecord(namedtuple('FileRecord', ['info', 'match', 'error'])):
     """A record that reports file info, matching status, and errors."""
 
 
-class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines', 'ending', 'context'])):
+class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines', 'context'])):
     """A record that contains match info, lineno content, context, etc."""
 
 
@@ -841,16 +843,41 @@ class _FileSearch(object):
             col
         )
 
-    def _get_line_context(self, content, m, line_map):
+    def _get_line_endings_to_point(self, point):
+        """Get line ending up to the given point."""
+        try:
+            while point > self.last_line:
+                lend = next(self.line_iter)
+                self.line_map.append(lend.end() - 1)
+                self.last_line = lend.end()
+        except StopIteration:
+            self.last_line = point
+            pass
+
+    def _get_line_endings_count(self, count):
+        """Get line ending up to the given point."""
+        try:
+            found = 0
+            for x in range(count):
+                lend = next(self.line_iter)
+                self.line_map.append(lend.end() - 1)
+                self.last_line = lend.end()
+                found += 1
+        except StopIteration:
+            pass
+        return found
+
+    def _get_line_context(self, content, m):
         """Get context info about the line."""
 
         win_end = '\r\n'
 
         before, after = self.context
-        row = self._get_row(m.start(), line_map)
+        self._get_line_endings_to_point(m.start())
+        row = self._get_row(m.start())
         col = m.start() + 1
         idx = row - 1
-        lines = len(line_map) - 1
+        lines = len(self.line_map) - 1
         start = 0
         end = len(content)
 
@@ -869,26 +896,28 @@ class _FileSearch(object):
 
         # Extended beyond map's end
         if lines < end_idx:
-            after -= end_idx - lines
-            end_idx = None
+            lines += self._get_line_endings_count(end_idx - lines)
+            if lines < end_idx:
+                after -= end_idx - lines
+                end_idx = None
 
         # Calculate column of cursor and actual start and end of context
         if lines != -1:
             col_start = idx - 1
-            col = m.start() - line_map[col_start] if col_start >= 0 else m.start() + 1
+            col = m.start() - self.line_map[col_start] if col_start >= 0 else m.start() + 1
             # \r\n combinations usually show up as one char in editors and displays.
             # Decrement the column if we are at a line's end with one of these.
             # We will verify any line to account for mixed line endings.
             if (
-                line_map and idx < len(line_map) and m.start() == line_map[idx] and
+                self.line_map and idx < len(self.line_map) and m.start() == self.line_map[idx] and
                 m.start() != 0 and content[m.start() - 1: m.start() + 1] == win_end
             ):
                 col -= 1
 
             if start_idx is not None:
-                start = line_map[start_idx] + 1
+                start = self.line_map[start_idx] + 1
             if end_idx is not None:
-                end = line_map[end_idx]
+                end = self.line_map[end_idx]
 
         # Make the match start and match end relative to the context snippet
         match_start = m.start() - start
@@ -918,62 +947,26 @@ class _FileSearch(object):
             col
         )
 
-    def _get_row(self, start, line_map):
+    def _get_row(self, start):
         """Get line number where result is found in file."""
 
         # Binary Search
         mn = 0
-        mx = len(line_map) - 1
-        if mx == -1 or start <= line_map[mn]:
+        mx = len(self.line_map) - 1
+        if mx == -1 or start <= self.line_map[mn]:
             return mn + 1
 
-        if start > line_map[-1]:
+        if start > self.line_map[-1]:
             return mx + 2
 
         while mx - mn != 1:
             idx = mn + ((mx - mn) >> 1)
-            if start > line_map[idx]:
+            if start > self.line_map[idx]:
                 mn = idx
             else:
                 mx = idx
 
         return mx + 1
-
-    def _get_line_ending(self, file_content):
-        """Get the line ending for the file content by scanning for and evaluating the first new line occurance."""
-
-        if self.is_binary:
-            nl = b'\n'
-            cr = b'\r'
-        else:
-            nl = '\n'
-            cr = '\r'
-        line_map = []
-        ending = None
-        offset = 0
-        last_offset = None
-        for c in file_content:
-            if last_offset is not None and (c == nl or c == cr):
-                if last_offset + 1 == offset and c == nl:
-                    ending = c
-                    line_map.append(offset)
-                else:
-                    line_map.append(last_offset)
-                    if c == ending:
-                        line_map.append(offset)
-                last_offset = None
-            elif ending is None and (c == nl or c == cr):
-                ending = c
-                if ending == cr:
-                    last_offset = offset
-                else:
-                    line_map.append(offset)
-            elif c == ending:
-                line_map.append(offset)
-            offset += 1
-        if last_offset is not None:
-            line_map.append(last_offset)
-        return nl if ending is None else ending, line_map
 
     def expand_match(self, m):
         """Expand the match."""
@@ -1218,7 +1211,6 @@ class _FileSearch(object):
                                     0,                     # colno
                                     (m.start(), m.end()),  # Postion of match
                                     None,                  # Line(s) in which match is found
-                                    None,                  # Line ending for file
                                     (0, 0)                 # Number of lines shown before and after matched line(s)
                                 ),
                                 None
@@ -1262,7 +1254,6 @@ class _FileSearch(object):
                                     0,                     # colno
                                     (m.start(), m.end()),  # Postion of match
                                     None,                  # Line(s) in which match is found
-                                    None,                  # Line ending for file
                                     (0, 0)                 # Number of lines shown before and after matched line(s)
                                 ),
                                 None
@@ -1336,36 +1327,31 @@ class _FileSearch(object):
                         file_info = file_info._replace(encoding=self.current_encoding.encode.upper())
 
                     if not skip:
-                        line_ending = None
-                        line_map = []
+                        self.line_map = []
+                        self.last_line = False
+                        self.line_iter = None
+                        get_context = self._get_binary_context if self.is_binary else self._get_line_context
 
                         for pattern, replace, flags in self.search_obj:
                             if hasattr(rum_buff, 'seek'):
                                 rum_buff.seek(0)
 
+                            if (
+                                self.line_iter is None and not self.boolean and
+                                not self.count_only and not self.is_binary
+                            ):
+                                self.line_iter = RE_LINE_ENDINGS.finditer(rum_buff)
+
                             for m in self._findall(rum_buff, pattern, replace, flags, file_info):
-                                if (
-                                    line_ending is None and not self.boolean and
-                                    not self.count_only and not self.is_binary
-                                ):
-                                    line_ending, line_map = self._get_line_ending(rum_buff)
 
                                 if not self.boolean and not self.count_only:
                                     # Get line related context.
-                                    if self.is_binary:
-                                        lines, match, context, row, col = self._get_binary_context(
-                                            rum_buff, m
-                                        )
-                                    else:
-                                        lines, match, context, row, col = self._get_line_context(
-                                            rum_buff, m, line_map
-                                        )
+                                    lines, match, context, row, col = get_context(rum_buff, m)
                                 else:
                                     row = 1
                                     col = 1
                                     match = (m.start(), m.end())
                                     lines = None
-                                    line_ending = None
                                     context = (0, 0)
 
                                 file_record_sent = True
@@ -1377,7 +1363,6 @@ class _FileSearch(object):
                                         col,          # colno
                                         match,        # Postion of match
                                         lines,        # Line(s) in which match is found
-                                        line_ending,  # Line ending for file
                                         context       # Number of lines shown before and after matched line(s)
                                     ),
                                     None
