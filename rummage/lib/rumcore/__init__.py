@@ -1547,7 +1547,10 @@ class _DirWalker(object):
             valid = False
         elif self.re_folder_exclude is not None:
             valid = self.re_folder_exclude.fullmatch(name) is None
-            if self.re_negated_folder_exclude is not None and self.re_negated_folder_exclude.fullmatch(name) is not None:
+            if (
+                self.re_negated_folder_exclude is not None and
+                self.re_negated_folder_exclude.fullmatch(name) is not None
+            ):
                 valid = True
         return valid
 
