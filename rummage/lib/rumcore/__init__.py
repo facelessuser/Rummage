@@ -558,6 +558,8 @@ class Wildcard2Regex(object):
                     current.append('\\[')
             else:
                 current.append(self.engine.escape(c))
+        if not result:
+            result.append('.*')
         if util.PY36 or self.is_regex:
             pattern = r'(?s:%s)\Z' % ''.join(result)
             exclude_pattern = r'(?s:%s)\Z' % ''.join(exclude_result)
@@ -1418,13 +1420,15 @@ class _DirWalker(object):
             self.backup_ext = None
             self.backup_folder = None
 
-    def _parse_pattern(self, string, regex_match):
+    def _parse_pattern(self, string, regex_match, force_default=False):
         r"""Compile or format the inclusion\exclusion pattern."""
 
         pattern = None
         exclude_pattern = None
         if regex_match:
-            if string is not None:
+            if not string and force_default:
+                string = r'.*'
+            if string:
                 if self.regex_mode == BREGEX_MODE:
                     pattern = bregex.compile(string, bregex.IGNORECASE)
                 elif self.regex_mode == REGEX_MODE:
@@ -1433,8 +1437,11 @@ class _DirWalker(object):
                     pattern = bre.compile(string, bre.IGNORECASE | bre.ASCII)
                 else:
                     pattern = re.compile(string, re.IGNORECASE | re.ASCII)
-        elif string is not None:
-            pattern, exclude_pattern = Wildcard2Regex(string).translate()
+        else:
+            if not string and force_default:
+                string = '*'
+            if string:
+                pattern, exclude_pattern = Wildcard2Regex(string).translate()
         return pattern, exclude_pattern
 
     def _is_hidden(self, path):
@@ -1521,8 +1528,8 @@ class _DirWalker(object):
             not self._is_hidden(os.path.join(base, name)) and
             not self._is_backup(name)
         ):
-            valid = self.re_file_pattern.match(name) is not None
-            if self.re_exclude_file_pattern and self.re_exclude_file_pattern.match(name) is not None:
+            valid = self.re_file_pattern.fullmatch(name) is not None
+            if self.re_exclude_file_pattern and self.re_exclude_file_pattern.fullmatch(name) is not None:
                 valid = False
             if valid:
                 valid = self._is_size_okay(os.path.join(base, name))
@@ -1539,8 +1546,8 @@ class _DirWalker(object):
         elif self._is_hidden(os.path.join(base, name)) or self._is_backup(name, True):
             valid = False
         elif self.re_folder_exclude is not None:
-            valid = self.re_folder_exclude.match(name) is None
-            if self.re_negated_folder_exclude is not None and self.re_negated_folder_exclude.match(name) is not None:
+            valid = self.re_folder_exclude.fullmatch(name) is None
+            if self.re_negated_folder_exclude is not None and self.re_negated_folder_exclude.fullmatch(name) is not None:
                 valid = True
         return valid
 
@@ -1613,7 +1620,7 @@ class _DirWalker(object):
         """Compile search patterns."""
 
         self.re_file_pattern, self.re_exclude_file_pattern = self._parse_pattern(
-            self.file_pattern, self.file_regex_match
+            self.file_pattern, self.file_regex_match, force_default=True
         )
         self.re_folder_exclude, self.re_negated_folder_exclude = self._parse_pattern(
             self.folder_exclude, self.dir_regex_match

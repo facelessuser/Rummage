@@ -58,10 +58,10 @@ class TestWildcard(unittest.TestCase):
 
         p1, p2 = rc.Wildcard2Regex('-|-test|-').translate()
         if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:)\Z')
+            self.assertEqual(p1.pattern, r'(?s:.*)\Z')
             self.assertEqual(p2.pattern, r'(?s:|test|)\Z')
         else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:)\Z')
+            self.assertEqual(p1.pattern, r'(?ms)(?:.*)\Z')
             self.assertEqual(p2.pattern, r'(?ms)(?:|test|)\Z')
 
         p1, p2 = rc.Wildcard2Regex('test[^chars]').translate()
@@ -628,8 +628,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.RE_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bre(self):
@@ -649,8 +649,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.BRE_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_regex(self):
@@ -670,8 +670,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.REGEX_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bregex(self):
@@ -691,8 +691,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.BREGEX_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bad_regular_expression_mode(self):
@@ -712,8 +712,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.RE_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_abort(self):

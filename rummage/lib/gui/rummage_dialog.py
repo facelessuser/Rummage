@@ -1671,15 +1671,9 @@ class RummageFrame(gui.RummageFrame):
 
         if not fail and not os.path.isfile(self.m_searchin_text.GetValue()):
             if not fail and self.m_fileregex_checkbox.GetValue():
-                if (
-                    self.m_filematch_textbox.GetValue().strip() == "" or
-                    self.validate_regex(self.m_filematch_textbox.Value)
-                ):
+                if self.validate_regex(self.m_filematch_textbox.Value):
                     msg = self.ERR_INVALID_FILE_SEARCH
                     fail = True
-            elif not fail and self.m_filematch_textbox.GetValue().strip() == "":
-                msg = self.ERR_INVALID_FILE_SEARCH
-                fail = True
             if not fail and self.m_dirregex_checkbox.GetValue():
                 if self.validate_regex(self.m_exclude_textbox.Value):
                     msg = self.ERR_INVALID_EXCLUDE
