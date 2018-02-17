@@ -4,6 +4,8 @@
 
 - **NEW**: Drop Python 2.7 support.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
+- **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
+- **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
 
 ## 3.6.0
 
