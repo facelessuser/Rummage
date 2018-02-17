@@ -226,18 +226,6 @@ class TestHelperFunctions(unittest.TestCase):
             bre.UNICODE | bre.DOTALL | bre.IGNORECASE | bre.MULTILINE
         )
 
-    def test_bre_literal_flags(self):
-        """Test the literal bre flags."""
-
-        default = re.ASCII
-
-        self.assertEqual(rc._bre_literal_pattern(r"test").flags, default)
-        self.assertEqual(rc._bre_literal_pattern(r"test", rc.IGNORECASE).flags, bre.IGNORECASE | default)
-        self.assertEqual(
-            rc._bre_literal_pattern(r"test", rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE).flags,
-            bre.IGNORECASE | bre.UNICODE
-        )
-
     def test_regex_flags(self):
         """Test the re flag settings."""
 
@@ -334,24 +322,6 @@ class TestHelperFunctions(unittest.TestCase):
             bregex.V1 | bregex.UNICODE | bregex.DOTALL | bregex.IGNORECASE | bregex.MULTILINE |
             bregex.WORD | bregex.ENHANCEMATCH | bregex.BESTMATCH | bregex.REVERSE | bregex.FULLCASE |
             bregex.POSIX
-        )
-
-    def test_bregex_literal_flags(self):
-        """Test the literal re flags."""
-
-        self.assertEqual(
-            rc._bregex_literal_pattern(r"test").flags, bregex.V0 | bregex.ASCII
-        )
-        self.assertEqual(
-            rc._bregex_literal_pattern(r"test", rc.IGNORECASE).flags, bregex.V0 | bregex.ASCII | bregex.IGNORECASE
-        )
-        self.assertEqual(
-            rc._bregex_literal_pattern(
-                r"test",
-                rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE |
-                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE | rc.VERSION0
-            ).flags,
-            bregex.IGNORECASE | bregex.V0 | bregex.UNICODE | bregex.FULLCASE
         )
 
     def test_exception(self):

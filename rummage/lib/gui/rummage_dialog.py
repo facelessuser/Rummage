@@ -1810,14 +1810,14 @@ class RummageFrame(gui.RummageFrame):
             if mode == rumcore.BREGEX_MODE:
                 if flags == 0:
                     flags = bregex.ASCII
-                bregex.compile_search(pattern, flags)
+                bregex.compile(pattern, flags)
             elif mode == rumcore.REGEX_MODE:
                 import regex
                 if flags == 0:
                     flags = regex.ASCII
                 regex.compile(pattern, flags)
             elif mode == rumcore.BRE_MODE:
-                bre.compile_search(pattern, flags)
+                bre.compile(pattern, flags)
             else:
                 re.compile(pattern, flags)
             return False
