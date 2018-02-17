@@ -357,9 +357,8 @@ class _StringIter(object):
     def __init__(self, string):
         """Initialize."""
 
-        self.string = string
-        self.max_index = len(string) - 1
-        self.index = 0
+        self._string = string
+        self._index = 0
 
     def __iter__(self):
         """Iterate."""
@@ -371,22 +370,31 @@ class _StringIter(object):
 
         return self.iternext()
 
+    @property
+    def index(self):
+        """Get current index."""
+
+        return self._index
+
     def previous(self):
         """Get previous char."""
 
-        return self.string[self.index - 1]
+        return self._string[self._index - 1]
 
     def rewind(self, count):
         """Rewind index."""
 
-        self.index -= count
+        if count > self._index:  # pragma: no cover
+            raise ValueError("Can't rewind past beginning!")
+
+        self._index -= count
 
     def iternext(self):
         """Iterate through characters of the string."""
 
         try:
-            char = self.string[self.index]
-            self.index += 1
+            char = self._string[self._index]
+            self._index += 1
         except IndexError:  # pragma: no cover
             raise StopIteration
 
