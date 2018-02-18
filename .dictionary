@@ -49,6 +49,7 @@ dropdown
 emoji
 endian
 fnmatch
+fullmatch
 grepWin
 inline
 macOS

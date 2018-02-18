@@ -9,6 +9,7 @@
 [filelock]: https://pypi.python.org/pypi/filelock/
 [fnmatch]: https://docs.python.org/3.6/library/fnmatch.html
 [format-string]: https://docs.python.org/2/library/string.html#format-string-syntax
+[fullmatch]: https://docs.python.org/3/library/re.html#re.fullmatch
 [gntp]: https://github.com/kdfm/gntp
 [grepwin]: http://stefanstools.sourceforge.net/grepWin.html
 [growl-linux]: http://mattn.github.io/growl-for-linux/

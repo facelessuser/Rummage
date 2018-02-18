@@ -2,9 +2,9 @@
 
 ## Overview
 
-Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, and Content.  In general, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with toggles, and the files that get searched can be narrowed with filters.  Search and replace options are all contained in the **Search** tab.  As matches are found, general info about the matches will be displayed in the **Files** and **Content** tab.
+Rummage is designed to be easy to pick up. Rummage's interface consists of three tabs: Search, Files, and Content.  In the [Search](#search-tab) tab, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with various toggles and options. The files that get searched can also be narrowed with filters. As matches are found, general info about the matches will be displayed in the [Files](#files-tab) and [Content](#content-tab) tab.
 
-Rummage also comes with a simple regular expression tester to test out patterns. It also provides a feature where patterns can be saved for later and/or frequent use.
+Rummage also comes with a simple regular expression tester to test out patterns. It also provides a feature where patterns can be saved for later and/or frequent use. You can even create chains that will apply a series of saved searches.
 
 The status bar will show search status such as match counts and other useful information.
 
@@ -31,17 +31,17 @@ rummage --path mydirectory
 
 ### Regular Expression Libraries Used
 
-Rummage uses the default regular expression library ([Re][re]) that comes with the version of Python you are using. It also optionally works with the 3rd party [Regex][regex] library as well.
+Rummage uses the default regular expression library ([Re][re]) that comes with Python. It also optionally works with the 3rd party [Regex][regex] library as well.
 
-Rummage also provides an optional, wrapper called [Backrefs][backrefs] which augments Re and Regex and adds support for various new back references, and adds some new features.  Additions differ depending on which library Backrefs is augmenting. See [Backrefs' documentation][backrefs] for more info.
+Rummage also provides an optional wrapper called [Backrefs][backrefs] which augments Re and Regex and adds support for various new back references and additional features.  Additions differ depending on which library Backrefs is augmenting. See [Backrefs' documentation][backrefs] for more info.
 
-To provide a consistent user experience there are a few differences between libraries that are normalized. In Python, there is a difference between how back slashes are handled in strings (`#!py3 "..."`) and raw strings (`#!py3 r"..."`). Rummage inputs can be thought of as raw string inputs. Normal Regex replace templates allows for character back references in raw string, replace templates (`\u0057`, `\x057`, etc.), but Re and Regex format replacement templates do not (Regex raw string format templates won't convert normal references like `\n` either). When Backrefs is applied, all replacement templates will support and translate character references, but Rummage will also ensure that normal Re and normal Regex format replace work the same.
+To provide a consistent user experience, there are a few differences between libraries that are normalized. Normalization mainly deals with allowed, standard escapes.  In general, you should be able to use Python style Unicode, byte, and standard Python string escapes (such as newlines, vertical tabs etc.) in both engines. This applies to both search patterns and replace templates.
 
 ## Search Tab
 
 ![Search Tab](/images/search_tab.png)
 
-The **Search** tab is broken up into 2 panels, the first of which is the **Search &amp; Replace** panel. The **Search &amp; Replace** panel has all the inputs where the search and replace is defined and configured.  It also has access to the regular expression tester and the save/load dialogs for saving/loading patterns for later use.
+The **Search** tab is broken up into 2 panels, the first of which is the **Search &amp; Replace** panel. The **Search &amp; Replace** panel has all the inputs where the search and replace is defined and configured.  It also has access to the [regular expression tester](#regular-expression-tester), [saving and loading patterns](#saving-and-loading-regular-expressions), and [chain management](#search-chains).
 
 The second panel, is the **Limit Search** panel.  The **Limit Search** panel contains toggles and inputs that filter the files to be searched.
 
@@ -49,7 +49,7 @@ The second panel, is the **Limit Search** panel.  The **Limit Search** panel con
 
 ![Files Tab](/images/files_tab.png)
 
-The **Files** tab is where files with matches are shown after a search completes.  The files are arranged in a sortable table.  Each entry will show the file's name, size, number of matches in the file, the file path, detected file encoding, date/time when the file was created, and date/time of when the file was last modified.
+The **Files** tab is where files with matches are shown after a search completes.  The files are arranged in a sortable table.  Each entry will show the file's name, size, number of matches in the file, extension, the file path, detected file encoding, date/time when the file was created, and date/time of when the file was last modified.
 
 When mousing over an entry, the full path to the file will be shown in the status bar.  If you have the editor option in the preference dialog configured properly, you can double click an entry to open to the first match of that file in your favorite editor.
 
@@ -67,11 +67,13 @@ Right clicking the entries will bring up a context menu as well allowing you to 
 
 ## Search &amp; Replace Panel
 
-![Search and Replace Panel](/images/search_replace_panel.png)
+![Search and Replace Panel](/images/search_replace_inputs.png)
 
 The **Search &amp; Replace** panel contains three text boxes with a dropdown history. The first text box defines **where to search**, the second defines **what to search for**, and the last defines **what to replace matches with** (this is only needed when doing replaces).  You can select previously used patterns and search targets by expanding the dropdown panel for the input.
 
-Below the text boxes are toggles that control the regular expression engine's flags and/or features.  These will vary depending on which regular expression engine you are using as Rummage can be used with Python's default [Re][re] engine or the third party [Regex][regex] engine.  Both optionally can use the a special wrapper called Backrefs to add support for a couple special escapes.
+![Search and Replace Toggles](/images/search_replace_panel.png)
+
+Below the text boxes are toggles that control the regular expression engine's flags and/or features.  These will vary depending on which regular expression engine you are using as Rummage can be used with Python's default [Re][re] engine or the 3rd party [Regex][regex] engine.  Optionally, both can use the special wrapper called Backrefs to add support for additional, special escapes.
 
 Underneath the regular expression flags, are toggles for general Rummage search features.  These will alter search and/or replace behavior.
 
@@ -301,7 +303,7 @@ Include\ binary\ files | Forces Rummage to search binary files.
 
 ### File Patterns
 
-When the `Regex` check box is selected to the right of `Exclude folders` or `Files which match`, the currently configured regular expression engine will be used, and the patterns will be configured for case insensitive matching. If you don't select the `Regex`, those patterns will be a simple wildcard pattern instead of a regular expression pattern, and the wildcard matches will also be case insensitive. The wildcard syntax mimics Python's [fnmatch module][fnmatch], but with two additions.
+When the `Regex` check box is selected to the right of `Exclude folders` or `Files which match`, the currently configured regular expression engine will be used, and the patterns will be configured for case insensitive, [fullmatch][fullmatch] matching. If you don't select the `Regex` check box, those patterns will be a simple wildcard pattern instead of a regular expression pattern, and the wildcard matches will also be case insensitive. The wildcard syntax mimics Python's [fnmatch module][fnmatch], but with a couple of additions.
 
 Pattern  | Meaning
 -------- | -------
@@ -349,7 +351,7 @@ You can also use Python character escapes to make things like Unicode character 
 
 Rummage allows the exporting of the results to either CSV or HTML.  Simply select **File-->Export** and pick either **CSV** or **HTML**.  The HTML output will be styled similar to the GUI interface with the results in tables with sortable columns.
 
-!!! info "Large Result Sets":
+!!! info "Large Result Sets"
     Really, really large sets of results will probably be best suited for CSV as a browser may have a hard time loading the entire data set at once.
 
 ## Preferences
@@ -534,7 +536,7 @@ To learn more about the added back references when using Backrefs, read the offi
 
 #### Backups
 
-Rummage by default does a backup of files on replace when `Create backups` is enabled in the main dialog. Backups are saved in the same location as the target file with the unique extension `rum-bak` appended to them.  When `Create backups` is enabled, files with the extension `rum-bak` are ignored in search and replace in order to avoid replacing content in your backup.
+Rummage does a backup of files on replace when `Create backups` is enabled in the main dialog. Backups are saved in the same location as the target file with the unique extension `rum-bak` appended to them.  When `Create backups` is enabled, files with the extension `rum-bak` are ignored in search and replace in order to avoid replacing content in your backup.
 
 If desired, Rummage can be configured to store backups in a sub-folder at the target file's location by setting the `Backup to folder` option in the setting dialog. The backup folder will be named `.rum-bak`.  When this is done, all files in `.rum-bak` will have the `bak` extension. The entire folder `.rum-bak` is excluded from search and replace when `Create backups` is enabled.
 
