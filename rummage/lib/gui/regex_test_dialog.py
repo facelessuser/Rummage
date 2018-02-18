@@ -387,11 +387,11 @@ class RegexTestDialog(gui.RegexTestDialog):
 
             try:
                 if self.regex_mode == rumcore.BREGEX_MODE:
-                    test = bregex.compile_search(search_text, flags)
+                    test = bregex.compile(search_text, flags)
                 elif self.regex_mode == rumcore.REGEX_MODE:
                     test = regex.compile(search_text, flags)
                 elif self.regex_mode == rumcore.BRE_MODE:
-                    test = bre.compile_search(search_text, flags)
+                    test = bre.compile(search_text, flags)
                 else:
                     test = re.compile(search_text, flags)
             except Exception as e:
@@ -425,8 +425,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     if not is_regex:
                         replace_test = functools.partial(replace_literal, replace=rpattern)
                     elif self.regex_mode == rumcore.BREGEX_MODE:
-                        replace_test = bregex.compile_replace(
-                            test,
+                        replace_test = test.compile(
                             rpattern,
                             bregex.FORMAT if self.m_format_replace_checkbox.GetValue() else 0
                         )
@@ -437,8 +436,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                         else:
                             replace_test = functools.partial(replace_regex, replace=rpattern)
                     elif self.regex_mode == rumcore.BRE_MODE:
-                        replace_test = bre.compile_replace(
-                            test,
+                        replace_test = test.compile(
                             rpattern,
                             (bre.FORMAT if self.m_format_replace_checkbox.GetValue() else 0)
                         )

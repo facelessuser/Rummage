@@ -310,7 +310,7 @@ Pattern  | Meaning
 `[seq]`  | Matches any character in seq.
 `[!seq]` | Matches any character not in seq.
 `|`      | Separates multiple patterns.
-`-`      | If used at the start of a pattern, the pattern is treated as an exception to other applied patterns.
+`-`      | If used at the start of a pattern, the pattern is treated as the inverse.
 
 You can also use Python character escapes to make things like Unicode character input easier. So you can use `\x70`, `\u0070`, `\U00000070`, and `\160`, for bytes, Unicode, 32 bit Unicode, or octal style character notation. You can also use Unicode names: `\N{unicode name}` and standard Python character escapes like `\t` etc. You can also escape the the backslash to avoid special escapes: `\\`.
 
@@ -322,12 +322,22 @@ You can also use Python character escapes to make things like Unicode character 
     *.py|-__init__.py
     ```
 
-    Keep in mind that `-` patterns augment logic of other patterns, you can't just specify `-__init__.py` as it is more an exception to non `-` matches as shown above.
+    Used in the `Files which match` box, this would match any file type that is not `.py`.
+
+    ```
+    -*.py
+    ```
 
     Used in the `Exclude folders`, this would exclude all folders with `name` followed by a single digit, except `name3` which we will always be included.
 
     ```
     name[0-9]|-name3
+    ```
+
+    Used in the `Exclude folders`, this would exclude all folders except `name3`.
+
+    ```
+    -name3
     ```
 
     If you need to escape `-` or `|`, you can put them in a sequence: `[-|]`. Remember to place `-` at the beginning of a sequence as `-` is also used to specify character ranges: `[a-z]`.

@@ -86,6 +86,7 @@ BREGEX_MODE = 3
 SEARCH_MASK = 0x1FFFF
 FILE_MASK = 0xFFE0000
 
+RE_MODES = (RE_MODE, BRE_MODE)
 REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
 FORMAT_MODES = (REGEX_MODE, BREGEX_MODE, BRE_MODE)
 
@@ -166,19 +167,6 @@ def _re_pattern(pattern, rum_flags=0, binary=False):
     return re.compile(pattern, flags)
 
 
-def _re_literal_pattern(pattern, rum_flags=0, binary=False):
-    """Prepare literal search pattern flags."""
-
-    flags = 0
-    if rum_flags & IGNORECASE:
-        flags |= re.IGNORECASE
-    if not binary and rum_flags & UNICODE:
-        flags |= re.UNICODE
-    else:
-        flags |= re.ASCII
-    return re.compile(re.escape(pattern), flags)
-
-
 def _bre_pattern(pattern, rum_flags=0, binary=False):
     """Prepare regex search pattern flags."""
 
@@ -193,20 +181,20 @@ def _bre_pattern(pattern, rum_flags=0, binary=False):
         flags |= bre.UNICODE
     else:
         flags |= bre.ASCII
-    return bre.compile_search(pattern, flags)
+    return bre.compile(pattern, flags)
 
 
-def _bre_literal_pattern(pattern, rum_flags=0, binary=False):
+def _re_literal_pattern(pattern, rum_flags=0, binary=False):
     """Prepare literal search pattern flags."""
 
     flags = 0
     if rum_flags & IGNORECASE:
-        flags |= bre.IGNORECASE
+        flags |= re.IGNORECASE
     if not binary and rum_flags & UNICODE:
-        flags |= bre.UNICODE
+        flags |= re.UNICODE
     else:
-        flags |= bre.ASCII
-    return bre.compile_search(bre.escape(pattern), flags)
+        flags |= re.ASCII
+    return re.compile(re.escape(pattern), flags)
 
 
 if REGEX_SUPPORT:
@@ -243,26 +231,6 @@ if REGEX_SUPPORT:
             flags |= regex.ASCII
         return regex.compile(pattern, flags)
 
-    def _regex_literal_pattern(pattern, rum_flags=0, binary=False):
-        """Prepare literal search pattern flags."""
-
-        flags = 0
-        if rum_flags & VERSION1:
-            flags |= regex.VERSION1
-        else:
-            flags |= regex.VERSION0
-            if rum_flags & FULLCASE:
-                flags |= regex.FULLCASE
-
-        if not binary and rum_flags & UNICODE:
-            flags |= regex.UNICODE
-        else:
-            flags |= regex.ASCII
-
-        if rum_flags & IGNORECASE:
-            flags |= regex.IGNORECASE
-        return regex.compile(regex.escape(pattern), flags)
-
     def _bregex_pattern(pattern, rum_flags=0, binary=False):
         """Prepare regex search pattern flags for regex module."""
 
@@ -295,28 +263,27 @@ if REGEX_SUPPORT:
             flags |= bregex.UNICODE
         else:
             flags |= bregex.ASCII
-        return bregex.compile_search(pattern, flags)
+        return bregex.compile(pattern, flags)
 
-    def _bregex_literal_pattern(pattern, rum_flags=0, binary=False):
+    def _regex_literal_pattern(pattern, rum_flags=0, binary=False):
         """Prepare literal search pattern flags."""
 
         flags = 0
-
         if rum_flags & VERSION1:
-            flags |= bregex.VERSION1
+            flags |= regex.VERSION1
         else:
-            flags |= bregex.VERSION0
+            flags |= regex.VERSION0
             if rum_flags & FULLCASE:
-                flags |= bregex.FULLCASE
+                flags |= regex.FULLCASE
 
         if not binary and rum_flags & UNICODE:
-            flags |= bregex.UNICODE
+            flags |= regex.UNICODE
         else:
-            flags |= bregex.ASCII
+            flags |= regex.ASCII
 
         if rum_flags & IGNORECASE:
-            flags |= bregex.IGNORECASE
-        return bregex.compile_search(bregex.escape(pattern), flags)
+            flags |= regex.IGNORECASE
+        return regex.compile(regex.escape(pattern), flags)
 
 
 class RummageException(Exception):
@@ -591,6 +558,8 @@ class Wildcard2Regex(object):
                     current.append('\\[')
             else:
                 current.append(self.engine.escape(c))
+        if not result:
+            result.append('.*')
         if util.PY36 or self.is_regex:
             pattern = r'(?s:%s)\Z' % ''.join(result)
             exclude_pattern = r'(?s:%s)\Z' % ''.join(exclude_result)
@@ -1026,29 +995,21 @@ class _FileSearch(object):
         if pattern is not None:
             if bool(flags & LITERAL):
                 self.literal = True
-                if self.regex_mode == BREGEX_MODE:
-                    pattern = _bregex_literal_pattern(pattern, flags, self.is_binary)
-                elif self.regex_mode == REGEX_MODE:
+                if self.regex_mode in REGEX_MODES:
                     pattern = _regex_literal_pattern(pattern, flags, self.is_binary)
-                elif self.regex_mode == BRE_MODE:
-                    pattern = _bre_literal_pattern(pattern, flags, self.is_binary)
                 else:
                     pattern = _re_literal_pattern(pattern, flags, self.is_binary)
             else:
                 if self.regex_mode == BREGEX_MODE:
                     pattern = _bregex_pattern(pattern, flags, self.is_binary)
                     if replace is not None and not self.is_plugin_replace:
-                        self.expand = bregex.compile_replace(
-                            pattern, replace, (bregex.FORMAT if bool(flags & FORMATREPLACE) else 0)
-                        )
+                        self.expand = pattern.compile(replace, (bregex.FORMAT if bool(flags & FORMATREPLACE) else 0))
                 elif self.regex_mode == REGEX_MODE:
                     pattern = _regex_pattern(pattern, flags, self.is_binary)
                 elif self.regex_mode == BRE_MODE:
                     pattern = _bre_pattern(pattern, flags, self.is_binary)
                     if replace is not None and not self.is_plugin_replace:
-                        self.expand = bre.compile_replace(
-                            pattern, replace, (bre.FORMAT if bool(flags & FORMATREPLACE) else 0)
-                        )
+                        self.expand = pattern.compile(replace, (bre.FORMAT if bool(flags & FORMATREPLACE) else 0))
                 else:
                     pattern = _re_pattern(pattern, flags, self.is_binary)
                     if replace is not None and not self.is_plugin_replace:
@@ -1459,31 +1420,28 @@ class _DirWalker(object):
             self.backup_ext = None
             self.backup_folder = None
 
-    def _parse_pattern(self, string, regex_match):
+    def _parse_pattern(self, string, regex_match, force_default=False):
         r"""Compile or format the inclusion\exclusion pattern."""
 
         pattern = None
         exclude_pattern = None
         if regex_match:
-            if string is not None:
+            if not string and force_default:
+                string = r'.*'
+            if string:
                 if self.regex_mode == BREGEX_MODE:
-                    pattern = bregex.compile_search(
-                        string, bregex.IGNORECASE
-                    )
+                    pattern = bregex.compile(string, bregex.IGNORECASE)
                 elif self.regex_mode == REGEX_MODE:
-                    pattern = regex.compile(
-                        string, regex.IGNORECASE | regex.ASCII
-                    )
+                    pattern = regex.compile(string, regex.IGNORECASE | regex.ASCII)
                 elif self.regex_mode == BRE_MODE:
-                    pattern = bre.compile_search(
-                        string, bre.IGNORECASE | bre.ASCII
-                    )
+                    pattern = bre.compile(string, bre.IGNORECASE | bre.ASCII)
                 else:
-                    pattern = re.compile(
-                        string, re.IGNORECASE | re.ASCII
-                    )
-        elif string is not None:
-            pattern, exclude_pattern = Wildcard2Regex(string).translate()
+                    pattern = re.compile(string, re.IGNORECASE | re.ASCII)
+        else:
+            if not string and force_default:
+                string = '*'
+            if string:
+                pattern, exclude_pattern = Wildcard2Regex(string).translate()
         return pattern, exclude_pattern
 
     def _is_hidden(self, path):
@@ -1570,8 +1528,8 @@ class _DirWalker(object):
             not self._is_hidden(os.path.join(base, name)) and
             not self._is_backup(name)
         ):
-            valid = self.re_file_pattern.match(name) is not None
-            if self.re_exclude_file_pattern and self.re_exclude_file_pattern.match(name) is not None:
+            valid = self.re_file_pattern.fullmatch(name) is not None
+            if self.re_exclude_file_pattern and self.re_exclude_file_pattern.fullmatch(name) is not None:
                 valid = False
             if valid:
                 valid = self._is_size_okay(os.path.join(base, name))
@@ -1588,8 +1546,11 @@ class _DirWalker(object):
         elif self._is_hidden(os.path.join(base, name)) or self._is_backup(name, True):
             valid = False
         elif self.re_folder_exclude is not None:
-            valid = self.re_folder_exclude.match(name) is None
-            if self.re_negated_folder_exclude is not None and self.re_negated_folder_exclude.match(name) is not None:
+            valid = self.re_folder_exclude.fullmatch(name) is None
+            if (
+                self.re_negated_folder_exclude is not None and
+                self.re_negated_folder_exclude.fullmatch(name) is not None
+            ):
                 valid = True
         return valid
 
@@ -1662,7 +1623,7 @@ class _DirWalker(object):
         """Compile search patterns."""
 
         self.re_file_pattern, self.re_exclude_file_pattern = self._parse_pattern(
-            self.file_pattern, self.file_regex_match
+            self.file_pattern, self.file_regex_match, force_default=True
         )
         self.re_folder_exclude, self.re_negated_folder_exclude = self._parse_pattern(
             self.folder_exclude, self.dir_regex_match

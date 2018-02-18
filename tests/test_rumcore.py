@@ -58,10 +58,10 @@ class TestWildcard(unittest.TestCase):
 
         p1, p2 = rc.Wildcard2Regex('-|-test|-').translate()
         if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:)\Z')
+            self.assertEqual(p1.pattern, r'(?s:.*)\Z')
             self.assertEqual(p2.pattern, r'(?s:|test|)\Z')
         else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:)\Z')
+            self.assertEqual(p1.pattern, r'(?ms)(?:.*)\Z')
             self.assertEqual(p2.pattern, r'(?ms)(?:|test|)\Z')
 
         p1, p2 = rc.Wildcard2Regex('test[^chars]').translate()
@@ -226,18 +226,6 @@ class TestHelperFunctions(unittest.TestCase):
             bre.UNICODE | bre.DOTALL | bre.IGNORECASE | bre.MULTILINE
         )
 
-    def test_bre_literal_flags(self):
-        """Test the literal bre flags."""
-
-        default = re.ASCII
-
-        self.assertEqual(rc._bre_literal_pattern(r"test").flags, default)
-        self.assertEqual(rc._bre_literal_pattern(r"test", rc.IGNORECASE).flags, bre.IGNORECASE | default)
-        self.assertEqual(
-            rc._bre_literal_pattern(r"test", rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE).flags,
-            bre.IGNORECASE | bre.UNICODE
-        )
-
     def test_regex_flags(self):
         """Test the re flag settings."""
 
@@ -334,24 +322,6 @@ class TestHelperFunctions(unittest.TestCase):
             bregex.V1 | bregex.UNICODE | bregex.DOTALL | bregex.IGNORECASE | bregex.MULTILINE |
             bregex.WORD | bregex.ENHANCEMATCH | bregex.BESTMATCH | bregex.REVERSE | bregex.FULLCASE |
             bregex.POSIX
-        )
-
-    def test_bregex_literal_flags(self):
-        """Test the literal re flags."""
-
-        self.assertEqual(
-            rc._bregex_literal_pattern(r"test").flags, bregex.V0 | bregex.ASCII
-        )
-        self.assertEqual(
-            rc._bregex_literal_pattern(r"test", rc.IGNORECASE).flags, bregex.V0 | bregex.ASCII | bregex.IGNORECASE
-        )
-        self.assertEqual(
-            rc._bregex_literal_pattern(
-                r"test",
-                rc.UNICODE | rc.DOTALL | rc.IGNORECASE | rc.MULTILINE |
-                rc.WORD | rc.BESTMATCH | rc.ENHANCEMATCH | rc.REVERSE | rc.FULLCASE | rc.VERSION0
-            ).flags,
-            bregex.IGNORECASE | bregex.V0 | bregex.UNICODE | bregex.FULLCASE
         )
 
     def test_exception(self):
@@ -658,8 +628,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.RE_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bre(self):
@@ -679,8 +649,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.BRE_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_regex(self):
@@ -700,8 +670,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.REGEX_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bregex(self):
@@ -721,8 +691,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.BREGEX_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bad_regular_expression_mode(self):
@@ -742,8 +712,8 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.RE_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
-        self.assertEqual(len(self.files), 2)
+        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_abort(self):
