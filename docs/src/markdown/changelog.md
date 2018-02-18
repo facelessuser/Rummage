@@ -2,6 +2,8 @@
 
 ## 4.0.0
 
+Feb 18, 2018
+
 - **NEW**: Drop Python 2.7 support.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
 - **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
