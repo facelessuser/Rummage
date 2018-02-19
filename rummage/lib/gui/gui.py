@@ -14,6 +14,7 @@ from .controls.date_picker import DatePicker
 from wx.lib.masked import TimeCtrl
 from .controls.result_lists import ResultFileList
 from .controls.result_lists import ResultContentList
+from .controls.encoding_list import EncodingList
 from .controls.load_search_list import SavedSearchList
 from .controls.search_chain_list import SearchChainList
 from .controls.list_box import ListBox
@@ -1095,8 +1096,8 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_filetype_label.Wrap( -1 )
 		fgSizer57.Add( self.m_filetype_label, 0, wx.ALL, 5 )
 		
-		self.m_filetype_listctrl = wx.ListCtrl( self.m_encoding_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT )
-		fgSizer57.Add( self.m_filetype_listctrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.m_encoding_list = EncodingList(self.m_encoding_panel)
+		fgSizer57.Add( self.m_encoding_list, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		self.m_encoding_panel.SetSizer( fgSizer57 )
@@ -1280,7 +1281,6 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_bregex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bregex_toggle )
 		self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
 		self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
-		self.m_filetype_listctrl.Bind( wx.EVT_LEFT_DCLICK, self.on_dclick )
 		self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
 		self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
 		self.m_notify_choice.Bind( wx.EVT_CHOICE, self.on_notify_choice )
@@ -1333,9 +1333,6 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_chardet( self, event ):
-		event.Skip()
-	
-	def on_dclick( self, event ):
 		event.Skip()
 	
 	def on_editor_change( self, event ):

@@ -74,7 +74,7 @@ class SearchChainDialog(gui.SearchChainDialog):
             searches = ';'.join(c)
             self.m_chain_list.set_item_map(count, key, searches)
             count += 1
-        self.m_chain_list.load_list()
+        self.m_chain_list.load_list(True)
 
     def edit_chain(self, name=None):
         """Edit chain."""

@@ -98,7 +98,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
                 replace_type
             )
             count += 1
-        self.m_search_list.load_list()
+        self.m_search_list.load_list(True)
 
     def edit(self, item):
         """Edit the saved search."""
