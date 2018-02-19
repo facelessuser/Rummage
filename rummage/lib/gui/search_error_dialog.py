@@ -75,3 +75,9 @@ class SearchErrorDialog(gui.SearchErrorDialog):
             self.m_error_list.set_item_map("%d" % count, e.error, name)
             count += 1
         self.m_error_list.load_list()
+
+    def on_close(self, event):
+        """Handle on close event."""
+
+        self.m_error_list.destroy()
+        event.Skip()

@@ -188,3 +188,9 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         """Close dialog."""
 
         self.Close()
+
+    def on_close(self, event):
+        """Handle on close event."""
+
+        self.m_search_list.destroy()
+        event.Skip()

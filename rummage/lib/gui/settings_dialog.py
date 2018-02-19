@@ -446,6 +446,12 @@ class SettingsDialog(gui.SettingsDialog):
             mode = rumcore.RE_MODE
         Settings.set_regex_mode(mode)
 
+    def on_close(self, event):
+        """Handle on close event."""
+
+        self.dc.Destroy()
+        event.Skip()
+
     on_bregex_toggle = on_change_module
 
     on_regex_toggle = on_change_module

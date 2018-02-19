@@ -125,3 +125,9 @@ class SearchChainDialog(gui.SearchChainDialog):
         """Close window."""
 
         self.Close()
+
+    def on_close(self, event):
+        """Handle on close event."""
+
+        self.m_chain_list.destroy()
+        event.Skip()

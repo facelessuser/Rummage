@@ -1268,6 +1268,7 @@ class SettingsDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.on_close )
 		self.m_single_checkbox.Bind( wx.EVT_CHECKBOX, self.on_single_toggle )
 		self.m_lang_choice.Bind( wx.EVT_CHOICE, self.on_language )
 		self.m_update_checkbox.Bind( wx.EVT_CHECKBOX, self.on_update_toggle )
@@ -1298,6 +1299,9 @@ class SettingsDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def on_close( self, event ):
+		event.Skip()
+	
 	def on_single_toggle( self, event ):
 		event.Skip()
 	
@@ -2209,6 +2213,7 @@ class LoadSearchDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.on_close )
 		self.m_edit_button.Bind( wx.EVT_BUTTON, self.on_edit_click )
 		self.m_delete_button.Bind( wx.EVT_BUTTON, self.on_delete )
 		self.m_load_button.Bind( wx.EVT_BUTTON, self.on_load )
@@ -2219,6 +2224,9 @@ class LoadSearchDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def on_close( self, event ):
+		event.Skip()
+	
 	def on_edit_click( self, event ):
 		event.Skip()
 	
@@ -2241,7 +2249,7 @@ class SearchChainDialog ( wx.Dialog ):
 	def __init__( self, parent ):
 		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Search Chains", pos = wx.DefaultPosition, size = wx.Size( 470,288 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
 		
-		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		self.SetSizeHints( wx.Size( 470,288 ), wx.DefaultSize )
 		
 		bSizer16 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -2298,6 +2306,7 @@ class SearchChainDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.on_close )
 		self.m_add_button.Bind( wx.EVT_BUTTON, self.on_add_click )
 		self.m_edit_button.Bind( wx.EVT_BUTTON, self.on_edit_click )
 		self.m_remove_button.Bind( wx.EVT_BUTTON, self.on_remove_click )
@@ -2308,6 +2317,9 @@ class SearchChainDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def on_close( self, event ):
+		event.Skip()
+	
 	def on_add_click( self, event ):
 		event.Skip()
 	
@@ -2491,9 +2503,17 @@ class SearchErrorDialog ( wx.Dialog ):
 		self.Layout()
 		
 		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.on_close )
 	
 	def __del__( self ):
 		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_close( self, event ):
+		event.Skip()
 	
 
 ###########################################################################

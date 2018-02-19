@@ -150,7 +150,7 @@ class ResultFileList(DynamicList):
         self.bin = self.images.Add(data.get_bitmap('binary.png'))
         self.sort_up = self.images.Add(data.get_bitmap('su.png'))
         self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
-        self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
+        self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def set_match(self, obj, file_search=False):
         """Set match."""
@@ -439,7 +439,7 @@ class ResultContentList(DynamicList):
         self.bin = self.images.Add(data.get_bitmap('binary.png'))
         self.sort_up = self.images.Add(data.get_bitmap('su.png'))
         self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
-        self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
+        self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def on_enter_window(self, event):
         """Reset last moused over item tracker on mouse entering the window."""

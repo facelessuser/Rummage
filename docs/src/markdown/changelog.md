@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.1
+
+- **FIX**: Cleanup some object leaks.
+- **FIX**: Incorrect sizing of chain dialog.
+
 ## 4.0.0
 
 Feb 18, 2018
