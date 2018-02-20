@@ -2,8 +2,12 @@
 
 ## 4.0.1
 
+Feb 20, 2018
+
 - **FIX**: Cleanup some object leaks.
 - **FIX**: Incorrect sizing of chain dialog.
+- **FIX**: All list objects should be finalized properly to allow sorting.
+- **FIX**: Make encoding list style in settings dialog consistent with the look and feel of other list objects.
 
 ## 4.0.0
 
