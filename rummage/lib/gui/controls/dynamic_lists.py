@@ -85,6 +85,11 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.setup_columns()
         self.itemIndexMap = []
 
+    def destroy(self):
+        """Destroy."""
+
+        self.dc.Destroy()
+
     def set_keybindings(self, keybindings=None):
         """
         Method to easily set key bindings.

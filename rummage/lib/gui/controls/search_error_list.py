@@ -55,7 +55,7 @@ class ErrorList(DynamicList):
         self.error_symbol = self.images.Add(data.get_bitmap('error.png'))
         self.sort_up = self.images.Add(data.get_bitmap('su.png'))
         self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
-        self.SetImageList(self.images, wx.IMAGE_LIST_SMALL)
+        self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def get_item_text(self, item, col, absolute=False):
         """Return the text for the given item and col."""

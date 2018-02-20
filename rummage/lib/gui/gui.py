@@ -14,6 +14,7 @@ from .controls.date_picker import DatePicker
 from wx.lib.masked import TimeCtrl
 from .controls.result_lists import ResultFileList
 from .controls.result_lists import ResultContentList
+from .controls.encoding_list import EncodingList
 from .controls.load_search_list import SavedSearchList
 from .controls.search_chain_list import SearchChainList
 from .controls.list_box import ListBox
@@ -1095,8 +1096,8 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_filetype_label.Wrap( -1 )
 		fgSizer57.Add( self.m_filetype_label, 0, wx.ALL, 5 )
 		
-		self.m_filetype_listctrl = wx.ListCtrl( self.m_encoding_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT )
-		fgSizer57.Add( self.m_filetype_listctrl, 1, wx.ALL|wx.EXPAND, 5 )
+		self.m_encoding_list = EncodingList(self.m_encoding_panel)
+		fgSizer57.Add( self.m_encoding_list, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		self.m_encoding_panel.SetSizer( fgSizer57 )
@@ -1268,6 +1269,7 @@ class SettingsDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.on_close )
 		self.m_single_checkbox.Bind( wx.EVT_CHECKBOX, self.on_single_toggle )
 		self.m_lang_choice.Bind( wx.EVT_CHOICE, self.on_language )
 		self.m_update_checkbox.Bind( wx.EVT_CHECKBOX, self.on_update_toggle )
@@ -1279,7 +1281,6 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_bregex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bregex_toggle )
 		self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
 		self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
-		self.m_filetype_listctrl.Bind( wx.EVT_LEFT_DCLICK, self.on_dclick )
 		self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
 		self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
 		self.m_notify_choice.Bind( wx.EVT_CHOICE, self.on_notify_choice )
@@ -1298,6 +1299,9 @@ class SettingsDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def on_close( self, event ):
+		event.Skip()
+	
 	def on_single_toggle( self, event ):
 		event.Skip()
 	
@@ -1329,9 +1333,6 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_chardet( self, event ):
-		event.Skip()
-	
-	def on_dclick( self, event ):
 		event.Skip()
 	
 	def on_editor_change( self, event ):
@@ -2209,6 +2210,7 @@ class LoadSearchDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.on_close )
 		self.m_edit_button.Bind( wx.EVT_BUTTON, self.on_edit_click )
 		self.m_delete_button.Bind( wx.EVT_BUTTON, self.on_delete )
 		self.m_load_button.Bind( wx.EVT_BUTTON, self.on_load )
@@ -2219,6 +2221,9 @@ class LoadSearchDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def on_close( self, event ):
+		event.Skip()
+	
 	def on_edit_click( self, event ):
 		event.Skip()
 	
@@ -2241,7 +2246,7 @@ class SearchChainDialog ( wx.Dialog ):
 	def __init__( self, parent ):
 		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Search Chains", pos = wx.DefaultPosition, size = wx.Size( 470,288 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
 		
-		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		self.SetSizeHints( wx.Size( 470,288 ), wx.DefaultSize )
 		
 		bSizer16 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -2298,6 +2303,7 @@ class SearchChainDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.on_close )
 		self.m_add_button.Bind( wx.EVT_BUTTON, self.on_add_click )
 		self.m_edit_button.Bind( wx.EVT_BUTTON, self.on_edit_click )
 		self.m_remove_button.Bind( wx.EVT_BUTTON, self.on_remove_click )
@@ -2308,6 +2314,9 @@ class SearchChainDialog ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def on_close( self, event ):
+		event.Skip()
+	
 	def on_add_click( self, event ):
 		event.Skip()
 	
@@ -2491,9 +2500,17 @@ class SearchErrorDialog ( wx.Dialog ):
 		self.Layout()
 		
 		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.on_close )
 	
 	def __del__( self ):
 		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def on_close( self, event ):
+		event.Skip()
 	
 
 ###########################################################################

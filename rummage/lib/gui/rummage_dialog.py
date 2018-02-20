@@ -2178,6 +2178,8 @@ class RummageFrame(gui.RummageFrame):
         if self.error_dlg is not None:
             self.error_dlg.Destroy()
             self.error_dlg = None
+        self.m_result_list.destroy()
+        self.m_result_file_list.destroy()
         self.m_statusbar.tear_down()
         notify.destroy_notifications()
         event.Skip()

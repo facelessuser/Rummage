@@ -1,8 +1,8 @@
 """
-Load search list.
+Encoding list.
 
 Licensed under MIT
-Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2018 Isaac Muse <isaacmuse@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -24,43 +24,34 @@ from ..localization import _
 from .. import data
 
 
-class SavedSearchList(DynamicList):
-    """Error list."""
+class EncodingList(DynamicList):
+    """Encoding list."""
 
     def __init__(self, parent):
         """Initialization."""
 
         self.localize()
 
-        super(SavedSearchList, self).__init__(
+        super(EncodingList, self).__init__(
             parent,
             [
-                self.NAME,
-                self.COMMENT,
-                self.SEARCH,
-                self.REPLACE,
-                self.FLAGS,
-                self.TYPE,
-                self.REPLACE_TYPE
+                self.FILE_TYPE,
+                self.EXTENSIONS
             ]
         )
 
     def localize(self):
         """Translate strings."""
 
-        self.NAME = _("Name")
-        self.COMMENT = _("Comment")
-        self.SEARCH = _("Search")
-        self.REPLACE = _("Replace")
-        self.FLAGS = _("Flags")
-        self.TYPE = _("Type")
-        self.REPLACE_TYPE = _("Replace Type")
+        self.FILE_TYPE = _("File type")
+        self.EXTENSIONS = _("Extensions")
 
     def create_image_list(self):
         """Create image list."""
 
         self.images = wx.ImageList(16, 16)
-        self.glass = self.images.Add(data.get_bitmap('glass.png'))
+        self.doc = self.images.Add(data.get_bitmap('doc.png'))
+        self.bin = self.images.Add(data.get_bitmap('binary.png'))
         self.sort_up = self.images.Add(data.get_bitmap('su.png'))
         self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
         self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
@@ -71,3 +62,8 @@ class SavedSearchList(DynamicList):
         if not absolute:
             item = self.itemIndexMap[item]
         return self.itemDataMap[item][col]
+
+    def OnGetItemImage(self, item):
+        """Override method to get the image for the given item."""
+
+        return self.bin if self.itemIndexMap[item] == 'bin' else self.doc
