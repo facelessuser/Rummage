@@ -50,6 +50,8 @@ class EncodingList(DynamicList):
         """Create image list."""
 
         self.images = wx.ImageList(16, 16)
+        self.doc = self.images.Add(data.get_bitmap('doc.png'))
+        self.bin = self.images.Add(data.get_bitmap('binary.png'))
         self.sort_up = self.images.Add(data.get_bitmap('su.png'))
         self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
         self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
@@ -64,4 +66,4 @@ class EncodingList(DynamicList):
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
 
-        return -1
+        return self.bin if self.itemIndexMap[item] == 'bin' else self.doc
