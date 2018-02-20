@@ -398,17 +398,17 @@ class SettingsDialog(gui.SettingsDialog):
         """Handle double click."""
 
         pos = event.GetPosition()
-        item = self.HitTestSubItem(pos)[0]
+        item = self.m_encoding_list.HitTestSubItem(pos)[0]
         if item != -1:
-            key = self.GetItemText(item, 0)
-            extensions = self.GetItemText(item, 1)
+            key = self.m_encoding_list.GetItemText(item, 0)
+            extensions = self.m_encoding_list.GetItemText(item, 1)
             dlg = FileExtDialog(self, extensions)
             dlg.ShowModal()
             value = dlg.extensions
             dlg.Destroy()
             if extensions != value:
                 Settings.set_encoding_ext({key: value.split(', ')})
-                self.SetItem(item, 1, value)
+                self.m_encoding_list.SetItem(item, 1, value)
                 self.reload_list()
         event.Skip()
 
