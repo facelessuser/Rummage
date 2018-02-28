@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.0.2
+
+Feb 27, 2018
+
+- **FIX**: In test dialog, when an expression doesn't match, the result box is empty.
+- **FIX**: Require Backrefs 3.3.0.
+
 ## 4.0.1
 
 Feb 20, 2018

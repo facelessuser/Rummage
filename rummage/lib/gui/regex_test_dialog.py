@@ -509,11 +509,10 @@ class RegexTestDialog(gui.RegexTestDialog):
                     new_text = [str(e)]
                     replace_test = None
                     errors = True
-                if replace_test:
-                    if reverse:
-                        new_text.appendleft(text[:offset])
-                    else:
-                        new_text.append(text[offset:])
+                if reverse:
+                    new_text.appendleft(text[:offset])
+                else:
+                    new_text.append(text[offset:])
                 value = ''.join(list(new_text))
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr if errors else self.replace_attr)
