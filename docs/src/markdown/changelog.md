@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.3
+
+Mar 6, 2018
+
+- **FIX**: Regression that causes crash when using reverse flag with Regex **and** Backrefs.
+
 ## 4.0.2
 
 Feb 27, 2018

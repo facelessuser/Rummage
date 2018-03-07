@@ -464,7 +464,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 # Reset Colors
                 self.reset_highlights()
 
-                if rumcore.REGEX_SUPPORT and isinstance(test, bregex._REGEX_TYPE):
+                if rumcore.REGEX_SUPPORT and isinstance(test, (bregex._REGEX_TYPE, bregex.Bregex)):
                     reverse = bool(test.flags & regex.REVERSE)
                 else:
                     reverse = False

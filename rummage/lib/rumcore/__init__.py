@@ -101,33 +101,13 @@ _CHAR_ESCAPES = frozenset(('u', 'U', 'x'))
 _SET_OPERATORS = frozenset(('&', '~', '|'))
 _WILDCARD_CHARS = frozenset(('-', '[', ']', '*', '?', '|'))
 
-U32 = (
-    'u32', 'utf32', 'utf_32'
-)
-
-U32BE = (
-    'utf-32be', 'utf_32_be'
-)
-
-U32LE = (
-    'utf-32le', 'utf_32_le'
-)
-
-U16 = (
-    'u16', 'utf16', 'utf_16'
-)
-
-U16BE = (
-    'utf-16be', 'utf_16_be'
-)
-
-U16LE = (
-    'utf-16le', 'utf_16_le'
-)
-
-U8 = (
-    'u8', 'utf', 'utf8', 'utf_8', 'utf_8_sig', 'utf-8-sig'
-)
+_U32 = frozenset(('u32', 'utf32', 'utf_32'))
+_U32BE = frozenset(('utf-32be', 'utf_32_be'))
+_U32LE = frozenset(('utf-32le', 'utf_32_le'))
+_U16 = frozenset(('u16', 'utf16', 'utf_16'))
+_U16BE = frozenset(('utf-16be', 'utf_16_be'))
+_U16LE = frozenset(('utf-16le', 'utf_16_le'))
+_U8 = frozenset(('u8', 'utf', 'utf8', 'utf_8', 'utf_8_sig', 'utf-8-sig'))
 
 RE_LINE_ENDINGS = re.compile(r'(?:\r\n|\r|\n)')
 
@@ -1016,7 +996,7 @@ class _FileSearch(object):
                         template = sre_parse.parse_template(replace, pattern)
                         self.expand = lambda m, t=template: sre_parse.expand_template(t, m)
 
-            if REGEX_SUPPORT and isinstance(pattern, bregex._REGEX_TYPE):
+            if REGEX_SUPPORT and isinstance(pattern, (bregex._REGEX_TYPE, bregex.Bregex)):
                 self.reverse = bool(pattern.flags & regex.REVERSE)
             else:
                 self.reverse = False
@@ -1746,19 +1726,19 @@ class Rummage(object):
 
         enc = encoding.lower()
         # Normalize UTFx encodings as we detect order and boms later.
-        if encoding in U8:
+        if encoding in _U8:
             enc = 'utf-8'
-        elif encoding in U16:
+        elif encoding in _U16:
             enc = 'utf-16'
-        elif encoding in U16BE:
+        elif encoding in _U16BE:
             enc = 'utf-16-be'
-        elif encoding in U16LE:
+        elif encoding in _U16LE:
             enc = 'utf-16-le'
-        elif encoding in U32:
+        elif encoding in _U32:
             enc = 'utf-32'
-        elif encoding in U32BE:
+        elif encoding in _U32BE:
             enc = 'utf-32-be'
-        elif encoding in U32LE:
+        elif encoding in _U32LE:
             enc = 'utf-32-le'
 
         if enc != 'bin':
