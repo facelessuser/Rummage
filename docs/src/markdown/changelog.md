@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.0.4
+
+Mar 13, 2018
+
+- **FIX**: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format string replace with the added ability to use format string align and fill.
+- **FIX**: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex replace templates without Backrefs. Require explicit `{{` or `}}`.
+
 ## 4.0.3
 
 Mar 6, 2018

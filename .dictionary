@@ -66,6 +66,7 @@ multi
 plugin
 plugins
 pre
+preprocessing
 prereleases
 regex
 reinstalling

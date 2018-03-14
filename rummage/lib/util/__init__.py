@@ -38,7 +38,7 @@ RE_FMT = re.compile(
 )
 
 RE_RE = re.compile(
-    r'''(\\[\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})|(\\x[\da-fA-F]{2})'''
+    r'''(\\[\\])|(\\U[\da-fA-F]{8}|\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2})|(\\[0-7]{3})'''
 )
 
 
@@ -166,20 +166,14 @@ def preprocess_replace(string, format_replace=False):
             if m.group(2):
                 # Unicode (wide and narrow) and bytes
                 value = int(m.group(2)[2:], 16)
-            elif not format_replace and m.group(4):
-                value = int(m.group(4)[2:], 16)
             elif m.group(3):
                 # Octal
                 value = int(m.group(3)[1:], 8)
 
-            if fmt_repl:
+            if fmt_repl or value >= 0xff:
                 text = chr(value)
-                if text in FMT_BRACKETS:
-                    text = text * 2
-            elif value <= 0xff:
-                text = '\\%03o' % value
             else:
-                text = chr(value)
+                text = '\\%03o' % value
         return text
 
     return (RE_FMT if format_replace else RE_RE).sub(replace, string)
