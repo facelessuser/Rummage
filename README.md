@@ -1,5 +1,4 @@
 [![Unix Build Status][travis-image]][travis-link]
-[![Code Health][landscape-image]][landscape-link]
 [![Coverage][codecov-image]][codecov-link]
 [![Requirements Status][requires-image]][requires-link]
 [![pypi-version][pypi-image]][pypi-link]
@@ -44,8 +43,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [travis-image]: https://img.shields.io/travis/facelessuser/Rummage/master.svg?label=Unix%20Build
 [travis-link]: https://travis-ci.org/facelessuser/Rummage
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
-[landscape-image]: https://landscape.io/github/facelessuser/Rummage/master/landscape.svg?style=flat
-[landscape-link]: https://landscape.io/github/facelessuser/Rummage/master
 [codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg
 [codecov-link]: http://codecov.io/github/facelessuser/Rummage?branch=master
 [requires-image]: https://img.shields.io/requires/github/facelessuser/Rummage/master.svg
