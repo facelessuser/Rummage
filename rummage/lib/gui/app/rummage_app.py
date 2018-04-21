@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import os
 from .platform_window_focus import platform_window_focus
 from .custom_app import PipeApp
-from ... import util
 from .. import rummage_dialog
 from ..settings import Settings
 import wx
