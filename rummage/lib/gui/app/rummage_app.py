@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import os
 from .platform_window_focus import platform_window_focus
 from .custom_app import PipeApp
-from ... import util
 from .. import rummage_dialog
 from ..settings import Settings
 import wx
@@ -65,11 +64,13 @@ class RummageApp(PipeApp):
 
         # Setup app.
         if self.single_instance is None or self.is_instance_okay():
-            rummage_dialog.RummageFrame(
+            window = rummage_dialog.RummageFrame(
                 None,
                 self.path,
                 self.debug_mode
-            ).Show()
+            )
+            window.Show()
+            self.SetTopWindow(window)
         return True
 
     def OnExit(self):
@@ -118,7 +119,7 @@ class RummageApp(PipeApp):
             args.append(a)
             if a == "--path":
                 try:
-                    args.append(os.path.abspath(os.path.normpath(util.iternext(argv))))
+                    args.append(os.path.abspath(os.path.normpath(next(argv))))
                     path_arg_found = True
                 except StopIteration:
                     break

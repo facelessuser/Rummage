@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.5
+
+Apr, 21, 2018
+
+- **FIX**: Single instance handling regression #217.
+
 ## 4.0.4
 
 Mar 13, 2018
