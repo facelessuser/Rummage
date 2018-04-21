@@ -71,7 +71,7 @@ VER, DEVSTATUS = get_version()
 
 LONG_DESC = '''
 Rummage is a GUI tool for searching and replacing texst in files.
-It is built with wxPython 4.0.0+ and requires Python 2.7 or 3.4+.
+It is built with wxPython 4.0.0+ and requires Python 3.4+.
 You can learn more about using Rummage by `reading the docs`_.
 
 .. _`reading the docs`: http://facelessuser.github.io/Rummage/
