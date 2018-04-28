@@ -1,8 +1,14 @@
 # Changelog
 
+## 4.0.6
+
+Apr 28, 2018
+
+- **FIX**: Fixes to Windows notifications.
+
 ## 4.0.5
 
-Apr, 21, 2018
+Apr 21, 2018
 
 - **FIX**: Single instance handling regression #217.
 
