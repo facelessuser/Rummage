@@ -2,7 +2,7 @@
 
 ## 4.0.6
 
-Apr 28, 2018
+Apr 29, 2018
 
 - **FIX**: Fixes to Windows notifications.
 
