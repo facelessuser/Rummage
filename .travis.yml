@@ -41,6 +41,7 @@ deploy:
     skip_upload_docs: true
     on:
       tags: false
+      branch: md-desc
       repo: facelessuser/Rummage
       condition: $TOXENV = documents
   - provider: pages
