@@ -40,7 +40,7 @@ deploy:
     distributions: sdist
     skip_upload_docs: true
     on:
-      tags: true
+      tags: false
       repo: facelessuser/Rummage
       condition: $TOXENV = documents
   - provider: pages
@@ -50,6 +50,6 @@ deploy:
     skip_cleanup: true
     local_dir: site
     on:
-      tags: false
+      tags: true
       repo: facelessuser/Rummage
       condition: $TOXENV = documents
