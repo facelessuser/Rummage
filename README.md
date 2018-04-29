@@ -17,11 +17,11 @@ In general, it is usually preferable to specify an encoding for Rummage to use, 
 
 ## Screenshots
 
-![Rummage Search](./docs/src/markdown/images/search_tab.png)
+![Rummage Search](https://github.com/facelessuser/Rummage/raw/master/docs/src/markdown/images/search_tab.png)
 
-![Rummage Files](./docs/src/markdown/images/files_tab.png)
+![Rummage Files](https://github.com/facelessuser/Rummage/raw/master/docs/src/markdown/images/files_tab.png)
 
-![Rummage Content](./docs/src/markdown/images/content_tab.png)
+![Rummage Content](https://github.com/facelessuser/Rummage/raw/master/docs/src/markdown/images/content_tab.png)
 
 # Documentation
 
