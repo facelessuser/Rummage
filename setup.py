@@ -67,24 +67,15 @@ def get_requirements(req):
     return install_requires
 
 
+def get_description():
+    """Get long description."""
+
+    with open("README.md", 'r') as f:
+        desc = f.read()
+    return desc
+
+
 VER, DEVSTATUS = get_version()
-
-LONG_DESC = '''
-Rummage is a GUI tool for searching and replacing texst in files.
-It is built with wxPython 4.0.0+ and requires Python 3.4+.
-You can learn more about using Rummage by `reading the docs`_.
-
-.. _`reading the docs`: http://facelessuser.github.io/Rummage/
-
-Support
-=======
-
-Help and support is available here at the repository's `bug tracker`_.
-Please read about `support and contributing`_ before creating issues.
-
-.. _`bug tracker`: https://github.com/facelessuser/rummage/issues
-.. _`support and contributing`: http://facelessuser.github.io/rummage/contributing/
-'''
 
 entry_points = {
     'gui_scripts': [
@@ -103,7 +94,8 @@ setup(
     version=VER,
     keywords='grep search find replace gui',
     description='A GUI search and replace app.',
-    long_description=LONG_DESC,
+    long_description=get_description(),
+    long_description_content_type='text/markdown',
     author='Isaac Muse',
     author_email='Isaac.Muse@gmail.com',
     url='https://github.com/facelessuser/Rummage',
