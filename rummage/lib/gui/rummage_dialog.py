@@ -465,6 +465,7 @@ class RummageFrame(gui.RummageFrame):
         self.ERR_CSV_FAILED = _("There was a problem exporting the CSV!  See the log for more info.")
         self.ERR_NOTHING_TO_EXPORT = _("There is nothing to export!")
         self.ERR_SETUP = _("There was an error in setup! Please check the log.")
+        self.ERR_UPDATE = _("There was an error checking for updates!")
         self.ERR_INVALID_SEARCH_PTH = _("Please enter a valid search path!")
         self.ERR_INVALID_SEARCH = _("Please enter a valid search!")
         self.ERR_EMPTY_CHAIN = _("There are no searches in this this chain!")
@@ -2295,12 +2296,22 @@ class RummageFrame(gui.RummageFrame):
         """Perform update request."""
 
         current = datetime.now()
+        failed = False
         Settings.set_last_update_check(current.strftime("%Y-%m-%d %H:%M"))
         self.last_update_check = current
 
-        new_ver = updates.check_update(pre=prerelease)
+        try:
+            new_ver = updates.check_update(pre=prerelease)
+        except Exception:
+            error(traceback.format_exc())
+            new_ver = None
+            failed = True
+
         if new_ver is None and not hide_no_update:
-            infomsg(self.UP_TO_DATE % __meta__.__version__)
+            if failed:
+                errormsg(self.ERR_UPDATE)
+            else:
+                infomsg(self.UP_TO_DATE % __meta__.__version__)
         elif new_ver is not None:
             infomsg(self.NOT_UP_TO_DATE % new_ver)
 
