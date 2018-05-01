@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.0.7
+
+Apr 30, 2018
+
+- **FIX**: Log error during update check. If not a silent check, alert user there was an update check issue.
+- **FIX**: Update requests should use `https`.
+- **FIX**: Update localization.
+
 ## 4.0.6
 
 Apr 29, 2018

@@ -28,19 +28,17 @@ def check_update(pre=False):
     """Check for module update."""
 
     latest_ver_str = None
-    url = 'http://pypi.python.org/pypi/rummage/json'
-    try:
-        response = urlopen(url, timeout=5)
-        data = json.loads(response.read().decode('utf-8'))
-        latest = (0, 0, 0, 'alpha', 0)
-        latest_str = None
-        for ver in data['releases'].keys():
-            ver_info = parse_version(ver)
-            if ver_info > latest:
-                latest = ver_info
-                latest_str = ver
-        if __version__.version_info < latest:
-            latest_ver_str = latest_str
-    except Exception as e:
-        pass
+    url = 'https://pypi.python.org/pypi/rummage/json'
+    response = urlopen(url, timeout=5)
+    data = json.loads(response.read().decode('utf-8'))
+    latest = (0, 0, 0, 'alpha', 0)
+    latest_str = None
+    for ver in data['releases'].keys():
+        ver_info = parse_version(ver)
+        if ver_info > latest:
+            latest = ver_info
+            latest_str = ver
+    if __version__.version_info < latest:
+        latest_ver_str = latest_str
+
     return latest_ver_str
