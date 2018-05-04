@@ -27,15 +27,13 @@ import os
 import re
 import shutil
 import sre_parse
-import unicodedata
-import backrefs
 from collections import namedtuple
 from time import ctime
 from backrefs import bre
 from collections import deque
 from . import text_decode
+from . import wcmatch as wcm
 from .file_times import getmtime, getctime
-from .file_hidden import is_hidden
 from .. import util
 try:
     from backrefs import bregex
@@ -94,12 +92,6 @@ TRUNCATE_LENGTH = 120
 
 DEFAULT_BAK = 'rum-bak'
 DEFAULT_FOLDER_BAK = '.rum-bak'
-
-_OCTAL = frozenset(('0', '1', '2', '3', '4', '5', '6', '7'))
-_STANDARD_ESCAPES = frozenset(('a', 'b', 'f', 'n', 'r', 't', 'v', '\\'))
-_CHAR_ESCAPES = frozenset(('u', 'U', 'x'))
-_SET_OPERATORS = frozenset(('&', '~', '|'))
-_WILDCARD_CHARS = frozenset(('-', '[', ']', '*', '?', '|'))
 
 _U32 = frozenset(('u32', 'utf32', 'utf_32'))
 _U32BE = frozenset(('utf-32be', 'utf_32_be'))
@@ -274,7 +266,7 @@ class RummageTestException(Exception):
     """Rummage exception."""
 
 
-class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'ext', 'size', 'modified', 'created', 'skipped', 'error'])):
+class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'ext', 'size', 'modified', 'created', 'error'])):
     """File Attributes."""
 
 
@@ -296,258 +288,6 @@ class BufferRecord(namedtuple('BufferRecord', ['content', 'error'])):
 
 class ErrorRecord(namedtuple('ErrorRecord', ['error'])):
     """A record for non-file related errors."""
-
-
-class _StringIter(object):
-    """Preprocess replace tokens."""
-
-    def __init__(self, string):
-        """Initialize."""
-
-        self._string = string
-        self._index = 0
-
-    def __iter__(self):
-        """Iterate."""
-
-        return self
-
-    def __next__(self):
-        """Python 3 iterator compatible next."""
-
-        return self.iternext()
-
-    @property
-    def index(self):
-        """Get current index."""
-
-        return self._index
-
-    def previous(self):
-        """Get previous char."""
-
-        return self._string[self._index - 1]
-
-    def rewind(self, count):
-        """Rewind index."""
-
-        if count > self._index:  # pragma: no cover
-            raise ValueError("Can't rewind past beginning!")
-
-        self._index -= count
-
-    def iternext(self):
-        """Iterate through characters of the string."""
-
-        try:
-            char = self._string[self._index]
-            self._index += 1
-        except IndexError:  # pragma: no cover
-            raise StopIteration
-
-        return char
-
-
-class Wildcard2Regex(object):
-    """Translate fnmatch pattern to regex."""
-
-    def __init__(self, pattern, regex_mode=RE_MODE, case_sensitive=False):
-        """Initialize."""
-
-        self.pattern = pattern
-        if (
-            (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or
-            (RE_MODE > regex_mode > BREGEX_MODE)
-        ):  # pragma: no cover
-            regex_mode = RE_MODE
-        self.is_regex = regex_mode in REGEX_MODES
-        if self.is_regex:  # pragma: no cover
-            self.engine = regex
-        else:
-            self.engine = re
-
-        self.flags = 0
-        if regex_mode:  # pragma: no cover
-            self.flags |= self.engine.V0
-        if not case_sensitive:
-            self.flags |= self.engine.I
-
-    def _sequence(self, i):
-        """Handle fnmatch character group."""
-
-        result = ['[']
-
-        c = next(i)
-        if c == '!':
-            # Handle negate char
-            result.append('^')
-            c = next(i)
-        if c == '^':
-            # Escape regular expression negate character
-            result.append('\\' + c)
-            c = next(i)
-        if c in ('-', '['):
-            # Escape opening bracket or hyphen
-            result.append('\\' + c)
-            c = next(i)
-        elif c == ']':
-            # Handle closing as first character
-            result.append(c)
-            c = next(i)
-
-        end_stored = False
-        escape_hypen = -1
-        while c != ']':
-            if c == '-':
-                if i.index - 1 > escape_hypen:
-                    # Found a range delimiter.
-                    # Mark the next two characters as needing to be escaped if hypens.
-                    # The next character would be the end char range (s-e),
-                    # and the one after that would be the potential start char range
-                    # of a new range (s-es-e), so neither can be legitimate range delimiters.
-                    result.append(c)
-                    escape_hypen = i.index + 1
-                else:
-                    result.append('\\' + c)
-            elif c == '\\':
-                # Handle escapes
-                subindex = i.index
-                try:
-                    result.append(self._references(i))
-                    if i.previous() == ']':
-                        end_stored = True
-                        break
-                except StopIteration:
-                    i.rewind(i.index - subindex)
-                    result.append('\\\\')
-            elif c in _SET_OPERATORS:
-                # Escape &, |, and ~ to avoid &&, ||, and ~~
-                result.append('\\' + c)
-            else:
-                # Anything else
-                result.append(c)
-            c = next(i)
-
-        if not end_stored:
-            result.append(']')
-
-        return ''.join(result)
-
-    def _references(self, i):
-        """Handle references."""
-
-        index = i.index
-        value = ''
-        c = next(i)
-        if c in 'N':
-            # \N{name}
-            try:
-                c = next(i)
-                if c != '{':
-                    raise SyntaxError("Missing '{' in named Unicode character format at position %d!" % (i.index - 1))
-                name = []
-                c = next(i)
-                while c != '}':
-                    name.append(c)
-                    c = next(i)
-            except StopIteration:
-                raise SyntaxError('Incomplete named Unicode character at position %d!' % (index - 1))
-            nval = ord(unicodedata.lookup(''.join(name)))
-            value = '\\%03o' % nval if nval <= 0xFF else backrefs.util.uchr(nval)
-        elif c in _OCTAL:
-            # \octal
-            digit = [c]
-            try:
-                for x in range(2):
-                    c = next(i)
-                    if c in _OCTAL:
-                        digit.append(c)
-                    else:
-                        i.rewind(1)
-                        break
-            except StopIteration:
-                pass
-            digit = int(''.join(digit), 8)
-            if digit <= 0xFF:
-                value = '\\%03o' % digit
-            else:
-                value = backrefs.util.uchr(digit)
-        elif c in _STANDARD_ESCAPES or c in _CHAR_ESCAPES:
-            # \n, \v, etc. and \u, \U, \x etc.
-            value = '\\' + c
-        elif c in _SET_OPERATORS or c in _WILDCARD_CHARS:
-            value = '\\\\'
-            i.rewind(1)
-        else:
-            # Anything else
-            value = '\\\\' + c
-        return value
-
-    def translate(self):
-        """Translate fnmatch pattern counting `|` as a separator and `-` as a negative pattern."""
-
-        result = []
-        exclude_result = []
-
-        if self.pattern[0] == '-':
-            current = exclude_result
-            pattern = self.pattern[1:]
-            current.append('')
-        else:
-            current = result
-            pattern = self.pattern
-            current.append('')
-
-        i = _StringIter(pattern)
-        iter(i)
-        for c in i:
-            if c == '*':
-                current.append('.*')
-            elif c == '?':
-                current.append('.')
-            elif c == '|':
-                try:
-                    c = next(i)
-                    if c == '-':
-                        current = exclude_result
-                    else:
-                        current = result
-                        i.rewind(1)
-                except StopIteration:
-                    # No need to append | as we are at the end.
-                    current = result
-                # Only append if we've already started the pattern
-                # This is to avoid adding a leading | to something
-                # like the exclude pattern on transition from normal
-                # to exclude pattern.
-                if current:
-                    current.append('|')
-            elif c == '\\':
-                index = i.index
-                try:
-                    current.append(self._references(i))
-                except StopIteration:
-                    i.rewind(i.index - index)
-                    current.append('\\\\')
-            elif c == '[':
-                index = i.index
-                try:
-                    current.append(self._sequence(i))
-                except StopIteration:
-                    i.rewind(i.index - index)
-                    current.append('\\[')
-            else:
-                current.append(self.engine.escape(c))
-        if not result:
-            result.append('.*')
-        if util.PY36 or self.is_regex:
-            pattern = r'(?s:%s)\Z' % ''.join(result)
-            exclude_pattern = r'(?s:%s)\Z' % ''.join(exclude_result)
-        else:
-            pattern = r'(?ms)(?:%s)\Z' % ''.join(result)
-            exclude_pattern = r'(?ms)(?:%s)\Z' % ''.join(exclude_result)
-
-        return self.engine.compile(pattern, self.flags), self.engine.compile(exclude_pattern, self.flags)
 
 
 class Search(object):
@@ -1367,31 +1107,20 @@ class _FileSearch(object):
             )
 
 
-class _DirWalker(object):
+class _DirWalker(wcm.FileCrawl):
     """Walk the directory."""
 
-    def __init__(
-        self, directory, file_pattern, file_regex_match,
-        folder_exclude, dir_regex_match, recursive,
-        show_hidden, size, modified, created, backup_location,
-        backup_to_folder=False, regex_mode=RE_MODE
+    def on_init(
+        self, size, modified, created,
+        backup_location, backup_to_folder, regex_mode=RE_MODE
     ):
-        """Init the directory walker object."""
-
-        self.abort = False
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode or regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
-        self.dir = directory
         self.size = (size[0], size[1]) if size is not None else size
         self.modified = modified
         self.created = created
-        self.file_pattern = file_pattern
-        self.file_regex_match = file_regex_match
-        self.folder_exclude = folder_exclude
-        self.dir_regex_match = dir_regex_match
-        self.recursive = recursive
-        self.show_hidden = show_hidden
+
         self.backup2folder = backup_to_folder
         if backup_location:
             self.backup_ext = ('.%s' % backup_location.lower()) if not self.backup2folder else DEFAULT_BAK
@@ -1400,36 +1129,27 @@ class _DirWalker(object):
             self.backup_ext = None
             self.backup_folder = None
 
-    def _parse_pattern(self, string, regex_match, force_default=False):
+    def compile_regexp(self, string, force_default=False):
         r"""Compile or format the inclusion\exclusion pattern."""
 
         pattern = None
-        exclude_pattern = None
-        if regex_match:
-            if not string and force_default:
-                string = r'.*'
-            if string:
-                if self.regex_mode == BREGEX_MODE:
-                    pattern = bregex.compile(string, bregex.IGNORECASE)
-                elif self.regex_mode == REGEX_MODE:
-                    pattern = regex.compile(string, regex.IGNORECASE | regex.ASCII)
-                elif self.regex_mode == BRE_MODE:
-                    pattern = bre.compile(string, bre.IGNORECASE | bre.ASCII)
-                else:
-                    pattern = re.compile(string, re.IGNORECASE | re.ASCII)
-        else:
-            if not string and force_default:
-                string = '*'
-            if string:
-                pattern, exclude_pattern = Wildcard2Regex(string).translate()
-        return pattern, exclude_pattern
+        if not string and force_default:
+            string = r'.*'
+        if string:
+            if self.regex_mode == BREGEX_MODE:
+                flags = bregex.IGNORECASE if not self.case_sensitive else 0
+                pattern = bregex.compile(string, flags | bregex.ASCII)
+            elif self.regex_mode == REGEX_MODE:
+                flags = regex.IGNORECASE if not self.case_sensitive else 0
+                pattern = regex.compile(string, flags | regex.ASCII)
+            elif self.regex_mode == BRE_MODE:
+                flags = bre.IGNORECASE if not self.case_sensitive else 0
+                pattern = bre.compile(string, flags | bre.ASCII)
+            else:
+                flags = re.IGNORECASE if not self.case_sensitive else 0
+                pattern = re.compile(string, flags | re.ASCII)
 
-    def _is_hidden(self, path):
-        """Check if file is hidden."""
-
-        if not self.show_hidden:
-            return is_hidden(path)
-        return False
+        return pattern
 
     def _compare_value(self, limit_check, current):
         """Compare file attribute against limits."""
@@ -1499,125 +1219,50 @@ class _DirWalker(object):
 
         return is_backup
 
-    def _valid_file(self, base, name):
-        """Return whether a file can be searched."""
+    def on_validate_file(self, base, name):
+        """Validate file override."""
 
-        valid = False
-        if (
-            self.re_file_pattern is not None and
-            not self._is_hidden(os.path.join(base, name)) and
-            not self._is_backup(name)
-        ):
-            valid = self.re_file_pattern.fullmatch(name) is not None
-            if self.re_exclude_file_pattern and self.re_exclude_file_pattern.fullmatch(name) is not None:
-                valid = False
-            if valid:
-                valid = self._is_size_okay(os.path.join(base, name))
-            if valid:
-                valid = self._is_times_okay(os.path.join(base, name))
+        valid = not self._is_backup(name)
+        fullname = os.path.join(base, name)
+        if valid:
+            valid = self._is_size_okay(fullname)
+        if valid:
+            valid = self._is_times_okay(fullname)
         return valid
 
-    def _valid_folder(self, base, name):
-        """Return whether a folder can be searched."""
+    def on_validate_directory(self, base, name):
+        """Validate folder override."""
 
-        valid = True
-        if not self.recursive:
-            valid = False
-        elif self._is_hidden(os.path.join(base, name)) or self._is_backup(name, True):
-            valid = False
-        elif self.re_folder_exclude is not None:
-            valid = self.re_folder_exclude.fullmatch(name) is None
-            if (
-                self.re_negated_folder_exclude is not None and
-                self.re_negated_folder_exclude.fullmatch(name) is not None
-            ):
-                valid = True
-        return valid
+        return not self._is_backup(name, True)
 
-    def kill(self):
-        """Abort process."""
+    def on_error(self, base, name):
+        """On error."""
 
-        self.abort = True
-
-    def walk(self):
-        """Start search for valid files."""
-
-        for base, dirs, files in os.walk(self.dir):
-            # Remove child folders based on exclude rules
-            for name in dirs[:]:
-                try:
-                    if not self._valid_folder(base, name):
-                        dirs.remove(name)
-                except Exception:  # pragma: no cover
-                    dirs.remove(name)
-                    yield FileAttrRecord(
-                        os.path.join(base, name),
-                        None,
-                        None,
-                        None,
-                        None,
-                        False,
-                        get_exception()
-                    )
-                if self.abort:
-                    break
-
-            # Seach files if they were found
-            if len(files):
-                # Only search files that are in the inlcude rules
-                for name in files:
-                    try:
-                        valid = self._valid_file(base, name)
-                    except Exception:  # pragma: no cover
-                        valid = False
-                        yield FileAttrRecord(
-                            os.path.join(base, name),
-                            None,
-                            None,
-                            None,
-                            None,
-                            False,
-                            get_exception()
-                        )
-
-                    if valid:
-                        filename = os.path.join(base, name)
-                        yield FileAttrRecord(
-                            filename,
-                            os.path.splitext(filename)[1].lower().lstrip('.'),
-                            self.current_size,
-                            self.modified_time,
-                            self.created_time,
-                            False,
-                            None
-                        )
-                    else:
-                        yield FileAttrRecord(os.path.join(base, name), None, None, None, None, True, None)
-
-                    if self.abort:
-                        break
-            if self.abort:
-                break
-
-    def compile_search_patterns(self):
-        """Compile search patterns."""
-
-        self.re_file_pattern, self.re_exclude_file_pattern = self._parse_pattern(
-            self.file_pattern, self.file_regex_match, force_default=True
-        )
-        self.re_folder_exclude, self.re_negated_folder_exclude = self._parse_pattern(
-            self.folder_exclude, self.dir_regex_match
+        return FileAttrRecord(
+            os.path.join(base, name),
+            None,
+            None,
+            None,
+            None,
+            get_exception()
         )
 
     def run(self):
         """Run the directory walker."""
 
-        try:
-            self.compile_search_patterns()
-            for f in self.walk():
+        self.skipped = 0
+        for f in self.walk():
+            if isinstance(f, str):
+                yield FileAttrRecord(
+                    f,
+                    os.path.splitext(f)[1].lower().lstrip('.'),
+                    self.current_size,
+                    self.modified_time,
+                    self.created_time,
+                    None
+                )
+            else:
                 yield f
-        except Exception:  # pragma: no cover
-            yield ErrorRecord(get_exception())
 
 
 class Rummage(object):
@@ -1673,11 +1318,12 @@ class Rummage(object):
             self.path_walker = _DirWalker(
                 self.target,
                 file_pattern,
-                file_regex_match,
                 folder_exclude,
-                dir_regex_match,
                 bool(self.file_flags & RECURSIVE),
                 bool(self.file_flags & SHOW_HIDDEN),
+                wcm.STRING_ESCAPES | wcm.IGNORECASE,
+                file_regex_match,
+                dir_regex_match,
                 size,
                 modified,
                 created,
@@ -1694,7 +1340,6 @@ class Rummage(object):
                         os.path.getsize(self.target),
                         getmtime(self.target),
                         getctime(self.target),
-                        False,
                         None
                     )
                 )
@@ -1705,7 +1350,6 @@ class Rummage(object):
                     None,
                     None,
                     None,
-                    False,
                     get_exception()
                 )
         elif self.buffer_input:
@@ -1716,7 +1360,6 @@ class Rummage(object):
                     len(self.target),
                     ctime(),
                     ctime(),
-                    False,
                     None
                 )
             )
@@ -1818,12 +1461,8 @@ class Rummage(object):
         folder_limit = 100
 
         for f in self.path_walker.run():
-            if hasattr(f, 'skipped') and f.skipped:
-                self.idx += 1
-                self.records += 1
-                self.skipped += 1
-                yield f
-            elif f.error:
+            self.skipped = self.path_walker.get_skipped()
+            if f.error:
                 self.idx += 1
                 self.records += 1
                 yield f
@@ -1840,6 +1479,7 @@ class Rummage(object):
 
                     for rec in self.search_file():
                         yield rec
+        self.skipped = self.path_walker.skipped.get_skipped()
 
         # Clear files if kill was signalled.
         if self.abort:
@@ -1872,16 +1512,19 @@ class Rummage(object):
                     yield result
             else:
                 # Crawl directory and search files.
-                for result in self.walk_files():
-                    yield result
+                try:
+                    for result in self.walk_files():
+                        yield result
+                except Exception:  # pragma: no cover
+                    yield ErrorRecord(get_exception())
         else:
             # No search pattern, so just return files that *would* be searched.
             for f in self.path_walker.run():
                 self.idx += 1
                 self.records += 1
-                if hasattr(f, 'skipped') and f.skipped:
-                    self.skipped += 1
+                self.skipped = self.path_walker.get_skipped()
                 yield f
 
                 if self.abort:
                     self.files.clear()
+            self.skipped = self.path_walker.get_skipped()

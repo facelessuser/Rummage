@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import contextlib
 import ctypes
 from os.path import expanduser, basename
-from .. import util
+from . import util
 
 _OSX_FOUNDATION_NOT_LOADED = 0
 _OSX_USE_FOUNDATION = 1

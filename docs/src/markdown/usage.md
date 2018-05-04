@@ -314,7 +314,7 @@ Pattern  | Meaning
 `|`      | Separates multiple patterns.
 `-`      | If used at the start of a pattern, the pattern is treated as the inverse.
 
-You can also use Python character escapes to make things like Unicode character input easier. So you can use `\x70`, `\u0070`, `\U00000070`, and `\160`, for bytes, Unicode, 32 bit Unicode, or octal style character notation. You can also use Unicode names: `\N{unicode name}` and standard Python character escapes like `\t` etc. You can also escape the the backslash to avoid special escapes: `\\`.
+You can also use Python character escapes to make things like Unicode character input easier. So you can use `\x70`, `\u0070`, `\U00000070`, and `\160`, for bytes, Unicode, 32 bit Unicode, or octal style character notation. You can also use Unicode names: `\N{unicode name}` and standard Python character escapes like `\t` etc. You can also escape the backslash to avoid special escapes: `\\`.
 
 !!! example "Example Patterns"
 

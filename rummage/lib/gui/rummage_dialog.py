@@ -228,9 +228,7 @@ class RummageThread(threading.Thread):
             _ERRORS = []
         for f in self.rummage.find():
             with _LOCK:
-                if hasattr(f, 'skipped') and f.skipped:
-                    self.no_results += 1
-                elif f.error is None and (self.file_search or f.match is not None):
+                if f.error is None and (self.file_search or f.match is not None):
                     _RESULTS.append(f)
                 else:
                     if isinstance(f, rumcore.FileRecord):
