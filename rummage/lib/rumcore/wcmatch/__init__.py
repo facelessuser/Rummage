@@ -198,6 +198,11 @@ class FileCrawl(object):
 
         return None
 
+    def on_match(self, base, name):
+        """On match."""
+
+        return _os.path.join(base, name)
+
     def get_skipped(self):
         """Get number of skipped files."""
 
@@ -244,7 +249,7 @@ class FileCrawl(object):
                             yield value
 
                     if valid:
-                        yield _os.path.join(base, name)
+                        yield self.on_match(base, name)
                     else:
                         self.skipped += 1
                         value = self.on_skip(base, name)

@@ -1253,23 +1253,18 @@ class _DirWalker(wcm.FileCrawl):
             get_exception()
         )
 
-    def run(self):
-        """Run the directory walker."""
-
-        self.skipped = 0
-        for f in self.walk():
-            if isinstance(f, str):
-                yield FileAttrRecord(
-                    f,
-                    os.path.splitext(f)[1].lower().lstrip('.'),
-                    self.current_size,
-                    self.modified_time,
-                    self.created_time,
-                    False,
-                    None
-                )
-            else:
-                yield f
+    def on_match(self, base, name):
+        """On match."""
+        f = os.path.join(base, name)
+        return FileAttrRecord(
+            f,
+            os.path.splitext(f)[1].lower().lstrip('.'),
+            self.current_size,
+            self.modified_time,
+            self.created_time,
+            False,
+            None
+        )
 
 
 class Rummage(object):
