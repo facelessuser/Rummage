@@ -96,20 +96,20 @@ class TestWildcard(unittest.TestCase):
             ['test\\m', 'test\\a']
         )
 
-        self.assertTrue(wcm.match('test\test', r'test\test', wcm.IGNORECASE | wcm.STRING_ESCAPES))
-        self.assertTrue(wcm.match('test\\test', r'test\test', wcm.IGNORECASE))
-        self.assertTrue(wcm.match('test\\test', r'test\\test', wcm.IGNORECASE | wcm.STRING_ESCAPES))
-        self.assertTrue(wcm.match('test\\\\test', r'test\\test', wcm.IGNORECASE))
-        self.assertTrue(wcm.match('test\\m', r'test\m', wcm.IGNORECASE))
-        self.assertTrue(wcm.match('test\\b', r'test\[a-z]', wcm.IGNORECASE))
-        self.assertTrue(wcm.match('test\\b', r'test\\[a-z]', wcm.IGNORECASE | wcm.STRING_ESCAPES))
-        self.assertTrue(wcm.match('test\\\\b', r'test\\[a-z]', wcm.IGNORECASE))
-        self.assertTrue(wcm.match('[', '[[]', wcm.IGNORECASE))
-        self.assertTrue(wcm.match('&', '[a&&b]', wcm.IGNORECASE))
-        self.assertTrue(wcm.match('|', '[a||b]', wcm.IGNORECASE))
-        self.assertTrue(wcm.match('~', '[a~~b]', wcm.IGNORECASE))
-        self.assertTrue(wcm.match(',', '[a-z+--A-Z]', wcm.IGNORECASE))
-        self.assertTrue(wcm.match('.', '[a-z--/A-Z]', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('test\test', r'test\test', wcm.IGNORECASE | wcm.STRING_ESCAPES))
+        self.assertTrue(wcm.fnmatch('test\\test', r'test\test', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('test\\test', r'test\\test', wcm.IGNORECASE | wcm.STRING_ESCAPES))
+        self.assertTrue(wcm.fnmatch('test\\\\test', r'test\\test', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('test\\m', r'test\m', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('test\\b', r'test\[a-z]', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('test\\b', r'test\\[a-z]', wcm.IGNORECASE | wcm.STRING_ESCAPES))
+        self.assertTrue(wcm.fnmatch('test\\\\b', r'test\\[a-z]', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('[', '[[]', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('&', '[a&&b]', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('|', '[a||b]', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('~', '[a~~b]', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch(',', '[a-z+--A-Z]', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('.', '[a-z--/A-Z]', wcm.IGNORECASE))
 
     def test_wildcard_character_notation(self):
         """Test wildcard character notations."""
@@ -762,7 +762,7 @@ class TestDirWalker(unittest.TestCase):
         for f in walker.run():
             records += 1
 
-        self.assertTrue(records == 1 or walker.skipped == 1)
+        self.assertTrue(records == 1 or walker.get_skipped() == 1)
 
     def test_size_less(self):
         """Test size less than x."""

@@ -1107,7 +1107,7 @@ class _FileSearch(object):
             )
 
 
-class _DirWalker(wcm.FileCrawl):
+class _DirWalker(wcm.FnCrawl):
     """Walk the directory."""
 
     def on_init(
@@ -1149,7 +1149,7 @@ class _DirWalker(wcm.FileCrawl):
                 flags = re.IGNORECASE if not self.case_sensitive else 0
                 pattern = re.compile(string, flags | re.ASCII)
 
-        return pattern
+        return wcm.WcMatch(pattern, None)
 
     def _compare_value(self, limit_check, current):
         """Compare file attribute against limits."""
@@ -1238,7 +1238,15 @@ class _DirWalker(wcm.FileCrawl):
     def on_skip(self, base, name):
         """On skip."""
 
-        return FileAttrRecord(os.path.join(base, name), None, None, None, None, True, None)
+        return FileAttrRecord(
+            os.path.join(base, name),
+            None,
+            None,
+            None,
+            None,
+            True,
+            None
+        )
 
     def on_error(self, base, name):
         """On error."""

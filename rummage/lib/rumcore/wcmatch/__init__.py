@@ -24,13 +24,25 @@ from __future__ import unicode_literals
 import os as _os
 import re as _re
 import functools as _functools
+from .wcparse import WcMatch
 from . import wcparse as _wcparse
 from .file_hidden import is_hidden as _is_hidden
+from . import __version__
+
+__all__ = (
+    "CASE", "IGNORECASE", "STRING_ESCAPES", "ESCAPE_CHARS", "NO_EXTRA"
+    "translate", "fnmatch", "filter", "FnCrawl", "WcMatch",
+    "version", "version_info"
+)
+
+version = __version__.version
+version_info = __version__.version_info
 
 CASE = _wcparse.CASE
 IGNORECASE = _wcparse.IGNORECASE
 STRING_ESCAPES = _wcparse.STRING_ESCAPES
 ESCAPE_CHARS = _wcparse.ESCAPE_CHARS
+NO_EXTRA = _wcparse.NO_EXTRA
 
 _CASE_FLAGS = CASE | IGNORECASE
 
@@ -63,7 +75,7 @@ def _compile(pattern, flags):  # noqa A001
         p1 = _re.compile(p1, flags)
     if p2 is not None:
         p2 = _re.compile(p2, flags)
-    return _wcparse.WcMatch(p1, p2)
+    return WcMatch(p1, p2)
 
 
 def translate(pattern, flags=0):
@@ -72,7 +84,7 @@ def translate(pattern, flags=0):
     return _wcparse.Parser(pattern, flags).parse()
 
 
-def match(filename, pattern, flags=0):
+def fnmatch(filename, pattern, flags=0):
     """
     Check if filename matches pattern.
 
@@ -80,7 +92,7 @@ def match(filename, pattern, flags=0):
     but if `case_sensitive` is set, respect that instead.
     """
 
-    return _compile(pattern, flags & _wcparse.FLAG_MASK).fullmatch(filename)
+    return _compile(pattern, flags & _wcparse.FLAG_MASK).match(filename)
 
 
 def filter(filenames, pattern, flags=0):  # noqa A001
@@ -91,20 +103,20 @@ def filter(filenames, pattern, flags=0):  # noqa A001
     obj = _compile(pattern, flags & _wcparse.FLAG_MASK)
 
     for filename in filenames:
-        if obj.fullmatch(filename):
+        if obj.match(filename):
             matches.append(filename)
     return matches
 
 
-class FileCrawl(object):
+class FnCrawl(object):
     """Walk the directory."""
 
     def __init__(self, *args, **kwargs):
         """Init the directory walker object."""
 
         args = list(args)
-        self.skipped = 0
-        self.abort = False
+        self._skipped = 0
+        self._abort = False
         self.directory = args.pop(0)
         self.file_pattern = args.pop(0) if args else kwargs.pop('file_pattern', None)
         self.folder_exclude_pattern = args.pop(0) if args else kwargs.pop('folder_exclude_pattern', None)
@@ -116,7 +128,7 @@ class FileCrawl(object):
         self.case_sensitive = _get_case(self.flags)
 
         self.on_init(*args, **kwargs)
-        self.file_check, self.folder_exclude_check = self.on_compile()
+        self.file_check, self.folder_exclude_check = self.on_compile(self.file_pattern, self.folder_exclude_pattern)
 
     def compile_wildcard(self, string, force_default=False):
         r"""Compile or format the wildcard inclusion\exclusion pattern."""
@@ -136,20 +148,22 @@ class FileCrawl(object):
             flags = _re.IGNORECASE if not self.case_sensitive else 0
             pattern = _re.compile(string, flags | _re.ASCII)
 
-        return pattern
+        return WcMatch(pattern, None)
 
-    def on_compile(self):
+    def on_compile(self, file_pattern, folder_exclude_pattern):
         """Compile patterns."""
 
-        if self.file_regex_match:
-            file_check = self.compile_regexp(self.file_pattern, force_default=True)
-        else:
-            file_check = self.compile_wildcard(self.file_pattern, force_default=True)
+        if not isinstance(file_pattern, WcMatch):
+            if self.file_regex_match:
+                file_check = self.compile_regexp(file_pattern, force_default=True)
+            else:
+                file_check = self.compile_wildcard(file_pattern, force_default=True)
 
-        if self.folder_regex_exclude_match:
-            folder_exclude_check = self.compile_regexp(self.folder_exclude_pattern)
-        else:
-            folder_exclude_check = self.compile_wildcard(self.folder_exclude_pattern)
+        if not isinstance(folder_exclude_pattern, WcMatch):
+            if self.folder_regex_exclude_match:
+                folder_exclude_check = self.compile_regexp(folder_exclude_pattern)
+            else:
+                folder_exclude_check = self.compile_wildcard(folder_exclude_pattern)
         return file_check, folder_exclude_check
 
     def _is_hidden(self, path):
@@ -162,7 +176,7 @@ class FileCrawl(object):
 
         valid = False
         if self.file_check is not None and not self._is_hidden(_os.path.join(base, name)):
-            valid = self.file_check.fullmatch(name)
+            valid = self.file_check.match(name)
         return self.on_validate_file(base, name) if valid else valid
 
     def on_validate_file(self, base, name):
@@ -177,7 +191,7 @@ class FileCrawl(object):
         if not self.recursive or self._is_hidden(_os.path.join(base, name)):
             valid = False
         elif self.folder_exclude_check is not None:
-            valid = not self.folder_exclude_check.fullmatch(name)
+            valid = not self.folder_exclude_check.match(name)
         return self.on_validate_directory(base, name) if valid else valid
 
     def on_init(self, **kwargs):
@@ -206,17 +220,17 @@ class FileCrawl(object):
     def get_skipped(self):
         """Get number of skipped files."""
 
-        return self.skipped
+        return self._skipped
 
     def kill(self):
         """Abort process."""
 
-        self.abort = True
+        self._abort = True
 
     def reset(self):
         """Revive class from a killed state."""
 
-        self.abort = False
+        self._abort = False
 
     def walk(self):
         """Start search for valid files."""
@@ -233,7 +247,7 @@ class FileCrawl(object):
                     if value:
                         yield value
 
-                if self.abort:
+                if self._abort:
                     break
 
             # Seach files if they were found
@@ -251,20 +265,20 @@ class FileCrawl(object):
                     if valid:
                         yield self.on_match(base, name)
                     else:
-                        self.skipped += 1
+                        self._skipped += 1
                         value = self.on_skip(base, name)
                         if value:
                             yield value
 
-                    if self.abort:
+                    if self._abort:
                         break
 
-            if self.abort:
+            if self._abort:
                 break
 
     def run(self):
         """Run the directory walker."""
 
-        self.skipped = 0
+        self._skipped = 0
         for f in self.walk():
             yield f

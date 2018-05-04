@@ -6,6 +6,11 @@ import unicodedata
 import copyreg
 from . import util
 
+__all__ = (
+    "CASE", "IGNORECASE", "STRING_ESCAPES", "ESCAPE_CHARS", "NO_EXTRA", "FLAG_MASK",
+    "Parser", "WcMatch"
+)
+
 _OCTAL = frozenset(('0', '1', '2', '3', '4', '5', '6', '7'))
 _STANDARD_ESCAPES = frozenset(('a', 'b', 'f', 'n', 'r', 't', 'v', '\\'))
 _CHAR_ESCAPES = frozenset(('x',))
@@ -14,12 +19,13 @@ _SET_OPERATORS = frozenset(('&', '~', '|'))
 _WILDCARD_CHARS = frozenset(('-', '[', ']', '*', '?', '|'))
 
 _CASE_FS = os.path.normcase('A') != os.path.normcase('a')
-CASE = 1
-IGNORECASE = 2
-STRING_ESCAPES = 4
-ESCAPE_CHARS = 8
+CASE = 0x0001
+IGNORECASE = 0x0002
+STRING_ESCAPES = 0x0004
+ESCAPE_CHARS = 0x0008
+NO_EXTRA = 0x0010
 
-FLAG_MASK = 0xF
+FLAG_MASK = 0x1F
 
 
 class Parser(object):
@@ -35,6 +41,7 @@ class Parser(object):
             self.is_bytes = False
         self.string_escapes = flags & STRING_ESCAPES
         self.escape_chars = flags & ESCAPE_CHARS
+        self.extra = not (flags & NO_EXTRA)
 
     def _sequence(self, i):
         """Handle fnmatch character group."""
@@ -165,7 +172,7 @@ class Parser(object):
 
         pattern = self.pattern.decode('latin-1') if self.is_bytes else self.pattern
 
-        if pattern[0] == '-':
+        if self.extra and pattern[0] == '-':
             current = exclude_result
             pattern = pattern[1:]
             current.append('')
@@ -180,7 +187,7 @@ class Parser(object):
                 current.append('.*')
             elif c == '?':
                 current.append('.')
-            elif c == '|':
+            elif self.extra and c == '|':
                 try:
                     c = next(i)
                     if c == '-':
@@ -268,7 +275,7 @@ class WcMatch(util.Immutable):
             self._exclude != other._exclude
         )
 
-    def fullmatch(self, filename):
+    def match(self, filename):
         """Match filename."""
 
         valid = self._include.fullmatch(filename) is not None
