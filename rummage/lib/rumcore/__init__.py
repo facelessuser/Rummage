@@ -1479,7 +1479,7 @@ class Rummage(object):
 
                     for rec in self.search_file():
                         yield rec
-        self.skipped = self.path_walker.skipped.get_skipped()
+        self.skipped = self.path_walker.get_skipped()
 
         # Clear files if kill was signalled.
         if self.abort:
