@@ -266,7 +266,7 @@ class RummageTestException(Exception):
     """Rummage exception."""
 
 
-class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'ext', 'size', 'modified', 'created', 'error'])):
+class FileAttrRecord(namedtuple('FileAttrRecord', ['name', 'ext', 'size', 'modified', 'created', 'skipped', 'error'])):
     """File Attributes."""
 
 
@@ -1235,6 +1235,11 @@ class _DirWalker(wcm.FileCrawl):
 
         return not self._is_backup(name, True)
 
+    def on_skip(self, base, name):
+        """On skip."""
+
+        return FileAttrRecord(os.path.join(base, name), None, None, None, None, True, None)
+
     def on_error(self, base, name):
         """On error."""
 
@@ -1244,6 +1249,7 @@ class _DirWalker(wcm.FileCrawl):
             None,
             None,
             None,
+            False,
             get_exception()
         )
 
@@ -1259,6 +1265,7 @@ class _DirWalker(wcm.FileCrawl):
                     self.current_size,
                     self.modified_time,
                     self.created_time,
+                    False,
                     None
                 )
             else:
@@ -1340,6 +1347,7 @@ class Rummage(object):
                         os.path.getsize(self.target),
                         getmtime(self.target),
                         getctime(self.target),
+                        False,
                         None
                     )
                 )
@@ -1350,6 +1358,7 @@ class Rummage(object):
                     None,
                     None,
                     None,
+                    False,
                     get_exception()
                 )
         elif self.buffer_input:
@@ -1360,6 +1369,7 @@ class Rummage(object):
                     len(self.target),
                     ctime(),
                     ctime(),
+                    False,
                     None
                 )
             )
@@ -1461,8 +1471,12 @@ class Rummage(object):
         folder_limit = 100
 
         for f in self.path_walker.run():
-            self.skipped = self.path_walker.get_skipped()
-            if f.error:
+            if hasattr(f, 'skipped') and f.skipped:
+                self.idx += 1
+                self.records += 1
+                self.skipped += 1
+                yield f
+            elif f.error:
                 self.idx += 1
                 self.records += 1
                 yield f
@@ -1479,7 +1493,6 @@ class Rummage(object):
 
                     for rec in self.search_file():
                         yield rec
-        self.skipped = self.path_walker.get_skipped()
 
         # Clear files if kill was signalled.
         if self.abort:
@@ -1522,7 +1535,8 @@ class Rummage(object):
             for f in self.path_walker.run():
                 self.idx += 1
                 self.records += 1
-                self.skipped = self.path_walker.get_skipped()
+                if hasattr(f, 'skipped') and f.skipped:
+                    self.skipped += 1
                 yield f
 
                 if self.abort:

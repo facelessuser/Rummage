@@ -163,10 +163,6 @@ class FileCrawl(object):
         valid = False
         if self.file_check is not None and not self._is_hidden(_os.path.join(base, name)):
             valid = self.file_check.fullmatch(name)
-            if valid:
-                valid = self._is_size_okay(_os.path.join(base, name))
-            if valid:
-                valid = self._is_times_okay(_os.path.join(base, name))
         return self.on_validate_file(base, name) if valid else valid
 
     def on_validate_file(self, base, name):
@@ -194,6 +190,8 @@ class FileCrawl(object):
 
     def on_skip(self, base, name):
         """On skip."""
+
+        return None
 
     def on_error(self, base, name):
         """On error."""
@@ -249,7 +247,9 @@ class FileCrawl(object):
                         yield _os.path.join(base, name)
                     else:
                         self.skipped += 1
-                        self.on_skip(base, name)
+                        value = self.on_skip(base, name)
+                        if value:
+                            yield value
 
                     if self.abort:
                         break
