@@ -465,11 +465,12 @@ class TestDirWalker(unittest.TestCase):
         """Crawl the files."""
 
         for f in walker.run():
-            if f.error:
+            if hasattr(f, 'skipped') and f.skipped:
+                self.skipped += 1
+            elif f.error:
                 self.errors.append(f)
             else:
                 self.files.append(f)
-        self.skipped = walker.get_skipped()
 
     def test_non_recursive(self):
         """Test non-recursive search."""
@@ -944,6 +945,7 @@ class TestFileSearch(unittest.TestCase):
             os.path.getsize(name),
             rc.getmtime(name),
             rc.getctime(name),
+            False,
             None
         )
 
