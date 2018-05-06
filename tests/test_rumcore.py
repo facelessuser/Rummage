@@ -25,7 +25,7 @@ class TestWildcard(unittest.TestCase):
     def test_wildcard_parsing(self):
         """Test wildcard parsing."""
 
-        p1, p2 = wcm.translate('*test[a-z]?|*test2[a-z]?|-test[!a-z]|-test[!-|a-z]')
+        p1, p2 = wcm.translate('*test[a-z]?|*test2[a-z]?|-test[!a-z]|-test[!-|a-z]', wcm.CASE)
         if util.PY36:
             self.assertEqual(p1, r'(?s:.*test[a-z].|.*test2[a-z].)\Z')
             self.assertEqual(p2, r'(?s:test[^a-z]|test[^\-\|a-z])\Z')
@@ -33,7 +33,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:.*test[a-z].|.*test2[a-z].)\Z')
             self.assertEqual(p2, r'(?ms)(?:test[^a-z]|test[^\-\|a-z])\Z')
 
-        p1, p2 = wcm.translate('test[]][!][][]')
+        p1, p2 = wcm.translate('test[]][!][][]', wcm.CASE)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test[]][^][]\[\])\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -41,7 +41,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test[]][^][]\[\])\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate('test[!]')
+        p1, p2 = wcm.translate('test[!]', wcm.CASE)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test\[\!\])\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -49,7 +49,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test\[\!\])\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate('|test|')
+        p1, p2 = wcm.translate('|test|', wcm.CASE)
         if util.PY36:
             self.assertEqual(p1, r'(?s:|test|)\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -57,7 +57,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:|test|)\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate('-|-test|-')
+        p1, p2 = wcm.translate('-|-test|-', wcm.CASE)
         if util.PY36:
             self.assertEqual(p1, r'(?s:.*)\Z')
             self.assertEqual(p2, r'(?s:|test|)\Z')
@@ -65,7 +65,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:.*)\Z')
             self.assertEqual(p2, r'(?ms)(?:|test|)\Z')
 
-        p1, p2 = wcm.translate('test[^chars]')
+        p1, p2 = wcm.translate('test[^chars]', wcm.CASE)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test[\^chars])\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -73,19 +73,19 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test[\^chars])\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1 = wcm.translate(r'test[^\-\&]')[0]
+        p1 = wcm.translate(r'test[^\-\&]', wcm.CASE)[0]
         if util.PY36:
             self.assertEqual(p1, r'(?s:test[\^\\-\\\&])\Z')
         else:
             self.assertEqual(p1, r'(?ms)(?:test[\^\\-\\\&])\Z')
 
-        p1 = wcm.translate(r'\*\?\|\[\]')[0]
+        p1 = wcm.translate(r'\*\?\|\[\]', wcm.CASE)[0]
         if util.PY36:
             self.assertEqual(p1, r'(?s:\\.*\\.\\|\\[\\])\Z')
         else:
             self.assertEqual(p1, r'(?ms)(?:\\.*\\.\\|\\[\\])\Z')
 
-        p1 = wcm.translate(r'\\u0300', wcm.STRING_ESCAPES)[0]
+        p1 = wcm.translate(r'\\u0300', wcm.CASE | wcm.RAW_STRING_ESCAPES)[0]
         if util.PY36:
             self.assertEqual(p1, r'(?s:\\u0300)\Z')
         else:
@@ -96,25 +96,25 @@ class TestWildcard(unittest.TestCase):
             ['test\\m', 'test\\a']
         )
 
-        self.assertTrue(wcm.fnmatch('test\test', r'test\test', wcm.IGNORECASE | wcm.STRING_ESCAPES))
-        self.assertTrue(wcm.fnmatch('test\\test', r'test\test', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch('test\\test', r'test\\test', wcm.IGNORECASE | wcm.STRING_ESCAPES))
-        self.assertTrue(wcm.fnmatch('test\\\\test', r'test\\test', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch('test\\m', r'test\m', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch('test\\b', r'test\[a-z]', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch('test\\b', r'test\\[a-z]', wcm.IGNORECASE | wcm.STRING_ESCAPES))
-        self.assertTrue(wcm.fnmatch('test\\\\b', r'test\\[a-z]', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch('[', '[[]', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch('&', '[a&&b]', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch('|', '[a||b]', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch('~', '[a~~b]', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch(',', '[a-z+--A-Z]', wcm.IGNORECASE))
-        self.assertTrue(wcm.fnmatch('.', '[a-z--/A-Z]', wcm.IGNORECASE))
+        self.assertTrue(wcm.fnmatch('test\test', r'test\test', wcm.RAW_STRING_ESCAPES))
+        self.assertTrue(wcm.fnmatch('test\\test', r'test\test'))
+        self.assertTrue(wcm.fnmatch('test\\test', r'test\\test', wcm.RAW_STRING_ESCAPES))
+        self.assertTrue(wcm.fnmatch('test\\\\test', r'test\\test'))
+        self.assertTrue(wcm.fnmatch('test\\m', r'test\m'))
+        self.assertTrue(wcm.fnmatch('test\\b', r'test\[a-z]'))
+        self.assertTrue(wcm.fnmatch('test\\b', r'test\\[a-z]', wcm.RAW_STRING_ESCAPES))
+        self.assertTrue(wcm.fnmatch('test\\\\b', r'test\\[a-z]'))
+        self.assertTrue(wcm.fnmatch('[', '[[]'))
+        self.assertTrue(wcm.fnmatch('&', '[a&&b]'))
+        self.assertTrue(wcm.fnmatch('|', '[a||b]'))
+        self.assertTrue(wcm.fnmatch('~', '[a~~b]'))
+        self.assertTrue(wcm.fnmatch(',', '[a-z+--A-Z]'))
+        self.assertTrue(wcm.fnmatch('.', '[a-z--/A-Z]'))
 
     def test_wildcard_character_notation(self):
         """Test wildcard character notations."""
 
-        p1, p2 = wcm.translate(r'test\x70\u0070\160\N{LATIN SMALL LETTER P}', wcm.STRING_ESCAPES)
+        p1, p2 = wcm.translate(r'test\x70\u0070\160\N{LATIN SMALL LETTER P}', wcm.CASE | wcm.RAW_STRING_ESCAPES)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test\x70\u0070\160\160)\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -122,7 +122,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test\x70\u0070\160\160)\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate(r'test[\x70][\u0070][\160][\N{LATIN SMALL LETTER P}]', wcm.STRING_ESCAPES)
+        p1, p2 = wcm.translate(r'test[\x70][\u0070][\160][\N{LATIN SMALL LETTER P}]', wcm.CASE | wcm.RAW_STRING_ESCAPES)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test[\x70][\u0070][\160][\160])\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -130,7 +130,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test[\x70][\u0070][\160][\160])\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate(r'test\t\m', wcm.STRING_ESCAPES)
+        p1, p2 = wcm.translate(r'test\t\m', wcm.CASE | wcm.RAW_STRING_ESCAPES)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test\t\\m)\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -138,7 +138,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test\t\\m)\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate(r'test[\]test', wcm.STRING_ESCAPES)
+        p1, p2 = wcm.translate(r'test[\]test', wcm.CASE | wcm.RAW_STRING_ESCAPES)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test[\\]test)\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -146,7 +146,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test[\\]test)\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate('test[\\')
+        p1, p2 = wcm.translate('test[\\', wcm.CASE)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test\[\\)\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -154,7 +154,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test\[\\)\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate(r'test\33test', wcm.STRING_ESCAPES)
+        p1, p2 = wcm.translate(r'test\33test', wcm.CASE | wcm.RAW_STRING_ESCAPES)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test\033test)\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -162,7 +162,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test\033test)\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate(r'test\33', wcm.STRING_ESCAPES)
+        p1, p2 = wcm.translate(r'test\33', wcm.CASE | wcm.RAW_STRING_ESCAPES)
         if util.PY36:
             self.assertEqual(p1, r'(?s:test\033)\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -170,7 +170,7 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p1, r'(?ms)(?:test\033)\Z')
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
-        p1, p2 = wcm.translate(r'test\400', wcm.STRING_ESCAPES)
+        p1, p2 = wcm.translate(r'test\400', wcm.CASE | wcm.RAW_STRING_ESCAPES)
         if util.PY36:
             self.assertEqual(p1, r'(?s:testĀ)\Z')
             self.assertEqual(p2, r'(?s:)\Z')
@@ -179,13 +179,13 @@ class TestWildcard(unittest.TestCase):
             self.assertEqual(p2, r'(?ms)(?:)\Z')
 
         with pytest.raises(SyntaxError):
-            wcm.translate(r'test\N', wcm.STRING_ESCAPES)
+            wcm.translate(r'test\N', wcm.RAW_STRING_ESCAPES)
 
         with pytest.raises(SyntaxError):
-            wcm.translate(r'test\Nx', wcm.STRING_ESCAPES)
+            wcm.translate(r'test\Nx', wcm.RAW_STRING_ESCAPES)
 
         with pytest.raises(SyntaxError):
-            wcm.translate(r'test\N{', wcm.STRING_ESCAPES)
+            wcm.translate(r'test\N{', wcm.RAW_STRING_ESCAPES)
 
 
 class TestHelperFunctions(unittest.TestCase):
@@ -456,7 +456,7 @@ class TestDirWalker(unittest.TestCase):
     def setUp(self):
         """Setup the tests."""
 
-        self.default_flags = wcm.STRING_ESCAPES | wcm.IGNORECASE
+        self.default_flags = wcm.RAW_STRING_ESCAPES | wcm.IGNORECASE
         self.errors = []
         self.skipped = 0
         self.files = []
@@ -464,7 +464,7 @@ class TestDirWalker(unittest.TestCase):
     def crawl_files(self, walker):
         """Crawl the files."""
 
-        for f in walker.run():
+        for f in walker.match():
             if hasattr(f, 'skipped') and f.skipped:
                 self.skipped += 1
             elif f.error:
@@ -739,7 +739,7 @@ class TestDirWalker(unittest.TestCase):
         )
 
         records = 0
-        for f in walker.run():
+        for f in walker.imatch():
             records += 1
             walker.kill()
 
@@ -759,7 +759,7 @@ class TestDirWalker(unittest.TestCase):
 
         walker.kill()
         records = 0
-        for f in walker.run():
+        for f in walker.imatch():
             records += 1
 
         self.assertTrue(records == 1 or walker.get_skipped() == 1)

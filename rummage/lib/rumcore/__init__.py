@@ -1111,15 +1111,18 @@ class _DirWalker(wcm.FnCrawl):
     """Walk the directory."""
 
     def on_init(
-        self, size, modified, created,
+        self, file_regex_match, folder_regex_exclude_match, size, modified, created,
         backup_location, backup_to_folder, regex_mode=RE_MODE
     ):
+        self.file_regex_match = file_regex_match
+        self.folder_regex_exclude_match = folder_regex_exclude_match
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode or regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
         self.regex_mode = regex_mode
         self.size = (size[0], size[1]) if size is not None else size
         self.modified = modified
         self.created = created
+        self.case_sensitive = wcm._wcparse._get_case(self.flags)
 
         self.backup2folder = backup_to_folder
         if backup_location:
@@ -1129,7 +1132,13 @@ class _DirWalker(wcm.FnCrawl):
             self.backup_ext = None
             self.backup_folder = None
 
-    def compile_regexp(self, string, force_default=False):
+        if self.file_regex_match and not isinstance(self.file_pattern, wcm.WcMatch):
+            self.file_pattern = self._compile_regexp(self.file_pattern)
+
+        if self.folder_regex_exclude_match and not isinstance(self.exclude_pattern, wcm.WcMatch):
+            self.exclude_pattern = self._compile_regexp(self.exclude_pattern)
+
+    def _compile_regexp(self, string, force_default=False):
         r"""Compile or format the inclusion\exclusion pattern."""
 
         pattern = None
@@ -1331,7 +1340,7 @@ class Rummage(object):
                 folder_exclude,
                 bool(self.file_flags & RECURSIVE),
                 bool(self.file_flags & SHOW_HIDDEN),
-                wcm.STRING_ESCAPES | wcm.IGNORECASE,
+                wcm.RAW_STRING_ESCAPES | wcm.IGNORECASE,
                 file_regex_match,
                 dir_regex_match,
                 size,
@@ -1473,7 +1482,7 @@ class Rummage(object):
 
         folder_limit = 100
 
-        for f in self.path_walker.run():
+        for f in self.path_walker.imatch():
             if hasattr(f, 'skipped') and f.skipped:
                 self.idx += 1
                 self.records += 1
