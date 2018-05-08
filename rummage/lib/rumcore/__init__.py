@@ -1340,7 +1340,7 @@ class Rummage(object):
                 folder_exclude,
                 bool(self.file_flags & RECURSIVE),
                 bool(self.file_flags & SHOW_HIDDEN),
-                wcm.RAW_STRING_ESCAPES | wcm.IGNORECASE,
+                wcm.R | wcm.I,
                 file_regex_match,
                 dir_regex_match,
                 size,
@@ -1544,7 +1544,7 @@ class Rummage(object):
                     yield ErrorRecord(get_exception())
         else:
             # No search pattern, so just return files that *would* be searched.
-            for f in self.path_walker.run():
+            for f in self.path_walker.imatch():
                 self.idx += 1
                 self.records += 1
                 if hasattr(f, 'skipped') and f.skipped:
