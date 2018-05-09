@@ -1132,11 +1132,20 @@ class _DirWalker(wcm.FnCrawl):
             self.backup_ext = None
             self.backup_folder = None
 
-        if self.file_regex_match and not isinstance(self.file_pattern, wcm.WcMatch):
-            self.file_pattern = self._compile_regexp(self.file_pattern)
+        if not isinstance(self.file_pattern, wcm.WcMatch):
+            if self.file_regex_match:
+                self.file_pattern = self._compile_regexp(self.file_pattern, force_default=True)
+            elif self.file_pattern:
+                self.file_pattern = wcm.split(self.file_pattern, self.flags)
 
-        if self.folder_regex_exclude_match and not isinstance(self.exclude_pattern, wcm.WcMatch):
-            self.exclude_pattern = self._compile_regexp(self.exclude_pattern)
+        if not isinstance(self.exclude_pattern, wcm.WcMatch):
+            if self.folder_regex_exclude_match:
+                self.exclude_pattern = self._compile_regexp(self.exclude_pattern)
+            elif self.exclude_pattern:
+                flags = self.flags
+                if self.pathname:
+                    flags |= wcm.P
+                self.exclude_pattern = wcm.split(self.exclude_pattern, flags)
 
     def _compile_regexp(self, string, force_default=False):
         r"""Compile or format the inclusion\exclusion pattern."""
@@ -1340,7 +1349,7 @@ class Rummage(object):
                 folder_exclude,
                 bool(self.file_flags & RECURSIVE),
                 bool(self.file_flags & SHOW_HIDDEN),
-                wcm.R | wcm.I,
+                wcm.C | wcm.I,
                 file_regex_match,
                 dir_regex_match,
                 size,
