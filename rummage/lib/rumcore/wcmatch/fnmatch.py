@@ -1,53 +1,88 @@
-"""Wildcard parsing."""
-from __future__ import unicode_literals
-import os
+"""
+Wild Card Match.
+
+A custom implementation of fnmatch.
+
+Licensed under MIT
+Copyright (c) 2018 Isaac Muse <isaacmuse@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
+"""
 import re
-import unicodedata
 import copyreg
+import functools
 from . import util
 
 __all__ = (
-    "FORCECASE", "IGNORECASE", "RAWSTRING", "RAWCHARS", "ESCAPES", "NOEXTRA", "PATHNAME", "FLAG_MASK",
-    "Parser", "Splitter", "WcMatch"
+    "EXTEND", "FORCECASE", "IGNORECASE", "RAWCHARS", "NONEGATE",
+    "PATHNAME", "DOT", "GLOBSTAR", "MINUSNEGATE",
+    "F", "I", "R", "N", "P", "D", "E", "G", "M",
+    "translate", "fnmatch", "filter", "fnsplit", "escape", "WcMatch"
 )
 
-_OCTAL = frozenset(('0', '1', '2', '3', '4', '5', '6', '7'))
-_STANDARD_ESCAPES = frozenset(('a', 'b', 'f', 'n', 'r', 't', 'v'))
-_CHAR_ESCAPES = frozenset(('x',))
-_UCHAR_ESCAPES = frozenset(('u', 'U'))
-_SET_OPERATORS = frozenset(('&', '~', '|'))
-_WILDCARD_CHARS = frozenset(('-', '[', ']', '*', '?', '|'))
-_HEX = frozenset(('a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'))
+SET_OPERATORS = frozenset(('&', '~', '|'))
 
-_CASE_FS = os.path.normcase('A') != os.path.normcase('a')
-FORCECASE = 0x0001
-IGNORECASE = 0x0002
-RAWSTRING = 0x0004
-RAWCHARS = 0x0008
-ESCAPES = 0x0010
-NOEXTRA = 0x0020
-PATHNAME = 0x0040
-DOT = 0x0080
+F = FORCECASE = 0x0001
+I = IGNORECASE = 0x0002
+R = RAWCHARS = 0x0004
+N = NONEGATE = 0x0008
+P = PATHNAME = 0x0010
+D = DOT = 0x0020
+E = EXTEND = 0x0040
+G = GLOBSTAR = 0x0080
+M = MINUSNEGATE = 0x0100
 
-FLAG_MASK = 0xFF
-_CASE_FLAGS = FORCECASE | IGNORECASE
+FLAG_MASK = (
+    FORCECASE |
+    IGNORECASE |
+    RAWCHARS |
+    NONEGATE |
+    PATHNAME |
+    DOT |
+    EXTEND |
+    GLOBSTAR |
+    MINUSNEGATE
+)
+CASE_FLAGS = FORCECASE | IGNORECASE
+
+RE_MAGIC = re.compile(r'(^[-!]|[*?(\[|])')
+RE_BMAGIC = re.compile(r'(^[-!]|[*?(\[|])')
 
 
 class PathNameException(Exception):
     """Path name exception."""
 
 
-def _is_case_sensitive():
-    """Check if case sensitive."""
+@functools.lru_cache(maxsize=256, typed=True)
+def _compile(pattern, flags):  # noqa A001
+    """Compile patterns."""
 
-    return _CASE_FS
+    p1, p2 = translate(pattern, flags)
+
+    if p1 is not None:
+        p1 = re.compile(p1)
+    if p2 is not None:
+        p2 = re.compile(p2)
+    return WcMatch(p1, p2)
 
 
-def _get_case(flags):
+def get_case(flags):
     """Parse flags for case sensitivity settings."""
 
-    if not bool(flags & _CASE_FLAGS):
-        case_sensitive = _is_case_sensitive()
+    if not bool(flags & CASE_FLAGS):
+        case_sensitive = util.is_case_sensitive()
     elif flags & FORCECASE and flags & IGNORECASE:
         raise ValueError("Cannot use FORCECASE and IGNORECASE flags together!")
     elif flags & FORCECASE:
@@ -57,19 +92,16 @@ def _get_case(flags):
     return case_sensitive
 
 
-class Splitter(object):
-    """Split patterns on |."""
+class Split(object):
+    """Class that splits patterns on |."""
 
     def __init__(self, pattern, flags):
         """Initialize."""
 
         self.pattern = pattern
         self.is_bytes = isinstance(pattern, bytes)
-        self.string_escapes = bool(flags & (RAWCHARS | RAWSTRING))
-        self.char_escapes = bool(flags & RAWCHARS)
-        self.bslash_escape = bool(flags & (RAWCHARS | RAWSTRING | ESCAPES))
-        self.escape_chars = bool(flags & ESCAPES)
         self.pathname = bool(flags & PATHNAME)
+        self.extend = bool(flags & EXTEND)
         self.bslash_abort = self.pathname if util.platform() == "windows" else False
 
     def _sequence(self, i):
@@ -87,8 +119,6 @@ class Splitter(object):
                 subindex = i.index
                 try:
                     self._references(i, True)
-                    if not self.escape_chars and i.previous() == ']':
-                        break
                 except PathNameException:
                     raise StopIteration
                 except StopIteration:
@@ -106,26 +136,52 @@ class Splitter(object):
             # \\
             if sequence and self.bslash_abort:
                 raise PathNameException
-            if not self.bslash_escape:
-                i.rewind(1)
         elif c == '/':
             # \/
             if sequence and self.pathname:
                 raise PathNameException
             elif self.pathname:
                 i.rewind(1)
-        elif self.escape_chars:
+        else:
             # \a, \b, \c, etc.
             pass
-        elif c in _SET_OPERATORS or c in _WILDCARD_CHARS:
-            # \?, \&, \[, etc
-            if sequence and self.bslash_abort:
-                raise PathNameException
-            i.rewind(1)
-        else:
-            # Anything else
-            if sequence and self.bslash_abort:
-                raise PathNameException
+
+    def parse_extend(self, c, i):
+        """Parse extended pattern lists."""
+
+        # Start list parsing
+        success = True
+        index = i.index
+        list_type = c
+        try:
+            c = next(i)
+            if c != '(':
+                raise StopIteration
+            while c != ')':
+                c = next(i)
+
+                if self.extend and self.parse_extend(c, i):
+                    continue
+
+                if c == '\\':
+                    index = i.index
+                    try:
+                        self._references(i)
+                    except StopIteration:
+                        i.rewind(i.index - index)
+                elif c == '[':
+                    index = i.index
+                    try:
+                        self._sequence(i)
+                    except StopIteration:
+                        i.rewind(i.index - index)
+
+        except StopIteration:
+            success = False
+            c = list_type
+            i.rewind(i.index - index)
+
+        return success
 
     def parse(self):
         """Start parsing the pattern."""
@@ -138,6 +194,9 @@ class Splitter(object):
         i = util.StringIter(pattern)
         iter(i)
         for c in i:
+            if self.extend and self.parse_extend(c, i):
+                continue
+
             if c == '|':
                 split_index.append(i.index - 1)
             elif c == '\\':
@@ -170,37 +229,37 @@ class Splitter(object):
         return tuple(parts)
 
 
-class Parser(object):
+class FnMatch(object):
     """Parse the wildcard pattern."""
 
-    def __init__(self, pattern, flags):
+    def __init__(self, pattern, flags=0):
         """Initialize."""
 
         self.pattern = pattern
+        self.negate_symbol = '-' if bool(flags & MINUSNEGATE) else '!'
         self.is_bytes = isinstance(pattern[0], bytes)
-        self.string_escapes = bool(flags & (RAWCHARS | RAWSTRING))
-        self.char_escapes = bool(flags & RAWCHARS)
-        self.bslash_escape = bool(flags & (RAWCHARS | RAWSTRING | ESCAPES))
-        self.escape_chars = bool(flags & ESCAPES)
-        self.extra = not bool(flags & NOEXTRA)
+        self.negate = not bool(flags & NONEGATE)
         self.pathname = bool(flags & PATHNAME)
+        self.raw_chars = bool(flags & RAWCHARS)
+        self.globstar = self.pathname and bool(flags & GLOBSTAR)
         self.dot = bool(flags & DOT)
-        self.case_sensitive = _get_case(flags)
+        self.extend = bool(flags & EXTEND)
+        self.case_sensitive = get_case(flags)
         self.seq_dot = r'(?<![.])'
+        self.in_list = False
+        self.flags = flags
         if util.platform() == "windows":
             self.char_avoid = (ord('\\'), ord('/'), ord('.'))
-            self.star = r'[^\\]*'
-            self.star_dot = r'(?:[^.][^\\]*)?'
-            self.seq_path = r'(?<![\\%s])'
+            self.star = r'[^\\]*?'
+            self.star_dot = r'(?:[^.][^\\]*?)?'
+            self.seq_path = r'(?<![\\/%s])'
             self.bslash_abort = self.pathname
-            self.norm_slash = '\\'
         else:
             self.char_avoid = (ord('/'), ord('.'))
-            self.star = r'[^\/]*'
-            self.star_dot = r'(?:[^.][^\/]*)?'
+            self.star = r'[^\/]*?'
+            self.star_dot = r'(?:[^.][^\/]*?)?'
             self.seq_path = r'(?<![\/%s])'
             self.bslash_abort = False
-            self.norm_slash = '/'
 
     def set_after_start(self):
         """Set tracker for character after the start of a directory."""
@@ -231,104 +290,6 @@ class Parser(object):
 
         return value
 
-    def _convert_value(self, value, sequence=True):
-        """Convert char value."""
-
-        if sequence or not (self.pathname or (self.after_start and self.dot)) or value not in self.char_avoid:
-            return '\\%03o' % value if value <= 0xFF else chr(value)
-        else:
-            return ('[%s]' % re.escape(chr(value))) + self._restrict_sequence()
-
-    def _get_unicode_name(self, index, i):
-        """Get Unicode name."""
-
-        try:
-            c = next(i)
-            if c != '{':
-                raise SyntaxError("Missing '{' in named Unicode character format at position %d!" % (i.index - 1))
-            name = []
-            c = next(i)
-            while c != '}':
-                name.append(c)
-                c = next(i)
-        except StopIteration:
-            raise SyntaxError('Incomplete named Unicode character at position %d!' % (index - 1))
-        nval = ord(unicodedata.lookup(''.join(name)))
-        return nval
-
-    def _get_wide_unicode(self, i):
-        """Get narrow Unicode."""
-
-        value = []
-        for x in range(3):
-            c = next(i)
-            if c == '0':
-                value.append(c)
-            else:  # pragma: no cover
-                raise SyntaxError('Invalid wide Unicode character at %d!' % (i.index - 1))
-
-        c = next(i)
-        if c in ('0', '1'):
-            value.append(c)
-        else:  # pragma: no cover
-            raise SyntaxError('Invalid wide Unicode character at %d!' % (i.index - 1))
-
-        for x in range(4):
-            c = next(i)
-            if c.lower() in _HEX:
-                value.append(c)
-            else:  # pragma: no cover
-                raise SyntaxError('Invalid wide Unicode character at %d!' % (i.index - 1))
-        return int(''.join(value), 16)
-
-    def _get_narrow_unicode(self, i):
-        """Get narrow Unicode."""
-
-        value = []
-        for x in range(4):
-            c = next(i)
-            if c.lower() in _HEX:
-                value.append(c)
-            else:  # pragma: no cover
-                raise SyntaxError('Invalid Unicode character at %d!' % (i.index - 1))
-        return int(''.join(value), 16)
-
-    def _get_unicode(self, i, wide=False):
-        """Parse Unicode."""
-
-        return self._get_wide_unicode(i) if wide else self._get_narrow_unicode(i)
-
-    def _get_byte(self, i):
-        """Get byte."""
-
-        value = []
-        for x in range(2):
-            c = next(i)
-            if c.lower() in _HEX:
-                value.append(c)
-            else:  # pragma: no cover
-                raise SyntaxError('Invalid byte character at %d!' % (i.index - 1))
-        return int(''.join(value), 16)
-
-    def _get_octal(self, c, i):
-        """Get octal value."""
-
-        digit = [c]
-        try:
-            for x in range(2):
-                c = next(i)
-                if c in _OCTAL:
-                    digit.append(c)
-                else:
-                    i.rewind(1)
-                    break
-        except StopIteration:
-            pass
-        value = int(''.join(digit), 8)
-        if value > 0xFF and self.is_bytes:
-            raise ValueError("octal escape value outside of range 0-0o377!")
-        return value
-
     def _sequence(self, i):
         """Handle fnmatch character group."""
 
@@ -343,7 +304,6 @@ class Parser(object):
             result.append(re.escape(c))
             c = next(i)
 
-        end_stored = False
         escape_hypen = -1
         while c != ']':
             if c == '-':
@@ -362,11 +322,6 @@ class Parser(object):
                 subindex = i.index
                 try:
                     result.append(self._references(i, True))
-                    if not self.escape_chars and i.previous() == ']':
-                        if self.pathname or (self.after_start and self.dot):
-                            result.append(self._restrict_sequence())
-                        end_stored = True
-                        break
                 except PathNameException:
                     raise StopIteration
                 except StopIteration:
@@ -375,8 +330,8 @@ class Parser(object):
             elif c == '/':
                 if self.pathname:
                     raise StopIteration
-                result.append(re.escape(self.norm_slash))
-            elif c in _SET_OPERATORS:
+                result.append(c)
+            elif c in SET_OPERATORS:
                 # Escape &, |, and ~ to avoid &&, ||, and ~~
                 result.append('\\' + c)
             else:
@@ -384,81 +339,51 @@ class Parser(object):
                 result.append(c)
             c = next(i)
 
-        if not end_stored:
-            result.append(']')
-            if self.pathname or (self.after_start and self.dot):
-                result.append(self._restrict_sequence())
+        result.append(']')
+        if self.pathname or (self.after_start and self.dot):
+            result.append(self._restrict_sequence())
 
         return ''.join(result)
 
     def _references(self, i, sequence=False):
         """Handle references."""
 
-        index = i.index
         value = ''
         c = next(i)
-        if not self.is_bytes and self.char_escapes and c in 'N':
-            # \N{Name}
-            value = self._convert_value(self._get_unicode_name(index, i), sequence)
-        elif self.char_escapes and c in _OCTAL:
-            # \000
-            value = self._convert_value(self._get_octal(c, i), sequence)
-        elif not self.is_bytes and self.char_escapes and c in _UCHAR_ESCAPES:
-            # \u, \U,
-            value = self._convert_value(self._get_unicode(i, c == "U"), sequence)
-        elif self.char_escapes and c in _CHAR_ESCAPES:
-            # \x
-            value = self._convert_value(self._get_byte(i), sequence)
-        elif self.char_escapes and c in _STANDARD_ESCAPES:
-            # \n, \v, etc. and \x.
-            value = '\\' + c
-        elif c == '\\':
+        if c == '\\':
             # \\
             if sequence and self.bslash_abort:
                 raise PathNameException
-            if self.bslash_abort:
-                self.set_start_dir()
             value = r'\\'
-            if not self.bslash_escape:
-                i.rewind(1)
+            if self.bslash_abort:
+                if not self.in_list:
+                    self.set_start_dir()
+                else:
+                    value += self._restrict_sequence()
         elif c == '/':
             # \/
             if sequence and self.pathname:
                 raise PathNameException
             if self.pathname:
-                self.set_start_dir()
                 value = r'\\'
+                if self.in_list:
+                    value += self._restrict_sequence()
                 i.rewind(1)
-            elif self.bslash_escape:
-                c = self.norm_slash
+            else:
                 value = re.escape(c)
-        elif self.escape_chars:
+        else:
             # \a, \b, \c, etc.
             value = re.escape(c)
-        elif c in _SET_OPERATORS or c in _WILDCARD_CHARS:
-            # \?, \&, \[, etc
-            if sequence and self.bslash_abort:
-                raise PathNameException
-            if self.bslash_abort:
-                self.set_start_dir()
-            value = r'\\'
-            i.rewind(1)
-        else:
-            # Anything else
-            if sequence and self.bslash_abort:
-                raise PathNameException
-            # No special need for dot hear as it would be okay
-            # if we were in a start dir scenario.
-            value = r'\\' + c
         return value
 
     def _handle_star(self, i):
         """Handle star."""
 
         star = self.star_dot if self.after_start and self.dot else self.star
-        dstar = r'(?:[^.].*)?' if self.after_start and self.dot else '.*'
-        value = dstar if not self.pathname else star
-        if self.after_start and self.pathname:
+        dstar = r'(?:[^.].*?)?' if self.after_start and self.dot else r'.*?'
+        value = dstar if not self.globstar and not self.in_list else star
+
+        if self.after_start and self.globstar:
             try:
                 c = next(i)
                 if c != '*':
@@ -471,7 +396,7 @@ class Parser(object):
             try:
                 index = i.index
                 c = next(i)
-                if c == '\\' and (self.bslash_abort or self.escape_chars):
+                if c == '\\':
                     try:
                         self._references(i, True)
                         # Was not what we expected
@@ -480,7 +405,7 @@ class Parser(object):
                     except PathNameException:
                         # Looks like escape was a valid slash
                         # Store pattern accordingly
-                        value = r'.*'
+                        value = r'.*?'
                     except StopIteration:
                         # Ran out of characters so assume backslash
                         # count as a double star
@@ -505,6 +430,104 @@ class Parser(object):
 
         return value
 
+    def parse_extend(self, c, i, current):
+        """Parse extended pattern lists."""
+
+        # Save state
+        temp_dir_start = self.dir_start
+        temp_after_start = self.after_start
+        temp_in_list = self.in_list
+        self.in_list = True
+
+        # Start list parsing
+        success = True
+        index = i.index
+        list_type = c
+        extended = []
+        try:
+            c = next(i)
+            if c != '(':
+                raise StopIteration
+            while c != ')':
+                c = next(i)
+
+                if self.extend and self.parse_extend(c, i, extended):
+                    # Track when next char needs special dot logic
+                    if self.dir_start and not self.after_start:
+                        self.set_after_start()
+                    elif not self.dir_start and self.after_start:
+                        self.reset_dir_track()
+                    continue
+
+                if c == '*':
+                    extended.append(self._handle_star(i))
+                elif c == '?':
+                    if not self.pathname:
+                        extended.append('.' + self._restrict_sequence())
+                    else:
+                        extended.append('[^.]' if self.after_start and self.dot else '.')
+                        self.reset_dir_track()
+                elif c == '/':
+                    extended.append(c)
+                    if self.pathname:
+                        extended.append(self._restrict_sequence())
+                elif c == "|":
+                    extended.append(c)
+                    if self.pathname and temp_after_start:
+                        self.set_start_dir()
+                elif c == '\\':
+                    subindex = i.index
+                    try:
+                        extended.append(self._references(i))
+                    except StopIteration:
+                        i.rewind(i.index - subindex)
+                        extended.append(r'\\')
+                        if self.pathname and self.bslash_abort:
+                            extended.append(self._restrict_sequence())
+                elif c == '[':
+                    subindex = i.index
+                    try:
+                        extended.append(self._sequence(i))
+                    except StopIteration:
+                        i.rewind(i.index - subindex)
+                        extended.append(r'\[')
+                elif c != ')':
+                    extended.append(re.escape(c))
+
+                # Track when next char needs special dot logic
+                if self.dir_start and not self.after_start:
+                    self.set_after_start()
+                elif not self.dir_start and self.after_start:
+                    self.reset_dir_track()
+
+            if list_type == '?':
+                current.append('(?:%s)?' % ''.join(extended))
+            elif list_type == '*':
+                current.append('(?:%s)*?' % ''.join(extended))
+            elif list_type == '+':
+                current.append('(?:%s)+' % ''.join(extended))
+            elif list_type == '@':
+                current.append('(?:%s)' % ''.join(extended))
+            elif list_type == '!':
+                star = self.star_dot if temp_after_start and self.dot else self.star
+                current.append('(?:(?!(?:%s))%s)' % (''.join(extended), star))
+
+        except StopIteration:
+            success = False
+            i.rewind(i.index - index)
+            assert i.index == index, "%d | %d" % (i.index, index)
+
+        # Either restore if extend parsing failed, or reset if it worked
+        if not temp_in_list:
+            self.in_list = False
+        if success:
+            self.reset_dir_track()
+        else:
+            self.dir_start = temp_dir_start
+            self.after_start = temp_after_start
+
+        return success
+
     def root(self, pattern, current):
         """Start parsing the pattern."""
 
@@ -512,6 +535,17 @@ class Parser(object):
         i = util.StringIter(pattern)
         iter(i)
         for c in i:
+
+            index = i.index
+            if self.extend and self.parse_extend(c, i, current):
+                # Track when next char needs special dot logic
+                if self.dir_start and not self.after_start:
+                    self.set_after_start()
+                elif not self.dir_start and self.after_start:
+                    self.reset_dir_track()
+                continue
+            assert i.index == index, "%d | %d" % (i.index, index)
+
             if c == '*':
                 current.append(self._handle_star(i))
             elif c == '?':
@@ -521,7 +555,7 @@ class Parser(object):
                     current.append('[^.]' if self.after_start and self.dot else '.')
                     self.reset_dir_track()
             elif c == '/':
-                current.append(re.escape(self.norm_slash))
+                current.append(c)
                 if self.pathname:
                     self.set_start_dir()
             elif c == '\\':
@@ -556,8 +590,9 @@ class Parser(object):
         empty_exclude = True
 
         for p in self.pattern:
+            p = util.norm_pattern(p, self.pathname, self.raw_chars)
             p = p.decode('latin-1') if self.is_bytes else p
-            if self.extra and p[0:1] == '-':
+            if self.negate and p[0:1] == self.negate_symbol:
                 current = exclude_result
                 p = p[1:]
                 current.append('|' if not empty_exclude else '')
@@ -573,7 +608,7 @@ class Parser(object):
             self.root(p, current)
 
         if exclude_result and not result:
-            result.append('.*')
+            result.append('.*?')
         case_flag = 'i' if not self.case_sensitive else ''
         if util.PY36:
             pattern = r'(?s%s:%s)\Z' % (case_flag, ''.join(result))
@@ -641,3 +676,62 @@ def _pickle(p):
 
 
 copyreg.pickle(WcMatch, _pickle)
+
+
+def fnsplit(pattern, flags=0):
+    """Split pattern by '|'."""
+
+    return Split(pattern, flags).parse()
+
+
+def translate(pattern, flags=0):
+    """Translate fnmatch pattern counting `|` as a separator and `-` as a negative pattern."""
+
+    return FnMatch(
+        tuple(pattern) if not isinstance(pattern, (str, bytes)) else (pattern,),
+        flags
+    ).parse()
+
+
+def fnmatch(filename, pattern, flags=0):
+    """
+    Check if filename matches pattern.
+
+    By default case sensitivity is determined by the filesystem,
+    but if `case_sensitive` is set, respect that instead.
+    """
+
+    return _compile(
+        tuple(pattern) if not isinstance(pattern, (str, bytes)) else (pattern,),
+        flags & FLAG_MASK
+    ).match(util.norm_slash(filename))
+
+
+def filter(filenames, pattern, flags=0):  # noqa A001
+    """Filter names using pattern."""
+
+    matches = []
+
+    obj = _compile(
+        tuple(pattern) if not isinstance(pattern, (str, bytes)) else (pattern,),
+        flags & FLAG_MASK
+    )
+
+    for filename in filenames:
+        filename = util.norm_slash(filename)
+        if obj.match(filename):
+            matches.append(filename)
+    return matches
+
+
+def escape(pattern):
+    """Escape."""
+
+    is_bytes = isinstance(pattern, bytes)
+
+    def replace(m):
+        """Replace."""
+
+        return '[\\%s]' % m.group(0)
+
+    return (RE_BMAGIC if is_bytes else RE_MAGIC).sub(replace, pattern)

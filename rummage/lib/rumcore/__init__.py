@@ -32,7 +32,7 @@ from time import ctime
 from backrefs import bre
 from collections import deque
 from . import text_decode
-from . import wcmatch as wcm
+from .wcmatch import wcfind
 from .file_times import getmtime, getctime
 from .. import util
 try:
@@ -743,8 +743,7 @@ class _FileSearch(object):
 
             self.text_offset = len(file_content) if self.reverse else 0
 
-            for m in pattern.finditer(file_content):
-                yield m
+            yield from pattern.finditer(file_content)
 
     def _update_buffer(self, content):
         """Update the buffer content."""
@@ -1086,11 +1085,9 @@ class _FileSearch(object):
 
         try:
             if self.search_obj.is_replace():
-                for rec in self.search_and_replace():
-                    yield rec
+                yield from self.search_and_replace()
             else:
-                for rec in self.search():
-                    yield rec
+                yield from self.search()
         except Exception:
             yield FileRecord(
                 FileInfoRecord(
@@ -1107,7 +1104,7 @@ class _FileSearch(object):
             )
 
 
-class _DirWalker(wcm.FnCrawl):
+class _DirWalker(wcfind.WcFind):
     """Walk the directory."""
 
     def on_init(
@@ -1122,7 +1119,7 @@ class _DirWalker(wcm.FnCrawl):
         self.size = (size[0], size[1]) if size is not None else size
         self.modified = modified
         self.created = created
-        self.case_sensitive = wcm._wcparse._get_case(self.flags)
+        self.case_sensitive = wcfind.fnmatch.get_case(self.flags)
 
         self.backup2folder = backup_to_folder
         if backup_location:
@@ -1132,20 +1129,20 @@ class _DirWalker(wcm.FnCrawl):
             self.backup_ext = None
             self.backup_folder = None
 
-        if not isinstance(self.file_pattern, wcm.WcMatch):
+        if not isinstance(self.file_pattern, wcfind.fnmatch.WcMatch):
             if self.file_regex_match:
                 self.file_pattern = self._compile_regexp(self.file_pattern, force_default=True)
             elif self.file_pattern:
-                self.file_pattern = wcm.split(self.file_pattern, self.flags)
+                self.file_pattern = wcfind.fnmatch.fnsplit(self.file_pattern, self.flags)
 
-        if not isinstance(self.exclude_pattern, wcm.WcMatch):
+        if not isinstance(self.exclude_pattern, wcfind.fnmatch.WcMatch):
             if self.folder_regex_exclude_match:
                 self.exclude_pattern = self._compile_regexp(self.exclude_pattern)
             elif self.exclude_pattern:
                 flags = self.flags
                 if self.pathname:
-                    flags |= wcm.P
-                self.exclude_pattern = wcm.split(self.exclude_pattern, flags)
+                    flags |= wcfind.P
+                self.exclude_pattern = wcfind.fnmatch.fnsplit(self.exclude_pattern, flags)
 
     def _compile_regexp(self, string, force_default=False):
         r"""Compile or format the inclusion\exclusion pattern."""
@@ -1167,7 +1164,7 @@ class _DirWalker(wcm.FnCrawl):
                 flags = re.IGNORECASE if not self.case_sensitive else 0
                 pattern = re.compile(string, flags | re.ASCII)
 
-        return wcm.WcMatch(pattern, None)
+        return wcfind.fnmatch.WcMatch(pattern, None)
 
     def _compare_value(self, limit_check, current):
         """Compare file attribute against limits."""
@@ -1349,7 +1346,7 @@ class Rummage(object):
                 folder_exclude,
                 bool(self.file_flags & RECURSIVE),
                 bool(self.file_flags & SHOW_HIDDEN),
-                wcm.C | wcm.I,
+                wcfind.R | wcfind.I | wcfind.M,
                 file_regex_match,
                 dir_regex_match,
                 size,
