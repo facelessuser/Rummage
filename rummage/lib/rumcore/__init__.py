@@ -1339,7 +1339,7 @@ class Rummage(object):
                 folder_exclude,
                 bool(self.file_flags & RECURSIVE),
                 bool(self.file_flags & SHOW_HIDDEN),
-                wcmatch.R | wcmatch.I | wcmatch.M | wcmatch.N,
+                wcmatch.R | wcmatch.I | wcmatch.M,
                 file_regex_match,
                 dir_regex_match,
                 size,

@@ -18,6 +18,7 @@ from rummage.lib import util
 from rummage.lib.util import epoch_timestamp as epoch
 from rummage.lib.rumcore import text_decode as td
 from rummage.lib.rumcore.wcmatch import fnmatch
+from rummage.lib.rumcore.wcmatch import wcmatch
 
 
 class TestWildcard(unittest.TestCase):
@@ -465,7 +466,7 @@ class TestDirWalker(unittest.TestCase):
     def setUp(self):
         """Setup the tests."""
 
-        self.default_flags = fnmatch.R | fnmatch.I | fnmatch.N | fnmatch.M
+        self.default_flags = wcmatch.R | wcmatch.I | wcmatch.M
         self.errors = []
         self.skipped = 0
         self.files = []
