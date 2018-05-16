@@ -26,9 +26,9 @@ from . import fnmatch
 from . import util
 
 __all__ = (
-    "FORCECASE", "IGNORECASE", "RAWCHARS", "PATHNAME", "EXTEND", "GLOBSTAR", "MINUSNEGATE",
+    "FORCECASE", "IGNORECASE", "RAWCHARS", "PATHNAME", "EXTEND", "GLOBSTAR", "MINUSNEGATE", "BRACE",
     "F", "I", "R", "P", "E", "G", "M",
-    "WcFind"
+    "WcMatch"
 )
 
 F = FORCECASE = fnmatch.FORCECASE
@@ -38,6 +38,7 @@ P = PATHNAME = fnmatch.PATHNAME
 E = EXTEND = fnmatch.EXTEND
 G = GLOBSTAR = fnmatch.GLOBSTAR
 M = MINUSNEGATE = fnmatch.MINUSNEGATE
+B = BRACE = fnmatch.BRACE
 
 FLAG_MASK = (
     FORCECASE |
@@ -46,11 +47,12 @@ FLAG_MASK = (
     PATHNAME |
     EXTEND |
     GLOBSTAR |
-    MINUSNEGATE
+    MINUSNEGATE |
+    BRACE
 )
 
 
-class WcFind(object):
+class WcMatch(object):
     """Finds files by wildcard."""
 
     def __init__(self, *args, **kwargs):
@@ -65,6 +67,7 @@ class WcFind(object):
         self.recursive = args.pop(0) if args else kwargs.pop('recursive', False)
         self.show_hidden = args.pop(0) if args else kwargs.pop('show_hidden', True)
         self.flags = (args.pop(0) if args else kwargs.pop('flags', 0)) & FLAG_MASK
+        self.flags |= fnmatch.NEGATE
         self.pathname = bool(self.flags & PATHNAME)
         if self.pathname:
             self.flags ^= PATHNAME
@@ -72,41 +75,28 @@ class WcFind(object):
         self.on_init(*args, **kwargs)
         self.file_check, self.folder_exclude_check = self._compile(self.file_pattern, self.exclude_pattern)
 
-    def _compile_wildcard(self, patterns, force_default=False, pathname=False):
+    def _compile_wildcard(self, pattern, force_default=False, pathname=False):
         """Compile or format the wildcard inclusion/exclusion pattern."""
 
-        pattern = None
+        patterns = None
         flags = self.flags
         if self.pathname:
             flags |= PATHNAME
-        return fnmatch._compile(tuple(patterns), self.flags) if patterns else pattern
+        if pattern:
+            patterns = tuple(fnmatch.fnsplit(pattern, flags=self.flags))
+        return fnmatch._compile(patterns, self.flags) if patterns else patterns
 
     def _compile(self, file_pattern, folder_exclude_pattern):
         """Compile patterns."""
 
-        if not isinstance(file_pattern, fnmatch.WcMatch):
+        if not isinstance(file_pattern, fnmatch.FnMatch):
             # Ensure file pattern is not empty
-            if (
-                file_pattern is None or
-                (isinstance(file_pattern, (str, bytes)) and not file_pattern)
-            ):
-                file_pattern = ('*',)
-
-            # Ensure if pattern is a string that it is wrapped in something iterable
-            if isinstance(file_pattern, (str, bytes)):
-                file_pattern = (file_pattern,)
-
-            # If it is an array of empty strings, assign a good default.
-            if not any(file_pattern):
-                file_pattern = ('*',)
+            if file_pattern is None:
+                file_pattern = '*'
 
             file_pattern = self._compile_wildcard(file_pattern)
 
-        if not isinstance(folder_exclude_pattern, fnmatch.WcMatch):
-
-            # Ensure if pattern is a string that it is wrapped in something iterable
-            if folder_exclude_pattern and isinstance(folder_exclude_pattern, (str, bytes)):
-                folder_exclude_pattern = (folder_exclude_pattern,)
+        if not isinstance(folder_exclude_pattern, fnmatch.FnMatch):
 
             folder_exclude_pattern = self._compile_wildcard(folder_exclude_pattern)
 

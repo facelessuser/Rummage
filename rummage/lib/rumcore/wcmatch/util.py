@@ -68,6 +68,12 @@ def is_case_sensitive():
     return CASE_FS
 
 
+def to_tuple(values):
+    """Combine values."""
+
+    return (values,) if isinstance(values, (str, bytes)) else tuple(values)
+
+
 def norm_slash(name):
     """Normalize path slashes."""
 
@@ -143,6 +149,14 @@ class StringIter(object):
 
         return self.iternext()
 
+    def match(self, pattern):
+        """Perform regex match at index."""
+
+        m = pattern.match(self._string, self._index)
+        if m:
+            self._index = m.end()
+        return m
+
     @property
     def index(self):
         """Get current index."""
@@ -153,6 +167,11 @@ class StringIter(object):
         """Get previous char."""
 
         return self._string[self._index - 1]
+
+    def advance(self, count):
+        """Advanced the index."""
+
+        self._index += count
 
     def rewind(self, count):
         """Rewind index."""
