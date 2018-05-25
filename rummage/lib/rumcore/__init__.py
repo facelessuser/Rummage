@@ -1413,13 +1413,13 @@ class _DirWalker(object):
                 string = r'.*'
             if string:
                 if self.regex_mode == BREGEX_MODE:
-                    pattern = bregex.compile(string, bregex.IGNORECASE)
+                    pattern = bregex.compile(string + r'\Z', bregex.IGNORECASE)
                 elif self.regex_mode == REGEX_MODE:
-                    pattern = regex.compile(string, regex.IGNORECASE | regex.ASCII)
+                    pattern = regex.compile(string + r'\Z', regex.IGNORECASE | regex.ASCII)
                 elif self.regex_mode == BRE_MODE:
-                    pattern = bre.compile(string, bre.IGNORECASE | (bre.ASCII if util.PY3 else 0))
+                    pattern = bre.compile(string + r'\Z', bre.IGNORECASE | (bre.ASCII if util.PY3 else 0))
                 else:
-                    pattern = re.compile(string, re.IGNORECASE | (re.ASCII if util.PY3 else 0))
+                    pattern = re.compile(string + r'\Z', re.IGNORECASE | (re.ASCII if util.PY3 else 0))
         else:
             if not string and force_default:
                 string = '*'
@@ -1511,8 +1511,8 @@ class _DirWalker(object):
             not self._is_hidden(os.path.join(base, name)) and
             not self._is_backup(name)
         ):
-            valid = self.re_file_pattern.fullmatch(name) is not None
-            if self.re_exclude_file_pattern and self.re_exclude_file_pattern.fullmatch(name) is not None:
+            valid = self.re_file_pattern.match(name) is not None
+            if self.re_exclude_file_pattern and self.re_exclude_file_pattern.match(name) is not None:
                 valid = False
             if valid:
                 valid = self._is_size_okay(os.path.join(base, name))
@@ -1529,10 +1529,10 @@ class _DirWalker(object):
         elif self._is_hidden(os.path.join(base, name)) or self._is_backup(name, True):
             valid = False
         elif self.re_folder_exclude is not None:
-            valid = self.re_folder_exclude.fullmatch(name) is None
+            valid = self.re_folder_exclude.match(name) is None
             if (
                 self.re_negated_folder_exclude is not None and
-                self.re_negated_folder_exclude.fullmatch(name) is not None
+                self.re_negated_folder_exclude.match(name) is not None
             ):
                 valid = True
         return valid
