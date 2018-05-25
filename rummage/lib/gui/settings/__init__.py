@@ -594,7 +594,11 @@ class Settings(object):
             # New string format
             filename = filename.replace('"', '\\"')
             return editor.replace(
-                "{$file}", filename).replace("{$line}", util.ustr(line)).replace("{$col}", util.ustr(col)
+                "{$file}", filename
+            ).replace(
+                "{$line}", util.ustr(line)
+            ).replace(
+                "{$col}", util.ustr(col)
             )
 
     @classmethod
