@@ -1119,7 +1119,7 @@ class _DirWalker(wcmatch.WcMatch):
         self.size = (size[0], size[1]) if size is not None else size
         self.modified = modified
         self.created = created
-        self.case_sensitive = wcmatch.fnmatch.get_case(self.flags)
+        self.case_sensitive = wcmatch._wcparse.get_case(self.flags)
 
         self.backup2folder = backup_to_folder
         if backup_location:
@@ -1129,11 +1129,11 @@ class _DirWalker(wcmatch.WcMatch):
             self.backup_ext = None
             self.backup_folder = None
 
-        if not isinstance(self.file_pattern, wcmatch.fnmatch.FnMatch):
+        if not isinstance(self.file_pattern, wcmatch._wcparse.WcRegexp):
             if self.file_regex_match:
                 self.file_pattern = self._compile_regexp(self.file_pattern, force_default=True)
 
-        if not isinstance(self.exclude_pattern, wcmatch.fnmatch.FnMatch):
+        if not isinstance(self.exclude_pattern, wcmatch._wcparse.WcRegexp):
             if self.folder_regex_exclude_match:
                 self.exclude_pattern = self._compile_regexp(self.exclude_pattern)
 
@@ -1157,7 +1157,7 @@ class _DirWalker(wcmatch.WcMatch):
                 flags = re.IGNORECASE if not self.case_sensitive else 0
                 pattern = re.compile(string, flags | re.ASCII)
 
-        return wcmatch.fnmatch.FnMatch(pattern, None)
+        return wcmatch._wcparse.WcRegexp((pattern,), tuple())
 
     def _compare_value(self, limit_check, current):
         """Compare file attribute against limits."""

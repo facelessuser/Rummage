@@ -50,7 +50,7 @@ BACK_SLASH_TRANSLATION = {
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
-elif sys.platform == "darwin":
+elif sys.platform == "darwin":  # pragma: no cover
     _PLATFORM = "osx"
 else:
     _PLATFORM = "linux"
@@ -83,7 +83,7 @@ def norm_slash(name):
         return name.replace(b'/', b"\\") if not is_case_sensitive() else name
 
 
-def norm_pattern(pattern, is_pathname, is_raw_chars):
+def norm_pattern(pattern, normalize, is_raw_chars):
     r"""
     Normalize pattern.
 
@@ -94,15 +94,14 @@ def norm_pattern(pattern, is_pathname, is_raw_chars):
     """
 
     is_bytes = isinstance(pattern, bytes)
-    is_case = is_case_sensitive()
 
-    if is_case and not is_raw_chars:
+    if not normalize and not is_raw_chars:
         return pattern
 
     def norm_char(token):
         """Normalize slash."""
 
-        if not is_case and token in ('/', b'/'):
+        if normalize and token in ('/', b'/'):
             token = br'\\' if is_bytes else r'\\'
         return token
 
@@ -111,8 +110,8 @@ def norm_pattern(pattern, is_pathname, is_raw_chars):
 
         if m.group(1):
             char = m.group(1)
-            if not is_case:
-                char = br'\\\\' if is_bytes else r'\\\\' if len(char) > 1 and is_pathname else norm_char(char)
+            if normalize:
+                char = br'\\\\' if is_bytes else r'\\\\' if len(char) > 1 else norm_char(char)
         elif m.group(2):
             char = norm_char(BACK_SLASH_TRANSLATION[m.group(2)] if is_raw_chars else m.group(2))
         elif is_raw_chars and m.group(4):
@@ -149,7 +148,7 @@ class StringIter(object):
 
         return self.iternext()
 
-    def match(self, pattern):
+    def match(self, pattern):  # pragma: no cover
         """Perform regex match at index."""
 
         m = pattern.match(self._string, self._index)
@@ -163,12 +162,12 @@ class StringIter(object):
 
         return self._index
 
-    def previous(self):
+    def previous(self):  # pragma: no cover
         """Get previous char."""
 
         return self._string[self._index - 1]
 
-    def advance(self, count):
+    def advance(self, count):  # pragma: no cover
         """Advanced the index."""
 
         self._index += count
@@ -204,7 +203,7 @@ class Immutable(object):
         for k, v in kwargs.items():
             super(Immutable, self).__setattr__(k, v)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name, value):  # pragma: no cover
         """Prevent mutability."""
 
         raise AttributeError('Class is immutable!')

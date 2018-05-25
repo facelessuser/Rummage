@@ -22,33 +22,33 @@ IN THE SOFTWARE.
 """
 import os
 from .file_hidden import is_hidden as _is_hidden
-from . import fnmatch
+from . import _wcparse
 from . import util
 
 __all__ = (
-    "FORCECASE", "IGNORECASE", "RAWCHARS", "PATHNAME", "EXTEND", "GLOBSTAR", "MINUSNEGATE", "BRACE",
+    "FORCECASE", "IGNORECASE", "RAWCHARS", "PATHNAME", "EXTGLOB", "GLOBSTAR", "BRACE", "MINUSNEGATE",
     "F", "I", "R", "P", "E", "G", "M",
     "WcMatch"
 )
 
-F = FORCECASE = fnmatch.FORCECASE
-I = IGNORECASE = fnmatch.IGNORECASE
-R = RAWCHARS = fnmatch.RAWCHARS
-P = PATHNAME = fnmatch.PATHNAME
-E = EXTEND = fnmatch.EXTEND
-G = GLOBSTAR = fnmatch.GLOBSTAR
-M = MINUSNEGATE = fnmatch.MINUSNEGATE
-B = BRACE = fnmatch.BRACE
+F = FORCECASE = _wcparse.FORCECASE
+I = IGNORECASE = _wcparse.IGNORECASE
+R = RAWCHARS = _wcparse.RAWCHARS
+P = PATHNAME = _wcparse.PATHNAME
+E = EXTGLOB = _wcparse.EXTGLOB
+G = GLOBSTAR = _wcparse.GLOBSTAR
+B = BRACE = _wcparse.BRACE
+M = MINUSNEGATE = _wcparse.MINUSNEGATE
 
 FLAG_MASK = (
     FORCECASE |
     IGNORECASE |
     RAWCHARS |
     PATHNAME |
-    EXTEND |
+    EXTGLOB |
     GLOBSTAR |
-    MINUSNEGATE |
-    BRACE
+    BRACE |
+    MINUSNEGATE
 )
 
 
@@ -67,7 +67,7 @@ class WcMatch(object):
         self.recursive = args.pop(0) if args else kwargs.pop('recursive', False)
         self.show_hidden = args.pop(0) if args else kwargs.pop('show_hidden', True)
         self.flags = (args.pop(0) if args else kwargs.pop('flags', 0)) & FLAG_MASK
-        self.flags |= fnmatch.NEGATE
+        self.flags |= _wcparse.NEGATE | _wcparse.DOTGLOB
         self.pathname = bool(self.flags & PATHNAME)
         if self.pathname:
             self.flags ^= PATHNAME
@@ -83,20 +83,20 @@ class WcMatch(object):
         if self.pathname:
             flags |= PATHNAME
         if pattern:
-            patterns = tuple(fnmatch.fnsplit(pattern, flags=self.flags))
-        return fnmatch._compile(patterns, self.flags) if patterns else patterns
+            patterns = _wcparse.WcSplit(pattern, flags=self.flags).split()
+        return _wcparse.compile(patterns, self.flags) if patterns else patterns
 
     def _compile(self, file_pattern, folder_exclude_pattern):
         """Compile patterns."""
 
-        if not isinstance(file_pattern, fnmatch.FnMatch):
+        if not isinstance(file_pattern, _wcparse.WcRegexp):
             # Ensure file pattern is not empty
             if file_pattern is None:
                 file_pattern = '*'
 
             file_pattern = self._compile_wildcard(file_pattern)
 
-        if not isinstance(folder_exclude_pattern, fnmatch.FnMatch):
+        if not isinstance(folder_exclude_pattern, _wcparse.WcRegexp):
 
             folder_exclude_pattern = self._compile_wildcard(folder_exclude_pattern)
 

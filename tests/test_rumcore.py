@@ -2,7 +2,6 @@
 """Tests for rumcore."""
 from __future__ import unicode_literals
 import unittest
-import pytest
 import os
 import re
 import regex
@@ -10,192 +9,189 @@ import codecs
 import datetime
 import tempfile
 import textwrap
-import mock
 from backrefs import bre
 from backrefs import bregex
 from rummage.lib import rumcore as rc
-from rummage.lib import util
 from rummage.lib.util import epoch_timestamp as epoch
 from rummage.lib.rumcore import text_decode as td
-from rummage.lib.rumcore.wcmatch import fnmatch
 from rummage.lib.rumcore.wcmatch import wcmatch
 
 
-class TestWildcard(unittest.TestCase):
-    """Test wildcard pattern parsing."""
+# class TestWildcard(unittest.TestCase):
+#     """Test wildcard pattern parsing."""
 
-    @mock.patch('rummage.lib.rumcore.wcmatch.util.platform')
-    @mock.patch('rummage.lib.rumcore.wcmatch.util.is_case_sensitive')
-    def test_wildcard_parsing(self, mock_iscase_sensitive, mock_platform):
-        """Test wildcard parsing."""
+#     @mock.patch('rummage.lib.rumcore.wcmatch.util.platform')
+#     @mock.patch('rummage.lib.rumcore.wcmatch.util.is_case_sensitive')
+#     def test_wildcard_parsing(self, mock_iscase_sensitive, mock_platform):
+#         """Test wildcard parsing."""
 
-        mock_platform.return_value = "linux"
-        mock_iscase_sensitive.return_value = True
-        fnmatch._compile.cache_clear()
+#         mock_platform.return_value = "linux"
+#         mock_iscase_sensitive.return_value = True
+#         fnmatch._compile.cache_clear()
 
-        p1, p2 = fnmatch.translate(
-            fnmatch.fnsplit('*test[a-z]?|*test2[a-z]?|-test[!a-z]|-test[!-|a-z]'), flags=fnmatch.N | fnmatch.M
-        )
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:(?=.).*?test[a-z].|(?=.).*?test2[a-z].)$')
-            self.assertEqual(p2, r'^(?s:test[^a-z]|test[^\-\|a-z])$')
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:(?=.).*?test[a-z].|(?=.).*?test2[a-z].)$')
-            self.assertEqual(p2, r'(?ms)^(?:test[^a-z]|test[^\-\|a-z])$')
+#         p1, p2 = fnmatch.translate(
+#             fnmatch.fnsplit('*test[a-z]?|*test2[a-z]?|-test[!a-z]|-test[!-|a-z]'), flags=fnmatch.N | fnmatch.M
+#         )
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:(?=.).*?test[a-z].|(?=.).*?test2[a-z].)$')
+#             self.assertEqual(p2, r'^(?s:test[^a-z]|test[^\-\|a-z])$')
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:(?=.).*?test[a-z].|(?=.).*?test2[a-z].)$')
+#             self.assertEqual(p2, r'(?ms)^(?:test[^a-z]|test[^\-\|a-z])$')
 
-        p1, p2 = fnmatch.translate(fnmatch.fnsplit('test[]][!][][]'))
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test[\]][^\][]\[\])$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test[\]][^\][]\[\])$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(fnmatch.fnsplit('test[]][!][][]'))
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test[\]][^\][]\[\])$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test[\]][^\][]\[\])$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate(fnmatch.fnsplit('test[!]'))
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test\[\!\])$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test\[\!\])$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(fnmatch.fnsplit('test[!]'))
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test\[\!\])$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test\[\!\])$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate(fnmatch.fnsplit('|test|'))
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:|test|)$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:|test|)$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(fnmatch.fnsplit('|test|'))
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:|test|)$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:|test|)$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate(fnmatch.fnsplit('-|-test|-'), flags=fnmatch.N | fnmatch.M)
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:.*?)$')
-            self.assertEqual(p2, r'^(?s:|test|)$')
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:.*?)$')
-            self.assertEqual(p2, r'(?ms)^(?:|test|)$')
+#         p1, p2 = fnmatch.translate(fnmatch.fnsplit('-|-test|-'), flags=fnmatch.N | fnmatch.M)
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:.*?)$')
+#             self.assertEqual(p2, r'^(?s:|test|)$')
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:.*?)$')
+#             self.assertEqual(p2, r'(?ms)^(?:|test|)$')
 
-        p1, p2 = fnmatch.translate(fnmatch.fnsplit('test[^chars]'))
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test[^chars])$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test[^chars])$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(fnmatch.fnsplit('test[^chars]'))
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test[^chars])$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test[^chars])$')
+#             self.assertEqual(p2, None)
 
-        p1 = fnmatch.translate(fnmatch.fnsplit(r'test[^\-\&]'))[0]
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test[^\-\&])$')
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test[^\-\&])$')
+#         p1 = fnmatch.translate(fnmatch.fnsplit(r'test[^\-\&]'))[0]
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test[^\-\&])$')
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test[^\-\&])$')
 
-        p1 = fnmatch.translate(fnmatch.fnsplit(r'\*\?\|\[\]'))[0]
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:\*\?\|\[\])$')
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:\*\?\|\[\])$')
+#         p1 = fnmatch.translate(fnmatch.fnsplit(r'\*\?\|\[\]'))[0]
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:\*\?\|\[\])$')
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:\*\?\|\[\])$')
 
-        p1 = fnmatch.translate(fnmatch.fnsplit(r'\\u0300', flags=fnmatch.R), flags=fnmatch.R)[0]
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:\\u0300)$')
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:\\u0300)$')
+#         p1 = fnmatch.translate(fnmatch.fnsplit(r'\\u0300', flags=fnmatch.R), flags=fnmatch.R)[0]
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:\\u0300)$')
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:\\u0300)$')
 
-        self.assertTrue(
-            fnmatch.filter(['testm', 'test\\3', 'test\\a'], fnmatch.fnsplit(r'test\m')),
-            ['testm']
-        )
+#         self.assertTrue(
+#             fnmatch.filter(['testm', 'test\\3', 'test\\a'], fnmatch.fnsplit(r'test\m')),
+#             ['testm']
+#         )
 
-        self.assertTrue(fnmatch.fnmatch('test\test', r'test\test', flags=fnmatch.R))
-        self.assertTrue(fnmatch.fnmatch('testtest', r'test\test'))
-        self.assertTrue(fnmatch.fnmatch('test\\test', r'test\\test', flags=fnmatch.R))
-        self.assertTrue(fnmatch.fnmatch('test\\test', r'test\\test'))
-        self.assertTrue(fnmatch.fnmatch('testm', r'test\m'))
-        self.assertTrue(fnmatch.fnmatch('test[a-z]', r'test\[a-z]'))
-        self.assertTrue(fnmatch.fnmatch('test\\b', r'test\\[a-z]', flags=fnmatch.R))
-        self.assertTrue(fnmatch.fnmatch('test\\b', r'test\\[a-z]'))
-        self.assertTrue(fnmatch.fnmatch('[', '[[]'))
-        self.assertTrue(fnmatch.fnmatch('&', '[a&&b]'))
-        self.assertTrue(fnmatch.fnmatch('|', '[a||b]'))
-        self.assertTrue(fnmatch.fnmatch('~', '[a~~b]'))
-        self.assertTrue(fnmatch.fnmatch(',', '[a-z+--A-Z]'))
-        self.assertTrue(fnmatch.fnmatch('.', '[a-z--/A-Z]'))
+#         self.assertTrue(fnmatch.fnmatch('test\test', r'test\test', flags=fnmatch.R))
+#         self.assertTrue(fnmatch.fnmatch('testtest', r'test\test'))
+#         self.assertTrue(fnmatch.fnmatch('test\\test', r'test\\test', flags=fnmatch.R))
+#         self.assertTrue(fnmatch.fnmatch('test\\test', r'test\\test'))
+#         self.assertTrue(fnmatch.fnmatch('testm', r'test\m'))
+#         self.assertTrue(fnmatch.fnmatch('test[a-z]', r'test\[a-z]'))
+#         self.assertTrue(fnmatch.fnmatch('test\\b', r'test\\[a-z]', flags=fnmatch.R))
+#         self.assertTrue(fnmatch.fnmatch('test\\b', r'test\\[a-z]'))
+#         self.assertTrue(fnmatch.fnmatch('[', '[[]'))
+#         self.assertTrue(fnmatch.fnmatch('&', '[a&&b]'))
+#         self.assertTrue(fnmatch.fnmatch('|', '[a||b]'))
+#         self.assertTrue(fnmatch.fnmatch('~', '[a~~b]'))
+#         self.assertTrue(fnmatch.fnmatch(',', '[a-z+--A-Z]'))
+#         self.assertTrue(fnmatch.fnmatch('.', '[a-z--/A-Z]'))
 
-    def test_wildcard_character_notation(self):
-        """Test wildcard character notations."""
+#     def test_wildcard_character_notation(self):
+#         """Test wildcard character notations."""
 
-        p1, p2 = fnmatch.translate(r'test\x70\u0070\160\N{LATIN SMALL LETTER P}', flags=fnmatch.F | fnmatch.R)
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:testpppp)$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:testpppp)$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(r'test\x70\u0070\160\N{LATIN SMALL LETTER P}', flags=fnmatch.F | fnmatch.R)
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:testpppp)$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:testpppp)$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate(r'test[\x70][\u0070][\160][\N{LATIN SMALL LETTER P}]', flags=fnmatch.F | fnmatch.R)
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test[p][p][p][p])$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test[p][p][p][p])$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(r'test[\x70][\u0070][\160][\N{LATIN SMALL LETTER P}]', flags=fnmatch.F | fnmatch.R)
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test[p][p][p][p])$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test[p][p][p][p])$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate(r'test\t\m', flags=fnmatch.F | fnmatch.R)
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test\	m)$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test\	m)$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(r'test\t\m', flags=fnmatch.F | fnmatch.R)
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test\	m)$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test\	m)$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate(r'test[\]test', flags=fnmatch.F | fnmatch.R)
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test\[\]test)$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test\[\]test)$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(r'test[\]test', flags=fnmatch.F | fnmatch.R)
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test\[\]test)$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test\[\]test)$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate('test[\\', flags=fnmatch.F)
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test\[\\)$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test\[\\)$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate('test[\\', flags=fnmatch.F)
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test\[\\)$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test\[\\)$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate(r'test\44test', flags=fnmatch.F | fnmatch.R)
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test\$test)$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test\$test)$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(r'test\44test', flags=fnmatch.F | fnmatch.R)
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test\$test)$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test\$test)$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate(r'test\44', flags=fnmatch.F | fnmatch.R)
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test\$)$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test\$)$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(r'test\44', flags=fnmatch.F | fnmatch.R)
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test\$)$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test\$)$')
+#             self.assertEqual(p2, None)
 
-        p1, p2 = fnmatch.translate(r'test\400', flags=fnmatch.F | fnmatch.R)
-        if util.PY36:
-            self.assertEqual(p1, r'^(?s:test\Ā)$')
-            self.assertEqual(p2, None)
-        else:
-            self.assertEqual(p1, r'(?ms)^(?:test\Ā)$')
-            self.assertEqual(p2, None)
+#         p1, p2 = fnmatch.translate(r'test\400', flags=fnmatch.F | fnmatch.R)
+#         if util.PY36:
+#             self.assertEqual(p1, r'^(?s:test\Ā)$')
+#             self.assertEqual(p2, None)
+#         else:
+#             self.assertEqual(p1, r'(?ms)^(?:test\Ā)$')
+#             self.assertEqual(p2, None)
 
-        with pytest.raises(SyntaxError):
-            fnmatch.translate(r'test\N', flags=fnmatch.R)
+#         with pytest.raises(SyntaxError):
+#             fnmatch.translate(r'test\N', flags=fnmatch.R)
 
-        with pytest.raises(SyntaxError):
-            fnmatch.translate(r'test\Nx', flags=fnmatch.R)
+#         with pytest.raises(SyntaxError):
+#             fnmatch.translate(r'test\Nx', flags=fnmatch.R)
 
-        with pytest.raises(SyntaxError):
-            fnmatch.translate(r'test\N{', flags=fnmatch.R)
+#         with pytest.raises(SyntaxError):
+#             fnmatch.translate(r'test\N{', flags=fnmatch.R)
 
 
 class TestHelperFunctions(unittest.TestCase):
