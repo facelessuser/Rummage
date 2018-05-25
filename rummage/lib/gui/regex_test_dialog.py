@@ -283,7 +283,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
             return self.imported_plugin[1].get_replace()
         except Exception:
-            raise PluginException(str(traceback.format_exc()))
+            raise PluginException(util.ustr(traceback.format_exc()))
 
     def test_regex(self):
         """Test and highlight search results in content buffer."""
@@ -311,7 +311,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.reset_highlights()
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.replace_attr)
-                self.m_test_replace_text.SetValue(self.m_test_text.GetValue())
+                self.m_test_replace_text.SetValue(util.replace_surrogates(self.m_test_text.GetValue()))
                 self.testing = False
                 return
 
@@ -375,7 +375,8 @@ class RegexTestDialog(gui.RegexTestDialog):
                     flags |= engine.UNICODE
                     rum_flags |= rumcore.UNICODE
                 else:
-                    flags |= engine.ASCII
+                    if util.PY3:
+                        flags |= engine.ASCII
                     rum_flags |= rumcore.ASCII
                 if is_regex:
                     if self.m_dotmatch_checkbox.GetValue():
@@ -386,6 +387,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     search_text = engine.escape(self.m_regex_text.GetValue())
 
             try:
+                search_text = util.preprocess_search(search_text, self.regex_mode, not is_regex)
                 if self.regex_mode == rumcore.BREGEX_MODE:
                     test = bregex.compile(search_text, flags)
                 elif self.regex_mode == rumcore.REGEX_MODE:
@@ -397,7 +399,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             except Exception as e:
                 self.reset_highlights()
                 self.testing = False
-                text = str(e)
+                text = util.ustr(e)
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr)
                 self.m_test_replace_text.SetValue(text)
@@ -446,7 +448,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             except PluginException:
                 self.imported_plugin = None
                 self.testing = False
-                text = str(traceback.format_exc())
+                text = util.ustr(traceback.format_exc())
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr)
                 self.m_test_replace_text.SetValue(text)
@@ -454,7 +456,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             except Exception as e:
                 self.imported_plugin = None
                 self.testing = False
-                text = str(e)
+                text = util.ustr(e)
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr)
                 self.m_test_replace_text.SetValue(text)
@@ -496,7 +498,7 @@ class RegexTestDialog(gui.RegexTestDialog):
 
                         except Exception as e:
                             if not errors:
-                                new_text = [str(e)]
+                                new_text = [util.ustr(e)]
                                 replace_test = None
                                 errors = True
 
@@ -506,7 +508,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                             self.highlight_attr
                         )
                 except Exception as e:
-                    new_text = [str(e)]
+                    new_text = [util.ustr(e)]
                     replace_test = None
                     errors = True
                 if reverse:
@@ -516,10 +518,10 @@ class RegexTestDialog(gui.RegexTestDialog):
                 value = ''.join(list(new_text))
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr if errors else self.replace_attr)
-                self.m_test_replace_text.SetValue(value)
+                self.m_test_replace_text.SetValue(util.replace_surrogates(value))
 
             except Exception:
-                print(str(traceback.format_exc()))
+                print(util.ustr(traceback.format_exc()))
             self.testing = False
 
     def regex_start_event(self, event):
@@ -615,6 +617,12 @@ class RegexTestDialog(gui.RegexTestDialog):
     def on_replace_changed(self, event):
         """On replace pattern change."""
 
+        if util.PY2 and util.NARROW:
+            old_string = self.m_replace_text.GetValue()
+            new_string = util.replace_surrogates(old_string, pattern=True)
+            if new_string != old_string:
+                self.m_replace_text.ChangeValue(new_string)
+
         if self.m_replace_plugin_checkbox.GetValue():
             pth = self.m_replace_text.GetValue()
             if os.path.exists(pth) and os.path.isfile(pth):
@@ -631,6 +639,11 @@ class RegexTestDialog(gui.RegexTestDialog):
     def on_regex_changed(self, event):
         """On regex changed."""
 
+        if util.PY2 and util.NARROW:
+            old_string = self.m_regex_text.GetValue()
+            new_string = util.replace_surrogates(old_string, pattern=True)
+            if new_string != old_string:
+                self.m_regex_text.ChangeValue(new_string)
         self.regex_start_event(event)
 
     on_regex_toggle = regex_start_event

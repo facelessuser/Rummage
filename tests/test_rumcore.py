@@ -182,10 +182,19 @@ class TestWildcard(unittest.TestCase):
 class TestHelperFunctions(unittest.TestCase):
     """Test helper functions."""
 
+    def test_to_ascii(self):
+        """Test unicode coversion to ascii."""
+
+        unicode_string = "test"
+        self.assertTrue(isinstance(util.to_ascii_bytes(unicode_string), util.bstr))
+
     def test_re_flags(self):
         """Test the re flag settings."""
 
-        default = re.ASCII
+        if util.PY3:
+            default = re.ASCII
+        else:
+            default = 0
 
         self.assertEqual(rc._re_pattern(r"test").flags, default)
         self.assertEqual(rc._re_pattern(r"test", rc.MULTILINE).flags, re.MULTILINE | default)
@@ -201,7 +210,10 @@ class TestHelperFunctions(unittest.TestCase):
     def test_re_literal_flags(self):
         """Test the literal re flags."""
 
-        default = re.ASCII
+        if util.PY3:
+            default = re.ASCII
+        else:
+            default = 0
 
         self.assertEqual(rc._re_literal_pattern(r"test").flags, default)
         self.assertEqual(rc._re_literal_pattern(r"test", rc.IGNORECASE).flags, re.IGNORECASE | default)
@@ -213,7 +225,10 @@ class TestHelperFunctions(unittest.TestCase):
     def test_bre_flags(self):
         """Test the bre flag settings."""
 
-        default = re.ASCII
+        if util.PY3:
+            default = re.ASCII
+        else:
+            default = 0
 
         self.assertEqual(rc._bre_pattern(r"test").flags, default)
         self.assertEqual(rc._bre_pattern(r"test", rc.MULTILINE).flags, bre.MULTILINE | default)

@@ -123,7 +123,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
     def is_string(self, value):
         """Check if string."""
 
-        return isinstance(value, str)
+        return isinstance(value, util.ustr)
 
     def is_dict(self, value):
         """Check if a dict."""

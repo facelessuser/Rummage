@@ -585,15 +585,17 @@ class Settings(object):
                 arg.replace(
                     "{$file}", filename
                 ).replace(
-                    "{$line}", str(line)
+                    "{$line}", util.ustr(line)
                 ).replace(
-                    "{$col}", str(col)
+                    "{$col}", util.ustr(col)
                 ) for arg in editor
             ]
         else:
             # New string format
             filename = filename.replace('"', '\\"')
-            return editor.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col))
+            return editor.replace(
+                "{$file}", filename).replace("{$line}", util.ustr(line)).replace("{$col}", util.ustr(col)
+            )
 
     @classmethod
     def set_editor(cls, editor):

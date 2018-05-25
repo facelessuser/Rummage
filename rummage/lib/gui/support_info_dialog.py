@@ -32,7 +32,7 @@ from .. import __meta__
 def list2string(obj):
     """Convert list to string."""
 
-    return '.'.join([str(x) for x in obj])
+    return '.'.join([util.ustr(x) for x in obj])
 
 
 def format_version(module, attr, call=False):
@@ -47,9 +47,9 @@ def format_version(module, attr, call=False):
         print(e)
         version = 'Version could not be acquired!'
 
-    if not isinstance(version, str):
+    if not isinstance(version, util.string_type):
         version = list2string(version)
-    return version
+    return util.ustr(version)
 
 
 class SupportInfoDialog(gui.SupportInfoDialog):

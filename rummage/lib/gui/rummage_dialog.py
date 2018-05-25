@@ -355,7 +355,7 @@ class RummageFrame(gui.RummageFrame):
         self.checking_updates = False
         self.imported_plugins = {}
         if start_path is None:
-            start_path = os.getcwd()
+            start_path = util.getcwd()
 
         # Setup debugging
         self.set_keybindings(
@@ -1229,7 +1229,7 @@ class RummageFrame(gui.RummageFrame):
                     replace_obj = util.preprocess_replace(replace_obj)
 
             search_chain.add(
-                search_obj['search'],
+                util.preprocess_search(search_obj['search'], mode, is_literal),
                 replace_obj,
                 flags
             )
@@ -1376,7 +1376,7 @@ class RummageFrame(gui.RummageFrame):
                         elif args.regex_mode == rumcore.RE_MODE and args.regexp:
                             replace_pattern = util.preprocess_replace(args.replace)
                     search_chain.add(
-                        args.pattern,
+                        util.preprocess_search(args.pattern, args.regex_mode, not args.regexp),
                         replace_pattern,
                         flags & rumcore.SEARCH_MASK
                     )
@@ -1385,8 +1385,16 @@ class RummageFrame(gui.RummageFrame):
             'target': args.target,
             'chain': search_chain,
             'flags': flags & rumcore.FILE_MASK,
-            'filepattern': args.filepattern,
-            'directory_exclude': args.directory_exclude,
+            'filepattern': util.preprocess_search(
+                args.filepattern,
+                (args.regex_mode if flags & rumcore.FILE_REGEX_MATCH else rumcore.RE_MODE),
+                False
+            ),
+            'directory_exclude': util.preprocess_search(
+                args.directory_exclude,
+                (args.regex_mode if flags & rumcore.DIR_REGEX_MATCH else rumcore.RE_MODE),
+                False
+            ),
             'force_encode': args.force_encode,
             'modified_compare': args.modified_compare,
             'created_compare': args.created_compare,
@@ -1750,7 +1758,7 @@ class RummageFrame(gui.RummageFrame):
                 flags |= engine.IGNORECASE
             if self.m_unicode_checkbox.GetValue():
                 flags |= engine.UNICODE
-        return self.validate_regex(self.m_searchfor_textbox.Value, flags)
+        return self.validate_regex(util.preprocess_search(self.m_searchfor_textbox.Value, mode, False), flags)
 
     def validate_chain_regex(self, pattern, cflags):
         """Validate chain regex."""
@@ -1795,7 +1803,7 @@ class RummageFrame(gui.RummageFrame):
             if cflags & rumcore.UNICODE:
                 flags |= engine.UNICODE
 
-        return self.validate_regex(pattern, flags)
+        return self.validate_regex(util.preprocess_search(pattern, mode, cflags & rumcore.LITERAL), flags)
 
     def validate_regex(self, pattern, flags=0):
         """Validate regular expresion compiling."""

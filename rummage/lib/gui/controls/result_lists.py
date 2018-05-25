@@ -259,8 +259,8 @@ class ResultFileList(DynamicList):
                 filename = self.GetItem(item, col=FILE_NAME).GetText()
                 path = self.GetItem(item, col=FILE_PATH).GetText()
                 target = os.path.join(path, filename)
-                line = str(self.get_map_item(item, col=FILE_LINE))
-                col = str(self.get_map_item(item, col=FILE_COL))
+                line = util.ustr(self.get_map_item(item, col=FILE_LINE))
+                col = util.ustr(self.get_map_item(item, col=FILE_COL))
             if target:
                 fileops.open_editor(target, line, col)
         else:
@@ -271,8 +271,8 @@ class ResultFileList(DynamicList):
                     filename = self.GetItem(item, col=FILE_NAME).GetText()
                     path = self.GetItem(item, col=FILE_PATH).GetText()
                     target = os.path.join(path, filename)
-                    line = str(self.get_map_item(item, col=FILE_LINE))
-                    col = str(self.get_map_item(item, col=FILE_COL))
+                    line = util.ustr(self.get_map_item(item, col=FILE_LINE))
+                    col = util.ustr(self.get_map_item(item, col=FILE_COL))
                 if target:
                     fileops.open_editor(target, line, col)
                 item = self.GetNextSelected(item)
@@ -521,7 +521,7 @@ class ResultContentList(DynamicList):
                 filename = self.GetItem(item, col=CONTENT_PATH).GetText()
                 line = self.GetItem(item, col=CONTENT_LINE).GetText()
                 file_row = self.get_map_item(item, col=CONTENT_KEY)
-                col = str(self.get_map_item(item, col=CONTENT_COL))
+                col = util.ustr(self.get_map_item(item, col=CONTENT_COL))
                 path = self.main_window.m_result_file_list.get_map_item(
                     file_row, col=FILE_PATH, absolute=True
                 )
@@ -541,7 +541,7 @@ class ResultContentList(DynamicList):
                 )
                 target = os.path.join(path, filename)
                 line = self.GetItem(item, col=CONTENT_LINE).GetText()
-                col = str(self.get_map_item(item, col=CONTENT_COL))
+                col = util.ustr(self.get_map_item(item, col=CONTENT_COL))
             if target:
                 fileops.open_editor(target, line, col)
         else:
@@ -557,7 +557,7 @@ class ResultContentList(DynamicList):
                     )
                     target = os.path.join(path, filename)
                     line = self.GetItem(item, col=CONTENT_LINE).GetText()
-                    col = str(self.get_map_item(item, col=CONTENT_COL))
+                    col = util.ustr(self.get_map_item(item, col=CONTENT_COL))
                 if target and target not in found:
                     found.add(target)
                     fileops.open_editor(target, line, col)

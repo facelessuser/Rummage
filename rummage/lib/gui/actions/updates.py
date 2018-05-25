@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from ... import __version__
 import json
 import re
-from urllib.request import urlopen
+from ... import util
 
 RE_VER = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)(?:\.(?P<micro>\d+))?(?:(?P<type>a|b|rc|post)(?P<pre_post>\d+))?')
 releases = {"a": 'alpha', "b": 'beta', "rc": 'candidate', "post": 'final'}
@@ -21,6 +21,10 @@ def parse_version(ver, pre=False):
         return (0, 0, 0, 'alpha', 0, 0)
     micro = int(m.group('micro')) if m.group('micro') else 0
 
+    if util.PY2 and int(m.group('major')) > 3:
+        # Python 2 will only be supported up to 3.X.X
+        return (0, 0, 0, 'alpha', 0, 0)
+
     return (int(m.group('major')), int(m.group('minor')), micro, rtype, 0)
 
 
@@ -29,7 +33,7 @@ def check_update(pre=False):
 
     latest_ver_str = None
     url = 'https://pypi.python.org/pypi/rummage/json'
-    response = urlopen(url, timeout=5)
+    response = util.urlopen(url, timeout=5)
     data = json.loads(response.read().decode('utf-8'))
     latest = (0, 0, 0, 'alpha', 0)
     latest_str = None
@@ -40,5 +44,4 @@ def check_update(pre=False):
             latest_str = ver
     if __version__.version_info < latest:
         latest_ver_str = latest_str
-
     return latest_ver_str
