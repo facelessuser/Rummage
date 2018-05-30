@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 import contextlib
 import ctypes
-from os.path import expanduser, basename
+import os
 from . import util
 
 _OSX_FOUNDATION_NOT_LOADED = 0
@@ -18,28 +18,43 @@ def platform_not_implemented(path):
     raise NotImplementedError
 
 
+def is_nix_hidden(path):
+    """Check if hidden for Linux."""
+
+    f = os.path.basename(path)
+    return f.startswith('.')
+
+
+def is_nix_hidden_bytes(path):
+    """Check if hidden for Linux."""
+
+    f = os.path.basename(path)
+    return f.startswith(b'.')
+
+
 if util.platform() == "windows":
     def is_win_hidden(path):
         """Check if hidden for Windows."""
 
-        f = basename(path)
+        f = os.path.basename(path)
         attrs = ctypes.windll.kernel32.GetFileAttributesW(path)
-        return (attrs != -1 and bool(attrs & 2)) or (f.startswith('.') and f != "..")
+        return (attrs != -1 and bool(attrs & 2)) or f.startswith('.')
+
+    def is_win_hidden_bytes(path):
+        """Check if bytes hidden for Windows."""
+
+        f = os.path.basename(path)
+        attrs = ctypes.windll.kernel32.GetFileAttributesA(path)
+        return (attrs != -1 and bool(attrs & 2)) or f.startswith(b'.')
 else:
     is_win_hidden = platform_not_implemented
-
-
-def is_nix_hidden(path):
-    """Check if hidden for Linux."""
-
-    f = basename(path)
-    return f.startswith('.') and f != ".."
+    is_win_hidden_bytes = platform_not_implemented
 
 
 def _test(fn):
     """Test if osx hidden is working."""
 
-    path = expanduser("~/Library")
+    path = os.path.expanduser("~/Library")
     is_osx_hidden(path)
     # print "OSX Hidden Method: %d, Test Path: %s, Result: %s"  % (_OSX_FOUNDATION_METHOD, path, str(fn(path)))
 
@@ -85,12 +100,10 @@ if util.platform() == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LO
                 for obj in objects:
                     cf.CFRelease(obj)
 
-        def is_osx_hidden(path):
+        def is_osx_hidden_bytes(path):
             """OSX platform is_hidden."""
 
             # Convert file name to bytes
-            if not isinstance(path, bytes):
-                path = path.encode('UTF-8')
 
             objects = []
             with cfreleasing(objects):
@@ -106,15 +119,20 @@ if util.platform() == "osx" and _OSX_FOUNDATION_METHOD == _OSX_FOUNDATION_NOT_LO
                     return True if result else False
                 raise OSError('CFURLCopyResourcePropertyForKey failed')
 
+        def is_osx_hidden(path):
+            """OSX platform is_hidden (bytes)."""
+
+            return is_osx_hidden_bytes(os.fsencode(path))
+
         _OSX_FOUNDATION_METHOD = _OSX_USE_CORE_FOUNDATION
         _test(is_osx_hidden)
     except Exception:
         is_osx_hidden = is_nix_hidden
         _OSX_FOUNDATION_METHOD = _OSX_FOUNDATION_NOT_LOADED
 
-
-if util.platform() != "osx":
+else:
     is_osx_hidden = platform_not_implemented
+    is_osx_hidden_bytes = platform_not_implemented
 
 
 def is_hidden(path):
@@ -133,9 +151,25 @@ def is_hidden(path):
         return is_nix_hidden(path)
 
 
+def is_hidden_bytes(path):
+    """Return if file is hidden based on platform rules."""
+
+    platform = util.platform()
+    if platform == "windows":
+        return is_win_hidden_bytes(path)
+    elif platform == "osx":
+        if is_nix_hidden_bytes(path):
+            return True
+        elif _OSX_FOUNDATION_METHOD != _OSX_FOUNDATION_NOT_LOADED:
+            return is_osx_hidden_bytes(path)
+        return False
+    else:
+        return is_nix_hidden_bytes(path)
+
+
 if __name__ == '__main__':
     import sys
 
     for arg in sys.argv[1:]:
-        filename = expanduser(arg)
+        filename = os.path.expanduser(arg)
         print('{}: {}'.format(filename, is_hidden(filename)))

@@ -26,9 +26,12 @@ import bracex
 from collections import namedtuple
 from . import util
 
-RE_WIN_PATH = re.compile(r'(\\{4}[^\\]+\\{2}[^\\]+|[a-z]:)(\\{2}|$)')
+RE_WIN_PATH = re.compile(r'((?:\\\\|/){2}[^\\/]+(?:\\\\|/){1}[^\\/]+|[a-z]:)((?:\\\\|/){1}|$)')
+RE_BWIN_PATH = re.compile(br'((?:\\\\|/){2}[^\\/]+(?:\\\\|/){1}[^\\/]+|[a-z]:)((?:\\\\|/){1}|$)')
+RE_WIN_MAGIC = re.compile(r'([-!*?(\[|^{]|(?<!\\)(?:(?:[\\]{2})*)\\(?!\\))')
+RE_BWIN_MAGIC = re.compile(br'([-!*?(\[|^{]|(?<!\\)(?:(?:[\\]{2})*)\\(?!\\))')
 RE_MAGIC = re.compile(r'([-!*?(\[|^{\\])')
-RE_BMAGIC = re.compile(r'([-!*?(\[|^{\\])')
+RE_BMAGIC = re.compile(br'([-!*?(\[|^{\\])')
 
 SET_OPERATORS = frozenset(('&', '~', '|'))
 NEGATIVE_SYM = frozenset((b'!', '!'))
@@ -45,6 +48,9 @@ EXTGLOB = 0x0080
 GLOBSTAR = 0x0100
 BRACE = 0x0200
 
+# Internal flag
+_FORCEWIN = 0x10000
+
 FLAG_MASK = (
     FORCECASE |
     IGNORECASE |
@@ -55,7 +61,8 @@ FLAG_MASK = (
     DOTGLOB |
     EXTGLOB |
     GLOBSTAR |
-    BRACE
+    BRACE |
+    _FORCEWIN
 )
 CASE_FLAGS = FORCECASE | IGNORECASE
 
@@ -118,7 +125,7 @@ class InvPlaceholder(str):
     """Placeholder for inverse pattern !(...)."""
 
 
-class WcGlob(namedtuple('WcGlob', ['pattern', 'is_magic', 'is_globstar', 'dir_only'])):
+class WcGlob(namedtuple('WcGlob', ['pattern', 'is_magic', 'is_globstar', 'dir_only', 'is_drive'])):
     """File Glob."""
 
 
@@ -174,38 +181,27 @@ def translate(patterns, flags):
     negative = []
     if isinstance(patterns, (str, bytes)):
         patterns = [patterns]
-    is_bytes = isinstance(patterns[0], bytes)
-
-    if util.PY36:
-        any_name = br'^(?s:.*?)$' if is_bytes else r'^(?s:.*?)$'
-    else:
-        any_name = br'(?ms)^(?:.*?)$' if is_bytes else r'(?ms)^(?:.*?)$'
 
     for pattern in patterns:
         for expanded in expand_braces(pattern, flags):
-            (negative if is_negative(expanded, flags) else positive).append(WcParse(pattern, flags & FLAG_MASK).parse())
-
-    if negative and not positive:
-        positive.append(any_name)
+            (negative if is_negative(expanded, flags) else positive).append(
+                WcParse(expanded, flags & FLAG_MASK).parse()
+            )
 
     return positive, negative
 
 
-def compile(patterns, flags, translate=False):  # noqa A001
+def compile(patterns, flags):  # noqa A001
     """Compile patterns."""
 
     positive = []
     negative = []
     if isinstance(patterns, (str, bytes)):
         patterns = [patterns]
-    is_bytes = isinstance(patterns[0], bytes)
 
     for pattern in patterns:
         for expanded in expand_braces(pattern, flags):
             (negative if is_negative(expanded, flags) else positive).append(_compile(expanded, flags))
-
-    if negative and not positive:
-        positive.append(re.compile(br'^.*?$' if is_bytes else r'^.*?$'))
 
     return WcRegexp(tuple(positive), tuple(negative))
 
@@ -245,8 +241,9 @@ class WcPathSplit(object):
     def __init__(self, pattern, flags):
         """Initialize."""
 
+        self.unix = is_unix_style(flags) and not flags & _FORCEWIN
         self.flags = flags
-        self.pattern = util.norm_pattern(pattern, True, flags & RAWCHARS)
+        self.pattern = util.norm_pattern(pattern, not self.unix, flags & RAWCHARS)
         if is_negative(self.pattern, flags):
             self.pattern = self.pattern[0:1]
         if flags & NEGATE:
@@ -254,7 +251,7 @@ class WcPathSplit(object):
         self.flags = flags
         self.is_bytes = isinstance(pattern, bytes)
         self.extend = bool(flags & EXTGLOB)
-        if util.platform() == "windows":
+        if not self.unix:
             self.win_drive_detect = True
             self.bslash_abort = True
             self.sep = '\\'
@@ -262,8 +259,10 @@ class WcPathSplit(object):
             self.win_drive_detect = False
             self.bslash_abort = False
             self.sep = '/'
-        self.magic = False
+        # Once split, Windows file names will never have `\\` in them,
+        # so we can use the unix matgic detect
         self.re_magic = RE_MAGIC if not self.is_bytes else RE_BMAGIC
+        self.magic = False
 
     def is_magic(self, name):
         """Check if name contains magic characters."""
@@ -354,14 +353,14 @@ class WcPathSplit(object):
     def store(self, value, l, dir_only):
         """Group patterns by literals and potential magic patterns."""
 
-        if l and value == '':
+        if l and value in (b'', ''):
             return
 
-        globstar = value == '**'
+        globstar = value in (b'**', '**')
         magic = self.is_magic(value)
         if magic:
             value = compile(value, self.flags)
-        l.append(WcGlob(value, magic, globstar, dir_only))
+        l.append(WcGlob(value, magic, globstar, dir_only, False))
 
     def split(self):
         """Start parsing the pattern."""
@@ -380,11 +379,9 @@ class WcPathSplit(object):
             m = RE_WIN_PATH.match(pattern)
             if m:
                 drive = m.group(0).replace('\\\\', '\\')
-                dir_only = drive.endswith('\\')
-                drive = drive.rstrip('\\')
                 if self.is_bytes:
                     drive = drive.encode('latin-1')
-                parts.append(WcGlob(drive, False, False, dir_only))
+                parts.append(WcGlob(drive, False, False, True, True))
                 start = m.end(0) - 1
                 i.advance(start + 1)
 
@@ -428,7 +425,7 @@ class WcPathSplit(object):
             if value:
                 self.store(value, parts, False)
         if len(pattern) == 0:
-            parts.append(WcGlob(pattern, False, False, False))
+            parts.append(WcGlob(pattern.encode('latin-1') if self.is_bytes else pattern, False, False, False, False))
 
         return parts
 
@@ -443,7 +440,7 @@ class WcSplit(object):
         self.is_bytes = isinstance(pattern, bytes)
         self.pathname = bool(flags & PATHNAME)
         self.extend = bool(flags & EXTGLOB)
-        self.unix = is_unix_style(flags)
+        self.unix = is_unix_style(flags) and not flags & _FORCEWIN
         self.bslash_abort = not self.unix
 
     def _sequence(self, i):
@@ -585,7 +582,7 @@ class WcParse(object):
         self.in_list = False
         self.flags = flags
         self.inv_ext = 0
-        self.unix = is_unix_style(self.flags)
+        self.unix = is_unix_style(self.flags) and not self.flags & _FORCEWIN
         if not self.unix:
             self.win_drive_detect = self.pathname
             self.char_avoid = (ord('\\'), ord('/'), ord('.'))
@@ -1087,20 +1084,22 @@ class WcParse(object):
         """Parse pattern list."""
 
         result = ['']
+        negative = False
 
         p = util.norm_pattern(self.pattern, not self.unix, self.raw_chars)
 
         p = p.decode('latin-1') if self.is_bytes else p
         if is_negative(p, self.flags):
+            negative = True
             p = p[1:]
 
         self.root(p, result)
 
         case_flag = 'i' if not self.case_sensitive else ''
         if util.PY36:
-            pattern = r'^(?s%s:%s)$' % (case_flag, ''.join(result))
+            pattern = (r'^(?!(?s%s:%s)).*?$' if negative else r'^(?s%s:%s)$') % (case_flag, ''.join(result))
         else:
-            pattern = r'(?ms%s)^(?:%s)$' % (case_flag, ''.join(result))
+            pattern = (r'(?s%s)^(?!(?:%s)).*?$' if negative else r'(?s%s)^(?:%s)$') % (case_flag, ''.join(result))
 
         if self.is_bytes:
             pattern = pattern.encode('latin-1')
@@ -1153,9 +1152,14 @@ class WcRegexp(util.Immutable):
             if x.fullmatch(filename):
                 matched = True
                 break
+
+        if not self._include and self._exclude:
+            matched = True
+
         if matched:
+            matched = True
             for x in self._exclude:
-                if x.fullmatch(filename):
+                if not x.fullmatch(filename):
                     matched = False
                     break
         return matched
