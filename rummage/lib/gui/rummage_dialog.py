@@ -361,7 +361,8 @@ class RummageFrame(gui.RummageFrame):
         self.set_keybindings(
             [
                 (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
-                (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key)
+                (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key),
+                (wx.ACCEL_NORMAL, wx.WXK_ESCAPE, self.on_esc_key)
             ]
         )
 
@@ -991,6 +992,21 @@ class RummageFrame(gui.RummageFrame):
                 self.m_searchin_dir_picker.SetPath(os.path.dirname(pth))
             self.searchin_update = False
 
+    def abort_search(self, is_replacing):
+        """Abort search."""
+
+        global _ABORT
+        aborted = False
+        if self.thread is not None and not self.kill:
+            if is_replacing:
+                self.m_replace_button.SetLabel(self.SEARCH_BTN_ABORT)
+            else:
+                self.m_search_button.SetLabel(self.SEARCH_BTN_ABORT)
+            _ABORT = True
+            self.kill = True
+            aborted = True
+        return aborted
+
     def start_search(self, replace=False):
         """Initiate search or stop search depending on search state."""
 
@@ -1005,14 +1021,7 @@ class RummageFrame(gui.RummageFrame):
         if is_searching or is_replacing:
             # Handle a search or replace request when a search or replace is already running
 
-            if self.thread is not None and not self.kill:
-                if is_replacing:
-                    self.m_replace_button.SetLabel(self.SEARCH_BTN_ABORT)
-                else:
-                    self.m_search_button.SetLabel(self.SEARCH_BTN_ABORT)
-                _ABORT = True
-                self.kill = True
-            else:
+            if not self.abort_search(is_replacing):
                 self.debounce_search = False
         else:
             # Handle a search or a search & replace request
@@ -1907,6 +1916,14 @@ class RummageFrame(gui.RummageFrame):
                 obj.GetEventHandler(),
                 wx.PyCommandEvent(wx.EVT_BUTTON.typeId, obj.GetId())
             )
+
+        event.Skip()
+
+    def on_esc_key(self, event):
+        """Abort on escape."""
+
+        if self.thread is not None and not self.kill:
+            self.abort_search(self.m_replace_button.GetLabel() in (self.SEARCH_BTN_STOP, self.SEARCH_BTN_ABORT))
 
         event.Skip()
 
