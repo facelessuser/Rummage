@@ -64,6 +64,7 @@ Feb 18, 2018
 
 ## 3.7.0
 
+- **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
 - **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
 - **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
@@ -85,7 +86,6 @@ Feb 18, 2018
 
 Feb 15, 2018
 
-- **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Rummage will use `cchardet` by default if found.
 - **NEW**: Expose way to specify `cchardet` being used.
 - **NEW**: Expose special file type encoding handling, and allow user to modify extension list. Covers: `bin`, `python`, `html`, and `xml`.
