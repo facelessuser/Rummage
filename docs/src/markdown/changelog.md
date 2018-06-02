@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.0
+
+- **NEW**: Escape key will terminate a search or replace from any main tab.
+
 ## 4.0.7
 
 Apr 30, 2018
@@ -58,10 +62,30 @@ Feb 18, 2018
 - **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
 - **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
 
+## 3.7.0
+
+- **NEW**: Lines are calculated incrementally as needed opposed to all up front.
+- **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
+- **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
+- **FIX**: Log error during update check. If not a silent check, alert user there was an update check issue.
+- **FIX**: Update requests should use `https`.
+- **FIX**: Update localization.
+- **FIX**: Fixes to Windows notifications.
+- **FIX**: Single instance handling regression #217.
+- **FIX**: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format string replace with the added ability to use format string align and fill.
+- **FIX**: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex replace templates without Backrefs. Require explicit `{{` or `}}`.
+- **FIX**: Regression that causes crash when using reverse flag with Regex **and** Backrefs.
+- **FIX**: In test dialog, when an expression doesn't match, the result box is empty.
+- **FIX**: Cleanup some object leaks.
+- **FIX**: Incorrect sizing of chain dialog.
+- **FIX**: All list objects should be finalized properly to allow sorting.
+- **FIX**: Make encoding list style in settings dialog consistent with the look and feel of other list objects.
+
 ## 3.6.0
 
 Feb 15, 2018
 
+- **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Rummage will use `cchardet` by default if found.
 - **NEW**: Expose way to specify `cchardet` being used.
 - **NEW**: Expose special file type encoding handling, and allow user to modify extension list. Covers: `bin`, `python`, `html`, and `xml`.
