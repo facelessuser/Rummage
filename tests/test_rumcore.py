@@ -14,7 +14,7 @@ from backrefs import bregex
 from rummage.lib import rumcore as rc
 from rummage.lib.util import epoch_timestamp as epoch
 from rummage.lib.rumcore import text_decode as td
-from rummage.lib.rumcore.wcmatch import wcmatch
+from wcmatch import wcmatch
 
 
 # class TestWildcard(unittest.TestCase):

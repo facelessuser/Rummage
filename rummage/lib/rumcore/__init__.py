@@ -32,7 +32,7 @@ from time import ctime
 from backrefs import bre
 from collections import deque
 from . import text_decode
-from .wcmatch import wcmatch
+from wcmatch import wcmatch
 from .file_times import getmtime, getctime
 from .. import util
 try:
