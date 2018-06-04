@@ -87,6 +87,10 @@ class SettingsDialog(gui.SettingsDialog):
             self.m_bregex_radio.Enable(True)
             self.m_regex_version_label.Enable(True)
             self.m_regex_ver_choice.Enable(True)
+        self.m_extmatch_checkbox.SetValue(Settings.get_extmatch())
+        self.m_brace_checkbox.SetValue(Settings.get_brace_expansion())
+        self.m_str_literal_checkbox.SetValue(Settings.get_string_literals())
+        self.m_fullpath_checkbox.SetValue(Settings.get_full_exclude_path())
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
         self.alert_methods = Settings.get_platform_notify()
@@ -141,7 +145,7 @@ class SettingsDialog(gui.SettingsDialog):
 
         self.TITLE = _("Preferences")
         self.GENERAL_TAB = _("General")
-        self.REGEX_TAB = _("Regex")
+        self.SEARCH_TAB = _("Search")
         self.EDITOR_TAB = _("Editor")
         self.NOTIFICATIONS_TAB = _("Notifications")
         self.HISTORY_TAB = _("History")
@@ -150,6 +154,12 @@ class SettingsDialog(gui.SettingsDialog):
         self.ALERT = _("Alert Sound")
         self.TERM_NOTIFY_PATH = _("Path to terminal-notifier")
         self.LANGUAGE = _("Language (restart required)")
+        self.EXTMATCH = _("Extended match")
+        self.BRACES = _("Brace expansion")
+        self.STR_LITERALS = _("String literals")
+        self.FULL_PATH = _("Full folder exclude path")
+        self.REGEX_GROUP = _("Regex")
+        self.FILE_MATCH_GROUP = _("File/folder matching")
         self.RE = _("Use re module")
         self.BRE = _("Use re module with backrefs")
         self.REGEX = _("Use regex module")
@@ -201,11 +211,13 @@ class SettingsDialog(gui.SettingsDialog):
 
         self.SetTitle(self.TITLE)
         self.m_settings_notebook.SetPageText(0, self.GENERAL_TAB)
-        self.m_settings_notebook.SetPageText(1, self.REGEX_TAB)
+        self.m_settings_notebook.SetPageText(1, self.SEARCH_TAB)
         self.m_settings_notebook.SetPageText(2, self.ENCODING)
         self.m_settings_notebook.SetPageText(3, self.EDITOR_TAB)
         self.m_settings_notebook.SetPageText(4, self.NOTIFICATIONS_TAB)
         self.m_settings_notebook.SetPageText(5, self.HISTORY_TAB)
+        self.m_regex_panel.GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(self.REGEX_GROUP)
+        self.m_regex_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(self.FILE_MATCH_GROUP)
         self.m_single_checkbox.SetLabel(self.SINGLE_INSTANCE)
         self.m_visual_alert_checkbox.SetLabel(self.NOTIFY_POPUP)
         self.m_audio_alert_checkbox.SetLabel(self.ALERT)
@@ -216,6 +228,10 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_regex_radio.SetLabel(self.REGEX)
         self.m_bregex_radio.SetLabel(self.BREGEX)
         self.m_regex_version_label.SetLabel(self.REGEX_VER)
+        self.m_extmatch_checkbox.SetLabel(self.EXTMATCH)
+        self.m_brace_checkbox.SetLabel(self.BRACES)
+        self.m_str_literal_checkbox.SetLabel(self.STR_LITERALS)
+        self.m_fullpath_checkbox.SetLabel(self.FULL_PATH)
         self.m_editor_button.SetLabel(self.CHANGE)
         self.m_history_clear_button.SetLabel(self.CLEAR)
         self.m_back_ext_label.SetLabel(self.BACK_EXT)
@@ -424,6 +440,26 @@ class SettingsDialog(gui.SettingsDialog):
         else:
             mode = rumcore.RE_MODE
         Settings.set_regex_mode(mode)
+
+    def on_extmatch_toggle(self, event):
+        """Handle extmatch toggle."""
+
+        Settings.set_extmatch(self.m_extmatch_checkbox.GetValue())
+
+    def on_brace_toggle(self, event):
+        """Handle brace toggle."""
+
+        Settings.set_brace_expansion(self.m_brace_checkbox.GetValue())
+
+    def on_str_literal_toggle(self, event):
+        """Handle string literal toggle."""
+
+        Settings.set_string_literals(self.m_str_literal_checkbox.GetValue())
+
+    def on_fullpath_toggle(self, event):
+        """Handle full path toggle."""
+
+        Settings.set_full_exclude_path(self.m_fullpath_checkbox.GetValue())
 
     def on_close(self, event):
         """Handle on close event."""

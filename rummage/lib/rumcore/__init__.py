@@ -76,13 +76,20 @@ TRUNCATE_LINES = 0x2000000  # Truncate context lines to 120 chars
 BACKUP = 0x4000000          # Backup files on replace
 BACKUP_FOLDER = 0x8000000   # Backup to folder
 
+# Fnmatch/Glob flags
+EXTMATCH = 0x10000000
+BRACE = 0x20000000
+RAWCHARS = 0x40000000
+PATHNAME = 0x80000000
+
 RE_MODE = 0
 BRE_MODE = 1
 REGEX_MODE = 2
 BREGEX_MODE = 3
 
 SEARCH_MASK = 0x1FFFF
-FILE_MASK = 0xFFE0000
+FILE_MASK = 0xFFFE0000
+FNMATCH_FLAGS = 0xF0000000
 
 RE_MODES = (RE_MODE, BRE_MODE)
 REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
@@ -1307,6 +1314,18 @@ class Rummage(object):
 
         self.search_params = searches
         self.file_flags = flags & FILE_MASK
+
+        # Wcmatch flags
+        self.wcmatch_flags = wcmatch.I | wcmatch.M
+        if self.file_flags & EXTMATCH:
+            self.wcmatch_flags |= wcmatch.EXTGLOB
+        if self.file_flags & BRACE:
+            self.wcmatch_flags |= wcmatch.BRACE
+        if self.file_flags & RAWCHARS:
+            self.wcmatch_flags |= RAWCHARS
+        if self.file_flags & PATHNAME:
+            self.wcmatch_flags |= PATHNAME
+
         self.context = context
         self.encoding = self._verify_encoding(encoding) if encoding is not None else None
         self.skipped = 0
@@ -1339,7 +1358,7 @@ class Rummage(object):
                 folder_exclude,
                 bool(self.file_flags & RECURSIVE),
                 bool(self.file_flags & SHOW_HIDDEN),
-                wcmatch.R | wcmatch.I | wcmatch.M,
+                self.wcmatch_flags,
                 file_regex_match,
                 dir_regex_match,
                 size,

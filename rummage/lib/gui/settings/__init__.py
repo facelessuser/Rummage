@@ -41,7 +41,7 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.1.0'
+SETTINGS_FMT = '2.2.0'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -69,6 +69,10 @@ DEFAULT_SETTINGS = {
     "notify_method": "default",
     "regex_mode": rumcore.RE_MODE,
     "regex_version": 0,
+    "extmatch": False,
+    "brace_expansion": False,
+    "string_literals": True,
+    "full_exclude_path": False,
     "saved_searches": {},
     "single_instance": False,
     "term_notifier": "",
@@ -1081,6 +1085,90 @@ class Settings(object):
         cls.save_cache()
 
     @classmethod
+    def _set_extmatch(cls, value):
+        """Set extmatch."""
+
+        cls.settings['extmatch'] = value
+
+    @classmethod
+    def set_extmatch(cls, value):
+        """Set extmatch."""
+
+        cls.reload_settings()
+        cls._set_extmatch(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_extmatch(cls):
+        """Get extmatch."""
+
+        cls.reload_settings()
+        return cls.settings.get('extmatch', False)
+
+    @classmethod
+    def _set_brace_expansion(cls, value):
+        """Set brace_expansion."""
+
+        cls.settings['brace_expansion'] = value
+
+    @classmethod
+    def set_brace_expansion(cls, value):
+        """Set brace_expansion."""
+
+        cls.reload_settings()
+        cls._set_brace_expansion(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_brace_expansion(cls):
+        """Get brace_expansion."""
+
+        cls.reload_settings()
+        return cls.settings.get('brace_expansion', False)
+
+    @classmethod
+    def _set_string_literals(cls, value):
+        """Set string_literals."""
+
+        cls.settings['string_literals'] = value
+
+    @classmethod
+    def set_string_literals(cls, value):
+        """Set string_literals."""
+
+        cls.reload_settings()
+        cls._set_string_literals(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_string_literals(cls):
+        """Get string_literals."""
+
+        cls.reload_settings()
+        return cls.settings.get('string_literals', True)
+
+    @classmethod
+    def _set_full_exclude_path(cls, value):
+        """Set full_exclude_path."""
+
+        cls.settings['full_exclude_path'] = value
+
+    @classmethod
+    def set_full_exclude_path(cls, value):
+        """Set full_exclude_path."""
+
+        cls.reload_settings()
+        cls._set_full_exclude_path(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_full_exclude_path(cls):
+        """Get full_exclude_path."""
+
+        cls.reload_settings()
+        return cls.settings.get('full_exclude_path', False)
+
+    @classmethod
     def import_settings(cls, obj):
         """Import settings."""
 
@@ -1104,6 +1192,16 @@ class Settings(object):
             if 'chardet_mode' in obj['encoding_options']:
                 cls._set_chardet_mode(obj['encoding_options']['chardet_mode'])
             cls._set_encoding_ext(obj['encoding_options'])
+
+        # File matching
+        if 'extmatch' in obj:
+            cls._set_extmatch(obj['extmatch'])
+        if 'brace_expansion' in obj:
+            cls._set_brace_expansion(obj['brace_expansion'])
+        if 'string_literals' in obj:
+            cls._set_string_literals(obj['string_literals'])
+        if 'full_exclude_path' in obj:
+            cls._set_full_exclude_path(obj['full_exclude_path'])
 
         # Notifications
         update_notify = False

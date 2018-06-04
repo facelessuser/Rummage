@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Jan 25 2018)
+## Python code generated with wxFormBuilder (version May 29 2018)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO *NOT* EDIT THIS FILE!
@@ -1015,58 +1015,88 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_regex_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_regex_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
-		fgSizer43 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer43 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer43.AddGrowableCol( 0 )
 		fgSizer43.SetFlexibleDirection( wx.BOTH )
 		fgSizer43.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_re_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use re module", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+		sbSizer8 = wx.StaticBoxSizer( wx.StaticBox( self.m_regex_panel, wx.ID_ANY, u"Regex" ), wx.VERTICAL )
+		
+		fgSizer62 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer62.AddGrowableCol( 0 )
+		fgSizer62.SetFlexibleDirection( wx.BOTH )
+		fgSizer62.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_re_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use re module", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
 		self.m_re_radio.SetValue( True ) 
-		fgSizer43.Add( self.m_re_radio, 0, wx.ALL, 5 )
+		fgSizer62.Add( self.m_re_radio, 0, wx.ALL, 5 )
 		
 		
-		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_bre_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use re module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer43.Add( self.m_bre_radio, 0, wx.ALL, 5 )
+		self.m_bre_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use re module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer62.Add( self.m_bre_radio, 0, wx.ALL, 5 )
 		
 		
-		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_regex_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use regex module", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_regex_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use regex module", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_regex_radio.Enable( False )
 		
-		fgSizer43.Add( self.m_regex_radio, 0, wx.ALL, 5 )
+		fgSizer62.Add( self.m_regex_radio, 0, wx.ALL, 5 )
 		
 		
-		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_bregex_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use regex module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_bregex_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use regex module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_bregex_radio.Enable( False )
 		
-		fgSizer43.Add( self.m_bregex_radio, 0, wx.ALL, 5 )
+		fgSizer62.Add( self.m_bregex_radio, 0, wx.ALL, 5 )
 		
 		
-		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_regex_version_label = wx.StaticText( self.m_regex_panel, wx.ID_ANY, u"Regex module version to use", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_regex_version_label = wx.StaticText( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Regex module version to use", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_regex_version_label.Wrap( -1 )
 		self.m_regex_version_label.Enable( False )
 		
-		fgSizer43.Add( self.m_regex_version_label, 0, wx.ALL, 5 )
+		fgSizer62.Add( self.m_regex_version_label, 0, wx.ALL, 5 )
 		
 		m_regex_ver_choiceChoices = [ u"V0", u"V1" ]
-		self.m_regex_ver_choice = wx.Choice( self.m_regex_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_regex_ver_choiceChoices, 0 )
+		self.m_regex_ver_choice = wx.Choice( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_regex_ver_choiceChoices, 0 )
 		self.m_regex_ver_choice.SetSelection( 0 )
 		self.m_regex_ver_choice.Enable( False )
 		
-		fgSizer43.Add( self.m_regex_ver_choice, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
+		fgSizer62.Add( self.m_regex_ver_choice, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
+		
+		
+		sbSizer8.Add( fgSizer62, 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer43.Add( sbSizer8, 1, wx.EXPAND, 5 )
+		
+		sbSizer9 = wx.StaticBoxSizer( wx.StaticBox( self.m_regex_panel, wx.ID_ANY, u"File/folder matching" ), wx.VERTICAL )
+		
+		self.m_extmatch_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Extended match", wx.DefaultPosition, wx.DefaultSize, 0 )
+		sbSizer9.Add( self.m_extmatch_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_brace_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Brace expansion", wx.DefaultPosition, wx.DefaultSize, 0 )
+		sbSizer9.Add( self.m_brace_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_str_literal_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"String literals", wx.DefaultPosition, wx.DefaultSize, 0 )
+		sbSizer9.Add( self.m_str_literal_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_fullpath_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full folder exclude path", wx.DefaultPosition, wx.DefaultSize, 0 )
+		sbSizer9.Add( self.m_fullpath_checkbox, 0, wx.ALL, 5 )
+		
+		
+		fgSizer43.Add( sbSizer9, 1, wx.EXPAND, 5 )
 		
 		
 		self.m_regex_panel.SetSizer( fgSizer43 )
 		self.m_regex_panel.Layout()
 		fgSizer43.Fit( self.m_regex_panel )
-		self.m_settings_notebook.AddPage( self.m_regex_panel, u"Regex", False )
+		self.m_settings_notebook.AddPage( self.m_regex_panel, u"Search", False )
 		self.m_encoding_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_encoding_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
@@ -1280,6 +1310,10 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_regex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_regex_toggle )
 		self.m_bregex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bregex_toggle )
 		self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
+		self.m_extmatch_checkbox.Bind( wx.EVT_CHECKBOX, self.on_extmatch_toggle )
+		self.m_brace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_brace_toggle )
+		self.m_str_literal_checkbox.Bind( wx.EVT_CHECKBOX, self.on_str_literal_toggle )
+		self.m_fullpath_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullpath_toggle )
 		self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
 		self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
 		self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
@@ -1330,6 +1364,18 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_regex_ver_choice( self, event ):
+		event.Skip()
+	
+	def on_extmatch_toggle( self, event ):
+		event.Skip()
+	
+	def on_brace_toggle( self, event ):
+		event.Skip()
+	
+	def on_str_literal_toggle( self, event ):
+		event.Skip()
+	
+	def on_fullpath_toggle( self, event ):
 		event.Skip()
 	
 	def on_chardet( self, event ):
@@ -2650,4 +2696,3 @@ class EditorDialog ( wx.Dialog ):
 	def on_cancel_click( self, event ):
 		event.Skip()
 	
-

@@ -314,6 +314,10 @@ class RummageArgs(object):
         self.regex_mode = rumcore.RE_MODE
         self.regex_version = 0
         self.formatreplace = False
+        self.extmatch = False
+        self.brace_expansion = False
+        self.string_literals = True
+        self.full_exclude_path = False
         self.encoding_options = {}
 
 
@@ -1147,6 +1151,18 @@ class RummageFrame(gui.RummageFrame):
                 if args.fullcase:
                     flags |= rumcore.FULLCASE
 
+        if args.extmatch:
+            flags |= rumcore.EXTMATCH
+
+        if args.brace_expansion:
+            flags |= rumcore.BRACE
+
+        if args.string_literals:
+            flags |= rumcore.RAWCHARS
+
+        if args.full_exclude_path:
+            flags |= rumcore.PATHNAME
+
         if args.regexfilepattern:
             flags |= rumcore.FILE_REGEX_MATCH
 
@@ -1312,6 +1328,11 @@ class RummageFrame(gui.RummageFrame):
         if os.path.isdir(args.target):
             args.process_binary = self.m_binary_checkbox.GetValue()
             args.show_hidden = self.m_hidden_checkbox.GetValue()
+
+            args.extmatch = bool(Settings.get_extmatch())
+            args.brace_expansion = bool(Settings.get_brace_expansion())
+            args.string_literals = bool(Settings.get_string_literals())
+            args.full_exclude_path = bool(Settings.get_full_exclude_path())
 
             args.filepattern = self.m_filematch_textbox.Value
             if self.m_fileregex_checkbox.GetValue():
