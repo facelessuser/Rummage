@@ -71,8 +71,10 @@ DEFAULT_SETTINGS = {
     "regex_version": 0,
     "extmatch": False,
     "brace_expansion": False,
+    "globstar": False,
     "string_literals": True,
     "full_exclude_path": False,
+    "full_file_path": False,
     "saved_searches": {},
     "single_instance": False,
     "term_notifier": "",
@@ -1169,6 +1171,48 @@ class Settings(object):
         return cls.settings.get('full_exclude_path', False)
 
     @classmethod
+    def _set_full_file_path(cls, value):
+        """Set full_file_path."""
+
+        cls.settings['full_file_path'] = value
+
+    @classmethod
+    def set_full_file_path(cls, value):
+        """Set full_file_path."""
+
+        cls.reload_settings()
+        cls._set_full_file_path(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_full_file_path(cls):
+        """Get full_file_path."""
+
+        cls.reload_settings()
+        return cls.settings.get('full_file_path', False)
+
+    @classmethod
+    def _set_globstar(cls, value):
+        """Set globstar."""
+
+        cls.settings['globstar'] = value
+
+    @classmethod
+    def set_globstar(cls, value):
+        """Set globstar."""
+
+        cls.reload_settings()
+        cls._set_globstar(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_globstar(cls):
+        """Get globstar."""
+
+        cls.reload_settings()
+        return cls.settings.get('globstar', False)
+
+    @classmethod
     def import_settings(cls, obj):
         """Import settings."""
 
@@ -1202,6 +1246,10 @@ class Settings(object):
             cls._set_string_literals(obj['string_literals'])
         if 'full_exclude_path' in obj:
             cls._set_full_exclude_path(obj['full_exclude_path'])
+        if 'full_file_path' in obj:
+            cls._set_full_file_path(obj['full_file_path'])
+        if 'globstar' in obj:
+            cls._set_globstar(obj['globstar'])
 
         # Notifications
         update_notify = False

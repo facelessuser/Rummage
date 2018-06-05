@@ -1012,15 +1012,15 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_general_panel.Layout()
 		fgSizer52.Fit( self.m_general_panel )
 		self.m_settings_notebook.AddPage( self.m_general_panel, u"General", False )
-		self.m_regex_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_regex_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		self.m_search_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_search_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
 		fgSizer43 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer43.AddGrowableCol( 0 )
 		fgSizer43.SetFlexibleDirection( wx.BOTH )
 		fgSizer43.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		sbSizer8 = wx.StaticBoxSizer( wx.StaticBox( self.m_regex_panel, wx.ID_ANY, u"Regex" ), wx.VERTICAL )
+		sbSizer8 = wx.StaticBoxSizer( wx.StaticBox( self.m_search_panel, wx.ID_ANY, u"Regex" ), wx.VERTICAL )
 		
 		fgSizer62 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer62.AddGrowableCol( 0 )
@@ -1075,7 +1075,7 @@ class SettingsDialog ( wx.Dialog ):
 		
 		fgSizer43.Add( sbSizer8, 1, wx.EXPAND, 5 )
 		
-		sbSizer9 = wx.StaticBoxSizer( wx.StaticBox( self.m_regex_panel, wx.ID_ANY, u"File/folder matching" ), wx.VERTICAL )
+		sbSizer9 = wx.StaticBoxSizer( wx.StaticBox( self.m_search_panel, wx.ID_ANY, u"File/Folder Matching" ), wx.VERTICAL )
 		
 		self.m_extmatch_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Extended match", wx.DefaultPosition, wx.DefaultSize, 0 )
 		sbSizer9.Add( self.m_extmatch_checkbox, 0, wx.ALL, 5 )
@@ -1086,17 +1086,23 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_str_literal_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"String literals", wx.DefaultPosition, wx.DefaultSize, 0 )
 		sbSizer9.Add( self.m_str_literal_checkbox, 0, wx.ALL, 5 )
 		
-		self.m_fullpath_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full folder exclude path", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_fullpath_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path directory match", wx.DefaultPosition, wx.DefaultSize, 0 )
 		sbSizer9.Add( self.m_fullpath_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_fullfile_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path file match", wx.DefaultPosition, wx.DefaultSize, 0 )
+		sbSizer9.Add( self.m_fullfile_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_globstar_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Globstar ** (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		sbSizer9.Add( self.m_globstar_checkbox, 0, wx.ALL, 5 )
 		
 		
 		fgSizer43.Add( sbSizer9, 1, wx.EXPAND, 5 )
 		
 		
-		self.m_regex_panel.SetSizer( fgSizer43 )
-		self.m_regex_panel.Layout()
-		fgSizer43.Fit( self.m_regex_panel )
-		self.m_settings_notebook.AddPage( self.m_regex_panel, u"Search", False )
+		self.m_search_panel.SetSizer( fgSizer43 )
+		self.m_search_panel.Layout()
+		fgSizer43.Fit( self.m_search_panel )
+		self.m_settings_notebook.AddPage( self.m_search_panel, u"Search", False )
 		self.m_encoding_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_encoding_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
@@ -1314,6 +1320,8 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_brace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_brace_toggle )
 		self.m_str_literal_checkbox.Bind( wx.EVT_CHECKBOX, self.on_str_literal_toggle )
 		self.m_fullpath_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullpath_toggle )
+		self.m_fullfile_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullfile_toggle )
+		self.m_globstar_checkbox.Bind( wx.EVT_CHECKBOX, self.on_globstar_toggle )
 		self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
 		self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
 		self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
@@ -1376,6 +1384,12 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_fullpath_toggle( self, event ):
+		event.Skip()
+	
+	def on_fullfile_toggle( self, event ):
+		event.Skip()
+	
+	def on_globstar_toggle( self, event ):
 		event.Skip()
 	
 	def on_chardet( self, event ):
@@ -2696,3 +2710,4 @@ class EditorDialog ( wx.Dialog ):
 	def on_cancel_click( self, event ):
 		event.Skip()
 	
+

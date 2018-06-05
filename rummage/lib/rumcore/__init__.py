@@ -77,10 +77,12 @@ BACKUP = 0x4000000          # Backup files on replace
 BACKUP_FOLDER = 0x8000000   # Backup to folder
 
 # Fnmatch/Glob flags
-EXTMATCH = 0x10000000
-BRACE = 0x20000000
-RAWCHARS = 0x40000000
-PATHNAME = 0x80000000
+EXTMATCH = 0x10000000       # Match with extended patterns +(...) etc.
+BRACE = 0x20000000          # Expand braces a{b,c} -> ab ac
+RAWCHARS = 0x40000000       # Raw char literals \x33 etc.
+DIRPATHNAME = 0x80000000    # Full directory exclude path match
+FILEPATHNAME = 0x100000000  # Full file name path match
+GLOBSTAR = 0x200000000      # Use globstar (**) in full paths
 
 RE_MODE = 0
 BRE_MODE = 1
@@ -88,8 +90,8 @@ REGEX_MODE = 2
 BREGEX_MODE = 3
 
 SEARCH_MASK = 0x1FFFF
-FILE_MASK = 0xFFFE0000
-FNMATCH_FLAGS = 0xF0000000
+FILE_MASK = 0x3FFFE0000
+FNMATCH_FLAGS = 0x3F0000000
 
 RE_MODES = (RE_MODE, BRE_MODE)
 REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
@@ -1139,6 +1141,9 @@ class _DirWalker(wcmatch.WcMatch):
         if not isinstance(self.file_pattern, wcmatch._wcparse.WcRegexp):
             if self.file_regex_match:
                 self.file_pattern = self._compile_regexp(self.file_pattern, force_default=True)
+            elif not self.file_pattern:
+                # Force default
+                self.file_pattern = '*'
 
         if not isinstance(self.exclude_pattern, wcmatch._wcparse.WcRegexp):
             if self.folder_regex_exclude_match:
@@ -1322,9 +1327,13 @@ class Rummage(object):
         if self.file_flags & BRACE:
             self.wcmatch_flags |= wcmatch.BRACE
         if self.file_flags & RAWCHARS:
-            self.wcmatch_flags |= RAWCHARS
-        if self.file_flags & PATHNAME:
-            self.wcmatch_flags |= PATHNAME
+            self.wcmatch_flags |= wcmatch.RAWCHARS
+        if self.file_flags & DIRPATHNAME:
+            self.wcmatch_flags |= wcmatch.DIRPATHNAME
+        if self.file_flags & FILEPATHNAME:
+            self.wcmatch_flags |= wcmatch.FILEPATHNAME
+        if self.file_flags & GLOBSTAR:
+            self.wcmatch_flags |= wcmatch.GLOBSTAR
 
         self.context = context
         self.encoding = self._verify_encoding(encoding) if encoding is not None else None

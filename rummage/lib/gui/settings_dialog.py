@@ -46,7 +46,7 @@ class SettingsDialog(gui.SettingsDialog):
         super(SettingsDialog, self).__init__(parent)
         if util.platform() == "windows":
             self.m_general_panel.SetDoubleBuffered(True)
-            self.m_regex_panel.SetDoubleBuffered(True)
+            self.m_search_panel.SetDoubleBuffered(True)
             self.m_editor_panel.SetDoubleBuffered(True)
             self.m_notify_panel.SetDoubleBuffered(True)
             self.m_history_panel.SetDoubleBuffered(True)
@@ -91,6 +91,8 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_brace_checkbox.SetValue(Settings.get_brace_expansion())
         self.m_str_literal_checkbox.SetValue(Settings.get_string_literals())
         self.m_fullpath_checkbox.SetValue(Settings.get_full_exclude_path())
+        self.m_fullfile_checkbox.SetValue(Settings.get_full_file_path())
+        self.m_globstar_checkbox.SetValue(Settings.get_globstar())
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
         self.alert_methods = Settings.get_platform_notify()
@@ -127,7 +129,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.refresh_localization()
 
         self.m_general_panel.Fit()
-        self.m_regex_panel.Fit()
+        self.m_search_panel.Fit()
         self.m_encoding_panel.Fit()
         self.m_editor_panel.Fit()
         self.m_notify_panel.Fit()
@@ -157,7 +159,9 @@ class SettingsDialog(gui.SettingsDialog):
         self.EXTMATCH = _("Extended match")
         self.BRACES = _("Brace expansion")
         self.STR_LITERALS = _("String literals")
-        self.FULL_PATH = _("Full folder exclude path")
+        self.FULL_PATH = _("Full path directory match")
+        self.FULL_FILE = _("Full path file match")
+        self.GLOBSTAR = _("Globstar ** (full path)")
         self.REGEX_GROUP = _("Regex")
         self.FILE_MATCH_GROUP = _("File/folder matching")
         self.RE = _("Use re module")
@@ -216,8 +220,8 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_settings_notebook.SetPageText(3, self.EDITOR_TAB)
         self.m_settings_notebook.SetPageText(4, self.NOTIFICATIONS_TAB)
         self.m_settings_notebook.SetPageText(5, self.HISTORY_TAB)
-        self.m_regex_panel.GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(self.REGEX_GROUP)
-        self.m_regex_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(self.FILE_MATCH_GROUP)
+        self.m_search_panel.GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(self.REGEX_GROUP)
+        self.m_search_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(self.FILE_MATCH_GROUP)
         self.m_single_checkbox.SetLabel(self.SINGLE_INSTANCE)
         self.m_visual_alert_checkbox.SetLabel(self.NOTIFY_POPUP)
         self.m_audio_alert_checkbox.SetLabel(self.ALERT)
@@ -232,6 +236,8 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_brace_checkbox.SetLabel(self.BRACES)
         self.m_str_literal_checkbox.SetLabel(self.STR_LITERALS)
         self.m_fullpath_checkbox.SetLabel(self.FULL_PATH)
+        self.m_fullfile_checkbox.SetLabel(self.FULL_FILE)
+        self.m_globstar_checkbox.SetLabel(self.GLOBSTAR)
         self.m_editor_button.SetLabel(self.CHANGE)
         self.m_history_clear_button.SetLabel(self.CLEAR)
         self.m_back_ext_label.SetLabel(self.BACK_EXT)
@@ -460,6 +466,16 @@ class SettingsDialog(gui.SettingsDialog):
         """Handle full path toggle."""
 
         Settings.set_full_exclude_path(self.m_fullpath_checkbox.GetValue())
+
+    def on_fullfile_toggle(self, event):
+        """Handle full file toggle."""
+
+        Settings.set_full_file_path(self.m_fullfile_checkbox.GetValue())
+
+    def on_globstar_toggle(self, event):
+        """Handle globstar toggle."""
+
+        Settings.set_globstar(self.m_globstar_checkbox.GetValue())
 
     def on_close(self, event):
         """Handle on close event."""
