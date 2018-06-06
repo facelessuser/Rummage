@@ -790,6 +790,7 @@ class Settings(object):
         png = os.path.join(data.RESOURCE_PATH, "rummage_hires.png")
         icon = os.path.join(data.RESOURCE_PATH, "rummage_tray.ico")
         icns = os.path.join(data.RESOURCE_PATH, "rummage.icns")
+        growl_png = os.path.join(data.RESOURCE_PATH, "rummage_large.png")
 
         if not os.path.exists(png):
             png = None
@@ -808,12 +809,20 @@ class Settings(object):
             os.path.exists(os.path.join(notifier, 'Contents/MacOS/terminal-notifier'))
         ):
             notifier = os.path.join(notifier, 'Contents/MacOS/terminal-notifier')
+
+        if util.platform() == "windows":
+            img = icon
+        elif util.platform() == "osx":
+            img = icns
+        else:
+            img = png
+
         notify.setup_notifications(
             "Rummage",
-            png,
-            icon,
-            (notifier, None, icns)
+            img,
+            (notifier, None)
         )
+        notify.setup_growl_notifications("Rummage", growl_png)
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
 
     @classmethod

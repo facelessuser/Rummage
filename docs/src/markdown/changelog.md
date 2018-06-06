@@ -8,6 +8,8 @@
 - **NEW**: Use new `wcmatch` library to handle wild card file matching. Includes new features.
 - **NEW**: Add notification test button in settings.
 - **FIX**: History clearing did not clear replace plugin history.
+- **FIX**: Growl notifications timing out due to image being to large.
+- **FIX**: Notifications sound not working when just alert sounds are enabled or sound is enabled with Growl.
 
 ## 4.0.7
 
@@ -73,6 +75,12 @@ Feb 18, 2018
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
 - **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
 - **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
+- **NEW**: Old legacy editor configuration is now removed. Only the new is allowed.
+- **NEW**: Show history in the settings dialog's history panel.
+- **NEW**: Add notification test button in settings.
+- **FIX**: History clearing did not clear replace plugin history.
+- **FIX**: Growl notifications timing out due to image being to large.
+- **FIX**: Notifications sound not working when just alert sounds are enabled or sound is enabled with Growl.
 - **FIX**: Log error during update check. If not a silent check, alert user there was an update check issue.
 - **FIX**: Update requests should use `https`.
 - **FIX**: Update localization.
