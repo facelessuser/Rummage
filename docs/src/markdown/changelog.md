@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.1.0
+
+- **NEW**: Old legacy editor configuration is now removed. Only the new is allowed.
+- **NEW**: Show history in the settings dialog's history panel.
+- **NEW**: Use new `wcmatch` library to handle wild card file matching. Includes new features.
+- **NEW**: Add notification test button in settings.
+- **FIX**: History clearing did not clear replace plugin history.
+
 ## 4.0.7
 
 Apr 30, 2018

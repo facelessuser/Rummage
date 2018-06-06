@@ -445,11 +445,9 @@ class Settings(object):
         """Update settings."""
 
         updated = False
-        settings_format = cls.settings.get('__format__')
-        # if settings_format is None:
-        #     # Replace invalid settings
-        #     cls.settings = cls.new_settings(cls.settings_file)
-        if settings_format < '2.1.0':
+        settings_format = tuple([int(x) for x in cls.settings.get('__format__').split('.')])
+
+        if settings_format < (2, 1, 0):
             updated = True
             searches = cls.settings.get("saved_searches", {})
 
@@ -481,6 +479,10 @@ class Settings(object):
 
             # Update format
             cls.settings["__format__"] = SETTINGS_FMT
+
+        if settings_format < (2, 2, 0):
+            if 'editor' in cls.settings and isinstance(cls.settings['editor'], (list, tuple)):
+                cls.settings['editor'] = ""
 
         # Update settings with any missing values
         for k, v in DEFAULT_SETTINGS.items():
@@ -1072,6 +1074,19 @@ class Settings(object):
         for h in history_types:
             count += len(cls.cache.get(h, []))
         return count
+
+    @classmethod
+    def get_history(cls, history_types=None):
+        """Get number of history items saved."""
+
+        if history_types is None:
+            history_types = []
+
+        cls.reload_settings()
+        history = {}
+        for h in history_types:
+            history[h] = cls.cache.get(h, [])
+        return history
 
     @classmethod
     def clear_history_records(cls, history_types=None):
