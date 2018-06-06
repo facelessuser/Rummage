@@ -120,6 +120,18 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             info["backrefs"] = 'Version could not be acquired!'
 
         try:
+            import bracex
+            info["bracex"] = format_version(bracex, 'version')
+        except Exception:
+            info["bracex"] = 'Version could not be acquired!'
+
+        try:
+            import wcmatch
+            info["wcmatch"] = format_version(wcmatch, 'version')
+        except Exception:
+            info["wcmatch"] = 'Version could not be acquired!'
+
+        try:
             import regex
             info["regex"] = format_version(regex, '__version__')
         except Exception:
@@ -157,6 +169,8 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             - Rummage: %(rummage)s %(status)s
             - WxPython: %(wxpython)s
             - Backrefs: %(backrefs)s
+            - Bracex: %(bracex)s
+            - Wcmatch: %(wcmatch)s
             - Chardet: %(chardet)s
             - cChardet: %(cchardet)s
             - Regex: %(regex)s
