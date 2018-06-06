@@ -6,7 +6,15 @@ License: MIT
 """
 from __future__ import unicode_literals
 import traceback
+import sys
 from os.path import exists
+
+if sys.platform.startswith('win'):
+    from .notify_windows import alert
+elif sys.platform == "darwin":
+    from .notify_osx import alert
+else:
+    from .notify_linux import alert
 
 __all__ = ("get_growl", "enable_growl", "growl_enabled", "setup_growl", "has_growl", "growl_destroy")
 
@@ -27,10 +35,6 @@ class Options(object):
         cls.enabled = False
         cls.growl = None
         cls.notify = None
-
-
-def alert():
-    """Alert dummy function."""
 
 
 @staticmethod
@@ -87,13 +91,10 @@ def growl_enabled():
     return has_growl() and Options.enabled
 
 
-def setup_growl(app_name, icon, alert_function):
+def setup_growl(app_name, icon):
     """Setup growl."""
 
-    global alert
     Options.icon = None
-
-    alert = alert_function
 
     try:
         assert(icon is not None and exists(icon))

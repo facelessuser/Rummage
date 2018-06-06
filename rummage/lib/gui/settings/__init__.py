@@ -41,7 +41,7 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.1.0'
+SETTINGS_FMT = '2.1.1'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -439,11 +439,9 @@ class Settings(object):
         """Update settings."""
 
         updated = False
-        settings_format = cls.settings.get('__format__')
-        # if settings_format is None:
-        #     # Replace invalid settings
-        #     cls.settings = cls.new_settings(cls.settings_file)
-        if settings_format < '2.1.0':
+        settings_format = tuple([int(x) for x in cls.settings.get('__format__').split('.')])
+
+        if settings_format < (2, 1, 0):
             updated = True
             searches = cls.settings.get("saved_searches", {})
 
@@ -475,6 +473,10 @@ class Settings(object):
 
             # Update format
             cls.settings["__format__"] = SETTINGS_FMT
+
+        if settings_format < (2, 1, 1):
+            if 'editor' in cls.settings and isinstance(cls.settings['editor'], (list, tuple)):
+                cls.settings['editor'] = ""
 
         # Update settings with any missing values
         for k, v in DEFAULT_SETTINGS.items():
@@ -788,6 +790,7 @@ class Settings(object):
         png = os.path.join(data.RESOURCE_PATH, "rummage_hires.png")
         icon = os.path.join(data.RESOURCE_PATH, "rummage_tray.ico")
         icns = os.path.join(data.RESOURCE_PATH, "rummage.icns")
+        growl_png = os.path.join(data.RESOURCE_PATH, "rummage_large.png")
 
         if not os.path.exists(png):
             png = None
@@ -806,12 +809,20 @@ class Settings(object):
             os.path.exists(os.path.join(notifier, 'Contents/MacOS/terminal-notifier'))
         ):
             notifier = os.path.join(notifier, 'Contents/MacOS/terminal-notifier')
+
+        if util.platform() == "windows":
+            img = icon
+        elif util.platform() == "osx":
+            img = icns
+        else:
+            img = png
+
         notify.setup_notifications(
             "Rummage",
-            png,
-            icon,
-            (notifier, None, icns)
+            img,
+            (notifier, None)
         )
+        notify.setup_growl_notifications("Rummage", growl_png)
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
 
     @classmethod
@@ -1072,6 +1083,19 @@ class Settings(object):
         for h in history_types:
             count += len(cls.cache.get(h, []))
         return count
+
+    @classmethod
+    def get_history(cls, history_types=None):
+        """Get number of history items saved."""
+
+        if history_types is None:
+            history_types = []
+
+        cls.reload_settings()
+        history = {}
+        for h in history_types:
+            history[h] = cls.cache.get(h, [])
+        return history
 
     @classmethod
     def clear_history_records(cls, history_types=None):

@@ -21,12 +21,13 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import re
+import json
 from .settings import Settings
-from .editor_dialog import EditorDialog
 from .file_ext_dialog import FileExtDialog
-from .generic_dialogs import yesno, errormsg
+from .generic_dialogs import errormsg
 from .localization import _
 from . import gui
+from . import notify
 from .. import rumcore
 from .. import util
 
@@ -46,7 +47,7 @@ class SettingsDialog(gui.SettingsDialog):
         super(SettingsDialog, self).__init__(parent)
         if util.platform() == "windows":
             self.m_general_panel.SetDoubleBuffered(True)
-            self.m_regex_panel.SetDoubleBuffered(True)
+            self.m_search_panel.SetDoubleBuffered(True)
             self.m_editor_panel.SetDoubleBuffered(True)
             self.m_notify_panel.SetDoubleBuffered(True)
             self.m_history_panel.SetDoubleBuffered(True)
@@ -56,6 +57,11 @@ class SettingsDialog(gui.SettingsDialog):
 
         self.localize()
 
+        # Ensure OS platform selectall shortcut works
+        self.set_keybindings(
+            [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+        )
+
         self.history_types = [
             "target",
             "regex_search",
@@ -63,7 +69,8 @@ class SettingsDialog(gui.SettingsDialog):
             "regex_folder_exclude",
             "folder_exclude",
             "regex_file_search",
-            "file_search"
+            "file_search",
+            "replace_plugin"
         ]
         history_records = Settings.get_history_record_count(self.history_types)
         self.history_records_cleared = False
@@ -75,6 +82,7 @@ class SettingsDialog(gui.SettingsDialog):
             self.m_editor_text.SetValue(self.editor if self.editor else "")
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
         self.m_history_label.SetLabel(self.RECORDS % history_records)
+        self.m_cache_textbox.SetValue(self.get_history())
         self.m_history_clear_button.Enable(history_records > 0)
         mode = Settings.get_regex_mode()
         self.m_bregex_radio.SetValue(mode == rumcore.BREGEX_MODE)
@@ -123,7 +131,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.refresh_localization()
 
         self.m_general_panel.Fit()
-        self.m_regex_panel.Fit()
+        self.m_search_panel.Fit()
         self.m_encoding_panel.Fit()
         self.m_editor_panel.Fit()
         self.m_notify_panel.Fit()
@@ -141,37 +149,27 @@ class SettingsDialog(gui.SettingsDialog):
 
         self.TITLE = _("Preferences")
         self.GENERAL_TAB = _("General")
-        self.REGEX_TAB = _("Regex")
+        self.SEARCH_TAB = _("Search")
         self.EDITOR_TAB = _("Editor")
         self.NOTIFICATIONS_TAB = _("Notifications")
         self.HISTORY_TAB = _("History")
         self.SINGLE_INSTANCE = _("Single Instance (applies to new instances)")
+        self.NOTIFY_TEST_TITLE = _("Rummage Test")
+        self.NOTIFY_TEST_MSG = _("Test complete!")
         self.NOTIFY_POPUP = _("Notification popup")
         self.ALERT = _("Alert Sound")
         self.TERM_NOTIFY_PATH = _("Path to terminal-notifier")
+        self.TEST = _("Test")
         self.LANGUAGE = _("Language (restart required)")
         self.RE = _("Use re module")
         self.BRE = _("Use re module with backrefs")
         self.REGEX = _("Use regex module")
         self.BREGEX = _("Use regex module with backrefs")
         self.REGEX_VER = _("Regex module version to use")
-        self.CHANGE = _("Change")
         self.CLEAR = _("Clear")
         self.CLOSE = _("Close")
         self.SAVE = _("Save")
         self.RECORDS = _("%d Records")
-        self.WARN_EDITOR_FORMAT = _(
-            "Editor setting format has changed!\n\n"
-            "Continuing will delete the old setting and require you to\n"
-            "reconfigure the option in the new format.\n\n"
-            "Ensure that you double quote paths and options with spaces,\n"
-            "inlcuding options that contain '{$file}'.\n\n"
-            "Example:\n"
-            "\"/My path/to editor\" --flag --path \"{$file}:{$line}:{$col}\""
-        )
-        self.CONTINUE = _("Continue")
-        self.CANCEL = _("Cancel")
-        self.WARNING_TITLE = _("Warning: Format Change")
         self.BACK_EXT = _("Backup extension")
         self.BACK_FOLDER = _("Backup folder")
         self.BACK_2_FOLDER = _("Backup to folder")
@@ -195,13 +193,23 @@ class SettingsDialog(gui.SettingsDialog):
             _("cchardet (C)")
         ]
         self.SPECIAL = _("Special file types:")
+        self.EDITOR_HELP = _(
+            "Use the vairable {$file} to insert the file path, "
+            "{$line} to insert the line number, and {$col} to "
+            "insert the line column.\n\n"
+            "Double quote paths and parameters that "
+            "contain spaces. {$file} should be double "
+            "quoted as well.\n\n"
+            "Check your editor's command line options for "
+            "the proper setup."
+        )
 
     def refresh_localization(self):
         """Localize dialog."""
 
         self.SetTitle(self.TITLE)
         self.m_settings_notebook.SetPageText(0, self.GENERAL_TAB)
-        self.m_settings_notebook.SetPageText(1, self.REGEX_TAB)
+        self.m_settings_notebook.SetPageText(1, self.SEARCH_TAB)
         self.m_settings_notebook.SetPageText(2, self.ENCODING)
         self.m_settings_notebook.SetPageText(3, self.EDITOR_TAB)
         self.m_settings_notebook.SetPageText(4, self.NOTIFICATIONS_TAB)
@@ -210,13 +218,15 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_visual_alert_checkbox.SetLabel(self.NOTIFY_POPUP)
         self.m_audio_alert_checkbox.SetLabel(self.ALERT)
         self.m_term_note_label.SetLabel(self.TERM_NOTIFY_PATH)
+        self.m_notify_test_button.SetLabel(self.TEST)
         self.m_language_label.SetLabel(self.LANGUAGE)
         self.m_re_radio.SetLabel(self.RE)
         self.m_bre_radio.SetLabel(self.BRE)
         self.m_regex_radio.SetLabel(self.REGEX)
         self.m_bregex_radio.SetLabel(self.BREGEX)
         self.m_regex_version_label.SetLabel(self.REGEX_VER)
-        self.m_editor_button.SetLabel(self.CHANGE)
+        self.m_editor_help_textbox.SetValue(self.EDITOR_HELP)
+        self.m_editor_button.SetLabel(self.SAVE)
         self.m_history_clear_button.SetLabel(self.CLEAR)
         self.m_back_ext_label.SetLabel(self.BACK_EXT)
         self.m_back_folder_label.SetLabel(self.BACK_FOLDER)
@@ -240,6 +250,26 @@ class SettingsDialog(gui.SettingsDialog):
 
         self.Fit()
 
+    def set_keybindings(self, keybindings):
+        """Set keybindings for frame."""
+
+        tbl = []
+        for binding in keybindings:
+            keyid = wx.NewId()
+            self.Bind(wx.EVT_MENU, binding[2], id=keyid)
+            tbl.append((binding[0], binding[1], keyid))
+
+        if len(keybindings):
+            self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
+
+    def on_textctrl_selectall(self, event):
+        """Selectall for TextCtrl."""
+
+        text = self.FindFocus()
+        if isinstance(text, wx.TextCtrl):
+            text.SelectAll()
+        event.Skip()
+
     def reload_list(self):
         """Reload list."""
 
@@ -249,6 +279,16 @@ class SettingsDialog(gui.SettingsDialog):
         for key in keys:
             self.m_encoding_list.set_item_map(key, key, ', '.join(encoding_ext[key]))
         self.m_encoding_list.load_list(True)
+
+    def get_history(self):
+        """Get history for display."""
+
+        return json.dumps(
+            Settings.get_history(self.history_types),
+            sort_keys=True,
+            indent=4,
+            separators=(',', ': ')
+        ) + '\n'
 
     def history_cleared(self):
         """Return if history was cleared."""
@@ -265,27 +305,17 @@ class SettingsDialog(gui.SettingsDialog):
 
         self.GetParent().update_request(Settings.get_prerelease())
 
+    def on_editor_changed(self, event):
+        """Handle on editor changed."""
+
+        self.m_editor_button.Enable(self.m_editor_text.GetValue() != self.editor)
+
     def on_editor_change(self, event):
         """Show editor dialog and update setting on return."""
 
-        if isinstance(self.editor, (list, tuple)):
-            # Using old format
-            if not yesno(self.WARN_EDITOR_FORMAT, title=self.WARNING_TITLE, yes=self.CONTINUE, no=self.CANCEL):
-                # Warn user about new format changes
-                return
-            else:
-                # Clear old format
-                self.editor = ""
-                Settings.set_editor("")
-                self.m_editor_text.SetValue("")
-
-        dlg = EditorDialog(self, self.editor)
-        dlg.ShowModal()
-        self.editor = dlg.get_editor()
+        self.editor = self.m_editor_text.GetValue()
         Settings.set_editor(self.editor)
         self.m_editor_text.SetValue(self.editor)
-        dlg.Destroy()
-        event.Skip()
 
     def on_update_toggle(self, event):
         """Update toggle."""
@@ -304,6 +334,7 @@ class SettingsDialog(gui.SettingsDialog):
 
         Settings.clear_history_records(self.history_types)
         self.history_records_cleared = True
+        self.m_cache_textbox.SetValue(self.get_history())
         self.m_history_label.SetLabel(self.RECORDS % 0)
         self.m_history_clear_button.Enable(False)
 
@@ -333,6 +364,20 @@ class SettingsDialog(gui.SettingsDialog):
         """Update if alert sound is used."""
 
         Settings.set_alert(self.m_audio_alert_checkbox.GetValue())
+        event.Skip()
+
+    def on_notify_test_click(self, event):
+        """Handle notificaton test."""
+
+        if Settings.get_notify():
+            notify.info(
+                self.NOTIFY_TEST_TITLE,
+                self.NOTIFY_TEST_MSG,
+                sound=Settings.get_alert()
+            )
+        elif Settings.get_alert():
+            notify.play_alert()
+
         event.Skip()
 
     def on_single_toggle(self, event):

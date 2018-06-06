@@ -112,23 +112,34 @@ def play_alert():
 ###################################
 # Setup Notifications
 ###################################
-def setup_notifications(app_name, png=None, icon=None, term_notify=(None, None, None)):
+def setup_notifications(app_name, img=None, term_notify=(None, None, None)):
     """Setup notifications for all platforms."""
 
-    destroy_notifications()
+    destroy()
 
-    if icon is not None and isinstance(icon, binary_type):
-        icon = icon.decode('utf-8')
+    if _PLATFORM == "windows" and img is not None and isinstance(img, binary_type):
+        img = img.decode('utf-8')
 
     if isinstance(app_name, binary_type):
         app_name = app_name.decode('utf-8')
 
-    setup_growl(app_name, png, alert)
+    # setup_growl(app_name, png)
     setup(
         app_name,
-        icon if _PLATFORM == "windows" else png,
+        img,
         term_notify if _PLATFORM == "osx" else None
     )
+
+
+def setup_growl_notifications(app_name, png):
+    """Setup growl notifications."""
+
+    growl_destroy()
+
+    if isinstance(app_name, binary_type):
+        app_name = app_name.decode('utf-8')
+
+    setup_growl(app_name, png)
 
 
 def destroy_notifications():
