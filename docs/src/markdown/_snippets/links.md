@@ -4,6 +4,7 @@
 [babel_update_catalog]: http://babel.pocoo.org/en/latest/setup.html#update-catalog
 [backrefs]: http://facelessuser.github.io/backrefs/
 [backrefs-format]: http://facelessuser.github.io/backrefs/#format-replacements
+[bracex]: https://github.com/facelessuser/bracex
 [cchardet]: https://pypi.python.org/pypi/cchardet
 [chardet]: https://pypi.python.org/pypi/chardet
 [filelock]: https://pypi.python.org/pypi/filelock/
@@ -22,4 +23,5 @@
 [regex]: https://pypi.python.org/pypi/regex
 [send2trash]: https://pypi.python.org/pypi/Send2Trash
 [terminal-notifier]: https://github.com/alloy/terminal-notifier
+[wcmatch]: https://github.com/facelessuser/wcmatch
 [wxpython]: https://pypi.python.org/pypi/wxPython/
