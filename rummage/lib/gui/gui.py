@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Jan 25 2018)
+## Python code generated with wxFormBuilder (version May 29 2018)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO *NOT* EDIT THIS FILE!
@@ -1012,61 +1012,104 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_general_panel.Layout()
 		fgSizer52.Fit( self.m_general_panel )
 		self.m_settings_notebook.AddPage( self.m_general_panel, u"General", False )
-		self.m_regex_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_regex_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		self.m_search_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_search_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
-		fgSizer43 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer43 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		fgSizer43.AddGrowableCol( 0 )
 		fgSizer43.SetFlexibleDirection( wx.BOTH )
 		fgSizer43.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_re_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use re module", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+		sbSizer8 = wx.StaticBoxSizer( wx.StaticBox( self.m_search_panel, wx.ID_ANY, u"Regex" ), wx.VERTICAL )
+		
+		fgSizer62 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer62.AddGrowableCol( 0 )
+		fgSizer62.SetFlexibleDirection( wx.BOTH )
+		fgSizer62.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_re_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use re module", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
 		self.m_re_radio.SetValue( True ) 
-		fgSizer43.Add( self.m_re_radio, 0, wx.ALL, 5 )
+		fgSizer62.Add( self.m_re_radio, 0, wx.ALL, 5 )
 		
 		
-		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_bre_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use re module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer43.Add( self.m_bre_radio, 0, wx.ALL, 5 )
+		self.m_bre_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use re module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer62.Add( self.m_bre_radio, 0, wx.ALL, 5 )
 		
 		
-		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_regex_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use regex module", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_regex_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use regex module", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_regex_radio.Enable( False )
 		
-		fgSizer43.Add( self.m_regex_radio, 0, wx.ALL, 5 )
+		fgSizer62.Add( self.m_regex_radio, 0, wx.ALL, 5 )
 		
 		
-		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_bregex_radio = wx.RadioButton( self.m_regex_panel, wx.ID_ANY, u"Use regex module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_bregex_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use regex module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_bregex_radio.Enable( False )
 		
-		fgSizer43.Add( self.m_bregex_radio, 0, wx.ALL, 5 )
+		fgSizer62.Add( self.m_bregex_radio, 0, wx.ALL, 5 )
 		
 		
-		fgSizer43.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_regex_version_label = wx.StaticText( self.m_regex_panel, wx.ID_ANY, u"Regex module version to use", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_regex_version_label = wx.StaticText( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Regex module version to use", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_regex_version_label.Wrap( -1 )
 		self.m_regex_version_label.Enable( False )
 		
-		fgSizer43.Add( self.m_regex_version_label, 0, wx.ALL, 5 )
+		fgSizer62.Add( self.m_regex_version_label, 0, wx.ALL, 5 )
 		
 		m_regex_ver_choiceChoices = [ u"V0", u"V1" ]
-		self.m_regex_ver_choice = wx.Choice( self.m_regex_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_regex_ver_choiceChoices, 0 )
+		self.m_regex_ver_choice = wx.Choice( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_regex_ver_choiceChoices, 0 )
 		self.m_regex_ver_choice.SetSelection( 0 )
 		self.m_regex_ver_choice.Enable( False )
 		
-		fgSizer43.Add( self.m_regex_ver_choice, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
+		fgSizer62.Add( self.m_regex_ver_choice, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
 		
 		
-		self.m_regex_panel.SetSizer( fgSizer43 )
-		self.m_regex_panel.Layout()
-		fgSizer43.Fit( self.m_regex_panel )
-		self.m_settings_notebook.AddPage( self.m_regex_panel, u"Regex", False )
+		sbSizer8.Add( fgSizer62, 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer43.Add( sbSizer8, 1, wx.EXPAND, 5 )
+		
+		sbSizer9 = wx.StaticBoxSizer( wx.StaticBox( self.m_search_panel, wx.ID_ANY, u"File/Folder Matching" ), wx.VERTICAL )
+		
+		fgSizer61 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer61.SetFlexibleDirection( wx.BOTH )
+		fgSizer61.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_extmatch_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Extended match", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer61.Add( self.m_extmatch_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_brace_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Brace expansion", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer61.Add( self.m_brace_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_str_literal_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"String literals", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer61.Add( self.m_str_literal_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_globstar_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Globstar ** (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer61.Add( self.m_globstar_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_fullpath_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path directory match", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer61.Add( self.m_fullpath_checkbox, 0, wx.ALL, 5 )
+		
+		self.m_fullfile_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path file match", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer61.Add( self.m_fullfile_checkbox, 0, wx.ALL, 5 )
+		
+		
+		sbSizer9.Add( fgSizer61, 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer43.Add( sbSizer9, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_search_panel.SetSizer( fgSizer43 )
+		self.m_search_panel.Layout()
+		fgSizer43.Fit( self.m_search_panel )
+		self.m_settings_notebook.AddPage( self.m_search_panel, u"Search", False )
 		self.m_encoding_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_encoding_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
@@ -1107,6 +1150,17 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_editor_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_editor_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 		
+		fgSizer63 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer63.AddGrowableCol( 0 )
+		fgSizer63.SetFlexibleDirection( wx.BOTH )
+		fgSizer63.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_editor_help_textbox = wx.TextCtrl( self.m_editor_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
+		self.m_editor_help_textbox.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		self.m_editor_help_textbox.SetMinSize( wx.Size( -1,100 ) )
+		
+		fgSizer63.Add( self.m_editor_help_textbox, 0, wx.ALL|wx.EXPAND, 5 )
+		
 		fgSizer13 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		fgSizer13.AddGrowableCol( 1 )
 		fgSizer13.SetFlexibleDirection( wx.BOTH )
@@ -1116,16 +1170,19 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_editor_label.Wrap( -1 )
 		fgSizer13.Add( self.m_editor_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_editor_text = wx.TextCtrl( self.m_editor_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		self.m_editor_text = wx.TextCtrl( self.m_editor_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer13.Add( self.m_editor_text, 1, wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_editor_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Change", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_editor_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer13.Add( self.m_editor_button, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		
 		
-		self.m_editor_panel.SetSizer( fgSizer13 )
+		fgSizer63.Add( fgSizer13, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_editor_panel.SetSizer( fgSizer63 )
 		self.m_editor_panel.Layout()
-		fgSizer13.Fit( self.m_editor_panel )
+		fgSizer63.Fit( self.m_editor_panel )
 		self.m_settings_notebook.AddPage( self.m_editor_panel, u"Editor", False )
 		self.m_notify_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_notify_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
@@ -1163,12 +1220,24 @@ class SettingsDialog ( wx.Dialog ):
 		fgSizer35.Add( self.m_term_note_picker, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 		
 		
+		fgSizer35.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_notify_test_button = wx.Button( self.m_notify_panel, wx.ID_ANY, u"Test", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer35.Add( self.m_notify_test_button, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
+		
+		
 		self.m_notify_panel.SetSizer( fgSizer35 )
 		self.m_notify_panel.Layout()
 		fgSizer35.Fit( self.m_notify_panel )
 		self.m_settings_notebook.AddPage( self.m_notify_panel, u"Notifications", False )
 		self.m_history_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_history_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
+		fgSizer66 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer66.AddGrowableCol( 0 )
+		fgSizer66.AddGrowableRow( 1 )
+		fgSizer66.SetFlexibleDirection( wx.BOTH )
+		fgSizer66.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
 		fgSizer30 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		fgSizer30.AddGrowableCol( 0 )
@@ -1183,9 +1252,17 @@ class SettingsDialog ( wx.Dialog ):
 		fgSizer30.Add( self.m_history_clear_button, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 		
 		
-		self.m_history_panel.SetSizer( fgSizer30 )
+		fgSizer66.Add( fgSizer30, 1, wx.EXPAND, 5 )
+		
+		self.m_cache_textbox = wx.TextCtrl( self.m_history_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
+		self.m_cache_textbox.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+		
+		fgSizer66.Add( self.m_cache_textbox, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.m_history_panel.SetSizer( fgSizer66 )
 		self.m_history_panel.Layout()
-		fgSizer30.Fit( self.m_history_panel )
+		fgSizer66.Fit( self.m_history_panel )
 		self.m_settings_notebook.AddPage( self.m_history_panel, u"History", False )
 		self.m_backup_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_backup_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
@@ -1280,12 +1357,20 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_regex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_regex_toggle )
 		self.m_bregex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bregex_toggle )
 		self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
+		self.m_extmatch_checkbox.Bind( wx.EVT_CHECKBOX, self.on_extmatch_toggle )
+		self.m_brace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_brace_toggle )
+		self.m_str_literal_checkbox.Bind( wx.EVT_CHECKBOX, self.on_str_literal_toggle )
+		self.m_globstar_checkbox.Bind( wx.EVT_CHECKBOX, self.on_globstar_toggle )
+		self.m_fullpath_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullpath_toggle )
+		self.m_fullfile_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullfile_toggle )
 		self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
+		self.m_editor_text.Bind( wx.EVT_TEXT, self.on_editor_changed )
 		self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
 		self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
 		self.m_notify_choice.Bind( wx.EVT_CHOICE, self.on_notify_choice )
 		self.m_audio_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_alert_toggle )
 		self.m_term_note_picker.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_term_note_change )
+		self.m_notify_test_button.Bind( wx.EVT_BUTTON, self.on_notify_test_click )
 		self.m_history_clear_button.Bind( wx.EVT_BUTTON, self.on_clear_history )
 		self.m_back_ext_textbox.Bind( wx.EVT_TEXT, self.on_back_ext_changed )
 		self.m_back_ext_button.Bind( wx.EVT_BUTTON, self.on_back_ext_click )
@@ -1332,7 +1417,28 @@ class SettingsDialog ( wx.Dialog ):
 	def on_regex_ver_choice( self, event ):
 		event.Skip()
 	
+	def on_extmatch_toggle( self, event ):
+		event.Skip()
+	
+	def on_brace_toggle( self, event ):
+		event.Skip()
+	
+	def on_str_literal_toggle( self, event ):
+		event.Skip()
+	
+	def on_globstar_toggle( self, event ):
+		event.Skip()
+	
+	def on_fullpath_toggle( self, event ):
+		event.Skip()
+	
+	def on_fullfile_toggle( self, event ):
+		event.Skip()
+	
 	def on_chardet( self, event ):
+		event.Skip()
+	
+	def on_editor_changed( self, event ):
 		event.Skip()
 	
 	def on_editor_change( self, event ):
@@ -1348,6 +1454,9 @@ class SettingsDialog ( wx.Dialog ):
 		event.Skip()
 	
 	def on_term_note_change( self, event ):
+		event.Skip()
+	
+	def on_notify_test_click( self, event ):
 		event.Skip()
 	
 	def on_clear_history( self, event ):
@@ -2548,106 +2657,5 @@ class ErrorTextDialog ( wx.Dialog ):
 	
 	def __del__( self ):
 		pass
-	
-
-###########################################################################
-## Class EditorDialog
-###########################################################################
-
-class EditorDialog ( wx.Dialog ):
-	
-	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Configure Editor", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
-		
-		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
-		
-		bSizer17 = wx.BoxSizer( wx.VERTICAL )
-		
-		self.m_editor_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_editor_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-		
-		fgSizer40 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		fgSizer40.AddGrowableCol( 0 )
-		fgSizer40.SetFlexibleDirection( wx.BOTH )
-		fgSizer40.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		
-		fgSizer43 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		fgSizer43.AddGrowableCol( 0 )
-		fgSizer43.SetFlexibleDirection( wx.BOTH )
-		fgSizer43.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		
-		self.m_help_text = wx.StaticText( self.m_editor_panel, wx.ID_ANY, u"Use the vairable {$file} to insert the file path, {$line} to insert the line number, and {$col} to insert the line column.\n\nDouble quote paths and parameters that contain spaces. {$file} should be double quoted as well.\n\nCheck your editor’s command line options for to proper setup.", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_help_text.Wrap( -1 )
-		fgSizer43.Add( self.m_help_text, 1, wx.ALL|wx.EXPAND, 5 )
-		
-		
-		fgSizer40.Add( fgSizer43, 1, 0, 5 )
-		
-		self.m_staticline8 = wx.StaticLine( self.m_editor_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-		fgSizer40.Add( self.m_staticline8, 0, wx.EXPAND |wx.ALL, 5 )
-		
-		fgSizer41 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		fgSizer41.AddGrowableCol( 0 )
-		fgSizer41.SetFlexibleDirection( wx.BOTH )
-		fgSizer41.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		
-		self.m_editor_textbox = wx.TextCtrl( self.m_editor_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer41.Add( self.m_editor_textbox, 0, wx.ALL|wx.EXPAND, 5 )
-		
-		
-		fgSizer40.Add( fgSizer41, 1, wx.EXPAND, 5 )
-		
-		fgSizer42 = wx.FlexGridSizer( 0, 4, 0, 0 )
-		fgSizer42.AddGrowableCol( 0 )
-		fgSizer42.AddGrowableCol( 3 )
-		fgSizer42.SetFlexibleDirection( wx.BOTH )
-		fgSizer42.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		
-		
-		fgSizer42.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-		
-		self.m_apply_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Apply", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer42.Add( self.m_apply_button, 0, wx.ALL, 5 )
-		
-		self.m_cancel_button = wx.Button( self.m_editor_panel, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer42.Add( self.m_cancel_button, 0, wx.ALL, 5 )
-		
-		
-		fgSizer42.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-		
-		
-		fgSizer40.Add( fgSizer42, 1, wx.EXPAND, 5 )
-		
-		
-		self.m_editor_panel.SetSizer( fgSizer40 )
-		self.m_editor_panel.Layout()
-		fgSizer40.Fit( self.m_editor_panel )
-		bSizer17.Add( self.m_editor_panel, 1, wx.EXPAND |wx.ALL, 5 )
-		
-		
-		self.SetSizer( bSizer17 )
-		self.Layout()
-		bSizer17.Fit( self )
-		
-		self.Centre( wx.BOTH )
-		
-		# Connect Events
-		self.Bind( wx.EVT_SIZE, self.on_resize )
-		self.m_apply_button.Bind( wx.EVT_BUTTON, self.on_apply_click )
-		self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel_click )
-	
-	def __del__( self ):
-		pass
-	
-	
-	# Virtual event handlers, overide them in your derived class
-	def on_resize( self, event ):
-		event.Skip()
-	
-	def on_apply_click( self, event ):
-		event.Skip()
-	
-	def on_cancel_click( self, event ):
-		event.Skip()
 	
 

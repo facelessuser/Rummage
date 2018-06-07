@@ -8,8 +8,8 @@ from __future__ import unicode_literals
 import subprocess
 import traceback
 from os.path import exists
-import ctypes
-import ctypes.util
+# import ctypes
+# import ctypes.util
 import sys
 import platform
 
@@ -22,35 +22,35 @@ if PY3:
 else:
     binary_type = str
 
-appkit = ctypes.cdll.LoadLibrary(ctypes.util.find_library('AppKit'))
-cf = ctypes.cdll.LoadLibrary(ctypes.util.find_library('CoreFoundation'))
-objc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('objc'))
+# appkit = ctypes.cdll.LoadLibrary(ctypes.util.find_library('AppKit'))
+# cf = ctypes.cdll.LoadLibrary(ctypes.util.find_library('CoreFoundation'))
+# objc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('objc'))
 
-kCFStringEncodingUTF8 = 0x08000100
+# kCFStringEncodingUTF8 = 0x08000100
 
-cf.CFStringCreateWithCString.restype = ctypes.c_void_p
-cf.CFStringCreateWithCString.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32]
+# cf.CFStringCreateWithCString.restype = ctypes.c_void_p
+# cf.CFStringCreateWithCString.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32]
 
-objc.objc_getClass.restype = ctypes.c_void_p
-objc.sel_registerName.restype = ctypes.c_void_p
-objc.objc_msgSend.restype = ctypes.c_void_p
-objc.objc_msgSend.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+# objc.objc_getClass.restype = ctypes.c_void_p
+# objc.sel_registerName.restype = ctypes.c_void_p
+# objc.objc_msgSend.restype = ctypes.c_void_p
+# objc.objc_msgSend.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
 
-NSSound = ctypes.c_void_p(objc.objc_getClass('NSSound'))
-NSAutoreleasePool = ctypes.c_void_p(objc.objc_getClass('NSAutoreleasePool'))
-
-
-def _nsstring(string):
-    """Return an NSString object."""
-
-    return ctypes.c_void_p(cf.CFStringCreateWithCString(None, string.encode('utf8'), kCFStringEncodingUTF8))
+# NSSound = ctypes.c_void_p(objc.objc_getClass('NSSound'))
+# NSAutoreleasePool = ctypes.c_void_p(objc.objc_getClass('NSAutoreleasePool'))
 
 
-def _callmethod(obj, method, *args, **kwargs):
-    """Call the ObjC method."""
+# def _nsstring(string):
+#     """Return an NSString object."""
 
-    cast_return = kwargs.get("cast_return", ctypes.c_void_p)
-    return cast_return(objc.objc_msgSend(obj, objc.sel_registerName(method), *args))
+#     return ctypes.c_void_p(cf.CFStringCreateWithCString(None, string.encode('utf8'), kCFStringEncodingUTF8))
+
+
+# def _callmethod(obj, method, *args, **kwargs):
+#     """Call the ObjC method."""
+
+#     cast_return = kwargs.get("cast_return", ctypes.c_void_p)
+#     return cast_return(objc.objc_msgSend(obj, objc.sel_registerName(method), *args))
 
 
 def _is_ver_okay():
@@ -85,12 +85,13 @@ class Options(object):
 def alert(sound=None):
     """Play an alert sound for the OS."""
 
-    pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
-    snd = _nsstring(sound if sound is not None else "Glass")
-    soundobj = _callmethod(NSSound, "soundNamed:", snd)
-    _callmethod(soundobj, "play")
-    _callmethod(pool, "drain")
-    del pool
+    subprocess.call(["afplay", "/System/Library/Sounds/Glass.aiff"])
+    # pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
+    # snd = _nsstring(sound if sound is not None else "Glass")
+    # soundobj = _callmethod(NSSound, "soundNamed:", snd)
+    # _callmethod(soundobj, "play")
+    # _callmethod(pool, "drain")
+    # del pool
 
 
 @staticmethod
@@ -136,10 +137,10 @@ def setup(app_name, icon, *args):
     term_notify = None
     sender = None
 
-    if len(args) and len(args[0]) == 3:
+    if len(args) and len(args[0]) == 2:
         term_notify = args[0][0]
         sender = args[0][1]
-        notify_icon = args[0][2]
+        notify_icon = icon
 
         if term_notify is not None and isinstance(term_notify, binary_type):
             term_notify = term_notify.decode('utf-8')

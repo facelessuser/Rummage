@@ -41,7 +41,7 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.1.0'
+SETTINGS_FMT = '2.2.0'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -69,6 +69,12 @@ DEFAULT_SETTINGS = {
     "notify_method": "default",
     "regex_mode": rumcore.RE_MODE,
     "regex_version": 0,
+    "extmatch": False,
+    "brace_expansion": False,
+    "globstar": False,
+    "string_literals": True,
+    "full_exclude_path": False,
+    "full_file_path": False,
     "saved_searches": {},
     "single_instance": False,
     "term_notifier": "",
@@ -439,11 +445,9 @@ class Settings(object):
         """Update settings."""
 
         updated = False
-        settings_format = cls.settings.get('__format__')
-        # if settings_format is None:
-        #     # Replace invalid settings
-        #     cls.settings = cls.new_settings(cls.settings_file)
-        if settings_format < '2.1.0':
+        settings_format = tuple([int(x) for x in cls.settings.get('__format__').split('.')])
+
+        if settings_format < (2, 1, 0):
             updated = True
             searches = cls.settings.get("saved_searches", {})
 
@@ -475,6 +479,10 @@ class Settings(object):
 
             # Update format
             cls.settings["__format__"] = SETTINGS_FMT
+
+        if settings_format < (2, 2, 0):
+            if 'editor' in cls.settings and isinstance(cls.settings['editor'], (list, tuple)):
+                cls.settings['editor'] = ""
 
         # Update settings with any missing values
         for k, v in DEFAULT_SETTINGS.items():
@@ -782,6 +790,7 @@ class Settings(object):
         png = os.path.join(data.RESOURCE_PATH, "rummage_hires.png")
         icon = os.path.join(data.RESOURCE_PATH, "rummage_tray.ico")
         icns = os.path.join(data.RESOURCE_PATH, "rummage.icns")
+        growl_png = os.path.join(data.RESOURCE_PATH, "rummage_large.png")
 
         if not os.path.exists(png):
             png = None
@@ -800,12 +809,20 @@ class Settings(object):
             os.path.exists(os.path.join(notifier, 'Contents/MacOS/terminal-notifier'))
         ):
             notifier = os.path.join(notifier, 'Contents/MacOS/terminal-notifier')
+
+        if util.platform() == "windows":
+            img = icon
+        elif util.platform() == "osx":
+            img = icns
+        else:
+            img = png
+
         notify.setup_notifications(
             "Rummage",
-            png,
-            icon,
-            (notifier, None, icns)
+            img,
+            (notifier, None)
         )
+        notify.setup_growl_notifications("Rummage", growl_png)
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
 
     @classmethod
@@ -1068,6 +1085,19 @@ class Settings(object):
         return count
 
     @classmethod
+    def get_history(cls, history_types=None):
+        """Get number of history items saved."""
+
+        if history_types is None:
+            history_types = []
+
+        cls.reload_settings()
+        history = {}
+        for h in history_types:
+            history[h] = cls.cache.get(h, [])
+        return history
+
+    @classmethod
     def clear_history_records(cls, history_types=None):
         """Clear history types."""
 
@@ -1079,6 +1109,132 @@ class Settings(object):
             if cls.cache.get(h, None) is not None:
                 cls.cache[h] = []
         cls.save_cache()
+
+    @classmethod
+    def _set_extmatch(cls, value):
+        """Set extmatch."""
+
+        cls.settings['extmatch'] = value
+
+    @classmethod
+    def set_extmatch(cls, value):
+        """Set extmatch."""
+
+        cls.reload_settings()
+        cls._set_extmatch(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_extmatch(cls):
+        """Get extmatch."""
+
+        cls.reload_settings()
+        return cls.settings.get('extmatch', False)
+
+    @classmethod
+    def _set_brace_expansion(cls, value):
+        """Set brace_expansion."""
+
+        cls.settings['brace_expansion'] = value
+
+    @classmethod
+    def set_brace_expansion(cls, value):
+        """Set brace_expansion."""
+
+        cls.reload_settings()
+        cls._set_brace_expansion(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_brace_expansion(cls):
+        """Get brace_expansion."""
+
+        cls.reload_settings()
+        return cls.settings.get('brace_expansion', False)
+
+    @classmethod
+    def _set_string_literals(cls, value):
+        """Set string_literals."""
+
+        cls.settings['string_literals'] = value
+
+    @classmethod
+    def set_string_literals(cls, value):
+        """Set string_literals."""
+
+        cls.reload_settings()
+        cls._set_string_literals(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_string_literals(cls):
+        """Get string_literals."""
+
+        cls.reload_settings()
+        return cls.settings.get('string_literals', True)
+
+    @classmethod
+    def _set_full_exclude_path(cls, value):
+        """Set full_exclude_path."""
+
+        cls.settings['full_exclude_path'] = value
+
+    @classmethod
+    def set_full_exclude_path(cls, value):
+        """Set full_exclude_path."""
+
+        cls.reload_settings()
+        cls._set_full_exclude_path(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_full_exclude_path(cls):
+        """Get full_exclude_path."""
+
+        cls.reload_settings()
+        return cls.settings.get('full_exclude_path', False)
+
+    @classmethod
+    def _set_full_file_path(cls, value):
+        """Set full_file_path."""
+
+        cls.settings['full_file_path'] = value
+
+    @classmethod
+    def set_full_file_path(cls, value):
+        """Set full_file_path."""
+
+        cls.reload_settings()
+        cls._set_full_file_path(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_full_file_path(cls):
+        """Get full_file_path."""
+
+        cls.reload_settings()
+        return cls.settings.get('full_file_path', False)
+
+    @classmethod
+    def _set_globstar(cls, value):
+        """Set globstar."""
+
+        cls.settings['globstar'] = value
+
+    @classmethod
+    def set_globstar(cls, value):
+        """Set globstar."""
+
+        cls.reload_settings()
+        cls._set_globstar(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_globstar(cls):
+        """Get globstar."""
+
+        cls.reload_settings()
+        return cls.settings.get('globstar', False)
 
     @classmethod
     def import_settings(cls, obj):
@@ -1104,6 +1260,20 @@ class Settings(object):
             if 'chardet_mode' in obj['encoding_options']:
                 cls._set_chardet_mode(obj['encoding_options']['chardet_mode'])
             cls._set_encoding_ext(obj['encoding_options'])
+
+        # File matching
+        if 'extmatch' in obj:
+            cls._set_extmatch(obj['extmatch'])
+        if 'brace_expansion' in obj:
+            cls._set_brace_expansion(obj['brace_expansion'])
+        if 'string_literals' in obj:
+            cls._set_string_literals(obj['string_literals'])
+        if 'full_exclude_path' in obj:
+            cls._set_full_exclude_path(obj['full_exclude_path'])
+        if 'full_file_path' in obj:
+            cls._set_full_file_path(obj['full_file_path'])
+        if 'globstar' in obj:
+            cls._set_globstar(obj['globstar'])
 
         # Notifications
         update_notify = False

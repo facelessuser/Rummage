@@ -2,7 +2,6 @@
 """Tests for rumcore."""
 from __future__ import unicode_literals
 import unittest
-import pytest
 import os
 import re
 import regex
@@ -13,170 +12,9 @@ import textwrap
 from backrefs import bre
 from backrefs import bregex
 from rummage.lib import rumcore as rc
-from rummage.lib import util
 from rummage.lib.util import epoch_timestamp as epoch
 from rummage.lib.rumcore import text_decode as td
-
-
-class TestWildcard(unittest.TestCase):
-    """Test wildcard pattern parsing."""
-
-    def test_wildcard_parsing(self):
-        """Test wildcard parsing."""
-
-        p1, p2 = rc.Wildcard2Regex('*test[a-z]?|*test2[a-z]?|-test[!a-z]|-test[!-|a-z]').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:.*test[a-z].|.*test2[a-z].)\Z')
-            self.assertEqual(p2.pattern, r'(?s:test[^a-z]|test[^\-\|a-z])\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:.*test[a-z].|.*test2[a-z].)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:test[^a-z]|test[^\-\|a-z])\Z')
-
-        p1, p2 = rc.Wildcard2Regex('test[]][!][][]').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test[]][^][]\[\])\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test[]][^][]\[\])\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex('test[!]').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test\[\!\])\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test\[\!\])\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex('|test|').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:|test|)\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:|test|)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex('-|-test|-').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:.*)\Z')
-            self.assertEqual(p2.pattern, r'(?s:|test|)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:.*)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:|test|)\Z')
-
-        p1, p2 = rc.Wildcard2Regex('test[^chars]').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test[\^chars])\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test[\^chars])\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1 = rc.Wildcard2Regex(r'test[^\-\&]').translate()[0]
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test[\^\\-\\\&])\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test[\^\\-\\\&])\Z')
-
-        p1 = rc.Wildcard2Regex(r'\*\?\|\[\]').translate()[0]
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:\\.*\\.\\|\\[\\])\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:\\.*\\.\\|\\[\\])\Z')
-
-        p1 = rc.Wildcard2Regex(r'\\u0300').translate()[0]
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:\\u0300)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:\\u0300)\Z')
-
-        self.assertTrue(rc.Wildcard2Regex(r'test\test').translate()[0].match('test\test') is not None)
-        self.assertTrue(rc.Wildcard2Regex(r'test\\test').translate()[0].match('test\\test') is not None)
-        self.assertTrue(rc.Wildcard2Regex(r'test\m').translate()[0].match('test\\m') is not None)
-        self.assertTrue(rc.Wildcard2Regex(r'test\[a-z]').translate()[0].match('test\\b') is not None)
-        self.assertTrue(rc.Wildcard2Regex(r'test\\[a-z]').translate()[0].match('test\\b') is not None)
-        self.assertTrue(rc.Wildcard2Regex('[[]').translate()[0].match('[') is not None)
-        self.assertTrue(rc.Wildcard2Regex('[a&&b]').translate()[0].match('&') is not None)
-        self.assertTrue(rc.Wildcard2Regex('[a||b]').translate()[0].match('|') is not None)
-        self.assertTrue(rc.Wildcard2Regex('[a~~b]').translate()[0].match('~') is not None)
-        self.assertTrue(rc.Wildcard2Regex('[a-z+--A-Z]').translate()[0].match(',') is not None)
-        self.assertTrue(rc.Wildcard2Regex('[a-z--/A-Z]').translate()[0].match('.') is not None)
-
-    def test_wildcard_character_notation(self):
-        """Test wildcard character notations."""
-
-        p1, p2 = rc.Wildcard2Regex(r'test\x70\u0070\160\N{LATIN SMALL LETTER P}').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test\x70\u0070\160\160)\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test\x70\u0070\160\160)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex(r'test[\x70][\u0070][\160][\N{LATIN SMALL LETTER P}]').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test[\x70][\u0070][\160][\160])\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test[\x70][\u0070][\160][\160])\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex(r'test\t\m').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test\t\\m)\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test\t\\m)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex(r'test[\]test').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test[\\]test)\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test[\\]test)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex('test[\\').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test\[\\)\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test\[\\)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex(r'test\33test').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test\033test)\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test\033test)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex(r'test\33').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:test\033)\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:test\033)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        p1, p2 = rc.Wildcard2Regex(r'test\400').translate()
-        if util.PY36:
-            self.assertEqual(p1.pattern, r'(?s:testĀ)\Z')
-            self.assertEqual(p2.pattern, r'(?s:)\Z')
-        else:
-            self.assertEqual(p1.pattern, r'(?ms)(?:testĀ)\Z')
-            self.assertEqual(p2.pattern, r'(?ms)(?:)\Z')
-
-        with pytest.raises(SyntaxError):
-            rc.Wildcard2Regex(r'test\N').translate()
-
-        with pytest.raises(SyntaxError):
-            rc.Wildcard2Regex(r'test\Nx').translate()
-
-        with pytest.raises(SyntaxError):
-            rc.Wildcard2Regex(r'test\N{').translate()
+from wcmatch import wcmatch
 
 
 class TestHelperFunctions(unittest.TestCase):
@@ -447,16 +285,17 @@ class TestDirWalker(unittest.TestCase):
     def setUp(self):
         """Setup the tests."""
 
+        self.default_flags = wcmatch.R | wcmatch.I | wcmatch.M
         self.errors = []
-        self.skipped = []
+        self.skipped = 0
         self.files = []
 
     def crawl_files(self, walker):
         """Crawl the files."""
 
-        for f in walker.run():
+        for f in walker.match():
             if hasattr(f, 'skipped') and f.skipped:
-                self.skipped.append(f)
+                self.skipped += 1
             elif f.error:
                 self.errors.append(f)
             else:
@@ -467,8 +306,8 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.txt', False,
-            None, False,
+            '*.txt', None,
+            False, False, self.default_flags,
             False, False,
             None, None, None,
             None, False
@@ -477,7 +316,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
 
@@ -486,8 +325,8 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.*|-*.file', False,
-            None, False,
+            '*.*|-*.file', None,
+            False, False, self.default_flags,
             False, False,
             None, None, None,
             None, False
@@ -496,7 +335,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 2)
+        self.assertEqual(self.skipped, 2)
         self.assertEqual(len(self.files), 2)
 
     def test_non_recursive_inverse_backup(self):
@@ -504,8 +343,8 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.*|-*.file', False,
-            None, False,
+            '*.*|-*.file', None,
+            False, False, self.default_flags,
             False, False,
             None, None, None,
             'rum-bak', False
@@ -514,7 +353,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
 
     def test_recursive(self):
@@ -522,9 +361,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.txt', False,
-            None, False,
-            True, False,
+            '*.txt', None,
+            True, False, self.default_flags,
+            False, False,
             None, None, None,
             None, False
         )
@@ -532,7 +371,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
 
@@ -541,9 +380,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.txt', False,
-            None, False,
-            True, True,
+            '*.txt', None,
+            True, True, self.default_flags,
+            False, False,
             None, None, None,
             None, False
         )
@@ -551,7 +390,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 4)
+        self.assertEqual(self.skipped, 4)
         self.assertEqual(len(self.files), 2)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
@@ -560,9 +399,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.txt', False,
-            '.hidden', False,
-            True, True,
+            '*.txt', '.hidden',
+            True, True, self.default_flags,
+            False, False,
             None, None, None,
             None, False
         )
@@ -570,7 +409,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
 
@@ -579,9 +418,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.txt', False,
-            '*|-.hidden', False,
-            True, True,
+            '*.txt', '*|-.hidden',
+            True, True, self.default_flags,
+            False, False,
             None, None, None,
             None, False
         )
@@ -589,7 +428,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 4)
+        self.assertEqual(self.skipped, 4)
         self.assertEqual(len(self.files), 2)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
@@ -598,9 +437,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.txt', False,
-            r'\.hidden', True,
-            True, True,
+            '*.txt', r'\.hidden',
+            True, True, self.default_flags,
+            False, True,
             None, None, None,
             None, False
         )
@@ -608,7 +447,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
 
@@ -617,9 +456,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'.*?\.txt', True,
-            None, False,
-            False, False,
+            r'.*?\.txt', None,
+            False, False, self.default_flags,
+            True, False,
             None, None, None,
             None, False
         )
@@ -628,7 +467,7 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.RE_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
@@ -637,9 +476,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'.*?\.txt', True,
-            None, False,
-            False, False,
+            r'.*?\.txt', None,
+            False, False, self.default_flags,
+            True, False,
             None, None, None,
             None, False,
             rc.BRE_MODE
@@ -649,7 +488,7 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.BRE_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
@@ -658,9 +497,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'.*?\.txt', True,
-            None, False,
-            False, False,
+            r'.*?\.txt', None,
+            False, False, self.default_flags,
+            True, False,
             None, None, None,
             None, False,
             rc.REGEX_MODE
@@ -670,7 +509,7 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.REGEX_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
@@ -679,9 +518,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'.*?\.txt', True,
-            None, False,
-            False, False,
+            r'.*?\.txt', None,
+            False, False, self.default_flags,
+            True, False,
             None, None, None,
             None, False,
             rc.BREGEX_MODE
@@ -691,7 +530,7 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.BREGEX_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
@@ -700,9 +539,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'.*?\.txt', True,
-            None, False,
-            False, False,
+            r'.*?\.txt', None,
+            False, False, self.default_flags,
+            True, False,
             None, None, None,
             None, False,
             -1
@@ -712,7 +551,7 @@ class TestDirWalker(unittest.TestCase):
 
         self.assertEqual(walker.regex_mode, rc.RE_MODE)
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 3)
+        self.assertEqual(self.skipped, 3)
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
@@ -721,15 +560,15 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.txt', False,
-            None, False,
-            True, True,
+            '*.txt', None,
+            True, True, self.default_flags,
+            False, False,
             None, None, None,
             None, False
         )
 
         records = 0
-        for f in walker.run():
+        for f in walker.imatch():
             records += 1
             walker.kill()
 
@@ -740,28 +579,28 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            '*.txt', False,
-            None, False,
-            True, True,
+            '*.txt*', None,
+            True, True, self.default_flags,
+            False, False,
             None, None, None,
             None, False
         )
 
         walker.kill()
         records = 0
-        for f in walker.run():
+        for f in walker.imatch():
             records += 1
 
-        self.assertEqual(records, 1)
+        self.assertTrue(records == 1 or walker.get_skipped() == 1)
 
     def test_size_less(self):
         """Test size less than x."""
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'*.*', False,
-            None, False,
-            True, True,
+            r'*.*', None,
+            True, True, self.default_flags,
+            False, False,
             ("lt", 1), None, None,
             None, False
         )
@@ -769,7 +608,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 1)
+        self.assertEqual(self.skipped, 1)
         self.assertEqual(len(self.files), 5)
 
     def test_size_greater(self):
@@ -777,9 +616,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'*.*', False,
-            None, False,
-            True, True,
+            r'*.*', None,
+            True, True, self.default_flags,
+            False, False,
             ("gt", 1), None, None,
             None, False
         )
@@ -787,7 +626,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 5)
+        self.assertEqual(self.skipped, 5)
         self.assertEqual(len(self.files), 1)
 
     def test_size_equal(self):
@@ -795,9 +634,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'*.*', False,
-            None, False,
-            True, True,
+            r'*.*', None,
+            True, True, self.default_flags,
+            False, False,
             ("eq", 0), None, None,
             None, False
         )
@@ -805,7 +644,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 1)
+        self.assertEqual(self.skipped, 1)
         self.assertEqual(len(self.files), 5)
 
     def test_time_modified_less(self):
@@ -816,9 +655,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'*.*', False,
-            None, False,
-            True, True,
+            r'*.*', None,
+            True, True, self.default_flags,
+            False, False,
             None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')), None,
             None, False
         )
@@ -826,7 +665,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(self.skipped, 0)
         self.assertEqual(len(self.files), 6)
 
     def test_time_modified_greater(self):
@@ -834,9 +673,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'*.*', False,
-            None, False,
-            True, True,
+            r'*.*', None,
+            True, True, self.default_flags,
+            False, False,
             None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')), None,
             None, False
         )
@@ -844,7 +683,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(self.skipped, 0)
         self.assertEqual(len(self.files), 6)
 
     def test_time_created_less(self):
@@ -855,9 +694,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'*.*', False,
-            None, False,
-            True, True,
+            r'*.*', None,
+            True, True, self.default_flags,
+            False, False,
             None, None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')),
             None, False
         )
@@ -865,7 +704,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(self.skipped, 0)
         self.assertEqual(len(self.files), 6)
 
     def test_time_created_greater(self):
@@ -873,9 +712,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker',
-            r'*.*', False,
-            None, False,
-            True, True,
+            r'*.*', None,
+            True, True, self.default_flags,
+            False, False,
             None, None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')),
             None, False
         )
@@ -883,7 +722,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(self.skipped, 0)
         self.assertEqual(len(self.files), 6)
 
     def test_backup_folder_no_backup(self):
@@ -891,9 +730,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker_folder_backup',
-            r'*.txt', False,
-            None, False,
-            True, True,
+            r'*.txt', None,
+            True, True, self.default_flags,
+            False, False,
             None, None, None,
             None, True
         )
@@ -901,7 +740,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(self.skipped, 0)
         self.assertEqual(len(self.files), 2)
 
     def test_backup_folder_with_backup(self):
@@ -909,9 +748,9 @@ class TestDirWalker(unittest.TestCase):
 
         walker = rc._DirWalker(
             'tests/dir_walker_folder_backup',
-            r'*.txt', False,
-            None, False,
-            True, True,
+            r'*.txt', None,
+            True, True, self.default_flags,
+            False, False,
             None, None, None,
             '.rum-bak', True
         )
@@ -919,7 +758,7 @@ class TestDirWalker(unittest.TestCase):
         self.crawl_files(walker)
 
         self.assertEqual(len(self.errors), 0)
-        self.assertEqual(len(self.skipped), 0)
+        self.assertEqual(self.skipped, 0)
         self.assertEqual(len(self.files), 1)
 
 
