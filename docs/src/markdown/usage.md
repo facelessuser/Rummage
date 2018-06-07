@@ -2,11 +2,11 @@
 
 ## Overview
 
-Rummage is designed to be easy to pick up. Its interface consists of three tabs: Search, Files, and Content.  In the [Search](#search-tab) tab, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with various toggles and options. The files that get searched can also be narrowed with patterns and filters.
+Rummage is designed to be easy to pick up. Its interface consists of three tabs: Search, Files, and Content.  In the **Search** tab, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with various options. The files that get searched can also be narrowed with patterns and filters.
 
-Rummage uses the default regular expression library ([Re][re]) that comes with Python. It also optionally works with the 3rd party [Regex][regex] library as well.
+Rummage uses the default regular expression library ([Re][re]) that comes with Python. It also optionally works with the 3rd party [Regex][regex] library (if installed).
 
-As matches are found, general info about the matches will be displayed in the [Files](#files-tab) and [Content](#content-tab) tabs. You can double click files to open them in your favorite editor (see [Preferences](#preference) to configure Rummage for your editor).
+As matches are found, general info about the matches will be displayed in the **Files** and **Content** tabs. You can double click files to open them in your favorite editor (see [Editor Preferences](#editor) to configure Rummage for your editor).
 
 Rummage also comes with a simple regular expression tester to test out patterns. It also provides a feature where patterns can be saved for later and/or frequent use. You can even create chains that will apply a series of saved searches.
 
@@ -30,31 +30,35 @@ Or execute the module:
 python -m rummage
 ```
 
-## Search &amp; Replace
+## Searching &amp; Replacing
 
 ![Search Tab](/images/search_tab.png)
 
-Search and replaces are configured in the **Search** tab which is broken up into 2 panels, the first of which is the **Search &amp; Replace** panel.
+Search and replaces are configured in the **Search** tab which is broken up into 2 panels, the first of which is the **Search &amp; Replace** panel. The second is the **Limit Search** panel.
+
+### Search Panel
 
 ![Search and Replace Panel](/images/search_replace_inputs.png)
 
 The **Search &amp; Replace** panel contains three text boxes with a dropdown history. The first text box defines **where to search**, the second defines **what to search for**, and the last defines **what to replace matches with** (this is only needed when doing replaces).  You can select previously used patterns and search targets by expanding the dropdown panel for the input.
 
-Below the text boxes are toggles that control the regular expression engine's flags and features.
+Below the text boxes are checkboxes that control the regular expression engine's options and features.
 
-![Search and Replace Toggles](/images/search_replace_panel.png)
+![Search and Replace Checkboxes](/images/search_replace_panel.png)
 
-The available flags will vary depending on which regular expression engine you are using as Rummage can be used with Python's default [Re][re] engine or the 3rd party [Regex][regex] engine.
+The available features will vary depending on which regular expression engine you are using. Each feature is documented in [Options](#options).
 
-Lastly, Rummage provides buttons to launch a regular expression tester dialog or dialogs to save or load frequently used regular expressions.
+Lastly, Rummage provides buttons to launch a [regular expression tester](#regular-expression-tester), dialogs to [save or load](#saving-and-loading-regular-expressions) frequently used regular expressions, and a .
 
-The second panel, is the **Limit Search** panel.
+### Limit Search Panel
 
 ![Limit Search Panel](/images/limit_search_panel.png)
 
-The **Limit Search** panel contains toggles and inputs that filter the files to be searched.  You can hide hidden files, filter out files by size, or creation date.
+The **Limit Search** panel contains checkboxes and inputs that filter the files to be searched.  You can hide hidden files, filter out files by size, or creation date.
 
-You can also restrict which files get searched by providing a wild card pattern. By default, the patterns are applied to the base file or folder name. See [File Patterns](#file-patterns) to learn more about accepted wild card pattern syntax and how to configure optional file pattern features. If you prefer regular expression, you can optionally use regular expression patterns instead.
+You can also restrict which files get searched by providing a wild card pattern. By default, the patterns are applied to the base file or folder name. See [File Patterns](#wildcard-file-patterns) to learn more about accepted wild card pattern syntax and how to configure optional file pattern features. If you prefer regular expression, you can optionally use regular expression patterns instead.
+
+### Results
 
 Once a search or replace is initiated, the results will begin to appear in the Files and Content tabs. You can then double click a file to open it in your editor, or right click them to bring up a context menu with additional options.
 
@@ -62,11 +66,13 @@ Once a search or replace is initiated, the results will begin to appear in the F
 
 ![Content Tab](/images/content_tab.png)
 
-## Regular Expression Flags
+## Options
 
-### Common Regular Expression Flags
+Rummage supports the default regular expression library ([Re][re]) that comes with Python and the 3rd party [Regex][regex] library, and though the basic syntax and features are similar between the two, Regex provides many additional features, some of which causes the syntax to deviate greatly from Re. If you are using Re, you will not see all the options shown below. Please check out documentation for whichever engine you have chosen to learn more about its specific feature set. This documentation will only briefly cover the features that can be enabled in each engine.
 
-Both the Re and Regex engine have a couple of shared flags that are exposed in Rummage. These toggles are found directly under the search and replace text boxes.
+### Common Options
+
+Both the Re and Regex engine have a couple of shared flags that are exposed in Rummage as checkboxes. These checkboxes are found directly under the search and replace text boxes.
 
 Toggle                      | Description
 --------------------------- | -----------
@@ -76,9 +82,11 @@ Dot\ matches\ newline       | `.` will also match newlines.
 Use\ Unicode\ properties    | Changes the behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use use characters from the Unicode property database (will also modify `\l`, `\L`, `\c`, and `\C` in search patterns if using Backrefs with Re).
 Format\ style\ replacements | Replace pattern will use [a string replace format][format-string] for replace. `#!py3 "{1} {1[-2]} {group_name[-3]}"` etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode [here][backrefs-format]. And remember that Rummage normalizes mentioned differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.
 
-### Regex Engine Flags
+### Regex Engine Options
 
-If the Regex engine is being used for regular expressions, a couple of extra toggles will be available. Regex can be run in either `VERSION0` or `VERSION1` mode.  `VERSION0` is compatible with Re regular expression patterns and has the extra `fullcase` toggle.  `VERSION1` does not have this toggle as it is enabled by default and can only be disabled inline via a pattern with `(?-f)`. `VERSION1` is not directly compatible with Re patterns as it adds a number of changes to the syntax allowing for more advanced search options.
+If the Regex engine is being used for regular expressions, a couple of extra checkboxes will be available. Regex can be run in either `VERSION0` or `VERSION1` mode.
+
+`VERSION0` is compatible with Re regular expression patterns and has the extra `fullcase` toggle. `VERSION1` does not have this toggle as it is enabled by default and can only be disabled inline via a pattern with `(?-f)`. `VERSION1` is not directly compatible with Re patterns as it adds a number of changes to the syntax allowing for more advanced search options.
 
 Toggle                      | Description
 --------------------------- | -----------
@@ -89,7 +97,7 @@ Use\ POSIX\ matching        | Use the POSIX standard for regular expression, whi
 Search\ backwards           | Search backwards. The result of a reverse search is not necessarily the reverse of a forward search.
 Full\ case-folding          | Use full case folding. For Regex `V0` only as it is enabled by default for `V1`.
 
-### Rummage Flags
+### Rummage Options
 
 Rummage has a couple of flags that are not specific to the regular expression engine.
 
@@ -102,52 +110,61 @@ Force\ &lt;encoding&gt; | Forces all files to be opened with the specified encod
 Use\ chain\ search      | Puts Rummage into ["search chain" mode](#search-chains). When in "search chain" mode, rummage will only use saved search chains for search and replace.
 Use\ replace\ plugin    | When enabled, Rummage will use a [replace plugin](#replace-plugins) instead of a replace pattern in order to do more advanced replaces.
 
+!!! tip "Encoding Guessing"
+
+    It is always recommended, if you know the encoding, to use `Force encoding` as it will always be the fastest. Encoding guessing can be slow and not always accurate.
+
+    Encoding guessing is performed by `chardet` which is a pure Python library and is, by far, the slowest option.  If you manually install `cChardet`, you will have a much faster guessing experience.
+
 ## Regular Expression Tester
 
 ![Regex Tester](/images/regex_tester.png)
 
-Rummage comes with a simple regular expression tester. It has a simple text box to place content to search, and another text box that will show the final results after the find and replace are applied.  Below those text boxes, there are two text input boxes for the find pattern and the replace pattern.  Lastly, all search and replace flag toggles are found under the patterns.
+Rummage comes with a simple regular expression tester. It has a simple text box to place content to search, and another text box that will show the final results after the find and replace are applied.  Below those text boxes, there are two text input boxes for the find pattern and the replace pattern.  Lastly, all search and replace flag options are found under the patterns.
 
-To use the tester, simply enter the content to search, set your desired toggles, and input your find and replace pattern.  As you change your pattern or options, matches will be updated and highlighted, and the result box will be updated with any replacements.
+To use the tester, simply enter the content to search, set your desired options, and input your find and replace pattern.  As you change your pattern or options, matches will be updated and highlighted, and the result box will be updated with any replacements.
 
 When you are satisfied with your result, click the `Use` button, and your pattern and settings will be populated in the main window.
 
-## File Patterns
+## Wildcard File Patterns
 
 Rummage uses file patterns and folder excludes to filter which files are searched. The default is to use wild card patterns modeled after `fnmatch` and `glob`. Below is a list of the syntax that is accepted, but not all features are enabled by default.
+
+- Searches are case insensitive by default, even for Linux/Unix systems.
+- Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`. There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.
+- `.` is always matched by `*`, `?`, `[]`, and extended patterns such as `*(...)`. Use enable searching hidden files in the [Limit Panel](#limit-panel).
+
+### Basic Wildcard syntax
+
+Rummage uses the [`wcmatch`][wcmatch] library to implement a specialized version of [`fnmatch`][wcmatch-fnmatch] wildcard patterns for file name matching.
 
 Pattern           | Meaning
 ----------------- | -------
 `*`               | Matches everything.
-`**`              | Matches zero or more directories. Only available for full path matching which is disabled by default.
 `?`               | Matches any single character.
 `[seq]`           | Matches any character in seq.
 `[!seq]`          | Matches any character not in seq.
-`[[:alnum:]]`     | POSIX style character classes inside sequences. The `C` locale is used for byte strings and Unicode properties for Unicode strings. See [POSIX Character Classes](#posix-character-classes) for more info.
+`[[:alnum:]]`     | POSIX style character classes inside sequences. The `C` locale is used for byte strings and Unicode properties for Unicode strings. See [POSIX Character Classes][posix] in `wcmatch`'s documentation for more info.
 `\`               | Escapes characters. If applied to a meta character, it will be treated as a normal character.
 `|`               | Multiple patterns can be provided by separating them with `|`.
 `-`               | If `-` is found at the start of a pattern, it will match the inverse.
-`?(pattern_list)` | The pattern matches if zero or one occurrences of any of the patterns in the `pattern_list` match the input string. Requires extended match feature to be enabled.
-`*(pattern_list)` | The pattern matches if zero or more occurrences of any of the patterns in the `pattern_list` match the input string. Requires extended match feature to be enabled.
-`+(pattern_list)` | The pattern matches if one or more occurrences of any of the patterns in the `pattern_list` match the input string. Requires extended match feature to be enabled.
-`@(pattern_list)` | The pattern matches if exactly one occurrence of any of the patterns in the `pattern_list` match the input string. Requires extended match feature to be enabled.
-`!(pattern_list)` | The pattern matches if the input string cannot be matched with any of the patterns in the `pattern_list`. Requires extended match feature to be enabled.
-`{}`              | Bash style brace expansions.  This is applied to patterns before anything else. Requires brace expansion feature to be enabled.
-`\xhh`            | By specifying `\x` followed by the hexadecimal byte value, you can specify characters directly. Can be disabled by turning off the string literal feature.
-`\uhhhh`          | By specifying `\u` with the four value hexadecimal character value, you can specify Unicode characters directly. Can be disabled by turning off the string literal feature.
-`\Uhhhhhhhh`      | By specifying `\U` with the eight value hexadecimal character value, you can specify wide Unicode characters directly. Can be disabled by turning off the string literal feature.
-`\N{name}`        | By specifying `\N{name}`, where `name` is a valid Unicode character name, you can specify Unicode characters directly. Can be disabled by turning off the string literal feature.
-`\a`              |  ASCII Bell (BEL). Can be disabled by truning off the string literal feature.
-`\b`              |  ASCII Backspace (BS). Can be disabled by truning off the string literal feature.
-`\f`              |  ASCII Formfeed (FF). Can be disabled by truning off the string literal feature.
-`\n`              |  ASCII Linefeed (LF). Can be disabled by truning off the string literal feature.
-`\r`              |  ASCII Carriage Return (CR). Can be disabled by truning off the string literal feature.
-`\t`              |  ASCII Horizontal Tab (TAB). Can be disabled by truning off the string literal feature.
-`\v`              |  ASCII Vertical Tab (VT). Can be disabled by truning off the string literal feature.
 
-- Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`. There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.  This applies to matching patterns and the file names the patterns are applied to.
-- If full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in `[]`, `*`, `?`, or extended patterns like `*(...)`. Slashes can be matched by `**` if globstar (`**`) is enabled.
-- `.` is always matched by `*`, `?`, `[]`, and extended patterns such as `*(...)`. Use enable searching hidden files in the **Limit Panel**.
+By default, Rummage enables support for Python string literals.  These can be disabled in [Preferences](#search_1) if desired.
+
+Pattern           | Meaning
+----------------- | -------
+`\xhh`            | By specifying `\x` followed by the hexadecimal byte value, you can specify characters directly.
+`\uhhhh`          | By specifying `\u` with the four value hexadecimal character value, you can specify Unicode characters directly.
+`\Uhhhhhhhh`      | By specifying `\U` with the eight value hexadecimal character value, you can specify wide Unicode characters directly.
+`\N{name}`        | By specifying `\N{name}`, where `name` is a valid Unicode character name, you can specify Unicode characters directly.
+`\a`              |  ASCII Bell (BEL).
+`\b`              |  ASCII Backspace (BS).
+`\f`              |  ASCII Formfeed (FF).
+`\n`              |  ASCII Linefeed (LF).
+`\r`              |  ASCII Carriage Return (CR).
+`\t`              |  ASCII Horizontal Tab (TAB).
+`\v`              |  ASCII Vertical Tab (VT).
+
 
 !!! example "Example Patterns"
 
@@ -177,13 +194,73 @@ Pattern           | Meaning
 
     If you need to escape `-` or `|`, you can put them in a sequence: `[-|]`. Remember to place `-` at the beginning of a sequence as `-` is also used to specify character ranges: `[a-z]`.
 
+### Extended Match Syntax
+
+In [Preferences](#search_1), you can also enable extended match patterns. Extended match patterns allow you to provide pattern lists to provide more advanced logic.
+
+Pattern           | Meaning
+----------------- | -------
+`?(pattern_list)` | The pattern matches if zero or one occurrences of any of the patterns in the `pattern_list` match the input string. Requires extended match feature to be enabled.
+`*(pattern_list)` | The pattern matches if zero or more occurrences of any of the patterns in the `pattern_list` match the input string. Requires extended match feature to be enabled.
+`+(pattern_list)` | The pattern matches if one or more occurrences of any of the patterns in the `pattern_list` match the input string. Requires extended match feature to be enabled.
+`@(pattern_list)` | The pattern matches if exactly one occurrence of any of the patterns in the `pattern_list` match the input string. Requires extended match feature to be enabled.
+`!(pattern_list)` | The pattern matches if the input string cannot be matched with any of the patterns in the `pattern_list`. Requires extended match feature to be enabled.
+`{}`              | Bash style brace expansions.  This is applied to patterns before anything else. Requires brace expansion feature to be enabled.
+
+!!! example "Example Extended Match Patterns"
+
+    For example, if we wanted to match files `this-file.txt` and `that-file.txt`, we could provide the following pattern:
+
+    ```
+    @(this|that)-file.txt
+    ```
+
+    The `|` contained within an extended match group will not split the pattern. So it is safe to combine with other patterns:
+
+    ```
+    @(this|that)-file.txt|*.py
+    ```
+
+### Brace Expansion Syntax
+
+In [Preferences](#search_1), you can enables Bash style brace expansion.
+
+Brace expansion is applied before anything else. When applied, a pattern will be expanded into multiple patterns. Each pattern will then be parsed separately.
+
+For simple patterns, it may make more sense to use extended match patterns which will only generate a single pattern: `@(ab|ac|ad)`.
+
+Be careful with patterns such as `{1..100}` which would generate one hundred patterns that will all get individually parsed. Sometimes you really need such a pattern, but be mindful that it will be slower as you generate larger sets of patterns.
+
+Pattern           | Meaning
+----------------- | -------
+`{,}`             | Bash style brace expansions.  This is applied to patterns before anything else. Requires brace expansion feature to be enabled.
+`{n1..n2[..i]}`     | Bash style sequences that expands a range of numbers or alphabetic characters by an optional increment.
+
+!!! example "Example Brace Expansion"
+
+    - `a{b,{c,d}}` --> `ab ac ad`
+    - `{1..3}` --> `1 2 3`
+    - `{a..d}` --> `a b c d`
+    - `{2..4..2}` --> `2 4`
+    - `{a..e..2}` --> `a c e`
+
+### Full Path Matching
+
+In [Preferences](#search_1), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
+
+Assuming you Provided a base folder to search of `/My/base/path`, and you were to match a file `/My/base/path/some/file.txt`, normally your file pattern would match against `file.txt`, but with full path enabled, you'd match against `some/file.txt`. This means you'd have to use pattern like `*/*.txt` instead of `*.txt`.
+
+When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in `[]`, `*`, `?`, or extended patterns like `*(...)`. Slashes can be matched by `**` if globstar (`**`) is enabled in [Preferences](#search_1).
+
+Pattern           | Meaning
+----------------- | -------
+`**`              | Matches zero or more directories. Only available for full path matching which is disabled by default.
+
 ## Advanced Search Features
 
 ### Backrefs (Extended Regex Escapes)
 
-Rummage has the option of using a special wrapper called Backrefs. It wraps around Python's Re or the 3rd party Regex module and adds various additional back references that are known to some regex engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on the engine.  You can enable extended back references in the [Preferences](#preferences) dialog.
-
-To learn more about the added back references when using Backrefs, read the official [Backrefs documentation][backrefs].
+Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the [Preferences](#search_1) dialog.
 
 ### Saving and Loading Regular Expressions
 
@@ -215,7 +292,7 @@ Here you can create or delete search chains.
 
 ![Search Chains](/images/chains.png)
 
-To use search chains you must put Rummage in "search chain" mode by selecting the check box named `Use search chains` in the main window. When "search chain" mode is enabled, all controls that don't apply to search chains will be disabled, and the search box will be replaced with a drop down for selecting existing chains you've already created. When a search is performed, Rummage will iterate over each file with all the saved searches in the chain.
+To use search chains, you must put Rummage in "search chain" mode by selecting the check box named `Use search chains` in the main window. When "search chain" mode is enabled, all controls that don't apply to search chains will be disabled, and the search box will be replaced with a drop down for selecting existing chains you've already created. When a search is performed, Rummage will iterate over each file with all the saved searches in the chain.
 
 ![Chain Select](/images/chain_mode.png)
 
@@ -340,7 +417,7 @@ LITERAL = 0x10000           # Literal search
 
 ## Preferences
 
-The preference dialog (found at **File-->Preferences**) is where general application settings are available. The preference dialog organizes settings by tabs.
+The preference dialog is found in the menu at **File-->Preferences** and contains all of the global options that can be controlled for the editor.
 
 ### General
 
@@ -367,7 +444,7 @@ Updates
 
         To get access again to the default certificates is actually quite easy. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed bundle location. If you are using something like macports, then you'll probably have to research to find out how to do the same thing.
 
-### Regex
+### Search {: #search_1}
 
 ![Preferences: Regex](/images/settings_regex.png)
 
@@ -520,14 +597,6 @@ Flags | Supported\ Libraries                       | Option
 `r`   | Regex, Regex\ + \Backrefs                  | [Search backwards.](#regex-engine-flags)
 `p`   | Regex, Regex\ + \Backrefs                  | [Use POSIX matching.](#regex-engine-flags)
 `F`   | Regex, Regex\ + \Backrefs, Re\ + \Backrefs | [Format style replacements.](#common-regular-expression-flags)
-
-#### Backups
-
-Rummage does a backup of files on replace when `Create backups` is enabled in the main dialog. Backups are saved in the same location as the target file with the unique extension `rum-bak` appended to them.  When `Create backups` is enabled, files with the extension `rum-bak` are ignored in search and replace in order to avoid replacing content in your backup.
-
-If desired, Rummage can be configured to store backups in a sub-folder at the target file's location by setting the `Backup to folder` option in the setting dialog. The backup folder will be named `.rum-bak`.  When this is done, all files in `.rum-bak` will have the `bak` extension. The entire folder `.rum-bak` is excluded from search and replace when `Create backups` is enabled.
-
-If you would like, you can control the backup extension in the settings dialog and/or the backup folder name.  Remember though, when saving backups to a sub-folder, the custom extension will not be applied and `bak` will be used as the whole folder is ignored eliminating the need for a unique extension.
 
 ## File Manager Context Menu
 

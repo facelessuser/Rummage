@@ -18,10 +18,12 @@
 [grol-win]: http://www.growlforwindows.com/gfw/
 [mkdocs]: https://github.com/mkdocs/mkdocs
 [mkdocs-material]: https://github.com/squidfunk/mkdocs-material
+[posix]: https://facelessuser.github.io/wcmatch/fnmatch/#posix-character-classes
 [pymdown-extensions]: https://github.com/facelessuser/pymdown-extensions
 [re]: https://docs.python.org/3/library/re.html
 [regex]: https://pypi.python.org/pypi/regex
 [send2trash]: https://pypi.python.org/pypi/Send2Trash
 [terminal-notifier]: https://github.com/alloy/terminal-notifier
 [wcmatch]: https://github.com/facelessuser/wcmatch
+[wcmatch-fnmatch]: https://facelessuser.github.io/wcmatch/fnmatch/#syntax
 [wxpython]: https://pypi.python.org/pypi/wxPython/
