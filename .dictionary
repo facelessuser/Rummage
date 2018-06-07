@@ -2,6 +2,7 @@ API
 Apr
 Aug
 Automator
+BEL
 BOM
 BOMs
 Backrefs
@@ -11,9 +12,11 @@ CLI
 CSV
 Changelog
 Chardet
+Checkboxes
 Dec
 EmojiOne
 Feb
+Formfeed
 GTK
 GitHub
 Homebrew
@@ -21,6 +24,7 @@ JSON
 Jan
 Jul
 Jun
+LF
 MERCHANTABILITY
 Mar
 MkDocs
@@ -44,6 +48,7 @@ Wildcard
 Xcode
 cChardet
 changelog
+checkboxes
 checksum
 dev
 dialog's
@@ -58,6 +63,7 @@ emoji
 endian
 fnmatch
 fullmatch
+globstar
 grepWin
 inline
 macOS
@@ -84,3 +90,4 @@ tuple
 wiki
 wildcard
 wxPython
+wxPython's
