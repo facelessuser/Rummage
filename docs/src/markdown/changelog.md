@@ -8,6 +8,7 @@
 - **NEW**: Use new `wcmatch` library to handle wild card file matching. Includes new features.
 - **NEW**: Add notification test button in settings.
 - **NEW**: Regular expression file patterns will respect the user's preference for the Regex libraries version choice.
+- **NEW**: Don't force ASCII in regular expression file patterns, but let user choose by sending in `(?a)` flag.
 - **FIX**: History clearing did not clear replace plugin history.
 - **FIX**: Growl notifications timing out due to image being to large.
 - **FIX**: Notifications sound not working when just alert sounds are enabled or sound is enabled with Growl.
@@ -79,6 +80,8 @@ Feb 18, 2018
 - **NEW**: Old legacy editor configuration is now removed. Only the new is allowed.
 - **NEW**: Show history in the settings dialog's history panel.
 - **NEW**: Add notification test button in settings.
+- **NEW**: Regular expression file patterns will respect the user's preference for the Regex libraries version choice.
+- **NEW**: Don't force ASCII in regular expression file patterns, but use the default for the Python version. Let user choose by sending in `(?a)` or `(?u)` flag.
 - **FIX**: History clearing did not clear replace plugin history.
 - **FIX**: Growl notifications timing out due to image being to large.
 - **FIX**: Notifications sound not working when just alert sounds are enabled or sound is enabled with Growl.
