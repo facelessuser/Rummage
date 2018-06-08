@@ -1377,13 +1377,14 @@ class _DirWalker(object):
         self, directory, file_pattern, file_regex_match,
         folder_exclude, dir_regex_match, recursive,
         show_hidden, size, modified, created, backup_location,
-        backup_to_folder=False, regex_mode=RE_MODE
+        backup_to_folder=False, regex_mode=RE_MODE, regex_ver=0
     ):
         """Init the directory walker object."""
 
         self.abort = False
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode or regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
+        self.regex_ver = 1 if regex_ver else 0
         self.regex_mode = regex_mode
         self.dir = directory
         self.size = (size[0], size[1]) if size is not None else size
@@ -1413,13 +1414,21 @@ class _DirWalker(object):
                 string = r'.*'
             if string:
                 if self.regex_mode == BREGEX_MODE:
-                    pattern = bregex.compile(string + r'\Z', bregex.IGNORECASE)
+                    flags = bregex.IGNORECASE
+                    flags |= bregex.VERSION1 if self.regex_ver else bregex.VERSION0
+                    pattern = bregex.compile(string + r'\Z', flags)
                 elif self.regex_mode == REGEX_MODE:
-                    pattern = regex.compile(string + r'\Z', regex.IGNORECASE | regex.ASCII)
+                    flags = regex.IGNORECASE
+                    flags |= bregex.VERSION1 if self.regex_ver else bregex.VERSION0
+                    pattern = regex.compile(string + r'\Z', flags)
                 elif self.regex_mode == BRE_MODE:
-                    pattern = bre.compile(string + r'\Z', bre.IGNORECASE | (bre.ASCII if util.PY3 else 0))
+                    flags = bre.IGNORECASE
+                    flags |= bregex.VERSION1 if self.regex_ver else bregex.VERSION0
+                    pattern = bre.compile(string + r'\Z', flags)
                 else:
-                    pattern = re.compile(string + r'\Z', re.IGNORECASE | (re.ASCII if util.PY3 else 0))
+                    flags = re.IGNORECASE
+                    flags |= bregex.VERSION1 if self.regex_ver else bregex.VERSION0
+                    pattern = re.compile(string + r'\Z', flags)
         else:
             if not string and force_default:
                 string = '*'
@@ -1686,7 +1695,8 @@ class Rummage(object):
                 created,
                 self.backup_location if bool(self.file_flags & BACKUP) else None,
                 bool(self.file_flags & BACKUP_FOLDER),
-                self.regex_mode
+                self.regex_mode,
+                0 if flags & VERSION1 else 1
             )
         elif not self.buffer_input and os.path.isfile(self.target):
             try:
