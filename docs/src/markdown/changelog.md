@@ -7,6 +7,7 @@
 - **NEW**: Show history in the settings dialog's history panel.
 - **NEW**: Use new `wcmatch` library to handle wild card file matching. Includes new features.
 - **NEW**: Add notification test button in settings.
+- **NEW**: Regular expression file patterns will respect the user's preference for the Regex libraries version choice.
 - **FIX**: History clearing did not clear replace plugin history.
 - **FIX**: Growl notifications timing out due to image being to large.
 - **FIX**: Notifications sound not working when just alert sounds are enabled or sound is enabled with Growl.
