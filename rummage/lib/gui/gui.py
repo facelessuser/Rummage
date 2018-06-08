@@ -1087,8 +1087,8 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_brace_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Brace expansion", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer61.Add( self.m_brace_checkbox, 0, wx.ALL, 5 )
 		
-		self.m_str_literal_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"String literals", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer61.Add( self.m_str_literal_checkbox, 0, wx.ALL, 5 )
+		self.m_case_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Case sensitive", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer61.Add( self.m_case_checkbox, 0, wx.ALL, 5 )
 		
 		self.m_globstar_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Globstar ** (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer61.Add( self.m_globstar_checkbox, 0, wx.ALL, 5 )
@@ -1359,7 +1359,7 @@ class SettingsDialog ( wx.Dialog ):
 		self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
 		self.m_extmatch_checkbox.Bind( wx.EVT_CHECKBOX, self.on_extmatch_toggle )
 		self.m_brace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_brace_toggle )
-		self.m_str_literal_checkbox.Bind( wx.EVT_CHECKBOX, self.on_str_literal_toggle )
+		self.m_case_checkbox.Bind( wx.EVT_CHECKBOX, self.on_case_toggle )
 		self.m_globstar_checkbox.Bind( wx.EVT_CHECKBOX, self.on_globstar_toggle )
 		self.m_fullpath_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullpath_toggle )
 		self.m_fullfile_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullfile_toggle )
@@ -1423,7 +1423,7 @@ class SettingsDialog ( wx.Dialog ):
 	def on_brace_toggle( self, event ):
 		event.Skip()
 	
-	def on_str_literal_toggle( self, event ):
+	def on_case_toggle( self, event ):
 		event.Skip()
 	
 	def on_globstar_toggle( self, event ):

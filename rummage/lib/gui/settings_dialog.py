@@ -97,7 +97,7 @@ class SettingsDialog(gui.SettingsDialog):
             self.m_regex_ver_choice.Enable(True)
         self.m_extmatch_checkbox.SetValue(Settings.get_extmatch())
         self.m_brace_checkbox.SetValue(Settings.get_brace_expansion())
-        self.m_str_literal_checkbox.SetValue(Settings.get_string_literals())
+        self.m_case_checkbox.SetValue(Settings.get_file_case_sensitive())
         self.m_fullpath_checkbox.SetValue(Settings.get_full_exclude_path())
         self.m_fullfile_checkbox.SetValue(Settings.get_full_file_path())
         self.m_globstar_checkbox.SetValue(Settings.get_globstar())
@@ -169,7 +169,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.LANGUAGE = _("Language (restart required)")
         self.EXTMATCH = _("Extended match")
         self.BRACES = _("Brace expansion")
-        self.STR_LITERALS = _("String literals")
+        self.CASE = _("Case sensitive")
         self.FULL_PATH = _("Full path directory match")
         self.FULL_FILE = _("Full path file match")
         self.GLOBSTAR = _("Globstar ** (full path)")
@@ -243,7 +243,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_regex_version_label.SetLabel(self.REGEX_VER)
         self.m_extmatch_checkbox.SetLabel(self.EXTMATCH)
         self.m_brace_checkbox.SetLabel(self.BRACES)
-        self.m_str_literal_checkbox.SetLabel(self.STR_LITERALS)
+        self.m_case_checkbox.SetLabel(self.CASE)
         self.m_fullpath_checkbox.SetLabel(self.FULL_PATH)
         self.m_fullfile_checkbox.SetLabel(self.FULL_FILE)
         self.m_globstar_checkbox.SetLabel(self.GLOBSTAR)
@@ -502,10 +502,10 @@ class SettingsDialog(gui.SettingsDialog):
 
         Settings.set_brace_expansion(self.m_brace_checkbox.GetValue())
 
-    def on_str_literal_toggle(self, event):
-        """Handle string literal toggle."""
+    def on_case_toggle(self, event):
+        """Handle case toggle."""
 
-        Settings.set_string_literals(self.m_str_literal_checkbox.GetValue())
+        Settings.set_file_case_sensitive(self.m_case_checkbox.GetValue())
 
     def on_fullpath_toggle(self, event):
         """Handle full path toggle."""

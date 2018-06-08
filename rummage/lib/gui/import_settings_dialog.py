@@ -38,7 +38,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
     BOOLEAN = (
         "alert_enabled", "check_updates", "check_prerelease", "debug",
         "hide_limit", "notify_enabled", "single_instance", "extmatch",
-        "brace_expansion", "string_literals", "full_exclude_path", "full_file_path",
+        "brace_expansion", "file_case_sensitive", "full_exclude_path", "full_file_path",
         "globstar"
     )
     STRING = ("backup_ext", "backup_folder", "term_notifier", "editor", "notify_method")

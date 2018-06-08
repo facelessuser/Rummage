@@ -72,7 +72,7 @@ DEFAULT_SETTINGS = {
     "extmatch": False,
     "brace_expansion": False,
     "globstar": False,
-    "string_literals": True,
+    "file_case_sensitive": False,
     "full_exclude_path": False,
     "full_file_path": False,
     "saved_searches": {},
@@ -1153,25 +1153,25 @@ class Settings(object):
         return cls.settings.get('brace_expansion', False)
 
     @classmethod
-    def _set_string_literals(cls, value):
-        """Set string_literals."""
+    def _set_file_case_sensitive(cls, value):
+        """Set file_case_sensitive."""
 
-        cls.settings['string_literals'] = value
+        cls.settings['file_case_sensitive'] = value
 
     @classmethod
-    def set_string_literals(cls, value):
-        """Set string_literals."""
+    def set_file_case_sensitive(cls, value):
+        """Set file_case_sensitive."""
 
         cls.reload_settings()
-        cls._set_string_literals(value)
+        cls._set_file_case_sensitive(value)
         cls.save_settings()
 
     @classmethod
-    def get_string_literals(cls):
-        """Get string_literals."""
+    def get_file_case_sensitive(cls):
+        """Get file_case_sensitive."""
 
         cls.reload_settings()
-        return cls.settings.get('string_literals', True)
+        return cls.settings.get('file_case_sensitive', False)
 
     @classmethod
     def _set_full_exclude_path(cls, value):
@@ -1266,8 +1266,8 @@ class Settings(object):
             cls._set_extmatch(obj['extmatch'])
         if 'brace_expansion' in obj:
             cls._set_brace_expansion(obj['brace_expansion'])
-        if 'string_literals' in obj:
-            cls._set_string_literals(obj['string_literals'])
+        if 'file_case_sensitive' in obj:
+            cls._set_file_case_sensitive(obj['file_case_sensitive'])
         if 'full_exclude_path' in obj:
             cls._set_full_exclude_path(obj['full_exclude_path'])
         if 'full_file_path' in obj:
