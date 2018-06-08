@@ -79,7 +79,7 @@ BACKUP_FOLDER = 0x8000000   # Backup to folder
 # Fnmatch/Glob flags
 EXTMATCH = 0x10000000       # Match with extended patterns +(...) etc.
 BRACE = 0x20000000          # Expand braces a{b,c} -> ab ac
-RAWCHARS = 0x40000000       # Raw char literals \x33 etc.
+FILECASE = 0x40000000       # File case sensitivity
 DIRPATHNAME = 0x80000000    # Full directory exclude path match
 FILEPATHNAME = 0x100000000  # Full file name path match
 GLOBSTAR = 0x200000000      # Use globstar (**) in full paths
@@ -1326,8 +1326,8 @@ class Rummage(object):
             self.wcmatch_flags |= wcmatch.EXTGLOB
         if self.file_flags & BRACE:
             self.wcmatch_flags |= wcmatch.BRACE
-        if self.file_flags & RAWCHARS:
-            self.wcmatch_flags |= wcmatch.RAWCHARS
+        if self.file_flags & FILECASE:
+            self.wcmatch_flags |= wcmatch.FORCECASE
         if self.file_flags & DIRPATHNAME:
             self.wcmatch_flags |= wcmatch.DIRPATHNAME
         if self.file_flags & FILEPATHNAME:

@@ -316,7 +316,7 @@ class RummageArgs(object):
         self.formatreplace = False
         self.extmatch = False
         self.brace_expansion = False
-        self.string_literals = True
+        self.file_case_sensitive = False
         self.full_exclude_path = False
         self.full_file_path = False
         self.globstar = False
@@ -1168,8 +1168,8 @@ class RummageFrame(gui.RummageFrame):
         if args.brace_expansion:
             flags |= rumcore.BRACE
 
-        if args.string_literals:
-            flags |= rumcore.RAWCHARS
+        if args.file_case_sensitive:
+            flags |= rumcore.FILECASE
 
         if args.full_exclude_path:
             flags |= rumcore.DIRPATHNAME
@@ -1348,7 +1348,7 @@ class RummageFrame(gui.RummageFrame):
 
             args.extmatch = bool(Settings.get_extmatch())
             args.brace_expansion = bool(Settings.get_brace_expansion())
-            args.string_literals = bool(Settings.get_string_literals())
+            args.file_case_sensitive = bool(Settings.get_file_case_sensitive())
             args.full_exclude_path = bool(Settings.get_full_exclude_path())
             args.full_file_path = bool(Settings.get_full_file_path())
             args.globstar = bool(Settings.get_globstar())
