@@ -172,7 +172,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.CASE = _("Case sensitive")
         self.FULL_PATH = _("Full path directory match")
         self.FULL_FILE = _("Full path file match")
-        self.GLOBSTAR = _("Globstar ** (full path)")
+        self.GLOBSTAR = _("Globstar **")
         self.REGEX_GROUP = _("Regular Expressions")
         self.FILE_MATCH_GROUP = _("File/Folder Matching")
         self.RE = _("Use re module")
