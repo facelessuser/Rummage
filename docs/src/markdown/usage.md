@@ -130,7 +130,9 @@ When you are satisfied with your result, click the `Use` button, and your patter
 
 Rummage uses file patterns and folder excludes to filter which files are searched. The default is to use wild card patterns modeled after `fnmatch` and `glob`. Below is a list of the syntax that is accepted, but not all features are enabled by default.
 
-- Searches are case insensitive by default, even for Linux/Unix systems.
+If you would prefer regular expression file patterns, please see [Regular Expression File Patterns](#regular-expression-file-patterns).
+
+- File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in [Preferences](#search_1).
 - Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`. There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.
 - `.` is always matched by `*`, `?`, `[]`, and extended patterns such as `*(...)`. Use enable searching hidden files in the [Limit Panel](#limit-panel).
 
@@ -148,11 +150,6 @@ Pattern           | Meaning
 `\`               | Escapes characters. If applied to a meta character, it will be treated as a normal character.
 `|`               | Multiple patterns can be provided by separating them with `|`.
 `-`               | If `-` is found at the start of a pattern, it will match the inverse.
-
-By default, Rummage enables support for Python string literals.  These can be disabled in [Preferences](#search_1) if desired.
-
-Pattern           | Meaning
------------------ | -------
 `\xhh`            | By specifying `\x` followed by the hexadecimal byte value, you can specify characters directly.
 `\uhhhh`          | By specifying `\u` with the four value hexadecimal character value, you can specify Unicode characters directly.
 `\Uhhhhhhhh`      | By specifying `\U` with the eight value hexadecimal character value, you can specify wide Unicode characters directly.
@@ -255,6 +252,16 @@ When full path matching is enabled for a pattern, slashes are generally treated 
 Pattern           | Meaning
 ----------------- | -------
 `**`              | Matches zero or more directories. Only available for full path matching which is disabled by default.
+
+## Regular Expression File Patterns
+
+Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the `Regex` checkbox beside the pattern. The regular expression engine set in [Preferences](#search_1) is what will be used for file patterns. It will also respect the case sensitivity setting in [Preferences](#search_1) for **File/Folder Matching**.
+
+### Full Path Matching
+
+In [Preferences](#search_1), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
+
+Assuming you Provided a base folder to search of `/My/base/path`, and you were to match a file `/My/base/path/some/file.txt`, normally your file pattern would match against `file.txt`, but with full path enabled, you'd match against `some/file.txt`. This means you'd have to use pattern like `.*/.*.txt` instead of `.*.txt`.
 
 ## Advanced Search Features
 
@@ -466,13 +473,7 @@ Remember that encoding detection is far from bulletproof and can pick an incorre
 
 ![Preferences: Editor](/images/settings_editor.png)
 
-The **Editor** panel is where an editor can be configured that will be used to show files for editing.  To setup, click the `Change` button.  You will be presented with a dialog. Simply provide the appropriate command to open files and click `Apply`.
-
-![Editor Options](/images/editor_options.png)
-
-The editor options dialog has a file picker to select the the editor.  In macOS it may be beneficial to create a shell script or symlink that you can references as the picker won't be able to descend into an `.app` bundle as it is viewed as a file instead of a folder.
-
-You can then add arguments.  Each argument must be added as a separate entry.  So something like `--file myfile.txt` would be counted as **two** arguments while `--file=myfile` would be counted as one.
+The **Editor** panel allows you to configure the editor that will be used to open files.  To setup, simply enter the path to the editor and the options it should be called with. Once done, press the save button.
 
 As noted in the image above, Rummage provides 3 special variables that can be used to insert the file name, line number, or column number.
 
@@ -587,16 +588,16 @@ Below is a table containing valid flags for the `flags` parameter.  Literal sear
 
 Flags | Supported\ Libraries                       | Option
 ----- | ------------------------------------------ | -----------
-`i`   | All                                        | [Search case-sensitive.](#common-regular-expression-flags)
-`u`   | All                                        | [Use Unicode properties.](#common-regular-expression-flags)
-`s`   | All                                        | [Dot matches newline.](#common-regular-expression-flags)
-`f`   | Regex, Regex\ + \Backrefs                  | [Full case-folding.](#regex-engine-flags)
-`b`   | Regex, Regex\ + \Backrefs                  | [Best fuzzy match.](#regex-engine-flags)
-`e`   | Regex, Regex\ + \Backrefs                  | [Improve fuzzy fit.](#regex-engine-flags)
-`w`   | Regex, Regex\ + \Backrefs                  | [Unicode word breaks.](#regex-engine-flags)
-`r`   | Regex, Regex\ + \Backrefs                  | [Search backwards.](#regex-engine-flags)
-`p`   | Regex, Regex\ + \Backrefs                  | [Use POSIX matching.](#regex-engine-flags)
-`F`   | Regex, Regex\ + \Backrefs, Re\ + \Backrefs | [Format style replacements.](#common-regular-expression-flags)
+`i`   | All                                        | [Search case-sensitive.](#common-options)
+`u`   | All                                        | [Use Unicode properties.](#common-options)
+`s`   | All                                        | [Dot matches newline.](#common-options)
+`f`   | Regex, Regex\ + \Backrefs                  | [Full case-folding.](#regex-options)
+`b`   | Regex, Regex\ + \Backrefs                  | [Best fuzzy match.](#regex-options)
+`e`   | Regex, Regex\ + \Backrefs                  | [Improve fuzzy fit.](#regex-options)
+`w`   | Regex, Regex\ + \Backrefs                  | [Unicode word breaks.](#regex-options)
+`r`   | Regex, Regex\ + \Backrefs                  | [Search backwards.](#regex-options)
+`p`   | Regex, Regex\ + \Backrefs                  | [Use POSIX matching.](#regex-options)
+`F`   | Regex, Regex\ + \Backrefs, Re\ + \Backrefs | [Format style replacements.](#common-options)
 
 ## File Manager Context Menu
 
