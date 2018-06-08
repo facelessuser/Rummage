@@ -48,7 +48,9 @@ Below the text boxes are checkboxes that control the regular expression engine's
 
 The available features will vary depending on which regular expression engine you are using. Each feature is documented in [Options](#options).
 
-Lastly, Rummage provides buttons to launch a [regular expression tester](#regular-expression-tester), dialogs to [save or load](#saving-and-loading-regular-expressions) frequently used regular expressions, and a .
+Lastly, Rummage provides buttons to launch a [regular expression tester](#regular-expression-tester), dialogs to [save or load](#saving-and-loading-regular-expressions) frequently used regular expressions, and a dialog to create and manage [regular expression chains](#search-chains).
+
+![Regular Expression Buttons](/images/regex_buttons.png)
 
 ### Limit Search Panel
 
@@ -56,7 +58,7 @@ Lastly, Rummage provides buttons to launch a [regular expression tester](#regula
 
 The **Limit Search** panel contains checkboxes and inputs that filter the files to be searched.  You can hide hidden files, filter out files by size, or creation date.
 
-You can also restrict which files get searched by providing a wild card pattern. By default, the patterns are applied to the base file or folder name. See [File Patterns](#wildcard-file-patterns) to learn more about accepted wild card pattern syntax and how to configure optional file pattern features. If you prefer regular expression, you can optionally use regular expression patterns instead.
+You can also restrict which files get searched by providing a wild card pattern. By default, the patterns are applied to the base file or folder name. See [File Patterns](#wildcard) to learn more about accepted wild card pattern syntax and how to configure optional file pattern features. If you prefer regular expression, you can optionally use regular expression patterns instead.
 
 ### Results
 
@@ -126,17 +128,23 @@ To use the tester, simply enter the content to search, set your desired options,
 
 When you are satisfied with your result, click the `Use` button, and your pattern and settings will be populated in the main window.
 
-## Wildcard File Patterns
+## File Patterns
+
+![File Patterns](/images/file_pattern.png)
+
+Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the `Regex` checkbox beside the pattern. Wildcard patterns and regular expression patterns will each be covered separately.
+
+### Wildcard
 
 Rummage uses file patterns and folder excludes to filter which files are searched. The default is to use wild card patterns modeled after `fnmatch` and `glob`. Below is a list of the syntax that is accepted, but not all features are enabled by default.
 
-If you would prefer regular expression file patterns, please see [Regular Expression File Patterns](#regular-expression-file-patterns).
+If you would prefer regular expression file patterns, please see [Regular Expression](#regular-expression) file patterns.
 
 - File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in [Preferences](#search_1).
 - Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`. There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.
 - `.` is always matched by `*`, `?`, `[]`, and extended patterns such as `*(...)`. Use enable searching hidden files in the [Limit Panel](#limit-panel).
 
-### Basic Wildcard syntax
+#### Basic Wildcard syntax
 
 Rummage uses the [`wcmatch`][wcmatch] library to implement a specialized version of [`fnmatch`][wcmatch-fnmatch] wildcard patterns for file name matching.
 
@@ -191,7 +199,7 @@ Pattern           | Meaning
 
     If you need to escape `-` or `|`, you can put them in a sequence: `[-|]`. Remember to place `-` at the beginning of a sequence as `-` is also used to specify character ranges: `[a-z]`.
 
-### Extended Match Syntax
+#### Extended Match Syntax
 
 In [Preferences](#search_1), you can also enable extended match patterns. Extended match patterns allow you to provide pattern lists to provide more advanced logic.
 
@@ -218,7 +226,7 @@ Pattern           | Meaning
     @(this|that)-file.txt|*.py
     ```
 
-### Brace Expansion Syntax
+#### Brace Expansion Syntax
 
 In [Preferences](#search_1), you can enables Bash style brace expansion.
 
@@ -241,7 +249,7 @@ Pattern           | Meaning
     - `{2..4..2}` --> `2 4`
     - `{a..e..2}` --> `a c e`
 
-### Full Path Matching
+#### Full Path Matching
 
 In [Preferences](#search_1), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
 
@@ -253,11 +261,11 @@ Pattern           | Meaning
 ----------------- | -------
 `**`              | Matches zero or more directories. Only available for full path matching which is disabled by default.
 
-## Regular Expression File Patterns
+### Regular Expression
 
 Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the `Regex` checkbox beside the pattern. The regular expression engine set in [Preferences](#search_1) is what will be used for file patterns. It will also respect the case sensitivity setting in [Preferences](#search_1) for **File/Folder Matching**.
 
-### Full Path Matching
+#### Full Path Matching
 
 In [Preferences](#search_1), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
 
@@ -265,7 +273,7 @@ Assuming you Provided a base folder to search of `/My/base/path`, and you were t
 
 ## Advanced Search Features
 
-### Backrefs (Extended Regex Escapes)
+### Backrefs
 
 Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the [Preferences](#search_1) dialog.
 
@@ -455,7 +463,7 @@ Updates
 
 ![Preferences: Regex](/images/settings_search.png)
 
-The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes).
+The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs) (a wrapper that adds a couple of special escapes).
 
 If using Regex, you can set it to version of your choice. `V0` tries to be completely compatible with Re patterns while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation](https://pypi.python.org/pypi/regex/) to learn more.
 
@@ -463,7 +471,7 @@ Under **File/Folder Matching** are a number options for file and folder matching
 
 - [Extended match](#extended-match-syntax).
 - [Brace expansion](#brace-expansion-syntax).
-- Case sensitive for [wildcard match](#wildcard-file-patterns) and for [regular expression match](#regular-expression-file-patterns).
+- Case sensitive for [wildcard match](#wildcard) and for [regular expression match](#regular-expression).
 - [Globstar](#full-path-matching).
 - [Full path directory matching](#full-path-matching).
 - [Full path file matching](#full-path-matching_1).

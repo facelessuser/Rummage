@@ -15,7 +15,7 @@
 [grepwin]: http://stefanstools.sourceforge.net/grepWin.html
 [growl-linux]: http://mattn.github.io/growl-for-linux/
 [growl-macos]: http://growl.info/
-[grol-win]: http://www.growlforwindows.com/gfw/
+[growl-win]: http://www.growlforwindows.com/gfw/
 [mkdocs]: https://github.com/mkdocs/mkdocs
 [mkdocs-material]: https://github.com/squidfunk/mkdocs-material
 [posix]: https://facelessuser.github.io/wcmatch/fnmatch/#posix-character-classes

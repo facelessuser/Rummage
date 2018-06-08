@@ -173,7 +173,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.FULL_PATH = _("Full path directory match")
         self.FULL_FILE = _("Full path file match")
         self.GLOBSTAR = _("Globstar ** (full path)")
-        self.REGEX_GROUP = _("Regex")
+        self.REGEX_GROUP = _("Regular Expressions")
         self.FILE_MATCH_GROUP = _("File/Folder Matching")
         self.RE = _("Use re module")
         self.BRE = _("Use re module with backrefs")
