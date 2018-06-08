@@ -8,6 +8,8 @@ Name                           | Details
 ------------------------------ | -------
 [`wxPython`\ 4.0.1+][wxpython] | The new wxPython Phoenix 4.0.0 is required for the GUI.
 [`backrefs`\ 3.5.0+][backrefs] | Used to extend the `re` or `regex` regular expression engine with additional back references.
+[`bracex`][bracex]             | Bash style brace expansion for file patterns.
+[`wcmatch`][wcmatch]           | File name matching library.
 [`chardet`\ 3.0.4+][chardet]   | Used for file encoding guessing when an encoding is not specified.
 [`filelock`][filelock]         | Used for file locking to allow different instances of Rummage to access the same file.
 [`gntp`][gntp]                 | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
@@ -18,47 +20,39 @@ Some optional modules that can be manually installed.
 Name                   | Details
 ---------------------- | -------
 [`regex`][regex]       | **regex** usage is completely optional, but it is included for those who wish to use it. Regex is a great regular expression engine that adds some nice features such as fuzzy searching, nested char sets, better Unicode support, and more.
-[`cchardet`][cchardet] | `cchardet` is high speed universal character encoding detector. Much faster than `chardet`.
+[`cchardet`][cchardet] | `cchardet` is high speed universal character encoding detector. Much faster than the default `chardet`.
 
 ## Linux Prerequisites
 
-Prerequisites are related to wxPython, the graphical interface for Rummage. For Windows and macOS, there are no prerequisites as wxPython provides pre-built wheels for these operating systems, so Rummage can be installed directly and quickly with `pip`. Only Linux requires additional work before installing, but check out the wxPython documentation to learn how to build manually if you have reasons to do so.  The rest of this section refers exclusively to Linux, and mainly from an Ubuntu perspective as that is usually the distro I test on.
+Rummage requires wxPython in order ton run. On Linux, this must be compiled from source. Before running `pip`, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are found. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under [this section](https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites).
 
-The latest wxPython Phoenix builds with GTK3 by default, so the example below will install GTK3 related dependencies. You can use GTK2 if you build wxPython manually.
+!!! info
+    The latest wxPython Phoenix builds with GTK3 by default, so the example below will install GTK3 related dependencies. You can use GTK2 if you build wxPython manually.
 
-!!! info "Read First!"
+Ubuntu
+: 
 
-    WxPython is a separate project from Rummage, so this documentation may not always be up to date when it comes to the prerequisites for wxPython.
+    ```bash
+    sudo apt-get install python3.5-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
+    ```
 
-    Please check the wxPython prerequisites before installing. Particularly under [this section](https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites), you should find information about Linux Prerequisites.
+    Replace `python3.5-dev` with the Python version you are using.
 
-    I usually try to keep Ubuntu info up to date, but if you find it is outdated, please let me know.  I rely on the community for other distros.
+Fedora 26
+: 
+    For Fedora 26, it has been reported that you need fewer dependencies to build wxPython; I have not personally confirmed this.
 
-Here are some last known prerequisite for a couple of distros. **Remember, they might be out of date**.
+    ```bash
+    sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
+    ```
 
-Example is for Ubuntu:
+    If your Linux distribution has `gstreamer` 1.0 available (like the Fedora distro), you can install the dev packages for that instead of the 0.10 version.
 
-```bash
-sudo apt-get install python3.5-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
-```
-
-Replace `python3.5-dev` with the Python version you are using.
-
-For Fedora 26, it has been reported that you need fewer dependencies to build wxPython; I have not personally confirmed this.
-
-```bash
-sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
-```
-
-If your Linux distribution has `gstreamer` 1.0 available (like the Fedora distro), you can install the dev packages for that instead of the 0.10 version.
-
-After getting all the correct prerequisites, you should be able to install Rummage with `pip`. Be patient while installing Rummage. Linux must build wxPython while macOS and Windows do not. If installing with `pip`, you may be waiting a long time with no real indication of how far along the process is.  If `pip` doesn't work, you can look into building and installing manually.  If you find any of this information, please feel free to offer a pull request or create an issue on GitHub to at least report the problem.
+After getting all the correct prerequisites, you should be able to install Rummage with `pip`. Be patient while installing Rummage. Linux must build wxPython while macOS and Windows do not. If installing with `pip`, you may be waiting a long time with no real indication of how far along the process is.  If `pip` doesn't work, you can look into building and installing manually.  If you find any of this information incorrect, please feel free to offer a pull request or create an issue on GitHub to at least report the problem.
 
 ## macOS Prerequisites
 
-On macOS, Rummage uses either pure Python modules, or modules that provide wheels. What this means is that no C code compilation is required to install Rummage; therefore, no prior steps are needed. But if you want to install `regex`, there will be some C code compilation during install via `pip`.
-
-To install modules like `regex`, you will need to have Xcode installed.
+On macOS, Rummage uses either pure Python modules, or modules that provide wheels. What this means is that no C code compilation is required to install Rummage; therefore, no prior steps are needed. But if you want to install `regex`, there will be some C code compilation performed by `pip` which will require Xcode to be installed.
 
 1. Download Xcode from the Mac App Store.
 2. Navigate to Xcode > Preferences > Downloads tab.
@@ -69,49 +63,43 @@ To install modules like `regex`, you will need to have Xcode installed.
 
 Here are a couple of ways to install and upgrade. Keep in mind if you are a Linux user, you have some [prerequisites](#linux-prerequisites) to install before proceeding.
 
-1. Install:
+Install:
 
-    ```bash
-    pip install rummage
-    ```
+```bash
+pip install rummage
+```
 
-    Or upgrade:
+Upgrade:
 
-    ```bash
-    pip install --upgrade rummage
-    ```
+```bash
+pip install --upgrade rummage
+```
 
-2. Then you can run it from the command line with (assuming your Python scripts/bin folder is in your system path):
+## Running 
 
-    ```bash
-    rummage
-    ```
+Once Rummage is installed, you can run it from the command line (assuming your Python scripts/bin folder is in your system path):
 
-    This is the safest, recommended way to run rummage and will prevent it from loading any Python libraries from your current working directory.
+```bash
+rummage
+```
 
-    In some environments it may make sense to run rummage with `python -m rummage` or `pythonw -m rummage` (`pythonw` being the preferred for a GUI script like this).  In some environments, it may be required (see ["Running in Anaconda (macOS)"](#running-in-anaconda-macos)).
+If you have multiple Python versions installed, you can call the rummage for that specific Python version by appending the major and minor Python version to the end:
 
-    !!! Note "python(w) -m rummage"
-        In general, Rummage uses relative imports and removes the current local directory from the import path to prevent Python from accidentally overwriting an expected module with a local one. In general, it should be safe to use `python -m rummage` or `pythonw -m rummage` most anywhere.  The only module that is imported before this change is `sys`, but there isn't really a way to avoid this.  Using global `rummage` command will always be the safest.
+```bash
+rummage3.6
+```
 
-4. If developing on Rummage, you can clone the project, and install the requirements with the following command:
+In some environments it may make sense to run Rummage with:
 
-    ```bash
-    pip install -r requirements/project.txt`
-    ```
+```bash
+pythonw -m rummage
+```
 
-    When developing, you often want to run the local module, not the one installed. You can do this from the project's root folder by running:
-
-    ```
-    python -m rummage
-    ```
-
-    In general, you may find it more appropriate to use the `pythonw` command instead of `python`.  In some environments, it may be required (see ["Running in Anaconda (macOS)"](#running-in-anaconda-macos)).
+In some environments, it may be required (see ["Running in Anaconda (macOS)"](#running-in-anaconda-macos)).
 
 ## Running in Virtual Environments (macOS)
 
 If installing in a virtual environment via `virtualenv`, you may run into the following error:
-
 
 This used to be a fairly annoying issue to workaround, but in wxPython 4+, it's not too bad.  The wxPython wiki is a bit out of date.  You don't have to symlink `wx.pth` or anything like that anymore as the design of wxPython is a bit different now.  All you have to do is place the script below in `my_virtual_env/bin`.  In this example I call it `fwpy` for "framework python" (make sure to adjust paths or Python versions to match your installation).
 

@@ -7,13 +7,9 @@
 Rummage
 =======
 
-Rummage is a cross platform search and replace tool written in Python. Rummage crawls directories and searches for specified patterns (either regular expression or literal) and can optionally replace those targets with desired text.
+Rummage is a cross platform search and replace tool. Rummage crawls directories and searches for specified patterns (either regular expression or literal) and can optionally replace those targets with desired text.
 
-Windows has always had decent search and replace GUI tools, but at the time, it was difficult to find a decent one for macOS and Linux. Rummage was created to fill that void and is available on Linux, macOS, and Windows.
-
-Rummage is written in Python and is currently available on Python 3.4+. Rummage by default uses the Python's Re regular expression engine, but you can also use the fantastic, feature rich [Regex](https://pypi.python.org/pypi/regex) search engine and do interesting things like fuzzy searching and more.
-
-In general, it is usually preferable to specify an encoding for Rummage to use, but if you don't, Rummage will attempt encoding detection via the default, slower [Chardet](https://pypi.python.org/pypi/chardet) or the optional, faster [cChardet](https://pypi.python.org/pypi/cchardet/) depending on what is installed on your system (Chardet is installed by default with Rummage as it is pure Python). When replacing, it is usually recommended to specify the encoding to ensure the replace is done with the correct encoding.
+Rummage is written in Python and is currently available on Python 3.4+ (some older releases are available for Python 2.7). Rummage by default uses Python's Re regular expression engine, but you can also use the fantastic, feature rich [Regex](https://pypi.python.org/pypi/regex) search engine and do interesting things like fuzzy searching and more.
 
 ## Screenshots
 
