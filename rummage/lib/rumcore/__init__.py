@@ -1118,12 +1118,13 @@ class _DirWalker(wcmatch.WcMatch):
 
     def on_init(
         self, file_regex_match, folder_regex_exclude_match, size, modified, created,
-        backup_location, backup_to_folder, regex_mode=RE_MODE
+        backup_location, backup_to_folder, regex_mode=RE_MODE, regex_ver=0
     ):
         self.file_regex_match = file_regex_match
         self.folder_regex_exclude_match = folder_regex_exclude_match
         if (regex_mode in REGEX_MODES and not REGEX_SUPPORT) or (RE_MODE > regex_mode or regex_mode > BREGEX_MODE):
             regex_mode = RE_MODE
+        self.regex_ver = 1 if regex_ver else 0
         self.regex_mode = regex_mode
         self.size = (size[0], size[1]) if size is not None else size
         self.modified = modified
@@ -1158,16 +1159,18 @@ class _DirWalker(wcmatch.WcMatch):
         if string:
             if self.regex_mode == BREGEX_MODE:
                 flags = bregex.IGNORECASE if not self.case_sensitive else 0
-                pattern = bregex.compile(string, flags | bregex.ASCII)
+                flags |= bregex.VERSION1 if self.regex_ver else bregex.VERSION0
+                pattern = bregex.compile(string, flags)
             elif self.regex_mode == REGEX_MODE:
                 flags = regex.IGNORECASE if not self.case_sensitive else 0
-                pattern = regex.compile(string, flags | regex.ASCII)
+                flags |= bregex.VERSION1 if self.regex_ver else bregex.VERSION0
+                pattern = regex.compile(string, flags)
             elif self.regex_mode == BRE_MODE:
                 flags = bre.IGNORECASE if not self.case_sensitive else 0
-                pattern = bre.compile(string, flags | bre.ASCII)
+                pattern = bre.compile(string, flags)
             else:
                 flags = re.IGNORECASE if not self.case_sensitive else 0
-                pattern = re.compile(string, flags | re.ASCII)
+                pattern = re.compile(string, flags)
 
         return wcmatch._wcparse.WcRegexp((pattern,), tuple())
 
@@ -1375,7 +1378,8 @@ class Rummage(object):
                 created,
                 self.backup_location if bool(self.file_flags & BACKUP) else None,
                 bool(self.file_flags & BACKUP_FOLDER),
-                self.regex_mode
+                self.regex_mode,
+                0 if flags & VERSION1 else 1
             )
         elif not self.buffer_input and os.path.isfile(self.target):
             try:
