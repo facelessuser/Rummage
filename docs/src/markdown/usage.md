@@ -453,11 +453,20 @@ Updates
 
 ### Search {: #search_1}
 
-![Preferences: Regex](/images/settings_regex.png)
+![Preferences: Regex](/images/settings_search.png)
 
 The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](#backrefs-extended-regex-escapes) (a wrapper that adds a couple of special escapes).
 
 If using Regex, you can set it to version of your choice. `V0` tries to be completely compatible with Re patterns while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation](https://pypi.python.org/pypi/regex/) to learn more.
+
+Under **File/Folder Matching** are a number options for file and folder matching patterns. Follow the links to learn more about each feature:
+
+- [Extended match](#extended-match-syntax).
+- [Brace expansion](#brace-expansion-syntax).
+- Case sensitive for [wildcard match](#wildcard-file-patterns) and for [regular expression match](#regular-expression-file-patterns).
+- [Globstar](#full-path-matching).
+- [Full path directory matching](#full-path-matching).
+- [Full path file matching](#full-path-matching_1).
 
 ### Encoding
 
@@ -490,6 +499,8 @@ Argument Variables | Description
 The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
 
 You can also select whether to use the system's built-in notifications or Growl.
+
+A test button is provided to test the configuration once set.
 
 Ubuntu
 : 
