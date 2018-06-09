@@ -1,11 +1,90 @@
 # Changelog
 
+## 4.1.0
+
+- **NEW**: Escape key will terminate a search or replace from any main tab.
+- **NEW**: Old legacy editor configuration is now removed. Only the new is allowed.
+- **NEW**: Show history in the settings dialog's history panel.
+- **NEW**: Use new `wcmatch` library to handle wild card file matching. Includes new features.
+- **NEW**: Add notification test button in settings.
+- **NEW**: Regular expression file patterns will respect the user's preference for the Regex libraries version choice.
+- **NEW**: Don't force ASCII in regular expression file patterns, but let user choose by sending in `(?a)` flag.
+- **FIX**: History clearing did not clear replace plugin history.
+- **FIX**: Growl notifications timing out due to image being to large.
+- **FIX**: Notifications sound not working when just alert sounds are enabled or sound is enabled with Growl.
+
+## 4.0.7
+
+Apr 30, 2018
+
+- **FIX**: Log error during update check. If not a silent check, alert user there was an update check issue.
+- **FIX**: Update requests should use `https`.
+- **FIX**: Update localization.
+
+## 4.0.6
+
+Apr 29, 2018
+
+- **FIX**: Fixes to Windows notifications.
+
+## 4.0.5
+
+Apr 21, 2018
+
+- **FIX**: Single instance handling regression #217.
+
+## 4.0.4
+
+Mar 13, 2018
+
+- **FIX**: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format string replace with the added ability to use format string align and fill.
+- **FIX**: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex replace templates without Backrefs. Require explicit `{{` or `}}`.
+
+## 4.0.3
+
+Mar 6, 2018
+
+- **FIX**: Regression that causes crash when using reverse flag with Regex **and** Backrefs.
+
+## 4.0.2
+
+Feb 27, 2018
+
+- **FIX**: In test dialog, when an expression doesn't match, the result box is empty.
+- **FIX**: Require Backrefs 3.3.0.
+
+## 4.0.1
+
+Feb 20, 2018
+
+- **FIX**: Cleanup some object leaks.
+- **FIX**: Incorrect sizing of chain dialog.
+- **FIX**: All list objects should be finalized properly to allow sorting.
+- **FIX**: Make encoding list style in settings dialog consistent with the look and feel of other list objects.
+
+## 4.0.0
+
+Feb 18, 2018
+
+- **NEW**: Drop Python 2.7 support.
+- **NEW**: Lines are calculated incrementally as needed opposed to all up front.
+- **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
+- **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
+
 ## 3.7.0
 
 - **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
 - **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
 - **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
+- **NEW**: Old legacy editor configuration is now removed. Only the new is allowed.
+- **NEW**: Show history in the settings dialog's history panel.
+- **NEW**: Add notification test button in settings.
+- **NEW**: Regular expression file patterns will respect the user's preference for the Regex libraries version choice.
+- **NEW**: Don't force ASCII in regular expression file patterns, but use the default for the Python version. Let user choose by sending in `(?a)` or `(?u)` flag.
+- **FIX**: History clearing did not clear replace plugin history.
+- **FIX**: Growl notifications timing out due to image being to large.
+- **FIX**: Notifications sound not working when just alert sounds are enabled or sound is enabled with Growl.
 - **FIX**: Log error during update check. If not a silent check, alert user there was an update check issue.
 - **FIX**: Update requests should use `https`.
 - **FIX**: Update localization.
