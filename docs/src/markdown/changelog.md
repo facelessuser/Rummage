@@ -2,6 +2,8 @@
 
 ## 4.1.0
 
+Jun 8, 2018
+
 - **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Old legacy editor configuration is now removed. Only the new is allowed.
 - **NEW**: Show history in the settings dialog's history panel.
@@ -72,6 +74,8 @@ Feb 18, 2018
 - **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
 
 ## 3.7.0
+
+Jun 8, 2018
 
 - **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
