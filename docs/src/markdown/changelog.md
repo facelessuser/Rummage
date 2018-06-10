@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.1.1
+
+Jun 10, 2018
+
+- **FIX**: Fix regression where raw character translations (`\xXX` etc.) are no longer working.
+- **FIX**: Style tweaks to HTML output.
+
 ## 4.1.0
 
 Jun 8, 2018

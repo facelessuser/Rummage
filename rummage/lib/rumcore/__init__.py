@@ -1324,7 +1324,7 @@ class Rummage(object):
         self.file_flags = flags & FILE_MASK
 
         # Wcmatch flags
-        self.wcmatch_flags = wcmatch.I | wcmatch.M
+        self.wcmatch_flags = wcmatch.I | wcmatch.M | wcmatch.R
         if self.file_flags & EXTMATCH:
             self.wcmatch_flags |= wcmatch.EXTGLOB
         if self.file_flags & BRACE:
