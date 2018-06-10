@@ -451,6 +451,25 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(len(self.files), 1)
         self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
 
+    def test_raw_chars(self):
+        """Test raw chars."""
+
+        walker = rc._DirWalker(
+            'tests/dir_walker',
+            r'*.\x74\N{LATIN SMALL LETTER X}\u0074', r'\.\U00000068idden',
+            True, True, self.default_flags,
+            False, True,
+            None, None, None,
+            None, False
+        )
+
+        self.crawl_files(walker)
+
+        self.assertEqual(len(self.errors), 0)
+        self.assertEqual(self.skipped, 3)
+        self.assertEqual(len(self.files), 1)
+        self.assertEqual(os.path.basename(self.files[0].name), 'a.txt')
+
     def test_re(self):
         """Test regex search."""
 
