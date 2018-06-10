@@ -48,7 +48,6 @@ HTML_HEADER = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w
 <script type="text/javascript">
 %(js)s
 </script>
-%(morejs)s
 </head>
 '''
 
@@ -98,25 +97,8 @@ RESULT_CONTENT_TABLE_HEADER = '''
 </tr>
 '''
 
-TABS_START = '''
-<div id="bar">
-<a id="tabbutton1" href="javascript:select_tab(1)">%(file_tab)s</a>
-<a id="tabbutton2" href="javascript:select_tab(2)">%(content_tab)s</a>
-</div>
-
-<div class="main">
-'''
-
-TABS_START_SINGLE = '''
-<div id="bar">
-<a id="tabbutton1" href="javascript:select_tab(1)">%(file_tab)s</a>
-</div>
-
-<div class="main">
-'''
-
 TABS_END = '''
-<div id="search_div"><label id="search_label">%(label)s %(search)s</label></div>
+<div id="search_div"><label id="search_label">%(label)s</label><pre><code>%(search)s</code></pre></div>
 '''
 
 LOAD_TAB = '''
@@ -139,15 +121,13 @@ function select_tab(num) {
 </script>
 '''
 
-TAB_INIT = '''
-<script type="text/javascript">
-select_tab(1)
-</script>
-'''
+TAB = r'''<input name="rummage-resuls" type="radio" id="%(name)s" %(state)s/>
+<label for="%(name)s">%(label)s</label>
+<div class="rummage-content">%(content)s</div>'''
 
 BODY_START = '''
 <body>
-<h1 id="title"><img src="data:image/bmp;base64,%(icon)s"/>%(title)s</h1>
+<h1 id="title">%(title)s</h1>
 '''
 
 BODY_END = '''
@@ -160,10 +140,18 @@ def export_result_list(res, html):
     """Export result list."""
 
     if len(res) == 0:
+        html.write(
+            TAB % {
+                "name": "rummage-files",
+                "label": html_encode(_("Files")),
+                'content': '',
+                'state': 'checked="checked" '
+            }
+        )
         return
-    html.write('<div id="tab1">')
-    html.write('<table class="sortable">')
-    html.write(
+    content = []
+    content.append('<table class="sortable">')
+    content.append(
         RESULT_TABLE_HEADER % {
             "file": html_encode(_("File")),
             "matches": html_encode(_("Matches")),
@@ -177,7 +165,7 @@ def export_result_list(res, html):
     )
 
     for item in res.values():
-        html.write(
+        content.append(
             RESULT_ROW % {
                 "file": html_encode(item[0]),
                 "matches": util.to_ustr(item[1]),
@@ -192,8 +180,15 @@ def export_result_list(res, html):
                 "created": time.ctime(item[7])
             }
         )
-    html.write('</table>')
-    html.write('</div>')
+    content.append('</table>')
+    html.write(
+        TAB % {
+            "name": "rummage-files",
+            "label": html_encode(_("Files")),
+            'content': ''.join(content),
+            'state': 'checked="checked" '
+        }
+    )
 
 
 def export_result_content_list(res, html):
@@ -201,9 +196,9 @@ def export_result_content_list(res, html):
 
     if len(res) == 0:
         return
-    html.write('<div id="tab2"">')
-    html.write('<table class="sortable">')
-    html.write(
+    content = []
+    content.append('<table class="sortable">')
+    content.append(
         RESULT_CONTENT_TABLE_HEADER % {
             "file": html_encode(_("File")),
             "line": html_encode(_("Line")),
@@ -214,7 +209,7 @@ def export_result_content_list(res, html):
     )
 
     for item in res.values():
-        html.write(
+        content.append(
             RESULT_CONTENT_ROW % {
                 "file_sort": html_encode(os.path.join(item[0][1], item[0][0])),
                 "file": html_encode(item[0][0]),
@@ -224,8 +219,15 @@ def export_result_content_list(res, html):
                 "context": html_encode(item[4])
             }
         )
-    html.write('</table>')
-    html.write('</div>')
+    content.append('</table>')
+    html.write(
+        TAB % {
+            "name": "rummage-file-content",
+            "label": html_encode(_("Content")),
+            'content': ''.join(content),
+            'state': ''
+        }
+    )
 
 
 def open_in_browser(name):
@@ -277,7 +279,6 @@ def export(export_html, chain, result_list, result_content_list):
         html.write(
             HTML_HEADER % {
                 "js": data.get_file('sorttable.js'),
-                "morejs": LOAD_TAB,
                 "css": data.get_file('results.css'),
                 "icon": util.to_ustr(base64.b64encode(data.get_image('glass.png').GetData())),
                 "title": title,
@@ -291,14 +292,11 @@ def export(export_html, chain, result_list, result_content_list):
             }
         )
 
-        html.write(
-            (TABS_START if len(result_content_list) else TABS_START_SINGLE) % {
-                "file_tab": html_encode(_("Files")),
-                "content_tab": html_encode(_("Content"))
-            }
-        )
+        html.write('<div id="main">')
+        html.write('<div class=rummage-results>')
         export_result_list(result_list, html)
         export_result_content_list(result_content_list, html)
+        html.write('</div>')
 
         search_label_regex = html_encode(_("Regex search:"))
         search_label_literal = html_encode(_("Literal search:"))
@@ -310,7 +308,6 @@ def export(export_html, chain, result_list, result_content_list):
                 }
             )
         html.write('</div>')
-        html.write(TAB_INIT)
         html.write(BODY_END)
 
     open_in_browser(html.name)

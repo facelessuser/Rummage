@@ -2,39 +2,67 @@ body {
     padding: 0;
     margin: 0 10em;
     height: auto;
-    background: #fff;
-    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
-    text-align: center;
+    background: #ffffff;
+    font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
 }
 
 h1 {
-    position: relative;
-    top: 0;
-    margin-top: 0;
-    padding-top: 50px;
-    color: #333;
+    color: #757575;
+    text-align: center;
 }
-#search_div {
-    margin: 1em auto;
+
+/* Tabbed interface */
+.rummage-results {
+  display: flex;
+  position: relative;
+  border: 8px solid #489bd2;
+  flex-wrap: wrap;
+  background-color: #489bd2;
+  box-shadow:
+    0 2px 2px 0 rgba(0,0,0,.14),
+    0 1px 5px 0 rgba(0,0,0,.12),
+    0 3px 1px -2px rgba(0,0,0,.2);
+  -moz-border-radius: 0.2rem;
+  border-radius: 0.2rem;
 }
-#search_label {
-    padding: 1em 0;
-    font-weight: bold;
-    color: #333;
+
+.rummage-results label {
+  width: auto;
+  color: #ffffff;
+  padding: 0.25em 1em;
+  font-size: 120%;
+  cursor: pointer;
 }
-img {
-    padding: 0;
-    border: 0;
-    vertical-align: middle;
-    width:32px;
-    height: auto;
+
+.rummage-results input {
+  position: absolute;
+  opacity: 0;
 }
+
+.rummage-results input:nth-child(n+1) {
+  color: #333333;
+}
+
+.rummage-results input:nth-child(n+1):checked + label {
+  border-bottom: 0.25em solid #ffffff;
+}
+
+.rummage-results input:nth-child(n+1):checked + label + .rummage-content {
+    display: block;
+}
+
+.rummage-results .rummage-content {
+  display: none;
+  order: 99;
+  width: 100%;
+}
+
 /* Sortable tables */
 table.sortable thead {
-    background-color:#489bd2;
+    background-color: #757575;
     padding-top: 5px;
     padding-bottom: 5px;
-    color:#eeeeee;
+    color:#ffffff;
     font-weight: bold;
     cursor: default;
 }
@@ -47,54 +75,17 @@ table.sortable tbody tr:nth-child(2n) td {
 table.sortable tbody tr:nth-child(2n+1) td {
   background: #ffffff;
 }
-/* Tab Bar */
-#bar a{
-    margin: 0px;
-    padding-top:5px;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 5px;
-    color:#eeeeee;
-    text-decoration:none;
-    font-weight:bold;
-    -moz-border-radius-topright: 10px;
-    border-top-right-radius: 10px;
-    -moz-border-radius-topleft: 10px;
-    border-top-left-radius: 10px;
-    border-bottom: 5px;
-    background:#489bd2;
-    -moz-box-shadow: 3px 3px 4px #444;
-    -webkit-box-shadow: 3px 3px 4px #444;
-    box-shadow: 3px 3px 4px #444;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444')";
-    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444');
-}
-#bar a.unselected {
-    background: #116ba6;
-}
-#bar a:hover{
-    color:#ccffff;
-}
+
 table {
     position: relative;
-    z-index: 99;
     font-size: small;
-    border: 8px solid #489bd2;
     text-align: left;
     margin: auto;
     display: block;
     overflow: auto;
     border-collapse: separate;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
     border-spacing:0;
-    -moz-box-shadow: 3px 3px 4px #444;
-    -webkit-box-shadow: 3px 3px 4px #444;
-    box-shadow: 3px 3px 4px #444;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444')";
-    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444');
+    color: #757575;
 }
 table td, table th {
     white-space: nowrap;
@@ -106,17 +97,35 @@ table td:last-child {
     width: 100%;
 }
 
-dif.tab_hidden:after {
-    visibility: hidden;
+/* Search used */
+#search_div {
+  text-align: center;
+  margin: 1em auto;
+}
+#search_label {
+  padding: 1em 0;
+  font-weight: bold;
+  color: #757575;
 }
 
-div.tab_hidden {
-    display: none;
+pre {
+  padding: 13px 13px 13px 13px;
+  overflow: auto;
+  font-size: 85%;
+  -moz-border-radius: 0.2rem;
+  border-radius: 0.2rem;
+  background-color: #eeeeee;
+  border: 1px solid #e0e0e0;
+  text-align: left;
 }
-div#bar {
-    margin: auto;
-}
-div.main {
-    zoom: 1;
-    padding-bottom: 50px;
+
+code {
+    color: #757575;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 85%;
+    padding: 0;
+    margin: 0;
+    word-break: normal;
+    white-space: pre;
+    background: transparent;
 }
