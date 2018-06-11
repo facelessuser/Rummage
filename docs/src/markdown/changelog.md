@@ -80,6 +80,13 @@ Feb 18, 2018
 - **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
 - **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
 
+## 3.7.1
+
+Jun 10, 2018
+
+- **FIX**: Don't feed Regex version flags into Re patterns.
+- **FIX**: Style tweaks to HTML output.
+
 ## 3.7.0
 
 Jun 8, 2018
