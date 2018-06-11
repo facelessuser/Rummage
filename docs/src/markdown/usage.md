@@ -140,7 +140,7 @@ Rummage uses file patterns and folder excludes to filter which files are searche
 
 If you would prefer regular expression file patterns, please see [Regular Expression](#regular-expression) file patterns.
 
-- File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in [Preferences](#search_1).
+- File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in [Preferences](#search).
 - Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`. There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.
 - `.` is always matched by `*`, `?`, `[]`, and extended patterns such as `*(...)`. Use enable searching hidden files in the [Limit Panel](#limit-panel).
 
@@ -201,7 +201,7 @@ Pattern           | Meaning
 
 #### Extended Match Syntax
 
-In [Preferences](#search_1), you can also enable extended match patterns. Extended match patterns allow you to provide pattern lists to provide more advanced logic.
+In [Preferences](#search), you can also enable extended match patterns. Extended match patterns allow you to provide pattern lists to provide more advanced logic.
 
 Pattern           | Meaning
 ----------------- | -------
@@ -228,7 +228,7 @@ Pattern           | Meaning
 
 #### Brace Expansion Syntax
 
-In [Preferences](#search_1), you can enables Bash style brace expansion.
+In [Preferences](#search), you can enables Bash style brace expansion.
 
 Brace expansion is applied before anything else. When applied, a pattern will be expanded into multiple patterns. Each pattern will then be parsed separately.
 
@@ -251,11 +251,11 @@ Pattern           | Meaning
 
 #### Full Path Matching
 
-In [Preferences](#search_1), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
+In [Preferences](#search), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
 
 Assuming you Provided a base folder to search of `/My/base/path`, and you were to match a file `/My/base/path/some/file.txt`, normally your file pattern would match against `file.txt`, but with full path enabled, you'd match against `some/file.txt`. This means you'd have to use pattern like `*/*.txt` instead of `*.txt`.
 
-When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in `[]`, `*`, `?`, or extended patterns like `*(...)`. Slashes can be matched by `**` if globstar (`**`) is enabled in [Preferences](#search_1).
+When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in `[]`, `*`, `?`, or extended patterns like `*(...)`. Slashes can be matched by `**` if globstar (`**`) is enabled in [Preferences](#search).
 
 Pattern           | Meaning
 ----------------- | -------
@@ -263,11 +263,11 @@ Pattern           | Meaning
 
 ### Regular Expression
 
-Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the `Regex` checkbox beside the pattern. The regular expression engine set in [Preferences](#search_1) is what will be used for file patterns. It will also respect the case sensitivity setting in [Preferences](#search_1) for **File/Folder Matching**.
+Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the `Regex` checkbox beside the pattern. The regular expression engine set in [Preferences](#search) is what will be used for file patterns. It will also respect the case sensitivity setting in [Preferences](#search) for **File/Folder Matching**.
 
 #### Full Path Matching
 
-In [Preferences](#search_1), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
+In [Preferences](#search), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
 
 Assuming you Provided a base folder to search of `/My/base/path`, and you were to match a file `/My/base/path/some/file.txt`, normally your file pattern would match against `file.txt`, but with full path enabled, you'd match against `some/file.txt`. This means you'd have to use pattern like `.*/.*.txt` instead of `.*.txt`.
 
@@ -275,7 +275,7 @@ Assuming you Provided a base folder to search of `/My/base/path`, and you were t
 
 ### Backrefs
 
-Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the [Preferences](#search_1) dialog.
+Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the [Preferences](#search) dialog.
 
 ### Saving and Loading Regular Expressions
 
@@ -459,7 +459,7 @@ Updates
 
         To get access again to the default certificates is actually quite easy. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed bundle location. If you are using something like macports, then you'll probably have to research to find out how to do the same thing.
 
-### Search {: #search_1}
+### Search
 
 ![Preferences: Regex](/images/settings_search.png)
 

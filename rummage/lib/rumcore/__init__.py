@@ -442,7 +442,7 @@ class Wildcard2Regex(object):
         index = i.index
         value = ''
         c = next(i)
-        if c in 'N':
+        if c == 'N':
             # \N{name}
             try:
                 c = next(i)
@@ -1419,15 +1419,13 @@ class _DirWalker(object):
                     pattern = bregex.compile(string + r'\Z', flags)
                 elif self.regex_mode == REGEX_MODE:
                     flags = regex.IGNORECASE
-                    flags |= bregex.VERSION1 if self.regex_ver else bregex.VERSION0
+                    flags |= regex.VERSION1 if self.regex_ver else regex.VERSION0
                     pattern = regex.compile(string + r'\Z', flags)
                 elif self.regex_mode == BRE_MODE:
                     flags = bre.IGNORECASE
-                    flags |= bregex.VERSION1 if self.regex_ver else bregex.VERSION0
                     pattern = bre.compile(string + r'\Z', flags)
                 else:
                     flags = re.IGNORECASE
-                    flags |= bregex.VERSION1 if self.regex_ver else bregex.VERSION0
                     pattern = re.compile(string + r'\Z', flags)
         else:
             if not string and force_default:
