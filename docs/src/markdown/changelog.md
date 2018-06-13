@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.1.2
+
+Jun 13, 2018
+
+- **FIX**: Require `wcmatch` 1.0.1 which fixes a number of bugs, most notably a fix for POSIX character classes not properly being handled when at the start of sequence followed by range syntax (`[[:ascii:]-z]`) which will now be handled properly.
+- **FIX**: When full path is enabled, and no file pattern is specified, all files will properly be matched like they are when full path is not enabled.
+
 ## 4.1.1
 
 Jun 10, 2018

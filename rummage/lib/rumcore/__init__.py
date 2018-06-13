@@ -1141,10 +1141,7 @@ class _DirWalker(wcmatch.WcMatch):
 
         if not isinstance(self.file_pattern, wcmatch._wcparse.WcRegexp):
             if self.file_regex_match:
-                self.file_pattern = self._compile_regexp(self.file_pattern, force_default=True)
-            elif not self.file_pattern:
-                # Force default
-                self.file_pattern = '*'
+                self.file_pattern = self._compile_regexp(self.file_pattern)
 
         if not isinstance(self.exclude_pattern, wcmatch._wcparse.WcRegexp):
             if self.folder_regex_exclude_match:
@@ -1154,8 +1151,6 @@ class _DirWalker(wcmatch.WcMatch):
         r"""Compile or format the inclusion\exclusion pattern."""
 
         pattern = None
-        if not string and force_default:
-            string = r'.*'
         if string:
             if self.regex_mode == BREGEX_MODE:
                 flags = bregex.IGNORECASE if not self.case_sensitive else 0
