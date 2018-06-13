@@ -4,4 +4,4 @@ cchardet
 backrefs>=3.5.1,<4.0
 bracex
 regex
-wcmatch
+wcmatch>=1.0.1
