@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.1.3
+
+Jun 18, 2018
+
+- **FIX**: Officially support Python 3.7.
+
 ## 4.1.2
 
 Jun 13, 2018
