@@ -41,7 +41,7 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.2.0'
+SETTINGS_FMT = '2.3.0'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -59,22 +59,23 @@ DEFAULT_SETTINGS = {
     "backup_ext": "rum-bak",
     "backup_folder": ".rum-bak",
     "backup_type": BACKUP_FILE,
+    "brace_expansion": False,
     "chains": {},
     "check_prerelease": False,
     "check_updates": False,
     "editor": "",
+    "extmatch": False,
+    "file_case_sensitive": False,
+    "full_exclude_path": False,
+    "full_file_path": False,
+    "globstar": False,
     "hide_limit": False,
+    "international_time": False,
     "locale": "en_US",
     "notify_enabled": True,
     "notify_method": "default",
     "regex_mode": rumcore.RE_MODE,
     "regex_version": 0,
-    "extmatch": False,
-    "brace_expansion": False,
-    "globstar": False,
-    "file_case_sensitive": False,
-    "full_exclude_path": False,
-    "full_file_path": False,
     "saved_searches": {},
     "single_instance": False,
     "term_notifier": "",
@@ -280,6 +281,27 @@ class Settings(object):
         """Set hide limit setting."""
 
         cls.settings["hide_limit"] = hide
+
+    @classmethod
+    def get_international_time(cls):
+        """Get international time setting."""
+
+        cls.reload_settings()
+        return cls.settings.get("international_time", False)
+
+    @classmethod
+    def set_international_time(cls, hide):
+        """Set international time setting."""
+
+        cls.reload_settings()
+        cls._set_international_time(hide)
+        cls.save_settings()
+
+    @classmethod
+    def _set_international_time(cls, hide):
+        """Set international time setting."""
+
+        cls.settings["international_time"] = hide
 
     @classmethod
     def get_language(cls):
@@ -1303,6 +1325,9 @@ class Settings(object):
         # Hide limit panel
         if 'hide_limit' in obj:
             cls._set_hide_limit(obj['hide_limit'])
+
+        if 'international_time' in obj:
+            cls._set_international_time(obj['international_time'])
 
         # Regex
         if 'regex_mode' in obj:

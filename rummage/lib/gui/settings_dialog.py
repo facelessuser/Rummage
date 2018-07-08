@@ -81,6 +81,7 @@ class SettingsDialog(gui.SettingsDialog):
         else:
             self.m_editor_text.SetValue(self.editor if self.editor else "")
         self.m_single_checkbox.SetValue(Settings.get_single_instance())
+        self.m_time_output_checkbox.SetValue(Settings.get_international_time())
         self.m_history_label.SetLabel(self.RECORDS % history_records)
         self.m_cache_textbox.SetValue(self.get_history())
         self.m_history_clear_button.Enable(history_records > 0)
@@ -160,6 +161,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.NOTIFICATIONS_TAB = _("Notifications")
         self.HISTORY_TAB = _("History")
         self.SINGLE_INSTANCE = _("Single Instance (applies to new instances)")
+        self.INTERNATIONAL_TIME = _("International time format for file results")
         self.NOTIFY_TEST_TITLE = _("Rummage Test")
         self.NOTIFY_TEST_MSG = _("Test complete!")
         self.NOTIFY_POPUP = _("Notification popup")
@@ -231,6 +233,7 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_search_panel.GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(self.REGEX_GROUP)
         self.m_search_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(self.FILE_MATCH_GROUP)
         self.m_single_checkbox.SetLabel(self.SINGLE_INSTANCE)
+        self.m_time_output_checkbox.SetLabel(self.INTERNATIONAL_TIME)
         self.m_visual_alert_checkbox.SetLabel(self.NOTIFY_POPUP)
         self.m_audio_alert_checkbox.SetLabel(self.ALERT)
         self.m_term_note_label.SetLabel(self.TERM_NOTIFY_PATH)
@@ -406,6 +409,13 @@ class SettingsDialog(gui.SettingsDialog):
         """Update if single instance is used."""
 
         Settings.set_single_instance(self.m_single_checkbox.GetValue())
+
+    def on_time_output_toggle(self, event):
+        """Update international time output."""
+
+        itime = self.m_time_output_checkbox.GetValue()
+        Settings.set_international_time(itime)
+        self.GetParent().set_international_time_output(itime)
 
     def on_language(self, event):
         """Set selected on_language."""
