@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.2.0
+
+- **NEW**: File time result format has been updated for better readability.
+- **NEW**: International file time result format for modified and created times has been added and can be enabled in the global preferences.
+
 ## 4.1.3
 
 Jun 18, 2018

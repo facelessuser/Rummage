@@ -19,7 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
-from time import ctime
+import time
 import wx
 import decimal
 import os
@@ -98,6 +98,7 @@ class ResultFileList(DynamicList):
         """Init ResultFileList object."""
 
         self.localize()
+        self.international = False
 
         super(ResultFileList, self).__init__(
             parent,
@@ -151,6 +152,11 @@ class ResultFileList(DynamicList):
         self.sort_up = self.images.Add(data.get_bitmap('su.png'))
         self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
         self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
+
+    def set_international_time(self, enable):
+        """Enable or disable international time output."""
+
+        self.international = enable
 
     def set_match(self, obj, file_search=False):
         """Set match."""
@@ -216,7 +222,10 @@ class ResultFileList(DynamicList):
         if col == FILE_SIZE:
             return '%.2fKB' % round(self.itemDataMap[item][FILE_SIZE], 2)
         elif col in (FILE_MOD, FILE_CRE):
-            return ctime(self.itemDataMap[item][col])
+            if self.international:
+                return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.itemDataMap[item][col]))
+            else:
+                return time.strftime("%b %d, %Y, %I:%M:%S %p", time.localtime(self.itemDataMap[item][col]))
         else:
             return util.to_ustr(self.itemDataMap[item][col])
 

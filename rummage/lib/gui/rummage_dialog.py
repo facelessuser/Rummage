@@ -397,6 +397,7 @@ class RummageFrame(gui.RummageFrame):
         )
 
         # Replace result panel placeholders with new custom panels
+        self.m_result_file_list.set_international_time(Settings.get_international_time())
         self.m_result_file_list.set_wait_lock(_LOCK)
         self.m_result_list.set_wait_lock(_LOCK)
         self.m_result_file_list.load_list(True)
@@ -653,6 +654,11 @@ class RummageFrame(gui.RummageFrame):
         self.m_created_choice.Clear()
         for x in [self.TIME_ANY, self.TIME_GT, self.TIME_EQ, self.TIME_LT]:
             self.m_created_choice.Append(x)
+
+    def set_international_time_output(self, itime):
+        """Set international time output."""
+
+        self.m_result_file_list.set_international_time(itime)
 
     def set_keybindings(self, keybindings=None):
         """
