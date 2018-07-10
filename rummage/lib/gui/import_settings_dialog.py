@@ -294,7 +294,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
     def import_hidden_cols(self, key, value):
         """Import hidden columns settings."""
 
-        if not self.is_list(v):
+        if not self.is_list(value):
             value = None
         else:
             for x in value[:]:
