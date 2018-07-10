@@ -68,6 +68,9 @@ Once a search or replace is initiated, the results will begin to appear in the F
 
 ![Content Tab](/images/content_tab.png)
 
+!!! tip
+    You can hide/show columns by right clicking the list header to get a special context menu. You can then deselect or select the the column(s) you wish to hide/show respectively.
+
 ## Options
 
 Rummage supports the default regular expression library ([Re][re]) that comes with Python and the 3rd party [Regex][regex] library, and though the basic syntax and features are similar between the two, Regex provides many additional features, some of which causes the syntax to deviate greatly from Re. If you are using Re, you will not see all the options shown below. Please check out documentation for whichever engine you have chosen to learn more about its specific feature set. This documentation will only briefly cover the features that can be enabled in each engine.
@@ -458,6 +461,10 @@ Updates
         There is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
 
         To get access again to the default certificates is actually quite easy. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed bundle location. If you are using something like macports, then you'll probably have to research to find out how to do the same thing.
+
+International Time
+: 
+    Rummage displays file creation and modified time in the form `Jul 01, 2018, 03:00:00 AM`, but you can enable this option to display the times in international format: `2018-07-01 03:00:00`.
 
 ### Search
 
