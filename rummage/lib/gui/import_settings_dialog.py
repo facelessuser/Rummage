@@ -291,6 +291,18 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
             value = None
         return value
 
+    def import_hidden_cols(self, key, value):
+        """Import hidden columns settings."""
+
+        if not self.is_list(value):
+            value = None
+        else:
+            for x in value[:]:
+                if not self.is_integer(x) or x < 0:
+                    value = None
+                    break
+        return value
+
     def import_search(self, key, value):
         """Import search settings."""
 
@@ -378,6 +390,9 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
 
         elif key in self.INTEGER:
             value = self.import_int(key, value)
+
+        elif key in ('hide_cols_file', 'hide_cols_content'):
+            value = self.import_hidden_cols(key, value)
 
         elif key == 'encoding_options':
             value = self.import_encoding_options(key, value)

@@ -69,6 +69,8 @@ DEFAULT_SETTINGS = {
     "full_exclude_path": False,
     "full_file_path": False,
     "globstar": False,
+    "hide_cols_content": [],
+    "hide_cols_file": [],
     "hide_limit": False,
     "international_time": False,
     "locale": "en_US",
@@ -283,6 +285,48 @@ class Settings(object):
         cls.settings["hide_limit"] = hide
 
     @classmethod
+    def get_hide_cols_file(cls):
+        """Get hide cols file."""
+
+        cls.reload_settings()
+        return cls.settings.get("hide_cols_file", [])
+
+    @classmethod
+    def set_hide_cols_file(cls, hide):
+        """Set hide cols file."""
+
+        cls.reload_settings()
+        cls._set_hide_cols_file(sorted(hide))
+        cls.save_settings()
+
+    @classmethod
+    def _set_hide_cols_file(cls, hide):
+        """Set hide cols file."""
+
+        cls.settings["hide_cols_file"] = hide
+
+    @classmethod
+    def get_hide_cols_content(cls):
+        """Get hide cols content."""
+
+        cls.reload_settings()
+        return cls.settings.get("hide_cols_content", [])
+
+    @classmethod
+    def set_hide_cols_content(cls, hide):
+        """Set hide cols content."""
+
+        cls.reload_settings()
+        cls._set_hide_cols_content(sorted(hide))
+        cls.save_settings()
+
+    @classmethod
+    def _set_hide_cols_content(cls, hide):
+        """Set hide cols content."""
+
+        cls.settings["hide_cols_content"] = hide
+
+    @classmethod
     def get_international_time(cls):
         """Get international time setting."""
 
@@ -290,11 +334,11 @@ class Settings(object):
         return cls.settings.get("international_time", False)
 
     @classmethod
-    def set_international_time(cls, hide):
+    def set_international_time(cls, itime):
         """Set international time setting."""
 
         cls.reload_settings()
-        cls._set_international_time(hide)
+        cls._set_international_time(itime)
         cls.save_settings()
 
     @classmethod
@@ -1326,6 +1370,13 @@ class Settings(object):
         if 'hide_limit' in obj:
             cls._set_hide_limit(obj['hide_limit'])
 
+        # Hide columns
+        if 'hide_cols_file' in obj:
+            cls._set_hide_cols_file(obj['hide_cols_file'])
+        if 'hide_cols_content' in obj:
+            cls._set_hide_cols_content(obj['hide_cols_content'])
+
+        # International time
         if 'international_time' in obj:
             cls._set_international_time(obj['international_time'])
 

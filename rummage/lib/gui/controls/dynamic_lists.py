@@ -65,6 +65,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
                 ]
             )
 
+        self.hidden_columns = set()
         self.main_window = self.GetParent().GetParent().GetParent().GetParent()
         self.sort_init = True
         self.complete = False
@@ -83,6 +84,16 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.create_image_list()
         self.setup_columns()
         self.itemIndexMap = []
+
+    def set_hidden_columns(self, hidden):
+        """Set hidden columns."""
+
+        self.hidden_columns = set(hidden)
+        for i in range(0, self.column_count):
+            if i in self.hidden_columns:
+                self.SetColumnWidth(i, 0)
+            elif self.GetColumnWidth(i) == 0:
+                self.SetColumnWidth(i, MINIMUM_COL_SIZE)
 
     def destroy(self):
         """Destroy."""
@@ -143,12 +154,17 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
         total_width = 0
         last_width = 0
+        last_column = -1
         for i in range(0, self.column_count):
-            total_width += self.GetColumnWidth(i)
-            if i == self.column_count - 1:
-                last_width = self.GetColumnWidth(i)
-        if total_width < self.GetSize()[0] - 20:
-            self.SetColumnWidth(self.column_count - 1, last_width + self.GetSize()[0] - total_width)
+            w = self.GetColumnWidth(i)
+            total_width += w
+            last_width = w
+            if w > 0:
+                last_column = i
+        total_width -= last_width
+
+        if total_width < (self.GetSize()[0] - 20) and last_column > -1:
+            self.SetColumnWidth(last_column, last_width + self.GetSize()[0] - total_width)
 
     def setup_columns(self):
         """Setup columns."""
@@ -156,7 +172,10 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         for x in range(0, self.column_count):
             self.InsertColumn(x, self.headers[x])
         for i in range(0, self.column_count):
-            self.SetColumnWidth(i, self.widest_cell[i])
+            if i not in self.hidden_columns:
+                self.SetColumnWidth(i, self.widest_cell[i])
+            else:
+                self.SetColumnWidth(i, 0)
 
     def get_column_count(self):
         """Get column count."""
@@ -205,7 +224,10 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.SetItemCount(len(self.itemDataMap))
         if not self.resize_complete:
             for i in range(0, self.column_count):
-                self.SetColumnWidth(i, self.widest_cell[i])
+                if i not in self.hidden_columns:
+                    self.SetColumnWidth(i, self.widest_cell[i])
+                else:
+                    self.SetColumnWidth(i, 0)
             if not self.size_sample:
                 self.resize_complete = True
         if last:
