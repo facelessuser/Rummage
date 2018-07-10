@@ -9,27 +9,19 @@
 
 ## 4.1.3
 
-Jun 18, 2018
-
 - **FIX**: Officially support Python 3.7.
 
 ## 4.1.2
-
-Jun 13, 2018
 
 - **FIX**: Require `wcmatch` 1.0.1 which fixes a number of bugs, most notably a fix for POSIX character classes not properly being handled when at the start of sequence followed by range syntax (`[[:ascii:]-z]`) which will now be handled properly.
 - **FIX**: When full path is enabled, and no file pattern is specified, all files will properly be matched like they are when full path is not enabled.
 
 ## 4.1.1
 
-Jun 10, 2018
-
 - **FIX**: Fix regression where raw character translations (`\xXX` etc.) are no longer working.
 - **FIX**: Style tweaks to HTML output.
 
 ## 4.1.0
-
-Jun 8, 2018
 
 - **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Old legacy editor configuration is now removed. Only the new is allowed.
@@ -44,47 +36,33 @@ Jun 8, 2018
 
 ## 4.0.7
 
-Apr 30, 2018
-
 - **FIX**: Log error during update check. If not a silent check, alert user there was an update check issue.
 - **FIX**: Update requests should use `https`.
 - **FIX**: Update localization.
 
 ## 4.0.6
 
-Apr 29, 2018
-
 - **FIX**: Fixes to Windows notifications.
 
 ## 4.0.5
 
-Apr 21, 2018
-
 - **FIX**: Single instance handling regression #217.
 
 ## 4.0.4
-
-Mar 13, 2018
 
 - **FIX**: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format string replace with the added ability to use format string align and fill.
 - **FIX**: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex replace templates without Backrefs. Require explicit `{{` or `}}`.
 
 ## 4.0.3
 
-Mar 6, 2018
-
 - **FIX**: Regression that causes crash when using reverse flag with Regex **and** Backrefs.
 
 ## 4.0.2
-
-Feb 27, 2018
 
 - **FIX**: In test dialog, when an expression doesn't match, the result box is empty.
 - **FIX**: Require Backrefs 3.3.0.
 
 ## 4.0.1
-
-Feb 20, 2018
 
 - **FIX**: Cleanup some object leaks.
 - **FIX**: Incorrect sizing of chain dialog.
@@ -93,8 +71,6 @@ Feb 20, 2018
 
 ## 4.0.0
 
-Feb 18, 2018
-
 - **NEW**: Drop Python 2.7 support.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
 - **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
@@ -102,14 +78,10 @@ Feb 18, 2018
 
 ## 3.7.1
 
-Jun 10, 2018
-
 - **FIX**: Don't feed Regex version flags into Re patterns.
 - **FIX**: Style tweaks to HTML output.
 
 ## 3.7.0
-
-Jun 8, 2018
 
 - **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
@@ -139,8 +111,6 @@ Jun 8, 2018
 
 ## 3.6.0
 
-Feb 15, 2018
-
 - **NEW**: Rummage will use `cchardet` by default if found.
 - **NEW**: Expose way to specify `cchardet` being used.
 - **NEW**: Expose special file type encoding handling, and allow user to modify extension list. Covers: `bin`, `python`, `html`, and `xml`.
@@ -162,8 +132,6 @@ Feb 15, 2018
 
 ## 3.5.0
 
-Feb 1, 2018
-
 - **NEW**: Add context menu to content tab just like file tab with all the same entries.
 - **NEW**: Add copy commands to context menus to copy selected file names, paths, or content of match (content tab only).
 - **NEW**: Add "delete" and "send to trash" options to context menu.
@@ -179,26 +147,18 @@ Feb 1, 2018
 
 ## 3.4.3
 
-Jan 23, 2018
-
 - **FIX**: Import of `bregex` when `regex` is not installed.
 - **FIX**: Backwards search did not reassemble text proper.
 
 ## 3.4.2
 
-Jan 23, 2018
-
 - **FIX**: Require Backrefs 3.0.2 which fixes a minor Bregex cache purge issue.
 
 ## 3.4.1
 
-Jan 22, 2018
-
 - **FIX**: Regression where installed CLI command would fail on launch.
 
 ## 3.4.0
-
-Jan 22, 2018
 
 - **NEW**: Require latest Backrefs 3.0.1.
 - **NEW**: Add extension column in results.
@@ -211,21 +171,15 @@ Jan 22, 2018
 
 ## 3.3.0
 
-Jan 17, 2018
-
 - **NEW**: Add changelog link in menu for quick reference.
 - **NEW**: Encoding list is generated from the Python installation being used.
 - **FIX**: Infinite loop on result double click in content list.
 
 ## 3.2.1
 
-Jan 10, 2018
-
 - **FIX**: Complete message should not be of "error" type.
 
 ## 3.2.0
-
-Jan 10, 2018
 
 - **NEW**: Results update live. Progress has been removed. (#140)
 - **FIX**: Windows status bar flicker.
@@ -233,14 +187,10 @@ Jan 10, 2018
 
 ## 3.1.0
 
-Oct 22, 2017
-
 - **NEW**: Add export/import of settings and/or regular expression rules and chains.
 - **NEW**: Add support info dialog to gather info when filing issues.
 
 ## 3.0.0
-
-Sep 29, 2017
 
 - **NEW**: Allow Backrefs' replace references to work with format replaces.
 - **NEW**: Add support for format replace with Re (with Backrefs only).
@@ -250,26 +200,18 @@ Sep 29, 2017
 
 ## 2.3.3
 
-Sep 27, 2017
-
 - **FIX**: Avoid Backrefs 1.1.0 and 2+ for until 2.1.
 
 ## 2.3.2
-
-Aug 18, 2017
 
 - **FIX**: Fix Windows `pythonw` failure.
 
 ## 2.3.1
 
-Jul 26, 2017
-
 - **FIX**: `wxPython` 4.0.0b1 removed label parameter from constructor.
 - **FIX**: Debug Unicode issue.
 
 ## 2.3.0
-
-Jul 17, 2017
 
 - **NEW**: Add reveal right click menu option in "File" tab results.
 - **NEW**: Expose backup configuration and allow putting all backups in a folder if desired.
@@ -277,8 +219,6 @@ Jul 17, 2017
 - **FIX**: Windows Unicode issue when calling a shell command to open file in editor.
 
 ## 2.2.0
-
-Jul 14, 2017
 
 - **NEW**: Redesign of the preferences dialog.
 - **NEW**: Editor configurations are now sent through the shell which changes and simplifies the interface to set it up.
@@ -289,8 +229,6 @@ Jul 14, 2017
 - **FIX**: Revert ensuring window is never bigger than usable size for now.
 
 ## 2.1.0
-
-Jul 9, 2017
 
 - **NEW**: Add new chained search feature.
 - **NEW**: Add new replace plugin support.
@@ -317,38 +255,26 @@ Jul 9, 2017
 
 ## 2.0.5
 
-Jul 2, 2017
-
 - **FIX**: Issue where mousing over results showed nothing in status bar.
 - **FIX**: Issue where double clicking result in Content pattern would not open in editor.
 
 ## 2.0.4
 
-Jun 30, 2017
-
 - **FIX**: Bump rev.
 
 ## 2.0.3
-
-Jun 30, 2017
 
 - **FIX**: Fix editor argument dialog.
 
 ## 2.0.2
 
-Jun 27, 2017
-
 - **FIX**: Revert changes in 2.0.1 as wheels don't run setup and don't properly create the Python specific commands.
 
 ## 2.0.1
 
-Jun 27, 2017
-
 - **FIX**: Release binary in path as `rummage` and `rummage<version>`. So for 2.7, it would be `rummage2.7`.
 
 ## 2.0.0
-
-Jun 27, 2017
 
 - **NEW**: Python 3 support via the new wxPython 4.0.0 Phoenix!
 - **NEW**: Dropped classic wxPython (<4.0.0) as it is too much work to maintain legacy support as well.
@@ -361,18 +287,12 @@ Jun 27, 2017
 
 ## 1.0.2
 
-Jul 16, 2016
-
 - **FIX**: issue where editor could not be set.
 
 ## 1.0.1
 
-Jun 22, 2016
-
 - **FIX**: Fixed issue where literal replace was not actually literal replace.
 
 ## 1.0.0
-
-May 3, 2016
 
 - **NEW**: Initial release
