@@ -4,6 +4,7 @@
 
 - **NEW**: File time result format has been updated for better readability.
 - **NEW**: International file time result format for modified and created times has been added and can be enabled in the global preferences.
+- **NEW**: Add ability to hide result columns.
 - **FIX**: Use wxPython API to highlight alternate rows in lists in order to properly highlight rows on systems with dark themes etc.
 
 ## 4.1.3

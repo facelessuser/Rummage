@@ -29,6 +29,7 @@ from ..actions import fileops
 from ..localization import _
 from .. import data
 from ... import util
+from ..settings import Settings
 from ..actions import checksum
 
 CONTENT_PATH = 0
@@ -81,7 +82,14 @@ class ContextMenu(wx.Menu):
                         parent.Enable(item.GetId(), False)
                 else:
                     menuid = wx.NewId()
-                    item = wx.MenuItem(self, menuid, i[0])
+                    item = wx.MenuItem(
+                        self,
+                        menuid,
+                        i[0],
+                        kind=(wx.ITEM_CHECK if len(i) > 3 else wx.ITEM_NORMAL)
+                    )
+                    if len(i) > 3 and i[3]:
+                        item.Check()
                     parent.Append(item)
                     if len(i) > 2 and not i[2]:
                         parent.Enable(menuid, False)
@@ -119,6 +127,7 @@ class ResultFileList(DynamicList):
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_rclick)
+        self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.on_col_rclick)
 
     def localize(self):
         """Translate strings."""
@@ -380,6 +389,37 @@ class ResultFileList(DynamicList):
             menu.Destroy()
         event.Skip()
 
+    def on_col_hide_click(self, event, col=-1):
+        """Hande column hide click."""
+
+        hidden = list(self.hidden_columns)
+
+        if not event.IsChecked():
+            if col not in hidden:
+                hidden.append(col)
+        elif col in hidden:
+            del hidden[hidden.index(col)]
+        self.set_hidden_columns(hidden)
+        Settings.set_hide_cols_file(list(self.hidden_columns))
+
+    def on_col_rclick(self, event):
+        """Hanlde col right click."""
+
+        menu = ContextMenu(
+            [
+                (self.FILE, functools.partial(self.on_col_hide_click, col=0), True, 0 not in self.hidden_columns),
+                (self.MATCHES, functools.partial(self.on_col_hide_click, col=1), True, 1 not in self.hidden_columns),
+                (self.EXTENSION, functools.partial(self.on_col_hide_click, col=2), True, 2 not in self.hidden_columns),
+                (self.SIZE, functools.partial(self.on_col_hide_click, col=3), True, 3 not in self.hidden_columns),
+                (self.PATH, functools.partial(self.on_col_hide_click, col=4), True, 4 not in self.hidden_columns),
+                (self.ENCODING, functools.partial(self.on_col_hide_click, col=5), True, 5 not in self.hidden_columns),
+                (self.MODIFIED, functools.partial(self.on_col_hide_click, col=6), True, 6 not in self.hidden_columns),
+                (self.CREATED, functools.partial(self.on_col_hide_click, col=7), True, 7 not in self.hidden_columns),
+            ]
+        )
+        self.PopupMenu(menu)
+        menu.Destroy()
+
 
 class ResultContentList(DynamicList):
     """ResultContentList."""
@@ -405,6 +445,7 @@ class ResultContentList(DynamicList):
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_rclick)
+        self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.on_col_rclick)
 
     def localize(self):
         """Translate strings."""
@@ -680,3 +721,31 @@ class ResultContentList(DynamicList):
             self.PopupMenu(menu, pos)
             menu.Destroy()
         event.Skip()
+
+    def on_col_hide_click(self, event, col=-1):
+        """Hande column hide click."""
+
+        hidden = list(self.hidden_columns)
+
+        if not event.IsChecked():
+            if col not in hidden:
+                hidden.append(col)
+        elif col in hidden:
+            del hidden[hidden.index(col)]
+        self.set_hidden_columns(hidden)
+        Settings.set_hide_cols_content(list(self.hidden_columns))
+
+    def on_col_rclick(self, event):
+        """Hanlde col right click."""
+
+        menu = ContextMenu(
+            [
+                (self.FILE, functools.partial(self.on_col_hide_click, col=0), True, 0 not in self.hidden_columns),
+                (self.LINE, functools.partial(self.on_col_hide_click, col=1), True, 1 not in self.hidden_columns),
+                (self.MATCHES, functools.partial(self.on_col_hide_click, col=2), True, 2 not in self.hidden_columns),
+                (self.EXTENSION, functools.partial(self.on_col_hide_click, col=3), True, 3 not in self.hidden_columns),
+                (self.CONTEXT, functools.partial(self.on_col_hide_click, col=4), True, 4 not in self.hidden_columns)
+            ]
+        )
+        self.PopupMenu(menu)
+        menu.Destroy()
