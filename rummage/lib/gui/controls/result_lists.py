@@ -88,9 +88,9 @@ class ContextMenu(wx.Menu):
                         i[0],
                         kind=(wx.ITEM_CHECK if len(i) > 3 else wx.ITEM_NORMAL)
                     )
+                    parent.Append(item)
                     if len(i) > 3 and i[3]:
                         item.Check()
-                    parent.Append(item)
                     if len(i) > 2 and not i[2]:
                         parent.Enable(menuid, False)
                     if util.platform() == 'windows':
