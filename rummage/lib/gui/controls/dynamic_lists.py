@@ -76,8 +76,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.first_resize = True
         self.size_sample = COLUMN_SAMPLE_SIZE
         self.widest_cell = [MINIMUM_COL_SIZE] * self.column_count
-        self.attr1 = wx.ListItemAttr()
-        self.attr1.SetBackgroundColour(wx.Colour(0xEE, 0xEE, 0xEE))
+        self.EnableAlternateRowColours()
         self.dc = wx.ClientDC(self)
         self.dc.SetFont(self.GetFont())
         self.last_idx_sized = -1
@@ -244,13 +243,6 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Override method to return the text for the given item and col."""
 
         return self.get_item_text(item, col)
-
-    def OnGetItemAttr(self, item):
-        """Override method to get attributes for the cells in the given item."""
-
-        if item % 2 == 0:
-            return self.attr1
-        return None
 
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
