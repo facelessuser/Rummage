@@ -484,6 +484,7 @@ class RummageFrame ( wx.Frame ):
         
         # Connect Events
         self.Bind( wx.EVT_CLOSE, self.on_close )
+        self.m_grep_notebook.Bind( wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_notebook_changed )
         self.m_regex_search_checkbox.Bind( wx.EVT_CHECKBOX, self.on_regex_search_toggle )
         self.m_chains_checkbox.Bind( wx.EVT_CHECKBOX, self.on_chain_toggle )
         self.m_replace_plugin_checkbox.Bind( wx.EVT_CHECKBOX, self.on_plugin_function_toggle )
@@ -516,6 +517,9 @@ class RummageFrame ( wx.Frame ):
     
     # Virtual event handlers, overide them in your derived class
     def on_close( self, event ):
+        event.Skip()
+    
+    def on_notebook_changed( self, event ):
         event.Skip()
     
     def on_regex_search_toggle( self, event ):

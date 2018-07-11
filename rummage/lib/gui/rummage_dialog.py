@@ -1880,9 +1880,9 @@ class RummageFrame(gui.RummageFrame):
 
         self.call_later.Stop()
         if self.m_chains_checkbox.GetValue():
-            self.m_searchin_text.GetTextCtrl().SetFocus()
+            self.m_searchin_text.SetFocus()
         else:
-            self.m_searchfor_textbox.GetTextCtrl().SetFocus()
+            self.m_searchfor_textbox.SetFocus()
         self.Refresh()
 
         self.Fit()
@@ -1891,6 +1891,26 @@ class RummageFrame(gui.RummageFrame):
         self.m_main_panel.Fit()
         self.m_main_panel.GetSizer().Layout()
         self.optimize_size(first_time=True)
+
+    def on_notebook_changed(self, event):
+        """
+        Handle when notebook tab changes.
+
+        On Linux, GTK seems to force the first tab start every time
+        the notebook page is changed.  Here we will detect the notebook
+        page change for the search tab, and force the more sensible "search for"
+        to be selected.
+
+        If chains, we let "search in" get selected as "search for" is no longer a text box.
+        """
+
+        if util.platform() == "linux":
+            new = event.GetSelection()
+            old = event.GetOldSelection()
+            if new != old and new == 0:
+                if not self.m_chains_checkbox.GetValue():
+                    self.m_searchfor_textbox.SetFocus()
+        event.Skip()
 
     def on_resize(self, event):
         """

@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.1
+
+- **FIX**: Better default input focus on Linux when selecting the search tab.
+
 ## 4.2.0
 
 - **NEW**: File time result format has been updated for better readability.
