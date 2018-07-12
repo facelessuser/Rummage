@@ -1903,7 +1903,8 @@ class RummageFrame(gui.RummageFrame):
             new = event.GetSelection()
             old = event.GetOldSelection()
             if new != old and new == 0:
-                self.m_searchfor_textbox.SetFocus()
+                self.call_later = wx.CallLater(100, self.m_searchfor_textbox.SetFocus)
+                self.call_later.Start()
         event.Skip()
 
     def on_resize(self, event):
