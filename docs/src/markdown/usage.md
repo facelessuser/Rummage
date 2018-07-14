@@ -697,7 +697,7 @@ Flags | Supported\ Libraries                       | Option
 
 There are many different flavors of Linux using different file managers.  This makes it difficult to give a guide to cover all cases.  Please research about your specific distro's file manager and how to add context menus.  If you would like to include the info here, please issue a pull request to update the documentation.
 
-#### Ubuntu Nautilus
+#### Ubuntu Nautilus (Gnome)
 
 Paths might vary depending on Ubuntu version etc.
 
@@ -718,6 +718,43 @@ Paths might vary depending on Ubuntu version etc.
     ```
 
 - Restart of Nautilus may or may not be needed, but context menu item should appear under `Scripts` and should work on files and folders.
+
+#### Ubuntu Dolphin (KDE)
+
+At the time of writing, this was tested on KDE 5, so most of the commands are appended with '5'.
+
+- To discover where you can store your context menu entries, run the following command:
+
+    ```
+    facelessuser@facelessuser:~$ kf5-config --path services
+    /home/facelessuser/.local/share/kservices5/:/usr/share/kservices5/
+    ```
+
+- Next create your `.desktop` file in one of these locations creating the necessary folder(s) if needed.  In this example, the file will be created at `~/.local/share/kservices5/ServiceMenus/rummage.desktoop`.
+
+- Provide the necessary configuration to specify the entry type, file targets, command to execute, icon, etc. In our case, we specify `all/all` to target both files and folders. We also point to one of the PNG files that ship in the package for the icon.
+
+    ```ini
+    [Desktop Entry]
+    Type=Service
+    X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+    MimeType=all/all;
+    Actions=rummage
+
+    [Desktop Action rummage]
+    Name=Rummage Here...
+    Icon=/usr/local/lib/python3.5/dist-packages/rummage/lib/gui/data/rummage_hires.png
+    Exec=rummage --path "%f"
+    ```
+
+- Lastly we rebuild and refresh the desktop entries:
+
+    ```console
+    facelessuser@facelessuser:~$ kbuildsycoca5
+    ```
+
+- Close all Dolphin windows and reopen to see your context menu item.  It should be found under `Actions`.
+
 
 ## Localization
 
