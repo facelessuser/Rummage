@@ -26,6 +26,12 @@ Name                   | Details
 
 Rummage requires wxPython in order ton run. On Linux, this must be compiled from source. Before running `pip`, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are found. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under [this section](https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites).
 
+Due to recent changes in PyPI, it is probably best to ensure you have at least version 10.0 or greater of `pip`.  Ubuntu provides a method for installing pip with `sudo apt-get install python3-pip`, but this is usually installs an older version.  It is recommended to install `pip` the command shown below (where `python3` is a call to the installed Python version of your choice):
+
+```
+curl https://bootstrap.pypa.io/get-pip.py | sudo python3
+```
+
 !!! info
     The latest wxPython Phoenix builds with GTK3 by default, so the example below will install GTK3 related dependencies. You can use GTK2 if you build wxPython manually.
 
@@ -33,10 +39,10 @@ Ubuntu
 : 
 
     ```bash
-    sudo apt-get install python3.5-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
+    sudo apt-get install python3.6-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base1.0-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
     ```
 
-    Replace `python3.5-dev` with the Python version you are using.
+    Replace `python3.6-dev` with the Python version you are using.
 
 Fedora 26
 : 
@@ -48,7 +54,11 @@ Fedora 26
 
     If your Linux distribution has `gstreamer` 1.0 available (like the Fedora distro), you can install the dev packages for that instead of the 0.10 version.
 
-After getting all the correct prerequisites, you should be able to install Rummage with `pip`. Be patient while installing Rummage. Linux must build wxPython while macOS and Windows do not. If installing with `pip`, you may be waiting a long time with no real indication of how far along the process is.  If `pip` doesn't work, you can look into building and installing manually.  If you find any of this information incorrect, please feel free to offer a pull request or create an issue on GitHub to at least report the problem.
+After getting all the correct prerequisites, you should be able to install Rummage with `pip`, though it is recommended to try and install wxPython first via `pip install wxpython`.
+
+If wxPython doesn't install properly, be sure to reference wxPython's documentation to see if there is something you are missing. Also, creating an issue over at wxPython's GitHub site for related wxPython install issues may get you help faster than creating them on the the Rummage issue page, which is mainly meant for tracking Rummage specific issues, not wxPython install issues.
+
+Be patient while installing wxPython as Linux must build wxPython while macOS and Windows do not. If installing with `pip`, you may be waiting a long time with no real indication of how far along the process is.  If `pip` doesn't work, you can look into building and installing manually.  If you find any of this information incorrect, please feel free to offer a pull request.
 
 ## macOS Prerequisites
 
