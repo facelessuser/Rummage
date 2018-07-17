@@ -2174,7 +2174,7 @@ class RummageFrame(gui.RummageFrame):
         """On idle event."""
 
         if not self.checking_updates and not self.allow_update:
-            self.checking_updates = False
+            self.checking_updates = True
             check = False
             current = datetime.now()
             if self.last_update_check is None:
@@ -2389,7 +2389,9 @@ class RummageFrame(gui.RummageFrame):
     def on_check_update(self, event):
         """Check for update."""
 
+        self.checking_updates = True
         self.update_request(Settings.get_prerelease())
+        self.check_updates = False
 
     def on_documentation(self, event):
         """Open documentation site."""

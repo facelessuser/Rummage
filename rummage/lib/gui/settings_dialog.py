@@ -328,7 +328,9 @@ class SettingsDialog(gui.SettingsDialog):
     def on_check(self, event):
         """Check updates."""
 
-        self.GetParent().update_request(Settings.get_prerelease())
+        self.GetParent().checking_updates = True
+        self.GetParent().on_check_update(Settings.get_prerelease())
+        self.GetParent().checking_updates = False
 
     def on_editor_changed(self, event):
         """Handle on editor changed."""
