@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.2
+
+- **FIX**: Don't open another update notification if one is already open.
+
 ## 4.2.1
 
 - **FIX**: Better default input focus on Linux when selecting the search tab.
