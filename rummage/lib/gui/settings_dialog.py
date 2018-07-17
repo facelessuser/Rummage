@@ -329,7 +329,7 @@ class SettingsDialog(gui.SettingsDialog):
         """Check updates."""
 
         self.GetParent().checking_updates = True
-        self.GetParent().on_check_update(Settings.get_prerelease())
+        self.GetParent().on_check_update(event)
         self.GetParent().checking_updates = False
 
     def on_editor_changed(self, event):
