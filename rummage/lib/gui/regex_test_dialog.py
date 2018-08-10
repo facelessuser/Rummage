@@ -421,7 +421,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                         rumcore.text_decode.Encoding('unicode', None)
                     )
                     replace_test = self.import_plugin(rpattern)(file_info, rum_flags)._test
-                elif rpattern:
+                elif not self.m_replace_plugin_checkbox.GetValue():
                     if not is_regex:
                         replace_test = functools.partial(replace_literal, replace=rpattern)
                     elif self.regex_mode == rumcore.BREGEX_MODE:

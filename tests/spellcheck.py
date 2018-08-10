@@ -10,6 +10,7 @@ PY3 = sys.version_info >= (3, 0)
 
 USER_DICT = '.dictionary'
 BUILD_DIR = os.path.join('.', 'build', 'docs')
+BACKOUT = '../../'
 MKDOCS_CFG = 'mkdocs.yml'
 COMPILED_DICT = os.path.join(BUILD_DIR, 'dictionary.bin')
 MKDOCS_SPELL = os.path.join(BUILD_DIR, MKDOCS_CFG)
@@ -97,6 +98,16 @@ def patch_doc_config(config_file):
 
     with open(config_file, 'rb') as f:
         config = yaml_load(f)
+
+    docs_dir = config.get('docs_dir')
+    if docs_dir is not None:
+        config['docs_dir'] = BACKOUT + docs_dir
+
+    theme = config.get('theme')
+    if theme is not None:
+        custom_dir = theme.get('custom_dir')
+        if custom_dir is not None:
+            config['theme']['custom_dir'] = BACKOUT + custom_dir
 
     index = 0
     for extension in config.get('markdown_extensions', []):

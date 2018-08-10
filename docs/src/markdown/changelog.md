@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.3
+
+- **FIX**: Process preview in regular expression test dialog when replace pattern is empty. If replace plugin is enabled, we must have a plugin specified.
+
 ## 4.2.2
 
 - **FIX**: Don't open another update notification if one is already open.
