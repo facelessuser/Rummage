@@ -1,6 +1,6 @@
 gntp>=1.0.2
 chardet>=3.0.4
-backrefs>=3.5.1,<4.0
+backrefs>=3.5.2,<4.0
 bracex
 wxpython>=4.0.1
 filelock
