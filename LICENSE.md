@@ -1,4 +1,4 @@
-Rummage is released under the MIT license.
+MIT license.
 
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 
