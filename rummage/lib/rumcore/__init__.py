@@ -1321,17 +1321,17 @@ class Rummage(object):
         # Wcmatch flags
         self.wcmatch_flags = wcmatch.I | wcmatch.M | wcmatch.R
         if self.file_flags & EXTMATCH:
-            self.wcmatch_flags |= wcmatch.EXTGLOB
+            self.wcmatch_flags |= wcmatch.E
         if self.file_flags & BRACE:
-            self.wcmatch_flags |= wcmatch.BRACE
+            self.wcmatch_flags |= wcmatch.B
         if self.file_flags & FILECASE:
-            self.wcmatch_flags |= wcmatch.FORCECASE
+            self.wcmatch_flags |= wcmatch.F
         if self.file_flags & DIRPATHNAME:
-            self.wcmatch_flags |= wcmatch.DIRPATHNAME
+            self.wcmatch_flags |= wcmatch.DP
         if self.file_flags & FILEPATHNAME:
-            self.wcmatch_flags |= wcmatch.FILEPATHNAME
+            self.wcmatch_flags |= wcmatch.FP
         if self.file_flags & GLOBSTAR:
-            self.wcmatch_flags |= wcmatch.GLOBSTAR
+            self.wcmatch_flags |= wcmatch.G
 
         self.context = context
         self.encoding = self._verify_encoding(encoding) if encoding is not None else None

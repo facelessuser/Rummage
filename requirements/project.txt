@@ -5,4 +5,4 @@ bracex
 wxpython>=4.0.1
 filelock
 send2trash
-wcmatch>=1.0.1,<2.0
+wcmatch>=1.0.1,<3.0

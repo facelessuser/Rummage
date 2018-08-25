@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.4
+
+- **FIX**: Adjustments to work with `wcmatch` version 2.0.0.
+
 ## 4.2.3
 
 - **FIX**: Process preview in regular expression test dialog when replace pattern is empty. If replace plugin is enabled, we must have a plugin specified.
