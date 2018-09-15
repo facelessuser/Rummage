@@ -85,7 +85,7 @@ Search\ with\ regex         | Alters the behavior of `Search for` and `Replace w
 Search\ case-sensitive      | Forces the search to be case-sensitive.
 Dot\ matches\ newline       | `.` will also match newlines.
 Use\ Unicode\ properties    | Changes the behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use use characters from the Unicode property database (will also modify `\l`, `\L`, `\c`, and `\C` in search patterns if using Backrefs with Re).
-Format\ style\ replacements | Replace pattern will use [a string replace format][format-string] for replace. `#!py3 "{1} {1[-2]} {group_name[-3]}"` etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode [here][backrefs-format]. And remember that Rummage normalizes mentioned differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.
+Format\ style\ replacements | Replace pattern will use [a string replace format][format-string] for replace. `#!py3 "{1} {1[-2]} {group_name[-3]}"` etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode [here][backrefs-format]. And remember that Rummage normalizes differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.
 
 ### Regex Engine Options
 
@@ -235,7 +235,7 @@ In [Preferences](#search), you can enables Bash style brace expansion.
 
 Brace expansion is applied before anything else. When applied, a pattern will be expanded into multiple patterns. Each pattern will then be parsed separately.
 
-For simple patterns, it may make more sense to use extended match patterns which will only generate a single pattern: `@(ab|ac|ad)`.
+This is great for specifying complex combinations of patterns: `a{b,{c,d}}` --> `ab ac ad`. Since each brace will generate a separate pattern for each combination that Rummage must evaluate. For simple patterns, it may make more sense to use extended match patterns which will only generate a single pattern: `@(ab|ac|ad)`.
 
 Be careful with patterns such as `{1..100}` which would generate one hundred patterns that will all get individually parsed. Sometimes you really need such a pattern, but be mindful that it will be slower as you generate larger sets of patterns.
 
