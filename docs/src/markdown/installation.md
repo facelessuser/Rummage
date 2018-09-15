@@ -24,9 +24,9 @@ Name                   | Details
 
 ## Linux Prerequisites
 
-Rummage requires wxPython in order ton run. On Linux, this must be compiled from source. Before running `pip`, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are found. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under [this section](https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites).
+Rummage requires wxPython in order to run. On Linux, this must be compiled from source. Before running `pip`, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are generally most up to date for Ubuntu. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under [this section](https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites).
 
-Due to recent changes in PyPI, it is probably best to ensure you have at least version 10.0 or greater of `pip`.  Ubuntu provides a method for installing pip with `sudo apt-get install python3-pip`, but this is usually installs an older version.  It is recommended to install `pip` the command shown below (where `python3` is a call to the installed Python version of your choice):
+Due to recent changes in PyPI, it is probably best to ensure you have at least version 10.0 or greater of `pip`.  Ubuntu provides a method for installing pip with `sudo apt-get install python3-pip`, but this usually installs an older version.  It is recommended to install `pip` with the command shown below (where `python3` is a call to the installed Python version of your choice):
 
 ```
 curl https://bootstrap.pypa.io/get-pip.py | sudo python3
@@ -56,7 +56,7 @@ Fedora 26
 
 After getting all the correct prerequisites, you should be able to install Rummage with `pip`, though it is recommended to try and install wxPython first via `pip install wxpython`.
 
-If wxPython doesn't install properly, be sure to reference wxPython's documentation to see if there is something you are missing. Also, creating an issue over at wxPython's GitHub site for related wxPython install issues may get you help faster than creating them on the the Rummage issue page, which is mainly meant for tracking Rummage specific issues, not wxPython install issues.
+If wxPython doesn't install properly, be sure to reference wxPython's documentation to see if there is something you are missing. Also, creating an issue over at wxPython's GitHub site for related wxPython install issues may get you help faster than creating them on the Rummage issue page, which is mainly meant for tracking Rummage specific issues, not wxPython install issues.
 
 Be patient while installing wxPython as Linux must build wxPython while macOS and Windows do not. If installing with `pip`, you may be waiting a long time with no real indication of how far along the process is.  If `pip` doesn't work, you can look into building and installing manually.  If you find any of this information incorrect, please feel free to offer a pull request.
 
@@ -77,6 +77,12 @@ Install:
 
 ```bash
 pip install rummage
+```
+
+Install with optional module. Upgrades of optional modules will have to be manually upgraded when needed as well as they are not tracked in Rummage's requirements.
+
+```bash
+pip install rummage regex cchardet
 ```
 
 Upgrade:
