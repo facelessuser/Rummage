@@ -363,7 +363,6 @@ class TestDirWalker(_FileTest):
         self.skipped = 0
         self.files = []
 
-
     def crawl_files(self, walker):
         """Crawl the files."""
 
