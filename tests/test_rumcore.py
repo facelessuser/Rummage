@@ -15,6 +15,53 @@ from rummage.lib import rumcore as rc
 from rummage.lib.util import epoch_timestamp as epoch
 from rummage.lib.rumcore import text_decode as td
 from wcmatch import wcmatch
+from . import util
+import shutil
+
+
+class _FileTest(unittest.TestCase):
+    """Test BOM detection."""
+
+    def mktemp(self, *parts, content=b''):
+        """Make temp directory."""
+
+        filename = self.norm(*parts)
+        base, file = os.path.split(filename)
+        if not os.path.exists(base):
+            retry = 3
+            while retry:
+                try:
+                    os.makedirs(base)
+                    retry = 0
+                except Exception:
+                    retry -= 1
+        util.create_empty_file(filename, content)
+
+    def norm(self, *parts):
+        """Normalizes file path (in relation to temp dir)."""
+        tempdir = os.fsencode(self.tempdir) if isinstance(parts[0], bytes) else self.tempdir
+        return os.path.join(tempdir, *parts)
+
+    def dedent(self, text):
+        """Reduce indentation."""
+
+        return textwrap.dedent(text).lstrip('\n')
+
+    def setUp(self):
+        """Setup temp folder."""
+
+        self.tempdir = util.TESTFN + "_dir"
+
+    def tearDown(self):
+        """Tear down."""
+
+        retry = 3
+        while retry:
+            try:
+                shutil.rmtree(self.tempdir)
+                retry = 0
+            except Exception:
+                retry -= 1
 
 
 class TestHelperFunctions(unittest.TestCase):
@@ -174,121 +221,148 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertTrue(error[0].startswith('TypeError'))
 
 
-class TestRummageFileContent(unittest.TestCase):
+class TestRummageFileContent(_FileTest):
     """Tests for _RummageFileContent."""
+
+    def compare_encoding(self, filename, content, file_encoding, expected, bfr=False):
+        """Compare encoding."""
+
+        if not bfr:
+            self.mktemp(filename, content=content)
+            name = self.norm(filename)
+            size = os.path.getsize(name)
+        else:
+            name = filename
+            size = None
+        if not bfr:
+            rfc = rc._RummageFileContent(name, size, file_encoding)
+        else:
+            rfc = rc._RummageFileContent(name, size, file_encoding, content)
+        with rfc as f:
+            text = f[:]
+        if not bfr:
+            if expected.startswith('utf-8'):
+                enc = 'utf-8-sig'
+            elif expected.startswith('utf-32'):
+                enc = 'utf-32'
+            elif expected.startswith('utf-16'):
+                enc = 'utf-16'
+            else:
+                enc = expected
+            if enc == 'bin':
+                with open(name, 'rb') as f:
+                    text2 = f.read()
+            else:
+                with codecs.open(name, 'r', encoding=enc) as f:
+                    text2 = f.read()
+        else:
+            text2 = content
+        self.assertEqual(rfc.encoding.encode, expected)
+        self.assertEqual(text, text2)
 
     def test_string_bin(self):
         """Test passing a binary string."""
 
-        encoding = td.Encoding('bin', None)
-        rfc = rc._RummageFileContent("buffer", None, encoding, b'test')
-        with rfc as bfr:
-            text = bfr
-        self.assertEqual(rfc.encoding.encode, 'bin')
-        self.assertEqual(text, b'test')
+        self.compare_encoding(
+            'buffer',
+            b'test',
+            td.Encoding('bin', None),
+            'bin',
+            True
+        )
 
     def test_string_unicode(self):
         """Test passing a binary string."""
 
-        encoding = td.Encoding('unicode', None)
-        rfc = rc._RummageFileContent("buffer", None, encoding, 'test')
-        with rfc as bfr:
-            text = bfr
-        self.assertEqual(rfc.encoding.encode, 'unicode')
-        self.assertEqual(text, 'test')
+        self.compare_encoding(
+            'buffer',
+            'test',
+            td.Encoding('unicode', None),
+            'unicode',
+            True
+        )
 
     def test_bin(self):
         """Test bin file."""
 
-        encoding = td.Encoding('bin', None)
-        name = "tests/encodings/binary.txt"
-        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
-        with rfc as f:
-            text = f[:]
-        with open(name, 'rb') as f:
-            text2 = f.read()
-        self.assertEqual(rfc.encoding.encode, 'bin')
-        self.assertEqual(text, text2)
+        self.compare_encoding(
+            'binary.txt',
+            b'This is a \x00\x00\x00binary test.\n',
+            td.Encoding('bin', None),
+            'bin'
+        )
 
     def test_utf8(self):
         """Test utf-8 file."""
 
-        encoding = td.Encoding('utf-8', codecs.BOM_UTF8)
-        name = "tests/encodings/utf8_bom.txt"
-        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
-        with rfc as f:
-            text = f[:]
-        with codecs.open(name, 'r', encoding='utf-8-sig') as f:
-            text2 = f.read()
-        self.assertEqual(rfc.encoding.encode, 'utf-8')
-        self.assertEqual(text, text2)
+        self.compare_encoding(
+            'utf8-bom.txt',
+            'UTF8 file with BOM'.encode('utf-8-sig'),
+            td.Encoding('utf-8', codecs.BOM_UTF8),
+            'utf-8'
+        )
 
     def test_utf16(self):
         """Test utf-16 file."""
 
-        encoding = td.Encoding('utf-16-be', codecs.BOM_UTF16_BE)
-        name = "tests/encodings/utf16_be_bom.txt"
-        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
-        with rfc as f:
-            text = f[:]
-        with codecs.open(name, 'r', encoding='utf-16') as f:
-            text2 = f.read()
-        self.assertEqual(rfc.encoding.encode, 'utf-16-be')
-        self.assertEqual(text, text2)
+        self.compare_encoding(
+            'utf16_be_bom.txt',
+            codecs.BOM_UTF16_BE + 'UTF16BE file with BOM'.encode('utf-16-be'),
+            td.Encoding('utf-16-be', codecs.BOM_UTF16_BE),
+            'utf-16-be'
+        )
 
     def test_utf32(self):
         """Test utf-8 file."""
 
-        encoding = td.Encoding('utf-32-be', codecs.BOM_UTF32_BE)
-        name = "tests/encodings/utf32_be_bom.txt"
-        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
-        with rfc as f:
-            text = f[:]
-        with codecs.open(name, 'r', encoding='utf-32') as f:
-            text2 = f.read()
-        self.assertEqual(rfc.encoding.encode, 'utf-32-be')
-        self.assertEqual(text, text2)
+        self.compare_encoding(
+            'utf16_be_bom.txt',
+            codecs.BOM_UTF32_BE + 'UTF32BE file with BOM'.encode('utf-32-be'),
+            td.Encoding('utf-32-be', codecs.BOM_UTF32_BE),
+            'utf-32-be'
+        )
+
+    def test_wrong(self):
+        """Test wrong encoding failure."""
+
+        self.compare_encoding(
+            'utf8.txt',
+            'exámple'.encode('utf-8'),
+            td.Encoding('utf-32-be', codecs.BOM_UTF32_BE),
+            'bin'
+        )
 
     def test_rummageexception(self):
         """Test RummageException with file."""
 
-        encoding = td.Encoding('ascii', None)
-        name = "tests/encodings/does_not_exist.txt"
-        rfc = rc._RummageFileContent(name, 10, encoding)
+        rfc = rc._RummageFileContent(self.norm('does_not_exist.txt'), 10, td.Encoding('ascii', None))
         self.assertRaises(rc.RummageException, rfc.__enter__)
 
     def test_bin_rummageexception(self):
         """Test RummageException with a bin file."""
 
-        encoding = td.Encoding('bin', None)
-        name = "tests/encodings/does_not_exist.txt"
-        rfc = rc._RummageFileContent(name, 10, encoding)
+        rfc = rc._RummageFileContent(self.norm('does_not_exist.txt'), 10, td.Encoding('bin', None))
         self.assertRaises(rc.RummageException, rfc.__enter__)
 
-    def test_wrong(self):
-        """Test wrong encoding failure."""
 
-        encoding = td.Encoding('utf-32-be', codecs.BOM_UTF32_BE)
-        name = "tests/encodings/utf8.txt"
-        rfc = rc._RummageFileContent(name, os.path.getsize(name), encoding)
-        with rfc as f:
-            text = f[:]
-        with open(name, 'rb') as f:
-            text2 = f.read()
-        self.assertEqual(rfc.encoding.encode, 'bin')
-        self.assertEqual(text, text2)
-
-
-class TestDirWalker(unittest.TestCase):
+class TestDirWalker(_FileTest):
     """Test the _DirWalker class."""
 
     def setUp(self):
         """Setup the tests."""
 
+        _FileTest.setUp(self)
+        self.mktemp('a.txt')
+        self.mktemp('b.file')
+        self.mktemp('.hidden_file')
+        self.mktemp('greater_than_0.txt.rum-bak', content=b'Content greater than 0.')
+        self.mktemp('.hidden', 'a.txt')
+        self.mktemp('.hidden', 'b.file')
         self.default_flags = wcmatch.R | wcmatch.I | wcmatch.M
         self.errors = []
         self.skipped = 0
         self.files = []
+
 
     def crawl_files(self, walker):
         """Crawl the files."""
@@ -305,7 +379,7 @@ class TestDirWalker(unittest.TestCase):
         """Test non-recursive search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.txt', None,
             False, False, self.default_flags,
             False, False,
@@ -324,7 +398,7 @@ class TestDirWalker(unittest.TestCase):
         """Test non-recursive inverse search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.*|-*.file', None,
             False, False, self.default_flags,
             False, False,
@@ -342,7 +416,7 @@ class TestDirWalker(unittest.TestCase):
         """Test non-recursive inverse search with backup."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.*|-*.file', None,
             False, False, self.default_flags,
             False, False,
@@ -360,7 +434,7 @@ class TestDirWalker(unittest.TestCase):
         """Test non-recursive search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.txt', None,
             True, False, self.default_flags,
             False, False,
@@ -379,7 +453,7 @@ class TestDirWalker(unittest.TestCase):
         """Test non-recursive search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.txt', None,
             True, True, self.default_flags,
             False, False,
@@ -398,7 +472,7 @@ class TestDirWalker(unittest.TestCase):
         """Test non-recursive search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.txt', '.hidden',
             True, True, self.default_flags,
             False, False,
@@ -417,7 +491,7 @@ class TestDirWalker(unittest.TestCase):
         """Test non-recursive search with inverse."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.txt', '*|-.hidden',
             True, True, self.default_flags,
             False, False,
@@ -436,7 +510,7 @@ class TestDirWalker(unittest.TestCase):
         """Test non-recursive search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.txt', r'\.hidden',
             True, True, self.default_flags,
             False, True,
@@ -455,7 +529,7 @@ class TestDirWalker(unittest.TestCase):
         """Test raw chars."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'*.\x74\N{LATIN SMALL LETTER X}\u0074', r'\.\U00000068idden',
             True, True, self.default_flags,
             False, True,
@@ -474,7 +548,7 @@ class TestDirWalker(unittest.TestCase):
         """Test regex search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'.*?\.txt', None,
             False, False, self.default_flags,
             True, False,
@@ -494,7 +568,7 @@ class TestDirWalker(unittest.TestCase):
         """Test bre search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'.*?\.txt', None,
             False, False, self.default_flags,
             True, False,
@@ -515,7 +589,7 @@ class TestDirWalker(unittest.TestCase):
         """Test regex search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'.*?\.txt', None,
             False, False, self.default_flags,
             True, False,
@@ -536,7 +610,7 @@ class TestDirWalker(unittest.TestCase):
         """Test bregex search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'.*?\.txt', None,
             False, False, self.default_flags,
             True, False,
@@ -557,7 +631,7 @@ class TestDirWalker(unittest.TestCase):
         """Test bad regular expression mode search."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'.*?\.txt', None,
             False, False, self.default_flags,
             True, False,
@@ -578,7 +652,7 @@ class TestDirWalker(unittest.TestCase):
         """Test aborting."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.txt', None,
             True, True, self.default_flags,
             False, False,
@@ -597,7 +671,7 @@ class TestDirWalker(unittest.TestCase):
         """Test aborting early."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             '*.txt*', None,
             True, True, self.default_flags,
             False, False,
@@ -616,7 +690,7 @@ class TestDirWalker(unittest.TestCase):
         """Test size less than x."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'*.*', None,
             True, True, self.default_flags,
             False, False,
@@ -634,7 +708,7 @@ class TestDirWalker(unittest.TestCase):
         """Test size greater than x."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'*.*', None,
             True, True, self.default_flags,
             False, False,
@@ -652,7 +726,7 @@ class TestDirWalker(unittest.TestCase):
         """Test size equals than x."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'*.*', None,
             True, True, self.default_flags,
             False, False,
@@ -673,7 +747,7 @@ class TestDirWalker(unittest.TestCase):
         date = "%02d/%02d/%04d" % (future.month, future.day, future.year)
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'*.*', None,
             True, True, self.default_flags,
             False, False,
@@ -691,7 +765,7 @@ class TestDirWalker(unittest.TestCase):
         """Test modified time greater than x."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'*.*', None,
             True, True, self.default_flags,
             False, False,
@@ -712,7 +786,7 @@ class TestDirWalker(unittest.TestCase):
         date = "%02d/%02d/%04d" % (future.month, future.day, future.year)
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'*.*', None,
             True, True, self.default_flags,
             False, False,
@@ -730,7 +804,7 @@ class TestDirWalker(unittest.TestCase):
         """Test created time greater than x."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker',
+            self.tempdir,
             r'*.*', None,
             True, True, self.default_flags,
             False, False,
@@ -744,11 +818,37 @@ class TestDirWalker(unittest.TestCase):
         self.assertEqual(self.skipped, 0)
         self.assertEqual(len(self.files), 6)
 
+
+class TestHiddenDirWalker(_FileTest):
+    """Test the _DirWalker class."""
+
+    def setUp(self):
+        """Setup the tests."""
+
+        _FileTest.setUp(self)
+        self.mktemp('a.txt')
+        self.mktemp('.rum-bak', 'a.txt')
+        self.default_flags = wcmatch.R | wcmatch.I | wcmatch.M
+        self.errors = []
+        self.skipped = 0
+        self.files = []
+
+    def crawl_files(self, walker):
+        """Crawl the files."""
+
+        for f in walker.match():
+            if hasattr(f, 'skipped') and f.skipped:
+                self.skipped += 1
+            elif f.error:
+                self.errors.append(f)
+            else:
+                self.files.append(f)
+
     def test_backup_folder_no_backup(self):
         """Test directory search with backup disabled and folder backup."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker_folder_backup',
+            self.tempdir,
             r'*.txt', None,
             True, True, self.default_flags,
             False, False,
@@ -766,7 +866,7 @@ class TestDirWalker(unittest.TestCase):
         """Test directory search with backup disabled and folder backup."""
 
         walker = rc._DirWalker(
-            'tests/dir_walker_folder_backup',
+            self.tempdir,
             r'*.txt', None,
             True, True, self.default_flags,
             False, False,
