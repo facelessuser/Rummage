@@ -880,12 +880,13 @@ class TestHiddenDirWalker(_FileTest):
         self.assertEqual(len(self.files), 1)
 
 
-class TestFileSearch(unittest.TestCase):
+class TestFileSearch(_FileTest):
     """Test file searching."""
 
-    def get_file_attr(self, name):
+    def get_file_attr(self, *path):
         """Get the file attributes."""
 
+        name = self.norm(*path)
         return rc.FileAttrRecord(
             name,
             os.path.splitext(name)[1].lower().lstrip('.'),
@@ -899,6 +900,21 @@ class TestFileSearch(unittest.TestCase):
     def test_literal_search(self):
         """Test for literal search."""
 
+        self.mktemp(
+            'searches.txt',
+            content=self.dedent(
+                '''
+                search1
+
+                search2
+
+                search1
+
+                search2
+                '''
+            ).encode('ascii')
+        )
+
         search_params = rc.Search()
         search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
 
@@ -911,7 +927,7 @@ class TestFileSearch(unittest.TestCase):
 
         fs = rc._FileSearch(
             search_params,
-            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            self.get_file_attr('searches.txt'),
             file_id,
             flags,
             context,
@@ -927,6 +943,21 @@ class TestFileSearch(unittest.TestCase):
     def test_literal_chain_search(self):
         """Test for literal search."""
 
+        self.mktemp(
+            'searches.txt',
+            content=self.dedent(
+                '''
+                search1
+
+                search2
+
+                search1
+
+                search2
+                '''
+            ).encode('ascii')
+        )
+
         search_params = rc.Search()
         search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
         search_params.add('search2', None, rc.IGNORECASE | rc.LITERAL)
@@ -940,7 +971,7 @@ class TestFileSearch(unittest.TestCase):
 
         fs = rc._FileSearch(
             search_params,
-            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            self.get_file_attr('searches.txt'),
             file_id,
             flags,
             context,
@@ -956,22 +987,28 @@ class TestFileSearch(unittest.TestCase):
     def test_literal_chain_replace(self):
         """Test for literal search and replace."""
 
-        before = textwrap.dedent(
-            '''search1
-            search1
+        self.mktemp(
+            'searches.txt',
+            content=self.dedent(
+                '''
+                search1
+                search1
 
-            search2
-            search2
+                search2
+                search2
 
-            search3
-            search3
+                search3
+                search3
 
-            search1, search2, search3
-            '''
+                search1, search2, search3
+                '''
+            ).encode('utf-8')
         )
 
-        after = textwrap.dedent(
-            '''replace1
+
+        after = self.dedent(
+            '''
+            replace1
             replace1
 
             replace2
@@ -995,34 +1032,41 @@ class TestFileSearch(unittest.TestCase):
         backup_ext = 'rum-bak',
         max_count = None
 
-        f = None
-        try:
-            with tempfile.NamedTemporaryFile('wb', delete=False) as f:
-                f.write(before.encode('utf-8'))
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('searches.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
+        )
 
-            fs = rc._FileSearch(
-                search_params,
-                self.get_file_attr(f.name),
-                file_id,
-                flags,
-                context,
-                encoding,
-                backup_ext,
-                max_count
-            )
+        for result in fs.run():
+            if result.error is not None:
+                print(''.join(result.error))
 
-            for result in fs.run():
-                if result.error is not None:
-                    print(''.join(result.error))
-
-            with codecs.open(f.name, 'r', encoding='utf-8') as f:
-                self.assertEqual(f.read(), after)
-        finally:
-            if f is not None:
-                os.remove(f.name)
+        with codecs.open(self.norm('searches.txt'), 'r', encoding='utf-8') as f:
+            self.assertEqual(f.read(), after)
 
     def test_literal_binary_search(self):
         """Test for literal search."""
+
+        self.mktemp(
+            'searches.txt',
+            content=self.dedent(
+                '''
+                search1
+
+                search2
+
+                search1
+
+                search2
+                '''
+            ).encode('utf-8')
+        )
 
         search_params = rc.Search()
         search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
@@ -1036,7 +1080,7 @@ class TestFileSearch(unittest.TestCase):
 
         fs = rc._FileSearch(
             search_params,
-            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            self.get_file_attr('searches.txt'),
             file_id,
             flags,
             context,
@@ -1052,6 +1096,21 @@ class TestFileSearch(unittest.TestCase):
     def test_literal_chain_binary_search(self):
         """Test for literal search."""
 
+        self.mktemp(
+            'searches.txt',
+            content=self.dedent(
+                '''
+                search1
+
+                search2
+
+                search1
+
+                search2
+                '''
+            ).encode('utf-8')
+        )
+
         search_params = rc.Search()
         search_params.add('search1', None, rc.IGNORECASE | rc.LITERAL)
         search_params.add('search2', None, rc.IGNORECASE | rc.LITERAL)
@@ -1065,7 +1124,7 @@ class TestFileSearch(unittest.TestCase):
 
         fs = rc._FileSearch(
             search_params,
-            self.get_file_attr('tests/searches/searches_unix_ending.txt'),
+            self.get_file_attr('searches.txt'),
             file_id,
             flags,
             context,
@@ -1081,22 +1140,28 @@ class TestFileSearch(unittest.TestCase):
     def test_literal_chain_binary_replace(self):
         """Test for literal search and replace."""
 
-        before = textwrap.dedent(
-            '''search1
-            search1
+        self.mktemp(
+            'searches.txt',
+            content=self.dedent(
+                '''
+                search1
+                search1
 
-            search2
-            search2
+                search2
+                search2
 
-            search3
-            search3
+                search3
+                search3
 
-            search1, search2, search3
-            '''
+                search1, search2, search3
+                '''
+            ).encode('utf-8')
         )
 
-        after = textwrap.dedent(
-            '''replace1
+
+        after = self.dedent(
+            '''
+            replace1
             replace1
 
             replace2
@@ -1107,7 +1172,7 @@ class TestFileSearch(unittest.TestCase):
 
             replace1, replace2, search3
             '''
-        )
+        ).encode('utf-8')
 
         search_params = rc.Search(True)
         search_params.add('search1', 'replace1', rc.IGNORECASE | rc.LITERAL)
@@ -1120,28 +1185,20 @@ class TestFileSearch(unittest.TestCase):
         backup_ext = 'rum-bak',
         max_count = None
 
-        f = None
-        try:
-            with tempfile.NamedTemporaryFile('wb', delete=False) as f:
-                f.write(before.encode('utf-8'))
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('searches.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
+        )
 
-            fs = rc._FileSearch(
-                search_params,
-                self.get_file_attr(f.name),
-                file_id,
-                flags,
-                context,
-                encoding,
-                backup_ext,
-                max_count
-            )
+        for result in fs.run():
+            if result.error is not None:
+                print(''.join(result.error))
 
-            for result in fs.run():
-                if result.error is not None:
-                    print(''.join(result.error))
-
-            with codecs.open(f.name, 'r', encoding='utf-8') as f:
-                self.assertEqual(f.read(), after)
-        finally:
-            if f is not None:
-                os.remove(f.name)
+        with codecs.open(self.norm('searches.txt'), 'rb') as f:
+            self.assertEqual(f.read(), after)
