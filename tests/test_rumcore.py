@@ -7,7 +7,6 @@ import re
 import regex
 import codecs
 import datetime
-import tempfile
 import textwrap
 from backrefs import bre
 from backrefs import bregex
@@ -1005,7 +1004,6 @@ class TestFileSearch(_FileTest):
             ).encode('utf-8')
         )
 
-
         after = self.dedent(
             '''
             replace1
@@ -1157,7 +1155,6 @@ class TestFileSearch(_FileTest):
                 '''
             ).encode('utf-8')
         )
-
 
         after = self.dedent(
             '''
