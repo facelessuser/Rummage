@@ -1,4 +1,5 @@
 [![Unix Build Status][travis-image]][travis-link]
+[![Windows Build Status][appveyor-image]][appveyor-link]
 [![Coverage][codecov-image]][codecov-link]
 [![Requirements Status][requires-image]][requires-link]
 [![pypi-version][pypi-image]][pypi-link]
@@ -38,6 +39,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 [travis-image]: https://img.shields.io/travis/facelessuser/Rummage/master.svg?label=Unix%20Build
 [travis-link]: https://travis-ci.org/facelessuser/Rummage
+[appveyor-image]: https://img.shields.io/appveyor/ci/facelessuser/Rummage/master.svg?label=Windows%20Build
+[appveyor-link]: https://ci.appveyor.com/project/facelessuser/Rummage
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
 [codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg
 [codecov-link]: http://codecov.io/github/facelessuser/Rummage?branch=master
