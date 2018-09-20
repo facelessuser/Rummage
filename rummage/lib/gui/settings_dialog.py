@@ -86,15 +86,12 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_cache_textbox.SetValue(self.get_history())
         self.m_history_clear_button.Enable(history_records > 0)
         mode = Settings.get_regex_mode()
-        self.m_bregex_radio.SetValue(mode == rumcore.BREGEX_MODE)
-        self.m_regex_radio.SetValue(mode == rumcore.REGEX_MODE)
-        self.m_bre_radio.SetValue(mode == rumcore.BRE_MODE)
-        self.m_re_radio.SetValue(mode == rumcore.RE_MODE)
+        self.m_regex_radio.SetValue(mode in rumcore.REGEX_MODES)
+        self.m_re_radio.SetValue(mode in rumcore.RE_MODES)
         self.m_regex_ver_choice.SetSelection(Settings.get_regex_version())
+        self.m_backrefs_checkbox.SetValue(mode in rumcore.BACKREFS_MODES)
         if Settings.is_regex_available():
             self.m_regex_radio.Enable(True)
-            self.m_bregex_radio.Enable(True)
-            self.m_regex_version_label.Enable(True)
             self.m_regex_ver_choice.Enable(True)
         self.m_extmatch_checkbox.SetValue(Settings.get_extmatch())
         self.m_brace_checkbox.SetValue(Settings.get_brace_expansion())
@@ -174,14 +171,12 @@ class SettingsDialog(gui.SettingsDialog):
         self.CASE = _("Case sensitive")
         self.FULL_PATH = _("Full path directory match")
         self.FULL_FILE = _("Full path file match")
-        self.GLOBSTAR = _("Globstar **")
+        self.GLOBSTAR = _("Globstar (full path)")
         self.REGEX_GROUP = _("Regular Expressions")
         self.FILE_MATCH_GROUP = _("File/Folder Matching")
-        self.RE = _("Use re module")
-        self.BRE = _("Use re module with backrefs")
-        self.REGEX = _("Use regex module")
-        self.BREGEX = _("Use regex module with backrefs")
-        self.REGEX_VER = _("Regex module version to use")
+        self.RE = _("Use Re module")
+        self.REGEX = _("Use Regex module")
+        self.BACKREFS = _("Enable Backrefs")
         self.CLEAR = _("Clear")
         self.CLOSE = _("Close")
         self.SAVE = _("Save")
@@ -240,10 +235,8 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_notify_test_button.SetLabel(self.TEST)
         self.m_language_label.SetLabel(self.LANGUAGE)
         self.m_re_radio.SetLabel(self.RE)
-        self.m_bre_radio.SetLabel(self.BRE)
         self.m_regex_radio.SetLabel(self.REGEX)
-        self.m_bregex_radio.SetLabel(self.BREGEX)
-        self.m_regex_version_label.SetLabel(self.REGEX_VER)
+        self.m_backrefs_checkbox.SetLabel(self.BACKREFS)
         self.m_extmatch_checkbox.SetLabel(self.EXTMATCH)
         self.m_brace_checkbox.SetLabel(self.BRACES)
         self.m_case_checkbox.SetLabel(self.CASE)
@@ -492,11 +485,12 @@ class SettingsDialog(gui.SettingsDialog):
     def on_change_module(self, event):
         """Change the module."""
 
-        if self.m_bregex_radio.GetValue():
-            mode = rumcore.BREGEX_MODE
-        elif self.m_regex_radio.GetValue():
-            mode = rumcore.REGEX_MODE
-        elif self.m_bre_radio.GetValue():
+        if self.m_regex_radio.GetValue():
+            if self.m_backrefs_checkbox.GetValue():
+                mode = rumcore.BREGEX_MODE
+            else:
+                mode = rumcore.REGEX_MODE
+        elif self.m_backrefs_checkbox.GetValue():
             mode = rumcore.BRE_MODE
         else:
             mode = rumcore.RE_MODE
@@ -538,10 +532,8 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_encoding_list.destroy()
         event.Skip()
 
-    on_bregex_toggle = on_change_module
-
     on_regex_toggle = on_change_module
 
-    on_bre_toggle = on_change_module
-
     on_re_toggle = on_change_module
+
+    on_backrefs_toggle = on_change_module

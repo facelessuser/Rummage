@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version May 29 2018)
+## Python code generated with wxFormBuilder (version Aug  8 2018)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO *NOT* EDIT THIS FILE!
@@ -70,6 +70,7 @@ class RummageFrame ( wx.Frame ):
         
         self.m_searchin_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Search in", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_searchin_label.Wrap( -1 )
+        
         fgSizer8.Add( self.m_searchin_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.ALIGN_RIGHT, 5 )
         
         self.m_searchin_text = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
@@ -80,6 +81,7 @@ class RummageFrame ( wx.Frame ):
         
         self.m_searchfor_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Search for", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_searchfor_label.Wrap( -1 )
+        
         fgSizer8.Add( self.m_searchfor_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.ALIGN_RIGHT, 5 )
         
         self.m_searchfor_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
@@ -90,6 +92,7 @@ class RummageFrame ( wx.Frame ):
         
         self.m_replace_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Replace with", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_replace_label.Wrap( -1 )
+        
         fgSizer8.Add( self.m_replace_label, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
         
         self.m_replace_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
@@ -232,6 +235,7 @@ class RummageFrame ( wx.Frame ):
         
         self.m_size_is_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Size is", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_size_is_label.Wrap( -1 )
+        
         gbSizer3.Add( self.m_size_is_label, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
         
         m_logic_choiceChoices = [ u"any", u"greater than", u"equal to", u"less than" ]
@@ -248,6 +252,7 @@ class RummageFrame ( wx.Frame ):
         
         self.m_size_type_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"KB", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_size_type_label.Wrap( -1 )
+        
         fgSizer37.Add( self.m_size_type_label, 0, wx.BOTTOM|wx.RIGHT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
         
         
@@ -255,6 +260,7 @@ class RummageFrame ( wx.Frame ):
         
         self.m_exclude_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Exclude folders", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_exclude_label.Wrap( -1 )
+        
         gbSizer3.Add( self.m_exclude_label, wx.GBPosition( 0, 6 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
         
         self.m_exclude_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
@@ -265,6 +271,7 @@ class RummageFrame ( wx.Frame ):
         
         self.m_modified_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Modified", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_modified_label.Wrap( -1 )
+        
         gbSizer3.Add( self.m_modified_label, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
         
         m_modified_choiceChoices = [ u"on any", u"after", u"on", u"before" ]
@@ -283,6 +290,7 @@ class RummageFrame ( wx.Frame ):
         
         self.m_filematch_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Files which match", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_filematch_label.Wrap( -1 )
+        
         gbSizer3.Add( self.m_filematch_label, wx.GBPosition( 1, 6 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
         
         self.m_filematch_textbox = AutoCompleteCombo(self.m_settings_panel, wx.ID_ANY)
@@ -293,6 +301,7 @@ class RummageFrame ( wx.Frame ):
         
         self.m_created_label = wx.StaticText( self.m_settings_panel, wx.ID_ANY, u"Created", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_created_label.Wrap( -1 )
+        
         gbSizer3.Add( self.m_created_label, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
         
         m_created_choiceChoices = [ u"on any", u"after", u"on", u"before" ]
@@ -618,6 +627,7 @@ class DeleteDialog ( wx.Dialog ):
         
         self.m_progress_label = wx.StaticText( self.m_progress_panel, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_progress_label.Wrap( -1 )
+        
         bSizer22.Add( self.m_progress_label, 0, wx.ALL, 5 )
         
         self.m_progress = wx.Gauge( self.m_progress_panel, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
@@ -706,10 +716,12 @@ class ChecksumDialog ( wx.Dialog ):
         
         self.m_file_label = wx.StaticText( self.m_hash_panel, wx.ID_ANY, u"File.ext", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_file_label.Wrap( -1 )
+        
         fgSizer54.Add( self.m_file_label, 0, wx.ALL, 5 )
         
         self.m_hash_label = wx.StaticText( self.m_hash_panel, wx.ID_ANY, u"Hash:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_hash_label.Wrap( -1 )
+        
         fgSizer54.Add( self.m_hash_label, 0, wx.ALL, 5 )
         
         self.m_hash_textbox = wx.TextCtrl( self.m_hash_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
@@ -808,14 +820,16 @@ class AboutDialog ( wx.Dialog ):
         fgSizer34.SetFlexibleDirection( wx.BOTH )
         fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_app_label = wx.StaticText( self.m_about_panel, wx.ID_ANY, u"Rummage", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
+        self.m_app_label = wx.StaticText( self.m_about_panel, wx.ID_ANY, u"Rummage", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
         self.m_app_label.Wrap( -1 )
+        
         self.m_app_label.SetFont( wx.Font( 20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, wx.EmptyString ) )
         
         fgSizer34.Add( self.m_app_label, 0, wx.ALL|wx.EXPAND, 5 )
         
-        self.m_version_label = wx.StaticText( self.m_about_panel, wx.ID_ANY, u"Version", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
+        self.m_version_label = wx.StaticText( self.m_about_panel, wx.ID_ANY, u"Version", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
         self.m_version_label.Wrap( -1 )
+        
         fgSizer34.Add( self.m_version_label, 0, wx.ALL|wx.EXPAND, 5 )
         
         self.m_dev_toggle = wx.ToggleButton( self.m_about_panel, wx.ID_ANY, u"Contact >>", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -824,8 +838,9 @@ class AboutDialog ( wx.Dialog ):
         self.m_staticline4 = wx.StaticLine( self.m_about_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer34.Add( self.m_staticline4, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_developers_label = wx.StaticText( self.m_about_panel, wx.ID_ANY, u"Dev", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
+        self.m_developers_label = wx.StaticText( self.m_about_panel, wx.ID_ANY, u"Dev", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
         self.m_developers_label.Wrap( -1 )
+        
         self.m_developers_label.Hide()
         
         fgSizer34.Add( self.m_developers_label, 0, wx.ALL|wx.EXPAND, 5 )
@@ -982,6 +997,7 @@ class SettingsDialog ( wx.Dialog ):
         
         self.m_language_label = wx.StaticText( self.m_general_panel, wx.ID_ANY, u"Language (restart required)", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_language_label.Wrap( -1 )
+        
         fgSizer38.Add( self.m_language_label, 0, wx.ALL, 5 )
         
         m_lang_choiceChoices = []
@@ -1032,55 +1048,36 @@ class SettingsDialog ( wx.Dialog ):
         
         sbSizer8 = wx.StaticBoxSizer( wx.StaticBox( self.m_search_panel, wx.ID_ANY, u"Regex" ), wx.VERTICAL )
         
-        fgSizer62 = wx.FlexGridSizer( 0, 2, 0, 0 )
-        fgSizer62.AddGrowableCol( 0 )
-        fgSizer62.SetFlexibleDirection( wx.BOTH )
-        fgSizer62.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        gbSizer5 = wx.GridBagSizer( 0, 0 )
+        gbSizer5.SetFlexibleDirection( wx.BOTH )
+        gbSizer5.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_re_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use re module", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+        self.m_re_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use Re module", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
         self.m_re_radio.SetValue( True ) 
-        fgSizer62.Add( self.m_re_radio, 0, wx.ALL, 5 )
+        gbSizer5.Add( self.m_re_radio, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 2 ), wx.ALL, 5 )
         
-        
-        fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-        
-        self.m_bre_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use re module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer62.Add( self.m_bre_radio, 0, wx.ALL, 5 )
-        
-        
-        fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-        
-        self.m_regex_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use regex module", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_regex_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use Regex module", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_regex_radio.Enable( False )
         
-        fgSizer62.Add( self.m_regex_radio, 0, wx.ALL, 5 )
-        
-        
-        fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-        
-        self.m_bregex_radio = wx.RadioButton( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Use regex module with backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_bregex_radio.Enable( False )
-        
-        fgSizer62.Add( self.m_bregex_radio, 0, wx.ALL, 5 )
-        
-        
-        fgSizer62.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-        
-        self.m_regex_version_label = wx.StaticText( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Regex module version to use", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_regex_version_label.Wrap( -1 )
-        self.m_regex_version_label.Enable( False )
-        
-        fgSizer62.Add( self.m_regex_version_label, 0, wx.ALL, 5 )
+        gbSizer5.Add( self.m_regex_radio, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
         
         m_regex_ver_choiceChoices = [ u"V0", u"V1" ]
         self.m_regex_ver_choice = wx.Choice( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_regex_ver_choiceChoices, 0 )
         self.m_regex_ver_choice.SetSelection( 0 )
         self.m_regex_ver_choice.Enable( False )
         
-        fgSizer62.Add( self.m_regex_ver_choice, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
+        gbSizer5.Add( self.m_regex_ver_choice, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
+        
+        self.m_staticline11 = wx.StaticLine( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        gbSizer5.Add( self.m_staticline11, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND |wx.ALL, 5 )
+        
+        self.m_backrefs_checkbox = wx.CheckBox( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Enable Backrefs", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gbSizer5.Add( self.m_backrefs_checkbox, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
         
         
-        sbSizer8.Add( fgSizer62, 1, wx.EXPAND, 5 )
+        gbSizer5.AddGrowableCol( 0 )
+        
+        sbSizer8.Add( gbSizer5, 1, wx.EXPAND, 5 )
         
         
         fgSizer43.Add( sbSizer8, 1, wx.EXPAND, 5 )
@@ -1100,7 +1097,7 @@ class SettingsDialog ( wx.Dialog ):
         self.m_case_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Case sensitive", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer61.Add( self.m_case_checkbox, 0, wx.ALL, 5 )
         
-        self.m_globstar_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Globstar ** (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_globstar_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Globstar (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer61.Add( self.m_globstar_checkbox, 0, wx.ALL, 5 )
         
         self.m_fullpath_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path directory match", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1135,6 +1132,7 @@ class SettingsDialog ( wx.Dialog ):
         
         self.m_encoding_label = wx.StaticText( self.m_encoding_panel, wx.ID_ANY, u"Encoding Detection", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_encoding_label.Wrap( -1 )
+        
         fgSizer58.Add( self.m_encoding_label, 0, wx.ALL, 5 )
         
         m_encoding_choiceChoices = []
@@ -1147,6 +1145,7 @@ class SettingsDialog ( wx.Dialog ):
         
         self.m_filetype_label = wx.StaticText( self.m_encoding_panel, wx.ID_ANY, u"Special file types:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_filetype_label.Wrap( -1 )
+        
         fgSizer57.Add( self.m_filetype_label, 0, wx.ALL, 5 )
         
         self.m_encoding_list = EncodingList(self.m_encoding_panel)
@@ -1178,6 +1177,7 @@ class SettingsDialog ( wx.Dialog ):
         
         self.m_editor_label = wx.StaticText( self.m_editor_panel, wx.ID_ANY, u"Editor", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_editor_label.Wrap( -1 )
+        
         fgSizer13.Add( self.m_editor_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.m_editor_text = wx.TextCtrl( self.m_editor_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1220,6 +1220,7 @@ class SettingsDialog ( wx.Dialog ):
         
         self.m_term_note_label = wx.StaticText( self.m_notify_panel, wx.ID_ANY, u"Path to terminal-notifier", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_term_note_label.Wrap( -1 )
+        
         self.m_term_note_label.Enable( False )
         
         fgSizer35.Add( self.m_term_note_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -1256,6 +1257,7 @@ class SettingsDialog ( wx.Dialog ):
         
         self.m_history_label = wx.StaticText( self.m_history_panel, wx.ID_ANY, u"0 Records", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_history_label.Wrap( -1 )
+        
         fgSizer30.Add( self.m_history_label, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         self.m_history_clear_button = wx.Button( self.m_history_panel, wx.ID_ANY, u"Clear", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1289,6 +1291,7 @@ class SettingsDialog ( wx.Dialog ):
         
         self.m_back_ext_label = wx.StaticText( self.m_backup_panel, wx.ID_ANY, u"Backup extension", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_back_ext_label.Wrap( -1 )
+        
         fgSizer41.Add( self.m_back_ext_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
         
         self.m_back_ext_textbox = wx.TextCtrl( self.m_backup_panel, wx.ID_ANY, u"rum-bak", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1299,6 +1302,7 @@ class SettingsDialog ( wx.Dialog ):
         
         self.m_back_folder_label = wx.StaticText( self.m_backup_panel, wx.ID_ANY, u"Backup folder", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_back_folder_label.Wrap( -1 )
+        
         fgSizer41.Add( self.m_back_folder_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
         
         self.m_back_folder_textbox = wx.TextCtrl( self.m_backup_panel, wx.ID_ANY, u".rum-bak", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1364,10 +1368,9 @@ class SettingsDialog ( wx.Dialog ):
         self.m_check_update_button.Bind( wx.EVT_BUTTON, self.on_check )
         self.m_time_output_checkbox.Bind( wx.EVT_CHECKBOX, self.on_time_output_toggle )
         self.m_re_radio.Bind( wx.EVT_RADIOBUTTON, self.on_re_toggle )
-        self.m_bre_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bre_toggle )
         self.m_regex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_regex_toggle )
-        self.m_bregex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_bregex_toggle )
         self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
+        self.m_backrefs_checkbox.Bind( wx.EVT_CHECKBOX, self.on_backrefs_toggle )
         self.m_extmatch_checkbox.Bind( wx.EVT_CHECKBOX, self.on_extmatch_toggle )
         self.m_brace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_brace_toggle )
         self.m_case_checkbox.Bind( wx.EVT_CHECKBOX, self.on_case_toggle )
@@ -1419,16 +1422,13 @@ class SettingsDialog ( wx.Dialog ):
     def on_re_toggle( self, event ):
         event.Skip()
     
-    def on_bre_toggle( self, event ):
-        event.Skip()
-    
     def on_regex_toggle( self, event ):
         event.Skip()
     
-    def on_bregex_toggle( self, event ):
+    def on_regex_ver_choice( self, event ):
         event.Skip()
     
-    def on_regex_ver_choice( self, event ):
+    def on_backrefs_toggle( self, event ):
         event.Skip()
     
     def on_extmatch_toggle( self, event ):
@@ -1523,6 +1523,7 @@ class FileExtDialog ( wx.Dialog ):
         
         self.m_ext_label = wx.StaticText( self.m_ext_panel, wx.ID_ANY, u"Extensions", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_ext_label.Wrap( -1 )
+        
         fgSizer60.Add( self.m_ext_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.m_ext_textbox = wx.TextCtrl( self.m_ext_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1782,8 +1783,9 @@ class OverwriteDialog ( wx.Dialog ):
         
         fgSizer52.Add( self.m_bitmap, 0, wx.ALL, 5 )
         
-        self.m_message_label = wx.StaticText( self.m_overwrite_panel, wx.ID_ANY, u"Overwrite?", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
+        self.m_message_label = wx.StaticText( self.m_overwrite_panel, wx.ID_ANY, u"Overwrite?", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
         self.m_message_label.Wrap( -1 )
+        
         fgSizer52.Add( self.m_message_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         
         
@@ -1904,6 +1906,7 @@ class RegexTestDialog ( wx.Dialog ):
         
         self.m_find_label = wx.StaticText( self.m_tester_panel, wx.ID_ANY, u"Find", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_find_label.Wrap( -1 )
+        
         fgSizer39.Add( self.m_find_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
         
         self.m_regex_text = wx.TextCtrl( self.m_tester_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1917,6 +1920,7 @@ class RegexTestDialog ( wx.Dialog ):
         
         self.m_replace_label = wx.StaticText( self.m_tester_panel, wx.ID_ANY, u"Replace", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_replace_label.Wrap( -1 )
+        
         fgSizer39.Add( self.m_replace_label, 0, wx.ALL|wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.m_replace_text = wx.TextCtrl( self.m_tester_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -2163,6 +2167,7 @@ class SaveSearchDialog ( wx.Dialog ):
         
         self.m_name_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Search name", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_name_label.Wrap( -1 )
+        
         gbSizer5.Add( self.m_name_label, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
         
         self.m_name_text = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -2170,6 +2175,7 @@ class SaveSearchDialog ( wx.Dialog ):
         
         self.m_comment_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Comment", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_comment_label.Wrap( -1 )
+        
         gbSizer5.Add( self.m_comment_label, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
         
         self.m_comment_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -2180,6 +2186,7 @@ class SaveSearchDialog ( wx.Dialog ):
         
         self.m_search_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Search", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_search_label.Wrap( -1 )
+        
         gbSizer5.Add( self.m_search_label, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
         
         self.m_search_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
@@ -2187,6 +2194,7 @@ class SaveSearchDialog ( wx.Dialog ):
         
         self.m_replace_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Replace", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_replace_label.Wrap( -1 )
+        
         gbSizer5.Add( self.m_replace_label, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
         
         self.m_replace_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
@@ -2194,6 +2202,7 @@ class SaveSearchDialog ( wx.Dialog ):
         
         self.m_flags_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Flags", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_flags_label.Wrap( -1 )
+        
         gbSizer5.Add( self.m_flags_label, wx.GBPosition( 5, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
         
         self.m_flags_textbox = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
