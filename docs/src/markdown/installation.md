@@ -24,7 +24,9 @@ Name                   | Details
 
 ## Linux Prerequisites
 
-Rummage requires wxPython in order to run. On Linux, this must be compiled from source. Before running `pip`, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are generally most up to date for Ubuntu. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under [this section](https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites).
+Rummage requires wxPython in order to run. If you have a recent Linux distro that has a pre-built, installable wxPython package for your version of Python, then it may make sense to just install the pre-built package via your Linux package manager (`apt-get` for Ubuntu). The version must meet the version requirement above.
+
+If you have installed a version of Python on your machine that does not have a pre-built wxPython package, or if your distro simply doesn't have a pre-built package that satisfies the requirements, then it may make sense to either install via `pip` or to manually compile and install. In both of these cases, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are generally most up to date for Ubuntu. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under [this section](https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites).
 
 Due to recent changes in PyPI, it is probably best to ensure you have at least version 10.0 or greater of `pip`.  Ubuntu provides a method for installing pip with `sudo apt-get install python3-pip`, but this usually installs an older version.  It is recommended to install `pip` with the command shown below (where `python3` is a call to the installed Python version of your choice):
 
