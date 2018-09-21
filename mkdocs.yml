@@ -22,7 +22,10 @@ theme:
 nav:
   - Rummage: index.md
   - Installation: installation.md
-  - User Guide: usage.md
+  - Basic Usage: usage.md
+  - Search Features: search.md
+  - Settings: preferences.md
+  - Extras: extras.md
   - Contributing &amp; Support: contributing.md
   - Changelog: changelog.md
   - License: license.md

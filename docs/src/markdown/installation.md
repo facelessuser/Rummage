@@ -26,7 +26,7 @@ Name                   | Details
 
 Rummage requires wxPython in order to run. If you have a recent Linux distro that has a pre-built, installable wxPython package for your version of Python, then it may make sense to just install the pre-built package via your Linux package manager (`apt-get` for Ubuntu). The version must meet the version requirement above.
 
-If you have installed a version of Python on your machine that does not have a pre-built wxPython package, or if your distro simply doesn't have a pre-built package that satisfies the requirements, then it may make sense to either install via `pip` or to manually compile and install. In both of these cases, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are generally most up to date for Ubuntu. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under [this section](https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites).
+If you have installed a version of Python on your machine that does not have a pre-built wxPython package, or if your distro simply doesn't have a pre-built package that satisfies the requirements, then it may make sense to either install via `pip` or to manually compile and install. In both of these cases, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are generally most up to date for Ubuntu. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under [this section][wxpython-prereq].
 
 Due to recent changes in PyPI, it is probably best to ensure you have at least version 10.0 or greater of `pip`.  Ubuntu provides a method for installing pip with `sudo apt-get install python3-pip`, but this usually installs an older version.  It is recommended to install `pip` with the command shown below (where `python3` is a call to the installed Python version of your choice):
 
@@ -93,29 +93,7 @@ Upgrade:
 pip install --upgrade rummage
 ```
 
-## Running 
-
-Once Rummage is installed, you can run it from the command line (assuming your Python scripts/bin folder is in your system path):
-
-```bash
-rummage
-```
-
-If you have multiple Python versions installed, you can call the rummage for that specific Python version by appending the major and minor Python version to the end:
-
-```bash
-rummage3.6
-```
-
-In some environments it may make sense to run Rummage with:
-
-```bash
-pythonw -m rummage
-```
-
-In some environments, it may be required (see ["Running in Anaconda (macOS)"](#running-in-anaconda-macos)).
-
-## Running in Virtual Environments (macOS)
+## Installing in Virtual Environments (macOS)
 
 If installing in a virtual environment via `virtualenv`, you may run into the following error:
 
@@ -137,7 +115,7 @@ export PYTHONHOME=$ENV
 exec $PYTHON "$@"
 ```
 
-## Running in Homebrew (macOS)
+## Installing in Homebrew (macOS)
 
 Homebrew from what I read used to have issues running wxPython in versions less than 4, but this doesn't seem to be an issue with wxPython 4 with Homebrew (at least in my testing).
 
@@ -164,8 +142,8 @@ Successfully installed backrefs-1.0.1 chardet-3.0.4 gntp-1.0.3 regex-2017.7.11 r
 Faceless-MacBook-Pro:~ facelessuser$ /usr/local/Cellar/python/2.7.13_1/bin/python2 -m rummage
 ```
 
-## Running in Anaconda (macOS)
+## Installing in Anaconda
 
-Anaconda can run Rummage fine from my testing.  The important thing to note is you must launch it with `pythonw -m rummage` and **not** `python -m rummage`.
+Anaconda can run Rummage fine from my testing on macOS.  The important thing to note is you must launch it with `pythonw -m rummage` on Windows and **not** `python -m rummage`. While this worked on macOS, results may vary on other systems.
 
 --8<-- "links.md"

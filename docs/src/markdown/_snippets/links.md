@@ -27,3 +27,4 @@
 [wcmatch]: https://github.com/facelessuser/wcmatch
 [wcmatch-fnmatch]: https://facelessuser.github.io/wcmatch/fnmatch/#syntax
 [wxpython]: https://pypi.python.org/pypi/wxPython/
+[wxpython-prereq]: https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites
