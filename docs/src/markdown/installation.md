@@ -146,4 +146,4 @@ Faceless-MacBook-Pro:~ facelessuser$ /usr/local/Cellar/python/2.7.13_1/bin/pytho
 
 Anaconda can run Rummage fine from my testing on macOS.  The important thing to note is you must launch it with `pythonw -m rummage` on Windows and **not** `python -m rummage`. While this worked on macOS, results may vary on other systems.
 
---8<-- "links.md"
+--8<-- "links.txt"

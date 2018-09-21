@@ -12,4 +12,4 @@ Rummage is written in Python and is currently available on Python 3.4+ (some old
 
 ![Content Tab](/images/content_tab.png)
 
---8<-- "links.md"
+--8<-- "links.txt"

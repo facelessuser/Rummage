@@ -200,4 +200,4 @@ python setup.py compile_catalog
 
 This should build `.mo` files for all languages.  See Babel's documentation on [`compile_catalog`][babel_compile_catalog] for more info.
 
---8<-- "refs.md"
+--8<-- "refs.txt"

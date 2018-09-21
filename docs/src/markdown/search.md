@@ -197,4 +197,4 @@ Assuming you Provided a base folder to search of `/My/base/path`, and you were t
 
 Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the [Preferences](./preferences.md#search) dialog.
 
---8<-- "refs.md"
+--8<-- "refs.txt"

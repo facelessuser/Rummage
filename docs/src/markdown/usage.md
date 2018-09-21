@@ -243,4 +243,4 @@ Rummage allows the exporting of the results to either CSV or HTML.  Simply selec
 !!! info "Large Result Sets"
     Really, really large sets of results will probably be best suited for CSV as a browser may have a hard time loading the entire data set at once.
 
---8<-- "refs.md"
+--8<-- "refs.txt"

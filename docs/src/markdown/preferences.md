@@ -183,4 +183,4 @@ Flags | Supported\ Libraries                       | Option
 `p`   | Regex, Regex\ + \Backrefs                  | [Use POSIX matching.](./search.md#regex-options)
 `F`   | Regex, Regex\ + \Backrefs, Re\ + \Backrefs | [Format style replacements.](./search.md#common-options)
 
---8<-- "refs.md"
+--8<-- "refs.txt"
