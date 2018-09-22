@@ -481,7 +481,7 @@ body .markdown
   background-color: #f8f8f8;
 }
 
-.markdown table tr:nth-child(2n) {
+.markdown table tr:nth-child(2n) code {
   background-color: #ededed;
 }
 
@@ -875,7 +875,7 @@ body .markdown
   vertical-align: middle;
 }
 
-.markdown .highlight {color:#333;background-color: #f5f5f5;}
+/*.markdown .highlight {color:#333;background-color: #f5f5f5;}*/
 .markdown .highlight .hll {background-color: #f8eec7;}
 .markdown .highlight .mf{color:#945277}
 .markdown .highlight .mh{color:#945277}
