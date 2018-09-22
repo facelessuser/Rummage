@@ -48,4 +48,4 @@ site/*
 *.log
 *.bak
 *.patch
-rummage/lib/gui/data/changelog.md
+rummage/lib/gui/data/docs/*

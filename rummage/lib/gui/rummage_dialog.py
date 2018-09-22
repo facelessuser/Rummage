@@ -51,7 +51,7 @@ from .support_info_dialog import SupportInfoDialog
 from .checksum_dialog import ChecksumDialog
 from .delete_dialog import DeleteDialog
 from .settings_dialog import SettingsDialog
-from .changelog_dialog import ChangelogDialog
+from .html_dialog import HTMLDialog
 from .about_dialog import AboutDialog
 from .controls import pick_button
 from .messages import filepickermsg
@@ -2397,12 +2397,15 @@ class RummageFrame(gui.RummageFrame):
     def on_documentation(self, event):
         """Open documentation site."""
 
-        webbrowser.open_new_tab(__meta__.__manual__)
+        dlg = HTMLDialog(self, 'index.html', self.MENU_DOCUMENTATION)
+        dlg.ShowModal()
+        dlg.Destroy()
+        # webbrowser.open_new_tab(__meta__.__manual__)
 
     def on_changelog(self, event):
         """Open documentation site."""
 
-        dlg = ChangelogDialog(self)
+        dlg = HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
         dlg.ShowModal()
         dlg.Destroy()
 

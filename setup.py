@@ -8,7 +8,7 @@ import sys
 import os
 import imp
 import traceback
-from tools import cplog
+from tools import gen_docs
 
 
 class BuildPy(build_py):
@@ -77,7 +77,7 @@ def get_description():
 
 
 VER, DEVSTATUS = get_version()
-cplog.copy_changelog()
+gen_docs.build_internal_docs()
 
 entry_points = {
     'gui_scripts': [

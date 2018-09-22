@@ -1,5 +1,5 @@
 """
-Changelog Dialog.
+HTML Dialog.
 
 Licensed under MIT
 Copyright (c) 2013 - 2017 Isaac Muse <isaacmuse@gmail.com>
@@ -21,6 +21,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import wx.html2
+import os
 from .localization import _
 from . import gui
 from . import data
@@ -31,95 +32,46 @@ from .app.custom_app import debug
 import webbrowser
 import re
 
-extensions = [
-    "markdown.extensions.toc",
-    "markdown.extensions.attr_list",
-    "markdown.extensions.def_list",
-    "markdown.extensions.smarty",
-    "markdown.extensions.footnotes",
-    "markdown.extensions.tables",
-    "markdown.extensions.sane_lists",
-    "markdown.extensions.admonition",
-    "pymdownx.highlight",
-    "pymdownx.inlinehilite",
-    "pymdownx.magiclink",
-    "pymdownx.superfences",
-    "pymdownx.betterem",
-    "pymdownx.extrarawhtml",
-    "pymdownx.keys",
-    "pymdownx.escapeall",
-    "pymdownx.smartsymbols",
-    "pymdownx.tasklist",
-    "pymdownx.tilde",
-    "pymdownx.caret"
-]
 
-extension_configs = {
-    "markdown.extensions.toc": {
-        "slugify": slugs.uslugify,
-        # "permalink": "\ue157"
-    },
-    "pymdownx.inlinehilite": {
-        "style_plain_text": True
-    },
-    "pymdownx.superfences": {
-        "custom_fences": []
-    },
-    "pymdownx.magiclink": {
-        "repo_url_shortener": True,
-        "repo_url_shorthand": True,
-        "user": "facelessuser",
-        "repo": "Rummage"
-    },
-    "markdown.extensions.smarty": {
-        "smart_quotes": False
-    },
-    "pymdownx.escapeall": {
-        "hardbreak": True,
-        "nbsp": True
-    }
-}
+class HTMLDialog(gui.HtmlDialog):
+    """HTMLDialog."""
 
-
-class ChangelogDialog(gui.HtmlDialog):
-    """SettingsDialog."""
-
-    def __init__(self, parent):
+    def __init__(self, parent, html, title=None, string=False):
         """Init SettingsDialog object."""
 
-        super(ChangelogDialog, self).__init__(parent)
-        # if util.platform() == "windows":
-        #     self.m_html_panel.SetDoubleBuffered(True)
+        super(HTMLDialog, self).__init__(parent)
         self.localize()
+        if title is None:
+            self.title = self.TITLE
+        else:
+            self.title = title
         self.refresh_localization()
         self.m_content_html.Bind(wx.html2.EVT_WEBVIEW_NAVIGATING, self.on_navigate)
-        self.load_changelog()
+        self.load_html(html, string)
         self.Fit()
 
     def localize(self):
         """Translage strings."""
 
-        self.TITLE = _("Changelog")
+        self.TITLE = _("Untitled")
 
     def refresh_localization(self):
         """Localize dialog."""
 
-        self.SetTitle(self.TITLE)
+        self.SetTitle(self.title)
         self.Fit()
 
-    def load_changelog(self):
-        """Handle copy event."""
+    def load_html(self, html, string):
+        """Load HTML."""
 
-        cl = data.get_file('changelog.md')
-        css = data.get_file('webview.css')
-        if not cl:
-            cl = "# Changelog\n\nChangelog was not generated!\n"
-        html = markdown.Markdown(extensions=extensions, extension_configs=extension_configs).convert(cl)
-        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>%s</style><body><div class="markdown">%s</div></body></html>' % (css, html)
-        debug(html)
-        while self.m_content_html.IsBusy():
+        if not string:
+            url = 'file://%s' % os.path.join(data.RESOURCE_PATH, 'docs', html).replace('\\', '/')
+            while self.m_content_html.IsBusy():
+                pass
+            self.m_content_html.LoadURL(url)
+        else:
+            # We may not even use this
             pass
-        self.m_content_html.SetPage(html, '.')
 
     def on_cancel(self, event):
         """Close dialog."""
@@ -140,7 +92,11 @@ class ChangelogDialog(gui.HtmlDialog):
             event.Veto()
         # Webkit relative page handling
         elif url.lower().startswith('file://'):
-            pass
+            if not os.path.exists(os.path.normpath(url[7:])):
+                event.Veto()
+                self.m_content_html.LoadURL(
+                    'file://%s' % os.path.join(data.RESOURCE_PATH, 'docs', '404.html').replace('\\', '/')
+                )
         # Handle webkit id jumps for IE
         elif url.startswith('about:blank#'):
             script = "document.getElementById('%s').scrollIntoView();" % url.replace('about:blank#', '')
