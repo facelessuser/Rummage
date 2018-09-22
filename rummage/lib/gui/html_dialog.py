@@ -31,12 +31,104 @@ import pymdownx.slugs as slugs
 from .app.custom_app import debug
 import webbrowser
 import re
+from urllib.request import url2pathname
+from urllib.parse import urlparse
+import html
+
+RE_WIN_DRIVE_LETTER = re.compile(r"^[A-Za-z]$")
+RE_WIN_DRIVE_PATH = re.compile(r"^[A-Za-z]:(?:\\.*)?$")
+RE_SLASH_WIN_DRIVE = re.compile(r"^/[A-Za-z]{1}:/.*")
+RE_URL = re.compile('(http|ftp)s?|data|mailto|tel|news')
+
+URL_LINK = 0
+HTML_LINK = 1
+OTHER_LINK = 2
+
+
+def parse_url(url):
+    """
+    Parse the URL.
+    Try to determine if the following is a file path or
+    (as we will call anything else) a URL.
+    We return it slightly modified and combine the path parts.
+    We also assume if we see something like c:/ it is a Windows path.
+    We don't bother checking if this **is** a Windows system, but
+    'nix users really shouldn't be creating weird names like c: for their folder.
+    """
+
+    is_url = False
+    is_absolute = False
+    scheme, netloc, path, params, query, fragment = urlparse(html.unescape(url))
+
+    if RE_URL.match(scheme):
+        # Clearly a url
+        is_url = True
+    elif scheme == '' and netloc == '' and path == '':
+        # Maybe just a url fragment
+        is_url = True
+    elif scheme == 'file' and (RE_WIN_DRIVE_PATH.match(netloc)):
+        # file://c:/path or file://c:\path
+        path = '/' + (netloc + path).replace('\\', '/')
+        netloc = ''
+        is_absolute = True
+    elif scheme == 'file' and netloc.startswith('\\'):
+        # file://\c:\path or file://\\path
+        path = (netloc + path).replace('\\', '/')
+        netloc = ''
+        is_absolute = True
+    elif scheme == 'file':
+        # file:///path
+        is_absolute = True
+    elif RE_WIN_DRIVE_LETTER.match(scheme):
+        # c:/path
+        path = '/%s:%s' % (scheme, path.replace('\\', '/'))
+        scheme = 'file'
+        netloc = ''
+        is_absolute = True
+    elif scheme == '' and netloc != '' and url.startswith('//'):
+        # //file/path
+        path = '//' + netloc + path
+        scheme = 'file'
+        netloc = ''
+        is_absolute = True
+    elif scheme != '' and netloc != '':
+        # A non-filepath or strange url
+        is_url = True
+    elif path.startswith(('/', '\\')):
+        # /root path
+        is_absolute = True
+
+    return (scheme, netloc, path, params, query, fragment, is_url, is_absolute)
+
+
+def link_type(link):
+    """Test if local file."""
+
+    link_type = OTHER_LINK
+    try:
+        scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(link)
+        if is_url:
+            link_type = URL_LINK
+        else:
+            path = url2pathname(path).replace('\\', '/')
+            # Adjust /c:/ to c:/.
+            if scheme == 'file' and RE_SLASH_WIN_DRIVE.match(path):
+                path = path[1:]
+
+            file_name = os.path.normpath(path)
+            if os.path.exists(file_name) and (file_name.lower().endswith('.html') or os.path.isdir(file_name)):
+                link_type = HTML_LINK
+
+    except Exception:
+        # Parsing crashed and burned; no need to continue.
+        pass
+    return link_type
 
 
 class HTMLDialog(gui.HtmlDialog):
     """HTMLDialog."""
 
-    def __init__(self, parent, html, title=None, string=False):
+    def __init__(self, parent, content, title=None, string=False):
         """Init SettingsDialog object."""
 
         super(HTMLDialog, self).__init__(parent)
@@ -47,7 +139,7 @@ class HTMLDialog(gui.HtmlDialog):
             self.title = title
         self.refresh_localization()
         self.m_content_html.Bind(wx.html2.EVT_WEBVIEW_NAVIGATING, self.on_navigate)
-        self.load_html(html, string)
+        self.load_html(content, string)
         self.Fit()
 
     def localize(self):
@@ -61,11 +153,11 @@ class HTMLDialog(gui.HtmlDialog):
         self.SetTitle(self.title)
         self.Fit()
 
-    def load_html(self, html, string):
+    def load_html(self, content, string):
         """Load HTML."""
 
         if not string:
-            url = 'file://%s' % os.path.join(data.RESOURCE_PATH, 'docs', html).replace('\\', '/')
+            url = 'file://%s' % os.path.join(data.RESOURCE_PATH, 'docs', content).replace('\\', '/')
             while self.m_content_html.IsBusy():
                 pass
             self.m_content_html.LoadURL(url)
@@ -86,14 +178,15 @@ class HTMLDialog(gui.HtmlDialog):
         debug("HTML Nav URL: " + url)
         debug("HTML Nav Target: " + target)
 
-        # Handle basic link schemes
-        if url.lower().startswith(('http://', 'https://', 'ftp://', 'ftps://')):
+        # Things we can allow the backend to handle (local HTML files)
+        ltype = link_type(url)
+        if ltype == HTML_LINK:
+            pass
+        # Send URL links to browser
+        elif ltype == URL_LINK:
             webbrowser.open_new_tab(url)
             event.Veto()
-        # Webkit relative page handling
-        elif url.lower().startswith('file://'):
-            pass
-        # Handle webkit id jumps for IE
+        # Handle webkit id jumps for IE (usually when handling HTML strings, not files)
         elif url.startswith('about:blank#'):
             script = "document.getElementById('%s').scrollIntoView();" % url.replace('about:blank#', '')
             debug("HTML Nav ID: " + script)
