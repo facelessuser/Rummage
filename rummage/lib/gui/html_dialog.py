@@ -92,11 +92,7 @@ class HTMLDialog(gui.HtmlDialog):
             event.Veto()
         # Webkit relative page handling
         elif url.lower().startswith('file://'):
-            if not os.path.exists(os.path.normpath(url[7:])):
-                event.Veto()
-                self.m_content_html.LoadURL(
-                    'file://%s' % os.path.join(data.RESOURCE_PATH, 'docs', '404.html').replace('\\', '/')
-                )
+            pass
         # Handle webkit id jumps for IE
         elif url.startswith('about:blank#'):
             script = "document.getElementById('%s').scrollIntoView();" % url.replace('about:blank#', '')
