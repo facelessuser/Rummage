@@ -1,6 +1,6 @@
 recursive-include rummage *.py
 recursive-include docs *.md *.png *.gif *.js *.css *.html
-recursive-include rummage/lib/gui/data *.png *.icns *.ico *.js *.css
+recursive-include rummage/lib/gui/data *.png *.icns *.ico *.js *.css *.md
 recursive-include tests *.txt *.py *.hidden_file *.rum-bak
 recursive-include requirements *.txt
 recursive-include tools *.py

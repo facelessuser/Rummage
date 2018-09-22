@@ -8,6 +8,7 @@ import sys
 import os
 import imp
 import traceback
+from tools import cplog
 
 
 class BuildPy(build_py):
@@ -76,6 +77,7 @@ def get_description():
 
 
 VER, DEVSTATUS = get_version()
+cplog.copy_changelog()
 
 entry_points = {
     'gui_scripts': [

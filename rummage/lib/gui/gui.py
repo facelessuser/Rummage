@@ -19,6 +19,7 @@ from .controls.load_search_list import SavedSearchList
 from .controls.search_chain_list import SearchChainList
 from .controls.list_box import ListBox
 from .controls.search_error_list import ErrorList
+import wx.html2
 
 wx.ID_EXit = 1000
 
@@ -2682,3 +2683,29 @@ class ErrorTextDialog ( wx.Dialog ):
         pass
     
 
+###########################################################################
+## Class HtmlDialog
+###########################################################################
+
+class HtmlDialog ( wx.Dialog ):
+    
+    def __init__( self, parent ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Html Dialog", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+        
+        self.SetSizeHints( wx.Size( 500,500 ), wx.DefaultSize )
+        
+        bSizer23 = wx.BoxSizer( wx.VERTICAL )
+        
+        self.m_content_html = wx.html2.WebView.New(self, url="")
+        bSizer23.Add( self.m_content_html, 1, wx.ALL|wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer23 )
+        self.Layout()
+        bSizer23.Fit( self )
+        
+        self.Centre( wx.BOTH )
+    
+    def __del__( self ):
+        pass
+    
