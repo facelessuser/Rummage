@@ -2696,7 +2696,7 @@ class HtmlDialog ( wx.Dialog ):
         
         bSizer23 = wx.BoxSizer( wx.VERTICAL )
         
-        self.m_content_html = wx.html2.WebView.New(self, url="")
+        self.m_content_html = wx.html2.WebView.New(self)
         bSizer23.Add( self.m_content_html, 1, wx.ALL|wx.EXPAND, 5 )
         
         

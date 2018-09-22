@@ -51,8 +51,7 @@ extensions = [
     "pymdownx.smartsymbols",
     "pymdownx.tasklist",
     "pymdownx.tilde",
-    "pymdownx.caret",
-    "pymdownx.mark"
+    "pymdownx.caret"
 ]
 
 extension_configs = {
@@ -117,7 +116,7 @@ class ChangelogDialog(gui.HtmlDialog):
             cl = "# Changelog\n\nChangelog was not generated!\n"
         html = markdown.Markdown(extensions=extensions, extension_configs=extension_configs).convert(cl)
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>%s</style><body><div class="markdown">%s</div></body></html>' % (css, html)
-        # debug(html)
+        debug(html)
         while self.m_content_html.IsBusy():
             pass
         self.m_content_html.SetPage(html, '.')

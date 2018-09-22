@@ -1,5 +1,5 @@
 body {
-  margin: 20px auto;
+  margin: 16px auto;
   background-color: #ffffff;
 }
 
@@ -116,23 +116,23 @@ body .markdown
   padding: 0;
 }
 
-.markdown .codehilitetable {
+.markdown .highlighttable {
   border: 0;
   border-spacing: 0;
 }
 
-.markdown .codehilitetable tr {
+.markdown .highlighttable tr {
   border: 0;
 }
 
-.markdown .codehilitetable pre,
-.markdown .codehilitetable div.codehilite {
+.markdown .highlighttable pre,
+.markdown .highlighttable div.highlight {
   margin: 0;
 }
 
 .markdown .linenos,
 .markdown .code,
-.markdown .codehilitetable td {
+.markdown .highlighttable td {
   border: 0;
   padding: 0;
 }
@@ -315,7 +315,6 @@ body .markdown
   font: normal 400 16px fontawesome-mini;
   vertical-align: middle;
   margin-left: -16px;
-  padding-right: 4px;
   float: left;
   display: inline-block;
   text-decoration: none;
@@ -410,7 +409,7 @@ body .markdown
 
 .markdown ul,
 .markdown ol {
-  padding-left: 2em;
+  padding-left: 2rem;
 }
 
 .markdown ul ul,
@@ -458,7 +457,6 @@ body .markdown
 
 .markdown table {
   display: block;
-  width: 100%;
   overflow: auto;
   word-break: normal;
   word-break: keep-all;
@@ -483,6 +481,10 @@ body .markdown
   background-color: #f8f8f8;
 }
 
+.markdown table tr:nth-child(2n) {
+  background-color: #ededed;
+}
+
 .markdown img {
   max-width: 100%;
   -moz-box-sizing: border-box;
@@ -496,7 +498,7 @@ body .markdown
   padding-bottom: 0.2em;
   margin: 0;
   font-size: 85%;
-  background-color: rgba(0,0,0,0.04);
+  background-color: #f5f5f5;
   border-radius: 3px;
 }
 
@@ -516,11 +518,11 @@ body .markdown
   border: 0;
 }
 
-.markdown .codehilite {
+.markdown .highlight {
   margin-bottom: 16px;
 }
 
-.markdown .codehilite pre,
+.markdown .highlight pre,
 .markdown pre {
   padding: 16px;
   overflow: auto;
@@ -530,7 +532,7 @@ body .markdown
   border-radius: 3px;
 }
 
-.markdown .codehilite pre {
+.markdown .highlight pre {
   margin-bottom: 0;
   word-break: normal;
 }
@@ -873,20 +875,7 @@ body .markdown
   vertical-align: middle;
 }
 
-/* Media */
-@media only screen and (min-width: 480px) {
-  .markdown {
-    font-size:14px;
-  }
-}
-
-@media only screen and (min-width: 768px) {
-  .markdown {
-    font-size:16px;
-  }
-}
-
-.markdown .highlight {color:#333;background-color:#fff}
+.markdown .highlight {color:#333;background-color: #f5f5f5;}
 .markdown .highlight .hll {background-color: #f8eec7;}
 .markdown .highlight .mf{color:#945277}
 .markdown .highlight .mh{color:#945277}
