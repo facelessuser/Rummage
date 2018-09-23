@@ -41,7 +41,7 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.3.0'
+SETTINGS_FMT = '2.3.1'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -55,6 +55,7 @@ BACKUP_FOLDER = 1
 
 DEFAULT_SETTINGS = {
     "__format__": SETTINGS_FMT,
+    "current_version": (0, 0, 0, 'final', 0, 0),
     "alert_enabled": True,
     "backup_ext": "rum-bak",
     "backup_folder": ".rum-bak",
@@ -134,6 +135,28 @@ class Settings(object):
         """Get location of log file."""
 
         return cls.log
+
+    @classmethod
+    def set_current_version(cls, value):
+        """Set current version."""
+
+        cls.reload_settings()
+        cls._set_current_version(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_current_version(cls, value):
+        """Set current version."""
+
+        cls.settings["current_version"] = value
+
+    @classmethod
+    def get_current_version(cls):
+        """Get current version."""
+
+        cls.reload_settings()
+        value = cls.settings.get('current_version', DEFAULT_SETTINGS['current_version'])
+        return value
 
     @classmethod
     def is_regex_available(cls):

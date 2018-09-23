@@ -63,6 +63,7 @@ from ..util import epoch_timestamp
 from .. import __meta__
 from .. import rumcore
 from .. import util
+from .. import __meta__
 import decimal
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
@@ -1892,6 +1893,11 @@ class RummageFrame(gui.RummageFrame):
         self.m_main_panel.Fit()
         self.m_main_panel.GetSizer().Layout()
         self.optimize_size(first_time=True)
+        if tuple(Settings.get_current_version()) < __meta__.__version_info__:
+            Settings.set_current_version(__meta__.__version_info__)
+            dlg = HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
+            dlg.ShowModal()
+            dlg.Destroy()
 
     def on_notebook_changed(self, event):
         """
