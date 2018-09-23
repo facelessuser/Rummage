@@ -474,6 +474,9 @@ class RummageFrame ( wx.Frame ):
         self.m_changelog_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Changelog", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_help_menu.Append( self.m_changelog_menuitem )
         
+        self.m_license_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"License", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_help_menu.Append( self.m_license_menuitem )
+        
         self.m_support_info_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Support Info", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_help_menu.Append( self.m_support_info_menuitem )
         
@@ -517,6 +520,7 @@ class RummageFrame ( wx.Frame ):
         self.Bind( wx.EVT_MENU, self.on_check_update, id = self.m_update_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_documentation, id = self.m_documentation_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_changelog, id = self.m_changelog_menuitem.GetId() )
+        self.Bind( wx.EVT_MENU, self.on_license, id = self.m_license_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_support, id = self.m_support_info_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_issues, id = self.m_issues_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_show_log_file, id = self.m_log_menuitem.GetId() )
@@ -596,6 +600,9 @@ class RummageFrame ( wx.Frame ):
         event.Skip()
     
     def on_changelog( self, event ):
+        event.Skip()
+    
+    def on_license( self, event ):
         event.Skip()
     
     def on_support( self, event ):
@@ -2690,7 +2697,7 @@ class ErrorTextDialog ( wx.Dialog ):
 class HtmlDialog ( wx.Dialog ):
     
     def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Html Dialog", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Html Dialog", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.DIALOG_NO_PARENT|wx.RESIZE_BORDER )
         
         self.SetSizeHints( wx.Size( 500,500 ), wx.DefaultSize )
         
@@ -2709,3 +2716,4 @@ class HtmlDialog ( wx.Dialog ):
     def __del__( self ):
         pass
     
+

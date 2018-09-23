@@ -25,9 +25,6 @@ import os
 from .localization import _
 from . import gui
 from . import data
-from .. import util
-import markdown
-import pymdownx.slugs as slugs
 from .app.custom_app import debug
 import webbrowser
 import re
@@ -48,6 +45,7 @@ OTHER_LINK = 2
 def parse_url(url):
     """
     Parse the URL.
+
     Try to determine if the following is a file path or
     (as we will call anything else) a URL.
     We return it slightly modified and combine the path parts.
@@ -133,14 +131,19 @@ class HTMLDialog(gui.HtmlDialog):
 
         super(HTMLDialog, self).__init__(parent)
         self.localize()
+        self.m_content_html.Bind(wx.html2.EVT_WEBVIEW_NAVIGATING, self.on_navigate)
+        self.load(content, title, string)
+        self.Fit()
+
+    def load(self, content, title=None, string=False):
+        """Reshow the dialog."""
+
         if title is None:
             self.title = self.TITLE
         else:
             self.title = title
         self.refresh_localization()
-        self.m_content_html.Bind(wx.html2.EVT_WEBVIEW_NAVIGATING, self.on_navigate)
         self.load_html(content, string)
-        self.Fit()
 
     def localize(self):
         """Translage strings."""
