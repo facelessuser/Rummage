@@ -23,6 +23,7 @@ import wx
 import re
 import json
 import os
+import webbrowser
 from .settings import Settings
 from .file_ext_dialog import FileExtDialog
 from .generic_dialogs import errormsg

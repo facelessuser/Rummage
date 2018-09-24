@@ -63,7 +63,6 @@ from ..util import epoch_timestamp
 from .. import __meta__
 from .. import rumcore
 from .. import util
-from .. import __meta__
 import decimal
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
