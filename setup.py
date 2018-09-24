@@ -18,6 +18,7 @@ class BuildPy(build_py):
         """Run the python build process."""
 
         self.run_command('compile_catalog')
+        gen_docs.build_internal_docs()
         build_py.run(self)
 
 
@@ -34,6 +35,7 @@ class Sdist(sdist):
         """Run the sdist build process."""
 
         self._clean_mo_files("rummage/lib/gui/localization/locale")
+        gen_docs.build_internal_docs()
         sdist.run(self)
 
 
@@ -77,7 +79,6 @@ def get_description():
 
 
 VER, DEVSTATUS = get_version()
-gen_docs.build_internal_docs()
 
 entry_points = {
     'gui_scripts': [

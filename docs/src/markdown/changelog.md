@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.3.0
+
+- **NEW**: Documents are now included locally in installation and can be viewed directly in Rummage via a webview dialog.
+- **NEW**: License can now be viewed from the application menu.
+- **NEW**: Show changelog on next launch after upgrade.
+- **NEW**: Render editor instructions as HTML in the settings dialog.
+- **NEW**: Simplify regular expression engine selection settings panel.
+
 ## 4.2.4
 
 - **FIX**: Adjustments to work with `wcmatch` version 2.0.0.

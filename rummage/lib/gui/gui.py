@@ -1169,14 +1169,14 @@ class SettingsDialog ( wx.Dialog ):
         
         fgSizer63 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer63.AddGrowableCol( 0 )
+        fgSizer63.AddGrowableRow( 0 )
         fgSizer63.SetFlexibleDirection( wx.BOTH )
         fgSizer63.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_editor_help_textbox = wx.TextCtrl( self.m_editor_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
-        self.m_editor_help_textbox.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-        self.m_editor_help_textbox.SetMinSize( wx.Size( -1,100 ) )
+        self.m_help_html = wx.html2.WebView.New(self.m_editor_panel)
+        self.m_help_html.SetMinSize( wx.Size( -1,100 ) )
         
-        fgSizer63.Add( self.m_editor_help_textbox, 0, wx.ALL|wx.EXPAND, 5 )
+        fgSizer63.Add( self.m_help_html, 0, wx.ALL|wx.EXPAND, 5 )
         
         fgSizer13 = wx.FlexGridSizer( 0, 3, 0, 0 )
         fgSizer13.AddGrowableCol( 1 )

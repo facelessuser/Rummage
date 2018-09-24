@@ -1,4 +1,3 @@
 babel
 mkdocs
 pymdown-extensions
-https://github.com/facelessuser/rummage-mkdocs-theme/archive/master.zip
