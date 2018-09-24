@@ -52,7 +52,7 @@ Use\ replace\ plugin    | When enabled, Rummage will use a [replace plugin](./us
 
 ## File Patterns
 
-![File Patterns](/images/file_pattern.png)
+![File Patterns](images/file_pattern.png)
 
 Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the `Regex` checkbox beside the pattern. Wildcard patterns and regular expression patterns will each be covered separately.
 
