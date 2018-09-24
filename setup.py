@@ -12,7 +12,7 @@ from tools import gen_docs
 
 
 class BuildPy(build_py):
-    """Custom ``build_py`` command to always build mo files for wheels."""
+    """Custom ``build_py`` command to always build mo files for wheels and build internal docs."""
 
     def run(self):
         """Run the python build process."""
@@ -23,7 +23,7 @@ class BuildPy(build_py):
 
 
 class Sdist(sdist):
-    """Custom `sdist` command to ensure that we don't include `.m0` files in source."""
+    """Custom `sdist` command to ensure that we don't include `.m0` files in source and we build internal docs."""
 
     def _clean_mo_files(self, path):
         for root, dirs, files in os.walk(path):

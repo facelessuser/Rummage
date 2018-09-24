@@ -7,3 +7,4 @@ filelock
 send2trash
 wcmatch>=1.0.1,<3.0
 pymdown-extensions
+pygments

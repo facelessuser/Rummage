@@ -1,0 +1,61 @@
+<!-- Base HTML template -->
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Title -->
+  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ config.site_name }}</title>
+
+  <!-- Theme CSS  -->
+  <link rel="stylesheet" href="{{ "css/theme.css"|url }}">
+
+  <!-- Extra CSS -->
+  {% for path in config.extra_css %}
+    <link href="{{ path|url }}" rel="stylesheet">
+  {% endfor %}
+
+  {% block extrahead %}
+  {% endblock %}
+
+  <script>var base_url = '{{ base_url }}';</script>
+
+  <!-- JavaScript -->
+  {% for path in config.extra_javascript %}
+    <script src="{{ path|url }}"></script>
+  {% endfor %}
+
+</head>
+
+<body>
+
+  <!-- Content -->
+  <div class="markdown">
+  {% block content %}
+    {{ page.content }}
+  {% endblock %}
+  </div>
+
+  <!-- Navigation -->
+  {% if page.next_page or page.previous_page %}
+
+    <div class="nav">
+      {% if page.previous_page %}
+        <a href="{{ page.previous_page.url|url }}" class="prev-page" title="{{ page.previous_page.title }}">&#8592; Prev</a>
+      {% else %}
+        <span class="prev-page">&#8592; Prev</span>
+      {% endif %}
+
+      <a href="./sitemap.html">Home</a>
+
+      {% if page.next_page %}
+        <a href="{{ page.next_page.url|url }}" class="next-page" title="{{ page.next_page.title }}"/>Next &#8594;</a>
+      {% else %}
+        <span class="next-page">Next &#8594;</span>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</body>
+</html>

@@ -1,17 +1,18 @@
-site_name: Rummage Documentation
-site_url: https://facelessuser.github.io/Rummage
-repo_url: https://github.com/facelessuser/Rummage
+site_name: ''
 edit_uri: tree/master/docs/src/markdown
 site_description: A search and replace tool written in Python.
-copyright: |
-  Copyright &copy; 2013 - 2018 <a href="https://github.com/facelessuser">Isaac Muse</a>
-  <br><span class="md-footer-custom-text">emoji provided free by </span><a href="http://www.emojione.com">EmojiOne</a>
 
 use_directory_urls: false
 
 docs_dir: docs/src/markdown
 theme:
-  name: rummage
+  name: null
+  custom_dir: docs/internal_theme
+  static_templates:
+    - 404.html
+    - sitemap.html
+  include_search_page: false
+  search_index_only: true
 
 nav:
   - Rummage: index.md
