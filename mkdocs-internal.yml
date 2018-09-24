@@ -1,4 +1,4 @@
-site_name: ''
+site_name: Rummage
 edit_uri: tree/master/docs/src/markdown
 site_description: A search and replace tool written in Python.
 
