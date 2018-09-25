@@ -1,7 +1,7 @@
 body {
   margin: auto;
   background-color: #ffffff;
-  padding: 16px;
+  padding: 14px;
 }
 
 @font-face {
@@ -223,89 +223,35 @@ body {
 }
 
 .markdown h1 {
-  font-size: 30px;
+  padding-bottom: 0.3em;
+  font-size: 2.25em;
+  line-height: 1.2;
+  border-bottom: 1px solid #eee;
 }
 
 .markdown h2 {
-  font-size: 21px;
+  padding-bottom: 0.3em;
+  font-size: 1.75em;
+  line-height: 1.225;
+  border-bottom: 1px solid #eee;
 }
 
 .markdown h3 {
-  font-size: 16px;
+  font-size: 1.5em;
+  line-height: 1.43;
 }
 
 .markdown h4 {
-  font-size: 14px;
+  font-size: 1.25em;
 }
 
 .markdown h5 {
-  font-size: 12px;
+  font-size: 1em;
 }
 
 .markdown h6 {
-  font-size: 11px;
-}
-
-.markdown blockquote {
-  margin: 0;
-}
-
-.markdown ul,
-.markdown ol {
-  padding: 0;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.markdown ol ol,
-.markdown ul ol {
-  list-style-type: lower-roman;
-}
-
-.markdown ul ul ol,
-.markdown ul ol ol,
-.markdown ol ul ol,
-.markdown ol ol ol {
-  list-style-type: lower-alpha;
-}
-
-.markdown dd {
-  margin-left: 0;
-}
-
-.markdown code,
-.markdown pre,
-.markdown samp {
-  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  font-size: 12px;
-}
-
-.markdown pre {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.markdown kbd {
-  background-color: #e7e7e7;
-  background-image: -moz-linear-gradient(#fefefe, #e7e7e7);
-  background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
-  background-image: linear-gradient(#fefefe, #e7e7e7);
-  background-repeat: repeat-x;
-  border-radius: 2px;
-  border: 1px solid #cfcfcf;
-  color: #000;
-  padding: 3px 5px;
-  line-height: 10px;
-  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  display: inline-block;
-}
-
-.markdown>*:first-child {
-  margin-top: 0 !important;
-}
-
-.markdown>*:last-child {
-  margin-bottom: 0 !important;
+  font-size: 1em;
+  color: #777;
 }
 
 .markdown .headerlink {
@@ -352,36 +298,65 @@ body {
   text-decoration: none;
 }
 
-.markdown h1 {
-  padding-bottom: 0.3em;
-  font-size: 2.25em;
-  line-height: 1.2;
-  border-bottom: 1px solid #eee;
+.markdown blockquote {
+  margin: 0;
 }
 
-.markdown h2 {
-  padding-bottom: 0.3em;
-  font-size: 1.75em;
-  line-height: 1.225;
-  border-bottom: 1px solid #eee;
+.markdown ul,
+.markdown ol {
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
-.markdown h3 {
-  font-size: 1.5em;
-  line-height: 1.43;
+.markdown ol ol,
+.markdown ul ol {
+  list-style-type: lower-roman;
 }
 
-.markdown h4 {
-  font-size: 1.25em;
+.markdown ul ul ol,
+.markdown ul ol ol,
+.markdown ol ul ol,
+.markdown ol ol ol {
+  list-style-type: lower-alpha;
 }
 
-.markdown h5 {
-  font-size: 1em;
+.markdown dd {
+  margin-left: 0;
 }
 
-.markdown h6 {
-  font-size: 1em;
-  color: #777;
+.markdown code,
+.markdown pre,
+.markdown samp {
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.markdown pre {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown kbd {
+  background-color: #e7e7e7;
+  background-image: -moz-linear-gradient(#fefefe, #e7e7e7);
+  background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
+  background-image: linear-gradient(#fefefe, #e7e7e7);
+  background-repeat: repeat-x;
+  border-radius: 2px;
+  border: 1px solid #cfcfcf;
+  color: #000;
+  padding: 3px 5px;
+  line-height: 10px;
+  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  display: inline-block;
+}
+
+.markdown>*:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown>*:last-child {
+  margin-bottom: 0 !important;
 }
 
 .markdown p,
