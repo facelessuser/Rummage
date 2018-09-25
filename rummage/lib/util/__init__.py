@@ -4,10 +4,14 @@ import re
 import sys
 import codecs
 import json
+import os
 import subprocess
 from itertools import groupby
 from encodings.aliases import aliases
 from .file_strip.json import sanitize_json
+from urllib.request import url2pathname
+from urllib.parse import urlparse
+import html
 
 PY36 = (3, 6) <= sys.version_info
 NARROW = sys.maxunicode == 0xFFFF
@@ -19,6 +23,15 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
+
+RE_WIN_DRIVE_LETTER = re.compile(r"^[A-Za-z]$")
+RE_WIN_DRIVE_PATH = re.compile(r"^[A-Za-z]:(?:\\.*)?$")
+RE_SLASH_WIN_DRIVE = re.compile(r"^/[A-Za-z]{1}:/.*")
+RE_URL = re.compile('(http|ftp)s?|data|mailto|tel|news')
+
+URL_LINK = 0
+HTML_LINK = 1
+OTHER_LINK = 2
 
 BACK_SLASH_TRANSLATION = {
     "\\a": '\a',
@@ -46,6 +59,87 @@ def platform():
     """Get Platform."""
 
     return _PLATFORM
+
+
+def parse_url(url):
+    """
+    Parse the URL.
+
+    Try to determine if the following is a file path or
+    (as we will call anything else) a URL.
+    We return it slightly modified and combine the path parts.
+    We also assume if we see something like c:/ it is a Windows path.
+    We don't bother checking if this **is** a Windows system, but
+    'nix users really shouldn't be creating weird names like c: for their folder.
+    """
+
+    is_url = False
+    is_absolute = False
+    scheme, netloc, path, params, query, fragment = urlparse(html.unescape(url))
+
+    if RE_URL.match(scheme):
+        # Clearly a url
+        is_url = True
+    elif scheme == '' and netloc == '' and path == '':
+        # Maybe just a url fragment
+        is_url = True
+    elif scheme == 'file' and (RE_WIN_DRIVE_PATH.match(netloc)):
+        # file://c:/path or file://c:\path
+        path = '/' + (netloc + path).replace('\\', '/')
+        netloc = ''
+        is_absolute = True
+    elif scheme == 'file' and netloc.startswith('\\'):
+        # file://\c:\path or file://\\path
+        path = (netloc + path).replace('\\', '/')
+        netloc = ''
+        is_absolute = True
+    elif scheme == 'file':
+        # file:///path
+        is_absolute = True
+    elif RE_WIN_DRIVE_LETTER.match(scheme):
+        # c:/path
+        path = '/%s:%s' % (scheme, path.replace('\\', '/'))
+        scheme = 'file'
+        netloc = ''
+        is_absolute = True
+    elif scheme == '' and netloc != '' and url.startswith('//'):
+        # //file/path
+        path = '//' + netloc + path
+        scheme = 'file'
+        netloc = ''
+        is_absolute = True
+    elif scheme != '' and netloc != '':
+        # A non-filepath or strange url
+        is_url = True
+    elif path.startswith(('/', '\\')):
+        # /root path
+        is_absolute = True
+
+    return (scheme, netloc, path, params, query, fragment, is_url, is_absolute)
+
+
+def link_type(link):
+    """Test if local file."""
+
+    link_type = OTHER_LINK
+    try:
+        scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(link)
+        if is_url:
+            link_type = URL_LINK
+        else:
+            path = url2pathname(path).replace('\\', '/')
+            # Adjust /c:/ to c:/.
+            if scheme == 'file' and RE_SLASH_WIN_DRIVE.match(path):
+                path = path[1:]
+
+            file_name = os.path.normpath(path)
+            if os.path.exists(file_name) and (file_name.lower().endswith('.html') or os.path.isdir(file_name)):
+                link_type = HTML_LINK
+
+    except Exception:
+        # Parsing crashed and burned; no need to continue.
+        pass
+    return link_type
 
 
 def char_size(c):

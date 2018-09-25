@@ -1,1 +1,4 @@
 babel
+mkdocs
+pymdown-extensions
+pygments

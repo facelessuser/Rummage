@@ -19,6 +19,7 @@ from .controls.load_search_list import SavedSearchList
 from .controls.search_chain_list import SearchChainList
 from .controls.list_box import ListBox
 from .controls.search_error_list import ErrorList
+import wx.html2
 
 wx.ID_EXit = 1000
 
@@ -473,6 +474,9 @@ class RummageFrame ( wx.Frame ):
         self.m_changelog_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Changelog", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_help_menu.Append( self.m_changelog_menuitem )
         
+        self.m_license_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"License", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_help_menu.Append( self.m_license_menuitem )
+        
         self.m_support_info_menuitem = wx.MenuItem( self.m_help_menu, wx.ID_ANY, u"Support Info", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_help_menu.Append( self.m_support_info_menuitem )
         
@@ -516,6 +520,7 @@ class RummageFrame ( wx.Frame ):
         self.Bind( wx.EVT_MENU, self.on_check_update, id = self.m_update_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_documentation, id = self.m_documentation_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_changelog, id = self.m_changelog_menuitem.GetId() )
+        self.Bind( wx.EVT_MENU, self.on_license, id = self.m_license_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_support, id = self.m_support_info_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_issues, id = self.m_issues_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_show_log_file, id = self.m_log_menuitem.GetId() )
@@ -595,6 +600,9 @@ class RummageFrame ( wx.Frame ):
         event.Skip()
     
     def on_changelog( self, event ):
+        event.Skip()
+    
+    def on_license( self, event ):
         event.Skip()
     
     def on_support( self, event ):
@@ -1161,14 +1169,14 @@ class SettingsDialog ( wx.Dialog ):
         
         fgSizer63 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer63.AddGrowableCol( 0 )
+        fgSizer63.AddGrowableRow( 0 )
         fgSizer63.SetFlexibleDirection( wx.BOTH )
         fgSizer63.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_editor_help_textbox = wx.TextCtrl( self.m_editor_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
-        self.m_editor_help_textbox.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-        self.m_editor_help_textbox.SetMinSize( wx.Size( -1,100 ) )
+        self.m_help_html = wx.html2.WebView.New(self.m_editor_panel)
+        self.m_help_html.SetMinSize( wx.Size( -1,100 ) )
         
-        fgSizer63.Add( self.m_editor_help_textbox, 0, wx.ALL|wx.EXPAND, 5 )
+        fgSizer63.Add( self.m_help_html, 0, wx.ALL|wx.EXPAND, 5 )
         
         fgSizer13 = wx.FlexGridSizer( 0, 3, 0, 0 )
         fgSizer13.AddGrowableCol( 1 )
@@ -2675,6 +2683,33 @@ class ErrorTextDialog ( wx.Dialog ):
         
         self.SetSizer( bSizer14 )
         self.Layout()
+        
+        self.Centre( wx.BOTH )
+    
+    def __del__( self ):
+        pass
+    
+
+###########################################################################
+## Class HtmlDialog
+###########################################################################
+
+class HtmlDialog ( wx.Dialog ):
+    
+    def __init__( self, parent ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Html Dialog", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.DIALOG_NO_PARENT|wx.RESIZE_BORDER )
+        
+        self.SetSizeHints( wx.Size( 500,500 ), wx.DefaultSize )
+        
+        bSizer23 = wx.BoxSizer( wx.VERTICAL )
+        
+        self.m_content_html = wx.html2.WebView.New(self)
+        bSizer23.Add( self.m_content_html, 1, wx.ALL|wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer23 )
+        self.Layout()
+        bSizer23.Fit( self )
         
         self.Centre( wx.BOTH )
     

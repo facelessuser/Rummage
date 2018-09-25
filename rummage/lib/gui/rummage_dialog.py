@@ -51,6 +51,7 @@ from .support_info_dialog import SupportInfoDialog
 from .checksum_dialog import ChecksumDialog
 from .delete_dialog import DeleteDialog
 from .settings_dialog import SettingsDialog
+from .html_dialog import HTMLDialog
 from .about_dialog import AboutDialog
 from .controls import pick_button
 from .messages import filepickermsg
@@ -345,6 +346,7 @@ class RummageFrame(gui.RummageFrame):
         self.client_size = wx.Size(-1, -1)
         self.paylod = {}
         self.error_dlg = None
+        self.doc_dlg = None
         self.debounce_search = False
         self.searchin_update = False
         self.replace_plugin_update = False
@@ -558,6 +560,7 @@ class RummageFrame(gui.RummageFrame):
         self.MENU_UPDATE = _("Check for Updates")
         self.MENU_DOCUMENTATION = _("Documentation")
         self.MENU_CHANGELOG = _("Changelog")
+        self.MENU_LICENSE = _("License")
         self.MENU_HELP_SUPPORT = _("Help and Support")
         self.MENU_SHOW_LIMIT = _("Show Limit Search Panel")
         self.MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
@@ -643,6 +646,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_update_menuitem.SetItemLabel(self.MENU_UPDATE)
         self.m_documentation_menuitem.SetItemLabel(self.MENU_DOCUMENTATION)
         self.m_changelog_menuitem.SetItemLabel(self.MENU_CHANGELOG)
+        self.m_license_menuitem.SetItemLabel(self.MENU_LICENSE)
         self.m_issues_menuitem.SetItemLabel(self.MENU_HELP_SUPPORT)
 
         self.m_logic_choice.Clear()
@@ -1888,6 +1892,11 @@ class RummageFrame(gui.RummageFrame):
         self.m_main_panel.Fit()
         self.m_main_panel.GetSizer().Layout()
         self.optimize_size(first_time=True)
+        if tuple(Settings.get_current_version()) < __meta__.__version_info__:
+            Settings.set_current_version(__meta__.__version_info__)
+            dlg = HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
+            dlg.ShowModal()
+            dlg.Destroy()
 
     def on_notebook_changed(self, event):
         """
@@ -2247,6 +2256,9 @@ class RummageFrame(gui.RummageFrame):
 
         if self.thread is not None:
             _ABORT = True
+        if self.doc_dlg is not None:
+            self.doc_dlg.Destroy()
+            self.doc_dlg = None
         if self.error_dlg is not None:
             self.error_dlg.Destroy()
             self.error_dlg = None
@@ -2396,12 +2408,26 @@ class RummageFrame(gui.RummageFrame):
     def on_documentation(self, event):
         """Open documentation site."""
 
-        webbrowser.open_new_tab(__meta__.__manual__)
+        if self.doc_dlg is None:
+            self.doc_dlg = HTMLDialog(None, 'sitemap.html', self.MENU_DOCUMENTATION)
+            self.doc_dlg.Show()
+        else:
+            self.doc_dlg.load('sitemap.html', self.MENU_DOCUMENTATION)
+            self.doc_dlg.Show()
 
     def on_changelog(self, event):
         """Open documentation site."""
 
-        webbrowser.open_new_tab(__meta__.__changelog__)
+        dlg = HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def on_license(self, event):
+        """Open documentation site."""
+
+        dlg = HTMLDialog(self, 'license.html', self.MENU_CHANGELOG)
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def on_support(self, event):
         """Open support information dialog."""

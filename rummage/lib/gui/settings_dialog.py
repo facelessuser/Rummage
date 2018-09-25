@@ -22,6 +22,8 @@ from __future__ import unicode_literals
 import wx
 import re
 import json
+import os
+import webbrowser
 from .settings import Settings
 from .file_ext_dialog import FileExtDialog
 from .generic_dialogs import errormsg
@@ -30,6 +32,97 @@ from . import gui
 from . import notify
 from .. import rumcore
 from .. import util
+import markdown
+import pymdownx.slugs as slugs
+from . import data
+from .app.custom_app import debug
+
+extensions = [
+    "markdown.extensions.toc",
+    "markdown.extensions.attr_list",
+    "markdown.extensions.def_list",
+    "markdown.extensions.smarty",
+    "markdown.extensions.footnotes",
+    "markdown.extensions.tables",
+    "markdown.extensions.sane_lists",
+    "markdown.extensions.admonition",
+    "pymdownx.highlight",
+    "pymdownx.inlinehilite",
+    "pymdownx.magiclink",
+    "pymdownx.superfences",
+    "pymdownx.betterem",
+    "pymdownx.extrarawhtml",
+    "pymdownx.keys",
+    "pymdownx.escapeall",
+    "pymdownx.smartsymbols",
+    "pymdownx.tasklist",
+    "pymdownx.tilde",
+    "pymdownx.caret",
+    "pymdownx.mark"
+]
+
+extension_configs = {
+    "markdown.extensions.toc": {
+        "slugify": slugs.uslugify,
+        # "permalink": "\ue157"
+    },
+    "pymdownx.inlinehilite": {
+        "style_plain_text": True
+    },
+    "pymdownx.superfences": {
+        "custom_fences": []
+    },
+    "pymdownx.magiclink": {
+        "repo_url_shortener": True,
+        "repo_url_shorthand": True,
+        "user": "facelessuser",
+        "repo": "Rummage"
+    },
+    "markdown.extensions.smarty": {
+        "smart_quotes": False
+    },
+    "pymdownx.escapeall": {
+        "hardbreak": True,
+        "nbsp": True
+    }
+}
+
+EDITOR_HELP = _("""
+Enter in the appropriate command to open files in your editor.
+Double quote paths with spaces and parameters that *may* contain spaces after substitution.
+
+Use the following variables for parameter substitution:
+
+Variable | Description
+-------- | -----------
+`{$file}`| Insert the file path.
+`{$line}`| Insert the line number.
+`{$col}` | Insert the line column.
+
+!!! example "Example"
+
+    ```bash
+    "C:\Program Files\Sublime Text 3\subl.exe" "{$file}:{$line}:{$col}"
+    ```
+""")
+
+HELP_HTML = """<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<style>
+%s
+</style>
+</head>
+<body>
+<div class="markdown">
+%s
+</div>
+</body>
+</html>
+"""
 
 # We really need a better validator
 BACKUP_VALIDATOR = re.compile(r'^[-_a-zA-Z\d.]+$')
@@ -61,6 +154,9 @@ class SettingsDialog(gui.SettingsDialog):
         self.set_keybindings(
             [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
+        self.m_help_html.Bind(wx.html2.EVT_WEBVIEW_NAVIGATING, self.on_navigate)
+        self.m_help_html.Bind(wx.html2.EVT_WEBVIEW_LOADED, self.on_loaded)
+        self.busy = False
 
         self.history_types = [
             "target",
@@ -204,16 +300,7 @@ class SettingsDialog(gui.SettingsDialog):
             _("cchardet (C)")
         ]
         self.SPECIAL = _("Special file types:")
-        self.EDITOR_HELP = _(
-            "Use the vairable {$file} to insert the file path, "
-            "{$line} to insert the line number, and {$col} to "
-            "insert the line column.\n\n"
-            "Double quote paths and parameters that "
-            "contain spaces. {$file} should be double "
-            "quoted as well.\n\n"
-            "Check your editor's command line options for "
-            "the proper setup."
-        )
+        self.EDITOR_HELP = EDITOR_HELP
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -243,7 +330,6 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_fullpath_checkbox.SetLabel(self.FULL_PATH)
         self.m_fullfile_checkbox.SetLabel(self.FULL_FILE)
         self.m_globstar_checkbox.SetLabel(self.GLOBSTAR)
-        self.m_editor_help_textbox.SetValue(self.EDITOR_HELP)
         self.m_editor_button.SetLabel(self.SAVE)
         self.m_history_clear_button.SetLabel(self.CLEAR)
         self.m_back_ext_label.SetLabel(self.BACK_EXT)
@@ -257,6 +343,8 @@ class SettingsDialog(gui.SettingsDialog):
         self.m_check_update_button.SetLabel(self.CHECK_NOW)
         self.m_filetype_label.SetLabel(self.SPECIAL)
 
+        self.load_help(self.EDITOR_HELP)
+
         encoding = Settings.get_chardet_mode()
         cchardet_available = Settings.is_cchardet_available()
         options = self.CHARDET_CHOICE if cchardet_available else self.CHARDET_CHOICE[:1]
@@ -267,6 +355,20 @@ class SettingsDialog(gui.SettingsDialog):
         self.reload_list()
 
         self.Fit()
+
+    def load_help(self, text):
+        """Handle copy event."""
+
+        css = data.get_file(os.path.join('docs', 'css', 'theme.css'))
+        html = markdown.Markdown(extensions=extensions, extension_configs=extension_configs).convert(text)
+        html = HELP_HTML % (css, html)
+        self.busy = True
+        self.m_help_html.SetPage(html, '')
+        if util._PLATFORM == "windows":
+            # Ugh.  Why can't things just work
+            # Here we must reload the page so that things render properly.
+            # This was done to fix poorly rendered pages observed in Windows.
+            self.m_help_html.Reload()
 
     def set_keybindings(self, keybindings):
         """Set keybindings for frame."""
@@ -481,6 +583,42 @@ class SettingsDialog(gui.SettingsDialog):
                 self.m_encoding_list.SetItem(item, 1, value)
                 self.reload_list()
         event.Skip()
+
+    def on_loaded(self, event):
+        """Handle laoded event."""
+
+        self.busy = False
+
+    def on_navigate(self, event):
+        """Handle links."""
+
+        target = event.GetTarget()
+        url = event.GetURL()
+        debug("HTML Nav URL: " + url)
+        debug("HTML Nav Target: " + target)
+
+        # Things we can allow the backend to handle (local HTML files)
+        ltype = util.link_type(url)
+        if ltype == util.HTML_LINK:
+            self.busy = True
+            pass
+        # Send URL links to browser
+        elif ltype == util.URL_LINK:
+            webbrowser.open_new_tab(url)
+            self.busy = False
+            event.Veto()
+        # Handle webkit id jumps for IE (usually when handling HTML strings, not files)
+        elif url.startswith('about:blank#'):
+            script = "document.getElementById('%s').scrollIntoView();" % url.replace('about:blank#', '')
+            debug("HTML Nav ID: " + script)
+            self.m_help_html.RunScript(script)
+            self.busy = False
+            event.Veto()
+        # Show unhandled links
+        else:
+            debug("HTML unhandled link: " + url)
+            self.busy = False
+            event.Veto()
 
     def on_change_module(self, event):
         """Change the module."""

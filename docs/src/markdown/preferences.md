@@ -6,7 +6,7 @@ The preference dialog is found in the menu at **File-->Preferences** and contain
 
 ## General
 
-![Preferences: General](/images/settings_general.png)
+![Preferences: General](images/settings_general.png)
 
 The **General** tab contains a couple of useful settings.
 
@@ -35,7 +35,7 @@ International Time
 
 ## Search
 
-![Preferences: Regex](/images/settings_search.png)
+![Preferences: Regex](images/settings_search.png)
 
 The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](./search.md#backrefs) (a wrapper that adds a couple of special escapes).
 
@@ -52,7 +52,7 @@ Under **File/Folder Matching** are a number options for file and folder matching
 
 ## Encoding
 
-![Preferences: Encoding](/images/settings_encoding.png)
+![Preferences: Encoding](images/settings_encoding.png)
 
 The **Encoding** panel is where you can tweak encoding detection. You can change the default encoding detection used (assuming you have both Chardet and cChardet installed). By default, Rummage will use the fastest (cChardet).
 
@@ -62,7 +62,7 @@ Remember that encoding detection is far from bulletproof and can pick an incorre
 
 ## Editor
 
-![Preferences: Editor](/images/settings_editor.png)
+![Preferences: Editor](images/settings_editor.png)
 
 The **Editor** panel allows you to configure the editor that will be used to open files.  To setup, simply enter the path to the editor and the options it should be called with. Once done, press the save button.
 
@@ -76,7 +76,7 @@ Argument Variables | Description
 
 ## Notifications
 
-![Preferences: Notifications](/images/settings_notify.png)
+![Preferences: Notifications](images/settings_notify.png)
 
 The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
 
@@ -110,13 +110,13 @@ Windows
 
 ## History
 
-![Preferences: History](/images/settings_history.png)
+![Preferences: History](images/settings_history.png)
 
 The **History** panel is where all text box, drop down history can be cleared.
 
 ## Backups
 
-![Preferences: Backups](/images/settings_backup.png)
+![Preferences: Backups](images/settings_backup.png)
 
 The **Backups** panel allows you to configure where Rummage creates backups. You can control whether backups are all placed in the same folder as the original source, or if they are put into a subfolder. You can also configure the name of the subfolder used or the extension used when not writing to a subfolder.
 
@@ -126,11 +126,11 @@ If desired, Rummage's settings can be exported to a JSON file or imported from a
 
 Import and export are broken up into three types of settings: general settings, chains, and searches. General settings are the basic feature configurations for Rummage.  Chains contains all of your configured pattern chains.  And searches is the actual configured search and replaces.  When exporting, you will be presented with a dialog allowing you to select which categories of settings you wish to export.
 
-![Settings: Export](/images/settings_export.png)
+![Settings: Export](images/settings_export.png)
 
 When importing, you will be prompted to select the settings file to import.  Then you will be asked to select one or more settings categories to import.  Rummage will skip any malformed or invalid settings. If you are going to overwrite an existing chain or search, it will prompt you whether to proceed with the overwrite.  Afterwards, it will output the import results in the text box.
 
-![Settings: Export](/images/settings_import.png)
+![Settings: Export](images/settings_import.png)
 
 The general settings are meant to be transferred between installations, not specifically configured by hand, so all the supported settings will not be covered here, but the chain and search format will be discussed in details.
 

@@ -32,29 +32,29 @@ pythonw -m rummage
 
 ## Searching &amp; Replacing
 
-![Search Tab](/images/search_tab.png)
+![Search Tab](images/search_tab.png)
 
 Search and replaces are configured in the **Search** tab which is broken up into 2 panels, the first of which is the **Search &amp; Replace** panel. The second is the **Limit Search** panel.
 
 ### Search Panel
 
-![Search and Replace Panel](/images/search_replace_inputs.png)
+![Search and Replace Panel](./images/search_replace_inputs.png)
 
 The **Search &amp; Replace** panel contains three text boxes with a dropdown history. The first text box defines **where to search**, the second defines **what to search for**, and the last defines **what to replace matches with**.  You can select previously used patterns and search targets by expanding the dropdown panel for the input.
 
 Below the text boxes are checkboxes that control the regular expression engine's options and features.
 
-![Search and Replace Checkboxes](/images/search_replace_panel.png)
+![Search and Replace Checkboxes](images/search_replace_panel.png)
 
 The available features will vary depending on which regular expression engine you are using. Each feature is documented in [Search Options](./search.md#search-options).
 
 Lastly, Rummage provides buttons to launch a [regular expression tester](#regular-expression-tester), dialogs to [save or load](#saving-and-loading-regular-expressions) frequently used regular expressions, and a dialog to create and manage [regular expression chains](#search-chains).
 
-![Regular Expression Buttons](/images/regex_buttons.png)
+![Regular Expression Buttons](images/regex_buttons.png)
 
 ### Limit Search Panel
 
-![Limit Search Panel](/images/limit_search_panel.png)
+![Limit Search Panel](images/limit_search_panel.png)
 
 The **Limit Search** panel contains checkboxes and inputs that filter the files to be searched.  You can filter out hidden files, files of specific sizes, or creation/modification dates.
 
@@ -64,16 +64,16 @@ You can also restrict which files get searched by providing a wild card (or regu
 
 Once a search or replace is initiated, the results will begin to appear in the **Files** and **Content** tabs. You can then double click a file to open it in your editor, or right click them to bring up a context menu with additional options.
 
-![Files Tab](/images/files_tab.png)
+![Files Tab](images/files_tab.png)
 
-![Content Tab](/images/content_tab.png)
+![Content Tab](images/content_tab.png)
 
 !!! tip
     You can hide/show columns by right clicking the list header to get a special context menu. You can then deselect or select the the column(s) you wish to hide/show respectively.
 
 ## Regular Expression Tester
 
-![Regex Tester](/images/regex_tester.png)
+![Regex Tester](images/regex_tester.png)
 
 Rummage comes with a simple regular expression tester. It has a simple text box to place content to search, and another text box that will show the final results after the find and replace are applied.  Below those text boxes, there are two text input boxes for the find pattern and the replace pattern.  Lastly, all search and replace flag options are found under the patterns.
 
@@ -91,13 +91,13 @@ You'll notice that there are two input boxes. The first requires a unique name (
 
 Underneath the inputs will be the actual search settings being saved.
 
-![Save Search](/images/save_search.png)
+![Save Search](images/save_search.png)
 
 To load a pattern that was saved previously, click the `Load Search` button.  You will be presented with a dialog showing all your saved searches.  Highlight the pattern you want to load and click the `Load` button.  Your pattern and options will be populated in the main dialog.
 
 If you wish to edit the name or comment of a search, you can double click the entry or click the "Edit" button.
 
-![Load Search](/images/load_search.png)
+![Load Search](images/load_search.png)
 
 ## Search Chains
 
@@ -105,15 +105,15 @@ There are times you may have a task that requires you to do multiple find and re
 
 Search chains are essentially a sequence of multiple [saved search and replace patterns](#saving-and-loading-regular-expressions). You can create a search chain by clicking the `Search Chains` button which will bring up the search change manager.
 
-![Chain Button](/images/chain_button.png)
+![Chain Button](images/chain_button.png)
 
 Here you can create or delete search chains.
 
-![Search Chains](/images/chains.png)
+![Search Chains](images/chains.png)
 
 To use search chains, you must put Rummage in "search chain" mode by selecting the check box named `Use search chains` in the main window. When "search chain" mode is enabled, all controls that don't apply to search chains will be disabled, and the search box will be replaced with a drop down for selecting existing chains you've already created. When a search is performed, Rummage will iterate over each file with all the saved searches in the chain.
 
-![Chain Select](/images/chain_mode.png)
+![Chain Select](images/chain_mode.png)
 
 ## Replace plugins
 
@@ -121,13 +121,13 @@ Regular expressions are great, but sometimes regular expressions aren't enough. 
 
 Replace plugins are written in Python and are loaded by first selecting the `Use plugin replace` check box in the main dialog.
 
-![Enable Replace Plugin](/images/plugin_toggle.png)
+![Enable Replace Plugin](images/plugin_toggle.png)
 
 Then the main dialog's `Replace with` text box will become the `Replace plugin` text box with an associated file picker.  Here you can point to your replace plugin file.
 
 Replace plugins aren't meant to be full, complex modules that import lots of other relative files.  They are meant to be a single, compact script, but inside that script, you can import anything that is *already* installed in your Python environment.
 
-![Enable Replace Plugin](/images/plugin_input.png)
+![Enable Replace Plugin](images/plugin_input.png)
 
 ### Writing a Plugin
 
@@ -236,7 +236,7 @@ LITERAL = 0x10000           # Literal search
 
 ## Export to CSV or HTML
 
-![HTML Export](/images/html_export.png)
+![HTML Export](images/html_export.png)
 
 Rummage allows the exporting of the results to either CSV or HTML.  Simply select **File-->Export** and pick either **CSV** or **HTML**.  The HTML output will be styled similar to the GUI interface with the results in tables with sortable columns.
 

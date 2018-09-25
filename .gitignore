@@ -16,6 +16,7 @@ sdist
 develop-eggs
 .installed.cfg
 lib64
+.eggs/*
 
 # Installer logs
 pip-log.txt
@@ -33,23 +34,19 @@ nosetests.xml
 .project
 .pydevproject
 
+# mac files
 *.DS_Store
 
-*.log
-
-*.bak
-
-*.spec
-
-Output/*
-
-pyinstaller
-
+# Mkdocs
 site/*
 
-.cache
-
-*.patch
-.idea/*
+# Pytest
 .pytest_cache/*
-.eggs/*
+
+# Miscellaneous
+.cache
+.idea/*
+*.log
+*.bak
+*.patch
+rummage/lib/gui/data/docs/*
