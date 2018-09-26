@@ -6,8 +6,8 @@ import subprocess
 import glob
 import hashlib
 try:
-    import mkdocs
-    import pymdownx
+    import mkdocs  # noqa
+    import pymdownx  # noqa
 except ImportError:
     print(
         '========================================================================================\n'
