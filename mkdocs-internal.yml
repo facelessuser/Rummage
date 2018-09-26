@@ -1,4 +1,5 @@
 site_name: Rummage
+site_url: 'file://.'
 edit_uri: tree/master/docs/src/markdown
 site_description: A search and replace tool written in Python.
 
@@ -14,6 +15,8 @@ theme:
   include_search_page: false
   search_index_only: true
 
+plugins: []
+
 nav:
   - Rummage: index.md
   - Installation: installation.md
@@ -21,6 +24,7 @@ nav:
   - Search Features: search.md
   - Settings: preferences.md
   - Extras: extras.md
+  - Contributing &amp; Support: contributing.md
 
 markdown_extensions:
   - markdown.extensions.toc:

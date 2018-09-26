@@ -49,4 +49,6 @@ site/*
 *.log
 *.bak
 *.patch
-rummage/lib/gui/data/docs/*
+rummage/lib/gui/data/docs/_snippets/*
+rummage/lib/gui/data/docs/sitemap.xml
+rummage/lib/gui/data/docs/sitemap.xml.gz

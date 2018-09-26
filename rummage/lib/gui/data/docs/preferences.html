@@ -1,0 +1,260 @@
+<!-- Base HTML template -->
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Title -->
+  <title>Settings - Rummage</title>
+
+  <!-- Theme CSS  -->
+  <link rel="stylesheet" href="css/theme.css">
+
+  <!-- Extra CSS -->
+  
+
+  
+  
+
+  <!-- JavaScript -->
+  
+
+</head>
+
+<body>
+
+  <!-- Content -->
+  <div class="markdown">
+  
+    <h1 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link"></a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link"></a></h2>
+<p>The preference dialog is found in the menu at <strong>File&rarr;Preferences</strong> and contains all of the global options that can be controlled for the editor.</p>
+<h2 id="general">General<a class="headerlink" href="#general" title="Permanent link"></a></h2>
+<p><img alt="Preferences: General" src="images/settings_general.png" /></p>
+<p>The <strong>General</strong> tab contains a couple of useful settings.</p>
+<dl>
+<dt>Single Instance</dt>
+<dd>By default, Rummage will allow for multiple windows to be open.  If this option is enabled, the first window will be be the only window to open.  All subsequent instances will pass their arguments to the first and close without showing a window.</dd>
+<dt>Language</dt>
+<dd>Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian is outdated but includes a fair bit of the needed translations. See <a href="extras.html#localization">Localization</a> to learn more about improving current translations or adding additional translations.</dd>
+<dt>Updates</dt>
+<dd>
+<p>Controls whether Rummage will check for new updates daily and allows controlling whether you want to be notified of prereleases as well. A button has also been provided to check for updates right away after configuring your update settings.</p>
+<p>The check is only a check for new versions and doesn't perform an upgrade.  Rummage must be upgraded via <code>pip</code> from command line.</p>
+<div class="admonition info">
+<p class="admonition-title">Update Issues: Python 3.6+ on macOS</p>
+<p>There is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates required to properly check URLs. The details are actually documented here: <a href="https://bugs.python.org/issue28150#msg276516">https://bugs.python.org/issue28150#msg276516</a>.</p>
+<p>To get access again to the default certificates is actually quite easy. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to navigate to <code>/Applications/Python 3.6/Install Certificates.command</code> and double click the command.  The script will use <code>pip</code> to install <code>certifi</code> and creates a symlink in the OpenSSL directory to <code>certifi</code>'s installed bundle location. If you are using something like macports, then you'll probably have to research to find out how to do the same thing.</p>
+</div>
+</dd>
+<dt>International Time</dt>
+<dd>Rummage displays file creation and modified time in the form <code>Jul 01, 2018, 03:00:00 AM</code>, but you can enable this option to display the times in international format: <code>2018-07-01 03:00:00</code>.</dd>
+</dl>
+<h2 id="search">Search<a class="headerlink" href="#search" title="Permanent link"></a></h2>
+<p><img alt="Preferences: Regex" src="images/settings_search.png" /></p>
+<p>The <strong>Regular Expression Modules</strong> panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if the Regex module is installed in your Python installation, it can be selected instead.  There is also the option of using Re or Regex with <a href="search.html#backrefs">Backrefs</a> (a wrapper that adds a couple of special escapes and features).</p>
+<p>If using Regex, you can set it to the version of your choice. <code>V0</code> tries to be completely compatible with Re patterns with non-breaking additional features, while <code>V1</code> breaks compatibility with Re and adds even more useful features. Please see <a href="https://pypi.python.org/pypi/regex">Regex documentation</a> to learn more.</p>
+<p>Under <strong>File/Folder Matching</strong> are a number options for file and folder matching patterns. Follow the links to learn more about each feature:</p>
+<ul>
+<li><a href="search.html#extended-match-syntax">Extended match</a>.</li>
+<li><a href="search.html#brace-expansion-syntax">Brace expansion</a>.</li>
+<li>Case sensitive for <a href="search.html#wildcard">wildcard match</a> and for <a href="#regular-expression">regular expression match</a>.</li>
+<li><a href="search.html#full-path-matching">Globstar</a>.</li>
+<li><a href="search.html#full-path-matching">Full path directory matching</a>.</li>
+<li><a href="search.html#full-path-matching_1">Full path file matching</a>.</li>
+</ul>
+<h2 id="encoding">Encoding<a class="headerlink" href="#encoding" title="Permanent link"></a></h2>
+<p><img alt="Preferences: Encoding" src="images/settings_encoding.png" /></p>
+<p>The <strong>Encoding</strong> panel is where you can tweak encoding detection. You can change the default encoding detection used (assuming you have both Chardet and cChardet installed). By default, Rummage will use the fastest (cChardet).</p>
+<p>Special encoding file type considerations are also exposed here. File extensions assigned to either HTML, XML, or Python will use special logic to look for encoding declarations in the file's header, while file extensions assigned to binary will shortcut the encoding selection to binary. Just double click the file type whose extensions you would like to modify.</p>
+<p>Remember that encoding detection is far from bulletproof and can pick an incorrect encoding. While during searches it might not be as big an issue, it is strongly suggested you use a forced encoding when performing replaces.</p>
+<h2 id="editor">Editor<a class="headerlink" href="#editor" title="Permanent link"></a></h2>
+<p><img alt="Preferences: Editor" src="images/settings_editor.png" /></p>
+<p>The <strong>Editor</strong> panel allows you to configure the editor that will be used to open files.  To setup, simply enter the path to the editor and the options it should be called with. Once done, press the save button.</p>
+<p>As noted in the image above, Rummage provides 3 special variables that can be used to insert the file name, line number, or column number.</p>
+<table>
+<thead>
+<tr>
+<th>Argument Variables</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{$file}</code></td>
+<td>Insert the file name.</td>
+</tr>
+<tr>
+<td><code>{$line}</code></td>
+<td>Insert the line number.</td>
+</tr>
+<tr>
+<td><code>{$col}</code></td>
+<td>Insert the column number.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="notifications">Notifications<a class="headerlink" href="#notifications" title="Permanent link"></a></h2>
+<p><img alt="Preferences: Notifications" src="images/settings_notify.png" /></p>
+<p>The <strong>Notification</strong> panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.</p>
+<p>You can also select whether to use the system's built-in notifications or Growl.</p>
+<p>A test button is provided to test the configuration once set.</p>
+<dl>
+<dt>Ubuntu</dt>
+<dd>
+<ul>
+<li>Growl: <a href="http://mattn.github.io/growl-for-linux/">Support for Linux</a>.</li>
+<li>Native: OSD via <code>notify-send</code>.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Other Distros</p>
+<p>Though Rummage should run on any Linux distro, the native dialog option was built around Ubuntu's native notifications called OSD.  Notifications will not work on other distros that do not use OSD <em>unless</em> they use Growl.  Even without Growl, other distros will probably still get the audible cue, but as each distro varies, it is difficult to be certain.  As notifications are not crucial to usage, this is minor concern.</p>
+</div>
+</dd>
+<dt>macOS</dt>
+<dd>
+<ul>
+<li>Growl: <a href="http://growl.info/">Support for macOS</a>.</li>
+<li>Native: Notification Center via <a href="https://github.com/alloy/terminal-notifier">terminal-notifier</a>. Path to <code>terminal-notifier</code> must be configured.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Configuring macOS Native</p>
+<p>When selecting <code>native</code> on macOS, an option to select the path to terminal notifier will be available since native dialogs rely on <code>terminal-notifier</code> to send notifications to the Notification Center. This must be configured or <em>native</em> notifications will not work.</p>
+<p>When selecting the <code>terminal-notifier</code> path, you can select either the binary directly or the <code>.&lt;app</code> bundle (depending on how you installed <code>terminal-notifier</code>).  When selecting the <code>.app</code> bundle, Rummage will know how to access the binary inside the bundle.</p>
+</div>
+</dd>
+<dt>Windows</dt>
+<dd>
+<ul>
+<li>Growl: <a href="http://www.growlforwindows.com/gfw/">Support for Windows</a>.</li>
+<li>Native: Native windows taskbar notifications.</li>
+</ul>
+</dd>
+</dl>
+<h2 id="history">History<a class="headerlink" href="#history" title="Permanent link"></a></h2>
+<p><img alt="Preferences: History" src="images/settings_history.png" /></p>
+<p>The <strong>History</strong> panel is where all text box, drop down history can be cleared.</p>
+<h2 id="backups">Backups<a class="headerlink" href="#backups" title="Permanent link"></a></h2>
+<p><img alt="Preferences: Backups" src="images/settings_backup.png" /></p>
+<p>The <strong>Backups</strong> panel allows you to configure where Rummage creates backups. You can control whether backups are all placed in the same folder as the original source, or if they are put into a subfolder. You can also configure the name of the subfolder used or the extension used when not writing to a subfolder.</p>
+<h2 id="importexport-settings">Import/Export Settings<a class="headerlink" href="#importexport-settings" title="Permanent link"></a></h2>
+<p>If desired, Rummage's settings can be exported to a <abbr title="JavaScript Object Notation">JSON</abbr> file or imported from a <abbr title="JavaScript Object Notation">JSON</abbr> file.  This can be particularly useful for importing regular expression patterns from one system into another system's existing regular expression list. This can also be useful if you have a lot of regular expression patterns you wish to create, and it would be too cumbersome to do it through the GUI.  In the latter case, you could construct the pattern configurations in a <abbr title="JavaScript Object Notation">JSON</abbr> file and import all the patterns in one shot.</p>
+<p>Import and export are broken up into three types of settings: general settings, chains, and searches. General settings are the basic feature configurations for Rummage.  Chains contains all of your configured pattern chains.  And searches is the actual configured search and replaces.  When exporting, you will be presented with a dialog allowing you to select which categories of settings you wish to export.</p>
+<p><img alt="Settings: Export" src="images/settings_export.png" /></p>
+<p>When importing, you will be prompted to select the settings file to import.  Then you will be asked to select one or more settings categories to import.  Rummage will skip any malformed or invalid settings. If you are going to overwrite an existing chain or search, it will prompt you whether to proceed with the overwrite.  Afterwards, it will output the import results in the text box.</p>
+<p><img alt="Settings: Export" src="images/settings_import.png" /></p>
+<p>The general settings are meant to be transferred between installations, not specifically configured by hand, so all the supported settings will not be covered here, but the chain and search format will be discussed in details.</p>
+<p>The chain format for importing is shown below:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;chains&quot;</span><span class="o">:</span> <span class="p">{</span>                 <span class="c1">// The key that denotes this setting is the &quot;chains&quot; setting.</span>
+        <span class="s2">&quot;a-chain&quot;</span><span class="o">:</span> <span class="p">[</span>            <span class="c1">// Unique chain ID.  Must be composed of letters, numbers, underscores, and hyphens.</span>
+            <span class="s2">&quot;example-1&quot;</span><span class="p">,</span>        <span class="c1">// A list of references to specific unique search IDs.</span>
+            <span class="s2">&quot;example-2&quot;</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;another-chain&quot;</span><span class="o">:</span> <span class="p">[</span>
+            <span class="s2">&quot;example-3&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;example-4&quot;</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>The search/replace format for importing is show below:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;saved_searches&quot;</span><span class="o">:</span> <span class="p">{</span>                                         <span class="c1">// The key that denotes this setting is the &quot;chains&quot; setting.</span>
+        <span class="s2">&quot;Copyright-update&quot;</span><span class="o">:</span> <span class="p">{</span>                                   <span class="c1">// Unique search ID.  Must be composed of letters, numbers, underscores, and hyphens.</span>
+            <span class="s2">&quot;flags&quot;</span><span class="o">:</span> <span class="s2">&quot;is&quot;</span><span class="p">,</span>                                      <span class="c1">// Search and replace flags (covered below).</span>
+            <span class="s2">&quot;is_function&quot;</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>                               <span class="c1">// Boolean stating whether the replace pattern is a function or not.</span>
+            <span class="s2">&quot;is_regex&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>                                   <span class="c1">// Boolean stating whether the search pattern is a regular expression or literal string.</span>
+            <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Copyright update&quot;</span><span class="p">,</span>                         <span class="c1">// A more user friendly name or description of the pattern.</span>
+            <span class="s2">&quot;replace&quot;</span><span class="o">:</span> <span class="s2">&quot;\\g&lt;1&gt;16&quot;</span><span class="p">,</span>                              <span class="c1">// The replace pattern, or in case `is_function` is `true`, the path to the Python replace plugin file.</span>
+            <span class="s2">&quot;search&quot;</span><span class="o">:</span> <span class="s2">&quot;(Copyright \\(c\\) \\d+ - 20)(\\d{2})&quot;</span>   <span class="c1">// The search pattern.</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Below is a table containing valid flags for the <code>flags</code> parameter.  Literal searches only allow flags <code>i</code>, <code>u</code>, and <code>f</code>.  Regular expression patterns can use <code>i</code>, <code>u</code>, <code>f</code>, <code>s</code>, <code>b</code>, <code>e</code>, <code>w</code>, <code>r</code>, <code>p</code>, and <code>F</code> (though flags are applicable depending on whether you are using Re, Regex, or one of the two with Backrefs).</p>
+<table>
+<thead>
+<tr>
+<th>Flags</th>
+<th>Supported&nbsp;Libraries</th>
+<th>Option</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>i</code></td>
+<td>All</td>
+<td><a href="search.html#common-options">Search case-sensitive.</a></td>
+</tr>
+<tr>
+<td><code>u</code></td>
+<td>All</td>
+<td><a href="search.html#common-options">Use Unicode properties.</a></td>
+</tr>
+<tr>
+<td><code>s</code></td>
+<td>All</td>
+<td><a href="search.html#common-options">Dot matches newline.</a></td>
+</tr>
+<tr>
+<td><code>f</code></td>
+<td>Regex, Regex&nbsp;+ Backrefs</td>
+<td><a href="search.html#regex-options">Full case-folding.</a></td>
+</tr>
+<tr>
+<td><code>b</code></td>
+<td>Regex, Regex&nbsp;+ Backrefs</td>
+<td><a href="search.html#regex-options">Best fuzzy match.</a></td>
+</tr>
+<tr>
+<td><code>e</code></td>
+<td>Regex, Regex&nbsp;+ Backrefs</td>
+<td><a href="search.html#regex-options">Improve fuzzy fit.</a></td>
+</tr>
+<tr>
+<td><code>w</code></td>
+<td>Regex, Regex&nbsp;+ Backrefs</td>
+<td><a href="search.html#regex-options">Unicode word breaks.</a></td>
+</tr>
+<tr>
+<td><code>r</code></td>
+<td>Regex, Regex&nbsp;+ Backrefs</td>
+<td><a href="search.html#regex-options">Search backwards.</a></td>
+</tr>
+<tr>
+<td><code>p</code></td>
+<td>Regex, Regex&nbsp;+ Backrefs</td>
+<td><a href="search.html#regex-options">Use POSIX matching.</a></td>
+</tr>
+<tr>
+<td><code>F</code></td>
+<td>Regex, Regex&nbsp;+ Backrefs, Re&nbsp;+ Backrefs</td>
+<td><a href="search.html#common-options">Format style replacements.</a></td>
+</tr>
+</tbody>
+</table>
+  
+  </div>
+
+  <!-- Navigation -->
+  
+
+    <div class="nav">
+      
+        <a href="search.html" class="prev-page" title="Search Features">&#8592; Prev</a>
+      
+
+      <a href="./sitemap.html">Home</a>
+
+      
+        <a href="extras.html" class="next-page" title="Extras"/>Next &#8594;</a>
+      
+    </div>
+  
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!-- Base HTML template -->
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Title -->
+  <title>Installation - Rummage</title>
+
+  <!-- Theme CSS  -->
+  <link rel="stylesheet" href="css/theme.css">
+
+  <!-- Extra CSS -->
+  
+
+  
+  
+
+  <!-- JavaScript -->
+  
+
+</head>
+
+<body>
+
+  <!-- Content -->
+  <div class="markdown">
+  
+    <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link"></a></h1>
+<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link"></a></h2>
+<p>Rummage has a few requirements when installing.  These will all be taken care of when installing via <code>pip</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://pypi.python.org/pypi/wxPython/"><code>wxPython</code>&nbsp;4.0.1+</a></td>
+<td>The new wxPython Phoenix 4.0.0 is required for the GUI.</td>
+</tr>
+<tr>
+<td><a href="http://facelessuser.github.io/backrefs/"><code>backrefs</code>&nbsp;3.5.0+</a></td>
+<td>Used to extend the <code>re</code> or <code>regex</code> regular expression engine with additional back references.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/facelessuser/bracex"><code>bracex</code></a></td>
+<td>Bash style brace expansion for file patterns.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/facelessuser/wcmatch"><code>wcmatch</code></a></td>
+<td>File name matching library.</td>
+</tr>
+<tr>
+<td><a href="https://pypi.python.org/pypi/chardet"><code>chardet</code>&nbsp;3.0.4+</a></td>
+<td>Used for file encoding guessing when an encoding is not specified.</td>
+</tr>
+<tr>
+<td><a href="https://pypi.python.org/pypi/filelock/"><code>filelock</code></a></td>
+<td>Used for file locking to allow different instances of Rummage to access the same file.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kdfm/gntp"><code>gntp</code></a></td>
+<td>Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).</td>
+</tr>
+<tr>
+<td><a href="https://pypi.python.org/pypi/Send2Trash"><code>send2trash</code></a></td>
+<td>Used for sending files to trash/recycle bin on each platform.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/facelessuser/pymdown-extensions"><code>pymdown-extensions</code></a></td>
+<td>An extension pack used in conjunction with <a href="https://github.com/Python-Markdown/markdown">Python Markdown</a> to render some dynamic content into HTML that is embedded into the GUI.</td>
+</tr>
+<tr>
+<td><a href="http://pygments.org/"><code>pygments</code></a></td>
+<td>Used to provide syntax highlighting in some of the dynamically generated HTML help.</td>
+</tr>
+</tbody>
+</table>
+<p>Some optional modules that can be manually installed.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://pypi.python.org/pypi/regex"><code>regex</code></a></td>
+<td><strong>regex</strong> usage is completely optional, but it is included for those who wish to use it. Regex is a great regular expression engine that adds some nice features such as fuzzy searching, nested char sets, better Unicode support, and more.</td>
+</tr>
+<tr>
+<td><a href="https://pypi.python.org/pypi/cchardet"><code>cchardet</code></a></td>
+<td><code>cchardet</code> is high speed universal character encoding detector. Much faster than the default <code>chardet</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="linux-prerequisites">Linux Prerequisites<a class="headerlink" href="#linux-prerequisites" title="Permanent link"></a></h2>
+<p>Rummage requires wxPython in order to run. If you have a recent Linux distro that has a pre-built, installable wxPython package for your version of Python, then it may make sense to just install the pre-built package via your Linux package manager (<code>apt-get</code> for Ubuntu). The version must meet the version requirement above.</p>
+<p>If you have installed a version of Python on your machine that does not have a pre-built wxPython package, or if your distro simply doesn't have a pre-built package that satisfies the requirements, then it may make sense to either install via <code>pip</code> or to manually compile and install. In both of these cases, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are generally most up to date for Ubuntu. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under <a href="https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites">this section</a>.</p>
+<p>Due to recent changes in PyPI, it is probably best to ensure you have at least version 10.0 or greater of <code>pip</code>.  Ubuntu provides a method for installing pip with <code>sudo apt-get install python3-pip</code>, but this usually installs an older version.  It is recommended to install <code>pip</code> with the command shown below (where <code>python3</code> is a call to the installed Python version of your choice):</p>
+<div class="highlight"><pre><span></span>curl https://bootstrap.pypa.io/get-pip.py | sudo python3
+</pre></div>
+
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>The latest wxPython Phoenix builds with GTK3 by default, so the example below will install GTK3 related dependencies. You can use GTK2 if you build wxPython manually.</p>
+</div>
+<dl>
+<dt>Ubuntu</dt>
+<dd>
+<div class="highlight"><pre><span></span>sudo apt-get install python3.6-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base1.0-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
+</pre></div>
+
+<p>Replace <code>python3.6-dev</code> with the Python version you are using.</p>
+</dd>
+<dt>Fedora 26</dt>
+<dd>
+<p>For Fedora 26, it has been reported that you need fewer dependencies to build wxPython; I have not personally confirmed this.</p>
+<div class="highlight"><pre><span></span>sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
+</pre></div>
+
+<p>If your Linux distribution has <code>gstreamer</code> 1.0 available (like the Fedora distro), you can install the dev packages for that instead of the 0.10 version.</p>
+</dd>
+</dl>
+<p>After getting all the correct prerequisites, you should be able to install Rummage with <code>pip</code>, though it is recommended to try and install wxPython first via <code>pip install wxpython</code>.</p>
+<p>If wxPython doesn't install properly, be sure to reference wxPython's documentation to see if there is something you are missing. Also, creating an issue over at wxPython's GitHub site for related wxPython install issues may get you help faster than creating them on the Rummage issue page, which is mainly meant for tracking Rummage specific issues, not wxPython install issues.</p>
+<p>Be patient while installing wxPython as Linux must build wxPython while macOS and Windows do not. If installing with <code>pip</code>, you may be waiting a long time with no real indication of how far along the process is.  If <code>pip</code> doesn't work, you can look into building and installing manually.  If you find any of this information incorrect, please feel free to offer a pull request.</p>
+<h2 id="macos-prerequisites">macOS Prerequisites<a class="headerlink" href="#macos-prerequisites" title="Permanent link"></a></h2>
+<p>On macOS, Rummage uses either pure Python modules, or modules that provide wheels. What this means is that no C code compilation is required to install Rummage; therefore, no prior steps are needed. But if you want to install <code>regex</code>, there will be some C code compilation performed by <code>pip</code> which will require Xcode to be installed.</p>
+<ol>
+<li>Download Xcode from the Mac App Store.</li>
+<li>Navigate to Xcode &gt; Preferences &gt; Downloads tab.</li>
+<li>Click the button to install the Command Line Tools.</li>
+<li>Open Terminal (Applications/Terminal) and run <code>xcode-select --install</code>. You will be prompted to install the Xcode Command Line Tools.</li>
+</ol>
+<h2 id="installation_1">Installation<a class="headerlink" href="#installation_1" title="Permanent link"></a></h2>
+<p>Here are a couple of ways to install and upgrade. Keep in mind if you are a Linux user, you have some <a href="#linux-prerequisites">prerequisites</a> to install before proceeding.</p>
+<p>Install:</p>
+<div class="highlight"><pre><span></span>pip install rummage
+</pre></div>
+
+<p>Install with optional module. Upgrades of optional modules will have to be manually upgraded when needed as well as they are not tracked in Rummage's requirements.</p>
+<div class="highlight"><pre><span></span>pip install rummage regex cchardet
+</pre></div>
+
+<p>Upgrade:</p>
+<div class="highlight"><pre><span></span>pip install --upgrade rummage
+</pre></div>
+
+<h2 id="installing-in-virtual-environments-macos">Installing in Virtual Environments (macOS)<a class="headerlink" href="#installing-in-virtual-environments-macos" title="Permanent link"></a></h2>
+<p>If installing in a virtual environment via <code>virtualenv</code>, you may run into the following error:</p>
+<p>This used to be a fairly annoying issue to workaround, but in wxPython 4+, it's not too bad.  The wxPython wiki is a bit out of date.  You don't have to symlink <code>wx.pth</code> or anything like that anymore as the design of wxPython is a bit different now.  All you have to do is place the script below in <code>my_virtual_env/bin</code>.  In this example I call it <code>fwpy</code> for "framework python" (make sure to adjust paths or Python versions to match your installation).</p>
+<div class="highlight"><pre><span></span>#!/bin/bash
+
+# what real Python executable to use
+PYVER=2.7
+PYTHON=/Library/Frameworks/Python.framework/Versions/$PYVER/bin/python$PYVER
+
+# find the root of the virtualenv, it should be the parent of the dir this script is in
+ENV=`$PYTHON -c &quot;import os; print os.path.abspath(os.path.join(os.path.dirname(\&quot;$0\&quot;), &#39;..&#39;))&quot;`
+echo $ENV
+
+# now run Python with the virtualenv set as Python&#39;s HOME
+export PYTHONHOME=$ENV
+exec $PYTHON &quot;$@&quot;
+</pre></div>
+
+<h2 id="installing-in-homebrew-macos">Installing in Homebrew (macOS)<a class="headerlink" href="#installing-in-homebrew-macos" title="Permanent link"></a></h2>
+<p>Homebrew from what I read used to have issues running wxPython in versions less than 4, but this doesn't seem to be an issue with wxPython 4 with Homebrew (at least in my testing).</p>
+<div class="highlight"><pre><span></span>Faceless-MacBook-Pro:~ facelessuser$ brew install python
+...a lot of install stuff
+
+Faceless-MacBook-Pro:~ facelessuser$ /usr/local/Cellar/python/2.7.13_1/bin/pip install rummage
+Collecting rummage
+  Using cached rummage-2.3-py2.py3-none-any.whl
+Collecting regex (from rummage)
+Collecting backrefs&gt;=1.0.1 (from rummage)
+Collecting gntp&gt;=1.0.2 (from rummage)
+  Using cached gntp-1.0.3-py2-none-any.whl
+Collecting chardet&gt;=3.0.4 (from rummage)
+  Using cached chardet-3.0.4-py2.py3-none-any.whl
+Collecting wxpython&gt;=4.0.0a3 (from rummage)
+  Using cached wxPython-4.0.0a3-cp27-cp27m-macosx_10_6_intel.whl
+Collecting six (from wxpython&gt;=4.0.0a3-&gt;rummage)
+  Using cached six-1.10.0-py2.py3-none-any.whl
+Installing collected packages: regex, backrefs, gntp, chardet, six, wxpython, rummage
+Successfully installed backrefs-1.0.1 chardet-3.0.4 gntp-1.0.3 regex-2017.7.11 rummage-2.3 six-1.10.0 wxpython-4.0.0a3
+
+Faceless-MacBook-Pro:~ facelessuser$ /usr/local/Cellar/python/2.7.13_1/bin/python2 -m rummage
+</pre></div>
+
+<h2 id="installing-in-anaconda">Installing in Anaconda<a class="headerlink" href="#installing-in-anaconda" title="Permanent link"></a></h2>
+<p>Anaconda can run Rummage fine from my testing on macOS.  The important thing to note is you must launch it with <code>pythonw -m rummage</code> on Windows and <strong>not</strong> <code>python -m rummage</code>. While this worked on macOS, results may vary on other systems.</p>
+  
+  </div>
+
+  <!-- Navigation -->
+  
+
+    <div class="nav">
+      
+        <a href="index.html" class="prev-page" title="Rummage">&#8592; Prev</a>
+      
+
+      <a href="./sitemap.html">Home</a>
+
+      
+        <a href="usage.html" class="next-page" title="Basic Usage"/>Next &#8594;</a>
+      
+    </div>
+  
+
+</body>
+</html>
