@@ -5,6 +5,18 @@ import os
 import subprocess
 import glob
 import hashlib
+try:
+    import mkdocs
+    import pymdownx
+except ImportError:
+    print(
+        '========================================================================================\n'
+        'gen_docs requires mkdocs and pymdown-extensions to be installed properly.\n'
+        'You can install requirements with the command `pip install -r requirements/docs.txt`.\n'
+        'Please reslove the issues and try again.\n'
+        '========================================================================================\n'
+    )
+    raise
 
 __version__ = '2.0.0'
 
