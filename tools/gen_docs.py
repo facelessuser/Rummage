@@ -89,16 +89,14 @@ def hash_files(verbose, debug):
         for f in glob.iglob(pattern, recursive=True):
             name = f.replace('\\', '/')
             found.append(name)
-            h.update(name.encode('ascii'))
-            with open(f, 'rb') as f:
-                content = f.read().replace(b'\r\n', b'\n')
-            h.update(content)
     if verbose:
         print('FILES:')
     for f in sorted(found):
-        h.update(f.encode('ascii'))
         if verbose:
             print(f)
+        h.update(f.encode('ascii'))
+        with open(f, 'rb') as f:
+            h.update(f.read().replace(b'\r\n', b'\n'))
     result = h.hexdigest()
     print('HASH: ', result)
     return result
