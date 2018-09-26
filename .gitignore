@@ -49,4 +49,3 @@ site/*
 *.log
 *.bak
 *.patch
-rummage/lib/gui/data/docs/*

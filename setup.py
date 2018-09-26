@@ -8,22 +8,20 @@ import sys
 import os
 import imp
 import traceback
-from tools import gen_docs
 
 
 class BuildPy(build_py):
-    """Custom ``build_py`` command to always build mo files for wheels and build internal docs."""
+    """Custom ``build_py`` command to always build mo files for wheels."""
 
     def run(self):
         """Run the python build process."""
 
         self.run_command('compile_catalog')
-        gen_docs.build_internal_docs()
         build_py.run(self)
 
 
 class Sdist(sdist):
-    """Custom `sdist` command to ensure that we don't include `.m0` files in source and we build internal docs."""
+    """Custom `sdist` command to ensure that we don't include `.m0` files in source."""
 
     def _clean_mo_files(self, path):
         for root, dirs, files in os.walk(path):
@@ -35,7 +33,6 @@ class Sdist(sdist):
         """Run the sdist build process."""
 
         self._clean_mo_files("rummage/lib/gui/localization/locale")
-        gen_docs.build_internal_docs()
         sdist.run(self)
 
 

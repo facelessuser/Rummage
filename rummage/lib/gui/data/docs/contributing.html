@@ -1,0 +1,92 @@
+<!-- Base HTML template -->
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Title -->
+  <title>Contributing &amp; Support - Rummage</title>
+
+  <!-- Theme CSS  -->
+  <link rel="stylesheet" href="css/theme.css">
+
+  <!-- Extra CSS -->
+  
+
+  
+  
+
+  <script>var base_url = '.';</script>
+
+  <!-- JavaScript -->
+  
+
+</head>
+
+<body>
+
+  <!-- Content -->
+  <div class="markdown">
+  
+    <h1 id="contributing--support">Contributing &amp; Support<a class="headerlink" href="#contributing--support" title="Permanent link"></a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link"></a></h2>
+<p>Contribution from the community is encouraged and can be done in a variety of ways:</p>
+<ul>
+<li>Bug reports.</li>
+<li>Reviewing code.</li>
+<li>Code patches via pull requests.</li>
+<li>Documentation improvements via pull requests.</li>
+</ul>
+<h2 id="bug-reports">Bug Reports<a class="headerlink" href="#bug-reports" title="Permanent link"></a></h2>
+<ol>
+<li>
+<p>Please <strong>read the documentation</strong> and <strong>search the issue tracker</strong> to try to find the answer to your question <strong>before</strong> posting an issue.</p>
+</li>
+<li>
+<p>When creating an issue on the repository, please provide as much info as possible:</p>
+<ul>
+<li>Version being used.</li>
+<li>Operating system.</li>
+<li>Errors in console.</li>
+<li>Detailed description of the problem.</li>
+<li>Examples for reproducing the error.  You can post pictures, but if specific text or code is required to reproduce the issue, please provide the text in a plain text format for easy copy/paste.</li>
+</ul>
+<p>The more info provided the greater the chance someone will take the time to answer, implement, or fix the issue.</p>
+</li>
+<li>
+<p>Be prepared to answer questions and provide additional information if required.  Issues in which the creator refuses to respond to follow up questions will be marked as stale and closed.</p>
+</li>
+</ol>
+<h2 id="reviewing-code">Reviewing Code<a class="headerlink" href="#reviewing-code" title="Permanent link"></a></h2>
+<p>Take part in reviewing pull requests and/or reviewing direct commits.  Make suggestions to improve the code and discuss solutions to overcome weaknesses in the algorithm.</p>
+<h2 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link"></a></h2>
+<p>Pull requests are welcome, and if you plan on contributing directly to the code, there are a couple of things to be mindful of.</p>
+<p>Continuous integration tests are run on all pull requests and commits via Travis CI.  When making a pull request, the tests will automatically be run, and the request must pass to be accepted.  You can (and should) run these tests before pull requesting. You should also add tests for bugs you are fixing. If it is not possible to run these tests locally, they will be run when the pull request is made, but it is strongly suggested that requesters make an effort to verify before requesting to allow for a quick, smooth merge.</p>
+<h3 id="running-validation-tests">Running Validation Tests<a class="headerlink" href="#running-validation-tests" title="Permanent link"></a></h3>
+<ol>
+<li>
+<p>Make sure that Tox is installed:</p>
+<div class="highlight"><pre><span></span>pip install tox
+</pre></div>
+
+</li>
+<li>
+<p>Run Tox:</p>
+<div class="highlight"><pre><span></span>tox
+</pre></div>
+
+<p>Tox should install necessary dependencies and run the tests. If you are a Linux user, please check out information on <a href="installation.html#requirements">requirements</a>.</p>
+</li>
+</ol>
+<h2 id="documentation-improvements">Documentation Improvements<a class="headerlink" href="#documentation-improvements" title="Permanent link"></a></h2>
+<p>A ton of time has been spent not only creating and supporting this plugin, but also spent making this documentation.  If you feel it is still lacking, show your appreciation for the plugin by helping to improve the documentation.  Help with documentation is always appreciated and can be done via pull requests.  There shouldn't be any need to run validation tests if only updating documentation.</p>
+<p>You don't have to render the docs locally before pull requesting, but if you wish to, I currently use a combination of <a href="https://github.com/mkdocs/mkdocs">MkDocs</a>, the <a href="https://github.com/squidfunk/mkdocs-material">Material theme</a>, and <a href="https://github.com/facelessuser/pymdown-extensions">PyMdown Extensions</a> to render the docs.  You can preview the docs if you install these packages.  The command for previewing the docs is <code>mkdocs serve</code>. It should be run from the root directory. You can then view the documents at <code>localhost:8000</code>.</p>
+  
+  </div>
+
+  <!-- Navigation -->
+  
+
+</body>
+</html>
