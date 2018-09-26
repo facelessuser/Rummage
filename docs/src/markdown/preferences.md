@@ -37,9 +37,9 @@ International Time
 
 ![Preferences: Regex](images/settings_search.png)
 
-The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if Regex module is installed in your Python installation, it can be selected instead.  There is also the options of using Re or Regex with [Backrefs](./search.md#backrefs) (a wrapper that adds a couple of special escapes).
+The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if the Regex module is installed in your Python installation, it can be selected instead.  There is also the option of using Re or Regex with [Backrefs](./search.md#backrefs) (a wrapper that adds a couple of special escapes and features).
 
-If using Regex, you can set it to version of your choice. `V0` tries to be completely compatible with Re patterns while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation][regex] to learn more.
+If using Regex, you can set it to the version of your choice. `V0` tries to be completely compatible with Re patterns with non-breaking additional features, while `V1` breaks compatibility with Re and adds even more useful features. Please see [Regex documentation][regex] to learn more.
 
 Under **File/Folder Matching** are a number options for file and folder matching patterns. Follow the links to learn more about each feature:
 

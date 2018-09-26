@@ -16,9 +16,11 @@
 [growl-linux]: http://mattn.github.io/growl-for-linux/
 [growl-macos]: http://growl.info/
 [growl-win]: http://www.growlforwindows.com/gfw/
+[markdown]: https://github.com/Python-Markdown/markdown
 [mkdocs]: https://github.com/mkdocs/mkdocs
 [mkdocs-material]: https://github.com/squidfunk/mkdocs-material
 [posix]: https://facelessuser.github.io/wcmatch/fnmatch/#posix-character-classes
+[pygments]: http://pygments.org/
 [pymdown-extensions]: https://github.com/facelessuser/pymdown-extensions
 [re]: https://docs.python.org/3/library/re.html
 [regex]: https://pypi.python.org/pypi/regex

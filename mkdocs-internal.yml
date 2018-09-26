@@ -21,6 +21,7 @@ nav:
   - Search Features: search.md
   - Settings: preferences.md
   - Extras: extras.md
+  - Contributing &amp; Support: contributing.md
 
 markdown_extensions:
   - markdown.extensions.toc:
