@@ -800,93 +800,6 @@ class ChecksumDialog ( wx.Dialog ):
     
 
 ###########################################################################
-## Class AboutDialog
-###########################################################################
-
-class AboutDialog ( wx.Dialog ):
-    
-    def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"About", pos = wx.DefaultPosition, size = wx.Size( 300,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
-        
-        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
-        
-        bSizer12 = wx.BoxSizer( wx.VERTICAL )
-        
-        self.m_about_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_about_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-        
-        fgSizer33 = wx.FlexGridSizer( 0, 2, 0, 0 )
-        fgSizer33.AddGrowableCol( 1 )
-        fgSizer33.SetFlexibleDirection( wx.BOTH )
-        fgSizer33.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
-        self.m_bitmap = wx.StaticBitmap( self.m_about_panel, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.Size( 64,64 ), 0 )
-        fgSizer33.Add( self.m_bitmap, 0, wx.ALL, 5 )
-        
-        fgSizer34 = wx.FlexGridSizer( 0, 1, 0, 0 )
-        fgSizer34.AddGrowableCol( 0 )
-        fgSizer34.SetFlexibleDirection( wx.BOTH )
-        fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
-        self.m_app_label = wx.StaticText( self.m_about_panel, wx.ID_ANY, u"Rummage", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
-        self.m_app_label.Wrap( -1 )
-        
-        self.m_app_label.SetFont( wx.Font( 20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, wx.EmptyString ) )
-        
-        fgSizer34.Add( self.m_app_label, 0, wx.ALL|wx.EXPAND, 5 )
-        
-        self.m_version_label = wx.StaticText( self.m_about_panel, wx.ID_ANY, u"Version", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
-        self.m_version_label.Wrap( -1 )
-        
-        fgSizer34.Add( self.m_version_label, 0, wx.ALL|wx.EXPAND, 5 )
-        
-        self.m_dev_toggle = wx.ToggleButton( self.m_about_panel, wx.ID_ANY, u"Contact >>", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer34.Add( self.m_dev_toggle, 0, wx.ALL, 5 )
-        
-        self.m_staticline4 = wx.StaticLine( self.m_about_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        fgSizer34.Add( self.m_staticline4, 0, wx.EXPAND |wx.ALL, 5 )
-        
-        self.m_developers_label = wx.StaticText( self.m_about_panel, wx.ID_ANY, u"Dev", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
-        self.m_developers_label.Wrap( -1 )
-        
-        self.m_developers_label.Hide()
-        
-        fgSizer34.Add( self.m_developers_label, 0, wx.ALL|wx.EXPAND, 5 )
-        
-        
-        fgSizer33.Add( fgSizer34, 1, wx.EXPAND, 5 )
-        
-        
-        fgSizer33.Add( ( 64, 0), 1, wx.EXPAND, 5 )
-        
-        
-        fgSizer33.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-        
-        
-        self.m_about_panel.SetSizer( fgSizer33 )
-        self.m_about_panel.Layout()
-        fgSizer33.Fit( self.m_about_panel )
-        bSizer12.Add( self.m_about_panel, 1, wx.EXPAND |wx.ALL, 5 )
-        
-        
-        self.SetSizer( bSizer12 )
-        self.Layout()
-        
-        self.Centre( wx.BOTH )
-        
-        # Connect Events
-        self.m_dev_toggle.Bind( wx.EVT_TOGGLEBUTTON, self.on_toggle )
-    
-    def __del__( self ):
-        pass
-    
-    
-    # Virtual event handlers, overide them in your derived class
-    def on_toggle( self, event ):
-        event.Skip()
-    
-
-###########################################################################
 ## Class SupportInfoDialog
 ###########################################################################
 
@@ -2699,7 +2612,7 @@ class HtmlDialog ( wx.Dialog ):
     def __init__( self, parent ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Html Dialog", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.DIALOG_NO_PARENT|wx.RESIZE_BORDER )
         
-        self.SetSizeHints( wx.Size( 500,500 ), wx.DefaultSize )
+        self.SetSizeHints( wx.Size( -1,-1 ), wx.Size( -1,-1 ) )
         
         bSizer23 = wx.BoxSizer( wx.VERTICAL )
         

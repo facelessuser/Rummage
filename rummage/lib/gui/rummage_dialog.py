@@ -51,8 +51,7 @@ from .support_info_dialog import SupportInfoDialog
 from .checksum_dialog import ChecksumDialog
 from .delete_dialog import DeleteDialog
 from .settings_dialog import SettingsDialog
-from .html_dialog import HTMLDialog
-from .about_dialog import AboutDialog
+from . import html_dialog
 from .controls import pick_button
 from .messages import filepickermsg
 from .localization import _
@@ -1894,7 +1893,7 @@ class RummageFrame(gui.RummageFrame):
         self.optimize_size(first_time=True)
         if tuple(Settings.get_current_version()) < __meta__.__version_info__:
             Settings.set_current_version(__meta__.__version_info__)
-            dlg = HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
+            dlg = html_dialog.HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
             dlg.ShowModal()
             dlg.Destroy()
 
@@ -2409,7 +2408,7 @@ class RummageFrame(gui.RummageFrame):
         """Open documentation site."""
 
         if self.doc_dlg is None:
-            self.doc_dlg = HTMLDialog(None, 'sitemap.html', self.MENU_DOCUMENTATION)
+            self.doc_dlg = html_dialog.HTMLDialog(None, 'sitemap.html', self.MENU_DOCUMENTATION)
             self.doc_dlg.Show()
         else:
             self.doc_dlg.load('sitemap.html', self.MENU_DOCUMENTATION)
@@ -2418,14 +2417,14 @@ class RummageFrame(gui.RummageFrame):
     def on_changelog(self, event):
         """Open documentation site."""
 
-        dlg = HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
+        dlg = html_dialog.HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
         dlg.ShowModal()
         dlg.Destroy()
 
     def on_license(self, event):
         """Open documentation site."""
 
-        dlg = HTMLDialog(self, 'license.html', self.MENU_CHANGELOG)
+        dlg = html_dialog.HTMLDialog(self, 'license.html', self.MENU_CHANGELOG)
         dlg.ShowModal()
         dlg.Destroy()
 
@@ -2444,7 +2443,29 @@ class RummageFrame(gui.RummageFrame):
     def on_about(self, event):
         """Show about dialog."""
 
-        dlg = AboutDialog(self)
+        title = _("About")
+        version = _("Version: %s %s")
+        developers = _("Developer(s)")
+
+        md = (
+            '<style>\n'
+            '.markdown {text-align: center;}\n'
+            'img {display: inline; padding: 0; margin: 0; height: 64px; width: 64px; vertical-align: bottom;}\n'
+            '.markdown h2 {font-size: 48px;}\n'
+            '</style>\n\n'
+            '## ![Logo](images/rummage.png) Rummage\n\n'
+            '%s\n\n'
+            '### %s\n\n'
+            '%s\n'
+        ) % (
+            version % (__meta__.__version__, __meta__.__status__),
+            developers,
+            "\n".join(["%s - %s  " % (m[0], m[1]) for m in __meta__.__maintainers__])
+        )
+
+        dlg = html_dialog.HTMLDialog(
+            self, md, title, content_type=html_dialog.MARKDOWN_STRING, min_width=400, min_height=350
+        )
         dlg.ShowModal()
         dlg.Destroy()
 
