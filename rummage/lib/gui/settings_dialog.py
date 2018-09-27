@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import wx
 import re
 import json
-import os
 import webbrowser
 from .settings import Settings
 from .file_ext_dialog import FileExtDialog
@@ -32,9 +31,6 @@ from . import gui
 from . import notify
 from .. import rumcore
 from .. import util
-import markdown
-import pymdownx.slugs as slugs
-from . import data
 from .app.custom_app import debug
 from .html_dialog import convert_markdown
 

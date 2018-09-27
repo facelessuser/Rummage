@@ -109,6 +109,7 @@ TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
+
 def escape(txt):
     """Basic html escaping."""
 
@@ -132,7 +133,8 @@ class HTMLDialog(gui.HtmlDialog):
     """HTMLDialog."""
 
     def __init__(
-        self, parent, content, title=None, content_type=HTML_FILE, min_width=500, min_height=500, max_width=-1, max_height=-1
+        self, parent, content, title=None, content_type=HTML_FILE,
+        min_width=500, min_height=500, max_width=-1, max_height=-1
     ):
         """Init SettingsDialog object."""
 
