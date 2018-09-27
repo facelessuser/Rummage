@@ -526,19 +526,12 @@ class SettingsDialog(gui.SettingsDialog):
 
         # Things we can allow the backend to handle (local HTML files)
         ltype = util.link_type(url)
-        if ltype == util.HTML_LINK:
+        if ltype in (util.HTML_LINK, util.BLANK_LINK):
             self.busy = True
             pass
         # Send URL links to browser
         elif ltype == util.URL_LINK:
             webbrowser.open_new_tab(url)
-            self.busy = False
-            event.Veto()
-        # Handle webkit id jumps for IE (usually when handling HTML strings, not files)
-        elif url.startswith('about:blank#'):
-            script = "document.getElementById('%s').scrollIntoView();" % url.replace('about:blank#', '')
-            debug("HTML Nav ID: " + script)
-            self.m_help_html.RunScript(script)
             self.busy = False
             event.Veto()
         # Show unhandled links
