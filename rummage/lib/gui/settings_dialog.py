@@ -526,11 +526,17 @@ class SettingsDialog(gui.SettingsDialog):
 
         # Things we can allow the backend to handle (local HTML files)
         ltype = util.link_type(url)
-        if ltype in (util.HTML_LINK, util.BLANK_LINK):
+        if ltype == util.BLANK_LINK:
             self.busy = True
-            pass
+        elif ltype == util.HTML_LINK:
+            if url.startswith('about:'):
+                self.busy = False
+                event.Veto()
+            else:
+                self.busy = True
         # Send URL links to browser
         elif ltype == util.URL_LINK:
+            debug('external')
             webbrowser.open_new_tab(url)
             self.busy = False
             event.Veto()

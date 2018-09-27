@@ -57,6 +57,7 @@ EXTENSIONS = [
     "pymdownx.tilde",
     "pymdownx.caret",
     "pymdownx.mark",
+    "pymdownx.b64",
     "pymdownx.pathconverter"
 ]
 
@@ -87,6 +88,9 @@ EXTENSION_CONFIGS = {
     "pymdownx.pathconverter": {
         "base_path": os.path.join(data.RESOURCE_PATH, 'docs'),
         "absolute": True
+    },
+    "pymdownx.b64": {
+        "base_path": os.path.join(data.RESOURCE_PATH, 'docs')
     }
 }
 
@@ -216,9 +220,14 @@ class HTMLDialog(gui.HtmlDialog):
 
         # Things we can allow the backend to handle (local HTML files)
         ltype = util.link_type(url)
-        if ltype in (util.HTML_LINK, util.BLANK_LINK):
+        if ltype == util.BLANK_LINK:
             self.busy = True
-            pass
+        elif ltype == util.HTML_LINK:
+            if url.startswith('about:'):
+                self.busy = False
+                event.Veto()
+            else:
+                self.busy = True
         # Send URL links to browser
         elif ltype == util.URL_LINK:
             webbrowser.open_new_tab(url)
