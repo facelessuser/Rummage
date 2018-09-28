@@ -290,7 +290,7 @@ class SettingsDialog(gui.SettingsDialog):
 
         html = convert_markdown('Editor Settings', text)
         self.busy = True
-        self.m_help_html.SetPage(html, '')
+        self.m_help_html.SetPage(html, 'file:///')
         if util._PLATFORM == "windows":
             # Ugh.  Why can't things just work
             # Here we must reload the page so that things render properly.

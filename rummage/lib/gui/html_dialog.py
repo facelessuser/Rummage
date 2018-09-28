@@ -187,7 +187,7 @@ class HTMLDialog(gui.HtmlDialog):
             else:
                 html = content
             self.busy = True
-            self.m_content_html.SetPage(html, '')
+            self.m_content_html.SetPage(html, 'file://')
             if util._PLATFORM == "windows":
                 # Ugh.  Why can't things just work
                 # Here we must reload the page so that things render properly.
