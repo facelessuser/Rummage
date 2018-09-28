@@ -1072,3 +1072,8 @@ body {
 .nav a:focus {
   outline: 0;
 }
+
+h1,
+.__toc_level_0 {
+  display: none;
+}

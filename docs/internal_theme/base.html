@@ -30,6 +30,42 @@
 
   <!-- Content -->
   <div class="markdown">
+
+  <!-- Table of Content (Don't show for static sites) -->
+  {% if page.next_page or page.previous_page %}
+    <h2>Table of Contents</h2>
+    <ul>
+    {% for toc_item in page.toc %}
+      <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+      <ul>
+      {% for toc_item in toc_item.children %}
+        <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+        <ul>
+        {% for toc_item in toc_item.children %}
+          <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+          <ul>
+          {% for toc_item in toc_item.children %}
+            <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+            <ul>
+            {% for toc_item in toc_item.children %}
+              <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+              <ul>
+              {% for toc_item in toc_item.children %}
+                <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+              {% endfor %}
+              </ul>
+            {% endfor %}
+            </ul>
+          {% endfor %}
+          </ul>
+        {% endfor %}
+        </ul>
+      {% endfor %}
+      </ul>
+    {% endfor %}
+    </ul>
+  {% endif %}
+
   {% block content %}
     {{ page.content }}
   {% endblock %}
