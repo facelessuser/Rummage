@@ -31,7 +31,8 @@ RE_URL = re.compile('(http|ftp)s?|data|mailto|tel|news')
 
 URL_LINK = 0
 HTML_LINK = 1
-OTHER_LINK = 2
+BLANK_LINK = 2
+OTHER_LINK = 3
 
 BACK_SLASH_TRANSLATION = {
     "\\a": '\a',
@@ -75,9 +76,12 @@ def parse_url(url):
 
     is_url = False
     is_absolute = False
+    is_blank = False
     scheme, netloc, path, params, query, fragment = urlparse(html.unescape(url))
 
-    if RE_URL.match(scheme):
+    if scheme == 'about' and netloc == '' and path == "blank":
+        is_blank = True
+    elif RE_URL.match(scheme):
         # Clearly a url
         is_url = True
     elif scheme == '' and netloc == '' and path == '':
@@ -115,7 +119,7 @@ def parse_url(url):
         # /root path
         is_absolute = True
 
-    return (scheme, netloc, path, params, query, fragment, is_url, is_absolute)
+    return (scheme, netloc, path, params, query, fragment, is_url, is_absolute, is_blank)
 
 
 def link_type(link):
@@ -123,9 +127,11 @@ def link_type(link):
 
     link_type = OTHER_LINK
     try:
-        scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(link)
+        scheme, netloc, path, params, query, fragment, is_url, is_absolute, is_blank = parse_url(link)
         if is_url:
             link_type = URL_LINK
+        elif is_blank:
+            link_type = BLANK_LINK
         else:
             path = url2pathname(path).replace('\\', '/')
             # Adjust /c:/ to c:/.

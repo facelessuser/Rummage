@@ -28,29 +28,138 @@ from . import data
 from .app.custom_app import debug
 import webbrowser
 from .. import util
+import markdown
+import pymdownx.slugs as slugs
+
+HTML_FILE = 0
+HTML_STRING = 1
+MARKDOWN_STRING = 2
+
+EXTENSIONS = [
+    "markdown.extensions.toc",
+    "markdown.extensions.attr_list",
+    "markdown.extensions.def_list",
+    "markdown.extensions.smarty",
+    "markdown.extensions.footnotes",
+    "markdown.extensions.tables",
+    "markdown.extensions.sane_lists",
+    "markdown.extensions.admonition",
+    "pymdownx.highlight",
+    "pymdownx.inlinehilite",
+    "pymdownx.magiclink",
+    "pymdownx.superfences",
+    "pymdownx.betterem",
+    "pymdownx.extrarawhtml",
+    "pymdownx.keys",
+    "pymdownx.escapeall",
+    "pymdownx.smartsymbols",
+    "pymdownx.tasklist",
+    "pymdownx.tilde",
+    "pymdownx.caret",
+    "pymdownx.mark",
+    "pymdownx.b64",
+    "pymdownx.pathconverter"
+]
+
+EXTENSION_CONFIGS = {
+    "markdown.extensions.toc": {
+        "slugify": slugs.uslugify,
+        # "permalink": "\ue157"
+    },
+    "pymdownx.inlinehilite": {
+        "style_plain_text": True
+    },
+    "pymdownx.superfences": {
+        "custom_fences": []
+    },
+    "pymdownx.magiclink": {
+        "repo_url_shortener": True,
+        "repo_url_shorthand": True,
+        "user": "facelessuser",
+        "repo": "Rummage"
+    },
+    "markdown.extensions.smarty": {
+        "smart_quotes": False
+    },
+    "pymdownx.escapeall": {
+        "hardbreak": True,
+        "nbsp": True
+    },
+    "pymdownx.pathconverter": {
+        "base_path": os.path.join(data.RESOURCE_PATH, 'docs'),
+        "absolute": True
+    },
+    "pymdownx.b64": {
+        "base_path": os.path.join(data.RESOURCE_PATH, 'docs')
+    }
+}
+
+TEMPLATE = """<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>%s</title>
+<style>
+%s
+</style>
+</head>
+<body>
+<div class="markdown">
+%s
+</div>
+</body>
+</html>
+"""
+
+
+def escape(txt):
+    """Basic html escaping."""
+
+    txt = txt.replace('&', '&amp;')
+    txt = txt.replace('<', '&lt;')
+    txt = txt.replace('>', '&gt;')
+    txt = txt.replace('"', '&quot;')
+    return txt
+
+
+def convert_markdown(title, content):
+    """Convert Markdown to HTML."""
+
+    css = data.get_file(os.path.join('docs', 'css', 'theme.css'))
+    html = markdown.Markdown(extensions=EXTENSIONS, extension_configs=EXTENSION_CONFIGS).convert(content)
+    html = TEMPLATE % (escape(title), css, html)
+    return html
 
 
 class HTMLDialog(gui.HtmlDialog):
     """HTMLDialog."""
 
-    def __init__(self, parent, content, title=None, string=False):
+    def __init__(
+        self, parent, content, title=None, content_type=HTML_FILE,
+        min_width=500, min_height=500, max_width=-1, max_height=-1
+    ):
         """Init SettingsDialog object."""
 
         super(HTMLDialog, self).__init__(parent)
+        self.SetSizeHints(wx.Size(min_width, min_height), wx.Size(max_width, max_height))
         self.localize()
         self.busy = False
         self.m_content_html.Bind(wx.html2.EVT_WEBVIEW_NAVIGATING, self.on_navigate)
         # self.m_content_html.Bind(wx.html2.EVT_WEBVIEW_NAVIGATED, self.on_navigated)
         self.m_content_html.Bind(wx.html2.EVT_WEBVIEW_LOADED, self.on_loaded)
         self.m_content_html.Bind(wx.html2.EVT_WEBVIEW_TITLE_CHANGED, self.on_title_changed)
-        self.load(content, title, string)
+        self.load(content, title, content_type)
         self.Fit()
+        self.Center()
 
-    def load(self, content, title=None, string=False):
+    def load(self, content, title=None, content_type=HTML_FILE):
         """Reshow the dialog."""
 
+        self.content_type = content_type
         self.refresh_localization()
-        self.load_html(content, string)
+        self.load_html(content, title)
 
     def localize(self):
         """Translage strings."""
@@ -63,18 +172,27 @@ class HTMLDialog(gui.HtmlDialog):
         self.SetTitle(self.TITLE)
         self.Fit()
 
-    def load_html(self, content, string):
+    def load_html(self, content, title):
         """Load HTML."""
 
-        if not string:
+        if self.content_type == HTML_FILE:
             url = 'file://%s' % os.path.join(data.RESOURCE_PATH, 'docs', content).replace('\\', '/')
             if self.busy:
                 self.m_content_html.Stop()
             self.busy = True
             self.m_content_html.LoadURL(url)
         else:
-            # We may not even use this
-            pass
+            if self.content_type == MARKDOWN_STRING:
+                html = convert_markdown(title, content)
+            else:
+                html = content
+            self.busy = True
+            self.m_content_html.SetPage(html, 'file://')
+            if util._PLATFORM == "windows":
+                # Ugh.  Why can't things just work
+                # Here we must reload the page so that things render properly.
+                # This was done to fix poorly rendered pages observed in Windows.
+                self.m_content_html.Reload()
 
     def on_title_changed(self, event):
         """Get title."""
@@ -102,19 +220,24 @@ class HTMLDialog(gui.HtmlDialog):
 
         # Things we can allow the backend to handle (local HTML files)
         ltype = util.link_type(url)
-        if ltype == util.HTML_LINK:
+        if ltype == util.BLANK_LINK:
             self.busy = True
-            pass
+        # We don't handle links outside of a "blank" (HTML string) page.
+        # This mainly occurs on Windows.
+        elif self.content_type == HTML_STRING and url.startswith('about:'):
+            self.busy = False
+            event.Veto()
+        # 'Nix systems treat "blank" (HTML string) pages as root paths most of the time.
+        # So if we get `file:///` that is not empty and not linking to a target, we are
+        # Linking outside or page, but not to an external site.
+        elif self.content_type == HTML_STRING and not (url == 'file:///' or url.startswith('file:///#')):
+            self.busy = False
+            event.Veto()
+        elif ltype == util.HTML_LINK:
+            self.busy = True
         # Send URL links to browser
         elif ltype == util.URL_LINK:
             webbrowser.open_new_tab(url)
-            self.busy = False
-            event.Veto()
-        # Handle webkit id jumps for IE (usually when handling HTML strings, not files)
-        elif url.startswith('about:blank#'):
-            script = "document.getElementById('%s').scrollIntoView();" % url.replace('about:blank#', '')
-            debug("HTML Nav ID: " + script)
-            self.m_content_html.RunScript(script)
             self.busy = False
             event.Veto()
         # Show unhandled links

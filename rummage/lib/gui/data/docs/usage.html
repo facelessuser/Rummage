@@ -12,13 +12,13 @@
   <link rel="stylesheet" href="css/theme.css">
 
   <!-- Extra CSS -->
-  
-
-  
-  
+  <style>
+  .markdown {
+    padding-left: 24px;
+  }
+  </style>
 
   <!-- JavaScript -->
-  
 
 </head>
 
@@ -26,14 +26,73 @@
 
   <!-- Content -->
   <div class="markdown">
-  
-    <h1 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link"></a></h1>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link"></a></h2>
+
+  <!-- Table of Content (Don't show for static sites) -->
+    <div class="__toc_wrapper"><span class="__toc_icon"></span>
+    <div class="__toc_content">
+    <ul class="__toc_list">
+      <li class="__toc_level_1"><a href="#basic-usage">Basic Usage</a></li>
+      <ul class="__toc_list_1">
+      
+      <li class="__toc_level_2"><a href="#overview">Overview</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#running">Running</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#searching--replacing">Searching &amp; Replacing</a></li>
+      <ul class="__toc_list_2">
+      
+      <li class="__toc_level_3"><a href="#search-panel">Search Panel</a></li>
+      <ul class="__toc_list_3">
+      
+      </ul>
+      <li class="__toc_level_3"><a href="#limit-search-panel">Limit Search Panel</a></li>
+      <ul class="__toc_list_3">
+      
+      </ul>
+      <li class="__toc_level_3"><a href="#results">Results</a></li>
+      <ul class="__toc_list_3">
+      
+      </ul>
+      </ul>
+      <li class="__toc_level_2"><a href="#regular-expression-tester">Regular Expression Tester</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#saving-and-loading-regular-expressions">Saving and Loading Regular Expressions</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#search-chains">Search Chains</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#replace-plugins">Replace plugins</a></li>
+      <ul class="__toc_list_2">
+      
+      <li class="__toc_level_3"><a href="#writing-a-plugin">Writing a Plugin</a></li>
+      <ul class="__toc_list_3">
+      
+      </ul>
+      </ul>
+      <li class="__toc_level_2"><a href="#export-to-csv-or-html">Export to CSV or HTML</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      </ul>
+    </ul>
+    </div>
+    </div>
+    <h1 id="basic-usage">Basic Usage</h1>
+<h2 id="overview">Overview</h2>
 <p>Rummage is designed to be easy to pick up. Its interface consists of three tabs: Search, Files, and Content.  In the <strong>Search</strong> tab, a user specifies where they want to search, what they want to search for, and optionally what they want to replace it with.  Search features can be tweaked with various options. The files that get searched can also be narrowed with patterns and filters.</p>
 <p>Rummage uses the default regular expression library (<a href="https://docs.python.org/3/library/re.html">Re</a>) that comes with Python. It also optionally works with the 3<sup>rd</sup> party <a href="https://pypi.python.org/pypi/regex">Regex</a> library (if installed).</p>
 <p>As matches are found, general info about the matches will be displayed in the <strong>Files</strong> and <strong>Content</strong> tabs. You can double click files to open them in your favorite editor (see <a href="preferences.html#editor">Editor Preferences</a> to configure Rummage for your editor).</p>
 <p>Rummage also comes with a simple regular expression tester to test out patterns. It also provides a feature where patterns can be saved for later and/or frequent use. You can even create chains that will apply a series of saved searches.</p>
-<h2 id="running">Running<a class="headerlink" href="#running" title="Permanent link"></a></h2>
+<h2 id="running">Running</h2>
 <p>Once Rummage is installed, you can run it from the command line (assuming your Python scripts/bin folder is in your system path):</p>
 <div class="highlight"><pre><span></span>rummage
 </pre></div>
@@ -46,10 +105,10 @@
 <div class="highlight"><pre><span></span>pythonw -m rummage
 </pre></div>
 
-<h2 id="searching--replacing">Searching &amp; Replacing<a class="headerlink" href="#searching--replacing" title="Permanent link"></a></h2>
+<h2 id="searching--replacing">Searching &amp; Replacing</h2>
 <p><img alt="Search Tab" src="images/search_tab.png" /></p>
 <p>Search and replaces are configured in the <strong>Search</strong> tab which is broken up into 2 panels, the first of which is the <strong>Search &amp; Replace</strong> panel. The second is the <strong>Limit Search</strong> panel.</p>
-<h3 id="search-panel">Search Panel<a class="headerlink" href="#search-panel" title="Permanent link"></a></h3>
+<h3 id="search-panel">Search Panel</h3>
 <p><img alt="Search and Replace Panel" src="images/search_replace_inputs.png" /></p>
 <p>The <strong>Search &amp; Replace</strong> panel contains three text boxes with a dropdown history. The first text box defines <strong>where to search</strong>, the second defines <strong>what to search for</strong>, and the last defines <strong>what to replace matches with</strong>.  You can select previously used patterns and search targets by expanding the dropdown panel for the input.</p>
 <p>Below the text boxes are checkboxes that control the regular expression engine's options and features.</p>
@@ -57,11 +116,11 @@
 <p>The available features will vary depending on which regular expression engine you are using. Each feature is documented in <a href="search.html#search-options">Search Options</a>.</p>
 <p>Lastly, Rummage provides buttons to launch a <a href="#regular-expression-tester">regular expression tester</a>, dialogs to <a href="#saving-and-loading-regular-expressions">save or load</a> frequently used regular expressions, and a dialog to create and manage <a href="#search-chains">regular expression chains</a>.</p>
 <p><img alt="Regular Expression Buttons" src="images/regex_buttons.png" /></p>
-<h3 id="limit-search-panel">Limit Search Panel<a class="headerlink" href="#limit-search-panel" title="Permanent link"></a></h3>
+<h3 id="limit-search-panel">Limit Search Panel</h3>
 <p><img alt="Limit Search Panel" src="images/limit_search_panel.png" /></p>
 <p>The <strong>Limit Search</strong> panel contains checkboxes and inputs that filter the files to be searched.  You can filter out hidden files, files of specific sizes, or creation/modification dates.</p>
 <p>You can also restrict which files get searched by providing a wild card (or regular expression if preferred) pattern. By default, the patterns are applied to the base file or folder name. See <a href="search.html#wildcard">File Patterns</a> to learn more about accepted wild card pattern syntax and how to configure optional file pattern features.</p>
-<h3 id="results">Results<a class="headerlink" href="#results" title="Permanent link"></a></h3>
+<h3 id="results">Results</h3>
 <p>Once a search or replace is initiated, the results will begin to appear in the <strong>Files</strong> and <strong>Content</strong> tabs. You can then double click a file to open it in your editor, or right click them to bring up a context menu with additional options.</p>
 <p><img alt="Files Tab" src="images/files_tab.png" /></p>
 <p><img alt="Content Tab" src="images/content_tab.png" /></p>
@@ -69,12 +128,12 @@
 <p class="admonition-title">Tip</p>
 <p>You can hide/show columns by right clicking the list header to get a special context menu. You can then deselect or select the the column(s) you wish to hide/show respectively.</p>
 </div>
-<h2 id="regular-expression-tester">Regular Expression Tester<a class="headerlink" href="#regular-expression-tester" title="Permanent link"></a></h2>
+<h2 id="regular-expression-tester">Regular Expression Tester</h2>
 <p><img alt="Regex Tester" src="images/regex_tester.png" /></p>
 <p>Rummage comes with a simple regular expression tester. It has a simple text box to place content to search, and another text box that will show the final results after the find and replace are applied.  Below those text boxes, there are two text input boxes for the find pattern and the replace pattern.  Lastly, all search and replace flag options are found under the patterns.</p>
 <p>To use the tester, simply enter the content to search, set your desired options, and input your find and replace pattern.  As you change your pattern or options, matches will be updated and highlighted, and the result box will be updated with any replacements.</p>
 <p>When you are satisfied with your result, click the <code>Use</code> button, and your pattern and settings will be populated in the main window.</p>
-<h2 id="saving-and-loading-regular-expressions">Saving and Loading Regular Expressions<a class="headerlink" href="#saving-and-loading-regular-expressions" title="Permanent link"></a></h2>
+<h2 id="saving-and-loading-regular-expressions">Saving and Loading Regular Expressions</h2>
 <p>Regular expressions can be very complex, and sometimes you might want to save them for future use.</p>
 <p>When you have a pattern configured that you want to save, simply click the <code>Save Search</code> button, and a dialog will pop up asking you to name the search.  When done, click the <code>Save</code> button on the dialog and your search patterns and options will be saved.</p>
 <p>You'll notice that there are two input boxes. The first requires a unique name (only word characters, underscores, and hyphens are allowed). The second is an optional comment in case you wish to elaborate on what the pattern is for.</p>
@@ -83,7 +142,7 @@
 <p>To load a pattern that was saved previously, click the <code>Load Search</code> button.  You will be presented with a dialog showing all your saved searches.  Highlight the pattern you want to load and click the <code>Load</code> button.  Your pattern and options will be populated in the main dialog.</p>
 <p>If you wish to edit the name or comment of a search, you can double click the entry or click the "Edit" button.</p>
 <p><img alt="Load Search" src="images/load_search.png" /></p>
-<h2 id="search-chains">Search Chains<a class="headerlink" href="#search-chains" title="Permanent link"></a></h2>
+<h2 id="search-chains">Search Chains</h2>
 <p>There are times you may have a task that requires you to do multiple find and replaces that are all related, but are too difficult to represent as a single find and replace. This is where search chains can be helpful.</p>
 <p>Search chains are essentially a sequence of multiple <a href="#saving-and-loading-regular-expressions">saved search and replace patterns</a>. You can create a search chain by clicking the <code>Search Chains</code> button which will bring up the search change manager.</p>
 <p><img alt="Chain Button" src="images/chain_button.png" /></p>
@@ -91,14 +150,14 @@
 <p><img alt="Search Chains" src="images/chains.png" /></p>
 <p>To use search chains, you must put Rummage in "search chain" mode by selecting the check box named <code>Use search chains</code> in the main window. When "search chain" mode is enabled, all controls that don't apply to search chains will be disabled, and the search box will be replaced with a drop down for selecting existing chains you've already created. When a search is performed, Rummage will iterate over each file with all the saved searches in the chain.</p>
 <p><img alt="Chain Select" src="images/chain_mode.png" /></p>
-<h2 id="replace-plugins">Replace plugins<a class="headerlink" href="#replace-plugins" title="Permanent link"></a></h2>
+<h2 id="replace-plugins">Replace plugins</h2>
 <p>Regular expressions are great, but sometimes regular expressions aren't enough.  If you are dealing with a replace task that requires logic that cannot be represented in a simple replace pattern, you can create a "replace plugin".</p>
 <p>Replace plugins are written in Python and are loaded by first selecting the <code>Use plugin replace</code> check box in the main dialog.</p>
 <p><img alt="Enable Replace Plugin" src="images/plugin_toggle.png" /></p>
 <p>Then the main dialog's <code>Replace with</code> text box will become the <code>Replace plugin</code> text box with an associated file picker.  Here you can point to your replace plugin file.</p>
 <p>Replace plugins aren't meant to be full, complex modules that import lots of other relative files.  They are meant to be a single, compact script, but inside that script, you can import anything that is <em>already</em> installed in your Python environment.</p>
 <p><img alt="Enable Replace Plugin" src="images/plugin_input.png" /></p>
-<h3 id="writing-a-plugin">Writing a Plugin<a class="headerlink" href="#writing-a-plugin" title="Permanent link"></a></h3>
+<h3 id="writing-a-plugin">Writing a Plugin</h3>
 <p>Replace plugins should contain two things. The first is a plugin class derived from the <code>rummage.lib.rumcore.ReplacePlugin</code>.  The second is a function called <code>get_replace</code> that returns your class.</p>
 <p>The plugin class is fairly straight forward and is shown below.</p>
 <div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ReplacePlugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -194,31 +253,23 @@
 </pre></div>
 
 </div>
-<h2 id="export-to-csv-or-html">Export to CSV or HTML<a class="headerlink" href="#export-to-csv-or-html" title="Permanent link"></a></h2>
+<h2 id="export-to-csv-or-html">Export to CSV or HTML</h2>
 <p><img alt="HTML Export" src="images/html_export.png" /></p>
 <p>Rummage allows the exporting of the results to either CSV or HTML.  Simply select <strong>File&rarr;Export</strong> and pick either <strong>CSV</strong> or <strong>HTML</strong>.  The HTML output will be styled similar to the GUI interface with the results in tables with sortable columns.</p>
 <div class="admonition info">
 <p class="admonition-title">Large Result Sets</p>
 <p>Really, really large sets of results will probably be best suited for CSV as a browser may have a hard time loading the entire data set at once.</p>
 </div>
-  
   </div>
 
   <!-- Navigation -->
-  
 
     <div class="nav">
-      
         <a href="installation.html" class="prev-page" title="Installation">&#8592; Prev</a>
-      
 
       <a href="./sitemap.html">Home</a>
-
-      
         <a href="search.html" class="next-page" title="Search Features"/>Next &#8594;</a>
-      
     </div>
-  
 
 </body>
 </html>

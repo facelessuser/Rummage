@@ -7,6 +7,7 @@
 - **NEW**: Show changelog on next launch after upgrade.
 - **NEW**: Render editor instructions as HTML in the settings dialog.
 - **NEW**: Simplify regular expression engine selection settings panel.
+- **FIX**: New about dialog that no longer breaks on Linux.
 
 ## 4.2.4
 

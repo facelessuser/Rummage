@@ -29,7 +29,7 @@ nav:
 markdown_extensions:
   - markdown.extensions.toc:
       slugify: !!python/name:pymdownx.slugs.uslugify
-      permalink: "\ue157"
+      # permalink: "\uf0c1"
   - markdown.extensions.admonition:
   - markdown.extensions.smarty:
       smart_quotes: false

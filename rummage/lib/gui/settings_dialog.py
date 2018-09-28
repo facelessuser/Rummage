@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import wx
 import re
 import json
-import os
 import webbrowser
 from .settings import Settings
 from .file_ext_dialog import FileExtDialog
@@ -32,60 +31,8 @@ from . import gui
 from . import notify
 from .. import rumcore
 from .. import util
-import markdown
-import pymdownx.slugs as slugs
-from . import data
 from .app.custom_app import debug
-
-extensions = [
-    "markdown.extensions.toc",
-    "markdown.extensions.attr_list",
-    "markdown.extensions.def_list",
-    "markdown.extensions.smarty",
-    "markdown.extensions.footnotes",
-    "markdown.extensions.tables",
-    "markdown.extensions.sane_lists",
-    "markdown.extensions.admonition",
-    "pymdownx.highlight",
-    "pymdownx.inlinehilite",
-    "pymdownx.magiclink",
-    "pymdownx.superfences",
-    "pymdownx.betterem",
-    "pymdownx.extrarawhtml",
-    "pymdownx.keys",
-    "pymdownx.escapeall",
-    "pymdownx.smartsymbols",
-    "pymdownx.tasklist",
-    "pymdownx.tilde",
-    "pymdownx.caret",
-    "pymdownx.mark"
-]
-
-extension_configs = {
-    "markdown.extensions.toc": {
-        "slugify": slugs.uslugify,
-        # "permalink": "\ue157"
-    },
-    "pymdownx.inlinehilite": {
-        "style_plain_text": True
-    },
-    "pymdownx.superfences": {
-        "custom_fences": []
-    },
-    "pymdownx.magiclink": {
-        "repo_url_shortener": True,
-        "repo_url_shorthand": True,
-        "user": "facelessuser",
-        "repo": "Rummage"
-    },
-    "markdown.extensions.smarty": {
-        "smart_quotes": False
-    },
-    "pymdownx.escapeall": {
-        "hardbreak": True,
-        "nbsp": True
-    }
-}
+from .html_dialog import convert_markdown
 
 EDITOR_HELP = _("""
 Enter in the appropriate command to open files in your editor.
@@ -105,24 +52,6 @@ Variable | Description
     "C:\Program Files\Sublime Text 3\subl.exe" "{$file}:{$line}:{$col}"
     ```
 """)
-
-HELP_HTML = """<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<style>
-%s
-</style>
-</head>
-<body>
-<div class="markdown">
-%s
-</div>
-</body>
-</html>
-"""
 
 # We really need a better validator
 BACKUP_VALIDATOR = re.compile(r'^[-_a-zA-Z\d.]+$')
@@ -359,11 +288,9 @@ class SettingsDialog(gui.SettingsDialog):
     def load_help(self, text):
         """Handle copy event."""
 
-        css = data.get_file(os.path.join('docs', 'css', 'theme.css'))
-        html = markdown.Markdown(extensions=extensions, extension_configs=extension_configs).convert(text)
-        html = HELP_HTML % (css, html)
+        html = convert_markdown('Editor Settings', text)
         self.busy = True
-        self.m_help_html.SetPage(html, '')
+        self.m_help_html.SetPage(html, 'file:///')
         if util._PLATFORM == "windows":
             # Ugh.  Why can't things just work
             # Here we must reload the page so that things render properly.
@@ -599,19 +526,25 @@ class SettingsDialog(gui.SettingsDialog):
 
         # Things we can allow the backend to handle (local HTML files)
         ltype = util.link_type(url)
-        if ltype == util.HTML_LINK:
+        if ltype == util.BLANK_LINK:
             self.busy = True
-            pass
-        # Send URL links to browser
-        elif ltype == util.URL_LINK:
-            webbrowser.open_new_tab(url)
+        # We don't handle links outside of a "blank" (HTML string) page.
+        # This mainly occurs on Windows.
+        elif url.startswith('about:'):
             self.busy = False
             event.Veto()
-        # Handle webkit id jumps for IE (usually when handling HTML strings, not files)
-        elif url.startswith('about:blank#'):
-            script = "document.getElementById('%s').scrollIntoView();" % url.replace('about:blank#', '')
-            debug("HTML Nav ID: " + script)
-            self.m_help_html.RunScript(script)
+        # 'Nix systems treat "blank" (HTML string) pages as root paths most of the time.
+        # So if we get `file:///` that is not empty and not linking to a target, we are
+        # Linking outside or page, but not to an external site.
+        elif not (url == 'file:///' or url.startswith('file:///#')):
+            self.busy = False
+            event.Veto()
+        elif ltype == util.HTML_LINK:
+            self.busy = True
+        # Send URL links to browser
+        elif ltype == util.URL_LINK:
+            debug('external')
+            webbrowser.open_new_tab(url)
             self.busy = False
             event.Veto()
         # Show unhandled links

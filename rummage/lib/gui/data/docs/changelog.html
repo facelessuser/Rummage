@@ -12,13 +12,9 @@
   <link rel="stylesheet" href="css/theme.css">
 
   <!-- Extra CSS -->
-  
-
-  
-  
+  </style>
 
   <!-- JavaScript -->
-  
 
 </head>
 
@@ -26,55 +22,57 @@
 
   <!-- Content -->
   <div class="markdown">
-  
-    <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link"></a></h1>
-<h2 id="430">4.3.0<a class="headerlink" href="#430" title="Permanent link"></a></h2>
+
+  <!-- Table of Content (Don't show for static sites) -->
+    <h1 id="changelog">Changelog</h1>
+<h2 id="430">4.3.0</h2>
 <ul>
 <li><strong>NEW</strong>: Documents are now included locally in installation and can be viewed directly in Rummage via a webview dialog.</li>
 <li><strong>NEW</strong>: License can now be viewed from the application menu.</li>
 <li><strong>NEW</strong>: Show changelog on next launch after upgrade.</li>
 <li><strong>NEW</strong>: Render editor instructions as HTML in the settings dialog.</li>
 <li><strong>NEW</strong>: Simplify regular expression engine selection settings panel.</li>
+<li><strong>FIX</strong>: New about dialog that no longer breaks on Linux.</li>
 </ul>
-<h2 id="424">4.2.4<a class="headerlink" href="#424" title="Permanent link"></a></h2>
+<h2 id="424">4.2.4</h2>
 <ul>
 <li><strong>FIX</strong>: Adjustments to work with <code>wcmatch</code> version 2.0.0.</li>
 </ul>
-<h2 id="423">4.2.3<a class="headerlink" href="#423" title="Permanent link"></a></h2>
+<h2 id="423">4.2.3</h2>
 <ul>
 <li><strong>FIX</strong>: Process preview in regular expression test dialog when replace pattern is empty. If replace plugin is enabled, we must have a plugin specified.</li>
 </ul>
-<h2 id="422">4.2.2<a class="headerlink" href="#422" title="Permanent link"></a></h2>
+<h2 id="422">4.2.2</h2>
 <ul>
 <li><strong>FIX</strong>: Don't open another update notification if one is already open.</li>
 </ul>
-<h2 id="421">4.2.1<a class="headerlink" href="#421" title="Permanent link"></a></h2>
+<h2 id="421">4.2.1</h2>
 <ul>
 <li><strong>FIX</strong>: Better default input focus on Linux when selecting the search tab.</li>
 <li><strong>FIX</strong>: Properly select "Search for" as the default when chains mode is enabled.</li>
 </ul>
-<h2 id="420">4.2.0<a class="headerlink" href="#420" title="Permanent link"></a></h2>
+<h2 id="420">4.2.0</h2>
 <ul>
 <li><strong>NEW</strong>: File time result format has been updated for better readability.</li>
 <li><strong>NEW</strong>: International file time result format for modified and created times has been added and can be enabled in the global preferences.</li>
 <li><strong>NEW</strong>: Add ability to hide result columns.</li>
 <li><strong>FIX</strong>: Use wxPython API to highlight alternate rows in lists in order to properly highlight rows on systems with dark themes etc.</li>
 </ul>
-<h2 id="413">4.1.3<a class="headerlink" href="#413" title="Permanent link"></a></h2>
+<h2 id="413">4.1.3</h2>
 <ul>
 <li><strong>FIX</strong>: Officially support Python 3.7.</li>
 </ul>
-<h2 id="412">4.1.2<a class="headerlink" href="#412" title="Permanent link"></a></h2>
+<h2 id="412">4.1.2</h2>
 <ul>
 <li><strong>FIX</strong>: Require <code>wcmatch</code> 1.0.1 which fixes a number of bugs, most notably a fix for POSIX character classes not properly being handled when at the start of sequence followed by range syntax (<code>[[:ascii:]-z]</code>) which will now be handled properly.</li>
 <li><strong>FIX</strong>: When full path is enabled, and no file pattern is specified, all files will properly be matched like they are when full path is not enabled.</li>
 </ul>
-<h2 id="411">4.1.1<a class="headerlink" href="#411" title="Permanent link"></a></h2>
+<h2 id="411">4.1.1</h2>
 <ul>
 <li><strong>FIX</strong>: Fix regression where raw character translations (<code>\xXX</code> etc.) are no longer working.</li>
 <li><strong>FIX</strong>: Style tweaks to HTML output.</li>
 </ul>
-<h2 id="410">4.1.0<a class="headerlink" href="#410" title="Permanent link"></a></h2>
+<h2 id="410">4.1.0</h2>
 <ul>
 <li><strong>NEW</strong>: Escape key will terminate a search or replace from any main tab.</li>
 <li><strong>NEW</strong>: Old legacy editor configuration is now removed. Only the new is allowed.</li>
@@ -87,54 +85,54 @@
 <li><strong>FIX</strong>: Growl notifications timing out due to image being to large.</li>
 <li><strong>FIX</strong>: Notifications sound not working when just alert sounds are enabled or sound is enabled with Growl.</li>
 </ul>
-<h2 id="407">4.0.7<a class="headerlink" href="#407" title="Permanent link"></a></h2>
+<h2 id="407">4.0.7</h2>
 <ul>
 <li><strong>FIX</strong>: Log error during update check. If not a silent check, alert user there was an update check issue.</li>
 <li><strong>FIX</strong>: Update requests should use <code>https</code>.</li>
 <li><strong>FIX</strong>: Update localization.</li>
 </ul>
-<h2 id="406">4.0.6<a class="headerlink" href="#406" title="Permanent link"></a></h2>
+<h2 id="406">4.0.6</h2>
 <ul>
 <li><strong>FIX</strong>: Fixes to Windows notifications.</li>
 </ul>
-<h2 id="405">4.0.5<a class="headerlink" href="#405" title="Permanent link"></a></h2>
+<h2 id="405">4.0.5</h2>
 <ul>
 <li><strong>FIX</strong>: Single instance handling regression <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/217" title="GitHub Issue: facelessuser/Rummage#217">#217</a>.</li>
 </ul>
-<h2 id="404">4.0.4<a class="headerlink" href="#404" title="Permanent link"></a></h2>
+<h2 id="404">4.0.4</h2>
 <ul>
 <li><strong>FIX</strong>: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format string replace with the added ability to use format string align and fill.</li>
 <li><strong>FIX</strong>: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex replace templates without Backrefs. Require explicit <code>{{</code> or <code>}}</code>.</li>
 </ul>
-<h2 id="403">4.0.3<a class="headerlink" href="#403" title="Permanent link"></a></h2>
+<h2 id="403">4.0.3</h2>
 <ul>
 <li><strong>FIX</strong>: Regression that causes crash when using reverse flag with Regex <strong>and</strong> Backrefs.</li>
 </ul>
-<h2 id="402">4.0.2<a class="headerlink" href="#402" title="Permanent link"></a></h2>
+<h2 id="402">4.0.2</h2>
 <ul>
 <li><strong>FIX</strong>: In test dialog, when an expression doesn't match, the result box is empty.</li>
 <li><strong>FIX</strong>: Require Backrefs 3.3.0.</li>
 </ul>
-<h2 id="401">4.0.1<a class="headerlink" href="#401" title="Permanent link"></a></h2>
+<h2 id="401">4.0.1</h2>
 <ul>
 <li><strong>FIX</strong>: Cleanup some object leaks.</li>
 <li><strong>FIX</strong>: Incorrect sizing of chain dialog.</li>
 <li><strong>FIX</strong>: All list objects should be finalized properly to allow sorting.</li>
 <li><strong>FIX</strong>: Make encoding list style in settings dialog consistent with the look and feel of other list objects.</li>
 </ul>
-<h2 id="400">4.0.0<a class="headerlink" href="#400" title="Permanent link"></a></h2>
+<h2 id="400">4.0.0</h2>
 <ul>
 <li><strong>NEW</strong>: Drop Python 2.7 support.</li>
 <li><strong>NEW</strong>: Lines are calculated incrementally as needed opposed to all up front.</li>
 <li><strong>NEW</strong>: File pattern input will default to <code>*</code> or <code>.*</code> (for wildcard or regular expression respectively) if left empty.</li>
 <li><strong>NEW</strong>: Wildcard patterns starting with <code>-</code> will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).</li>
 </ul>
-<h2 id="371">3.7.1<a class="headerlink" href="#371" title="Permanent link"></a></h2>
+<h2 id="371">3.7.1</h2>
 <ul>
 <li><strong>FIX</strong>: Don't feed Regex version flags into Re patterns.</li>
 <li><strong>FIX</strong>: Style tweaks to HTML output.</li>
 </ul>
-<h2 id="370">3.7.0<a class="headerlink" href="#370" title="Permanent link"></a></h2>
+<h2 id="370">3.7.0</h2>
 <ul>
 <li><strong>NEW</strong>: Escape key will terminate a search or replace from any main tab.</li>
 <li><strong>NEW</strong>: Lines are calculated incrementally as needed opposed to all up front.</li>
@@ -162,7 +160,7 @@
 <li><strong>FIX</strong>: All list objects should be finalized properly to allow sorting.</li>
 <li><strong>FIX</strong>: Make encoding list style in settings dialog consistent with the look and feel of other list objects.</li>
 </ul>
-<h2 id="360">3.6.0<a class="headerlink" href="#360" title="Permanent link"></a></h2>
+<h2 id="360">3.6.0</h2>
 <ul>
 <li><strong>NEW</strong>: Rummage will use <code>cchardet</code> by default if found.</li>
 <li><strong>NEW</strong>: Expose way to specify <code>cchardet</code> being used.</li>
@@ -183,7 +181,7 @@
 <li><strong>FIX</strong>: Rework highlighting in tester dialog to properly highlight 32 bit characters.</li>
 <li><strong>FIX</strong>: Single instance regression.</li>
 </ul>
-<h2 id="350">3.5.0<a class="headerlink" href="#350" title="Permanent link"></a></h2>
+<h2 id="350">3.5.0</h2>
 <ul>
 <li><strong>NEW</strong>: Add context menu to content tab just like file tab with all the same entries.</li>
 <li><strong>NEW</strong>: Add copy commands to context menus to copy selected file names, paths, or content of match (content tab only).</li>
@@ -198,20 +196,20 @@
 <li><strong>FIX</strong>: Search error list destroying parent/main dialog when closed. Also ensure destruction of error list dialog on main window closing.</li>
 <li><strong>FIX</strong>: Python 2.7 not processing Unicode escapes in search patterns.</li>
 </ul>
-<h2 id="343">3.4.3<a class="headerlink" href="#343" title="Permanent link"></a></h2>
+<h2 id="343">3.4.3</h2>
 <ul>
 <li><strong>FIX</strong>: Import of <code>bregex</code> when <code>regex</code> is not installed.</li>
 <li><strong>FIX</strong>: Backwards search did not reassemble text proper.</li>
 </ul>
-<h2 id="342">3.4.2<a class="headerlink" href="#342" title="Permanent link"></a></h2>
+<h2 id="342">3.4.2</h2>
 <ul>
 <li><strong>FIX</strong>: Require Backrefs 3.0.2 which fixes a minor Bregex cache purge issue.</li>
 </ul>
-<h2 id="341">3.4.1<a class="headerlink" href="#341" title="Permanent link"></a></h2>
+<h2 id="341">3.4.1</h2>
 <ul>
 <li><strong>FIX</strong>: Regression where installed CLI command would fail on launch.</li>
 </ul>
-<h2 id="340">3.4.0<a class="headerlink" href="#340" title="Permanent link"></a></h2>
+<h2 id="340">3.4.0</h2>
 <ul>
 <li><strong>NEW</strong>: Require latest Backrefs 3.0.1.</li>
 <li><strong>NEW</strong>: Add extension column in results.</li>
@@ -222,28 +220,28 @@
 <li><strong>FIX</strong>: Result item hover not showing file name in status bar.</li>
 <li><strong>FIX</strong>: Warnings in plugin system.</li>
 </ul>
-<h2 id="330">3.3.0<a class="headerlink" href="#330" title="Permanent link"></a></h2>
+<h2 id="330">3.3.0</h2>
 <ul>
 <li><strong>NEW</strong>: Add changelog link in menu for quick reference.</li>
 <li><strong>NEW</strong>: Encoding list is generated from the Python installation being used.</li>
 <li><strong>FIX</strong>: Infinite loop on result double click in content list.</li>
 </ul>
-<h2 id="321">3.2.1<a class="headerlink" href="#321" title="Permanent link"></a></h2>
+<h2 id="321">3.2.1</h2>
 <ul>
 <li><strong>FIX</strong>: Complete message should not be of "error" type.</li>
 </ul>
-<h2 id="320">3.2.0<a class="headerlink" href="#320" title="Permanent link"></a></h2>
+<h2 id="320">3.2.0</h2>
 <ul>
 <li><strong>NEW</strong>: Results update live. Progress has been removed. (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/140" title="GitHub Issue: facelessuser/Rummage#140">#140</a>)</li>
 <li><strong>FIX</strong>: Windows status bar flicker.</li>
 <li><strong>FIX</strong>: Results not showing when notifications is set to only play audio alerts.</li>
 </ul>
-<h2 id="310">3.1.0<a class="headerlink" href="#310" title="Permanent link"></a></h2>
+<h2 id="310">3.1.0</h2>
 <ul>
 <li><strong>NEW</strong>: Add export/import of settings and/or regular expression rules and chains.</li>
 <li><strong>NEW</strong>: Add support info dialog to gather info when filing issues.</li>
 </ul>
-<h2 id="300">3.0.0<a class="headerlink" href="#300" title="Permanent link"></a></h2>
+<h2 id="300">3.0.0</h2>
 <ul>
 <li><strong>NEW</strong>: Allow Backrefs' replace references to work with format replaces.</li>
 <li><strong>NEW</strong>: Add support for format replace with Re (with Backrefs only).</li>
@@ -251,27 +249,27 @@
 <li><strong>FIX</strong>: Regex's format replacement (without Backrefs) and Re (without Backrefs) handling of back slashes Unicode, byte, notation was different that Backrefs and other Regex modes. Normalize the differences to give the expected feel.</li>
 <li><strong>FIX</strong>: Ensure replace (in all cases) isn't populated during a search only.</li>
 </ul>
-<h2 id="233">2.3.3<a class="headerlink" href="#233" title="Permanent link"></a></h2>
+<h2 id="233">2.3.3</h2>
 <ul>
 <li><strong>FIX</strong>: Avoid Backrefs 1.1.0 and 2+ for until 2.1.</li>
 </ul>
-<h2 id="232">2.3.2<a class="headerlink" href="#232" title="Permanent link"></a></h2>
+<h2 id="232">2.3.2</h2>
 <ul>
 <li><strong>FIX</strong>: Fix Windows <code>pythonw</code> failure.</li>
 </ul>
-<h2 id="231">2.3.1<a class="headerlink" href="#231" title="Permanent link"></a></h2>
+<h2 id="231">2.3.1</h2>
 <ul>
 <li><strong>FIX</strong>: <code>wxPython</code> 4.0.0b1 removed label parameter from constructor.</li>
 <li><strong>FIX</strong>: Debug Unicode issue.</li>
 </ul>
-<h2 id="230">2.3.0<a class="headerlink" href="#230" title="Permanent link"></a></h2>
+<h2 id="230">2.3.0</h2>
 <ul>
 <li><strong>NEW</strong>: Add reveal right click menu option in "File" tab results.</li>
 <li><strong>NEW</strong>: Expose backup configuration and allow putting all backups in a folder if desired.</li>
 <li><strong>FIX</strong>: Windows Unicode input path issues from command line and through the pipe during single instance argument transfer.</li>
 <li><strong>FIX</strong>: Windows Unicode issue when calling a shell command to open file in editor.</li>
 </ul>
-<h2 id="220">2.2.0<a class="headerlink" href="#220" title="Permanent link"></a></h2>
+<h2 id="220">2.2.0</h2>
 <ul>
 <li><strong>NEW</strong>: Redesign of the preferences dialog.</li>
 <li><strong>NEW</strong>: Editor configurations are now sent through the shell which changes and simplifies the interface to set it up.</li>
@@ -281,7 +279,7 @@
 <li><strong>FIX</strong>: Window is only resized by force on initial load, and if the dialog is ever too small when showing something that was hidden.</li>
 <li><strong>FIX</strong>: Revert ensuring window is never bigger than usable size for now.</li>
 </ul>
-<h2 id="210">2.1.0<a class="headerlink" href="#210" title="Permanent link"></a></h2>
+<h2 id="210">2.1.0</h2>
 <ul>
 <li><strong>NEW</strong>: Add new chained search feature.</li>
 <li><strong>NEW</strong>: Add new replace plugin support.</li>
@@ -306,28 +304,28 @@
 <li><strong>FIX</strong>: Call initial main window resize in <code>on_loaded</code> event in some situations.</li>
 <li><strong>FIX</strong>: Ensure main window initial resize is never bigger than usable screen size.</li>
 </ul>
-<h2 id="205">2.0.5<a class="headerlink" href="#205" title="Permanent link"></a></h2>
+<h2 id="205">2.0.5</h2>
 <ul>
 <li><strong>FIX</strong>: Issue where mousing over results showed nothing in status bar.</li>
 <li><strong>FIX</strong>: Issue where double clicking result in Content pattern would not open in editor.</li>
 </ul>
-<h2 id="204">2.0.4<a class="headerlink" href="#204" title="Permanent link"></a></h2>
+<h2 id="204">2.0.4</h2>
 <ul>
 <li><strong>FIX</strong>: Bump rev.</li>
 </ul>
-<h2 id="203">2.0.3<a class="headerlink" href="#203" title="Permanent link"></a></h2>
+<h2 id="203">2.0.3</h2>
 <ul>
 <li><strong>FIX</strong>: Fix editor argument dialog.</li>
 </ul>
-<h2 id="202">2.0.2<a class="headerlink" href="#202" title="Permanent link"></a></h2>
+<h2 id="202">2.0.2</h2>
 <ul>
 <li><strong>FIX</strong>: Revert changes in 2.0.1 as wheels don't run setup and don't properly create the Python specific commands.</li>
 </ul>
-<h2 id="201">2.0.1<a class="headerlink" href="#201" title="Permanent link"></a></h2>
+<h2 id="201">2.0.1</h2>
 <ul>
 <li><strong>FIX</strong>: Release binary in path as <code>rummage</code> and <code>rummage&lt;version&gt;</code>. So for 2.7, it would be <code>rummage2.7</code>.</li>
 </ul>
-<h2 id="200">2.0.0<a class="headerlink" href="#200" title="Permanent link"></a></h2>
+<h2 id="200">2.0.0</h2>
 <ul>
 <li><strong>NEW</strong>: Python 3 support via the new wxPython 4.0.0 Phoenix!</li>
 <li><strong>NEW</strong>: Dropped classic wxPython (&lt;4.0.0) as it is too much work to maintain legacy support as well.</li>
@@ -338,23 +336,21 @@
 <li><strong>FIX</strong>: Fix notifications with terminal-notifier.</li>
 <li><strong>FIX</strong>: Fix issues related to localization.</li>
 </ul>
-<h2 id="102">1.0.2<a class="headerlink" href="#102" title="Permanent link"></a></h2>
+<h2 id="102">1.0.2</h2>
 <ul>
 <li><strong>FIX</strong>: issue where editor could not be set.</li>
 </ul>
-<h2 id="101">1.0.1<a class="headerlink" href="#101" title="Permanent link"></a></h2>
+<h2 id="101">1.0.1</h2>
 <ul>
 <li><strong>FIX</strong>: Fixed issue where literal replace was not actually literal replace.</li>
 </ul>
-<h2 id="100">1.0.0<a class="headerlink" href="#100" title="Permanent link"></a></h2>
+<h2 id="100">1.0.0</h2>
 <ul>
 <li><strong>NEW</strong>: Initial release</li>
 </ul>
-  
   </div>
 
   <!-- Navigation -->
-  
 
 </body>
 </html>

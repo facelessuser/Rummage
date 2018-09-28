@@ -1072,3 +1072,52 @@ body {
 .nav a:focus {
   outline: 0;
 }
+
+/* Table of contents */
+.markdown h1,
+.markdown .__toc_list .__toc_level_1 {
+  display: none;
+}
+
+.markdown .__toc_list {
+  padding-left: 0;
+}
+
+.__toc_wrapper {
+  position: fixed;
+  left: 3px;
+  top: 3px;
+  z-index:  99;
+  background: transparent
+}
+
+.__toc_content {
+  display: none;
+  background-color: #f5f5f5;
+  padding: 0.5rem;
+  border-radius: 3px;
+  border: 1px solid #e0e0e0;
+  max-height: 400px;
+  max-width: 400px;
+  overflow: auto;
+}
+
+.__toc_wrapper:hover .__toc_content {
+  display: block;
+}
+
+span.__toc_icon:before {
+  font: normal normal 16px fontawesome-mini;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  line-height: 1.5;
+  font-family: fontawesome-mini;
+  content: '\f036';
+  padding: 0.24em;
+  background-color: #333333;
+  color: #FFFFFF;
+  border-radius: 3px;
+}
