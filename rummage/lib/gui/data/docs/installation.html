@@ -12,13 +12,13 @@
   <link rel="stylesheet" href="css/theme.css">
 
   <!-- Extra CSS -->
-  
-
-  
-  
+  <style>
+  .markdown {
+    padding-left: 24px;
+  }
+  </style>
 
   <!-- JavaScript -->
-  
 
 </head>
 
@@ -28,56 +28,46 @@
   <div class="markdown">
 
   <!-- Table of Content (Don't show for static sites) -->
-  
-    <h2>Table of Contents</h2>
-    <ul>
-    
-      <li class="__toc_level_0"><a href="#installation">Installation</a></li>
-      <ul>
+    <div class="__toc_wrapper"><span class="__toc_icon"></span>
+    <div class="__toc_content">
+    <ul class="__toc_list">
+      <li class="__toc_level_1"><a href="#installation">Installation</a></li>
+      <ul class="__toc_list_1">
       
-        <li class="__toc_level_1"><a href="#requirements">Requirements</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#linux-prerequisites">Linux Prerequisites</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#macos-prerequisites">macOS Prerequisites</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#installation_1">Installation</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#installing-in-virtual-environments-macos">Installing in Virtual Environments (macOS)</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#installing-in-homebrew-macos">Installing in Homebrew (macOS)</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#installing-in-anaconda">Installing in Anaconda</a></li>
-        <ul>
-        
-        </ul>
+      <li class="__toc_level_2"><a href="#requirements">Requirements</a></li>
+      <ul class="__toc_list_2">
       
       </ul>
-    
+      <li class="__toc_level_2"><a href="#linux-prerequisites">Linux Prerequisites</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#macos-prerequisites">macOS Prerequisites</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#installation_1">Installation</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#installing-in-virtual-environments-macos">Installing in Virtual Environments (macOS)</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#installing-in-homebrew-macos">Installing in Homebrew (macOS)</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#installing-in-anaconda">Installing in Anaconda</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      </ul>
     </ul>
-  
-
-  
-    <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link"></a></h1>
-<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link"></a></h2>
+    </div>
+    </div>
+    <h1 id="installation">Installation</h1>
+<h2 id="requirements">Requirements</h2>
 <p>Rummage has a few requirements when installing.  These will all be taken care of when installing via <code>pip</code>.</p>
 <table>
 <thead>
@@ -148,7 +138,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="linux-prerequisites">Linux Prerequisites<a class="headerlink" href="#linux-prerequisites" title="Permanent link"></a></h2>
+<h2 id="linux-prerequisites">Linux Prerequisites</h2>
 <p>Rummage requires wxPython in order to run. If you have a recent Linux distro that has a pre-built, installable wxPython package for your version of Python, then it may make sense to just install the pre-built package via your Linux package manager (<code>apt-get</code> for Ubuntu). The version must meet the version requirement above.</p>
 <p>If you have installed a version of Python on your machine that does not have a pre-built wxPython package, or if your distro simply doesn't have a pre-built package that satisfies the requirements, then it may make sense to either install via <code>pip</code> or to manually compile and install. In both of these cases, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are generally most up to date for Ubuntu. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under <a href="https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites">this section</a>.</p>
 <p>Due to recent changes in PyPI, it is probably best to ensure you have at least version 10.0 or greater of <code>pip</code>.  Ubuntu provides a method for installing pip with <code>sudo apt-get install python3-pip</code>, but this usually installs an older version.  It is recommended to install <code>pip</code> with the command shown below (where <code>python3</code> is a call to the installed Python version of your choice):</p>
@@ -179,7 +169,7 @@
 <p>After getting all the correct prerequisites, you should be able to install Rummage with <code>pip</code>, though it is recommended to try and install wxPython first via <code>pip install wxpython</code>.</p>
 <p>If wxPython doesn't install properly, be sure to reference wxPython's documentation to see if there is something you are missing. Also, creating an issue over at wxPython's GitHub site for related wxPython install issues may get you help faster than creating them on the Rummage issue page, which is mainly meant for tracking Rummage specific issues, not wxPython install issues.</p>
 <p>Be patient while installing wxPython as Linux must build wxPython while macOS and Windows do not. If installing with <code>pip</code>, you may be waiting a long time with no real indication of how far along the process is.  If <code>pip</code> doesn't work, you can look into building and installing manually.  If you find any of this information incorrect, please feel free to offer a pull request.</p>
-<h2 id="macos-prerequisites">macOS Prerequisites<a class="headerlink" href="#macos-prerequisites" title="Permanent link"></a></h2>
+<h2 id="macos-prerequisites">macOS Prerequisites</h2>
 <p>On macOS, Rummage uses either pure Python modules, or modules that provide wheels. What this means is that no C code compilation is required to install Rummage; therefore, no prior steps are needed. But if you want to install <code>regex</code>, there will be some C code compilation performed by <code>pip</code> which will require Xcode to be installed.</p>
 <ol>
 <li>Download Xcode from the Mac App Store.</li>
@@ -187,7 +177,7 @@
 <li>Click the button to install the Command Line Tools.</li>
 <li>Open Terminal (Applications/Terminal) and run <code>xcode-select --install</code>. You will be prompted to install the Xcode Command Line Tools.</li>
 </ol>
-<h2 id="installation_1">Installation<a class="headerlink" href="#installation_1" title="Permanent link"></a></h2>
+<h2 id="installation_1">Installation</h2>
 <p>Here are a couple of ways to install and upgrade. Keep in mind if you are a Linux user, you have some <a href="#linux-prerequisites">prerequisites</a> to install before proceeding.</p>
 <p>Install:</p>
 <div class="highlight"><pre><span></span>pip install rummage
@@ -201,7 +191,7 @@
 <div class="highlight"><pre><span></span>pip install --upgrade rummage
 </pre></div>
 
-<h2 id="installing-in-virtual-environments-macos">Installing in Virtual Environments (macOS)<a class="headerlink" href="#installing-in-virtual-environments-macos" title="Permanent link"></a></h2>
+<h2 id="installing-in-virtual-environments-macos">Installing in Virtual Environments (macOS)</h2>
 <p>If installing in a virtual environment via <code>virtualenv</code>, you may run into the following error:</p>
 <p>This used to be a fairly annoying issue to workaround, but in wxPython 4+, it's not too bad.  The wxPython wiki is a bit out of date.  You don't have to symlink <code>wx.pth</code> or anything like that anymore as the design of wxPython is a bit different now.  All you have to do is place the script below in <code>my_virtual_env/bin</code>.  In this example I call it <code>fwpy</code> for "framework python" (make sure to adjust paths or Python versions to match your installation).</p>
 <div class="highlight"><pre><span></span>#!/bin/bash
@@ -219,7 +209,7 @@ export PYTHONHOME=$ENV
 exec $PYTHON &quot;$@&quot;
 </pre></div>
 
-<h2 id="installing-in-homebrew-macos">Installing in Homebrew (macOS)<a class="headerlink" href="#installing-in-homebrew-macos" title="Permanent link"></a></h2>
+<h2 id="installing-in-homebrew-macos">Installing in Homebrew (macOS)</h2>
 <p>Homebrew from what I read used to have issues running wxPython in versions less than 4, but this doesn't seem to be an issue with wxPython 4 with Homebrew (at least in my testing).</p>
 <div class="highlight"><pre><span></span>Faceless-MacBook-Pro:~ facelessuser$ brew install python
 ...a lot of install stuff
@@ -243,26 +233,18 @@ Successfully installed backrefs-1.0.1 chardet-3.0.4 gntp-1.0.3 regex-2017.7.11 r
 Faceless-MacBook-Pro:~ facelessuser$ /usr/local/Cellar/python/2.7.13_1/bin/python2 -m rummage
 </pre></div>
 
-<h2 id="installing-in-anaconda">Installing in Anaconda<a class="headerlink" href="#installing-in-anaconda" title="Permanent link"></a></h2>
+<h2 id="installing-in-anaconda">Installing in Anaconda</h2>
 <p>Anaconda can run Rummage fine from my testing on macOS.  The important thing to note is you must launch it with <code>pythonw -m rummage</code> on Windows and <strong>not</strong> <code>python -m rummage</code>. While this worked on macOS, results may vary on other systems.</p>
-  
   </div>
 
   <!-- Navigation -->
-  
 
     <div class="nav">
-      
         <a href="index.html" class="prev-page" title="Rummage">&#8592; Prev</a>
-      
 
       <a href="./sitemap.html">Home</a>
-
-      
         <a href="usage.html" class="next-page" title="Basic Usage"/>Next &#8594;</a>
-      
     </div>
-  
 
 </body>
 </html>

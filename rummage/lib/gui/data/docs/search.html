@@ -12,13 +12,13 @@
   <link rel="stylesheet" href="css/theme.css">
 
   <!-- Extra CSS -->
-  
-
-  
-  
+  <style>
+  .markdown {
+    padding-left: 24px;
+  }
+  </style>
 
   <!-- JavaScript -->
-  
 
 </head>
 
@@ -28,88 +28,72 @@
   <div class="markdown">
 
   <!-- Table of Content (Don't show for static sites) -->
-  
-    <h2>Table of Contents</h2>
-    <ul>
-    
-      <li class="__toc_level_0"><a href="#search-features">Search Features</a></li>
-      <ul>
+    <div class="__toc_wrapper"><span class="__toc_icon"></span>
+    <div class="__toc_content">
+    <ul class="__toc_list">
+      <li class="__toc_level_1"><a href="#search-features">Search Features</a></li>
+      <ul class="__toc_list_1">
       
-        <li class="__toc_level_1"><a href="#search-options">Search Options</a></li>
-        <ul>
-        
-          <li class="__toc_level_2"><a href="#common-options">Common Options</a></li>
-          <ul>
-          
-          </ul>
-        
-          <li class="__toc_level_2"><a href="#regex-engine-options">Regex Engine Options</a></li>
-          <ul>
-          
-          </ul>
-        
-          <li class="__toc_level_2"><a href="#rummage-options">Rummage Options</a></li>
-          <ul>
-          
-          </ul>
-        
-        </ul>
+      <li class="__toc_level_2"><a href="#search-options">Search Options</a></li>
+      <ul class="__toc_list_2">
       
-        <li class="__toc_level_1"><a href="#file-patterns">File Patterns</a></li>
-        <ul>
-        
-          <li class="__toc_level_2"><a href="#wildcard">Wildcard</a></li>
-          <ul>
-          
-            <li class="__toc_level_3"><a href="#basic-wildcard-syntax">Basic Wildcard syntax</a></li>
-            <ul>
-            
-            </ul>
-          
-            <li class="__toc_level_3"><a href="#extended-match-syntax">Extended Match Syntax</a></li>
-            <ul>
-            
-            </ul>
-          
-            <li class="__toc_level_3"><a href="#brace-expansion-syntax">Brace Expansion Syntax</a></li>
-            <ul>
-            
-            </ul>
-          
-            <li class="__toc_level_3"><a href="#full-path-matching">Full Path Matching</a></li>
-            <ul>
-            
-            </ul>
-          
-          </ul>
-        
-          <li class="__toc_level_2"><a href="#regular-expression">Regular Expression</a></li>
-          <ul>
-          
-            <li class="__toc_level_3"><a href="#full-path-matching_1">Full Path Matching</a></li>
-            <ul>
-            
-            </ul>
-          
-          </ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#backrefs">Backrefs</a></li>
-        <ul>
-        
-        </ul>
+      <li class="__toc_level_3"><a href="#common-options">Common Options</a></li>
+      <ul class="__toc_list_3">
       
       </ul>
-    
+      <li class="__toc_level_3"><a href="#regex-engine-options">Regex Engine Options</a></li>
+      <ul class="__toc_list_3">
+      
+      </ul>
+      <li class="__toc_level_3"><a href="#rummage-options">Rummage Options</a></li>
+      <ul class="__toc_list_3">
+      
+      </ul>
+      </ul>
+      <li class="__toc_level_2"><a href="#file-patterns">File Patterns</a></li>
+      <ul class="__toc_list_2">
+      
+      <li class="__toc_level_3"><a href="#wildcard">Wildcard</a></li>
+      <ul class="__toc_list_3">
+      
+      <li class="__toc_level_4"><a href="#basic-wildcard-syntax">Basic Wildcard syntax</a></li>
+      <ul class="__toc_list_4">
+      
+      </ul>
+      <li class="__toc_level_4"><a href="#extended-match-syntax">Extended Match Syntax</a></li>
+      <ul class="__toc_list_4">
+      
+      </ul>
+      <li class="__toc_level_4"><a href="#brace-expansion-syntax">Brace Expansion Syntax</a></li>
+      <ul class="__toc_list_4">
+      
+      </ul>
+      <li class="__toc_level_4"><a href="#full-path-matching">Full Path Matching</a></li>
+      <ul class="__toc_list_4">
+      
+      </ul>
+      </ul>
+      <li class="__toc_level_3"><a href="#regular-expression">Regular Expression</a></li>
+      <ul class="__toc_list_3">
+      
+      <li class="__toc_level_4"><a href="#full-path-matching_1">Full Path Matching</a></li>
+      <ul class="__toc_list_4">
+      
+      </ul>
+      </ul>
+      </ul>
+      <li class="__toc_level_2"><a href="#backrefs">Backrefs</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      </ul>
     </ul>
-  
-
-  
-    <h1 id="search-features">Search Features<a class="headerlink" href="#search-features" title="Permanent link"></a></h1>
-<h2 id="search-options">Search Options<a class="headerlink" href="#search-options" title="Permanent link"></a></h2>
+    </div>
+    </div>
+    <h1 id="search-features">Search Features</h1>
+<h2 id="search-options">Search Options</h2>
 <p>Rummage supports the default regular expression library (<a href="https://docs.python.org/3/library/re.html">Re</a>) that comes with Python and the 3<sup>rd</sup> party <a href="https://pypi.python.org/pypi/regex">Regex</a> library, and though the basic syntax and features are similar between the two, Regex provides many additional features, some of which causes the syntax to deviate greatly from Re. If you are using Re, you will not see all the options shown below. Please check out documentation for whichever engine you have chosen to learn more about its specific feature set. This documentation will only briefly cover the features that can be enabled in each engine.</p>
-<h3 id="common-options">Common Options<a class="headerlink" href="#common-options" title="Permanent link"></a></h3>
+<h3 id="common-options">Common Options</h3>
 <p>Both the Re and Regex engine have a couple of shared flags that are exposed in Rummage as checkboxes. These checkboxes are found directly under the search and replace text boxes.</p>
 <table>
 <thead>
@@ -141,7 +125,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="regex-engine-options">Regex Engine Options<a class="headerlink" href="#regex-engine-options" title="Permanent link"></a></h3>
+<h3 id="regex-engine-options">Regex Engine Options</h3>
 <p>If the Regex engine is being used for regular expressions, a couple of extra checkboxes will be available. Regex can be run in either <code>VERSION0</code> or <code>VERSION1</code> mode.</p>
 <p><code>VERSION0</code> is compatible with Re regular expression patterns and has the extra <code>fullcase</code> toggle. <code>VERSION1</code> does not have this toggle as it is enabled by default and can only be disabled inline via a pattern with <code>(?-f)</code>. <code>VERSION1</code> is not directly compatible with Re patterns as it adds a number of changes to the syntax allowing for more advanced search options.</p>
 <table>
@@ -178,7 +162,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="rummage-options">Rummage Options<a class="headerlink" href="#rummage-options" title="Permanent link"></a></h3>
+<h3 id="rummage-options">Rummage Options</h3>
 <p>Rummage has a couple of flags that are not specific to the regular expression engine.</p>
 <table>
 <thead>
@@ -219,10 +203,10 @@
 <p>It is always recommended, if you know the encoding, to use <code>Force encoding</code> as it will always be the fastest. Encoding guessing can be slow and not always accurate.</p>
 <p>Encoding guessing is performed by <code>chardet</code> which is a pure Python library and is, by far, the slowest option.  If you manually install <code>cChardet</code>, you will have a much faster guessing experience.</p>
 </div>
-<h2 id="file-patterns">File Patterns<a class="headerlink" href="#file-patterns" title="Permanent link"></a></h2>
+<h2 id="file-patterns">File Patterns</h2>
 <p><img alt="File Patterns" src="images/file_pattern.png" /></p>
 <p>Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the <code>Regex</code> checkbox beside the pattern. Wildcard patterns and regular expression patterns will each be covered separately.</p>
-<h3 id="wildcard">Wildcard<a class="headerlink" href="#wildcard" title="Permanent link"></a></h3>
+<h3 id="wildcard">Wildcard</h3>
 <p>Rummage uses file patterns and folder excludes to filter which files are searched. The default is to use wild card patterns modeled after <code>fnmatch</code> and <code>glob</code>. Below is a list of the syntax that is accepted, but not all features are enabled by default.</p>
 <p>If you would prefer regular expression file patterns, please see <a href="#regular-expression">Regular Expression</a> file patterns.</p>
 <ul>
@@ -230,7 +214,7 @@
 <li>Slashes are generally treated as normal characters, but on windows they will be normalized: <code>/</code> will become <code>\\</code>. There is no need to explicitly use <code>\\</code> in patterns on Windows, but if you do, it will be handled.</li>
 <li><code>.</code> is always matched by <code>*</code>, <code>?</code>, <code>[]</code>, and extended patterns such as <code>*(...)</code>. Use enable searching hidden files in the <a href="usage.html#limit-panel">Limit Panel</a>.</li>
 </ul>
-<h4 id="basic-wildcard-syntax">Basic Wildcard syntax<a class="headerlink" href="#basic-wildcard-syntax" title="Permanent link"></a></h4>
+<h4 id="basic-wildcard-syntax">Basic Wildcard syntax</h4>
 <p>Rummage uses the <a href="https://github.com/facelessuser/wcmatch"><code>wcmatch</code></a> library to implement a specialized version of <a href="https://facelessuser.github.io/wcmatch/fnmatch/#syntax"><code>fnmatch</code></a> wildcard patterns for file name matching.</p>
 <table>
 <thead>
@@ -338,7 +322,7 @@
 
 <p>If you need to escape <code>-</code> or <code>|</code>, you can put them in a sequence: <code>[-|]</code>. Remember to place <code>-</code> at the beginning of a sequence as <code>-</code> is also used to specify character ranges: <code>[a-z]</code>.</p>
 </div>
-<h4 id="extended-match-syntax">Extended Match Syntax<a class="headerlink" href="#extended-match-syntax" title="Permanent link"></a></h4>
+<h4 id="extended-match-syntax">Extended Match Syntax</h4>
 <p>In <a href="preferences.html#search">Preferences</a>, you can also enable extended match patterns. Extended match patterns allow you to provide pattern lists to provide more advanced logic.</p>
 <table>
 <thead>
@@ -385,7 +369,7 @@
 </pre></div>
 
 </div>
-<h4 id="brace-expansion-syntax">Brace Expansion Syntax<a class="headerlink" href="#brace-expansion-syntax" title="Permanent link"></a></h4>
+<h4 id="brace-expansion-syntax">Brace Expansion Syntax</h4>
 <p>In <a href="preferences.html#search">Preferences</a>, you can enables Bash style brace expansion.</p>
 <p>Brace expansion is applied before anything else. When applied, a pattern will be expanded into multiple patterns. Each pattern will then be parsed separately.</p>
 <p>This is great for specifying complex combinations of patterns: <code>a{b,{c,d}}</code> &rarr; <code>ab ac ad</code>. Since each brace will generate a separate pattern for each combination that Rummage must evaluate. For simple patterns, it may make more sense to use extended match patterns which will only generate a single pattern: <code>@(ab|ac|ad)</code>.</p>
@@ -418,7 +402,7 @@
 <li><code>{a..e..2}</code> &rarr; <code>a c e</code></li>
 </ul>
 </div>
-<h4 id="full-path-matching">Full Path Matching<a class="headerlink" href="#full-path-matching" title="Permanent link"></a></h4>
+<h4 id="full-path-matching">Full Path Matching</h4>
 <p>In <a href="preferences.html#search">Preferences</a>, you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.</p>
 <p>Assuming you Provided a base folder to search of <code>/My/base/path</code>, and you were to match a file <code>/My/base/path/some/file.txt</code>, normally your file pattern would match against <code>file.txt</code>, but with full path enabled, you'd match against <code>some/file.txt</code>. This means you'd have to use pattern like <code>*/*.txt</code> instead of <code>*.txt</code>.</p>
 <p>When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in <code>[]</code>, <code>*</code>, <code>?</code>, or extended patterns like <code>*(...)</code>. Slashes can be matched by <code>**</code> if globstar (<code>**</code>) is enabled in <a href="preferences.html#search">Preferences</a>.</p>
@@ -436,31 +420,23 @@
 </tr>
 </tbody>
 </table>
-<h3 id="regular-expression">Regular Expression<a class="headerlink" href="#regular-expression" title="Permanent link"></a></h3>
+<h3 id="regular-expression">Regular Expression</h3>
 <p>Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the <code>Regex</code> checkbox beside the pattern. The regular expression engine set in <a href="preferences.html#search">Preferences</a> is what will be used for file patterns. It will also respect the case sensitivity setting in <a href="preferences.html#search">Preferences</a> for <strong>File/Folder Matching</strong>.</p>
-<h4 id="full-path-matching_1">Full Path Matching<a class="headerlink" href="#full-path-matching_1" title="Permanent link"></a></h4>
+<h4 id="full-path-matching_1">Full Path Matching</h4>
 <p>In <a href="preferences.html#search">Preferences</a>, you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.</p>
 <p>Assuming you Provided a base folder to search of <code>/My/base/path</code>, and you were to match a file <code>/My/base/path/some/file.txt</code>, normally your file pattern would match against <code>file.txt</code>, but with full path enabled, you'd match against <code>some/file.txt</code>. This means you'd have to use pattern like <code>.*/.*.txt</code> instead of <code>.*.txt</code>.</p>
-<h2 id="backrefs">Backrefs<a class="headerlink" href="#backrefs" title="Permanent link"></a></h2>
+<h2 id="backrefs">Backrefs</h2>
 <p>Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official <a href="http://facelessuser.github.io/backrefs/">Backrefs documentation</a>. You can enable extended back references in the <a href="preferences.html#search">Preferences</a> dialog.</p>
-  
   </div>
 
   <!-- Navigation -->
-  
 
     <div class="nav">
-      
         <a href="usage.html" class="prev-page" title="Basic Usage">&#8592; Prev</a>
-      
 
       <a href="./sitemap.html">Home</a>
-
-      
         <a href="preferences.html" class="next-page" title="Settings"/>Next &#8594;</a>
-      
     </div>
-  
 
 </body>
 </html>

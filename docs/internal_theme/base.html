@@ -12,17 +12,25 @@
   <link rel="stylesheet" href="{{ "css/theme.css"|url }}">
 
   <!-- Extra CSS -->
-  {% for path in config.extra_css %}
+  {%- for path in config.extra_css %}
     <link href="{{ path|url }}" rel="stylesheet">
-  {% endfor %}
+  {%- endfor %}
 
-  {% block extrahead %}
-  {% endblock %}
+  {%- if page.next_page or page.previous_page %}
+  <style>
+  .markdown {
+    padding-left: 24px;
+  }
+  {%- endif %}
+  </style>
+
+  {%- block extrahead %}
+  {%- endblock %}
 
   <!-- JavaScript -->
-  {% for path in config.extra_javascript %}
+  {%- for path in config.extra_javascript %}
     <script src="{{ path|url }}"></script>
-  {% endfor %}
+  {%- endfor %}
 
 </head>
 
@@ -32,64 +40,45 @@
   <div class="markdown">
 
   <!-- Table of Content (Don't show for static sites) -->
-  {% if page.next_page or page.previous_page %}
-    <h2>Table of Contents</h2>
-    <ul>
-    {% for toc_item in page.toc %}
-      <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
-      <ul>
-      {% for toc_item in toc_item.children %}
-        <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
-        <ul>
-        {% for toc_item in toc_item.children %}
-          <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
-          <ul>
-          {% for toc_item in toc_item.children %}
-            <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
-            <ul>
-            {% for toc_item in toc_item.children %}
-              <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
-              <ul>
-              {% for toc_item in toc_item.children %}
-                <li class="__toc_level_{{toc_item.level}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
-              {% endfor %}
-              </ul>
-            {% endfor %}
-            </ul>
-          {% endfor %}
-          </ul>
-        {% endfor %}
-        </ul>
-      {% endfor %}
+  {%- if page.next_page or page.previous_page %}
+    <div class="__toc_wrapper"><span class="__toc_icon"></span>
+    <div class="__toc_content">
+    <ul class="__toc_list">
+    {%- for toc_item in page.toc recursive %}
+      <li class="__toc_level_{{toc_item.level + 1}}"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+      <ul class="__toc_list_{{toc_item.level + 1}}">
+      {{loop(toc_item.children)}}
       </ul>
-    {% endfor %}
+    {%- endfor %}
     </ul>
-  {% endif %}
+    </div>
+    </div>
+  {%- endif %}
 
-  {% block content %}
+  {%- block content %}
     {{ page.content }}
-  {% endblock %}
+  {%- endblock %}
   </div>
 
   <!-- Navigation -->
-  {% if page.next_page or page.previous_page %}
+  {%- if page.next_page or page.previous_page %}
 
     <div class="nav">
-      {% if page.previous_page %}
+      {%- if page.previous_page %}
         <a href="{{ page.previous_page.url|url }}" class="prev-page" title="{{ page.previous_page.title }}">&#8592; Prev</a>
-      {% else %}
+      {%- else %}
         <span class="prev-page">&#8592; Prev</span>
-      {% endif %}
+      {%- endif %}
 
       <a href="./sitemap.html">Home</a>
 
-      {% if page.next_page %}
+      {%- if page.next_page %}
         <a href="{{ page.next_page.url|url }}" class="next-page" title="{{ page.next_page.title }}"/>Next &#8594;</a>
-      {% else %}
+      {%- else %}
         <span class="next-page">Next &#8594;</span>
-      {% endif %}
+      {%- endif %}
     </div>
-  {% endif %}
+  {%- endif %}
 
 </body>
 </html>

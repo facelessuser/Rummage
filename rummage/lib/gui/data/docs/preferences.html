@@ -12,13 +12,13 @@
   <link rel="stylesheet" href="css/theme.css">
 
   <!-- Extra CSS -->
-  
-
-  
-  
+  <style>
+  .markdown {
+    padding-left: 24px;
+  }
+  </style>
 
   <!-- JavaScript -->
-  
 
 </head>
 
@@ -28,68 +28,56 @@
   <div class="markdown">
 
   <!-- Table of Content (Don't show for static sites) -->
-  
-    <h2>Table of Contents</h2>
-    <ul>
-    
-      <li class="__toc_level_0"><a href="#settings">Settings</a></li>
-      <ul>
+    <div class="__toc_wrapper"><span class="__toc_icon"></span>
+    <div class="__toc_content">
+    <ul class="__toc_list">
+      <li class="__toc_level_1"><a href="#settings">Settings</a></li>
+      <ul class="__toc_list_1">
       
-        <li class="__toc_level_1"><a href="#overview">Overview</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#general">General</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#search">Search</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#encoding">Encoding</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#editor">Editor</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#notifications">Notifications</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#history">History</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#backups">Backups</a></li>
-        <ul>
-        
-        </ul>
-      
-        <li class="__toc_level_1"><a href="#importexport-settings">Import/Export Settings</a></li>
-        <ul>
-        
-        </ul>
+      <li class="__toc_level_2"><a href="#overview">Overview</a></li>
+      <ul class="__toc_list_2">
       
       </ul>
-    
+      <li class="__toc_level_2"><a href="#general">General</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#search">Search</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#encoding">Encoding</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#editor">Editor</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#notifications">Notifications</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#history">History</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#backups">Backups</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      <li class="__toc_level_2"><a href="#importexport-settings">Import/Export Settings</a></li>
+      <ul class="__toc_list_2">
+      
+      </ul>
+      </ul>
     </ul>
-  
-
-  
-    <h1 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link"></a></h1>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link"></a></h2>
+    </div>
+    </div>
+    <h1 id="settings">Settings</h1>
+<h2 id="overview">Overview</h2>
 <p>The preference dialog is found in the menu at <strong>File&rarr;Preferences</strong> and contains all of the global options that can be controlled for the editor.</p>
-<h2 id="general">General<a class="headerlink" href="#general" title="Permanent link"></a></h2>
+<h2 id="general">General</h2>
 <p><img alt="Preferences: General" src="images/settings_general.png" /></p>
 <p>The <strong>General</strong> tab contains a couple of useful settings.</p>
 <dl>
@@ -110,7 +98,7 @@
 <dt>International Time</dt>
 <dd>Rummage displays file creation and modified time in the form <code>Jul 01, 2018, 03:00:00 AM</code>, but you can enable this option to display the times in international format: <code>2018-07-01 03:00:00</code>.</dd>
 </dl>
-<h2 id="search">Search<a class="headerlink" href="#search" title="Permanent link"></a></h2>
+<h2 id="search">Search</h2>
 <p><img alt="Preferences: Regex" src="images/settings_search.png" /></p>
 <p>The <strong>Regular Expression Modules</strong> panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if the Regex module is installed in your Python installation, it can be selected instead.  There is also the option of using Re or Regex with <a href="search.html#backrefs">Backrefs</a> (a wrapper that adds a couple of special escapes and features).</p>
 <p>If using Regex, you can set it to the version of your choice. <code>V0</code> tries to be completely compatible with Re patterns with non-breaking additional features, while <code>V1</code> breaks compatibility with Re and adds even more useful features. Please see <a href="https://pypi.python.org/pypi/regex">Regex documentation</a> to learn more.</p>
@@ -123,12 +111,12 @@
 <li><a href="search.html#full-path-matching">Full path directory matching</a>.</li>
 <li><a href="search.html#full-path-matching_1">Full path file matching</a>.</li>
 </ul>
-<h2 id="encoding">Encoding<a class="headerlink" href="#encoding" title="Permanent link"></a></h2>
+<h2 id="encoding">Encoding</h2>
 <p><img alt="Preferences: Encoding" src="images/settings_encoding.png" /></p>
 <p>The <strong>Encoding</strong> panel is where you can tweak encoding detection. You can change the default encoding detection used (assuming you have both Chardet and cChardet installed). By default, Rummage will use the fastest (cChardet).</p>
 <p>Special encoding file type considerations are also exposed here. File extensions assigned to either HTML, XML, or Python will use special logic to look for encoding declarations in the file's header, while file extensions assigned to binary will shortcut the encoding selection to binary. Just double click the file type whose extensions you would like to modify.</p>
 <p>Remember that encoding detection is far from bulletproof and can pick an incorrect encoding. While during searches it might not be as big an issue, it is strongly suggested you use a forced encoding when performing replaces.</p>
-<h2 id="editor">Editor<a class="headerlink" href="#editor" title="Permanent link"></a></h2>
+<h2 id="editor">Editor</h2>
 <p><img alt="Preferences: Editor" src="images/settings_editor.png" /></p>
 <p>The <strong>Editor</strong> panel allows you to configure the editor that will be used to open files.  To setup, simply enter the path to the editor and the options it should be called with. Once done, press the save button.</p>
 <p>As noted in the image above, Rummage provides 3 special variables that can be used to insert the file name, line number, or column number.</p>
@@ -154,7 +142,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="notifications">Notifications<a class="headerlink" href="#notifications" title="Permanent link"></a></h2>
+<h2 id="notifications">Notifications</h2>
 <p><img alt="Preferences: Notifications" src="images/settings_notify.png" /></p>
 <p>The <strong>Notification</strong> panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.</p>
 <p>You can also select whether to use the system's built-in notifications or Growl.</p>
@@ -191,13 +179,13 @@
 </ul>
 </dd>
 </dl>
-<h2 id="history">History<a class="headerlink" href="#history" title="Permanent link"></a></h2>
+<h2 id="history">History</h2>
 <p><img alt="Preferences: History" src="images/settings_history.png" /></p>
 <p>The <strong>History</strong> panel is where all text box, drop down history can be cleared.</p>
-<h2 id="backups">Backups<a class="headerlink" href="#backups" title="Permanent link"></a></h2>
+<h2 id="backups">Backups</h2>
 <p><img alt="Preferences: Backups" src="images/settings_backup.png" /></p>
 <p>The <strong>Backups</strong> panel allows you to configure where Rummage creates backups. You can control whether backups are all placed in the same folder as the original source, or if they are put into a subfolder. You can also configure the name of the subfolder used or the extension used when not writing to a subfolder.</p>
-<h2 id="importexport-settings">Import/Export Settings<a class="headerlink" href="#importexport-settings" title="Permanent link"></a></h2>
+<h2 id="importexport-settings">Import/Export Settings</h2>
 <p>If desired, Rummage's settings can be exported to a <abbr title="JavaScript Object Notation">JSON</abbr> file or imported from a <abbr title="JavaScript Object Notation">JSON</abbr> file.  This can be particularly useful for importing regular expression patterns from one system into another system's existing regular expression list. This can also be useful if you have a lot of regular expression patterns you wish to create, and it would be too cumbersome to do it through the GUI.  In the latter case, you could construct the pattern configurations in a <abbr title="JavaScript Object Notation">JSON</abbr> file and import all the patterns in one shot.</p>
 <p>Import and export are broken up into three types of settings: general settings, chains, and searches. General settings are the basic feature configurations for Rummage.  Chains contains all of your configured pattern chains.  And searches is the actual configured search and replaces.  When exporting, you will be presented with a dialog allowing you to select which categories of settings you wish to export.</p>
 <p><img alt="Settings: Export" src="images/settings_export.png" /></p>
@@ -296,24 +284,16 @@
 </tr>
 </tbody>
 </table>
-  
   </div>
 
   <!-- Navigation -->
-  
 
     <div class="nav">
-      
         <a href="search.html" class="prev-page" title="Search Features">&#8592; Prev</a>
-      
 
       <a href="./sitemap.html">Home</a>
-
-      
         <a href="extras.html" class="next-page" title="Extras"/>Next &#8594;</a>
-      
     </div>
-  
 
 </body>
 </html>
