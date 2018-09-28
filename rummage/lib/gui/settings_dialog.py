@@ -528,12 +528,19 @@ class SettingsDialog(gui.SettingsDialog):
         ltype = util.link_type(url)
         if ltype == util.BLANK_LINK:
             self.busy = True
+        # We don't handle links outside of a "blank" (HTML string) page.
+        # This mainly occurs on Windows.
+        elif url.startswith('about:'):
+            self.busy = False
+            event.Veto()
+        # 'Nix systems treat "blank" (HTML string) pages as root paths most of the time.
+        # So if we get `file:///` that is not empty and not linking to a target, we are
+        # Linking outside or page, but not to an external site.
+        elif not (url == 'file:///' or url.startswith('file:///#')):
+            self.busy = False
+            event.Veto()
         elif ltype == util.HTML_LINK:
-            if url.startswith('about:'):
-                self.busy = False
-                event.Veto()
-            else:
-                self.busy = True
+            self.busy = True
         # Send URL links to browser
         elif ltype == util.URL_LINK:
             debug('external')
