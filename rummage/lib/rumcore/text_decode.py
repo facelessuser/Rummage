@@ -238,7 +238,7 @@ def _has_py_encode(content):
     # it is without a doubt encoded for use with python, but that may not be
     # the case.
     if encode is None:
-        encode = Encoding('ascii', None)
+        encode = Encoding('utf-8', None)
     return encode
 
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.3.1
+
+- **FIX**: Python file encoding detection should default to the Python 3 assumed default, not Python 2.
+
 ## 4.3.0
 
 - **NEW**: Documents are now included locally in installation and can be viewed directly in Rummage via a webview dialog.
