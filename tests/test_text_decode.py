@@ -363,6 +363,7 @@ class TestPyEncodingGuess(_Encoding):
     def test_py_default_ascii_file(self):
         """Test default Python file."""
 
+        # Python 3 default is UTF-8.
         self.guess(
             'ascii.py',
             content=self.dedent(
@@ -370,7 +371,7 @@ class TestPyEncodingGuess(_Encoding):
                 """Python test file example without utf8 chars."""
                 '''
             ).encode('ascii'),
-            encoding='ascii'
+            encoding='utf-8'
         )
 
     def test_py_with_encode_string(self):
@@ -403,7 +404,7 @@ class TestPyEncodingGuess(_Encoding):
         )
 
     def test_py_with_no_encode_string(self):
-        """Test Python file with no encode string, but non ASCII encoding."""
+        """Test Python file with no encode string, but not the default encoding either."""
 
         self.guess(
             'no_encode_string.py',
@@ -411,7 +412,7 @@ class TestPyEncodingGuess(_Encoding):
                 '''
                 """Python test file exámple with utf8 chárs."""
                 '''
-            ).encode('utf-8'),
+            ).encode('cp1252'),
             encoding='bin'
         )
 
@@ -432,6 +433,7 @@ class TestPyEncodingGuess(_Encoding):
     def test_py_with_bad_encode_string(self):
         """Test Python file with bad encode string."""
 
+        # Should fallback to the default UTF-8
         self.guess(
             'bad_encoding.py',
             content=self.dedent(
@@ -439,8 +441,8 @@ class TestPyEncodingGuess(_Encoding):
                 # -*- coding: utf-fake -*-
                 """Python test file with bad encode string."""
                 '''
-            ).encode('utf-8'),
-            encoding='ascii'
+            ).encode('cp1252'),
+            encoding='utf-8'
         )
 
 
