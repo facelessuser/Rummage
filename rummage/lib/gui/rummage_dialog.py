@@ -2464,7 +2464,7 @@ class RummageFrame(gui.RummageFrame):
         )
 
         dlg = html_dialog.HTMLDialog(
-            self, md, title, content_type=html_dialog.MARKDOWN_STRING, min_width=400, min_height=350
+            self, md, title, content_type=html_dialog.webview.MARKDOWN_STRING, min_width=400, min_height=350
         )
         dlg.ShowModal()
         dlg.Destroy()

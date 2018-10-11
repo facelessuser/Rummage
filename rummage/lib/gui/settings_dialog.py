@@ -32,7 +32,7 @@ from . import notify
 from .. import rumcore
 from .. import util
 from .app.custom_app import debug
-from .html_dialog import convert_markdown
+from .controls import webview
 
 EDITOR_HELP = _("""
 Enter in the appropriate command to open files in your editor.
@@ -60,13 +60,14 @@ MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
 
 
-class SettingsDialog(gui.SettingsDialog):
+class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
     """SettingsDialog."""
 
     def __init__(self, parent):
         """Init SettingsDialog object."""
 
         super(SettingsDialog, self).__init__(parent)
+        self.setup_html(self.m_help_html)
         if util.platform() == "windows":
             self.m_general_panel.SetDoubleBuffered(True)
             self.m_search_panel.SetDoubleBuffered(True)
@@ -83,9 +84,6 @@ class SettingsDialog(gui.SettingsDialog):
         self.set_keybindings(
             [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
-        self.m_help_html.Bind(wx.html2.EVT_WEBVIEW_NAVIGATING, self.on_navigate)
-        self.m_help_html.Bind(wx.html2.EVT_WEBVIEW_LOADED, self.on_loaded)
-        self.busy = False
 
         self.history_types = [
             "target",
@@ -288,14 +286,7 @@ class SettingsDialog(gui.SettingsDialog):
     def load_help(self, text):
         """Handle copy event."""
 
-        html = convert_markdown('Editor Settings', text)
-        self.busy = True
-        self.m_help_html.SetPage(html, 'file:///')
-        if util._PLATFORM == "windows":
-            # Ugh.  Why can't things just work
-            # Here we must reload the page so that things render properly.
-            # This was done to fix poorly rendered pages observed in Windows.
-            self.m_help_html.Reload()
+        self.load_html(self.m_help_html, text, 'Editor Settings', webview.MARKDOWN_STRING)
 
     def set_keybindings(self, keybindings):
         """Set keybindings for frame."""
@@ -510,48 +501,6 @@ class SettingsDialog(gui.SettingsDialog):
                 self.m_encoding_list.SetItem(item, 1, value)
                 self.reload_list()
         event.Skip()
-
-    def on_loaded(self, event):
-        """Handle laoded event."""
-
-        self.busy = False
-
-    def on_navigate(self, event):
-        """Handle links."""
-
-        target = event.GetTarget()
-        url = event.GetURL()
-        debug("HTML Nav URL: " + url)
-        debug("HTML Nav Target: " + target)
-
-        # Things we can allow the backend to handle (local HTML files)
-        ltype = util.link_type(url)
-        if ltype == util.BLANK_LINK:
-            self.busy = True
-        # We don't handle links outside of a "blank" (HTML string) page.
-        # This mainly occurs on Windows.
-        elif url.startswith('about:'):
-            self.busy = False
-            event.Veto()
-        # 'Nix systems treat "blank" (HTML string) pages as root paths most of the time.
-        # So if we get `file:///` that is not empty and not linking to a target, we are
-        # Linking outside or page, but not to an external site.
-        elif not (url == 'file:///' or url.startswith('file:///#')):
-            self.busy = False
-            event.Veto()
-        elif ltype == util.HTML_LINK:
-            self.busy = True
-        # Send URL links to browser
-        elif ltype == util.URL_LINK:
-            debug('external')
-            webbrowser.open_new_tab(url)
-            self.busy = False
-            event.Veto()
-        # Show unhandled links
-        else:
-            debug("HTML unhandled link: " + url)
-            self.busy = False
-            event.Veto()
 
     def on_change_module(self, event):
         """Change the module."""
