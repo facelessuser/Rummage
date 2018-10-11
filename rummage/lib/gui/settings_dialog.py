@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import wx
 import re
 import json
-import webbrowser
 from .settings import Settings
 from .file_ext_dialog import FileExtDialog
 from .generic_dialogs import errormsg
@@ -31,7 +30,6 @@ from . import gui
 from . import notify
 from .. import rumcore
 from .. import util
-from .app.custom_app import debug
 from .controls import webview
 
 EDITOR_HELP = _("""

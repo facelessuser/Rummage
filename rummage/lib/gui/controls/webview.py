@@ -98,7 +98,7 @@ EXTENSION_CONFIGS = {
 
 # No need to use `base64` as `pathconverter` issues have been fixed in version 6.0.0
 if not PMDX6:
-    EXTENSION_CONFIGS["pymdownx.b64"] =  {
+    EXTENSION_CONFIGS["pymdownx.b64"] = {
         "base_path": os.path.join(data.RESOURCE_PATH, 'docs')
     }
 
