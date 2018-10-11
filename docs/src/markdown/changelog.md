@@ -3,6 +3,7 @@
 ## 4.3.1
 
 - **FIX**: Python file encoding detection should default to the Python 3 assumed default, not Python 2.
+- **FIX**: Consolidate internal HTML logic and avoid using base 64 encoded images if using latest Markdown extensions that include path conversion fix.
 
 ## 4.3.0
 
