@@ -1070,7 +1070,6 @@ class RummageFrame(gui.RummageFrame):
 
         # Remove errors icon in status bar
         if self.error_dlg is not None:
-            self.error_dlg.m_error_list.destroy()
             self.error_dlg.Destroy()
             self.error_dlg = None
         self.m_statusbar.remove_icon("errors")
@@ -2244,7 +2243,6 @@ class RummageFrame(gui.RummageFrame):
             self.doc_dlg.Destroy()
             self.doc_dlg = None
         if self.error_dlg is not None:
-            self.error_dlg.m_error_list.destroy()
             self.error_dlg.Destroy()
             self.error_dlg = None
         self.m_result_list.destroy()

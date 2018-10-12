@@ -19,6 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
+import wx
 from .app.custom_app import error
 from .error_text_dialog import ErrorTextDialog
 from .localization import _
@@ -32,6 +33,7 @@ class SearchErrorDialog(gui.SearchErrorDialog):
         """Init LoadSearchDialog."""
 
         super(SearchErrorDialog, self).__init__(parent)
+        self.Bind(wx.EVT_WINDOW_DESTROY, self.on_destroy)
         self.localize()
         self.refresh_localization()
 
@@ -75,3 +77,9 @@ class SearchErrorDialog(gui.SearchErrorDialog):
             self.m_error_list.set_item_map("%d" % count, e.error, name)
             count += 1
         self.m_error_list.load_list(True)
+
+    def on_destroy(self, event):
+        """Handle on destroy events."""
+
+        self.m_error_list.destroy()
+        event.Skip()
