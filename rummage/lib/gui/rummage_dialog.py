@@ -73,7 +73,6 @@ PostResizeEvent, EVT_POST_RESIZE = wx.lib.newevent.NewEvent()
 _LOCK = threading.Lock()
 _RESULTS = []
 _COMPLETED = 0
-_TOTAL = 0
 _RECORDS = 0
 _SKIPPED = 0
 _ERRORS = []
@@ -197,12 +196,11 @@ class RummageThread(threading.Thread):
         """Update status."""
 
         global _COMPLETED
-        global _TOTAL
         global _RECORDS
         global _SKIPPED
 
         with _LOCK:
-            _COMPLETED, _TOTAL, _SKIPPED, _RECORDS = self.rummage.get_status()
+            _COMPLETED, _SKIPPED, _RECORDS = self.rummage.get_status()
             _RECORDS -= self.no_results
 
     def done(self):
@@ -215,20 +213,18 @@ class RummageThread(threading.Thread):
 
         global _RESULTS
         global _COMPLETED
-        global _TOTAL
         global _RECORDS
         global _ERRORS
         global _SKIPPED
         with _LOCK:
             _RESULTS = []
             _COMPLETED = 0
-            _TOTAL = 0
             _RECORDS = 0
             _SKIPPED = 0
             _ERRORS = []
         for f in self.rummage.find():
             with _LOCK:
-                if hasattr(f, 'skipped') and f.skipped:
+                if isinstance(f, rumcore.FileAttrRecord) and f.skipped:
                     self.no_results += 1
                 elif f.error is None and (self.file_search or f.match is not None):
                     _RESULTS.append(f)
@@ -491,9 +487,9 @@ class RummageFrame(gui.RummageFrame):
         self.ERR_IMPORT = _("There was an error attempting to read the settings file!")
 
         # Status
-        self.INIT_STATUS = _("Searching: 0/0 [ACTIVE] Skipped: 0 Matches: 0")
-        self.UPDATE_STATUS = _("Searching: %d/%d [ACTIVE] Skipped: %d Matches: %d")
-        self.FINAL_STATUS = _("Searching: %d/%d [DONE] Skipped: %d Matches: %d Benchmark: %s")
+        self.INIT_STATUS = _("Searched: 0 Skipped: 0 Matches: 0")
+        self.UPDATE_STATUS = _("Searched: %d Skipped: %d Matches: %d")
+        self.FINAL_STATUS = _("Searched: %d Skipped: %d Matches: %d Benchmark: %s")
 
         # Status bar popup
         self.SB_ERRORS = _("errors")
@@ -1074,6 +1070,7 @@ class RummageFrame(gui.RummageFrame):
 
         # Remove errors icon in status bar
         if self.error_dlg is not None:
+            self.error_dlg.m_error_list.destroy()
             self.error_dlg.Destroy()
             self.error_dlg = None
         self.m_statusbar.remove_icon("errors")
@@ -1578,17 +1575,17 @@ class RummageFrame(gui.RummageFrame):
             self.checking = True
             is_complete = self.thread.done()
             debug("Processing current results")
+            results = []
             with _LOCK:
                 completed = _COMPLETED
-                total = _TOTAL
                 records = _RECORDS
                 skipped = _SKIPPED
-            count = self.count
-            if records > count or not is_complete:
-                with _LOCK:
+                count = self.count
+                if records > count:
                     results = _RESULTS[0:records - count]
                     del _RESULTS[0:records - count]
-                count = self.update_table(count, completed, total, skipped, *results)
+            if results or not is_complete:
+                count = self.update_table(count, *results)
                 if (self.thread.benchmark - self.last_update) > 1.0:
                     self.m_result_file_list.load_list()
                     self.m_result_list.load_list()
@@ -1596,15 +1593,15 @@ class RummageFrame(gui.RummageFrame):
                     # self.m_result_list.Refresh()
                     self.thread.update_benchmark()
                     self.last_update = self.thread.benchmark
-            else:
-                self.m_statusbar.set_status(
-                    self.UPDATE_STATUS % (
-                        completed,
-                        total,
-                        skipped,
-                        count
+
+                    self.m_statusbar.set_status(
+                        self.UPDATE_STATUS % (
+                            completed,
+                            skipped,
+                            count
+                        )
                     )
-                )
+
             self.count = count
 
             # Run is finished or has been terminated
@@ -1641,12 +1638,12 @@ class RummageFrame(gui.RummageFrame):
                 self.m_statusbar.set_status(
                     self.FINAL_STATUS % (
                         completed,
-                        total,
                         skipped,
                         count,
                         benchmark
                     )
                 )
+
                 if Settings.get_notify():
                     message_type = 'error' if kill else 'info'
                     getattr(notify, message_type)(
@@ -1659,10 +1656,9 @@ class RummageFrame(gui.RummageFrame):
 
             self.checking = False
 
-    def update_table(self, count, done, total, skipped, *results):
+    def update_table(self, count, *results):
         """Update the result lists with current search results."""
 
-        actually_done = done - 1 if done > 0 else 0
         for f in results:
             self.m_result_file_list.set_match(f, self.no_pattern)
             if (self.is_count_only or self.is_boolean or self.payload['chain'].is_replace() or self.no_pattern):
@@ -1672,16 +1668,6 @@ class RummageFrame(gui.RummageFrame):
             self.m_result_list.set_match(f)
             count += 1
 
-        self.m_statusbar.set_status(
-            self.UPDATE_STATUS % (
-                (
-                    actually_done,
-                    total,
-                    skipped,
-                    count
-                ) if total != 0 else (0, 0, 0, 0)
-            )
-        )
         return count
 
     def validate_search_inputs(self, replace=False, chain=None):
@@ -2210,7 +2196,6 @@ class RummageFrame(gui.RummageFrame):
         event.Skip()
         if self.error_dlg is not None:
             self.error_dlg.ShowModal()
-            self.error_dlg.Close()
 
     def on_regex_search_toggle(self, event):
         """Switch literal/regex history depending on toggle state."""
@@ -2259,6 +2244,7 @@ class RummageFrame(gui.RummageFrame):
             self.doc_dlg.Destroy()
             self.doc_dlg = None
         if self.error_dlg is not None:
+            self.error_dlg.m_error_list.destroy()
             self.error_dlg.Destroy()
             self.error_dlg = None
         self.m_result_list.destroy()
