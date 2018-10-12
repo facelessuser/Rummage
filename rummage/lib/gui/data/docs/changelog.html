@@ -29,6 +29,11 @@
 <ul>
 <li><strong>FIX</strong>: Python file encoding detection should default to the Python 3 assumed default, not Python 2.</li>
 <li><strong>FIX</strong>: Consolidate internal HTML logic and avoid using base 64 encoded images if using latest Markdown extensions that include path conversion fix.</li>
+<li><strong>FIX</strong>: Refresh status less to improve on overall speed.</li>
+<li><strong>FIX</strong>: Simplify status: no need to display <code>ACITVE</code> or <code>DONE</code> as button will change back to <code>Search</code> to signify completion along with the display of the <code>Benchmark</code> or even the notification if enabled.</li>
+<li><strong>FIX</strong>: Ensure single file search with no pattern works like multi-file search with no pattern (just return file).</li>
+<li><strong>FIX</strong>: Minor cleanup and performance increase in core.</li>
+<li><strong>FIX</strong>: When search error dialog is shown from the status bar, fix error with window destruction.</li>
 </ul>
 <h2 id="430">4.3.0</h2>
 <ul>

@@ -2553,17 +2553,9 @@ class SearchErrorDialog ( wx.Dialog ):
         self.Layout()
         
         self.Centre( wx.BOTH )
-        
-        # Connect Events
-        self.Bind( wx.EVT_CLOSE, self.on_close )
     
     def __del__( self ):
         pass
-    
-    
-    # Virtual event handlers, overide them in your derived class
-    def on_close( self, event ):
-        event.Skip()
     
 
 ###########################################################################

@@ -1353,8 +1353,6 @@ class Rummage(object):
         self.path_walker = None
         self.is_binary = False
         self.files = deque()
-        self.queue = deque()
-        self.file_error = None
 
         # Initialize search objects:
         # - _DirWalker for if target is a folder
@@ -1391,14 +1389,16 @@ class Rummage(object):
                     )
                 )
             except Exception:
-                self.file_error = FileAttrRecord(
-                    self.target,
-                    None,
-                    None,
-                    None,
-                    None,
-                    False,
-                    get_exception()
+                self.files.append(
+                    FileAttrRecord(
+                        self.target,
+                        None,
+                        None,
+                        None,
+                        None,
+                        False,
+                        get_exception()
+                    )
                 )
         elif self.buffer_input:
             self.files.append(
@@ -1440,7 +1440,8 @@ class Rummage(object):
 
     def get_status(self):
         """Return number of files searched out of current number of files crawled."""
-        return self.idx + 1, self.idx + 1 + len(self.files), self.skipped, self.records + 1
+
+        return self.idx + 1, self.skipped, self.records + 1
 
     def kill(self):
         """Kill process."""
@@ -1454,26 +1455,9 @@ class Rummage(object):
     def _get_next_file(self):
         """Get the next file from the file crawler results."""
 
-        file_info = self.files.popleft() if self.path_walker is None else None
-        if file_info is None:
-            if not self.abort:
-                self.idx += 1
-                file_info = self.files.popleft()
-        else:
-            self.idx += 1
-
+        self.idx += 1
+        file_info = self.files.popleft()
         return file_info
-
-    def _drain_records(self):
-        """Grab all current records."""
-
-        while len(self.queue) and (self.max is None or self.max != 0):
-            record = self.queue.popleft()
-            if record.error is None:
-                self.records += 1
-                if self.max is not None and record.match is not None:
-                    self.max -= 1
-            yield record
 
     def search_file(self, content_buffer=None):
         """Search file."""
@@ -1510,7 +1494,7 @@ class Rummage(object):
         folder_limit = 100
 
         for f in self.path_walker.imatch():
-            if hasattr(f, 'skipped') and f.skipped:
+            if isinstance(f, FileAttrRecord) and f.skipped:
                 self.idx += 1
                 self.records += 1
                 self.skipped += 1
@@ -1525,11 +1509,10 @@ class Rummage(object):
             if self.abort:
                 self.files.clear()
 
-            # Search 50 for every 100
             if len(self.files) >= folder_limit:
-
-                for x in range(0, 50):
-
+                count = folder_limit
+                while count and not self.abort:
+                    count -= 1
                     for rec in self.search_file():
                         yield rec
 
@@ -1554,30 +1537,34 @@ class Rummage(object):
         self.idx = -1
         self.skipped = 0
 
-        if len(self.search_params):
-            if self.file_error is not None:
-                # Single target wasn't set up right; just return error.
-                yield self.file_error
-            elif len(self.files):
-                # Single target search (already set up); just search the file.
+        if len(self.files):
+            # Single target
+            if len(self.search_params):
+                # Search the file
                 for result in self.search_file(self.target if self.buffer_input else None):
                     yield result
             else:
+                # Single file with no search pattern, so just return the file
+                self.records += 1
+                yield self._get_next_file()
+        else:
+            # Directory to crawl
+            if len(self.search_params):
                 # Crawl directory and search files.
                 try:
                     for result in self.walk_files():
                         yield result
                 except Exception:  # pragma: no cover
                     yield ErrorRecord(get_exception())
-        else:
-            # No search pattern, so just return files that *would* be searched.
-            for f in self.path_walker.imatch():
-                self.idx += 1
-                self.records += 1
-                if hasattr(f, 'skipped') and f.skipped:
-                    self.skipped += 1
-                yield f
+            else:
+                # No search pattern, so just return files that *would* be searched.
+                for f in self.path_walker.imatch():
+                    self.idx += 1
+                    self.records += 1
+                    if isinstance(f, FileAttrRecord) and f.skipped:
+                        self.skipped += 1
+                    yield f
 
                 if self.abort:
                     self.files.clear()
-            self.skipped = self.path_walker.get_skipped()
+                self.skipped = self.path_walker.get_skipped()

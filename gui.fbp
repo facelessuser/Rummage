@@ -24558,7 +24558,7 @@
             <event name="OnAux2Up"></event>
             <event name="OnChar"></event>
             <event name="OnCharHook"></event>
-            <event name="OnClose">on_close</event>
+            <event name="OnClose"></event>
             <event name="OnEnterWindow"></event>
             <event name="OnEraseBackground"></event>
             <event name="OnHibernate"></event>
