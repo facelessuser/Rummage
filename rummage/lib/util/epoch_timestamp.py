@@ -19,7 +19,7 @@ class UTCTimezone(tzinfo):
         return "UTC"
 
     def dst(self, dt):
-        """Return dst."""
+        """Return `dst`."""
 
         return ZERO
 
@@ -29,7 +29,7 @@ EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 def totimestamp(dt, epoch=EPOCH):
-    """Format datetime as timestamp."""
+    """Format `datetime` as timestamp."""
 
     td = dt - epoch
     return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10 ** 6) / 1e6

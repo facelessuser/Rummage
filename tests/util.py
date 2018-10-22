@@ -1,4 +1,4 @@
-"""Test utils."""
+"""Test utilities."""
 import contextlib
 import os
 import warnings

@@ -65,6 +65,7 @@ distros
 dotfiles
 dropdown
 emoji
+encodings
 endian
 fnmatch
 fullmatch

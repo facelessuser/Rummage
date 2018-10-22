@@ -37,7 +37,7 @@ class _FileTest(unittest.TestCase):
         util.create_empty_file(filename, content)
 
     def norm(self, *parts):
-        """Normalizes file path (in relation to temp dir)."""
+        """Normalizes file path (in relation to temp directory)."""
         tempdir = os.fsencode(self.tempdir) if isinstance(parts[0], bytes) else self.tempdir
         return os.path.join(tempdir, *parts)
 
@@ -95,7 +95,7 @@ class TestHelperFunctions(unittest.TestCase):
         )
 
     def test_bre_flags(self):
-        """Test the bre flag settings."""
+        """Test the `bre` flag settings."""
 
         default = re.ASCII
 
@@ -221,7 +221,7 @@ class TestHelperFunctions(unittest.TestCase):
 
 
 class TestRummageFileContent(_FileTest):
-    """Tests for _RummageFileContent."""
+    """Tests for `_RummageFileContent`."""
 
     def compare_encoding(self, filename, content, file_encoding, expected, bfr=False):
         """Compare encoding."""
@@ -292,7 +292,7 @@ class TestRummageFileContent(_FileTest):
         )
 
     def test_utf8(self):
-        """Test utf-8 file."""
+        """Test `utf-8` file."""
 
         self.compare_encoding(
             'utf8-bom.txt',
@@ -302,7 +302,7 @@ class TestRummageFileContent(_FileTest):
         )
 
     def test_utf16(self):
-        """Test utf-16 file."""
+        """Test `utf-16` file."""
 
         self.compare_encoding(
             'utf16_be_bom.txt',
@@ -312,7 +312,7 @@ class TestRummageFileContent(_FileTest):
         )
 
     def test_utf32(self):
-        """Test utf-8 file."""
+        """Test `utf-8` file."""
 
         self.compare_encoding(
             'utf16_be_bom.txt',
@@ -332,20 +332,20 @@ class TestRummageFileContent(_FileTest):
         )
 
     def test_rummageexception(self):
-        """Test RummageException with file."""
+        """Test `RummageException` with file."""
 
         rfc = rc._RummageFileContent(self.norm('does_not_exist.txt'), 10, td.Encoding('ascii', None))
         self.assertRaises(rc.RummageException, rfc.__enter__)
 
     def test_bin_rummageexception(self):
-        """Test RummageException with a bin file."""
+        """Test `RummageException` with a bin file."""
 
         rfc = rc._RummageFileContent(self.norm('does_not_exist.txt'), 10, td.Encoding('bin', None))
         self.assertRaises(rc.RummageException, rfc.__enter__)
 
 
 class TestDirWalker(_FileTest):
-    """Test the _DirWalker class."""
+    """Test the `_DirWalker` class."""
 
     def setUp(self):
         """Setup the tests."""
@@ -563,7 +563,7 @@ class TestDirWalker(_FileTest):
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bre(self):
-        """Test bre search."""
+        """Test `bre` search."""
 
         walker = rc._DirWalker(
             self.tempdir,
@@ -605,7 +605,7 @@ class TestDirWalker(_FileTest):
         self.assertEqual(os.path.basename(sorted(self.files)[0].name), 'a.txt')
 
     def test_bregex(self):
-        """Test bregex search."""
+        """Test `bregex` search."""
 
         walker = rc._DirWalker(
             self.tempdir,
@@ -818,7 +818,7 @@ class TestDirWalker(_FileTest):
 
 
 class TestHiddenDirWalker(_FileTest):
-    """Test the _DirWalker class."""
+    """Test the `_DirWalker` class."""
 
     def setUp(self):
         """Setup the tests."""

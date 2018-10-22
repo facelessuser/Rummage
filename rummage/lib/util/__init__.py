@@ -149,7 +149,7 @@ def link_type(link):
 
 
 def char_size(c):
-    """Get UTF8 char size."""
+    """Get `UTF8` char size."""
 
     value = ord(c)
     if value <= 0xffff:

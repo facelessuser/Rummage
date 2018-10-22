@@ -54,7 +54,7 @@ JSON_PATTERN = re.compile(r'(?x)%(comments)s|%(code)s' % {"comments": CPP_COMMEN
 
 
 def _strip_regex(pattern, text, preserve_lines):
-    """Generic function that strips out comments pased on the given pattern."""
+    """Generic function that strips out comments passed on the given pattern."""
 
     def remove_comments(group, preserve_lines=False):
         """Remove comments."""
@@ -112,7 +112,7 @@ class CommentException(Exception):
         self.value = value
 
     def __str__(self):
-        """Return exception value repr on string convert."""
+        """Return exception value `repr` on string convert."""
 
         return repr(self.value)
 
