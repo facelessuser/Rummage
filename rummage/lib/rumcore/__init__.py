@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-RumCore.
+`RumCore`.
 
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -60,10 +60,10 @@ VERSION1 = 0x800        # (?V1)
 FORMATREPLACE = 0x1000  # Use {1} for groups in replace
 POSIX = 0x2000          # (?p)
 
-# Rumcore search related flags
+# `Rumcore` search related flags
 LITERAL = 0x10000           # Literal search
 
-# Rumcore related flags
+# `Rumcore` related flags
 BUFFER_INPUT = 0x20000      # Input is a buffer
 RECURSIVE = 0x40000         # Recursive directory search
 FILE_REGEX_MATCH = 0x80000  # Regex pattern for files
@@ -115,7 +115,7 @@ RE_LINE_ENDINGS = re.compile(r'(?:\r\n|\r|\n)')
 
 
 def get_exception():
-    """Capture exception and traceback separately."""
+    """Capture exception and `traceback` separately."""
 
     import traceback
 
@@ -289,7 +289,7 @@ class FileRecord(namedtuple('FileRecord', ['info', 'match', 'error'])):
 
 
 class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines', 'context'])):
-    """A record that contains match info, lineno content, context, etc."""
+    """A record that contains match information: line number, context, etc."""
 
 
 class BufferRecord(namedtuple('BufferRecord', ['content', 'error'])):
@@ -355,7 +355,7 @@ class ReplacePlugin(object):
         """
         Used for testing and capturing the exception.
 
-        Needs to raise the RummageTestException.
+        Needs to raise the `RummageTestException`.
         This should not be touched by the user.
         """
 
@@ -432,7 +432,7 @@ class _RummageFileContent(object):
         return enc
 
     def _read_bin(self):
-        """Setup binary file reading with mmap."""
+        """Setup binary file reading with `mmap`."""
         try:
             self.file_obj = open(self.name, "rb")
             if self.size != 0:
@@ -452,7 +452,7 @@ class _RummageFileContent(object):
                 self.file_obj = codecs.open(self.name, 'r', encoding=enc)
             return self.file_obj.read() if self.file_map is None else self.file_map
         except RummageException:
-            # Bubble up RummageExceptions
+            # Bubble up `RummageExceptions`
             raise
         except Exception:
             if self.encoding.encode != "bin":
@@ -473,7 +473,7 @@ class _FileSearch(object):
         backup_location, max_count, file_content=None, regex_mode=RE_MODE,
         encoding_options=None
     ):
-        """Init the file search object."""
+        """Initialize the file search object."""
 
         self.abort = False
         self.encoding_options = encoding_options
@@ -645,7 +645,7 @@ class _FileSearch(object):
 
         # Return the context snippet, where the match occurs,
         # and how many lines of context before and after,
-        # and the row and colum of match start.
+        # and the row and column of match start.
         return (
             content[start:end],
             (match_start, match_end),
@@ -690,7 +690,7 @@ class _FileSearch(object):
             return m.expand(self.current_replace)
 
     def _findall(self, file_content, search_pattern, replace_pattern, flags, file_info):
-        """Find all occurences of search pattern in file."""
+        """Find all occurrences of search pattern in file."""
 
         replace = None
         pattern = None
@@ -777,7 +777,7 @@ class _FileSearch(object):
                 shutil.copy2(file_name, backup)
 
         if encoding.bom:
-            # Write the bom first, then write in utf format out in the specified order.
+            # Write the BOM first, then write in `UTF` format out in the specified order.
             with open(file_name, 'wb') as f:
                 f.write(encoding.bom)
             with codecs.open(file_name, 'a', encoding=encoding.encode) as f:
@@ -789,10 +789,10 @@ class _FileSearch(object):
                 while content:
                     f.write(content.popleft())
         else:
-            # If a user is adding unicode to ascii,
-            # we write ascii files out as utf-8 to keep it from failing.
-            # We choose utf-8 because it is compatible with ASCII,
-            # but we could just as easily have choosen Latin-1 or CP1252.
+            # If a user is adding Unicode to ASCII,
+            # we write ASCII files out as `utf-8` to keep it from failing.
+            # We choose `utf-8` because it is compatible with ASCII,
+            # but we could just as easily have chosen `Latin-1` or `CP1252`.
             enc = encoding.encode
             with codecs.open(file_name, 'w', encoding=('utf-8' if enc == 'ascii' else enc)) as f:
                 while content:
@@ -905,9 +905,9 @@ class _FileSearch(object):
                             yield FileRecord(
                                 file_info,
                                 MatchRecord(
-                                    0,                     # lineno
-                                    0,                     # colno
-                                    (m.start(), m.end()),  # Postion of match
+                                    0,                     # line number
+                                    0,                     # column number
+                                    (m.start(), m.end()),  # Position of match
                                     None,                  # Line(s) in which match is found
                                     (0, 0)                 # Number of lines shown before and after matched line(s)
                                 ),
@@ -948,9 +948,9 @@ class _FileSearch(object):
                             yield FileRecord(
                                 file_info,
                                 MatchRecord(
-                                    0,                     # lineno
-                                    0,                     # colno
-                                    (m.start(), m.end()),  # Postion of match
+                                    0,                     # line number
+                                    0,                     # column number
+                                    (m.start(), m.end()),  # Position of match
                                     None,                  # Line(s) in which match is found
                                     (0, 0)                 # Number of lines shown before and after matched line(s)
                                 ),
@@ -976,7 +976,7 @@ class _FileSearch(object):
 
                 if not self.abort and text:
                     # Update the file or buffer depending on what is being used.
-                    # For a buffer, we will actually return the the content via a BufferRecord.
+                    # For a buffer, we will actually return the the content via a `BufferRecord`.
                     if is_buffer:
                         yield self._update_buffer(text)
                         file_record_sent = True
@@ -1057,9 +1057,9 @@ class _FileSearch(object):
                                 yield FileRecord(
                                     file_info,
                                     MatchRecord(
-                                        row,          # lineno
-                                        col,          # colno
-                                        match,        # Postion of match
+                                        row,          # line number
+                                        col,          # column number
+                                        match,        # Position of match
                                         lines,        # Line(s) in which match is found
                                         context       # Number of lines shown before and after matched line(s)
                                     ),
@@ -1219,7 +1219,7 @@ class _DirWalker(wcmatch.WcMatch):
         return size_okay
 
     def _is_backup(self, name, directory=False):
-        """Check if file or directory is a rumcore backup."""
+        """Check if file or directory is a `rumcore` backup."""
 
         is_backup = False
 
@@ -1319,7 +1319,7 @@ class Rummage(object):
         self.search_params = searches
         self.file_flags = flags & FILE_MASK
 
-        # Wcmatch flags
+        # `wcmatch` flags
         self.wcmatch_flags = wcmatch.I | wcmatch.M | wcmatch.R
         if self.file_flags & EXTMATCH:
             self.wcmatch_flags |= wcmatch.E
@@ -1355,8 +1355,8 @@ class Rummage(object):
         self.files = deque()
 
         # Initialize search objects:
-        # - _DirWalker for if target is a folder
-        # - Append FileAttrRecord if target is a file or buffer
+        # - `_DirWalker` for if target is a folder
+        # - Append `FileAttrRecord` if target is a file or buffer
         if not self.buffer_input and os.path.isdir(self.target):
             self.path_walker = _DirWalker(
                 self.target,
@@ -1417,7 +1417,7 @@ class Rummage(object):
         """Verify the encoding is okay."""
 
         enc = encoding.lower()
-        # Normalize UTFx encodings as we detect order and boms later.
+        # Normalize `UTFx` encodings as we detect order and BOMs later.
         if encoding in _U8:
             enc = 'utf-8'
         elif encoding in _U16:

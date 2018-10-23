@@ -1,18 +1,19 @@
-"""ListBox workaround.
+"""
+A `ListBox` workaround.
 
-WxFormBuilder on macOS currently freezes up when using a ListBox.
+WxFormBuilder on macOS currently freezes up when using a `ListBox`.
 So to sidestep this issue, we will use a custom control, that is
-actually just a ListBox. This way it doesn't try to render a live
-preview of a ListBox and put us in an endless cycle of pain.
+actually just a `ListBox`. This way it doesn't try to render a live
+preview of a `ListBox` and put us in an endless cycle of pain.
 
-Not sure how ListBox behaves on other platforms.
+Not sure how `ListBox` behaves on other platforms.
 """
 from __future__ import unicode_literals
 import wx
 
 
 class ListBox(wx.ListBox):
-    """ListBox workaround."""
+    """A `ListBox` workaround."""
 
     def __init__(self, parent, wx_id):
         """Initialize."""

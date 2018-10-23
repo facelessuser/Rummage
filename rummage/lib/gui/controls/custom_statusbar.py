@@ -28,7 +28,7 @@ from ... import util
 if (2, 9, 4) < wx.VERSION < (4, 0, 0, 'b2'):
     def monkey_patch():
         """
-        Monkey patch Supertooltips.
+        Monkey patch `Supertooltips`.
 
         Remove once WxPython gets its crap together.
         """
@@ -244,7 +244,7 @@ class IconTrayExtension(object):
         if resize:
             platform = util.platform()
             if platform in "osx":
-                # OSX must increment by 10
+                # macOS must increment by 10
                 self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 10])
             elif platform == "windows":
                 # In at least wxPython 2.9+, the first icon inserted changes the size, additional icons don't.
@@ -283,7 +283,7 @@ class CustomStatusExtension(IconTrayExtension, TimedStatusExtension):
     """Custom status extension."""
 
     def sb_setup(self, fields):
-        """Setup the extention variant of the CustomStatusBar object."""
+        """Setup the extension variant of the `CustomStatusBar` object."""
 
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
@@ -303,7 +303,7 @@ class CustomStatusBar(wx.StatusBar, CustomStatusExtension):
     """Custom status bar."""
 
     def __init__(self, parent, name, fields=None):
-        """Init the CustomStatusBar object."""
+        """Initialize the `CustomStatusBar` object."""
 
         field_array = [-1] if not fields else fields[:]
         super(CustomStatusBar, self).__init__(
@@ -328,7 +328,7 @@ def extend(instance, extension):
 
 
 def extend_sb(sb, fields=None):
-    """Extend the statusbar."""
+    """Extend the status bar."""
 
     field_array = [-1] if not fields else fields[:]
     extend(sb, CustomStatusExtension)

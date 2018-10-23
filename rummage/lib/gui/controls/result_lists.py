@@ -100,10 +100,10 @@ class ContextMenu(wx.Menu):
 
 
 class ResultFileList(DynamicList):
-    """ResultFileList."""
+    """Result file list."""
 
     def __init__(self, parent):
-        """Init ResultFileList object."""
+        """Initialize result file list object."""
 
         self.localize()
         self.international = False
@@ -390,7 +390,7 @@ class ResultFileList(DynamicList):
         event.Skip()
 
     def on_col_hide_click(self, event, col=-1):
-        """Hande column hide click."""
+        """Handle column hide click."""
 
         hidden = list(self.hidden_columns)
 
@@ -403,7 +403,7 @@ class ResultFileList(DynamicList):
         Settings.set_hide_cols_file(list(self.hidden_columns))
 
     def on_col_rclick(self, event):
-        """Hanlde col right click."""
+        """Handle column right click."""
 
         menu = ContextMenu(
             [
@@ -422,10 +422,10 @@ class ResultFileList(DynamicList):
 
 
 class ResultContentList(DynamicList):
-    """ResultContentList."""
+    """Result content list."""
 
     def __init__(self, parent):
-        """Init ResultContentFileList object."""
+        """Initialize the result content list object."""
 
         self.localize()
 
@@ -723,7 +723,7 @@ class ResultContentList(DynamicList):
         event.Skip()
 
     def on_col_hide_click(self, event, col=-1):
-        """Hande column hide click."""
+        """Handle column hide click."""
 
         hidden = list(self.hidden_columns)
 
@@ -736,7 +736,7 @@ class ResultContentList(DynamicList):
         Settings.set_hide_cols_content(list(self.hidden_columns))
 
     def on_col_rclick(self, event):
-        """Hanlde col right click."""
+        """Handle col right click."""
 
         menu = ContextMenu(
             [

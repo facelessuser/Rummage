@@ -31,7 +31,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
     """Load search dialog."""
 
     def __init__(self, parent):
-        """Init LoadSearchDialog."""
+        """Initialize dialog."""
 
         super(LoadSearchDialog, self).__init__(parent)
         self.localize()

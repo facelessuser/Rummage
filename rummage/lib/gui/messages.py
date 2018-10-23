@@ -1092,7 +1092,7 @@ class Messages(wx.Dialog):
         self, parent, text, title=wx.EmptyString, style=INFO, bitmap=None,
         yes="Okay", no="Cancel", cancel="Cancel", checkbox="Apply to all", checked=None
     ):
-        """Init Messages object."""
+        """Initialize Messages object."""
 
         m = HAS_CAPTION.match(text)
         if m is not None:

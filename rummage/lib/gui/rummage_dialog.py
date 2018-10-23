@@ -89,7 +89,7 @@ ENCODINGS = util.get_encodings()
 
 
 def eng_to_i18n(string, mapping):
-    """Convert english to i18n."""
+    """Convert English to i18n."""
 
     i18n = None
     for k, v in mapping.items():
@@ -100,13 +100,13 @@ def eng_to_i18n(string, mapping):
 
 
 def i18n_to_eng(string, mapping):
-    """Convert i18n to english."""
+    """Convert i18n to English."""
 
     return mapping.get(string, None)
 
 
 def setup_datepicker(obj, key):
-    """Setup GenericDatePickerCtrl object."""
+    """Setup `GenericDatePickerCtrl` object."""
 
     d = Settings.get_search_setting(key, None)
     if d is None:
@@ -142,7 +142,7 @@ def setup_autocomplete_combo(obj, key, load_last=False, changed_callback=None, d
 
 
 def update_autocomplete(obj, key, load_last=False, default=None):
-    """Convienance function for updating the AutoCompleteCombo choices."""
+    """Convenience function for updating the `AutoCompleteCombo` choices."""
 
     if default is None:
         default = []
@@ -156,7 +156,7 @@ class RummageThread(threading.Thread):
     """Threaded Rummage."""
 
     def __init__(self, args):
-        """Set up Rummage thread with the rumcore object."""
+        """Set up Rummage thread with the `rumcore` object."""
 
         self.localize()
 
@@ -271,12 +271,12 @@ class RummageArgs(object):
     """Rummage argument object."""
 
     def __init__(self):
-        """Default the rummage args on instatiation."""
+        """Default the rummage arguments on instantiation."""
 
         self.reset()
 
     def reset(self):
-        """Reset rummage args to defaults."""
+        """Reset rummage arguments to defaults."""
 
         self.regexp = False
         self.ignore_case = False
@@ -323,7 +323,7 @@ class RummageFrame(gui.RummageFrame):
     """Rummage Frame."""
 
     def __init__(self, parent, start_path, debug_mode=False):
-        """Init the RummageFrame object."""
+        """Initialize the Rummage frame object."""
 
         super(RummageFrame, self).__init__(parent)
         self.maximized = False
@@ -374,7 +374,7 @@ class RummageFrame(gui.RummageFrame):
         self.Bind(wx.EVT_SIZE, self.on_resize)
         self.Bind(EVT_POST_RESIZE, self.on_post_resize)
 
-        # Extend the statusbar
+        # Extend the status bar
         custom_statusbar.extend_sb(self.m_statusbar)
         self.m_statusbar.set_status("")
 
@@ -406,7 +406,7 @@ class RummageFrame(gui.RummageFrame):
         self.refresh_localization()
 
         # Setup the inputs history and replace
-        # placeholder objects with actual objecs
+        # placeholder objects with actual objects
         self.setup_inputs()
 
         # Pick optimal size
@@ -665,13 +665,13 @@ class RummageFrame(gui.RummageFrame):
         """
         Method to easily set key bindings.
 
-        Also sets up debug keybindings and events.
+        Also sets up debug key bindings and events.
         """
 
         if keybindings is None:
             keybindings = []
 
-        # Add keybindings.
+        # Add key bindings.
         tbl = []
         bindings = keybindings
         for binding in keybindings:
@@ -685,7 +685,7 @@ class RummageFrame(gui.RummageFrame):
     def init_search_path(self, start_path):
         """Initialize the search path input."""
 
-        # Init search path with passed in path
+        # Initialize search path with passed in path
         if start_path and os.path.exists(start_path):
             self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
 
@@ -711,12 +711,6 @@ class RummageFrame(gui.RummageFrame):
             width = mainframe[0]
             height = mainframe[1] + offset
             debug('Window Size: %d x %d' % (width, height))
-            # if width > rect.GetWidth():
-            #     width = rect.GetWidth()
-            #     debug('Shrink width')
-            # if height > rect.GetHeight():
-            #     height = rect.GetHeight()
-            #     debug('Shrink height')
             sz = wx.Size(width, height)
             self.SetMinSize(sz)
             self.SetSize(sz)
@@ -728,25 +722,9 @@ class RummageFrame(gui.RummageFrame):
             min_width, min_height = min_size[0], mainframe[1] + offset
             width, height = mainframe[0], mainframe[1]
 
-            # if min_width > rect.GetWidth():
-            #     debug('----Resize Height----')
-            #     debug('Screen Index: %d' % index)
-            #     debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
-            #     debug('Window Size: %d x %d' % (width, height))
-            #     debug('Shrink width')
-            #     min_width = rect.GetWidth()
-
             if min_width > width:
                 increase_width = True
                 width = min_width
-
-            # if min_height > rect.GetHeight():
-            #     debug('----Resize Height----')
-            #     debug('Screen Index: %d' % index)
-            #     debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
-            #     debug('Window Min Size: %d x %d' % (min_width, min_height))
-            #     debug('Shrink min-height')
-            #     min_height = rect.GetHeight()
 
             if min_height > height:
                 increase_height = True
@@ -1091,7 +1069,7 @@ class RummageFrame(gui.RummageFrame):
             self.m_search_button.SetLabel(self.SEARCH_BTN_STOP)
             self.m_replace_button.Enable(False)
 
-        # Init search status
+        # Initialize search status
         self.m_statusbar.set_status(self.INIT_STATUS)
 
         # Setup search thread
@@ -1157,7 +1135,7 @@ class RummageFrame(gui.RummageFrame):
         return flags
 
     def get_flags(self, args):
-        """Determine rumcore flags from RummageArgs."""
+        """Determine `rumcore` flags from `RummageArgs`."""
 
         flags = rumcore.MULTILINE | rumcore.TRUNCATE_LINES
 
@@ -1834,7 +1812,7 @@ class RummageFrame(gui.RummageFrame):
         return self.validate_regex(pattern, flags)
 
     def validate_regex(self, pattern, flags=0):
-        """Validate regular expresion compiling."""
+        """Validate regular expression compiling."""
 
         try:
             mode = Settings.get_regex_mode()
@@ -1906,7 +1884,7 @@ class RummageFrame(gui.RummageFrame):
 
         If the client size changed during resize (or sometime before)
         it might be because we entered full screen mode.  Maybe we
-        adjusted the windows minsize during fullscreen and it is wrong.
+        adjusted the windows minimum size during full screen and it is wrong.
         So check if client size changed, and if so, run optimize size
         to be safe.
         """
@@ -1967,7 +1945,7 @@ class RummageFrame(gui.RummageFrame):
         event.Skip()
 
     def on_textctrl_selectall(self, event):
-        """Select all in the TextCtrl and AutoCompleteCombo objects."""
+        """Select all in the `TextCtrl` and `AutoCompleteCombo` objects."""
 
         text = self.FindFocus()
         if isinstance(text, (wx.TextCtrl, AutoCompleteCombo)):
@@ -2043,7 +2021,7 @@ class RummageFrame(gui.RummageFrame):
         self.setup
 
     def on_preferences(self, event):
-        """Show settings dialog, and update history of AutoCompleteCombo if the history was cleared."""
+        """Show settings dialog, and update history of `AutoCompleteCombo` if the history was cleared."""
 
         dlg = SettingsDialog(self)
         dlg.ShowModal()
@@ -2106,7 +2084,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_settings_panel.GetSizer().Layout()
 
     def on_dir_changed(self, event):
-        """Event for when the directory changes in the DirPickButton."""
+        """Event for when the directory changes in the `DirPickButton`."""
 
         if not self.searchin_update:
             pth = event.target
@@ -2117,7 +2095,7 @@ class RummageFrame(gui.RummageFrame):
         event.Skip()
 
     def on_replace_plugin_dir_changed(self, event):
-        """Handle replace plugin dir change."""
+        """Handle replace plugin directory change."""
 
         if not self.replace_plugin_update:
             pth = event.target
@@ -2128,7 +2106,7 @@ class RummageFrame(gui.RummageFrame):
         event.Skip()
 
     def on_searchin_changed(self):
-        """Callback for when a directory changes via the m_searchin_text control."""
+        """Callback for when a directory changes via the `m_searchin_text` control."""
 
         self.check_searchin()
         self.SetTitle(self.m_searchin_text.GetValue())
@@ -2311,14 +2289,14 @@ class RummageFrame(gui.RummageFrame):
             errormsg(self.ERR_CSV_FAILED)
 
     def on_export_settings(self, event):
-        """Export settngs."""
+        """Export settings."""
 
         exporter = ExportSettingsDialog(self)
         exporter.ShowModal()
         exporter.Destroy()
 
     def on_import_settings(self, event):
-        """Import settngs."""
+        """Import settings."""
 
         filename = filepickermsg(self.IMPORT_FROM, wildcard="(*.json;*.settings)|*.json;*.settings", save=False)
         if filename is None:

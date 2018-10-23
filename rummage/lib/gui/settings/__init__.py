@@ -106,7 +106,6 @@ class Settings(object):
     def load_settings(cls):
         """Load the settings."""
 
-        # cls.debug = debug_mode
         cls.localize()
         cls.setup_setting_files()
         cls.settings = {"__format__": SETTINGS_FMT}
@@ -166,13 +165,13 @@ class Settings(object):
 
     @classmethod
     def is_cchardet_available(cls):
-        """Check if cchardet is available."""
+        """Check if `cchardet` is available."""
 
         return text_decode.CCDetect is not None
 
     @classmethod
     def set_chardet_mode(cls, value):
-        """Set chardet mode."""
+        """Set `chardet` mode."""
 
         cls.reload_settings()
         cls._set_chardet_mode(value)
@@ -180,7 +179,7 @@ class Settings(object):
 
     @classmethod
     def _set_chardet_mode(cls, value):
-        """Set chardet mode."""
+        """Set `chardet` mode."""
 
         if not cls.is_cchardet_available() or value > text_decode.CHARDET_CLIB:
             value = text_decode.CHARDET_DEFAULT
@@ -211,7 +210,7 @@ class Settings(object):
 
     @classmethod
     def set_encoding_ext(cls, values):
-        """Set chardet mode."""
+        """Set `chardet` mode."""
 
         cls.reload_settings()
         cls._set_encoding_ext(values)
@@ -447,7 +446,7 @@ class Settings(object):
 
     @classmethod
     def setup_setting_files(cls):
-        """Get settings, cache, log, and fifo location."""
+        """Get settings, cache, log, and FIFO location."""
 
         platform = util.platform()
 
@@ -632,13 +631,13 @@ class Settings(object):
 
     @classmethod
     def get_config_folder(cls):
-        """Return config folder."""
+        """Return configuration folder."""
 
         return cls.config_folder
 
     @classmethod
     def get_fifo(cls):
-        """Get fifo pipe."""
+        """Get FIFO pipe."""
 
         return cls.fifo
 
@@ -1127,7 +1126,7 @@ class Settings(object):
 
     @classmethod
     def get_check_updates(cls):
-        """Get check upates."""
+        """Get check updates."""
 
         cls.reload_settings()
         return cls.settings.get('check_updates', False)
@@ -1148,7 +1147,7 @@ class Settings(object):
 
     @classmethod
     def get_prerelease(cls):
-        """Get check upates."""
+        """Get check updates."""
 
         cls.reload_settings()
         return cls.settings.get('check_prerelease', False)
@@ -1201,13 +1200,13 @@ class Settings(object):
 
     @classmethod
     def _set_extmatch(cls, value):
-        """Set extmatch."""
+        """Set `extmatch`."""
 
         cls.settings['extmatch'] = value
 
     @classmethod
     def set_extmatch(cls, value):
-        """Set extmatch."""
+        """Set `extmatch`."""
 
         cls.reload_settings()
         cls._set_extmatch(value)
@@ -1215,7 +1214,7 @@ class Settings(object):
 
     @classmethod
     def get_extmatch(cls):
-        """Get extmatch."""
+        """Get `extmatch`."""
 
         cls.reload_settings()
         return cls.settings.get('extmatch', False)
@@ -1457,6 +1456,6 @@ class Settings(object):
 
     @classmethod
     def unload(cls):
-        """Perfrom needed actions when done with settings."""
+        """Perform needed actions when done with settings."""
 
         notify.destroy_notifications()

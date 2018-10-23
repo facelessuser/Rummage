@@ -1,4 +1,4 @@
-"""Tests for text_decode.py."""
+"""Tests for `text_decode.py`."""
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import unittest
@@ -30,7 +30,7 @@ class _Encoding(unittest.TestCase):
         util.create_empty_file(filename, content)
 
     def norm(self, *parts):
-        """Normalizes file path (in relation to temp dir)."""
+        """Normalizes file path (in relation to temp directory)."""
         tempdir = os.fsencode(self.tempdir) if isinstance(parts[0], bytes) else self.tempdir
         return os.path.join(tempdir, *parts)
 
@@ -90,14 +90,14 @@ class TestBom(_Encoding):
     """Test BOM detection."""
 
     def test_utf8(self):
-        """Test UTF8 BOM detection."""
+        """Test `UTF8` BOM detection."""
 
         bom = self.inspect_bom('utf8_bom.txt', content='UTF8 file with BOM'.encode('utf-8-sig'))
         self.assertEqual(bom.encode, 'utf-8')
         self.assertEqual(bom.bom, codecs.BOM_UTF8)
 
     def test_utf16be(self):
-        """Test UTF16BE BOM detection."""
+        """Test `UTF16BE` BOM detection."""
 
         bom = self.inspect_bom(
             'utf16_be_bom.txt',
@@ -107,7 +107,7 @@ class TestBom(_Encoding):
         self.assertEqual(bom.bom, codecs.BOM_UTF16_BE)
 
     def test_utf16le(self):
-        """Test UTF16LE BOM detection."""
+        """Test `UTF16LE` BOM detection."""
 
         bom = self.inspect_bom(
             'utf16_le_bom.txt',
@@ -117,7 +117,7 @@ class TestBom(_Encoding):
         self.assertEqual(bom.bom, codecs.BOM_UTF16_LE)
 
     def test_utf32be(self):
-        """Test UTF32BE BOM detection."""
+        """Test `UTF32BE` BOM detection."""
 
         bom = self.inspect_bom(
             'utf32_be_bom.txt',
@@ -127,7 +127,7 @@ class TestBom(_Encoding):
         self.assertEqual(bom.bom, codecs.BOM_UTF32_BE)
 
     def test_utf32le(self):
-        """Test UTF32LE BOM detection."""
+        """Test `UTF32LE` BOM detection."""
 
         bom = self.inspect_bom(
             'utf32_le_bom.txt',
@@ -137,14 +137,14 @@ class TestBom(_Encoding):
         self.assertEqual(bom.bom, codecs.BOM_UTF32_LE)
 
     def test_10646_UC4_3412(self):
-        """Test 10646_UC4_3412 BOM detection."""
+        """Test `10646_UC4_3412` BOM detection."""
 
         bom = self.inspect_bom('10646_UC4_3412.txt', content=b'\xfe\xff\x00\x00')
         self.assertEqual(bom.encode, 'bin')
         self.assertEqual(bom.bom, None)
 
     def test_10646_UC4_2143(self):
-        """Test 10646_UC4_2143 BOM detection."""
+        """Test `10646_UC4_2143` BOM detection."""
 
         bom = self.inspect_bom('10646_UC4_2143.txt', content=b'\x00\x00\xff\xfe')
         self.assertEqual(bom.encode, 'bin')
@@ -363,7 +363,7 @@ class TestPyEncodingGuess(_Encoding):
     def test_py_default_ascii_file(self):
         """Test default Python file."""
 
-        # Python 3 default is UTF-8.
+        # Python 3 default is `UTF-8`.
         self.guess(
             'ascii.py',
             content=self.dedent(
@@ -433,7 +433,7 @@ class TestPyEncodingGuess(_Encoding):
     def test_py_with_bad_encode_string(self):
         """Test Python file with bad encode string."""
 
-        # Should fallback to the default UTF-8
+        # Should fallback to the default `UTF-8`
         self.guess(
             'bad_encoding.py',
             content=self.dedent(
@@ -475,7 +475,7 @@ class TestSizeGuess(_Encoding):
         )
 
     def test_too_small_ascii(self):
-        """Test a small ascii file."""
+        """Test a small ASCII file."""
 
         self.guess(
             'ascii.txt',
@@ -488,7 +488,7 @@ class TestSizeGuess(_Encoding):
         )
 
     def test_too_small_utf8(self):
-        """Test a small utf-8 file."""
+        """Test a small `UTF-8` file."""
 
         self.guess(
             'utf8.txt',
@@ -503,7 +503,7 @@ class TestSizeGuess(_Encoding):
 
 class TestChardetGuess(_Encoding):
     """
-    Test guessing with chardet.
+    Test guessing with `chardet`.
 
     Force small file detection to ensure picking an encoding early.
     """
@@ -654,7 +654,7 @@ class TestSizeSguess(_Encoding):
         )
 
     def test_too_small_ascii(self):
-        """Test a small ascii file."""
+        """Test a small ASCII file."""
 
         self.sguess(
             self.dedent(
@@ -666,7 +666,7 @@ class TestSizeSguess(_Encoding):
         )
 
     def test_too_small_utf8(self):
-        """Test a small utf-8 file."""
+        """Test a small `UTF-8` file."""
 
         self.sguess(
             self.dedent(
@@ -680,7 +680,7 @@ class TestSizeSguess(_Encoding):
 
 class TestChardetSguess(_Encoding):
     """
-    Test guessing with chardet.
+    Test guessing with `chardet`.
 
     Force small file detection to ensure picking an encoding early.
     """
@@ -705,7 +705,7 @@ class TestChardetSguess(_Encoding):
     @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
     @mock.patch('rummage.lib.rumcore.text_decode.CDetect')
     def test_confidence_pass_guess_chardet(self, mock_detect, mock_small):
-        """Test result with an encoding with acceptable confidence with chardet."""
+        """Test result with an encoding with acceptable confidence with `chardet`."""
 
         instance = mock_detect.return_value
         instance.result = {"encoding": "utf-8", "confidence": 1.0}
@@ -723,7 +723,7 @@ class TestChardetSguess(_Encoding):
     @mock.patch('rummage.lib.rumcore.text_decode._is_very_small')
     @mock.patch('rummage.lib.rumcore.text_decode.CCDetect')
     def test_confidence_pass_guess_cchardet(self, mock_detect, mock_small):
-        """Test result with an encoding with acceptable confidence with cchardet."""
+        """Test result with an encoding with acceptable confidence with `cchardet`."""
 
         instance = mock_detect.return_value
         instance.result = {"encoding": "utf-8", "confidence": 1.0}

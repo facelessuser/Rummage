@@ -1,8 +1,8 @@
 """
  Whirlpool.
 
- whirlpool.py - pure Python implementation of the Whirlpool algorithm.
- Bjorn Edstrom <be@bjrn.se> 16 december 2007.
+ `whirlpool.py` - pure Python implementation of the Whirlpool algorithm.
+ Bjorn Edstrom <be@bjrn.se> 16 December 2007.
 
  Copyrights
  ==========

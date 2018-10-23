@@ -40,7 +40,7 @@ class NotifyFallback(object):
     """Fallback class."""
 
     def __init__(self, *args, **kwargs):
-        """Init class."""
+        """Initialize class."""
 
         self.sound = kwargs.get("sound", False)
 
@@ -123,7 +123,6 @@ def setup_notifications(app_name, img=None, term_notify=(None, None)):
     if isinstance(app_name, binary_type):
         app_name = app_name.decode('utf-8')
 
-    # setup_growl(app_name, png)
     setup(
         app_name,
         img,
@@ -143,7 +142,7 @@ def setup_growl_notifications(app_name, png):
 
 
 def destroy_notifications():
-    """Destory notifications if possible."""
+    """Destroy notifications if possible."""
 
     growl_destroy()
     destroy()

@@ -43,7 +43,7 @@ class PickButton(object):
             self.target = target
 
     def pick_init(self, pick_type, dialog_msg, default_path=None, pick_change_evt=None):
-        """Init the PickButton."""
+        """Initialize the `PickButton`."""
 
         self.dialog_msg = dialog_msg
         if default_path is not None and os.path.exists(default_path):
@@ -57,7 +57,7 @@ class PickButton(object):
         self.pick_change_callback = pick_change_evt
 
     def on_change(self, event):
-        """If the dir has changed call the callback given."""
+        """If the directory has changed call the callback given."""
 
         if self.pick_change_callback is not None:
             self.pick_change_callback(event)
@@ -67,7 +67,7 @@ class PickButton(object):
         """
         When a new directory/file is picked, validate it, and set it if it is good.
 
-        Call the PickChangeEvent to do any desired callback as well.
+        Call the `PickChangeEvent` to do any desired callback as well.
         """
 
         target = self.GetPath()

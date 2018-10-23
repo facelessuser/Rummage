@@ -55,7 +55,7 @@ class CustomApp(wx.App):
     """Custom app that adds a number of features."""
 
     def __init__(self, **kwargs):
-        """Init the custom app."""
+        """Initialize the custom app."""
 
         self.instance_okay = True
         self.instance = None
@@ -99,7 +99,7 @@ class ArgPipeThread(object):
     """Argument pipe thread for receiving arguments from another instance."""
 
     def __init__(self, app, pipe_name):
-        """Init pipe thread variables."""
+        """Initialize pipe thread variables."""
 
         self.app = app
         self.pipe_name = pipe_name
@@ -137,7 +137,7 @@ class ArgPipeThread(object):
 
         else:
             # It's okay if the pipe is broken, our goal is just to break the
-            # wait loop for recieving pipe data.
+            # wait loop for receiving pipe data.
             try:
                 with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
                     try:
@@ -205,10 +205,10 @@ class ArgPipeThread(object):
 
 
 class PipeApp(CustomApp):
-    """Pip app variant that allows the app to be sent data via a pipe."""
+    """Pipe app variant that allows the app to be sent data via a pipe."""
 
     def __init__(self, **kwargs):
-        """Parse pipe args."""
+        """Parse pipe arguments."""
 
         self.active_pipe = False
         self.pipe_thread = None
@@ -230,7 +230,7 @@ class PipeApp(CustomApp):
         return True
 
     def get_sys_args(self):
-        """Get system args as unicode."""
+        """Get system arguments as Unicode."""
 
         return sys.argv[1:]
 
@@ -258,12 +258,12 @@ class PipeApp(CustomApp):
                 pipeout.write(json.dumps(args) + '\n')
 
     def process_args(self, arguments):
-        """Noop, but can be overriden to process the args."""
+        """Noop, but can be overridden to process the arguments."""
 
         return arguments
 
     def receive_arg_pipe(self):
-        """Start the pipe listenr thread."""
+        """Start the pipe listener thread."""
 
         self.active_pipe = True
         self.pipe_thread = ArgPipeThread(self, self.pipe_name)

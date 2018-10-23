@@ -24,7 +24,7 @@ from . import gui
 
 
 class ErrorTextDialog(gui.ErrorTextDialog):
-    """ErrorText Dialog."""
+    """Error text dialog."""
 
     def __init__(self, parent, text):
         """Initialize."""

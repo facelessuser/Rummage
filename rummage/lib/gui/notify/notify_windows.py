@@ -50,7 +50,7 @@ NIF_SHOWTIP = 0x80
 
 
 class WndClassEx(ctypes.Structure):
-    """WNDCLASSEX structure."""
+    """The `WNDCLASSEX` structure."""
 
     _fields_ = [
         ("cbSize", ctypes.c_uint),
@@ -69,7 +69,7 @@ class WndClassEx(ctypes.Structure):
 
 
 class NotifyIconData(ctypes.Structure):
-    """NOTIFYICONDATA structure."""
+    """The `NOTIFYICONDATA` structure."""
 
     _fields_ = [
         ("cbSize", ctypes.c_uint),
@@ -91,7 +91,7 @@ class NotifyIconData(ctypes.Structure):
 
 
 class NotifyIconDataV3(ctypes.Structure):
-    """NOTIFYICONDATA_V3 structure."""
+    """The `NOTIFYICONDATA_V3` structure."""
 
     _fields_ = NotifyIconData._fields_[:-1]  # noqa
 
@@ -153,7 +153,7 @@ class WindowsNotify(object):
         """
 
         def winproc(hwnd, msg, wparam, lparam):
-            """Winproc funciton to handle events."""
+            """Handle `winproc` events."""
 
             return hwnd
 
@@ -214,9 +214,9 @@ class WindowsNotify(object):
 
     def show_notification(self, title, msg, sound, icon, fallback):
         """
-        Attemp to show notifications.
+        Attempt to show notifications.
 
-        Provide fallback for consistency with other notifyicatin methods.
+        Provide fallback for consistency with other notification methods.
         """
 
         try:

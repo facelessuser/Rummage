@@ -24,7 +24,6 @@ import os
 import re
 import functools
 from collections import namedtuple
-# import traceback
 try:
     from cchardet import UniversalDetector as CCDetect
     from chardet.universaldetector import UniversalDetector as CDetect
@@ -232,7 +231,7 @@ def _has_py_encode(content):
             encode = Encoding(enc, None)
         except LookupError:
             pass
-    # We could assume ascii for python files, but maybe
+    # We could assume ASCII for python files, but maybe
     # it is better to not simply assume even though that is what
     # Python will do.  I guess we are assuming if extension matches,
     # it is without a doubt encoded for use with python, but that may not be
@@ -272,13 +271,13 @@ def _is_binary(content):
 
 
 def _is_ascii(content):
-    """Check for invalid ascii."""
+    """Check for invalid ASCII."""
 
     return RE_BAD_ASCII.search(content) is None
 
 
 def _is_utf8(content):
-    """Check for invalid utf-8."""
+    """Check for invalid `utf-8`."""
 
     return RE_BAD_UTF8.search(content) is None
 
@@ -296,7 +295,7 @@ def _is_very_large(size):
 
 
 def _simple_detect(m):
-    """Do a quick check for ascii or utf-8."""
+    """Do a quick check for ASCII or `utf-8`."""
 
     encoding = None
 
@@ -308,7 +307,7 @@ def _simple_detect(m):
 
 
 def has_bom(content):
-    """Check for UTF8, UTF16, and UTF32 BOMS."""
+    """Check for `UTF8`, `UTF16`, and `UTF32` BOMs."""
 
     bom = None
     if content.startswith(codecs.BOM_UTF8):
@@ -339,13 +338,13 @@ def has_bom(content):
 
 
 def _detect_encoding(f, ext, file_size, encoding_options=None):
-    """Guess using chardet and using memory map."""
+    """Guess using `chardet` and using memory map."""
 
-    # Check for boms
+    # Check for BOMs
     encoding = has_bom(f.read(4))
     f.seek(0)
 
-    # Is bianary extension
+    # Is binary extension
     if encoding is None:
         encoding = _is_binary_ext(ext, encoding_options)
 
@@ -362,11 +361,11 @@ def _detect_encoding(f, ext, file_size, encoding_options=None):
         if encoding is None and _is_binary(header):
             encoding = Encoding('bin', None)
 
-        # If content is very small, let's try and do a a utf-8 and ascii check
-        # before giving it to chardet.  Chardet doesn't work well on small buffers.
+        # If content is very small, let's try and do a a `utf-8` and ASCII check
+        # before giving it to `chardet`.  `chardet` doesn't work well on small buffers.
         if encoding is None and _is_very_small(file_size):
             encoding = _simple_detect(header)
-        # Well, we tried everything else, lets give it to chardet and cross our fingers.
+        # Well, we tried everything else, lets give it to `chardet` and cross our fingers.
         if encoding is None:
             chardet_mode = encoding_options.get('chardet_mode', CHARDET_DEFAULT)
             if chardet_mode == CHARDET_DEFAULT:
@@ -403,7 +402,7 @@ def _detect_encoding(f, ext, file_size, encoding_options=None):
 
 
 def _detect_bfr_encoding(bfr, buffer_size, encoding_options=None):
-    """Guess using chardet."""
+    """Guess using `chardet`."""
 
     encoding = has_bom(bfr[:4])
     if encoding is None:
@@ -451,14 +450,13 @@ def _detect_bfr_encoding(bfr, buffer_size, encoding_options=None):
 
 
 def inspect_bom(filename):
-    """Inspect file for bom."""
+    """Inspect file for BOM."""
 
     encoding = None
     try:
         with open(filename, "rb") as f:
             encoding = has_bom(f.read(4))
     except Exception:  # pragma: no cover
-        # print(traceback.format_exc())
         pass
     return encoding
 
@@ -475,7 +473,7 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096, encodi
         ext = os.path.splitext(filename)[1].lower()
         file_size = os.path.getsize(filename)
         # If the file is really big, lets just call it binary.
-        # We dont' have time to let Python chug through a massive file.
+        # We don't have time to let Python chug through a massive file.
         if not _is_very_large(file_size):
             with open(filename, "rb") as f:
                 encoding = _detect_encoding(f, ext, file_size, encoding_options)
@@ -486,7 +484,6 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096, encodi
         else:
             encoding = Encoding('bin', None)
     except Exception:  # pragma: no cover
-        # print(traceback.format_exc())
         pass
 
     # If something went wrong, we will just return 'None'
@@ -512,7 +509,6 @@ def sguess(bfr, encoding_options=None):
             encoding = Encoding('bin', None)
 
     except Exception:  # pragma: no cover
-        # print(traceback.format_exc())
         pass
     return encoding
 

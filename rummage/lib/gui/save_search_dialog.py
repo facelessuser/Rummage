@@ -34,14 +34,14 @@ class SaveSearchDialog(gui.SaveSearchDialog):
     """Save search dialog."""
 
     def __init__(self, parent, data=None):
-        """Init SaveSearchDialog object."""
+        """Initialize save search dialog object."""
 
         super(SaveSearchDialog, self).__init__(parent)
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
         self.localize()
 
-        # Ensure OS selectall shortcut works in text inputs
+        # Ensure OS select all shortcut works in text inputs
         self.set_keybindings(
             [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
@@ -153,7 +153,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         return flags
 
     def set_keybindings(self, keybindings):
-        """Set keybindings for frame."""
+        """Set key bindings for frame."""
 
         tbl = []
         for binding in keybindings:
@@ -165,7 +165,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
 
     def on_textctrl_selectall(self, event):
-        """Selectall content of textctrl."""
+        """Select all content of `TextCtrl`."""
 
         text = self.FindFocus()
         if isinstance(text, wx.TextCtrl):

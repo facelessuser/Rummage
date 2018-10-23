@@ -9,7 +9,7 @@ locale_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'locale')
 
 
 def _(text):
-    """Unicode gettext."""
+    """Unicode `gettext`."""
 
     return lang.gettext(text) if lang is not None else text
 
@@ -45,5 +45,5 @@ def get_current_domain():
     return current_domain
 
 
-# Init the default setup on intitial load
+# Initialize the default setup on initial load
 _default_setup()

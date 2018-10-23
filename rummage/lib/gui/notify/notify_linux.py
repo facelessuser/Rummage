@@ -40,7 +40,7 @@ def alert(sound=None):
 def notify_osd_fallback(title, message, sound, fallback):
     """Ubuntu Notify OSD notifications fallback (just sound)."""
 
-    # Fallback to wxpython notification
+    # Fallback to wxPython notification
     fallback(title, message, sound)
 
 
@@ -64,7 +64,7 @@ try:
                 alert()
         except Exception:
             print(traceback.format_exc())
-            # Fallback to wxpython notification
+            # Fallback to wxPython notification
             fallback(title, message, sound)
 except Exception:
     notify_osd_call = None

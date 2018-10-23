@@ -9,12 +9,12 @@ if util.platform() == "osx":
 
     # http://stackoverflow.com/questions/946967/get-file-creation-time-with-python-on-mac
     class StructTimeSpec(ctypes.Structure):
-        """TimeSpec structure."""
+        """`TimeSpec` structure."""
 
         _fields_ = [('tv_sec', ctypes.c_long), ('tv_nsec', ctypes.c_long)]
 
     class StructStat64(ctypes.Structure):
-        """Stat64 structure."""
+        """`Stat64` structure."""
 
         _fields_ = [
             ('st_dev', ctypes.c_int32),
@@ -36,7 +36,7 @@ if util.platform() == "osx":
     stat64.argtypes = [ctypes.c_char_p, ctypes.POINTER(StructStat64)]
 
     def getctime(pth):
-        """Get the appropriate creation time on OSX."""
+        """Get the appropriate creation time on macOS."""
 
         buf = StructStat64()
         rv = stat64(pth.encode("utf-8"), ctypes.pointer(buf))

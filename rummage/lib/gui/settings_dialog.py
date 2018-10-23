@@ -59,10 +59,10 @@ COLUMN_SAMPLE_SIZE = 100
 
 
 class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
-    """SettingsDialog."""
+    """Settings dialog."""
 
     def __init__(self, parent):
-        """Init SettingsDialog object."""
+        """Initialize settings dialog object."""
 
         super(SettingsDialog, self).__init__(parent)
         self.setup_html(self.m_help_html)
@@ -78,7 +78,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
 
         self.localize()
 
-        # Ensure OS platform selectall shortcut works
+        # Ensure OS platform select all shortcut works
         self.set_keybindings(
             [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
@@ -170,7 +170,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
         self.SetMinSize(wx.Size(550, self.GetSize()[1]))
 
     def localize(self):
-        """Translage strings."""
+        """Translate strings."""
 
         self.TITLE = _("Preferences")
         self.GENERAL_TAB = _("General")
@@ -287,7 +287,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
         self.load_html(self.m_help_html, text, 'Editor Settings', webview.MARKDOWN_STRING)
 
     def set_keybindings(self, keybindings):
-        """Set keybindings for frame."""
+        """Set key bindings for frame."""
 
         tbl = []
         for binding in keybindings:
@@ -299,7 +299,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
             self.SetAcceleratorTable(wx.AcceleratorTable(tbl))
 
     def on_textctrl_selectall(self, event):
-        """Selectall for TextCtrl."""
+        """Select all for `TextCtrl`."""
 
         text = self.FindFocus()
         if isinstance(text, wx.TextCtrl):
@@ -332,7 +332,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
         return self.history_records_cleared
 
     def on_chardet(self, event):
-        """Handle chardet selection."""
+        """Handle `chardet` selection."""
 
         Settings.set_chardet_mode(self.m_encoding_choice.GetCurrentSelection())
 
@@ -403,7 +403,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
         event.Skip()
 
     def on_notify_test_click(self, event):
-        """Handle notificaton test."""
+        """Handle notification test."""
 
         if Settings.get_notify():
             notify.info(
@@ -515,7 +515,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
         Settings.set_regex_mode(mode)
 
     def on_extmatch_toggle(self, event):
-        """Handle extmatch toggle."""
+        """Handle `extmatch` toggle."""
 
         Settings.set_extmatch(self.m_extmatch_checkbox.GetValue())
 

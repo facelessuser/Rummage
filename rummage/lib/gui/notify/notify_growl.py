@@ -104,7 +104,7 @@ def setup_growl(app_name, icon):
         pass
 
     try:
-        # Init growl object
+        # Initialize growl object
         Options.growl = gntp.notifier.GrowlNotifier(
             applicationName=app_name,
             notifications=["Info", "Warning", "Error"],
