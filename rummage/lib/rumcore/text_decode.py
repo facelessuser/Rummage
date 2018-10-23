@@ -24,7 +24,6 @@ import os
 import re
 import functools
 from collections import namedtuple
-# import traceback
 try:
     from cchardet import UniversalDetector as CCDetect
     from chardet.universaldetector import UniversalDetector as CDetect
@@ -345,7 +344,7 @@ def _detect_encoding(f, ext, file_size, encoding_options=None):
     encoding = has_bom(f.read(4))
     f.seek(0)
 
-    # Is bianary extension
+    # Is binary extension
     if encoding is None:
         encoding = _is_binary_ext(ext, encoding_options)
 
@@ -474,7 +473,7 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096, encodi
         ext = os.path.splitext(filename)[1].lower()
         file_size = os.path.getsize(filename)
         # If the file is really big, lets just call it binary.
-        # We dont' have time to let Python chug through a massive file.
+        # We don't have time to let Python chug through a massive file.
         if not _is_very_large(file_size):
             with open(filename, "rb") as f:
                 encoding = _detect_encoding(f, ext, file_size, encoding_options)
@@ -485,7 +484,6 @@ def guess(filename, verify=True, verify_blocks=1, verify_block_size=4096, encodi
         else:
             encoding = Encoding('bin', None)
     except Exception:  # pragma: no cover
-        # print(traceback.format_exc())
         pass
 
     # If something went wrong, we will just return 'None'
@@ -511,7 +509,6 @@ def sguess(bfr, encoding_options=None):
             encoding = Encoding('bin', None)
 
     except Exception:  # pragma: no cover
-        # print(traceback.format_exc())
         pass
     return encoding
 

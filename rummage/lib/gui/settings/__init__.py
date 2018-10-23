@@ -106,7 +106,6 @@ class Settings(object):
     def load_settings(cls):
         """Load the settings."""
 
-        # cls.debug = debug_mode
         cls.localize()
         cls.setup_setting_files()
         cls.settings = {"__format__": SETTINGS_FMT}

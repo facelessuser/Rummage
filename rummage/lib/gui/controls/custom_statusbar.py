@@ -244,7 +244,7 @@ class IconTrayExtension(object):
         if resize:
             platform = util.platform()
             if platform in "osx":
-                # OSX must increment by 10
+                # macOS must increment by 10
                 self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 10])
             elif platform == "windows":
                 # In at least wxPython 2.9+, the first icon inserted changes the size, additional icons don't.

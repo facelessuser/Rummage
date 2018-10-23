@@ -123,7 +123,6 @@ def setup_notifications(app_name, img=None, term_notify=(None, None)):
     if isinstance(app_name, binary_type):
         app_name = app_name.decode('utf-8')
 
-    # setup_growl(app_name, png)
     setup(
         app_name,
         img,

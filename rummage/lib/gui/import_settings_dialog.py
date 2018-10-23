@@ -23,7 +23,7 @@ from __future__ import unicode_literals
 import re
 from .localization import _
 from .settings import Settings
-from .generic_dialogs import errormsg  # , infomsg
+from .generic_dialogs import errormsg
 from . import gui
 from .. import util
 from .overwrite_dialog import OverwriteDialog

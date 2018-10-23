@@ -69,7 +69,6 @@ EXTENSIONS = [
 EXTENSION_CONFIGS = {
     "markdown.extensions.toc": {
         "slugify": slugs.uslugify,
-        # "permalink": "\ue157"
     },
     "pymdownx.inlinehilite": {
         "style_plain_text": True

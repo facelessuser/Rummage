@@ -24,12 +24,12 @@ def platform_window_focus(frame):
         frame.Show(True)
     frame.Raise()
 
-    # OSX specific extra to ensure raise
+    # macOS specific extra to ensure raise
     if util.platform() == "osx":
         try:
             nsapplication = ctypes.c_void_p(objc.objc_getClass('NSApplication'))
             nsapp = ctypes.c_void_p(objc.objc_msgSend(nsapplication, objc.sel_registerName('sharedApplication')))
             objc.objc_msgSend(nsapp, objc.sel_registerName('activateIgnoringOtherApps:'), True)
         except Exception:
-            # Failed to bring window to top in OSX
+            # Failed to bring window to top in macOS
             pass

@@ -11,12 +11,12 @@ elif sys.platform == "darwin":
 else:
     _PLATFORM = "linux"
 
-# Below is general helper stuff that Python uses in unittests.  As these
+# Below is general helper stuff that Python uses in `unittests`.  As these
 # not meant for users, and could change without notice, include them
 # ourselves so we aren't surprised later.
 TESTFN = '@test'
 
-# Disambiguate TESTFN for parallel testing, while letting it remain a valid
+# Disambiguate `TESTFN` for parallel testing, while letting it remain a valid
 # module name.
 TESTFN = "{}_{}_tmp".format(TESTFN, os.getpid())
 

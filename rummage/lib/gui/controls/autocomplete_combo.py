@@ -44,7 +44,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
         self.changed_callback = changed_callback
         self.UseAltPopupWindow(True)
 
-        # Create list ctrl popup
+        # Create list control popup
         self.list = ListCtrlComboPopup(parent, self.GetTextCtrl())
         self.SetPopupControl(self.list)
 
@@ -66,7 +66,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
     def Create(self, parent):
         """Create list."""
 
-        # Create list ctrl popup
+        # Create list control popup
         self.list = ListCtrlComboPopup(parent, self.GetTextCtrl())
         self.SetPopupControl(self.list)
 
@@ -266,7 +266,7 @@ class ListCtrlComboPopup(wx.ComboPopup):
         self.popup_shown = False
         self.list = None
 
-        # Also init the `ComboPopup` base class.
+        # Also initialize the `ComboPopup` base class.
         wx.ComboPopup.__init__(self)
 
     def select_item(self, idx=None):
@@ -381,7 +381,7 @@ class ListCtrlComboPopup(wx.ComboPopup):
         event.Skip()
 
     # The following methods are those that are overridable from the
-    # ComboPopup base class.
+    # `ComboPopup` base class.
 
     def Init(self):
         """

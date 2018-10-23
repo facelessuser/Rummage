@@ -363,7 +363,7 @@ class TestPyEncodingGuess(_Encoding):
     def test_py_default_ascii_file(self):
         """Test default Python file."""
 
-        # Python 3 default is UTF-8.
+        # Python 3 default is `UTF-8`.
         self.guess(
             'ascii.py',
             content=self.dedent(
@@ -433,7 +433,7 @@ class TestPyEncodingGuess(_Encoding):
     def test_py_with_bad_encode_string(self):
         """Test Python file with bad encode string."""
 
-        # Should fallback to the default UTF-8
+        # Should fallback to the default `UTF-8`
         self.guess(
             'bad_encoding.py',
             content=self.dedent(

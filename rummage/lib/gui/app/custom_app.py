@@ -137,7 +137,7 @@ class ArgPipeThread(object):
 
         else:
             # It's okay if the pipe is broken, our goal is just to break the
-            # wait loop for recieving pipe data.
+            # wait loop for receiving pipe data.
             try:
                 with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
                     try:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-RumCore.
+`RumCore`.
 
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -60,10 +60,10 @@ VERSION1 = 0x800        # (?V1)
 FORMATREPLACE = 0x1000  # Use {1} for groups in replace
 POSIX = 0x2000          # (?p)
 
-# Rumcore search related flags
+# `Rumcore` search related flags
 LITERAL = 0x10000           # Literal search
 
-# Rumcore related flags
+# `Rumcore` related flags
 BUFFER_INPUT = 0x20000      # Input is a buffer
 RECURSIVE = 0x40000         # Recursive directory search
 FILE_REGEX_MATCH = 0x80000  # Regex pattern for files
@@ -452,7 +452,7 @@ class _RummageFileContent(object):
                 self.file_obj = codecs.open(self.name, 'r', encoding=enc)
             return self.file_obj.read() if self.file_map is None else self.file_map
         except RummageException:
-            # Bubble up RummageExceptions
+            # Bubble up `RummageExceptions`
             raise
         except Exception:
             if self.encoding.encode != "bin":
@@ -645,7 +645,7 @@ class _FileSearch(object):
 
         # Return the context snippet, where the match occurs,
         # and how many lines of context before and after,
-        # and the row and colum of match start.
+        # and the row and column of match start.
         return (
             content[start:end],
             (match_start, match_end),
@@ -777,7 +777,7 @@ class _FileSearch(object):
                 shutil.copy2(file_name, backup)
 
         if encoding.bom:
-            # Write the bom first, then write in utf format out in the specified order.
+            # Write the BOM first, then write in `UTF` format out in the specified order.
             with open(file_name, 'wb') as f:
                 f.write(encoding.bom)
             with codecs.open(file_name, 'a', encoding=encoding.encode) as f:
@@ -789,10 +789,10 @@ class _FileSearch(object):
                 while content:
                     f.write(content.popleft())
         else:
-            # If a user is adding unicode to ascii,
-            # we write ascii files out as utf-8 to keep it from failing.
-            # We choose utf-8 because it is compatible with ASCII,
-            # but we could just as easily have choosen Latin-1 or CP1252.
+            # If a user is adding Unicode to ASCII,
+            # we write ASCII files out as `utf-8` to keep it from failing.
+            # We choose `utf-8` because it is compatible with ASCII,
+            # but we could just as easily have chosen `Latin-1` or `CP1252`.
             enc = encoding.encode
             with codecs.open(file_name, 'w', encoding=('utf-8' if enc == 'ascii' else enc)) as f:
                 while content:
@@ -907,7 +907,7 @@ class _FileSearch(object):
                                 MatchRecord(
                                     0,                     # line number
                                     0,                     # column number
-                                    (m.start(), m.end()),  # Postion of match
+                                    (m.start(), m.end()),  # Position of match
                                     None,                  # Line(s) in which match is found
                                     (0, 0)                 # Number of lines shown before and after matched line(s)
                                 ),
@@ -950,7 +950,7 @@ class _FileSearch(object):
                                 MatchRecord(
                                     0,                     # line number
                                     0,                     # column number
-                                    (m.start(), m.end()),  # Postion of match
+                                    (m.start(), m.end()),  # Position of match
                                     None,                  # Line(s) in which match is found
                                     (0, 0)                 # Number of lines shown before and after matched line(s)
                                 ),
@@ -976,7 +976,7 @@ class _FileSearch(object):
 
                 if not self.abort and text:
                     # Update the file or buffer depending on what is being used.
-                    # For a buffer, we will actually return the the content via a BufferRecord.
+                    # For a buffer, we will actually return the the content via a `BufferRecord`.
                     if is_buffer:
                         yield self._update_buffer(text)
                         file_record_sent = True
@@ -1059,7 +1059,7 @@ class _FileSearch(object):
                                     MatchRecord(
                                         row,          # line number
                                         col,          # column number
-                                        match,        # Postion of match
+                                        match,        # Position of match
                                         lines,        # Line(s) in which match is found
                                         context       # Number of lines shown before and after matched line(s)
                                     ),
@@ -1319,7 +1319,7 @@ class Rummage(object):
         self.search_params = searches
         self.file_flags = flags & FILE_MASK
 
-        # Wcmatch flags
+        # `wcmatch` flags
         self.wcmatch_flags = wcmatch.I | wcmatch.M | wcmatch.R
         if self.file_flags & EXTMATCH:
             self.wcmatch_flags |= wcmatch.E
@@ -1355,8 +1355,8 @@ class Rummage(object):
         self.files = deque()
 
         # Initialize search objects:
-        # - _DirWalker for if target is a folder
-        # - Append FileAttrRecord if target is a file or buffer
+        # - `_DirWalker` for if target is a folder
+        # - Append `FileAttrRecord` if target is a file or buffer
         if not self.buffer_input and os.path.isdir(self.target):
             self.path_walker = _DirWalker(
                 self.target,
@@ -1417,7 +1417,7 @@ class Rummage(object):
         """Verify the encoding is okay."""
 
         enc = encoding.lower()
-        # Normalize UTFx encodings as we detect order and boms later.
+        # Normalize `UTFx` encodings as we detect order and BOMs later.
         if encoding in _U8:
             enc = 'utf-8'
         elif encoding in _U16:

@@ -374,7 +374,7 @@ class RummageFrame(gui.RummageFrame):
         self.Bind(wx.EVT_SIZE, self.on_resize)
         self.Bind(EVT_POST_RESIZE, self.on_post_resize)
 
-        # Extend the statusbar
+        # Extend the status bar
         custom_statusbar.extend_sb(self.m_statusbar)
         self.m_statusbar.set_status("")
 
@@ -406,7 +406,7 @@ class RummageFrame(gui.RummageFrame):
         self.refresh_localization()
 
         # Setup the inputs history and replace
-        # placeholder objects with actual objecs
+        # placeholder objects with actual objects
         self.setup_inputs()
 
         # Pick optimal size
@@ -671,7 +671,7 @@ class RummageFrame(gui.RummageFrame):
         if keybindings is None:
             keybindings = []
 
-        # Add keybindings.
+        # Add key bindings.
         tbl = []
         bindings = keybindings
         for binding in keybindings:
@@ -711,12 +711,6 @@ class RummageFrame(gui.RummageFrame):
             width = mainframe[0]
             height = mainframe[1] + offset
             debug('Window Size: %d x %d' % (width, height))
-            # if width > rect.GetWidth():
-            #     width = rect.GetWidth()
-            #     debug('Shrink width')
-            # if height > rect.GetHeight():
-            #     height = rect.GetHeight()
-            #     debug('Shrink height')
             sz = wx.Size(width, height)
             self.SetMinSize(sz)
             self.SetSize(sz)
@@ -728,25 +722,9 @@ class RummageFrame(gui.RummageFrame):
             min_width, min_height = min_size[0], mainframe[1] + offset
             width, height = mainframe[0], mainframe[1]
 
-            # if min_width > rect.GetWidth():
-            #     debug('----Resize Height----')
-            #     debug('Screen Index: %d' % index)
-            #     debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
-            #     debug('Window Size: %d x %d' % (width, height))
-            #     debug('Shrink width')
-            #     min_width = rect.GetWidth()
-
             if min_width > width:
                 increase_width = True
                 width = min_width
-
-            # if min_height > rect.GetHeight():
-            #     debug('----Resize Height----')
-            #     debug('Screen Index: %d' % index)
-            #     debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
-            #     debug('Window Min Size: %d x %d' % (min_width, min_height))
-            #     debug('Shrink min-height')
-            #     min_height = rect.GetHeight()
 
             if min_height > height:
                 increase_height = True

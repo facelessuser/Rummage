@@ -45,5 +45,5 @@ def get_current_domain():
     return current_domain
 
 
-# Init the default setup on intitial load
+# Initialize the default setup on initial load
 _default_setup()

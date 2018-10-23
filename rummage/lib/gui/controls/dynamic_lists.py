@@ -110,7 +110,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         if keybindings is None:
             keybindings = []
 
-        # Add keybindings.
+        # Add key bindings.
         tbl = []
         bindings = keybindings
         for binding in keybindings:

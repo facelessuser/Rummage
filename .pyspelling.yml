@@ -70,7 +70,6 @@ matrix:
   pipeline:
   - pyspelling.filters.python:
       group_comments: true
-      comments: false
   - pyspelling.flow_control.wildcard:
       allow:
       - py-comment

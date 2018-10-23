@@ -16,7 +16,9 @@ CSV
 Changelog
 Chardet
 Checkboxes
+Chunked
 Dec
+Decrement
 Edstrom
 EmojiOne
 Feb
@@ -35,6 +37,7 @@ LF
 MERCHANTABILITY
 Mar
 Mixin
+Miyaguchi
 MkDocs
 NONINFRINGEMENT
 Noop
@@ -49,6 +52,7 @@ POSIX
 Paulo
 Plugin
 Popup
+Preneel
 Prerelease
 PyMdown
 PyPI
@@ -60,6 +64,7 @@ Rummage's
 SIL
 Screenshots
 Sep
+TODO
 Tooltip
 Tox
 UI
@@ -68,9 +73,11 @@ Wildcard
 WxFormBuilder
 Xcode
 autocomplete
+backend
 boolean
 cChardet
 changelog
+charset
 checkbox
 checkboxes
 checksum
@@ -88,6 +95,7 @@ dropdown
 emoji
 encodings
 endian
+fallbacks
 filename
 fnmatch
 formatters
@@ -126,6 +134,9 @@ timestamp
 tooltip
 tuple
 un
+unhandled
+useable
+validator
 wiki
 wildcard
 wxPython
