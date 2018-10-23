@@ -48,6 +48,7 @@ Regex
 Regex's
 Rummage's
 SIL
+Screenshots
 Sep
 Tox
 UI
