@@ -61,7 +61,7 @@ Current version being used is **3.8.1**.
 
 A ton of time has been spent not only creating and supporting this plugin, but also spent making this documentation.  If you feel it is still lacking, show your appreciation for the plugin by helping to improve the documentation.  Help with documentation is always appreciated and can be done via pull requests.  There shouldn't be any need to run validation tests if only updating documentation.
 
-To build the documentation, you will need the necessary requirements. You can get them by running `pip install -r requirements/docs.txt`. I currently use a combination of [MkDocs][mkdocs], the [Material theme][mkdocs-material], and [PyMdown Extensions][pymdown-extensions] to render the docs.  You can preview the docs if you install these packages via teh requirements file.  The command for previewing the docs is `mkdocs serve`. It should be run from the root directory. You can then view the documents at `localhost:8000`.
+To build the documentation, you will need the necessary requirements. You can get them by running `pip install -r requirements/docs.txt`. I currently use a combination of [MkDocs][mkdocs], the [Material theme][mkdocs-material], and [PyMdown Extensions][pymdown-extensions] to render the docs.  You can preview the docs if you install these packages via the requirements file.  The command for previewing the docs is `mkdocs serve`. It should be run from the root directory. You can then view the documents at `localhost:8000`.
 
 When providing documentation updates, please generate Rummage's internal documentation via `python tools/gen_docs.py`. Pull requests will currently fail if the documentation is not updated along with the requested changes.
 

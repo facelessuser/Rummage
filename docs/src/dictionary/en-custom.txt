@@ -16,8 +16,10 @@ Checkboxes
 Dec
 EmojiOne
 Feb
+Fontello
 Formfeed
 GTK
+Gandy
 GitHub
 Homebrew
 JSON
@@ -31,6 +33,7 @@ Mar
 MkDocs
 NONINFRINGEMENT
 Nov
+OFL
 OS's
 OSD
 Oct
@@ -44,6 +47,7 @@ Re
 Regex
 Regex's
 Rummage's
+SIL
 Sep
 Tox
 UI
@@ -72,6 +76,7 @@ fullmatch
 globstar
 grepWin
 inline
+installable
 macOS
 macports
 multi

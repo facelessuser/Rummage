@@ -12,7 +12,7 @@
 
 ## 4.3.0
 
-- **NEW**: Documents are now included locally in installation and can be viewed directly in Rummage via a webview dialog.
+- **NEW**: Documents are now included locally in installation and can be viewed directly in Rummage via a `webview` dialog.
 - **NEW**: License can now be viewed from the application menu.
 - **NEW**: Show changelog on next launch after upgrade.
 - **NEW**: Render editor instructions as HTML in the settings dialog.
