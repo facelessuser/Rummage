@@ -55,6 +55,29 @@ matrix:
       - code
       - pre
 
+- name: css
+  default_encoding: utf-8
+  sources:
+  - docs/internal_theme/**/*.css
+  - rummage/**/*.css
+  aspell:
+    lang: en
+  dictionary:
+    wordlists:
+    - docs/src/dictionary/en-custom.txt
+    output: build/dictionary/scss.dic
+  pipeline:
+  - pyspelling.filters.stylesheets:
+      stylesheets: css
+  - pyspelling.filters.context:
+      context_visible_first: true
+      escapes: \\[\\`~]
+      delimiters:
+        - open: (?P<open>`+)
+          close: (?P=open)
+        - open: (?s)^(?P<open>\s*~{3,})
+          close: ^(?P=open)$
+
 - name: python
   sources:
   - setup.py

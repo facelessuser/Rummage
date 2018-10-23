@@ -930,7 +930,7 @@ body {
     inset 0 -12px 0 rgba(0, 0, 0, .05);
 }
 
-/* Multimarkdown Critic Blocks */
+/* MultiMarkdown Critic Blocks */
 .markdown .critic_mark {
   background: #ff0;
 }
