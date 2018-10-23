@@ -115,7 +115,7 @@ RE_LINE_ENDINGS = re.compile(r'(?:\r\n|\r|\n)')
 
 
 def get_exception():
-    """Capture exception and traceback separately."""
+    """Capture exception and `traceback` separately."""
 
     import traceback
 
@@ -289,7 +289,7 @@ class FileRecord(namedtuple('FileRecord', ['info', 'match', 'error'])):
 
 
 class MatchRecord(namedtuple('MatchRecord', ['lineno', 'colno', 'match', 'lines', 'context'])):
-    """A record that contains match info, lineno content, context, etc."""
+    """A record that contains match information: line number, context, etc."""
 
 
 class BufferRecord(namedtuple('BufferRecord', ['content', 'error'])):
@@ -355,7 +355,7 @@ class ReplacePlugin(object):
         """
         Used for testing and capturing the exception.
 
-        Needs to raise the RummageTestException.
+        Needs to raise the `RummageTestException`.
         This should not be touched by the user.
         """
 
@@ -432,7 +432,7 @@ class _RummageFileContent(object):
         return enc
 
     def _read_bin(self):
-        """Setup binary file reading with mmap."""
+        """Setup binary file reading with `mmap`."""
         try:
             self.file_obj = open(self.name, "rb")
             if self.size != 0:
@@ -473,7 +473,7 @@ class _FileSearch(object):
         backup_location, max_count, file_content=None, regex_mode=RE_MODE,
         encoding_options=None
     ):
-        """Init the file search object."""
+        """Initialize the file search object."""
 
         self.abort = False
         self.encoding_options = encoding_options
@@ -690,7 +690,7 @@ class _FileSearch(object):
             return m.expand(self.current_replace)
 
     def _findall(self, file_content, search_pattern, replace_pattern, flags, file_info):
-        """Find all occurences of search pattern in file."""
+        """Find all occurrences of search pattern in file."""
 
         replace = None
         pattern = None
@@ -905,8 +905,8 @@ class _FileSearch(object):
                             yield FileRecord(
                                 file_info,
                                 MatchRecord(
-                                    0,                     # lineno
-                                    0,                     # colno
+                                    0,                     # line number
+                                    0,                     # column number
                                     (m.start(), m.end()),  # Postion of match
                                     None,                  # Line(s) in which match is found
                                     (0, 0)                 # Number of lines shown before and after matched line(s)
@@ -948,8 +948,8 @@ class _FileSearch(object):
                             yield FileRecord(
                                 file_info,
                                 MatchRecord(
-                                    0,                     # lineno
-                                    0,                     # colno
+                                    0,                     # line number
+                                    0,                     # column number
                                     (m.start(), m.end()),  # Postion of match
                                     None,                  # Line(s) in which match is found
                                     (0, 0)                 # Number of lines shown before and after matched line(s)
@@ -1057,8 +1057,8 @@ class _FileSearch(object):
                                 yield FileRecord(
                                     file_info,
                                     MatchRecord(
-                                        row,          # lineno
-                                        col,          # colno
+                                        row,          # line number
+                                        col,          # column number
                                         match,        # Postion of match
                                         lines,        # Line(s) in which match is found
                                         context       # Number of lines shown before and after matched line(s)
@@ -1219,7 +1219,7 @@ class _DirWalker(wcmatch.WcMatch):
         return size_okay
 
     def _is_backup(self, name, directory=False):
-        """Check if file or directory is a rumcore backup."""
+        """Check if file or directory is a `rumcore` backup."""
 
         is_backup = False
 

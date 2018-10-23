@@ -55,41 +55,41 @@ matrix:
       - code
       - pre
 
-# - name: python
-#   sources:
-#   - setup.py
-#   - "{rummage,tests,tools}/**/*.py|!rummage/**/gui.py"
-#   hunspell:
-#     d: docs/src/dictionary/hunspell/en_US
-#   aspell:
-#     lang: en
-#   dictionary:
-#     wordlists:
-#     - docs/src/dictionary/en-custom.txt
-#     output: build/dictionary/python.dic
-#   pipeline:
-#   - pyspelling.filters.python:
-#       group_comments: true
-#       comments: false
-#   - pyspelling.flow_control.wildcard:
-#       allow:
-#       - py-comment
-#   - pyspelling.filters.context:
-#       context_visible_first: true
-#       delimiters:
-#       # Ignore lint (noqa) and coverage (pragma) as well as shebang (#!)
-#       - open: ^(?:(?:noqa|pragma)\b|!)
-#         close: $
-#       # Ignore Python encoding string -*- encoding stuff -*-
-#       - open: ^ *-\*-
-#         close: -\*-$
-#   - pyspelling.filters.context:
-#       context_visible_first: true
-#       escapes: \\[\\`~]
-#       delimiters:
-#       # Ignore text between inline back ticks
-#       - open: (?P<open>`+)
-#         close: (?P=open)
-#       # Ignore multiline content between fences ~~~ content ~~~
-#       - open: (?s)^(?P<open>\s*~{3,})
-#         close: ^(?P=open)$
+- name: python
+  sources:
+  - setup.py
+  - "{rummage,tests,tools}/**/*.py|!rummage/**/gui.py"
+  hunspell:
+    d: docs/src/dictionary/hunspell/en_US
+  aspell:
+    lang: en
+  dictionary:
+    wordlists:
+    - docs/src/dictionary/en-custom.txt
+    output: build/dictionary/python.dic
+  pipeline:
+  - pyspelling.filters.python:
+      group_comments: true
+      comments: false
+  - pyspelling.flow_control.wildcard:
+      allow:
+      - py-comment
+  - pyspelling.filters.context:
+      context_visible_first: true
+      delimiters:
+      # Ignore lint (noqa) and coverage (pragma) as well as shebang (#!)
+      - open: ^(?:(?:noqa|pragma)\b|!)
+        close: $
+      # Ignore Python encoding string -*- encoding stuff -*-
+      - open: ^ *-\*-
+        close: -\*-$
+  - pyspelling.filters.context:
+      context_visible_first: true
+      escapes: \\[\\`~]
+      delimiters:
+      # Ignore text between inline back ticks
+      - open: (?P<open>`+)
+        close: (?P=open)
+      # Ignore multiline content between fences ~~~ content ~~~
+      - open: (?s)^(?P<open>\s*~{3,})
+        close: ^(?P=open)$

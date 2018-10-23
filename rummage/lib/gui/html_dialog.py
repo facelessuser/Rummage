@@ -26,13 +26,13 @@ from .controls import webview
 
 
 class HTMLDialog(gui.HtmlDialog, webview.WebViewMixin):
-    """HTMLDialog."""
+    """HTML dialog."""
 
     def __init__(
         self, parent, content, title=None, content_type=webview.HTML_FILE,
         min_width=500, min_height=500, max_width=-1, max_height=-1
     ):
-        """Init SettingsDialog object."""
+        """Initialize dialog."""
 
         super(HTMLDialog, self).__init__(parent)
         self.setup_html(self.m_content_html, control_title=self)
@@ -49,7 +49,7 @@ class HTMLDialog(gui.HtmlDialog, webview.WebViewMixin):
         self.load_html(self.m_content_html, content, title, content_type)
 
     def localize(self):
-        """Translage strings."""
+        """Translate strings."""
 
         self.TITLE = _("Untitled")
 

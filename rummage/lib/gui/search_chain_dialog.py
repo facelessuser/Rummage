@@ -30,7 +30,7 @@ class SearchChainDialog(gui.SearchChainDialog):
     """Search chain dialog."""
 
     def __init__(self, parent, chain=None):
-        """Init SaveSearchDialog object."""
+        """Initialize search chain dialog object."""
 
         super(SearchChainDialog, self).__init__(parent)
         self.localize()

@@ -30,7 +30,7 @@ class Sdist(sdist):
                     os.remove(os.path.join(root, f))
 
     def run(self):
-        """Run the sdist build process."""
+        """Run the `sdist` build process."""
 
         self._clean_mo_files("rummage/lib/gui/localization/locale")
         sdist.run(self)

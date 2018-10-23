@@ -1,7 +1,7 @@
 """
-WebView mixin.
+A `WebView` mixin.
 
-Mixin for a window that adds functions to setup html2 objects.
+Mixin for a window that adds functions to setup `html2` objects.
 Adds events that control external and internal links.
 Loads HTML files from our specified data location.
 Loads HTML from strings and even converts it from Markdown if requested.
@@ -123,7 +123,7 @@ TEMPLATE = """<!DOCTYPE html>
 
 
 def escape(txt):
-    """Basic html escaping."""
+    """Basic HTML escaping."""
 
     txt = txt.replace('&', '&amp;')
     txt = txt.replace('<', '&lt;')
@@ -142,7 +142,7 @@ def convert_markdown(title, content):
 
 
 class WebViewMixin(object):
-    """HTML WebView."""
+    """HTML `WebView`."""
 
     def setup_html(self, obj, control_title=None):
         """Setup HTML events."""
@@ -153,7 +153,6 @@ class WebViewMixin(object):
 
         # Setup events
         obj.Bind(wx.html2.EVT_WEBVIEW_NAVIGATING, functools.partial(self.on_navigate, obj=obj))
-        # obj.Bind(wx.html2.EVT_WEBVIEW_NAVIGATED, functools.partial(self.on_navigated, obj=obj))
         obj.Bind(wx.html2.EVT_WEBVIEW_LOADED, functools.partial(self.on_loaded, obj=obj))
         obj.Bind(wx.html2.EVT_WEBVIEW_TITLE_CHANGED, functools.partial(self.on_title_changed, obj=obj))
 
@@ -225,6 +224,6 @@ class WebViewMixin(object):
             obj.control_title.SetTitle(title)
 
     def on_loaded(self, event, obj=None):
-        """Handle laoded event."""
+        """Handle loaded event."""
 
         obj.busy = False

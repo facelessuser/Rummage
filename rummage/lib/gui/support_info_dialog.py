@@ -53,10 +53,10 @@ def format_version(module, attr, call=False):
 
 
 class SupportInfoDialog(gui.SupportInfoDialog):
-    """SettingsDialog."""
+    """Support info dialog."""
 
     def __init__(self, parent):
-        """Init SettingsDialog object."""
+        """Initialize object."""
 
         super(SupportInfoDialog, self).__init__(parent)
         if util.platform() == "windows":
@@ -73,7 +73,7 @@ class SupportInfoDialog(gui.SupportInfoDialog):
         self.display_support_information()
 
     def localize(self):
-        """Translage strings."""
+        """Translate strings."""
 
         self.TITLE = _("Support Info")
         self.CLOSE = _("Close")

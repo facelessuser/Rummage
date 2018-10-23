@@ -32,7 +32,7 @@ class ChecksumDialog(gui.ChecksumDialog):
     """Search chain dialog."""
 
     def __init__(self, parent, algorithm, target):
-        """Init SaveSearchDialog object."""
+        """Initialize dialog."""
 
         self.file = None
         self.hashing = False

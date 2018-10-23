@@ -32,7 +32,7 @@ class ExportSettingsDialog(gui.ExportSettingsDialog):
     """Export settings dialog."""
 
     def __init__(self, parent):
-        """Init ExportSettingsDialog."""
+        """Initialize dialog."""
 
         super(ExportSettingsDialog, self).__init__(parent)
         self.localize()

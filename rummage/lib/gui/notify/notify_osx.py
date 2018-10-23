@@ -1,5 +1,5 @@
 """
-Notify OSX.
+Notify macOS.
 
 Copyright (c) 2013 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
@@ -86,17 +86,19 @@ def alert(sound=None):
     """Play an alert sound for the OS."""
 
     subprocess.call(["afplay", "/System/Library/Sounds/Glass.aiff"])
+    # ~~~
     # pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
     # snd = _nsstring(sound if sound is not None else "Glass")
     # soundobj = _callmethod(NSSound, "soundNamed:", snd)
     # _callmethod(soundobj, "play")
     # _callmethod(pool, "drain")
     # del pool
+    # ~~~
 
 
 @staticmethod
 def notify_osx_fallback(title, message, sound, fallback):
-    """OSX notifications fallback (just sound)."""
+    """The macOS notifications fallback (just sound)."""
 
     # Fallback to wxpython notification
     fallback(title, message, sound)
@@ -104,7 +106,7 @@ def notify_osx_fallback(title, message, sound, fallback):
 
 @staticmethod
 def notify_osx_call(title, message, sound, fallback):
-    """OSX notifications."""
+    """Notifications for macOS."""
 
     try:
         assert(Options.terminal_notifier is not None and exists(Options.terminal_notifier))

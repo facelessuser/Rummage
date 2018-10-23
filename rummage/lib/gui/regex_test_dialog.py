@@ -49,7 +49,7 @@ class RegexTestDialog(gui.RegexTestDialog):
     """Regex test dialog."""
 
     def __init__(self, parent):
-        """Init Regex Test Dialog object."""
+        """Initialize Regex Test Dialog object."""
 
         super(RegexTestDialog, self).__init__(None)
         if util.platform() == "windows":
@@ -77,7 +77,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.regex_version = Settings.get_regex_version()
         self.imported_plugin = None
 
-        # Ensure OS selectall shortcut works in text inputs
+        # Ensure OS select all shortcut works in text inputs
         self.set_keybindings(
             [
                 (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)
@@ -202,7 +202,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.Fit()
 
     def init_regex_timer(self):
-        """Init the update Timer object]."""
+        """Initialize the update Timer object]."""
 
         self.regex_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.regex_event, self.regex_timer)
@@ -234,7 +234,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             event.Skip()
 
     def set_keybindings(self, keybindings):
-        """Set keybindings for frame."""
+        """Set key bindings for frame."""
 
         tbl = []
         for binding in keybindings:
@@ -529,7 +529,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         event.Skip()
 
     def on_textctrl_selectall(self, event):
-        """Selectall content of textctrl."""
+        """Select all content of `TextCtrl`."""
 
         text = self.FindFocus()
         if isinstance(text, wx.TextCtrl):
@@ -591,7 +591,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             event.Skip()
 
     def on_replace_plugin_dir_changed(self, event):
-        """Handle replace plugin dir change."""
+        """Handle replace plugin directory change."""
 
         pth = event.target
         if pth is not None and os.path.exists(pth):

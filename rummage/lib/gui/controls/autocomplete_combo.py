@@ -1,5 +1,5 @@
 """
-AutoCompleteCombo.
+Autocomplete combo box.
 
 Licensed under MIT
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
@@ -24,10 +24,10 @@ from ... import util
 
 
 class AutoCompleteCombo(wx.ComboCtrl):
-    """AutoCompleteCombo box."""
+    """Autocomplete box."""
 
     def __init__(self, parent, wx_id, choices=None, load_last=False, changed_callback=None):
-        """Init the AutoCompleteCombo object."""
+        """Initialize the `AutoCompleteCombo` object."""
 
         if choices is None:
             choices = []
@@ -153,21 +153,21 @@ class AutoCompleteCombo(wx.ComboCtrl):
         self.list.resize_dropdown()
 
     def safe_set_value(self, text):
-        """Update TextCtrl without triggering autocomplete."""
+        """Update `TextCtrl` without triggering autocomplete."""
 
         self.update_semaphore = True
         self.GetTextCtrl().SetValue(text)
         self.update_semaphore = False
 
     def pick_item(self):
-        """Set the choice based on the TextCtrl value."""
+        """Set the choice based on the `TextCtrl` value."""
 
         value = self.GetTextCtrl().GetValue()
         if value in self.choices:
             self.list.set_item(self.choices.index(value))
 
     def on_dismiss(self, event):
-        """Load a previously selected choice to the TextCtrl on dismiss."""
+        """Load a previously selected choice to the `TextCtrl` on dismiss."""
 
         value = self.list.is_value_waiting()
         if value >= 0:
@@ -255,10 +255,10 @@ class AutoCompleteCombo(wx.ComboCtrl):
 
 
 class ListCtrlComboPopup(wx.ComboPopup):
-    """ListCtrlComboPopup."""
+    """List control combo popup."""
 
     def __init__(self, parent, txt_ctrl):
-        """Init the ListCtrlComboPopup object."""
+        """Initialize the `ListCtrlComboPopup` object."""
 
         self.txt_ctrl = txt_ctrl
         self.waiting_value = -1
@@ -266,7 +266,7 @@ class ListCtrlComboPopup(wx.ComboPopup):
         self.popup_shown = False
         self.list = None
 
-        # Also init the ComboPopup base class.
+        # Also init the `ComboPopup` base class.
         wx.ComboPopup.__init__(self)
 
     def select_item(self, idx=None):
@@ -275,22 +275,22 @@ class ListCtrlComboPopup(wx.ComboPopup):
         self.txt_ctrl.SetValue(self.list.GetItemText(idx if idx is not None else 0))
 
     def get_selected_text(self):
-        """Get the TextCtrl value."""
+        """Get the `TextCtrl` value."""
 
         return self.txt_ctrl.GetValue()
 
     def set_selected_text(self, text):
-        """Set the TextCtrl value."""
+        """Set the `TextCtrl` value."""
 
         self.txt_ctrl.SetValue(text)
 
     def set_waiting_value(self, value):
-        """Set a value that is to be written to the TextCtrl later."""
+        """Set a value that is to be written to the `TextCtrl` later."""
 
         self.waiting_value = value
 
     def is_value_waiting(self):
-        """Return if a selected value is waiting to be set to TextCtrl."""
+        """Return if a selected value is waiting to be set to `TextCtrl`."""
 
         return self.waiting_value
 
@@ -375,7 +375,7 @@ class ListCtrlComboPopup(wx.ComboPopup):
         event.Skip()
 
     def on_resize_dropdown(self, event):
-        """Handle ListCtrl resize event."""
+        """Handle `ListCtrl` resize event."""
 
         self.resize_dropdown()
         event.Skip()
@@ -387,7 +387,7 @@ class ListCtrlComboPopup(wx.ComboPopup):
         """
         Called immediately after construction finishes.
 
-        You can use self.GetCombo if needed to get to the ComboCtrl instance.
+        You can use `self.GetCombo` if needed to get to the `ComboCtrl` instance.
         """
 
     def Create(self, parent):

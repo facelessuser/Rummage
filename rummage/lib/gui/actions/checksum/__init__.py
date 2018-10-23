@@ -58,7 +58,7 @@ class HashThread(threading.Thread):
 
 
 class ZlibAlgorithm(object):
-    """Zlib hash algorithm."""
+    """`Zlib` hash algorithm."""
 
     __algorithm = None
     __name = None
@@ -111,7 +111,7 @@ class ZlibAlgorithm(object):
 
 class crc32(ZlibAlgorithm):  # noqa
 
-    """crc32 hash."""
+    """`crc32` hash."""
 
     def __init__(self, arg=b''):
         """Initialize."""
@@ -121,7 +121,7 @@ class crc32(ZlibAlgorithm):  # noqa
 
 class adler32(ZlibAlgorithm):  # noqa
 
-    """adler32 hash."""
+    """`adler32` hash."""
 
     def __init__(self, arg=b''):
         """Initialize."""

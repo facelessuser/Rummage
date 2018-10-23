@@ -34,7 +34,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
     """Edit search chain dialog."""
 
     def __init__(self, parent, chain=None):
-        """Init SaveSearchDialog object."""
+        """Initialize dialog."""
 
         super(EditSearchChainDialog, self).__init__(parent)
         if util.platform() == "windows":
@@ -88,7 +88,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         self.m_chain_panel.GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(self.CHAIN)
 
     def load_searches(self):
-        """Load search list in wxChoice."""
+        """Load search list in `wxChoice`."""
 
         searches = Settings.get_search()
         keys = list(searches.keys())

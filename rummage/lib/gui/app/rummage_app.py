@@ -30,10 +30,10 @@ __all__ = ('RummageApp',)
 
 
 class RummageApp(PipeApp):
-    """RummageApp."""
+    """Rummage app."""
 
     def __init__(self, argv, **kwargs):
-        """Init RummageApp object."""
+        """Initialize Rummage app object."""
 
         self.debug_mode = argv.debug
         self.path = argv.path if argv.path is not None else None
@@ -85,7 +85,7 @@ class RummageApp(PipeApp):
 
         When receiving arguments via named pipes,
         look for the search path argument, and populate
-        the search path in the RummageFrame
+        the search path in the Rummage frame
         """
 
         frame = self.GetTopWindow()
@@ -129,7 +129,7 @@ class RummageApp(PipeApp):
         return args
 
     def MacReopenApp(self):  # noqa
-        """Ensure that app will be unminimized in OSX on dock icon click."""
+        """Ensure that app will be un-minimized in macOS on dock icon click."""
 
         frame = self.GetTopWindow()
         platform_window_focus(frame)

@@ -46,7 +46,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     """Dynamic list."""
 
     def __init__(self, parent, columns, single_sel=True):
-        """Init the base class DynamicList object."""
+        """Initialize the base class `DynamicList` object."""
 
         flags = wx.LC_REPORT | wx.LC_VIRTUAL
 
@@ -104,7 +104,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """
         Method to easily set key bindings.
 
-        Also sets up debug keybindings and events.
+        Also sets up debug key bindings and events.
         """
 
         if keybindings is None:
@@ -277,6 +277,6 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         return self.sort_down, self.sort_up
 
     def GetListCtrl(self):
-        """Get ListCtrl object (self)."""
+        """Get `ListCtrl` object (self)."""
 
         return self

@@ -9,7 +9,7 @@ locale_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'locale')
 
 
 def _(text):
-    """Unicode gettext."""
+    """Unicode `gettext`."""
 
     return lang.gettext(text) if lang is not None else text
 

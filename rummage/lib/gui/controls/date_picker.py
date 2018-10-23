@@ -26,7 +26,7 @@ from ... import util
 
 
 class DatePicker(wx.adv.GenericDatePickerCtrl):
-    """DatePickerCtrl."""
+    """Custom `DatePickerCtrl`."""
 
     def __init__(self, parent, wx_id):
         """Initialize."""

@@ -1,4 +1,4 @@
-"""Data resource lib."""
+"""Data resource library."""
 from __future__ import unicode_literals
 import os
 import codecs
@@ -28,7 +28,7 @@ def get_file(file_name, raw=False):
 
 
 def get_image(file_name, b64=False):
-    """Get the image as a PyEmbeddedImage."""
+    """Get the image as a `PyEmbeddedImage`."""
     icon = b''
     resource = os.path.join(RESOURCE_PATH, file_name)
     if os.path.exists(resource):
@@ -46,13 +46,13 @@ def get_bitmap(file_name):
 
     For retina, we provide images that are 2X size.
     We can't detect retina yet, so we use 2X for non retina as well.
-    This works fine for OSX as it seems to scale the images to fit the sizer
+    This works fine for macOS as it seems to scale the images to fit the sizer
     as long as you set the height and width of the bitmap object (not the actual data)
     to half size.
 
     Windows and Linux do not auto scale, so we have to actually scale them.
-    In the future, we should load normal sizes for Windows/Linux (and OSX non retina if we can detect retina),
-    and load a separate 2X size for OSX retina.  But this is an okay work around for now.
+    In the future, we should load normal sizes for Windows/Linux (and macOS non retina if we can detect retina),
+    and load a separate 2X size for macOS retina.  But this is an okay work around for now.
     """
 
     image = get_image(file_name).GetImage()

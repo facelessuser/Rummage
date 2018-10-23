@@ -25,10 +25,10 @@ from . import gui
 
 
 class FileExtDialog(gui.FileExtDialog):
-    """File extensiion dialog."""
+    """File extension dialog."""
 
     def __init__(self, parent, extensions):
-        """Init OverwriteDialog."""
+        """Initialize dialog."""
 
         super(FileExtDialog, self).__init__(parent)
 

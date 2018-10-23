@@ -30,7 +30,7 @@ class OverwriteDialog(gui.OverwriteDialog):
     """Overwrite dialog."""
 
     def __init__(self, parent, msg=None):
-        """Init OverwriteDialog."""
+        """Initialize overwrite dialog."""
 
         super(OverwriteDialog, self).__init__(parent)
 

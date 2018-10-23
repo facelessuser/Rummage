@@ -109,7 +109,7 @@ class DeleteDialog(gui.DeleteDialog):
     """Generic progress dialog."""
 
     def __init__(self, parent, file_list, recycle):
-        """Init DeleteDialog object."""
+        """Initialize dialog."""
 
         self.file_list = file_list
         self.action = ACTION_DELETE if not recycle else ACTION_RECYCLE
