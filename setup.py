@@ -53,6 +53,8 @@ def get_version():
             return v.__version__, '2 - Pre-Alpha'
         else:
             return v.__version__, devstatus[v.__version_info__[3]]
+    except Exception:
+        print(traceback.format_exc())
     finally:
         fp.close()
 
