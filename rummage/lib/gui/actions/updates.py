@@ -27,13 +27,14 @@ def parse_version(ver, pre=False):
     # but if it was, adjust the type to a development type.
     if m.group('dev'):
         rtype = '.dev-' + rtype
+    pre = int(m.group('pre')) if m.group('pre') else 0
 
     # Ignore development releases and prereleases.
     if rtype.startswith('.dev') or (rtype in ('alpha', 'beta', 'candidate') and not pre):
-        return (0, 0, 0, 'alpha', 0, 0)
+        return (0, 0, 0, '.', 0, 0)
     micro = int(m.group('micro')) if m.group('micro') else 0
 
-    return (int(m.group('major')), int(m.group('minor')), micro, rtype, 0)
+    return (int(m.group('major')), int(m.group('minor')), micro, rtype, pre)
 
 
 def check_update(pre=False):
@@ -43,7 +44,7 @@ def check_update(pre=False):
     url = 'https://pypi.python.org/pypi/rummage/json'
     response = urlopen(url, timeout=5)
     data = json.loads(response.read().decode('utf-8'))
-    latest = (0, 0, 0, 'alpha', 0)
+    latest = (0, 0, 0, '.', 0)
     latest_str = None
     for ver in data['releases'].keys():
         ver_info = parse_version(ver)
