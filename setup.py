@@ -46,10 +46,13 @@ def get_version():
         'final': '5 - Production/Stable'
     }
     path = os.path.join(os.path.dirname(__file__), 'rummage', 'lib')
-    fp, pathname, desc = imp.find_module('__version__', [path])
+    fp, pathname, desc = imp.find_module('__meta__', [path])
     try:
-        v = imp.load_module('__version__', fp, pathname, desc)
-        return v.version, devstatus[v.version_info[3]]
+        v = imp.load_module('__meta__', fp, pathname, desc)
+        if v.__version_info__[3].startswith('.dev-'):
+            return v.__version__, '2 - Pre-Alpha'
+        else:
+            return v.__version__, devstatus[v.__version_info__[3]]
     except Exception:
         print(traceback.format_exc())
     finally:

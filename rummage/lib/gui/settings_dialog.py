@@ -47,7 +47,7 @@ Variable | Description
 !!! example "Example"
 
     ```bash
-    "C:\Program Files\Sublime Text 3\subl.exe" "{$file}:{$line}:{$col}"
+    "C:\\Program Files\\Sublime Text 3\\subl.exe" "{$file}:{$line}:{$col}"
     ```
 """)
 

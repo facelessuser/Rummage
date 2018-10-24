@@ -23751,7 +23751,7 @@
                                                 <property name="flag">wxALL|wxEXPAND</property>
                                                 <property name="row">1</property>
                                                 <property name="rowspan">4</property>
-                                                <object class="CustomControl" expanded="0">
+                                                <object class="wxListBox" expanded="0">
                                                     <property name="BottomDockable">1</property>
                                                     <property name="LeftDockable">1</property>
                                                     <property name="RightDockable">1</property>
@@ -23765,12 +23765,10 @@
                                                     <property name="caption"></property>
                                                     <property name="caption_visible">1</property>
                                                     <property name="center_pane">0</property>
-                                                    <property name="class">wxListBox</property>
+                                                    <property name="choices"></property>
                                                     <property name="close_button">1</property>
-                                                    <property name="construction">self.m_search_list = ListBox( self.m_chain_panel, wx.ID_ANY)</property>
                                                     <property name="context_help"></property>
                                                     <property name="context_menu">1</property>
-                                                    <property name="declaration"></property>
                                                     <property name="default_pane">0</property>
                                                     <property name="dock">Dock</property>
                                                     <property name="dock_fixed">0</property>
@@ -23782,7 +23780,6 @@
                                                     <property name="gripper">0</property>
                                                     <property name="hidden">0</property>
                                                     <property name="id">wxID_ANY</property>
-                                                    <property name="include">from .controls.list_box import ListBox</property>
                                                     <property name="max_size"></property>
                                                     <property name="maximize_button">0</property>
                                                     <property name="maximum_size"></property>
@@ -23798,12 +23795,16 @@
                                                     <property name="pin_button">1</property>
                                                     <property name="pos"></property>
                                                     <property name="resize">Resizable</property>
-                                                    <property name="settings"></property>
                                                     <property name="show">1</property>
                                                     <property name="size"></property>
-                                                    <property name="subclass"></property>
+                                                    <property name="style">wxLB_SINGLE</property>
+                                                    <property name="subclass">; ; forward_declare</property>
                                                     <property name="toolbar_pane">0</property>
                                                     <property name="tooltip"></property>
+                                                    <property name="validator_data_type"></property>
+                                                    <property name="validator_style">wxFILTER_NONE</property>
+                                                    <property name="validator_type">wxDefaultValidator</property>
+                                                    <property name="validator_variable"></property>
                                                     <property name="window_extra_style"></property>
                                                     <property name="window_name"></property>
                                                     <property name="window_style"></property>
@@ -23824,6 +23825,8 @@
                                                     <event name="OnLeftDClick"></event>
                                                     <event name="OnLeftDown"></event>
                                                     <event name="OnLeftUp"></event>
+                                                    <event name="OnListBox"></event>
+                                                    <event name="OnListBoxDClick"></event>
                                                     <event name="OnMiddleDClick"></event>
                                                     <event name="OnMiddleDown"></event>
                                                     <event name="OnMiddleUp"></event>

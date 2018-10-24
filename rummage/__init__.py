@@ -1,5 +1,2 @@
 """Rummage app."""
-from .lib import __version__
-
-version = __version__.version
-version_info = __version__.version_info
+from .lib.__meta__ import __version__, __version_info__  # noqa: F401
