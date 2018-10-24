@@ -25,37 +25,6 @@ import wx
 import wx.lib.agw.supertooltip
 from ... import util
 
-if (2, 9, 4) < wx.VERSION < (4, 0, 0, 'b2'):
-    def monkey_patch():
-        """
-        Monkey patch `Supertooltips`.
-
-        Remove once WxPython gets its crap together.
-        """
-
-        import inspect
-        import re
-
-        target_line = re.compile(r'([ ]{8})(maxWidth = max\(bmpWidth\+\(textWidth\+self._spacing\*3\), maxWidth\)\n)')
-        tt_source = inspect.getsourcelines(wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint)[0]
-        count = 0
-        found = False
-        for line in tt_source:
-            if not found:
-                m = target_line.match(line)
-                if m:
-                    tt_source[count] = m.group(0)
-                    found = True
-                    count += 1
-                    continue
-            tt_source[count] = line[4:]
-            count += 1
-        if found:
-            exec(''.join(tt_source))
-            wx.lib.agw.supertooltip.ToolTipWindowBase.OnPaint = locals()['OnPaint']  # noqa
-
-    monkey_patch()
-
 
 class ContextMenu(wx.Menu):
     """Context Menu."""

@@ -1,12 +1,19 @@
 """Perform a check for latest versions on PyPI."""
 from __future__ import unicode_literals
-from ... import __version__
+from ... import __meta__
 import json
 import re
 from urllib.request import urlopen
 
-RE_VER = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)(?:\.(?P<micro>\d+))?(?:(?P<type>a|b|rc|post)(?P<pre_post>\d+))?')
-releases = {"a": 'alpha', "b": 'beta', "rc": 'candidate', "post": 'final'}
+RE_VER = re.compile(
+    r'''(?x)
+    (?P<major>\d+)\.(?P<minor>\d+)(?:\.(?P<micro>\d+))?
+    (?:(?P<type>a|b|rc)(?P<pre>\d+))?
+    (?:\.post(?P<post>\d+))?
+    (?:\.dev(?P<dev>\d+))?
+    '''
+)
+releases = {"a": 'alpha', "b": 'beta', "rc": 'candidate'}
 
 
 def parse_version(ver, pre=False):
@@ -16,8 +23,13 @@ def parse_version(ver, pre=False):
     # Post releases will be formatted like a normal release stripping of the post specifier
     # as post releases are essentially things like doc changes or things like that.
     rtype = releases[m.group('type')] if m.group('type') else 'final'
+    # Development release should never actually be on the server,
+    # but if it was, adjust the type to a development type.
+    if m.group('dev'):
+        rtype = '.dev-' + rtype
 
-    if rtype in ('alpha', 'beta', 'candidate') and not pre:
+    # Ignore development releases and prereleases.
+    if rtype.startswith('.dev') or (rtype in ('alpha', 'beta', 'candidate') and not pre):
         return (0, 0, 0, 'alpha', 0, 0)
     micro = int(m.group('micro')) if m.group('micro') else 0
 
@@ -38,7 +50,7 @@ def check_update(pre=False):
         if ver_info > latest:
             latest = ver_info
             latest_str = ver
-    if __version__.version_info < latest:
+    if __meta__.__version_info__ < latest:
         latest_ver_str = latest_str
 
     return latest_ver_str

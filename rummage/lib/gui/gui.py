@@ -17,7 +17,6 @@ from .controls.result_lists import ResultContentList
 from .controls.encoding_list import EncodingList
 from .controls.load_search_list import SavedSearchList
 from .controls.search_chain_list import SearchChainList
-from .controls.list_box import ListBox
 from .controls.search_error_list import ErrorList
 import wx.html2
 
@@ -2424,7 +2423,8 @@ class EditSearchChainDialog ( wx.Dialog ):
         self.m_search_choice.SetSelection( 0 )
         gbSizer3.Add( self.m_search_choice, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
         
-        self.m_search_list = ListBox( self.m_chain_panel, wx.ID_ANY)
+        m_search_listChoices = []
+        self.m_search_list = wx.ListBox( self.m_chain_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_search_listChoices, wx.LB_SINGLE )
         self.m_search_list.SetMinSize( wx.Size( 200,-1 ) )
         
         gbSizer3.Add( self.m_search_list, wx.GBPosition( 1, 0 ), wx.GBSpan( 4, 1 ), wx.ALL|wx.EXPAND, 5 )
