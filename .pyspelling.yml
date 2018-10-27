@@ -9,7 +9,6 @@ matrix:
   aspell:
     lang: en
   dictionary:
-    lang: en
     wordlists:
     - docs/src/dictionary/en-custom.txt
     output: build/dictionary/mkdocs.dic
@@ -71,17 +70,22 @@ matrix:
       stylesheets: css
   - pyspelling.filters.context:
       context_visible_first: true
-      escapes: \\[\\`~]
+      escapes: '\\[\\`]'
       delimiters:
-        - open: (?P<open>`+)
-          close: (?P=open)
-        - open: (?s)^(?P<open>\s*~{3,})
-          close: ^(?P=open)$
+      # Ignore multiline content between fences (fences can have 3 or more back ticks)
+      # ```
+      # content
+      # ```
+      - open: '(?s)^(?P<open> *`{3,})$'
+        close: '^(?P=open)$'
+      # Ignore text between inline back ticks
+      - open: '(?P<open>`+)'
+        close: '(?P=open)'
 
 - name: python
   sources:
   - setup.py
-  - "{rummage,tests,tools}/**/*.py|!rummage/**/gui.py"
+  - '{rummage,tests,tools}/**/*.py|!rummage/**/gui.py'
   hunspell:
     d: docs/src/dictionary/hunspell/en_US
   aspell:
@@ -100,18 +104,21 @@ matrix:
       context_visible_first: true
       delimiters:
       # Ignore lint (noqa) and coverage (pragma) as well as shebang (#!)
-      - open: ^(?:(?:noqa|pragma)\b|!)
-        close: $
+      - open: '^(?: *(?:noqa\b|pragma: no cover)|!)'
+        close: '$'
       # Ignore Python encoding string -*- encoding stuff -*-
-      - open: ^ *-\*-
-        close: -\*-$
+      - open: '^ *-\*-'
+        close: '-\*-$'
   - pyspelling.filters.context:
       context_visible_first: true
-      escapes: \\[\\`~]
+      escapes: '\\[\\`]'
       delimiters:
+      # Ignore multiline content between fences (fences can have 3 or more back ticks)
+      # ```
+      # content
+      # ```
+      - open: '(?s)^(?P<open> *`{3,})$'
+        close: '^(?P=open)$'
       # Ignore text between inline back ticks
-      - open: (?P<open>`+)
-        close: (?P=open)
-      # Ignore multiline content between fences ~~~ content ~~~
-      - open: (?s)^(?P<open>\s*~{3,})
-        close: ^(?P=open)$
+      - open: '(?P<open>`+)'
+        close: '(?P=open)'

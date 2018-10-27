@@ -1,73 +1,194 @@
 """Version info."""
 from __future__ import unicode_literals
+from collections import namedtuple
+import re
+
+RE_VER = re.compile(
+    r'''(?x)
+    (?P<major>\d+)(?:\.(?P<minor>\d+))?(?:\.(?P<micro>\d+))?
+    (?:(?P<type>a|b|rc)(?P<pre>\d+))?
+    (?:\.post(?P<post>\d+))?
+    (?:\.dev(?P<dev>\d+))?
+    '''
+)
+
+REL_MAP = {
+    ".dev": "",
+    ".dev-alpha": "a",
+    ".dev-beta": "b",
+    ".dev-candidate": "rc",
+    "alpha": "a",
+    "beta": "b",
+    "candidate": "rc",
+    "final": ""
+}
+
+DEV_STATUS = {
+    ".dev": "2 - Pre-Alpha",
+    ".dev-alpha": "2 - Pre-Alpha",
+    ".dev-beta": "2 - Pre-Alpha",
+    ".dev-candidate": "2 - Pre-Alpha",
+    "alpha": "3 - Alpha",
+    "beta": "4 - Beta",
+    "candidate": "4 - Beta",
+    "final": "5 - Production/Stable"
+}
+
+PRE_REL_MAP = {"a": 'alpha', "b": 'beta', "rc": 'candidate'}
 
 
-def pep440_version(vi):
+class Pep440Version(namedtuple("Pep440Version", ["major", "minor", "micro", "release", "pre", "post", "dev"])):
     """
     Get the version (PEP 440).
 
-    Version structure
-      (major, minor, micro, release type, pre-release build, post-release build)
-    Release names are named is such a way they are sortable and comparable with ease.
-      (alpha | beta | candidate | final)
+    A biased approach to the PEP 440 semantic version.
 
-    - "final" should never have a pre-release build number
-    - pre-releases should have a pre-release build number greater than 0
-    - post-release is only applied if post-release build is greater than 0
-    - development-release is only applied if `.dev-` is appended to release type.
-      It can be applied to pre and post releases. Intention is to only use this internally
-      and never actually release a `dev` to the public server. As we don't manage build releases,
-      we will just use `dev0`.
+    Provides a tuple structure which is sorted for comparisons `v1 > v2` etc.
+      (major, minor, micro, release type, pre-release build, post-release build, development release build)
+    Release types are named in is such a way they are comparable with ease.
+    Accessors to check if a development, pre-release, or post-release build. Also provides accessor to get
+    development status for setup files.
+
+    How it works (currently):
+
+    - You must specify a release type as either `final`, `alpha`, `beta`, or `candidate`.
+    - To define a development release, you can use either `.dev`, `.dev-alpha`, `.dev-beta`, or `.dev-candidate`.
+      The dot is used to ensure all development specifiers are sorted before `alpha`.
+      You can specify a `dev` number for development builds, but do not have to as implicit development releases
+      are allowed.
+    - You must specify a `pre` value greater than zero if using a prerelease as this project (not PEP 440) does not
+      allow implicit prereleases.
+    - You can optionally set `post` to a value greater than zero to make the build a post release. While post releases
+      are technically allowed in prereleases, it is strongly discouraged, so we are rejecting them. It should be
+      noted that we do not allow `post0` even though PEP 440 does not restrict this. This project specifically
+      does not allow implicit post releases.
+    - It should be noted that we do not support epochs `1!` or local versions `+some-custom.version-1`.
 
     Acceptable version releases:
 
-    ~~~
-    (1, 0, 0, 'final', 0, 0)      1.0
-    (1, 2, 0, 'final', 0, 0)      1.2
-    (1, 2, 3, 'final', 0, 0)      1.2.3
-    (1, 2, 0, 'alpha', 4, 0):     1.2a4
-    (1, 2, 0, 'beta', 4, 0):      1.2b4
-    (1, 2, 0, 'candidate', 4, 0): 1.2rc4
-    (1, 2, 0, 'final', 0, 1)      1.2.post1
-    (1, 2, 0, 'beta', 1, 1):      1.2b1.post1
-    (1, 2, 3, '.dev-final', 0, 0) 1.2.3.dev0
-    (1, 2, 3, '.dev-alpha', 1, 0) 1.2.3a1.dev0
-    (1, 2, 3, '.dev-final', 0, 1) 1.2.3.post1.dev0
-    (1, 2, 3, '.dev-beta', 2, 1)  1.2.3b2.post1.dev0
-    ~~~
+    ```
+    Pep440Version(1, 0, 0, "final")                    1.0
+    Pep440Version(1, 2, 0, "final")                    1.2
+    Pep440Version(1, 2, 3, "final")                    1.2.3
+    Pep440Version(1, 2, 0, ".dev-alpha", pre=4)        1.2a4
+    Pep440Version(1, 2, 0, ".dev-beta", pre=4)         1.2b4
+    Pep440Version(1, 2, 0, ".dev-candidate", pre=4)    1.2rc4
+    Pep440Version(1, 2, 0, "final", post=1)            1.2.post1
+    Pep440Version(1, 2, 3, ".dev")                     1.2.3.dev0
+    Pep440Version(1, 2, 3, ".dev", dev=1)              1.2.3.dev1
+    ```
 
     """
 
-    # Determine if this is a development build or regular build
-    dev, rel_type = (True, vi[3][5:]) if vi[3].startswith('.dev-') else (False, vi[3])
+    def __new__(cls, major, minor, micro, release="final", pre=0, post=0, dev=0):
+        """Validate version info."""
 
-    releases = {"alpha": 'a', "beta": 'b', "candidate": 'rc', "final": ''}
+        # Ensure all parts are positive integers.
+        for value in (major, minor, micro, pre, post):
+            if not (isinstance(value, int) and value >= 0):
+                raise ValueError("All version parts except 'release' should be integers.")
 
-    # Ensure version info is valid.
-    # Version info should be proper length.
-    assert len(vi) == 6
-    # Should be a valid release.
-    assert rel_type in releases
-    # Pre-release releases should have a pre-release value.
-    assert rel_type == 'final' or vi[4] > 0
-    # Final should not have a pre-release value.
-    assert rel_type != 'final' or vi[4] == 0
+        if release not in REL_MAP:
+            raise ValueError("'{}' is not a valid release type.".format(release))
 
-    # Assemble major, minor, patch version. Patch can be left out if 0.
-    main = '.'.join(str(x) for x in (vi[0:2] if vi[2] == 0 else vi[0:3]))
-    # Assemble pre-release if needed.
-    prerel = releases[rel_type] + str(vi[4]) if releases[rel_type] else ''
-    # Assemble post-release if we have one.
-    postrel = '.post%d' % vi[5] if vi[5] > 0 else ''
-    # Assemble development release if we have one.
-    devrel = '.dev0' if dev else ''
+        # Ensure valid pre-release (we do not allow implicit pre-releases).
+        if ".dev-candidate" < release < "final":
+            if pre == 0:
+                raise ValueError("Implicit pre-releases not allowed.")
+            elif dev:
+                raise ValueError("Version is not a development release.")
+            elif post:
+                raise ValueError("Post-releases are not allowed with pre-releases.")
 
-    return ''.join((main, prerel, postrel, devrel))
+        # Ensure valid development or development/pre release
+        elif release < "alpha":
+            if release > ".dev" and pre == 0:
+                raise ValueError("Implicit pre-release not allowed.")
+            elif post:
+                raise ValueError("Post-releases are not allowed with pre-releases.")
+
+        # Ensure a valid normal release
+        else:
+            if pre:
+                raise ValueError("Version is not a pre-release.")
+            elif dev:
+                raise ValueError("Version is not a development release.")
+
+        return super(Pep440Version, cls).__new__(cls, major, minor, micro, release, pre, post, dev)
+
+    def _is_pre(self):
+        """Is prerelease."""
+
+        return self.pre > 0
+
+    def _is_dev(self):
+        """Is development."""
+
+        return bool(self.release < "alpha")
+
+    def _is_post(self):
+        """Is post."""
+
+        return self.post > 0
+
+    def _get_dev_status(self):  # pragma: no cover
+        """Get development status string."""
+
+        return DEV_STATUS[self.release]
+
+    def _get_canonical(self):
+        """Get the canonical output string."""
+
+        # Assemble major, minor, micro version and append `pre`, `post`, or `dev` if needed..
+        if self.micro == 0:
+            ver = "{}.{}".format(self.major, self.minor)
+        else:
+            ver = "{}.{}.{}".format(self.major, self.minor, self.micro)
+        if self._is_pre():
+            ver += '{}{}'.format(REL_MAP[self.release], self.pre)
+        if self._is_post():
+            ver += ".post{}".format(self.post)
+        if self._is_dev():
+            ver += ".dev{}".format(self.dev)
+
+        return ver
+
+
+def parse_version(ver, pre=False):
+    """Parse version into a comparable Pep440Version tuple."""
+
+    m = RE_VER.match(ver)
+
+    # Handle major, minor, micro
+    major = int(m.group('major'))
+    minor = int(m.group('minor')) if m.group('minor') else 0
+    micro = int(m.group('micro')) if m.group('micro') else 0
+
+    # Handle pre releases
+    if m.group('type'):
+        release = PRE_REL_MAP[m.group('type')]
+        pre = int(m.group('pre'))
+    else:
+        release = "final"
+        pre = 0
+
+    # Handle development releases
+    dev = m.group('dev') if m.group('dev') else 0
+    if m.group('dev'):
+        dev = int(m.group('dev'))
+        release = '.dev-' + release if pre else '.dev'
+    else:
+        dev = 0
+
+    # Handle post
+    post = int(m.group('post')) if m.group('post') else 0
+
+    return Pep440Version(major, minor, micro, release, pre, post, dev)
 
 
 #   (major, minor, micro, release type, pre-release build, post-release build, development-release)
-__version_info__ = (4, 3, 1, 'final', 0, 0)
-__version__ = pep440_version(__version_info__)
+__version_info__ = Pep440Version(4, 3, 1)
+__version__ = __version_info__._get_canonical()
 __app__ = "Rummage"
 __status__ = __version_info__[3]
 __maintainers__ = [("Isaac Muse", "IsaacMuse@gmail.com")]
