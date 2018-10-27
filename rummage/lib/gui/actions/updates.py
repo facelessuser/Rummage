@@ -2,39 +2,25 @@
 from __future__ import unicode_literals
 from ... import __meta__
 import json
-import re
 from urllib.request import urlopen
-
-RE_VER = re.compile(
-    r'''(?x)
-    (?P<major>\d+)\.(?P<minor>\d+)(?:\.(?P<micro>\d+))?
-    (?:(?P<type>a|b|rc)(?P<pre>\d+))?
-    (?:\.post(?P<post>\d+))?
-    (?:\.dev(?P<dev>\d+))?
-    '''
-)
-releases = {"a": 'alpha', "b": 'beta', "rc": 'candidate'}
 
 
 def parse_version(ver, pre=False):
     """Parse version into a comparable tuple."""
 
-    m = RE_VER.match(ver)
-    # Post releases will be formatted like a normal release stripping of the post specifier
-    # as post releases are essentially things like doc changes or things like that.
-    rtype = releases[m.group('type')] if m.group('type') else 'final'
-    # Development release should never actually be on the server,
-    # but if it was, adjust the type to a development type.
-    if m.group('dev'):
-        rtype = '.dev-' + rtype
-    pre = int(m.group('pre')) if m.group('pre') else 0
+    v = __meta__.parse_version(ver)
 
-    # Ignore development releases and prereleases.
-    if rtype.startswith('.dev') or (rtype in ('alpha', 'beta', 'candidate') and not pre):
-        return (0, 0, 0, '.', 0, 0)
-    micro = int(m.group('micro')) if m.group('micro') else 0
+    # If this is a dev build, or pre release and we are not allowing them
+    # generate a version which will be less than any version it is compared to.
+    if v._is_dev() or (v._is_pre() and not pre):
+        # Create a version which is before all versions.
+        v = __meta__.Pep440Version(0, 0, 0, '.dev')
 
-    return (int(m.group('major')), int(m.group('minor')), micro, rtype, pre)
+    # Exclude post number in comparison as they are not significant enough to alert the user.
+    if v._is_post():
+        v = __meta__.Pep440Version(*v[:4])
+
+    return v
 
 
 def check_update(pre=False):

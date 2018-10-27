@@ -8,10 +8,10 @@ from __future__ import unicode_literals
 import subprocess
 import traceback
 from os.path import exists
-# ~~~
+# ```
 # import ctypes
 # import ctypes.util
-# ~~~
+# ```
 import sys
 import platform
 
@@ -24,7 +24,7 @@ if PY3:
 else:
     binary_type = str
 
-# ~~~
+# ```
 # appkit = ctypes.cdll.LoadLibrary(ctypes.util.find_library('AppKit'))
 # cf = ctypes.cdll.LoadLibrary(ctypes.util.find_library('CoreFoundation'))
 # objc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('objc'))
@@ -54,7 +54,7 @@ else:
 #
 #     cast_return = kwargs.get("cast_return", ctypes.c_void_p)
 #     return cast_return(objc.objc_msgSend(obj, objc.sel_registerName(method), *args))
-# ~~~
+# ```
 
 
 def _is_ver_okay():
@@ -90,14 +90,14 @@ def alert(sound=None):
     """Play an alert sound for the OS."""
 
     subprocess.call(["afplay", "/System/Library/Sounds/Glass.aiff"])
-    # ~~~
+    # ```
     # pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
     # snd = _nsstring(sound if sound is not None else "Glass")
     # soundobj = _callmethod(NSSound, "soundNamed:", snd)
     # _callmethod(soundobj, "play")
     # _callmethod(pool, "drain")
     # del pool
-    # ~~~
+    # ```
 
 
 @staticmethod

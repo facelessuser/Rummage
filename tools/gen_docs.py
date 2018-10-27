@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import sys
 import os
 import subprocess
-import glob
+from wcmatch import glob
 import hashlib
 try:
     import mkdocs  # noqa
@@ -20,16 +20,12 @@ except ImportError:
 
 __version__ = '2.0.0'
 
+FLAGS = glob.G | glob.N | glob.B
+
 FILES_PATTERNS = [
     'mkdocs-internal.yml',
-    'docs/src/**/*.md',
-    'docs/src/**/*.txt',
-    'docs/src/**/*.png',
-    'docs/src/**/*.gif',
-    'docs/src/**/*.html',
-    'docs/internal_theme/*.html',
-    'docs/internal_theme/*.css',
-    'docs/internal_theme/*.js'
+    'docs/src/markdown/**/*.{md,txt,png,gif,html}',
+    'docs/internal_theme/*.{html,css,js}'
 ]
 
 MKDOCS_CFG = "mkdocs-internal.yml"
@@ -98,7 +94,7 @@ def hash_files(verbose, debug):
     found = []
     h = hashlib.new('md5')
     for pattern in FILES_PATTERNS:
-        for f in glob.iglob(pattern, recursive=True):
+        for f in glob.iglob(glob.globsplit(pattern, flags=FLAGS), flags=FLAGS):
             name = f.replace('\\', '/')
             found.append(name)
     if verbose:
