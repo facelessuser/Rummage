@@ -447,7 +447,7 @@ class TestPyEncodingGuess(_Encoding):
 
 
 class TestSizeGuess(_Encoding):
-    """Test Python file encoding based on special logic dependant on size."""
+    """Test Python file encoding based on special logic dependent on size."""
 
     def test_zero_size(self):
         """Test a file with zero size."""
@@ -629,7 +629,7 @@ class TestChardetGuess(_Encoding):
 
 
 class TestSizeSguess(_Encoding):
-    """Test Python file encoding based on special logic dependant on size."""
+    """Test Python file encoding based on special logic dependent on size."""
 
     def test_zero_size(self):
         """Test a file with zero size."""

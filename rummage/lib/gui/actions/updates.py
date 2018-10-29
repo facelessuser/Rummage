@@ -14,11 +14,11 @@ def parse_version(ver, pre=False):
     # generate a version which will be less than any version it is compared to.
     if v._is_dev() or (v._is_pre() and not pre):
         # Create a version which is before all versions.
-        v = __meta__.Pep440Version(0, 0, 0, '.dev')
+        v = __meta__.Version(0, 0, 0, '.dev')
 
     # Exclude post number in comparison as they are not significant enough to alert the user.
     if v._is_post():
-        v = __meta__.Pep440Version(*v[:4])
+        v = __meta__.Version(*v[:4])
 
     return v
 

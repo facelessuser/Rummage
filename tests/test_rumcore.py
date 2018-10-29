@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for rumcore."""
+"""Tests for `rumcore`."""
 from __future__ import unicode_literals
 import unittest
 import os
