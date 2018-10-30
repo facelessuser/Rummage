@@ -1516,7 +1516,7 @@ class Rummage(object):
                     for rec in self.search_file():
                         yield rec
 
-        # Clear files if kill was signalled.
+        # Clear files if kill was signaled.
         if self.abort:
             self.files.clear()
 

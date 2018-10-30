@@ -31,6 +31,7 @@ matrix:
       - .md-source__repository
       - .headerlink
       - .md-icon
+  - pyspelling.filters.url:
 
 - name: markdown
   sources:
@@ -53,6 +54,7 @@ matrix:
       ignores:
       - code
       - pre
+  - pyspelling.filters.url:
 
 - name: css
   default_encoding: utf-8
@@ -81,6 +83,7 @@ matrix:
       # Ignore text between inline back ticks
       - open: '(?P<open>`+)'
         close: '(?P=open)'
+  - pyspelling.filters.url:
 
 - name: python
   sources:
@@ -122,3 +125,4 @@ matrix:
       # Ignore text between inline back ticks
       - open: '(?P<open>`+)'
         close: '(?P=open)'
+  - pyspelling.filters.url:

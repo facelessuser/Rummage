@@ -58,6 +58,7 @@ Preneel
 Prerelease
 PyMdown
 PyPI
+PyPI
 Re
 Regex
 Regex's
