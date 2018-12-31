@@ -14,7 +14,7 @@ DELETE_UNSPECIFIED = True
 BUG = 'c45b46'
 FEATURE = '7b17d8'
 SUPPORT = 'efbe62'
-DOCS = 'b2ffeb'
+MAINTENANCE = 'b2ffeb'
 
 CATEGORY = '709ad8'
 SUBCATEGORY = 'bfd4f2'
@@ -31,6 +31,7 @@ label_list = {
     # Issue type
     'bug': (BUG, "Bug report."),
     'feature': (FEATURE, "Feature request."),
+    'maintenance': (MAINTENANCE, "Maintenance chore."),
     'support': (SUPPORT, "Support request."),
 
     # Category
@@ -40,8 +41,8 @@ label_list = {
     ('Documentation', 'docs'): (CATEGORY, "Related to documentation."),
 
     # Sub categories
-    '4.x': (SUBCATEGORY, "Targeting the 4.x branch"),
-    '3.x': (SUBCATEGORY, "Targeting the 3.x branch"),
+    '4.x': (SUBCATEGORY, "Targeting the 4.x branch."),
+    '3.x': (SUBCATEGORY, "Targeting the 3.x branch."),
 
     # Issue status
     'more-info-needed': (PENDING, "More information is required."),
