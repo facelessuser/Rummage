@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.3.2
+
+- **FIX**: Require Backrefs 4.0.1 which includes a number of bug fixes, particularly one that sometimes caused Backrefs not to install properly.
+
 ## 4.3.1
 
 - **FIX**: Python file encoding detection should default to the Python 3 assumed default, not Python 2.
