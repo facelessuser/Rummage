@@ -3,5 +3,5 @@ chardet>=3.0.4
 cchardet
 backrefs>=3.5.2,<5.0
 bracex
-regex<=2018.11.22
+regex
 wcmatch>=1.0.1,<3.0
