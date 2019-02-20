@@ -132,8 +132,12 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             info["wcmatch"] = 'Version could not be acquired!'
 
         try:
-            import regex
-            info["regex"] = format_version(regex, '__version__')
+            try:
+                from regex import __version__ as regex_version
+            except ImportError:
+                from regex.regex import __version__ as regex_version
+
+            info["regex"] = list2string(regex_version)
         except Exception:
             info["regex"] = 'Version could not be acquired!'
 
