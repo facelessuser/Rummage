@@ -137,7 +137,7 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             except ImportError:
                 from regex.regex import __version__ as regex_version
 
-            info["regex"] = list2string(regex_version)
+            info["regex"] = regex_version
         except Exception:
             info["regex"] = 'Version could not be acquired!'
 
