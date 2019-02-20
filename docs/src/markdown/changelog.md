@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.3.3
+
+- **FIX**: Fix incompatibilities with latest Regex versions.
+
 ## 4.3.2
 
 - **FIX**: Require Backrefs 4.0.1 which includes a number of bug fixes, particularly one that sometimes caused Backrefs not to install properly.
