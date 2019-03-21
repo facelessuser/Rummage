@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.3.4
+
+- **FIX**: Fix some glob related issues by upgrading to the minimum version of `wcmatch` version 2.1.0.
+- **FIX**: Require the minimum version of `bracex` version 1.1.1.
+
 ## 4.3.3
 
 - **FIX**: Fix incompatibilities with latest Regex versions.

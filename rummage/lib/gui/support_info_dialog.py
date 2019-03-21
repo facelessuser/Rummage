@@ -121,13 +121,13 @@ class SupportInfoDialog(gui.SupportInfoDialog):
 
         try:
             import bracex
-            info["bracex"] = format_version(bracex, 'version')
+            info["bracex"] = format_version(bracex, '__version__')
         except Exception:
             info["bracex"] = 'Version could not be acquired!'
 
         try:
             import wcmatch
-            info["wcmatch"] = format_version(wcmatch, 'version')
+            info["wcmatch"] = format_version(wcmatch, '__version__')
         except Exception:
             info["wcmatch"] = 'Version could not be acquired!'
 
