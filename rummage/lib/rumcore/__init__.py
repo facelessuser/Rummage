@@ -75,14 +75,15 @@ PROCESS_BINARY = 0x1000000  # Process binary files
 TRUNCATE_LINES = 0x2000000  # Truncate context lines to 120 chars
 BACKUP = 0x4000000          # Backup files on replace
 BACKUP_FOLDER = 0x8000000   # Backup to folder
+FOLLOW_LINKS = 0x10000000   # Follow symlinks
 
 # Fnmatch/Glob flags
-EXTMATCH = 0x10000000       # Match with extended patterns +(...) etc.
-BRACE = 0x20000000          # Expand braces a{b,c} -> ab ac
-FILECASE = 0x40000000       # File case sensitivity
-DIRPATHNAME = 0x80000000    # Full directory exclude path match
-FILEPATHNAME = 0x100000000  # Full file name path match
-GLOBSTAR = 0x200000000      # Use globstar (**) in full paths
+EXTMATCH = 0x100000000       # Match with extended patterns +(...) etc.
+BRACE = 0x200000000          # Expand braces a{b,c} -> ab ac
+FILECASE = 0x400000000       # File case sensitivity
+DIRPATHNAME = 0x800000000    # Full directory exclude path match
+FILEPATHNAME = 0x1000000000  # Full file name path match
+GLOBSTAR = 0x2000000000      # Use globstar (**) in full paths
 
 RE_MODE = 0
 BRE_MODE = 1
@@ -90,8 +91,8 @@ REGEX_MODE = 2
 BREGEX_MODE = 3
 
 SEARCH_MASK = 0x1FFFF
-FILE_MASK = 0x3FFFE0000
-FNMATCH_FLAGS = 0x3F0000000
+FILE_MASK = 0x3FFFFE0000
+FNMATCH_FLAGS = 0x3F00000000
 
 RE_MODES = (RE_MODE, BRE_MODE)
 REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
@@ -1238,6 +1239,19 @@ class _DirWalker(wcmatch.WcMatch):
 
         return is_backup
 
+    def compare_file(self, filename):
+        """Compare filename."""
+
+        return self.file_check.match(filename)
+
+    def compare_directory(self, directory):
+        """Compare folder."""
+
+        if self.folder_regex_exclude_match:
+            return not self.folder_exclude_check.match(directory)
+        else:
+            return not self.folder_exclude_check.match(directory + self.sep if self.dir_pathname else directory)
+
     def on_validate_file(self, base, name):
         """Validate file override."""
 
@@ -1333,6 +1347,12 @@ class Rummage(object):
             self.wcmatch_flags |= wcmatch.FP
         if self.file_flags & GLOBSTAR:
             self.wcmatch_flags |= wcmatch.G
+        if self.file_flags & RECURSIVE:
+            self.wcmatch_flags |= wcmatch.RV
+        if self.file_flags & SHOW_HIDDEN:
+            self.wcmatch_flags |= wcmatch.HD
+        if self.file_flags & FOLLOW_LINKS:
+            self.wcmatch_flags |= wcmatch.SL
 
         self.context = context
         self.encoding = self._verify_encoding(encoding) if encoding is not None else None
@@ -1362,8 +1382,6 @@ class Rummage(object):
                 self.target,
                 file_pattern,
                 folder_exclude,
-                bool(self.file_flags & RECURSIVE),
-                bool(self.file_flags & SHOW_HIDDEN),
                 self.wcmatch_flags,
                 file_regex_match,
                 dir_regex_match,

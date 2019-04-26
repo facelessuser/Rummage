@@ -289,6 +289,7 @@ class RummageArgs(object):
         self.pattern = None
         self.target = None
         self.show_hidden = False
+        self.follow_links = False
         self.size_compare = None
         self.modified_compare = None
         self.created_compare = None
@@ -527,6 +528,7 @@ class RummageFrame(gui.RummageFrame):
         self.CASEFOLD = _("Full case-folding")
         self.SUBFOLDERS = _("Include subfolders")
         self.HIDDEN = _("Include hidden")
+        self.SYMLINK = _("Follow symlink")
         self.INCLUDE_BINARY = _("Include binary files")
         self.USE_REGEX = _("Regex")
         self.TEST_REGEX = _("Test Regex")
@@ -617,6 +619,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_fullcase_checkbox.SetLabel(self.CASEFOLD)
         self.m_subfolder_checkbox.SetLabel(self.SUBFOLDERS)
         self.m_hidden_checkbox.SetLabel(self.HIDDEN)
+        self.m_symlinks_checkbox.SetLabel(self.SYMLINK)
         self.m_binary_checkbox.SetLabel(self.INCLUDE_BINARY)
         self.m_dirregex_checkbox.SetLabel(self.USE_REGEX)
         self.m_fileregex_checkbox.SetLabel(self.USE_REGEX)
@@ -775,6 +778,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_fullcase_checkbox.SetValue(Settings.get_search_setting("fullcase_toggle", False))
 
         self.m_hidden_checkbox.SetValue(Settings.get_search_setting("hidden_toggle", False))
+        self.m_symlinks_checkbox.SetValue(Settings.get_search_setting("symlink_toggle", False))
         self.m_subfolder_checkbox.SetValue(Settings.get_search_setting("recursive_toggle", True))
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
         self.m_chains_checkbox.SetValue(Settings.get_search_setting("chain_toggle", False))
@@ -1190,6 +1194,9 @@ class RummageFrame(gui.RummageFrame):
         if args.show_hidden:
             flags |= rumcore.SHOW_HIDDEN
 
+        if args.follow_links:
+            flags |= rumcore.FOLLOW_LINKS
+
         if args.process_binary:
             flags |= rumcore.PROCESS_BINARY
 
@@ -1330,7 +1337,7 @@ class RummageFrame(gui.RummageFrame):
         if os.path.isdir(args.target):
             args.process_binary = self.m_binary_checkbox.GetValue()
             args.show_hidden = self.m_hidden_checkbox.GetValue()
-
+            args.follow_links = self.m_symlinks_checkbox.GetValue()
             args.extmatch = bool(Settings.get_extmatch())
             args.brace_expansion = bool(Settings.get_brace_expansion())
             args.file_case_sensitive = bool(Settings.get_file_case_sensitive())
@@ -1468,6 +1475,7 @@ class RummageFrame(gui.RummageFrame):
             ("force_encode_toggle", args.force_encode is not None),
             ("recursive_toggle", args.recursive),
             ("hidden_toggle", args.show_hidden),
+            ("symlink_toggle", args.follow_links),
             ("binary_toggle", args.process_binary),
             ("regex_file_toggle", self.m_fileregex_checkbox.GetValue()),
             ("regex_dir_toggle", self.m_dirregex_checkbox.GetValue()),

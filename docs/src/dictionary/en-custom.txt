@@ -134,6 +134,7 @@ subfolder
 subfolders
 sublicense
 symlink
+symlinks
 taskbar
 timestamp
 tooltip
