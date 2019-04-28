@@ -118,8 +118,12 @@
 <p><img alt="Regular Expression Buttons" src="images/regex_buttons.png" /></p>
 <h3 id="limit-search-panel">Limit Search Panel</h3>
 <p><img alt="Limit Search Panel" src="images/limit_search_panel.png" /></p>
-<p>The <strong>Limit Search</strong> panel contains checkboxes and inputs that filter the files to be searched.  You can filter out hidden files, files of specific sizes, or creation/modification dates.</p>
+<p>The <strong>Limit Search</strong> panel contains checkboxes and inputs that filter the files to be searched.  You can filter out hidden files, symlinks, files of specific sizes, or creation/modification dates.</p>
 <p>You can also restrict which files get searched by providing a wild card (or regular expression if preferred) pattern. By default, the patterns are applied to the base file or folder name. See <a href="search.html#wildcard">File Patterns</a> to learn more about accepted wild card pattern syntax and how to configure optional file pattern features.</p>
+<div class="admonition new">
+<p class="admonition-title">New 4.4.0</p>
+<p>Added the symlink following via the <strong>Follow symlinks</strong> toggle.</p>
+</div>
 <h3 id="results">Results</h3>
 <p>Once a search or replace is initiated, the results will begin to appear in the <strong>Files</strong> and <strong>Content</strong> tabs. You can then double click a file to open it in your editor, or right click them to bring up a context menu with additional options.</p>
 <p><img alt="Files Tab" src="images/files_tab.png" /></p>

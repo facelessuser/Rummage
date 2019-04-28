@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.0
+
+- **NEW**: Add the ability to follow symlinks via a new symlink toggle in the limit panel (disabled by default).
+
 ## 4.3.4
 
 - **FIX**: Fix some glob related issues by upgrading to the minimum version of `wcmatch` version 2.1.0.

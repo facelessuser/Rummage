@@ -56,9 +56,12 @@ Lastly, Rummage provides buttons to launch a [regular expression tester](#regula
 
 ![Limit Search Panel](images/limit_search_panel.png)
 
-The **Limit Search** panel contains checkboxes and inputs that filter the files to be searched.  You can filter out hidden files, files of specific sizes, or creation/modification dates.
+The **Limit Search** panel contains checkboxes and inputs that filter the files to be searched.  You can filter out hidden files, symlinks, files of specific sizes, or creation/modification dates.
 
 You can also restrict which files get searched by providing a wild card (or regular expression if preferred) pattern. By default, the patterns are applied to the base file or folder name. See [File Patterns](./search.md#wildcard) to learn more about accepted wild card pattern syntax and how to configure optional file pattern features.
+
+!!! new "New 4.4.0"
+    Added the symlink following via the **Follow symlinks** toggle.
 
 ### Results
 

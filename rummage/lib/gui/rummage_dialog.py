@@ -528,7 +528,7 @@ class RummageFrame(gui.RummageFrame):
         self.CASEFOLD = _("Full case-folding")
         self.SUBFOLDERS = _("Include subfolders")
         self.HIDDEN = _("Include hidden")
-        self.SYMLINK = _("Follow symlink")
+        self.SYMLINK = _("Follow symlinks")
         self.INCLUDE_BINARY = _("Include binary files")
         self.USE_REGEX = _("Regex")
         self.TEST_REGEX = _("Test Regex")
