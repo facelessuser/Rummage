@@ -337,6 +337,9 @@ class RummageFrame ( wx.Frame ):
         self.m_hidden_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Include hidden", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer32.Add( self.m_hidden_checkbox, 0, wx.ALL, 5 )
 
+        self.m_symlinks_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Follow symlinks", wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer32.Add( self.m_symlinks_checkbox, 0, wx.ALL, 5 )
+
         self.m_binary_checkbox = wx.CheckBox( self.m_settings_panel, wx.ID_ANY, u"Include binary files", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer32.Add( self.m_binary_checkbox, 0, wx.ALL, 5 )
 

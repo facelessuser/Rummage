@@ -20,12 +20,16 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import unicode_literals
 from __future__ import absolute_import
-from .lib import safe_import  # noqa: F401
 import sys
-import os
-import argparse
-from .lib import __meta__
-from .lib.gui.app import rummage_app
+if '' in sys.path:
+    # Prevent us from loading local packages with `python -m`
+    # Comment this out if you want rummage to load a local package
+    # for testing.
+    sys.path.remove('')
+import os  # noqa: E402
+import argparse  # noqa: E402
+from .lib import __meta__  # noqa: E402
+from .lib.gui.app import rummage_app  # noqa: E402
 
 if sys.executable.endswith("pythonw.exe"):
     sys.stdout = open(os.devnull, "w")

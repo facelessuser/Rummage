@@ -357,7 +357,7 @@ class TestDirWalker(_FileTest):
         self.mktemp('greater_than_0.txt.rum-bak', content=b'Content greater than 0.')
         self.mktemp('.hidden', 'a.txt')
         self.mktemp('.hidden', 'b.file')
-        self.default_flags = wcmatch.R | wcmatch.I | wcmatch.M
+        self.default_flags = wcmatch.R | wcmatch.I | wcmatch.M | wcmatch.SL
         self.errors = []
         self.skipped = 0
         self.files = []
@@ -379,7 +379,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.txt', None,
-            False, False, self.default_flags,
+            self.default_flags,
             False, False,
             None, None, None,
             None, False
@@ -398,7 +398,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.*|-*.file', None,
-            False, False, self.default_flags,
+            self.default_flags,
             False, False,
             None, None, None,
             None, False
@@ -416,7 +416,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.*|-*.file', None,
-            False, False, self.default_flags,
+            self.default_flags,
             False, False,
             None, None, None,
             'rum-bak', False
@@ -434,7 +434,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.txt', None,
-            True, False, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE,
             False, False,
             None, None, None,
             None, False
@@ -453,7 +453,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.txt', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, None, None,
             None, False
@@ -472,7 +472,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.txt', '.hidden',
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, None, None,
             None, False
@@ -491,7 +491,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.txt', '*|-.hidden',
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, None, None,
             None, False
@@ -510,7 +510,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.txt', r'\.hidden',
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, True,
             None, None, None,
             None, False
@@ -529,7 +529,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.\x74\N{LATIN SMALL LETTER X}\u0074', r'\.\U00000068idden',
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, True,
             None, None, None,
             None, False
@@ -548,7 +548,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'.*?\.txt', None,
-            False, False, self.default_flags,
+            self.default_flags,
             True, False,
             None, None, None,
             None, False
@@ -568,7 +568,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'.*?\.txt', None,
-            False, False, self.default_flags,
+            self.default_flags,
             True, False,
             None, None, None,
             None, False,
@@ -589,7 +589,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'.*?\.txt', None,
-            False, False, self.default_flags,
+            self.default_flags,
             True, False,
             None, None, None,
             None, False,
@@ -610,7 +610,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'.*?\.txt', None,
-            False, False, self.default_flags,
+            self.default_flags,
             True, False,
             None, None, None,
             None, False,
@@ -631,7 +631,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'.*?\.txt', None,
-            False, False, self.default_flags,
+            self.default_flags,
             True, False,
             None, None, None,
             None, False,
@@ -652,7 +652,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.txt', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, None, None,
             None, False
@@ -671,7 +671,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             '*.txt*', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, None, None,
             None, False
@@ -690,7 +690,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.*', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             ("lt", 1), None, None,
             None, False
@@ -708,7 +708,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.*', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             ("gt", 1), None, None,
             None, False
@@ -726,7 +726,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.*', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             ("eq", 0), None, None,
             None, False
@@ -747,7 +747,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.*', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')), None,
             None, False
@@ -765,7 +765,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.*', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')), None,
             None, False
@@ -786,7 +786,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.*', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')),
             None, False
@@ -804,7 +804,7 @@ class TestDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.*', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')),
             None, False
@@ -848,7 +848,7 @@ class TestHiddenDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.txt', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, None, None,
             None, True
@@ -866,7 +866,7 @@ class TestHiddenDirWalker(_FileTest):
         walker = rc._DirWalker(
             self.tempdir,
             r'*.txt', None,
-            True, True, self.default_flags,
+            self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
             None, None, None,
             '.rum-bak', True

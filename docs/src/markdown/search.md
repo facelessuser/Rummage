@@ -64,7 +64,7 @@ If you would prefer regular expression file patterns, please see [Regular Expres
 
 - File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in [Preferences](./preferences.md#search).
 - Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`. There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.
-- `.` is always matched by `*`, `?`, `[]`, and extended patterns such as `*(...)`. Use enable searching hidden files in the [Limit Panel](./usage.md#limit-panel).
+- `.` is always matched by `*`, `?`, and `[]`. Enable searching hidden files in the [Limit Panel](./usage.md#limit-search-panel).
 
 #### Basic Wildcard syntax
 
