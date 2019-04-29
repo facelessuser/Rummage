@@ -1,6 +1,6 @@
 gntp>=1.0.2
 chardet>=3.0.4
-git+https://github.com/facelessuser/wcmatch.git@symlinks
+wcmatch>=3.0,<4.0
 backrefs>=4.0.2,<5.0
 bracex>=1.1.1
 wxpython>=4.0.1
