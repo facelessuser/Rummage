@@ -886,12 +886,13 @@ class TestFileSearch(_FileTest):
         """Get the file attributes."""
 
         name = self.norm(*path)
+        c_time, m_time = rc.get_stat(name)[:2]
         return rc.FileAttrRecord(
             name,
             os.path.splitext(name)[1].lower().lstrip('.'),
             os.path.getsize(name),
-            rc.getmtime(name),
-            rc.getctime(name),
+            m_time,
+            c_time,
             False,
             None
         )
