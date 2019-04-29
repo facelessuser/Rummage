@@ -4,8 +4,7 @@ omit=
     rummage/lib/gui/*
     rummage/lib/util/*
     rummage/lib/safe_import.py
-    rummage/lib/rumcore/file_hidden.py
-    rummage/lib/rumcore/file_times.py
+    rummage/lib/rumcore/file_stat.py
 
 [report]
 omit=
@@ -13,5 +12,4 @@ omit=
     rummage/lib/gui/*
     rummage/lib/util/*
     rummage/lib/safe_import.py
-    rummage/lib/rumcore/file_hidden.py
-    rummage/lib/rumcore/file_times.py
+    rummage/lib/rumcore/file_stat.py

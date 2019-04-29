@@ -187,7 +187,7 @@ def parse_version(ver, pre=False):
 
 
 #   (major, minor, micro, release type, pre-release build, post-release build, development-release)
-__version_info__ = Version(4, 4, 0, 'final')
+__version_info__ = Version(4, 4, 1, 'final')
 __version__ = __version_info__._get_canonical()
 __app__ = "Rummage"
 __status__ = __version_info__[3]

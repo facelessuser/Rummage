@@ -1,4 +1,8 @@
-"""File times."""
+"""
+File stat.
+
+Get just what we need all in one call.
+"""
 from __future__ import unicode_literals
 import os
 from .. import util
@@ -28,30 +32,27 @@ if util.platform() == "osx":
             ('st_mtimespec', StructTimeSpec),
             ('st_ctimespec', StructTimeSpec),
             ('st_birthtimespec', StructTimeSpec),
-            ('dont_care', ctypes.c_uint64 * 8)
+            ('st_size', ctypes.c_int64),
+            ('dont_care', ctypes.c_uint64 * 7)
         ]
 
     libc = ctypes.CDLL('libc.dylib')
     stat64 = libc.stat64
     stat64.argtypes = [ctypes.c_char_p, ctypes.POINTER(StructStat64)]
 
-    def getctime(pth):
-        """Get the appropriate creation time on macOS."""
+    def get_stat(pth):
+        """Get `stat` with the appropriate creation time on macOS."""
 
         buf = StructStat64()
         rv = stat64(pth.encode("utf-8"), ctypes.pointer(buf))
         if rv != 0:
             raise OSError("Couldn't stat file %r" % pth)
-        return buf.st_birthtimespec.tv_sec
+        size = 0 if buf.st_size < 0 else buf.st_size
+        return buf.st_birthtimespec.tv_sec, buf.st_mtimespec.tv_sec, size
 
 else:
-    def getctime(pth):
-        """Get the creation time for everyone else."""
+    def get_stat(pth):
+        """Get `stat`."""
 
-        return os.path.getctime(pth)
-
-
-def getmtime(pth):
-    """Get modified time for everyone (this is just a wrapper)."""
-
-    return os.path.getmtime(pth)
+        st = os.stat(pth)
+        return st.st_ctime, st.st_mtime, st.st_size
