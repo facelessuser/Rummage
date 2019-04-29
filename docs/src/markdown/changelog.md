@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.1
+
+- **FIX**: Increase performance by reducing number of `stat`/`lstat` calls during crawls.
+
 ## 4.4.0
 
 - **NEW**: Add the ability to follow symlinks via a new symlink toggle in the limit panel (disabled by default).
