@@ -1466,8 +1466,6 @@ class Rummage(object):
         self.abort = True
         if self.searcher:
             self.searcher.kill()
-        if self.path_walker:
-            self.path_walker.kill()
 
     def _get_next_file(self):
         """Get the next file from the file crawler results."""
@@ -1524,7 +1522,7 @@ class Rummage(object):
                 self.files.append(f)
 
             if self.abort:
-                self.files.clear()
+                break
 
             if len(self.files) >= folder_limit:
                 count = folder_limit
@@ -1581,6 +1579,8 @@ class Rummage(object):
                     if isinstance(f, FileAttrRecord) and f.skipped:
                         self.skipped += 1
                     yield f
+                    if self.abort:
+                        break
 
                 if self.abort:
                     self.files.clear()
