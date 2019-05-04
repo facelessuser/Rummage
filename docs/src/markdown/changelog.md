@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.5.0
+
+- **NEW**: Add **Match base** search option. **Match base** affects full path patterns when **Full path directory match** or **Full path file match** is enabled. When a full path pattern has no slashes, it will cause the pattern to only match the base file name. This allows you to have traditional base match patterns and more specific full path patterns usage simultaneously. Requires `wcmatch` 4.0 which is now the minimum requirement.
+- **FIX**: Ensure settings version is upgraded properly.
+
 ## 4.4.1
 
 - **FIX**: Increase performance by reducing number of `stat`/`lstat` calls during crawls.

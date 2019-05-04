@@ -120,6 +120,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
         self.m_fullpath_checkbox.SetValue(Settings.get_full_exclude_path())
         self.m_fullfile_checkbox.SetValue(Settings.get_full_file_path())
         self.m_globstar_checkbox.SetValue(Settings.get_globstar())
+        self.m_matchbase_checkbox.SetValue(Settings.get_matchbase())
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
         self.alert_methods = Settings.get_platform_notify()
@@ -193,6 +194,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
         self.FULL_PATH = _("Full path directory match")
         self.FULL_FILE = _("Full path file match")
         self.GLOBSTAR = _("Globstar (full path)")
+        self.MATCHBASE = _("Match base (full path)")
         self.REGEX_GROUP = _("Regular Expressions")
         self.FILE_MATCH_GROUP = _("File/Folder Matching")
         self.RE = _("Use Re module")
@@ -255,6 +257,7 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
         self.m_fullpath_checkbox.SetLabel(self.FULL_PATH)
         self.m_fullfile_checkbox.SetLabel(self.FULL_FILE)
         self.m_globstar_checkbox.SetLabel(self.GLOBSTAR)
+        self.m_matchbase_checkbox.SetLabel(self.MATCHBASE)
         self.m_editor_button.SetLabel(self.SAVE)
         self.m_history_clear_button.SetLabel(self.CLEAR)
         self.m_back_ext_label.SetLabel(self.BACK_EXT)
@@ -543,6 +546,11 @@ class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
         """Handle globstar toggle."""
 
         Settings.set_globstar(self.m_globstar_checkbox.GetValue())
+
+    def on_matchbase_toggle(self, event):
+        """Handle `matchbase` toggle."""
+
+        Settings.set_matchbase(self.m_matchbase_checkbox.GetValue())
 
     def on_close(self, event):
         """Handle on close event."""

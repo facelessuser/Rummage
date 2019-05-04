@@ -406,20 +406,8 @@
 <p>In <a href="preferences.html#search">Preferences</a>, you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.</p>
 <p>Assuming you Provided a base folder to search of <code>/My/base/path</code>, and you were to match a file <code>/My/base/path/some/file.txt</code>, normally your file pattern would match against <code>file.txt</code>, but with full path enabled, you'd match against <code>some/file.txt</code>. This means you'd have to use pattern like <code>*/*.txt</code> instead of <code>*.txt</code>.</p>
 <p>When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in <code>[]</code>, <code>*</code>, <code>?</code>, or extended patterns like <code>*(...)</code>. Slashes can be matched by <code>**</code> if globstar (<code>**</code>) is enabled in <a href="preferences.html#search">Preferences</a>.</p>
-<table>
-<thead>
-<tr>
-<th>Pattern</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>**</code></td>
-<td>Matches zero or more directories. Only available for full path matching which is disabled by default.</td>
-</tr>
-</tbody>
-</table>
+<p>When full path matching is not enabled, wildcard patterns use base matching. That is to say, the wildcard patterns are applied to the base filename instead of the full path. If you enable base matching for full paths in <a href="preferences.html#search">Preferences</a>, if a pattern has no slashes, it will perform base matching, and if there are slashes, it will perform a full path match.  This allows you to have the best of both worlds. For instance, the following pattern would match all Markdown files under the document directory, but would exclude any file in any subdirectory under docs whose name starts with <code>c</code>: <code>docs/**/*.md|-c*</code>. Full path is used for the <code>docs/**/*.md</code> while base matching is used for <code>-c*</code>.</p>
+<p>To learn more about full path matching with regular expression, checkout the regular expression <a href="#full-path-matching_1">section</a>.</p>
 <h3 id="regular-expression">Regular Expression</h3>
 <p>Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the <code>Regex</code> checkbox beside the pattern. The regular expression engine set in <a href="preferences.html#search">Preferences</a> is what will be used for file patterns. It will also respect the case sensitivity setting in <a href="preferences.html#search">Preferences</a> for <strong>File/Folder Matching</strong>.</p>
 <h4 id="full-path-matching_1">Full Path Matching</h4>

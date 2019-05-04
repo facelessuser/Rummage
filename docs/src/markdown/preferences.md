@@ -35,7 +35,7 @@ International Time
 
 ## Search
 
-![Preferences: Regex](images/settings_search.png)
+![Preferences: Search](images/settings_search.png)
 
 The **Regular Expression Modules** panel is where the desired regular expression engine that Rummage uses can be selected and configured.  By default, Rummage will use Re, but if the Regex module is installed in your Python installation, it can be selected instead.  There is also the option of using Re or Regex with [Backrefs](./search.md#backrefs) (a wrapper that adds a couple of special escapes and features).
 
@@ -47,8 +47,9 @@ Under **File/Folder Matching** are a number options for file and folder matching
 - [Brace expansion](./search.md#brace-expansion-syntax).
 - Case sensitive for [wildcard match](./search.md#wildcard) and for [regular expression match](#regular-expression).
 - [Globstar](./search.md#full-path-matching).
+- [Match base](./search.md#full-path-matching).
 - [Full path directory matching](./search.md#full-path-matching).
-- [Full path file matching](./search.md#full-path-matching_1).
+- [Full path file matching](./search.md#full-path-matching).
 
 ## Encoding
 

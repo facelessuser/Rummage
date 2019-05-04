@@ -25,6 +25,11 @@
 
   <!-- Table of Content (Don't show for static sites) -->
     <h1 id="changelog">Changelog</h1>
+<h2 id="450">4.5.0</h2>
+<ul>
+<li><strong>NEW</strong>: Add <strong>Match base</strong> search option. <strong>Match base</strong> affects full path patterns when <strong>Full path directory match</strong> or <strong>Full path file match</strong> is enabled. When a full path pattern has no slashes, it will cause the pattern to only match the base file name. This allows you to have traditional base match patterns and more specific full path patterns usage simultaneously. Requires <code>wcmatch</code> 4.0 which is now the minimum requirement.</li>
+<li><strong>FIX</strong>: Ensure settings version is upgraded properly.</li>
+</ul>
 <h2 id="441">4.4.1</h2>
 <ul>
 <li><strong>FIX</strong>: Increase performance by reducing number of <code>stat</code>/<code>lstat</code> calls during crawls.</li>
