@@ -1023,6 +1023,9 @@ class SettingsDialog ( wx.Dialog ):
         self.m_globstar_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Globstar (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer61.Add( self.m_globstar_checkbox, 0, wx.ALL, 5 )
 
+        self.m_matchbase_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Match base (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer61.Add( self.m_matchbase_checkbox, 0, wx.ALL, 5 )
+
         self.m_fullpath_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path directory match", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer61.Add( self.m_fullpath_checkbox, 0, wx.ALL, 5 )
 
@@ -1298,6 +1301,7 @@ class SettingsDialog ( wx.Dialog ):
         self.m_brace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_brace_toggle )
         self.m_case_checkbox.Bind( wx.EVT_CHECKBOX, self.on_case_toggle )
         self.m_globstar_checkbox.Bind( wx.EVT_CHECKBOX, self.on_globstar_toggle )
+        self.m_matchbase_checkbox.Bind( wx.EVT_CHECKBOX, self.on_matchbase_toggle )
         self.m_fullpath_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullpath_toggle )
         self.m_fullfile_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullfile_toggle )
         self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
@@ -1364,6 +1368,9 @@ class SettingsDialog ( wx.Dialog ):
         event.Skip()
 
     def on_globstar_toggle( self, event ):
+        event.Skip()
+
+    def on_matchbase_toggle( self, event ):
         event.Skip()
 
     def on_fullpath_toggle( self, event ):

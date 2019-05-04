@@ -84,6 +84,7 @@ FILECASE = 0x400000000       # File case sensitivity
 DIRPATHNAME = 0x800000000    # Full directory exclude path match
 FILEPATHNAME = 0x1000000000  # Full file name path match
 GLOBSTAR = 0x2000000000      # Use globstar (**) in full paths
+MATCHBASE = 0x4000000000     # Match base names when no slashes are present (full path)
 
 RE_MODE = 0
 BRE_MODE = 1
@@ -91,7 +92,7 @@ REGEX_MODE = 2
 BREGEX_MODE = 3
 
 SEARCH_MASK = 0x1FFFF
-FILE_MASK = 0x3FFFFE0000
+FILE_MASK = 0x7FFFFE0000
 FNMATCH_FLAGS = 0x3F00000000
 
 RE_MODES = (RE_MODE, BRE_MODE)
@@ -1239,7 +1240,10 @@ class _DirWalker(wcmatch.WcMatch):
     def compare_file(self, filename):
         """Compare filename."""
 
-        return self.file_check.match(filename)
+        if self.file_regex_match:
+            return self.file_check.match(filename)
+        else:
+            return super().compare_file(filename)
 
     def compare_directory(self, directory):
         """Compare folder."""
@@ -1247,7 +1251,7 @@ class _DirWalker(wcmatch.WcMatch):
         if self.folder_regex_exclude_match:
             return not self.folder_exclude_check.match(directory)
         else:
-            return not self.folder_exclude_check.match(directory + self.sep if self.dir_pathname else directory)
+            return super().compare_directory(directory)
 
     def on_validate_file(self, base, name):
         """Validate file override."""
@@ -1345,6 +1349,8 @@ class Rummage(object):
             self.wcmatch_flags |= wcmatch.FP
         if self.file_flags & GLOBSTAR:
             self.wcmatch_flags |= wcmatch.G
+        if self.file_flags & MATCHBASE:
+            self.wcmatch_flags |= wcmatch.X
         if self.file_flags & RECURSIVE:
             self.wcmatch_flags |= wcmatch.RV
         if self.file_flags & SHOW_HIDDEN:

@@ -130,6 +130,7 @@ reshow
 resize
 resized
 sortable
+subdirectory
 subfolder
 subfolders
 sublicense

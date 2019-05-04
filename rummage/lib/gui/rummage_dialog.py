@@ -317,6 +317,7 @@ class RummageArgs(object):
         self.full_exclude_path = False
         self.full_file_path = False
         self.globstar = False
+        self.matchbase = False
         self.encoding_options = {}
 
 
@@ -1169,6 +1170,9 @@ class RummageFrame(gui.RummageFrame):
         if args.globstar:
             flags |= rumcore.GLOBSTAR
 
+        if args.matchbase:
+            flags |= rumcore.MATCHBASE
+
         if args.regexfilepattern:
             flags |= rumcore.FILE_REGEX_MATCH
 
@@ -1344,6 +1348,7 @@ class RummageFrame(gui.RummageFrame):
             args.full_exclude_path = bool(Settings.get_full_exclude_path())
             args.full_file_path = bool(Settings.get_full_file_path())
             args.globstar = bool(Settings.get_globstar())
+            args.matchbase = bool(Settings.get_matchbase())
 
             args.filepattern = self.m_filematch_textbox.Value
             if self.m_fileregex_checkbox.GetValue():

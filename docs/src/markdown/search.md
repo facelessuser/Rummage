@@ -179,9 +179,9 @@ Assuming you Provided a base folder to search of `/My/base/path`, and you were t
 
 When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in `[]`, `*`, `?`, or extended patterns like `*(...)`. Slashes can be matched by `**` if globstar (`**`) is enabled in [Preferences](./preferences.md#search).
 
-Pattern           | Meaning
------------------ | -------
-`**`              | Matches zero or more directories. Only available for full path matching which is disabled by default.
+When full path matching is not enabled, wildcard patterns use base matching. That is to say, the wildcard patterns are applied to the base filename instead of the full path. If you enable base matching for full paths in [Preferences](./preferences.md#search), if a pattern has no slashes, it will perform base matching, and if there are slashes, it will perform a full path match.  This allows you to have the best of both worlds. For instance, the following pattern would match all Markdown files under the document directory, but would exclude any file in any subdirectory under docs whose name starts with `c`: `docs/**/*.md|-c*`. Full path is used for the `docs/**/*.md` while base matching is used for `-c*`.
+
+To learn more about full path matching with regular expression, checkout the regular expression [section](#full-path-matching_1).
 
 ### Regular Expression
 

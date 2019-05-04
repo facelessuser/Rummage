@@ -41,7 +41,7 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.3.1'
+SETTINGS_FMT = '2.4.0'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -75,6 +75,7 @@ DEFAULT_SETTINGS = {
     "hide_limit": False,
     "international_time": False,
     "locale": "en_US",
+    "matchbase": False,
     "notify_enabled": True,
     "notify_method": "default",
     "regex_mode": rumcore.RE_MODE,
@@ -565,9 +566,6 @@ class Settings(object):
             backup_type = cls.settings.get('backup_type')
             cls.settings["backup_type"] = 0 if backup_type is None or backup_type is False else 1
 
-            # Update format
-            cls.settings["__format__"] = SETTINGS_FMT
-
         if settings_format < (2, 2, 0):
             if 'editor' in cls.settings and isinstance(cls.settings['editor'], (list, tuple)):
                 cls.settings['editor'] = ""
@@ -582,6 +580,10 @@ class Settings(object):
                     if k1 not in cls.settings[k]:
                         updated = True
                         cls.settings[k][k1] = copy.copy(v1)
+
+        if settings_format < tuple([int(x) for x in SETTINGS_FMT.split('.')]):
+            updated = True
+            cls.settings["__format__"] = SETTINGS_FMT
 
         if updated:
             cls.save_settings()
@@ -1325,6 +1327,27 @@ class Settings(object):
         return cls.settings.get('globstar', False)
 
     @classmethod
+    def _set_matchbase(cls, value):
+        """Set `matchbase`."""
+
+        cls.settings['matchbase'] = value
+
+    @classmethod
+    def set_matchbase(cls, value):
+        """Set `matchbase`."""
+
+        cls.reload_settings()
+        cls._set_matchbase(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_matchbase(cls):
+        """Get `matchbase`."""
+
+        cls.reload_settings()
+        return cls.settings.get('matchbase', False)
+
+    @classmethod
     def import_settings(cls, obj):
         """Import settings."""
 
@@ -1362,6 +1385,8 @@ class Settings(object):
             cls._set_full_file_path(obj['full_file_path'])
         if 'globstar' in obj:
             cls._set_globstar(obj['globstar'])
+        if 'matchbase' in obj:
+            cls._set_matchbase(obj['matchbase'])
 
         # Notifications
         update_notify = False

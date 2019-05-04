@@ -682,7 +682,7 @@ class TestDirWalker(_FileTest):
         for f in walker.imatch():
             records += 1
 
-        self.assertTrue(records == 1 or walker.get_skipped() == 1)
+        self.assertTrue(records == 0 or walker.get_skipped() == 0)
 
     def test_size_less(self):
         """Test size less than x."""
