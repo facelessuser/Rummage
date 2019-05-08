@@ -339,6 +339,7 @@ class RummageFrame(gui.RummageFrame):
             data.get_image('rummage_large.png').GetIcon()
         )
 
+        self.last_pattern_search = ""
         self.no_pattern = False
         self.client_size = wx.Size(-1, -1)
         self.paylod = {}
@@ -854,11 +855,11 @@ class RummageFrame(gui.RummageFrame):
         elif is_selected and not setup:
             setup = selected
 
-        if setup and setup in chains:
-            self.m_searchfor_textbox.update_choices(chains)
-            self.m_searchfor_textbox.SetValue(setup)
-        else:
-            self.m_searchfor_textbox.update_choices(chains, load_last=True)
+        if setup and setup not in chains:
+            setup = chains[0] if chains else ""
+
+        self.m_searchfor_textbox.update_choices(chains)
+        self.m_searchfor_textbox.SetValue(setup)
 
     def refresh_regex_options(self):
         """Refresh the regex module options."""
@@ -892,6 +893,7 @@ class RummageFrame(gui.RummageFrame):
         """Refresh chain mode."""
 
         if self.m_chains_checkbox.GetValue():
+            self.last_pattern_search = self.m_searchfor_textbox.Value
             self.m_regex_search_checkbox.Enable(False)
             self.m_case_checkbox.Enable(False)
             self.m_dotmatch_checkbox.Enable(False)
@@ -930,7 +932,6 @@ class RummageFrame(gui.RummageFrame):
             self.m_replace_plugin_checkbox.Enable(True)
 
             self.m_searchfor_label.SetLabel(self.SEARCH_FOR)
-            self.m_searchfor_textbox.Value = ""
             self.m_replace_label.Enable(True)
             self.m_replace_textbox.Enable(True)
             self.m_replace_plugin_dir_picker.Enable(True)
@@ -940,6 +941,7 @@ class RummageFrame(gui.RummageFrame):
                 self.m_searchfor_textbox,
                 "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
             )
+            self.m_searchfor_textbox.SetValue(self.last_pattern_search)
             return False
 
     def limit_panel_toggle(self):
@@ -2027,11 +2029,6 @@ class RummageFrame(gui.RummageFrame):
         dlg.Destroy()
         if self.m_chains_checkbox.GetValue():
             self.setup_chains()
-
-    def on_plugin_function_click(self, event):
-        """Plugin function click."""
-
-        self.setup
 
     def on_preferences(self, event):
         """Show settings dialog, and update history of `AutoCompleteCombo` if the history was cleared."""

@@ -147,6 +147,8 @@ class AutoCompleteCombo(wx.ComboCtrl):
             idx = self.list.list.GetItemCount() - 1
             if idx != -1:
                 self.list.select_item(0)
+            else:
+                self.list.set_selected_text('')
         else:
             self.update_semaphore = True
             self.list.set_selected_text(value)
