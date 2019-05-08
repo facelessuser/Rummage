@@ -978,11 +978,41 @@ class Settings(object):
         return cls.cache.get(key, default)
 
     @classmethod
-    def add_search_settings(cls, history, toggles, strings):
-        """Add search settings to cache (more like history...but whatever)."""
+    def set_toggles(cls, toggles, save=True):
+        """Set toggles."""
 
-        cls.reload_settings()
-        debug(history)
+        if save:
+            cls.reload_settings()
+        for t in toggles:
+            key = t[0]
+            value = t[1]
+            if value is None:
+                continue
+            cls.cache[key] = value
+        if save:
+            cls.save_cache()
+
+    @classmethod
+    def set_strings(cls, strings, save=True):
+        """Set strings."""
+
+        if save:
+            cls.reload_settings()
+        for s in strings:
+            key = s[0]
+            value = s[1]
+            if value is None:
+                continue
+            cls.cache[key] = value
+        if save:
+            cls.save_cache()
+
+    @classmethod
+    def set_history(cls, history, save=True):
+        """Set history."""
+
+        if save:
+            cls.reload_settings()
         for i in history:
             key = i[0]
             value = i[1]
@@ -997,19 +1027,18 @@ class Settings(object):
             if len(values) > (20 if value != "" else 21):
                 del values[-1]
             cls.cache[key] = values
-        for t in toggles:
-            key = t[0]
-            value = t[1]
-            if value is None:
-                continue
-            cls.cache[key] = value
-        for s in strings:
-            key = s[0]
-            value = s[1]
-            if value is None:
-                continue
-            cls.cache[key] = value
+        if save:
+            cls.save_cache()
 
+    @classmethod
+    def add_search_settings(cls, history, toggles, strings):
+        """Add search settings to cache (more like history...but whatever)."""
+
+        cls.reload_settings()
+        debug(history)
+        cls.set_history(history, False)
+        cls.set_toggles(toggles, False)
+        cls.set_strings(strings, False)
         cls.save_cache()
 
     @classmethod

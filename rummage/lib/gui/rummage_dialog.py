@@ -536,6 +536,7 @@ class RummageFrame(gui.RummageFrame):
         self.NOT_UP_TO_DATE = _("There is an update available: %s.")
         self.DELETE = _("Are you sure you want to delete the files?")
         self.RECYCLE = _("Are you sure you want to recycle the files?")
+        self.OPTIONS = _("Options")
 
         # Menu
         self.MENU_EXPORT_RESULTS = _("Export Results")
@@ -584,6 +585,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_created_label.SetLabel(self.CREATED)
         self.m_exclude_label.SetLabel(self.EXCLUDE)
         self.m_filematch_label.SetLabel(self.FILE_MATCH)
+        self.m_options_collapse.SetLabel(self.OPTIONS)
         self.m_regex_search_checkbox.SetLabel(self.SEARCH_WITH_REGEX)
         self.m_case_checkbox.SetLabel(self.CASE)
         self.m_dotmatch_checkbox.SetLabel(self.DOTALL)
@@ -605,6 +607,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_posix_checkbox.SetLabel(self.POSIX)
         self.m_format_replace_checkbox.SetLabel(self.FORMAT)
         self.m_fullcase_checkbox.SetLabel(self.CASEFOLD)
+        self.m_limit_collapse.SetLabel(self.LIMIT_SEARCH)
         self.m_subfolder_checkbox.SetLabel(self.SUBFOLDERS)
         self.m_hidden_checkbox.SetLabel(self.HIDDEN)
         self.m_symlinks_checkbox.SetLabel(self.SYMLINK)
@@ -773,6 +776,11 @@ class RummageFrame(gui.RummageFrame):
         self.m_chains_checkbox.SetValue(Settings.get_search_setting("chain_toggle", False))
         self.m_replace_plugin_checkbox.SetValue(Settings.get_search_setting("replace_plugin_toggle", False))
 
+        option_collapse = Settings.get_search_setting('option_collapse', False)
+        self.m_options_collapse.Collapse(option_collapse)
+        limit_collapse = Settings.get_search_setting('limit_collapse', False)
+        self.m_limit_collapse.Collapse(limit_collapse)
+
         self.m_modified_choice.SetStringSelection(
             eng_to_i18n(
                 Settings.get_search_setting("modified_compare_string", "on any"),
@@ -879,22 +887,24 @@ class RummageFrame(gui.RummageFrame):
         self.m_settings_panel.GetSizer().Layout()
 
     def on_options_collapse(self, event):
-        """Handle on collapse."""
+        """Handle on collapse for options panel."""
 
         self.m_options_panel.GetSizer().Layout()
         self.m_options_collapse.GetPane().GetSizer().Layout()
         self.m_settings_panel.GetSizer().Layout()
         minimize = not self.IsMaximized()
         self.optimize_size(minimize_height=minimize)
+        Settings.set_toggles([("option_collapse", self.m_options_collapse.IsCollapsed())])
 
     def on_limit_collapse(self, event):
-        """Handle on collapse."""
+        """Handle on collapse for lilmit panel."""
 
         self.m_limit_panel.GetSizer().Layout()
         self.m_limit_collapse.GetPane().GetSizer().Layout()
         self.m_settings_panel.GetSizer().Layout()
         minimize = not self.IsMaximized()
         self.optimize_size(minimize_height=minimize)
+        Settings.set_toggles([("limit_collapse", self.m_limit_collapse.IsCollapsed())])
 
     def refresh_chain_mode(self):
         """Refresh chain mode."""
@@ -1456,7 +1466,7 @@ class RummageFrame(gui.RummageFrame):
             ("posix_toggle", args.posix),
             ("format_replace_toggle", args.formatreplace),
             ("chain_toggle", self.m_chains_checkbox.GetValue()),
-            ('replace_plugin_toggle', self.m_replace_plugin_checkbox.GetValue())
+            ('replace_plugin_toggle', self.m_replace_plugin_checkbox.GetValue()),
         ]
 
         if Settings.get_regex_version() == 0:
