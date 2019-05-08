@@ -897,7 +897,7 @@ class RummageFrame(gui.RummageFrame):
         Settings.set_toggles([("option_collapse", self.m_options_collapse.IsCollapsed())])
 
     def on_limit_collapse(self, event):
-        """Handle on collapse for lilmit panel."""
+        """Handle on collapse for limit panel."""
 
         self.m_limit_panel.GetSizer().Layout()
         self.m_limit_collapse.GetPane().GetSizer().Layout()
