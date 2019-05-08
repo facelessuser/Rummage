@@ -21,6 +21,7 @@ IN THE SOFTWARE.
 from __future__ import unicode_literals
 import wx
 import wx.adv
+import wx.lib.buttons as buttons
 import threading
 import traceback
 import webbrowser
@@ -63,6 +64,7 @@ from .. import __meta__
 from .. import rumcore
 from .. import util
 import decimal
+import wx.lib.agw.pycollapsiblepane as pycollapse
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
 else:
@@ -150,6 +152,85 @@ def update_autocomplete(obj, key, load_last=False, default=None):
     if choices == [] and choices != default:
         choices = default
     obj.update_choices(choices, load_last)
+
+
+def replace_collapse(parent, index, collapse, panel, label, func):
+    """Replace current collapsible panel with a generic one."""
+
+    sibling = collapse.GetPrevSibling()
+    sizer = panel.GetContainingSizer()
+    sizer.Detach(panel)
+    sizer = collapse.GetContainingSizer()
+    collapse2 = CollapsiblePane(parent, label=label, function=func)
+    panel.Reparent(collapse2.GetPane())
+    collapse.Destroy()
+    sizer.Insert(index, collapse2, 0, wx.EXPAND | wx.ALL, 5)
+    new_sizer = wx.BoxSizer(wx.VERTICAL)
+    new_sizer.Add(panel, 1, wx.EXPAND | wx.ALL, 5)
+    collapse2.GetPane().SetSizer(new_sizer)
+    panel.Fit()
+    panel.Layout()
+    collapse2.GetPane().Fit()
+    collapse2.GetPane().Layout()
+    parent.Fit()
+    parent.Layout()
+    collapse2.MoveAfterInTabOrder(sibling)
+    return collapse2
+
+
+class CollapsiblePane(pycollapse.PyCollapsiblePane):
+    """Custom collapsible pane."""
+
+    def __init__(self, parent, label="", function=None):
+        """Initialize."""
+
+        super(CollapsiblePane, self).__init__(parent, label=label, agwStyle=wx.CP_DEFAULT_STYLE | wx.CP_NO_TLW_RESIZE)
+        if function is not None:
+            self.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, function)
+        btn = CollapseButton(self, label)
+        self.SetButton(btn)
+
+    def GetBtnLabel(self):
+        """ Returns the button label. """
+
+        return self.GetLabel()
+
+    def collapse_toggle(self, collapse=True):
+        """Collapse."""
+
+        self._pButton.SetToggle(collapse)
+        if self.IsCollapsed() == collapse:
+            return
+        self.Collapse(collapse)
+
+
+class CollapseButton(buttons.GenBitmapTextToggleButton):
+    """Custom button."""
+
+    labelDelta = 0
+
+    def __init__(self, parent, label):
+        """Initialization."""
+
+        super(CollapseButton, self).__init__(
+            parent, -1, bitmap=data.get_bitmap('sd.png'), label=label,
+            style=wx.BORDER_NONE | wx.BU_EXACTFIT
+        )
+        self.SetBitmapSelected(data.get_bitmap('su.png'))
+        self.SetUseFocusIndicator(True)
+        self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+
+    def InitColours(self):
+        """
+        Calculate a new set of highlight and shadow colours based on
+        the background colour.  Works okay if the colour is dark...
+        """
+
+        face = self.GetBackgroundColour()
+        self.faceDnClr = face
+        self.shadowPenClr = face
+        self.highlightPenClr = face
+        self.focusClr = face
 
 
 class RummageThread(threading.Thread):
@@ -379,6 +460,16 @@ class RummageFrame(gui.RummageFrame):
         custom_statusbar.extend_sb(self.m_statusbar)
         self.m_statusbar.set_status("")
 
+        # Replace collapse panel
+        self.m_limit_collapse = replace_collapse(
+            self.m_settings_panel, 5,
+            self.m_limit_collapse, self.m_limit_panel, self.LIMIT_SEARCH, self.on_limit_collapse
+        )
+        self.m_options_collapse = replace_collapse(
+            self.m_settings_panel, 1,
+            self.m_options_collapse, self.m_options_panel, self.OPTIONS, self.on_options_collapse
+        )
+
         # Extend browse button
         pick_button.pick_extend(self.m_searchin_dir_picker, pick_button.PickButton)
         self.m_searchin_dir_picker.pick_init(
@@ -414,9 +505,6 @@ class RummageFrame(gui.RummageFrame):
 
         self.refresh_regex_options()
         self.refresh_chain_mode()
-        self.m_limit_panel.GetSizer().Layout()
-        self.m_limit_collapse.GetPane().GetSizer().Layout()
-        self.m_settings_panel.GetSizer().Layout()
 
         # So this is to fix some platform specific issues.
         # We will wait until we are sure we are loaded, then
@@ -777,9 +865,9 @@ class RummageFrame(gui.RummageFrame):
         self.m_replace_plugin_checkbox.SetValue(Settings.get_search_setting("replace_plugin_toggle", False))
 
         option_collapse = Settings.get_search_setting('option_collapse', False)
-        self.m_options_collapse.Collapse(option_collapse)
+        self.m_options_collapse.collapse_toggle(option_collapse)
         limit_collapse = Settings.get_search_setting('limit_collapse', False)
-        self.m_limit_collapse.Collapse(limit_collapse)
+        self.m_limit_collapse.collapse_toggle(limit_collapse)
 
         self.m_modified_choice.SetStringSelection(
             eng_to_i18n(
@@ -892,9 +980,9 @@ class RummageFrame(gui.RummageFrame):
         self.m_options_panel.GetSizer().Layout()
         self.m_options_collapse.GetPane().GetSizer().Layout()
         self.m_settings_panel.GetSizer().Layout()
+        Settings.set_toggles([("option_collapse", self.m_options_collapse.IsCollapsed())])
         minimize = not self.IsMaximized()
         self.optimize_size(minimize_height=minimize)
-        Settings.set_toggles([("option_collapse", self.m_options_collapse.IsCollapsed())])
 
     def on_limit_collapse(self, event):
         """Handle on collapse for limit panel."""
@@ -902,9 +990,9 @@ class RummageFrame(gui.RummageFrame):
         self.m_limit_panel.GetSizer().Layout()
         self.m_limit_collapse.GetPane().GetSizer().Layout()
         self.m_settings_panel.GetSizer().Layout()
+        Settings.set_toggles([("limit_collapse", self.m_limit_collapse.IsCollapsed())])
         minimize = not self.IsMaximized()
         self.optimize_size(minimize_height=minimize)
-        Settings.set_toggles([("limit_collapse", self.m_limit_collapse.IsCollapsed())])
 
     def refresh_chain_mode(self):
         """Refresh chain mode."""
