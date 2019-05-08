@@ -72,7 +72,6 @@ DEFAULT_SETTINGS = {
     "globstar": False,
     "hide_cols_content": [],
     "hide_cols_file": [],
-    "hide_limit": False,
     "international_time": False,
     "locale": "en_US",
     "matchbase": False,
@@ -285,27 +284,6 @@ class Settings(object):
 
         cls.reload_settings()
         return cls.settings.get('regex_version', 0)
-
-    @classmethod
-    def get_hide_limit(cls):
-        """Get hide limit setting."""
-
-        cls.reload_settings()
-        return cls.settings.get("hide_limit", False)
-
-    @classmethod
-    def set_hide_limit(cls, hide):
-        """Set hide limit setting."""
-
-        cls.reload_settings()
-        cls._set_hide_limit(hide)
-        cls.save_settings()
-
-    @classmethod
-    def _set_hide_limit(cls, hide):
-        """Set hide limit setting."""
-
-        cls.settings["hide_limit"] = hide
 
     @classmethod
     def get_hide_cols_file(cls):
@@ -1412,10 +1390,6 @@ class Settings(object):
         # Locale
         if 'locale' in obj:
             cls._set_language(obj['locale'])
-
-        # Hide limit panel
-        if 'hide_limit' in obj:
-            cls._set_hide_limit(obj['hide_limit'])
 
         # Hide columns
         if 'hide_cols_file' in obj:
