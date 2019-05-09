@@ -4,6 +4,8 @@
 
 - **NEW**: Search options and file limit options can be collapsed in the main dialog. This allows  hiding these options if you aren't frequently using them, and provides a more compact dialog.
 - **NEW**: There is no longer an option to hide the file limit options as now you can just collapse them.
+- **FIX**: Fix an issue where on Linux, tabbing past a hidden directory button would cause an error in GTK. Ensure such controls do not allow focus when they are hidden.
+- **FIX**: Fix an internal error where the autocomplete box could throw an error due to the index bounds not being checked.
 
 ## 4.5.0
 
