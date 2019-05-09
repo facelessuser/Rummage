@@ -2328,7 +2328,7 @@
                                                             <property name="flag">wxEXPAND</property>
                                                             <property name="proportion">1</property>
                                                             <object class="wxFlexGridSizer" expanded="0">
-                                                                <property name="cols">6</property>
+                                                                <property name="cols">5</property>
                                                                 <property name="flexible_direction">wxBOTH</property>
                                                                 <property name="growablecols">1</property>
                                                                 <property name="growablerows"></property>

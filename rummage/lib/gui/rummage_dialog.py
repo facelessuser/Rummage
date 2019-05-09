@@ -381,6 +381,13 @@ class RummageFrame(gui.RummageFrame):
 
         self.m_options_collapse.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.on_options_collapse)
         self.m_limit_collapse.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.on_limit_collapse)
+        self.m_options_collapse.GetPane().GetSizer().GetItem(0).GetWindow().Bind(
+            wx.EVT_SET_FOCUS, self.m_options_collapse.on_focus
+        )
+
+        self.m_limit_collapse.GetPane().GetSizer().GetItem(0).GetWindow().Bind(
+            wx.EVT_SET_FOCUS, self.m_limit_collapse.on_focus
+        )
 
         # Extend browse button
         pick_button.pick_extend(self.m_searchin_dir_picker, pick_button.PickButton)

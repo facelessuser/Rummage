@@ -20,7 +20,12 @@ class CollapsiblePane(pycollapse.PyCollapsiblePane):
         )
         btn = CollapseButton(self, label)
         self.SetButton(btn)
-        # btn.Bind(wx.EVT_KEY_DOWN, self.on_tab)
+        btn.Bind(wx.EVT_KEY_DOWN, self.on_tab)
+
+    def on_focus(self, event):
+        """Focus."""
+
+        self._pButton.SetFocus()
 
     def on_tab(self, event):
         """Handle tab."""

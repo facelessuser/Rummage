@@ -211,7 +211,7 @@ class RummageFrame ( wx.Frame ):
         self.m_staticline3 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer2.Add( self.m_staticline3, 0, wx.EXPAND |wx.ALL, 5 )
 
-        fgSizer17 = wx.FlexGridSizer( 0, 6, 0, 0 )
+        fgSizer17 = wx.FlexGridSizer( 0, 5, 0, 0 )
         fgSizer17.AddGrowableCol( 1 )
         fgSizer17.SetFlexibleDirection( wx.BOTH )
         fgSizer17.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -2655,3 +2655,5 @@ class HtmlDialog ( wx.Dialog ):
 
     def __del__( self ):
         pass
+
+
