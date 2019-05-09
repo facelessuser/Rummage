@@ -166,7 +166,9 @@ class AutoCompleteCombo(wx.ComboCtrl):
 
         value = self.GetTextCtrl().GetValue()
         if value in self.choices:
-            self.list.set_item(self.choices.index(value))
+            index = self.choices.index(value)
+            if 0 <= index < self.list.list.GetItemCount():
+                self.list.set_item(index)
 
     def on_dismiss(self, event):
         """Load a previously selected choice to the `TextCtrl` on dismiss."""
