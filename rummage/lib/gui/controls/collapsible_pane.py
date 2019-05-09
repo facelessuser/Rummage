@@ -4,6 +4,9 @@ import wx
 import wx.lib.agw.pycollapsiblepane as pycollapse
 import wx.lib.buttons as buttons
 from .. import data
+from ... import util
+
+IS_MAC = util.platform() == "osx"
 
 
 class CollapsiblePane(pycollapse.PyCollapsiblePane):
@@ -20,7 +23,7 @@ class CollapsiblePane(pycollapse.PyCollapsiblePane):
         )
         btn = CollapseButton(self, label)
         self.SetButton(btn)
-        btn.Bind(wx.EVT_KEY_DOWN, self.on_tab)
+        btn.Bind(wx.EVT_CHAR_HOOK, self.on_tab)
 
     def on_focus(self, event):
         """Focus."""
@@ -34,6 +37,14 @@ class CollapsiblePane(pycollapse.PyCollapsiblePane):
                 self.Navigate(False)
             else:
                 self.NavigateIn()
+
+    def workaround(self):
+        """Apply workaround for macOS."""
+
+        if IS_MAC:
+            self.GetPane().GetSizer().GetItem(0).GetWindow().Bind(
+                wx.EVT_SET_FOCUS, self.on_focus
+            )
 
     def GetBtnLabel(self):
         """Returns the button label."""
