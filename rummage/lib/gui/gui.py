@@ -38,7 +38,7 @@ class RummageFrame ( wx.Frame ):
         bFrameSizer = wx.BoxSizer( wx.VERTICAL )
 
         self.m_main_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        fgSizer13 = wx.FlexGridSizer( 2, 1, 0, 0 )
+        fgSizer13 = wx.FlexGridSizer( 1, 1, 0, 0 )
         fgSizer13.AddGrowableCol( 0 )
         fgSizer13.AddGrowableRow( 0 )
         fgSizer13.SetFlexibleDirection( wx.BOTH )
