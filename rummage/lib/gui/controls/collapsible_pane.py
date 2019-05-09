@@ -25,6 +25,15 @@ class CollapsiblePane(pycollapse.PyCollapsiblePane):
         self.SetButton(btn)
         btn.Bind(wx.EVT_CHAR_HOOK, self.on_tab)
 
+    def AcceptsFocus(self):
+        """
+        Check if we should accept focus.
+
+        We should never accept focus.
+        """
+
+        return False
+
     def on_focus(self, event):
         """Focus."""
 
@@ -41,10 +50,10 @@ class CollapsiblePane(pycollapse.PyCollapsiblePane):
     def workaround(self):
         """Apply workaround for macOS."""
 
-        if IS_MAC:
-            self.GetPane().GetSizer().GetItem(0).GetWindow().Bind(
-                wx.EVT_SET_FOCUS, self.on_focus
-            )
+        self.GetPane().AcceptsFocus = self.AcceptsFocus
+        self.GetPane().GetSizer().GetItem(0).GetWindow().Bind(
+            wx.EVT_SET_FOCUS, self.on_focus
+        )
 
     def GetBtnLabel(self):
         """Returns the button label."""
