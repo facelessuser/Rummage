@@ -11,7 +11,7 @@ import io
 def tint_png(byte_string, color):
     """Tint the image and return a byte string."""
 
-    # Read the byte string as a RGBA image.
+    # Read the byte string as a `RGBA` image.
     width, height, pixels, meta = Reader(bytes=byte_string).asRGBA()
 
     # Tint
@@ -28,7 +28,7 @@ def tint_png(byte_string, color):
             start += 4
         y += 1
 
-    # Create bytes buffer for PNG
+    # Create bytes buffer for `PNG`
     with io.BytesIO() as f:
 
         # Write out PNG

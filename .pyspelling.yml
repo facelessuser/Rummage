@@ -79,7 +79,7 @@ matrix:
 - name: python
   sources:
   - setup.py
-  - '{rummage,tests,tools}/**/*.py|!rummage/**/gui.py'
+  - '{rummage,tests,tools}/**/*.py|!rummage/**/{gui,png,rgba}.py'
   hunspell:
     d: docs/src/dictionary/hunspell/en_US
   aspell:
