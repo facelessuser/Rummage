@@ -56,6 +56,15 @@ class PickButton(object):
         self.Bind(EVT_PICK_CHANGE, self.on_change)
         self.pick_change_callback = pick_change_evt
 
+    def AcceptsFocus(self):
+        """
+        Check if we should accept focus.
+
+        If the button is hidden, we should not allow focus.
+        """
+
+        return self.IsShown()
+
     def on_change(self, event):
         """If the directory has changed call the callback given."""
 

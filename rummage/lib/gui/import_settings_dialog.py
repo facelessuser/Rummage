@@ -37,7 +37,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
 
     BOOLEAN = (
         "alert_enabled", "check_updates", "check_prerelease", "debug",
-        "hide_limit", "notify_enabled", "single_instance", "extmatch",
+        "notify_enabled", "single_instance", "extmatch",
         "brace_expansion", "file_case_sensitive", "full_exclude_path", "full_file_path",
         "globstar", "international_time", "matchbase"
     )

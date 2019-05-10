@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.6.0 Development
+
+- **NEW**: Search options and file limit options can be collapsed in the main dialog. This allows  hiding these options if you aren't frequently using them, and provides a more compact dialog.
+- **NEW**: There is no longer an option to hide the file limit options as now you can just collapse them.
+- **FIX**: Fix an issue where on Linux, tabbing past a hidden directory button would cause an error in GTK. Ensure such controls do not allow focus when they are hidden.
+- **FIX**: Fix an internal error where the autocomplete box could throw an error due to the index bounds not being checked.
+
 ## 4.5.0
 
 - **NEW**: Add **Match base** search option. **Match base** affects full path patterns when **Full path directory match** or **Full path file match** is enabled. When a full path pattern has no slashes, it will cause the pattern to only match the base file name. This allows you to have traditional base match patterns and more specific full path patterns usage simultaneously. Requires `wcmatch` 4.0 which is now the minimum requirement.

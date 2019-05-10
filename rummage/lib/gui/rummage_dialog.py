@@ -333,8 +333,6 @@ class RummageFrame(gui.RummageFrame):
             self.m_settings_panel.SetDoubleBuffered(True)
         self.localize()
 
-        self.hide_limit_panel = False
-
         self.SetIcon(
             data.get_image('rummage_large.png').GetIcon()
         )
@@ -381,6 +379,12 @@ class RummageFrame(gui.RummageFrame):
         custom_statusbar.extend_sb(self.m_statusbar)
         self.m_statusbar.set_status("")
 
+        self.m_options_collapse.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.on_options_collapse)
+        self.m_limit_collapse.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.on_limit_collapse)
+
+        self.m_options_collapse.workaround()
+        self.m_limit_collapse.workaround()
+
         # Extend browse button
         pick_button.pick_extend(self.m_searchin_dir_picker, pick_button.PickButton)
         self.m_searchin_dir_picker.pick_init(
@@ -411,12 +415,6 @@ class RummageFrame(gui.RummageFrame):
         # Setup the inputs history and replace
         # placeholder objects with actual objects
         self.setup_inputs()
-
-        # Pick optimal size
-        if Settings.get_hide_limit():
-            self.hide_limit_panel = True
-            self.limit_panel_hide()
-            self.m_hide_limit_menuitem.SetItemLabel(self.MENU_SHOW_LIMIT)
 
         self.init_search_path(start_path)
 
@@ -541,6 +539,7 @@ class RummageFrame(gui.RummageFrame):
         self.NOT_UP_TO_DATE = _("There is an update available: %s.")
         self.DELETE = _("Are you sure you want to delete the files?")
         self.RECYCLE = _("Are you sure you want to recycle the files?")
+        self.OPTIONS = _("Options")
 
         # Menu
         self.MENU_EXPORT_RESULTS = _("Export Results")
@@ -553,7 +552,6 @@ class RummageFrame(gui.RummageFrame):
         self.MENU_EXIT = _("&Exit")
         self.MENU_HTML = _("HTML")
         self.MENU_CSV = _("CSV")
-        self.MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
         self.MENU_OPEN_LOG = _("Open Log File")
         self.MENU_ABOUT = _("&About Rummage")
         self.MENU_UPDATE = _("Check for Updates")
@@ -561,8 +559,6 @@ class RummageFrame(gui.RummageFrame):
         self.MENU_CHANGELOG = _("Changelog")
         self.MENU_LICENSE = _("License")
         self.MENU_HELP_SUPPORT = _("Help and Support")
-        self.MENU_SHOW_LIMIT = _("Show Limit Search Panel")
-        self.MENU_HIDE_LIMIT = _("Hide Limit Search Panel")
 
         # Combo values
         self.SIZE_LIMIT_I18N = {
@@ -582,12 +578,6 @@ class RummageFrame(gui.RummageFrame):
     def refresh_localization(self):
         """Localize."""
 
-        self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(0).GetSizer().GetStaticBox().SetLabel(
-            self.SEARCH_REPLACE
-        )
-        self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(1).GetSizer().GetStaticBox().SetLabel(
-            self.LIMIT_SEARCH
-        )
         self.m_search_button.SetLabel(self.SEARCH_BTN_SEARCH)
         self.m_replace_button.SetLabel(self.REPLACE_BTN_REPLACE)
         self.m_searchin_label.SetLabel(self.SEARCH_IN)
@@ -598,6 +588,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_created_label.SetLabel(self.CREATED)
         self.m_exclude_label.SetLabel(self.EXCLUDE)
         self.m_filematch_label.SetLabel(self.FILE_MATCH)
+        self.m_options_collapse.SetLabel(self.OPTIONS)
         self.m_regex_search_checkbox.SetLabel(self.SEARCH_WITH_REGEX)
         self.m_case_checkbox.SetLabel(self.CASE)
         self.m_dotmatch_checkbox.SetLabel(self.DOTALL)
@@ -619,6 +610,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_posix_checkbox.SetLabel(self.POSIX)
         self.m_format_replace_checkbox.SetLabel(self.FORMAT)
         self.m_fullcase_checkbox.SetLabel(self.CASEFOLD)
+        self.m_limit_collapse.SetLabel(self.LIMIT_SEARCH)
         self.m_subfolder_checkbox.SetLabel(self.SUBFOLDERS)
         self.m_hidden_checkbox.SetLabel(self.HIDDEN)
         self.m_symlinks_checkbox.SetLabel(self.SYMLINK)
@@ -632,15 +624,13 @@ class RummageFrame(gui.RummageFrame):
         exportid = self.m_menu.FindMenuItem("File", "Export Results")
         self.m_menu.SetLabel(exportid, self.MENU_EXPORT_RESULTS)
         self.m_menu.SetMenuLabel(0, self.MENU_FILE)
-        self.m_menu.SetMenuLabel(1, self.MENU_VIEW)
-        self.m_menu.SetMenuLabel(2, self.MENU_HELP)
+        self.m_menu.SetMenuLabel(1, self.MENU_HELP)
         self.m_preferences_menuitem.SetItemLabel(self.MENU_PREFERENCES)
         self.m_quit_menuitem.SetItemLabel(self.MENU_EXIT)
         self.m_export_html_menuitem.SetItemLabel(self.MENU_HTML)
         self.m_export_csv_menuitem.SetItemLabel(self.MENU_CSV)
         self.m_export_settings_menuitem.SetItemLabel(self.MENU_EXPORT_SETTINGS)
         self.m_import_settings_menuitem.SetItemLabel(self.MENU_IMPORT_SETTINGS)
-        self.m_hide_limit_menuitem.SetItemLabel(self.MENU_HIDE_LIMIT)
         self.m_log_menuitem.SetItemLabel(self.MENU_OPEN_LOG)
         self.m_about_menuitem.SetItemLabel(self.MENU_ABOUT)
         self.m_update_menuitem.SetItemLabel(self.MENU_UPDATE)
@@ -694,7 +684,7 @@ class RummageFrame(gui.RummageFrame):
         if start_path and os.path.exists(start_path):
             self.m_searchin_text.safe_set_value(os.path.abspath(os.path.normpath(start_path)))
 
-    def optimize_size(self, first_time=False):
+    def optimize_size(self, first_time=False, minimize_height=False):
         """Optimally resize window."""
 
         best = self.m_settings_panel.GetBestSize()
@@ -741,6 +731,9 @@ class RummageFrame(gui.RummageFrame):
 
             self.SetMinSize(wx.Size(min_width, min_height))
 
+            if minimize_height:
+                self.SetSize(wx.Size(width, min_height))
+
         self.Refresh()
 
     def setup_inputs(self):
@@ -785,6 +778,11 @@ class RummageFrame(gui.RummageFrame):
         self.m_binary_checkbox.SetValue(Settings.get_search_setting("binary_toggle", False))
         self.m_chains_checkbox.SetValue(Settings.get_search_setting("chain_toggle", False))
         self.m_replace_plugin_checkbox.SetValue(Settings.get_search_setting("replace_plugin_toggle", False))
+
+        option_collapse = Settings.get_search_setting('option_collapse', False)
+        self.m_options_collapse.Collapse(option_collapse)
+        limit_collapse = Settings.get_search_setting('limit_collapse', False)
+        self.m_limit_collapse.Collapse(limit_collapse)
 
         self.m_modified_choice.SetStringSelection(
             eng_to_i18n(
@@ -887,7 +885,29 @@ class RummageFrame(gui.RummageFrame):
             else:
                 self.m_format_replace_checkbox.Hide()
             self.m_fullcase_checkbox.Hide()
+        self.m_options_panel.GetSizer().Layout()
+        self.m_options_collapse.GetPane().GetSizer().Layout()
         self.m_settings_panel.GetSizer().Layout()
+
+    def on_options_collapse(self, event):
+        """Handle on collapse for options panel."""
+
+        self.m_options_panel.GetSizer().Layout()
+        self.m_options_collapse.GetPane().GetSizer().Layout()
+        self.m_settings_panel.GetSizer().Layout()
+        Settings.set_toggles([("option_collapse", self.m_options_collapse.IsCollapsed())])
+        minimize = not self.IsMaximized()
+        self.optimize_size(minimize_height=minimize)
+
+    def on_limit_collapse(self, event):
+        """Handle on collapse for limit panel."""
+
+        self.m_limit_panel.GetSizer().Layout()
+        self.m_limit_collapse.GetPane().GetSizer().Layout()
+        self.m_settings_panel.GetSizer().Layout()
+        Settings.set_toggles([("limit_collapse", self.m_limit_collapse.IsCollapsed())])
+        minimize = not self.IsMaximized()
+        self.optimize_size(minimize_height=minimize)
 
     def refresh_chain_mode(self):
         """Refresh chain mode."""
@@ -943,52 +963,6 @@ class RummageFrame(gui.RummageFrame):
             )
             self.m_searchfor_textbox.SetValue(self.last_pattern_search)
             return False
-
-    def limit_panel_toggle(self):
-        """Show/Hide limit panel."""
-
-        limit_box = self.m_settings_panel.GetSizer().GetItem(0).GetSizer().GetItem(1).GetSizer()
-        if not self.hide_limit_panel:
-            pth = self.m_searchin_text.GetValue()
-            if os.path.isfile(pth) and limit_box.IsShown(0):
-                limit_box.ShowItems(False)
-                limit_box.Layout()
-                self.m_settings_panel.GetSizer().Layout()
-                self.m_main_panel.Layout()
-                self.Refresh()
-            elif not os.path.isfile(pth) and not limit_box.IsShown(0):
-                limit_box.ShowItems(True)
-                limit_box.Fit(limit_box.GetStaticBox())
-                limit_box.Layout()
-                self.m_settings_panel.GetSizer().Layout()
-                self.m_main_panel.Layout()
-                self.Refresh()
-        elif limit_box.IsShown(0):
-            limit_box.ShowItems(False)
-            limit_box.Layout()
-            self.m_settings_panel.GetSizer().Layout()
-            self.m_main_panel.Layout()
-            self.Refresh()
-
-    def limit_panel_hide(self):
-        """Hide the limit panel."""
-
-        self.limit_panel_toggle()
-        self.optimize_size()
-
-    def check_searchin(self):
-        """Determine if search in input is a file or not, and hide/show elements accordingly."""
-
-        self.limit_panel_toggle()
-        self.optimize_size()
-
-        pth = self.m_searchin_text.GetValue()
-        if not self.searchin_update:
-            if os.path.isdir(pth):
-                self.m_searchin_dir_picker.SetPath(pth)
-            elif os.path.isfile(pth):
-                self.m_searchin_dir_picker.SetPath(os.path.dirname(pth))
-            self.searchin_update = False
 
     def abort_search(self, is_replacing):
         """Abort search."""
@@ -1495,7 +1469,7 @@ class RummageFrame(gui.RummageFrame):
             ("posix_toggle", args.posix),
             ("format_replace_toggle", args.formatreplace),
             ("chain_toggle", self.m_chains_checkbox.GetValue()),
-            ('replace_plugin_toggle', self.m_replace_plugin_checkbox.GetValue())
+            ('replace_plugin_toggle', self.m_replace_plugin_checkbox.GetValue()),
         ]
 
         if Settings.get_regex_version() == 0:
@@ -2118,7 +2092,6 @@ class RummageFrame(gui.RummageFrame):
     def on_searchin_changed(self):
         """Callback for when a directory changes via the `m_searchin_text` control."""
 
-        self.check_searchin()
         self.SetTitle(self.m_searchin_text.GetValue())
 
     def on_save_search(self, event):
@@ -2320,17 +2293,6 @@ class RummageFrame(gui.RummageFrame):
         importer = ImportSettingsDialog(self, obj)
         importer.ShowModal()
         importer.Destroy()
-
-    def on_hide_limit(self, event):
-        """Hide limit panel."""
-
-        self.hide_limit_panel = not self.hide_limit_panel
-        self.limit_panel_hide()
-        Settings.set_hide_limit(self.hide_limit_panel)
-        if self.hide_limit_panel:
-            self.m_hide_limit_menuitem.SetItemLabel(self.MENU_SHOW_LIMIT)
-        else:
-            self.m_hide_limit_menuitem.SetItemLabel(self.MENU_HIDE_LIMIT)
 
     def on_show_log_file(self, event):
         """Show user files in editor."""

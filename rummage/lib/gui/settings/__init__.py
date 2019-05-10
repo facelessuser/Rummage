@@ -72,7 +72,6 @@ DEFAULT_SETTINGS = {
     "globstar": False,
     "hide_cols_content": [],
     "hide_cols_file": [],
-    "hide_limit": False,
     "international_time": False,
     "locale": "en_US",
     "matchbase": False,
@@ -285,27 +284,6 @@ class Settings(object):
 
         cls.reload_settings()
         return cls.settings.get('regex_version', 0)
-
-    @classmethod
-    def get_hide_limit(cls):
-        """Get hide limit setting."""
-
-        cls.reload_settings()
-        return cls.settings.get("hide_limit", False)
-
-    @classmethod
-    def set_hide_limit(cls, hide):
-        """Set hide limit setting."""
-
-        cls.reload_settings()
-        cls._set_hide_limit(hide)
-        cls.save_settings()
-
-    @classmethod
-    def _set_hide_limit(cls, hide):
-        """Set hide limit setting."""
-
-        cls.settings["hide_limit"] = hide
 
     @classmethod
     def get_hide_cols_file(cls):
@@ -1000,11 +978,41 @@ class Settings(object):
         return cls.cache.get(key, default)
 
     @classmethod
-    def add_search_settings(cls, history, toggles, strings):
-        """Add search settings to cache (more like history...but whatever)."""
+    def set_toggles(cls, toggles, save=True):
+        """Set toggles."""
 
-        cls.reload_settings()
-        debug(history)
+        if save:
+            cls.reload_settings()
+        for t in toggles:
+            key = t[0]
+            value = t[1]
+            if value is None:
+                continue
+            cls.cache[key] = value
+        if save:
+            cls.save_cache()
+
+    @classmethod
+    def set_strings(cls, strings, save=True):
+        """Set strings."""
+
+        if save:
+            cls.reload_settings()
+        for s in strings:
+            key = s[0]
+            value = s[1]
+            if value is None:
+                continue
+            cls.cache[key] = value
+        if save:
+            cls.save_cache()
+
+    @classmethod
+    def set_history(cls, history, save=True):
+        """Set history."""
+
+        if save:
+            cls.reload_settings()
         for i in history:
             key = i[0]
             value = i[1]
@@ -1019,19 +1027,18 @@ class Settings(object):
             if len(values) > (20 if value != "" else 21):
                 del values[-1]
             cls.cache[key] = values
-        for t in toggles:
-            key = t[0]
-            value = t[1]
-            if value is None:
-                continue
-            cls.cache[key] = value
-        for s in strings:
-            key = s[0]
-            value = s[1]
-            if value is None:
-                continue
-            cls.cache[key] = value
+        if save:
+            cls.save_cache()
 
+    @classmethod
+    def add_search_settings(cls, history, toggles, strings):
+        """Add search settings to cache (more like history...but whatever)."""
+
+        cls.reload_settings()
+        debug(history)
+        cls.set_history(history, False)
+        cls.set_toggles(toggles, False)
+        cls.set_strings(strings, False)
         cls.save_cache()
 
     @classmethod
@@ -1412,10 +1419,6 @@ class Settings(object):
         # Locale
         if 'locale' in obj:
             cls._set_language(obj['locale'])
-
-        # Hide limit panel
-        if 'hide_limit' in obj:
-            cls._set_hide_limit(obj['hide_limit'])
 
         # Hide columns
         if 'hide_cols_file' in obj:
