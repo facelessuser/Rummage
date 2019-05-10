@@ -61,8 +61,8 @@ class SavedSearchList(DynamicList):
 
         self.images = wx.ImageList(16, 16)
         self.glass = self.images.Add(data.get_bitmap('glass.png'))
-        self.sort_up = self.images.Add(data.get_bitmap('su.png'))
-        self.sort_down = self.images.Add(data.get_bitmap('sd.png'))
+        self.sort_up = self.images.Add(data.get_bitmap('su.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
+        self.sort_down = self.images.Add(data.get_bitmap('sd.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
         self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def get_item_text(self, item, col, absolute=False):

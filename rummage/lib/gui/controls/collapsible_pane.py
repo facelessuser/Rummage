@@ -79,14 +79,20 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
             parent, -1, bitmap=data.get_bitmap('sd.png'), label=label,
             style=wx.BORDER_NONE | wx.BU_EXACTFIT | wx.TAB_TRAVERSAL
         )
-        self.SetBitmapSelected(data.get_bitmap('su.png'))
-        self.SetUseFocusIndicator(True)
         self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        self.InitColours()
+        self.SetBitmapLabel(data.get_bitmap('sd.png', tint=self.tint))
+        self.SetBitmapSelected(data.get_bitmap('su.png', tint=self.tint))
+        self.SetUseFocusIndicator(True)
 
     def InitColours(self):
         """Calculate a new set of highlight and shadow colours."""
 
         face = self.GetBackgroundColour()
+        rgba = data.RGBA(*face.Get())
+        self.tint = (
+            data.RGBA(0x33, 0x33, 0x33, 0xFF) if rgba.get_luminance() > 127 else data.RGBA(0xbb, 0xbb, 0xbb, 0xFF)
+        )
         self.faceDnClr = face
         self.shadowPenClr = face
         self.highlightPenClr = face
