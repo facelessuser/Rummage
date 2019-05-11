@@ -344,15 +344,13 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
 
         # Internationalization of string sorting with locale module
         if isinstance(item1, str) and isinstance(item2, str):
-            # both are unicode (py2) or str (py3)
             cmpVal = locale.strcoll(item1, item2)
         elif isinstance(item1, bytes) or isinstance(item2, bytes):
-            # at least one is a str (py2) or byte (py3)
             cmpVal = locale.strcoll(str(item1), str(item2))
         else:
             cmpVal = cmp(item1, item2)
 
-        # If the items are equal then pick something else to make the sort value unique
+        # If the items are equal, then pick something else to make the sort value unique
         if cmpVal == 0:
             cmpVal = cmp(*self.GetSecondarySortValues(col, key1, key2))
 

@@ -221,7 +221,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         self.CHECKSUM_LABEL = _("Checksum")
         self.DELETE_LABEL = _("Delete")
         self.RECYCLE_LABEL = _("Send to Trash")
-        self.ARRANGE_COLUMNS = _("Arrange Columns")
+        self.ARRANGE_COLUMNS = _("Reorder columns")
         self.DELETE = _("Are you sure you want to delete the files?")
         self.RECYCLE = _("Are you sure you want to recycle the files?")
 
@@ -555,7 +555,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
         self.CHECKSUM_LABEL = _("Checksum")
         self.DELETE_LABEL = _("Delete")
         self.RECYCLE_LABEL = _("Send to Trash")
-        self.ARRANGE_COLUMNS = _("Arrange Columns")
+        self.ARRANGE_COLUMNS = _("Reorder Columns")
         self.DELETE = _("Are you sure you want to delete the files?")
         self.RECYCLE = _("Are you sure you want to recycle the files?")
 
