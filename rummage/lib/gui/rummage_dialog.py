@@ -424,6 +424,10 @@ class RummageFrame(gui.RummageFrame):
         self.refresh_regex_options()
         self.refresh_chain_mode()
 
+        if util.platform() != "linux":
+            self.finalize_size()
+        self.m_searchfor_textbox.SetFocus()
+
         # So this is to fix some platform specific issues.
         # We will wait until we are sure we are loaded, then
         # We will fix mac focusing random elements, and we will
@@ -1831,6 +1835,16 @@ class RummageFrame(gui.RummageFrame):
             debug(traceback.format_exc())
             return True
 
+    def finalize_size(self):
+        """Finalize size."""
+
+        self.Fit()
+        self.m_settings_panel.Fit()
+        self.m_settings_panel.GetSizer().Layout()
+        self.m_main_panel.Fit()
+        self.m_main_panel.GetSizer().Layout()
+        self.optimize_size(first_time=True)
+
     def on_loaded(self):
         """
         Stupid workarounds on load.
@@ -1840,15 +1854,15 @@ class RummageFrame(gui.RummageFrame):
         """
 
         self.call_later.Stop()
-        self.m_searchfor_textbox.SetFocus()
+
+        if util.platform() == "osx":
+            self.m_searchfor_textbox.SetFocus()
+
         self.Refresh()
 
-        self.Fit()
-        self.m_settings_panel.Fit()
-        self.m_settings_panel.GetSizer().Layout()
-        self.m_main_panel.Fit()
-        self.m_main_panel.GetSizer().Layout()
-        self.optimize_size(first_time=True)
+        if util.platform() == "linux":
+            self.finalize_size()
+
         if tuple(Settings.get_current_version()) < __meta__.__version_info__:
             Settings.set_current_version(__meta__.__version_info__)
             dlg = html_dialog.HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
