@@ -98,7 +98,7 @@ class RummageFrame ( wx.Frame ):
 
         fgSizer2.Add( fgSizer8, 1, wx.EXPAND, 5 )
 
-        self.m_options_collapse = CollapsiblePane( self.m_settings_panel, wx.ID_ANY, u"Options", wx.DefaultPosition, wx.DefaultSize, wx.CP_DEFAULT_STYLE|wx.CP_NO_TLW_RESIZE )
+        self.m_options_collapse = CollapsiblePane( self.m_settings_panel, wx.ID_ANY, u"Text search options", wx.DefaultPosition, wx.DefaultSize, wx.CP_DEFAULT_STYLE|wx.CP_NO_TLW_RESIZE )
         self.m_options_collapse.Collapse( False )
 
         self.m_options_collapse.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
@@ -237,7 +237,7 @@ class RummageFrame ( wx.Frame ):
         self.m_staticline111 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer2.Add( self.m_staticline111, 0, wx.EXPAND |wx.ALL, 5 )
 
-        self.m_limit_collapse = CollapsiblePane( self.m_settings_panel, wx.ID_ANY, u"Limit search", wx.DefaultPosition, wx.DefaultSize, wx.CP_DEFAULT_STYLE|wx.CP_NO_TLW_RESIZE )
+        self.m_limit_collapse = CollapsiblePane( self.m_settings_panel, wx.ID_ANY, u"File search", wx.DefaultPosition, wx.DefaultSize, wx.CP_DEFAULT_STYLE|wx.CP_NO_TLW_RESIZE )
         self.m_limit_collapse.Collapse( False )
 
         self.m_limit_collapse.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )

@@ -34,31 +34,35 @@ pythonw -m rummage
 
 ![Search Tab](images/search_tab.png)
 
-Search and replaces are configured in the **Search** tab which is broken up into 2 panels, the first of which is the **Search &amp; Replace** panel. The second is the **Limit Search** panel.
+Search and replaces are configured in the **Search** tab. The search tab can essentially be broken up into two sections: text search configuration and file search configuration.
 
-### Search Panel
+### Configuring Text Search
 
-![Search and Replace Panel](./images/search_replace_inputs.png)
+![Search and Replace Inputs](./images/search_replace_inputs.png)
 
-The **Search &amp; Replace** panel contains three text boxes with a dropdown history. The first text box defines **where to search**, the second defines **what to search for**, and the last defines **what to replace matches with**.  You can select previously used patterns and search targets by expanding the dropdown panel for the input.
+The first part of the **Search** tab contains mostly text search inputs, with the exception of the very first control, which is used to configure where to search. The second text box is used to specify what we are searching for in the content of each file. The last text box specified what we want to replace the found text with. Each text box retains a limit history of recent inputs that can be accessed via the drop down control to the right.
 
-Below the text boxes are checkboxes that control the regular expression engine's options and features.
+The replace text box is only needed if you are performing a replace. The search input can also be omitted, and if so, Rummage will simply return files that match the provided file patterns (covered in [Configuring File Search](#configuring-file-search)).
+
+Below the text boxes is a collapsible panel that contains the text search options. The options consist of various checkboxes and controls that enable/disable search and replace features. The available features will vary depending on which regular expression engine you are using. Each feature is documented in [Search Options](./search.md#search-options).
 
 ![Search and Replace Checkboxes](images/search_replace_panel.png)
-
-The available features will vary depending on which regular expression engine you are using. Each feature is documented in [Search Options](./search.md#search-options).
 
 Lastly, Rummage provides buttons to launch a [regular expression tester](#regular-expression-tester), dialogs to [save or load](#saving-and-loading-regular-expressions) frequently used regular expressions, and a dialog to create and manage [regular expression chains](#search-chains).
 
 ![Regular Expression Buttons](images/regex_buttons.png)
 
-### Limit Search Panel
+### Configuring File Search
 
-![Limit Search Panel](images/limit_search_panel.png)
+![File Search Inputs](images/limit_search_panel.png)
 
-The **Limit Search** panel contains checkboxes and inputs that filter the files to be searched.  You can filter out hidden files, symlinks, files of specific sizes, or creation/modification dates.
+The bottom part of the search tab focuses on controlling which files get searched. Various checkboxes and inputs are available that can narrow the actual files that get searched. You can filter out hidden files, symlinks, files of specific sizes, or creation/modification dates.
 
-You can also restrict which files get searched by providing a wild card (or regular expression if preferred) pattern. By default, the patterns are applied to the base file or folder name. See [File Patterns](./search.md#wildcard) to learn more about accepted wild card pattern syntax and how to configure optional file pattern features.
+You can also restrict which files get searched by providing a wild card patterns (or regular expression if preferred). By default, the patterns are applied to the base file or folder name. See [File Patterns](./search.md#wildcard) to learn more about accepted wild card pattern syntax and how to configure optional file pattern features.
+
+!!! tip "Hidden Files"
+    Rummage assumes dot files as hidden on all systems. Additionally, on Windows and macOS, it will also look at a
+    file's filesystem attributes to determine if the system is potentially hiding the file as well.
 
 !!! new "New 4.4.0"
     Added the symlink following via the **Follow symlinks** toggle.
@@ -71,14 +75,14 @@ Once a search or replace is initiated, the results will begin to appear in the *
 
 ![Content Tab](images/content_tab.png)
 
-!!! tip
+!!! tip "Column Options"
     You can hide/show columns by right clicking the list header to get a special context menu. You can then deselect or select the the column(s) you wish to hide/show respectively. You can also reorder the columns if desired.
 
 ## Regular Expression Tester
 
 ![Regex Tester](images/regex_tester.png)
 
-Rummage comes with a simple regular expression tester. It has a simple text box to place content to search, and another text box that will show the final results after the find and replace are applied.  Below those text boxes, there are two text input boxes for the find pattern and the replace pattern.  Lastly, all search and replace flag options are found under the patterns.
+Rummage comes with a simple regular expression tester. It has a simple text box to place content to search, and another text box that will show the final results after the find and replace is applied.  Below those text boxes, there are two text input boxes for the find pattern and the replace pattern.  Lastly, all search and replace flag options are found under the patterns.
 
 To use the tester, simply enter the content to search, set your desired options, and input your find and replace pattern.  As you change your pattern or options, matches will be updated and highlighted, and the result box will be updated with any replacements.
 
@@ -106,7 +110,7 @@ If you wish to edit the name or comment of a search, you can double click the en
 
 There are times you may have a task that requires you to do multiple find and replaces that are all related, but are too difficult to represent as a single find and replace. This is where search chains can be helpful.
 
-Search chains are essentially a sequence of multiple [saved search and replace patterns](#saving-and-loading-regular-expressions). You can create a search chain by clicking the `Search Chains` button which will bring up the search change manager.
+Search chains are essentially a sequence of multiple [saved search and replace patterns](#saving-and-loading-regular-expressions). You can create a search chain by clicking the `Search Chains` button which will bring up the search chain manager.
 
 ![Chain Button](images/chain_button.png)
 
@@ -134,7 +138,7 @@ Replace plugins aren't meant to be full, complex modules that import lots of oth
 
 ### Writing a Plugin
 
-Replace plugins should contain two things. The first is a plugin class derived from the `rummage.lib.rumcore.ReplacePlugin`.  The second is a function called `get_replace` that returns your class.
+Replace plugins should contain two things. The first is a plugin class derived from the `rummage.lib.rumcore.ReplacePlugin` class.  The second is a function called `get_replace` that returns your class.
 
 The plugin class is fairly straight forward and is shown below.
 

@@ -231,8 +231,8 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         self.images = wx.ImageList(16, 16)
         self.doc = self.images.Add(data.get_bitmap('doc.png'))
         self.bin = self.images.Add(data.get_bitmap('binary.png'))
-        self.sort_up = self.images.Add(data.get_bitmap('su.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.sort_down = self.images.Add(data.get_bitmap('sd.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
+        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
+        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
         self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def set_international_time(self, enable):
@@ -582,8 +582,8 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
         self.images = wx.ImageList(16, 16)
         self.doc = self.images.Add(data.get_bitmap('doc.png'))
         self.bin = self.images.Add(data.get_bitmap('binary.png'))
-        self.sort_up = self.images.Add(data.get_bitmap('su.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.sort_down = self.images.Add(data.get_bitmap('sd.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
+        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
+        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
         self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def on_enter_window(self, event):

@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.6.0 Development
+## 4.6.0b1
 
 - **NEW**: Search options and file limit options can be collapsed in the main dialog. This allows  hiding these options if you aren't frequently using them, and provides a more compact dialog.
 - **NEW**: There is no longer an option to hide the file limit options as now you can just collapse them.
