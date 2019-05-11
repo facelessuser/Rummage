@@ -234,7 +234,6 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
             last_width = w
             if w > 0:
                 last_column = i
-        total_width -= last_width
 
         if total_width < (self.GetSize()[0] - 20) and last_column > -1:
             self.SetColumnWidth(last_column, last_width + self.GetSize()[0] - total_width)

@@ -7,6 +7,7 @@
 - **NEW**: Added context menu option to move columns in the result lists and remember their positions across sessions.
 - **FIX**: Fix an issue where on Linux, tabbing past a hidden directory button would cause an error in GTK. Ensure such controls do not allow focus when they are hidden.
 - **FIX**: Fix an internal error where the autocomplete box could throw an error due to the index bounds not being checked.
+- **FIX**: When list controls are smaller than the window, don't resize last column too an excessively big width.
 
 ## 4.5.0
 
