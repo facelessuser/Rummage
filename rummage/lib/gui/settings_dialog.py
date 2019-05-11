@@ -58,7 +58,7 @@ MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
 
 
-class SettingsDialog(gui.SettingsDialog, webview.WebViewMixin):
+class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
     """Settings dialog."""
 
     def __init__(self, parent):

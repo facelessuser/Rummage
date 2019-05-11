@@ -31,6 +31,7 @@ from .. import data
 from ... import util
 from ..settings import Settings
 from ..actions import checksum
+from ..generic_dialogs import yesno
 
 CONTENT_PATH = 0
 CONTENT_LINE = 1
@@ -99,10 +100,78 @@ class ContextMenu(wx.Menu):
                         parent.Bind(wx.EVT_MENU, i[1], item)
 
 
-class ResultFileList(DynamicList):
+class CommonOperationsMixin:
+    """Handle common operations."""
+
+    def on_arrange_click(self, event, setting_callback):
+        """Handle arranging columns."""
+
+        dlg = self.main_window.get_dialog('ColumnDialog')(self.main_window, self.virtual_list, self.headers)
+        dlg.ShowModal()
+        if dlg.changed:
+            virtual_list = self.update_virtual(dlg.virtual_columns)
+            setting_callback(virtual_list)
+        dlg.Destroy()
+
+    def on_checksum(self, event, h, target):
+        """Handle checksum event."""
+
+        dlg = self.main_window.get_dialog('ChecksumDialog')(self.main_window, h, target)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def on_delete_files(self, event, recycle):
+        """Delete files in the list control."""
+
+        if not yesno(self.RECYCLE if recycle else self.DELETE):
+            return
+
+        files = self.get_selected_files()
+        dlg = self.main_window.get_dialog('DeleteDialog')(self.main_window, files, recycle)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+        self.main_window.m_result_list.deselect_all(None)
+        self.main_window.m_result_file_list.deselect_all(None)
+
+        # Remove entries from table that no longer exist while rebuilding table index
+        if self.main_window.m_result_list.GetItemCount():
+            remove = set()
+            new_index = []
+            for i in self.main_window.m_result_list.itemIndexMap:
+                v = self.main_window.m_result_list.itemDataMap[i]
+                if not os.path.exists(os.path.join(v[0][1], v[0][0])):
+                    del self.main_window.m_result_list.itemDataMap[i]
+                    remove.add(v[5])
+                else:
+                    new_index.append(i)
+            self.main_window.m_result_list.itemIndexMap = new_index
+
+            new_index = []
+            for i in self.main_window.m_result_file_list.itemIndexMap:
+                if i in remove:
+                    del self.main_window.m_result_file_list.itemDataMap[i]
+                else:
+                    new_index.append(i)
+            self.main_window.m_result_file_list.itemIndexMap = new_index
+
+            self.main_window.m_result_list.SetItemCount(len(self.main_window.m_result_list.itemDataMap))
+            self.main_window.m_result_file_list.SetItemCount(len(self.main_window.m_result_file_list.itemDataMap))
+        else:
+            new_index = []
+            for i in self.main_window.m_result_file_list.itemIndexMap:
+                if not os.path.exists(i):
+                    del self.main_window.m_result_file_list.itemDataMap[i]
+                else:
+                    new_index.append(i)
+            self.main_window.m_result_file_list.itemIndexMap = new_index
+            self.main_window.m_result_file_list.SetItemCount(len(self.main_window.m_result_file_list.itemDataMap))
+
+
+class ResultFileList(CommonOperationsMixin, DynamicList):
     """Result file list."""
 
-    def __init__(self, parent):
+    def __init__(self, parent, virtual_list=None):
         """Initialize result file list object."""
 
         self.localize()
@@ -120,7 +189,8 @@ class ResultFileList(DynamicList):
                 self.MODIFIED,
                 self.CREATED
             ],
-            False
+            False,
+            virtual_list
         )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
@@ -151,6 +221,9 @@ class ResultFileList(DynamicList):
         self.CHECKSUM_LABEL = _("Checksum")
         self.DELETE_LABEL = _("Delete")
         self.RECYCLE_LABEL = _("Send to Trash")
+        self.ARRANGE_COLUMNS = _("Reorder columns")
+        self.DELETE = _("Are you sure you want to delete the files?")
+        self.RECYCLE = _("Are you sure you want to recycle the files?")
 
     def create_image_list(self):
         """Create the image list."""
@@ -226,17 +299,18 @@ class ResultFileList(DynamicList):
     def get_item_text(self, item, col, absolute=False):
         """Return the text for the given item and col."""
 
+        real = self.get_real_col(col)
         if not absolute:
             item = self.itemIndexMap[item]
-        if col == FILE_SIZE:
+        if real == FILE_SIZE:
             return '%.2fKB' % round(self.itemDataMap[item][FILE_SIZE], 2)
-        elif col in (FILE_MOD, FILE_CRE):
+        elif real in (FILE_MOD, FILE_CRE):
             if self.international:
-                return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.itemDataMap[item][col]))
+                return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.itemDataMap[item][real]))
             else:
-                return time.strftime("%b %d, %Y, %I:%M:%S %p", time.localtime(self.itemDataMap[item][col]))
+                return time.strftime("%b %d, %Y, %I:%M:%S %p", time.localtime(self.itemDataMap[item][real]))
         else:
-            return util.to_ustr(self.itemDataMap[item][col])
+            return util.to_ustr(self.itemDataMap[item][real])
 
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
@@ -253,11 +327,12 @@ class ResultFileList(DynamicList):
         # Sample the first "size_sample" to determine
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
-            text = self.get_item_text(idx, FILE_MATCH, True)
+            virt = self.get_virt_col(FILE_MATCH)
+            text = self.get_item_text(idx, virt, True)
             lw = self.dc.GetFullTextExtent(text)[0]
             width = lw + 30
-            if width > self.widest_cell[FILE_MATCH]:
-                self.widest_cell[FILE_MATCH] = width
+            if width > self.widest_cell[virt]:
+                self.widest_cell[virt] = width
 
     def on_dclick(self, event):
         """Open file at in editor with optional line and column argument."""
@@ -274,11 +349,11 @@ class ResultFileList(DynamicList):
         if item != -1:
             target = None
             with self.wait:
-                filename = self.GetItem(item, col=FILE_NAME).GetText()
-                path = self.GetItem(item, col=FILE_PATH).GetText()
+                filename = self.GetItem(item, col=self.get_virt_col(FILE_NAME)).GetText()
+                path = self.GetItem(item, col=self.get_virt_col(FILE_PATH)).GetText()
                 target = os.path.join(path, filename)
-                line = str(self.get_map_item(item, col=FILE_LINE))
-                col = str(self.get_map_item(item, col=FILE_COL))
+                line = str(self.get_map_item(item, col=self.get_virt_col(FILE_LINE)))
+                col = str(self.get_map_item(item, col=self.get_virt_col(FILE_COL)))
             if target:
                 fileops.open_editor(target, line, col)
         else:
@@ -286,11 +361,11 @@ class ResultFileList(DynamicList):
             while item != -1:
                 target = None
                 with self.wait:
-                    filename = self.GetItem(item, col=FILE_NAME).GetText()
-                    path = self.GetItem(item, col=FILE_PATH).GetText()
+                    filename = self.GetItem(item, col=self.get_virt_col(FILE_NAME)).GetText()
+                    path = self.GetItem(item, col=self.get_virt_col(FILE_PATH)).GetText()
                     target = os.path.join(path, filename)
-                    line = str(self.get_map_item(item, col=FILE_LINE))
-                    col = str(self.get_map_item(item, col=FILE_COL))
+                    line = str(self.get_map_item(item, col=self.get_virt_col(FILE_LINE)))
+                    col = str(self.get_map_item(item, col=self.get_virt_col(FILE_COL)))
                 if target:
                     fileops.open_editor(target, line, col)
                 item = self.GetNextSelected(item)
@@ -304,9 +379,9 @@ class ResultFileList(DynamicList):
         while item != -1:
             with self.wait:
                 if col == FILE_NAME:
-                    copy_bfr.append(self.GetItem(item, col=FILE_NAME).GetText())
+                    copy_bfr.append(self.GetItem(item, col=self.get_virt_col(FILE_NAME)).GetText())
                 elif col == FILE_PATH:
-                    copy_bfr.append(self.GetItem(item, col=FILE_PATH).GetText())
+                    copy_bfr.append(self.GetItem(item, col=self.get_virt_col(FILE_PATH)).GetText())
             item = self.GetNextSelected(item)
 
         if copy_bfr:
@@ -325,8 +400,8 @@ class ResultFileList(DynamicList):
             item = self.GetNextItem(-1)
             while item != -1:
                 if self.IsSelected(item):
-                    filename = self.GetItem(item, col=FILE_NAME).GetText()
-                    path = self.GetItem(item, col=FILE_PATH).GetText()
+                    filename = self.GetItem(item, col=self.get_virt_col(FILE_NAME)).GetText()
+                    path = self.GetItem(item, col=self.get_virt_col(FILE_PATH)).GetText()
                     files.add(os.path.join(path, filename))
                 item = self.GetNextItem(item)
         return sorted(list(files))
@@ -341,8 +416,8 @@ class ResultFileList(DynamicList):
             pos = event.GetPosition()
             item = self.HitTestSubItem(pos)[0]
             if item != -1:
-                filename = self.GetItem(item, col=FILE_NAME).GetText()
-                path = self.GetItem(item, col=FILE_PATH).GetText()
+                filename = self.GetItem(item, col=self.get_virt_col(FILE_NAME)).GetText()
+                path = self.GetItem(item, col=self.get_virt_col(FILE_PATH)).GetText()
                 target = os.path.join(path, filename)
                 selected = self.IsSelected(item)
                 select_count = self.GetSelectedItemCount()
@@ -361,7 +436,7 @@ class ResultFileList(DynamicList):
 
             hash_entries = []
             for h in checksum.VALID_HASH:
-                hash_entries.append((h, functools.partial(self.main_window.on_checksum, h=h, target=target)))
+                hash_entries.append((h, functools.partial(self.on_checksum, h=h, target=target)))
 
             # Open menu
             menu = ContextMenu(
@@ -375,12 +450,12 @@ class ResultFileList(DynamicList):
                     None,
                     (
                         self.DELETE_LABEL,
-                        functools.partial(self.main_window.on_delete_files, recycle=False, listctrl=self),
+                        functools.partial(self.on_delete_files, recycle=False),
                         self.complete
                     ),
                     (
                         self.RECYCLE_LABEL,
-                        functools.partial(self.main_window.on_delete_files, recycle=True, listctrl=self),
+                        functools.partial(self.on_delete_files, recycle=True),
                         self.complete
                     )
                 ]
@@ -405,26 +480,38 @@ class ResultFileList(DynamicList):
     def on_col_rclick(self, event):
         """Handle column right click."""
 
-        menu = ContextMenu(
-            [
-                (self.FILE, functools.partial(self.on_col_hide_click, col=0), True, 0 not in self.hidden_columns),
-                (self.MATCHES, functools.partial(self.on_col_hide_click, col=1), True, 1 not in self.hidden_columns),
-                (self.EXTENSION, functools.partial(self.on_col_hide_click, col=2), True, 2 not in self.hidden_columns),
-                (self.SIZE, functools.partial(self.on_col_hide_click, col=3), True, 3 not in self.hidden_columns),
-                (self.PATH, functools.partial(self.on_col_hide_click, col=4), True, 4 not in self.hidden_columns),
-                (self.ENCODING, functools.partial(self.on_col_hide_click, col=5), True, 5 not in self.hidden_columns),
-                (self.MODIFIED, functools.partial(self.on_col_hide_click, col=6), True, 6 not in self.hidden_columns),
-                (self.CREATED, functools.partial(self.on_col_hide_click, col=7), True, 7 not in self.hidden_columns),
-            ]
+        items = [
+            (self.FILE, functools.partial(self.on_col_hide_click, col=0), True, 0 not in self.hidden_columns),
+            (self.MATCHES, functools.partial(self.on_col_hide_click, col=1), True, 1 not in self.hidden_columns),
+            (self.EXTENSION, functools.partial(self.on_col_hide_click, col=2), True, 2 not in self.hidden_columns),
+            (self.SIZE, functools.partial(self.on_col_hide_click, col=3), True, 3 not in self.hidden_columns),
+            (self.PATH, functools.partial(self.on_col_hide_click, col=4), True, 4 not in self.hidden_columns),
+            (self.ENCODING, functools.partial(self.on_col_hide_click, col=5), True, 5 not in self.hidden_columns),
+            (self.MODIFIED, functools.partial(self.on_col_hide_click, col=6), True, 6 not in self.hidden_columns),
+            (self.CREATED, functools.partial(self.on_col_hide_click, col=7), True, 7 not in self.hidden_columns),
+        ]
+
+        menu_entries = []
+        for index in range(self.column_count):
+            menu_entries.append(items[self.get_real_col(index)])
+
+        menu_entries.append(
+            (
+                self.ARRANGE_COLUMNS,
+                functools.partial(self.on_arrange_click, setting_callback=Settings.set_pos_cols_file),
+                self.complete
+            )
         )
+
+        menu = ContextMenu(menu_entries)
         self.PopupMenu(menu)
         menu.Destroy()
 
 
-class ResultContentList(DynamicList):
+class ResultContentList(CommonOperationsMixin, DynamicList):
     """Result content list."""
 
-    def __init__(self, parent):
+    def __init__(self, parent, virtual_list=None):
         """Initialize the result content list object."""
 
         self.localize()
@@ -438,7 +525,8 @@ class ResultContentList(DynamicList):
                 self.EXTENSION,
                 self.CONTEXT
             ],
-            False
+            False,
+            virtual_list
         )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
@@ -467,9 +555,16 @@ class ResultContentList(DynamicList):
         self.CHECKSUM_LABEL = _("Checksum")
         self.DELETE_LABEL = _("Delete")
         self.RECYCLE_LABEL = _("Send to Trash")
+        self.ARRANGE_COLUMNS = _("Reorder Columns")
+        self.DELETE = _("Are you sure you want to delete the files?")
+        self.RECYCLE = _("Are you sure you want to recycle the files?")
 
     def GetSecondarySortValues(self, col, key1, key2):
-        """Get secondary sort values."""
+        """
+        Get secondary sort values.
+
+        Virtual columns are handled in `__ColumnSorter`.
+        """
 
         if col == CONTENT_LINE:
             return (self.itemDataMap[key1][CONTENT_PATH], self.itemDataMap[key2][CONTENT_PATH])
@@ -514,12 +609,13 @@ class ResultContentList(DynamicList):
     def get_item_text(self, item, col, absolute=False):
         """Return the text for the given item and col."""
 
+        real = self.get_real_col(col)
         if not absolute:
             item = self.itemIndexMap[item]
-        if col == CONTENT_PATH:
+        if real == CONTENT_PATH:
             return util.to_ustr(self.itemDataMap[item][CONTENT_PATH][0])
         else:
-            return util.to_ustr(self.itemDataMap[item][col])
+            return util.to_ustr(self.itemDataMap[item][real])
 
     def increment_match_count(self, idx):
         """Increment the match count of the given item."""
@@ -530,11 +626,12 @@ class ResultContentList(DynamicList):
         # Sample the first "size_sample" to determine
         # column width for when table first loads
         if idx <= self.last_idx_sized or not USE_SAMPLE_SIZE:
-            text = self.get_item_text(idx, CONTENT_MATCH, True)
+            virt = self.get_virt_col(CONTENT_MATCH)
+            text = self.get_item_text(idx, virt, True)
             lw = self.dc.GetFullTextExtent(text)[0]
             width = lw + 30
-            if width > self.widest_cell[CONTENT_MATCH]:
-                self.widest_cell[CONTENT_MATCH] = width
+            if width > self.widest_cell[virt]:
+                self.widest_cell[virt] = width
 
     def set_match(self, obj):
         """Set the match."""
@@ -568,12 +665,12 @@ class ResultContentList(DynamicList):
             pos = event.GetPosition()
             item = self.HitTestSubItem(pos)[0]
             if item != -1:
-                filename = self.GetItem(item, col=CONTENT_PATH).GetText()
-                line = self.GetItem(item, col=CONTENT_LINE).GetText()
-                file_row = self.get_map_item(item, col=CONTENT_KEY)
-                col = str(self.get_map_item(item, col=CONTENT_COL))
+                filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
+                line = self.GetItem(item, col=self.get_virt_col(CONTENT_LINE)).GetText()
+                file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
+                col = str(self.get_map_item(item, col=self.get_virt_col(CONTENT_COL)))
                 path = self.main_window.m_result_file_list.get_map_item(
-                    file_row, col=FILE_PATH, absolute=True
+                    file_row, col=self.get_virt_col(FILE_PATH), absolute=True
                 )
                 fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()
@@ -584,14 +681,14 @@ class ResultContentList(DynamicList):
         if item != -1:
             target = None
             with self.wait:
-                file_row = self.get_map_item(item, col=CONTENT_KEY)
-                filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
+                filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                 path = self.main_window.m_result_file_list.get_map_item(
                     file_row, col=FILE_PATH, absolute=True
                 )
                 target = os.path.join(path, filename)
-                line = self.GetItem(item, col=CONTENT_LINE).GetText()
-                col = str(self.get_map_item(item, col=CONTENT_COL))
+                line = self.GetItem(item, col=self.get_virt_col(CONTENT_LINE)).GetText()
+                col = str(self.get_map_item(item, col=self.get_virt_col(CONTENT_COL)))
             if target:
                 fileops.open_editor(target, line, col)
         else:
@@ -600,14 +697,14 @@ class ResultContentList(DynamicList):
             while item != -1:
                 target = None
                 with self.wait:
-                    file_row = self.get_map_item(item, col=CONTENT_KEY)
-                    filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                    file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
+                    filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                     path = self.main_window.m_result_file_list.get_map_item(
                         file_row, col=FILE_PATH, absolute=True
                     )
                     target = os.path.join(path, filename)
-                    line = self.GetItem(item, col=CONTENT_LINE).GetText()
-                    col = str(self.get_map_item(item, col=CONTENT_COL))
+                    line = self.GetItem(item, col=self.get_virt_col(CONTENT_LINE)).GetText()
+                    col = str(self.get_map_item(item, col=self.get_virt_col(CONTENT_COL)))
                 if target and target not in found:
                     found.add(target)
                     fileops.open_editor(target, line, col)
@@ -623,16 +720,16 @@ class ResultContentList(DynamicList):
             with self.wait:
                 if col == CONTENT_PATH:
                     if from_file_tab:
-                        file_row = self.get_map_item(item, col=CONTENT_KEY)
+                        file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
                         path = self.main_window.m_result_file_list.get_map_item(
-                            file_row, col=FILE_PATH, absolute=True
+                            file_row, col=self.get_virt_col(FILE_PATH), absolute=True
                         )
-                        filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                        filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                         copy_bfr.append(os.path.join(path, filename))
                     else:
-                        copy_bfr.append(self.GetItem(item, col=CONTENT_PATH).GetText())
+                        copy_bfr.append(self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText())
                 else:
-                    copy_bfr.append(self.GetItem(item, col=CONTENT_TEXT).GetText())
+                    copy_bfr.append(self.GetItem(item, col=self.get_virt_col(CONTENT_TEXT)).GetText())
             item = self.GetNextSelected(item)
 
         if copy_bfr:
@@ -651,11 +748,11 @@ class ResultContentList(DynamicList):
             item = self.GetNextItem(-1)
             while item != -1:
                 if self.IsSelected(item):
-                    file_row = self.get_map_item(item, col=CONTENT_KEY)
+                    file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
                     path = self.main_window.m_result_file_list.get_map_item(
                         file_row, col=FILE_PATH, absolute=True
                     )
-                    filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                    filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                     files.add(os.path.join(path, filename))
                 item = self.GetNextItem(item)
         return sorted(list(files))
@@ -670,10 +767,10 @@ class ResultContentList(DynamicList):
             pos = event.GetPosition()
             item = self.HitTestSubItem(pos)[0]
             if item != -1:
-                file_row = self.get_map_item(item, col=CONTENT_KEY)
-                filename = self.GetItem(item, col=CONTENT_PATH).GetText()
+                file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
+                filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                 path = self.main_window.m_result_file_list.get_map_item(
-                    file_row, col=FILE_PATH, absolute=True
+                    file_row, col=self.get_virt_col(FILE_PATH), absolute=True
                 )
                 target = os.path.join(path, filename)
                 selected = self.IsSelected(item)
@@ -693,7 +790,7 @@ class ResultContentList(DynamicList):
 
             hash_entries = []
             for h in checksum.VALID_HASH:
-                hash_entries.append((h, functools.partial(self.main_window.on_checksum, h=h, target=target)))
+                hash_entries.append((h, functools.partial(self.on_checksum, h=h, target=target)))
 
             # Open menu
             menu = ContextMenu(
@@ -708,12 +805,12 @@ class ResultContentList(DynamicList):
                     None,
                     (
                         self.DELETE_LABEL,
-                        functools.partial(self.main_window.on_delete_files, recycle=False, listctrl=self),
+                        functools.partial(self.on_delete_files, recycle=False),
                         self.complete
                     ),
                     (
                         self.RECYCLE_LABEL,
-                        functools.partial(self.main_window.on_delete_files, recycle=True, listctrl=self),
+                        functools.partial(self.on_delete_files, recycle=True),
                         self.complete
                     )
                 ]
@@ -738,14 +835,26 @@ class ResultContentList(DynamicList):
     def on_col_rclick(self, event):
         """Handle col right click."""
 
-        menu = ContextMenu(
-            [
-                (self.FILE, functools.partial(self.on_col_hide_click, col=0), True, 0 not in self.hidden_columns),
-                (self.LINE, functools.partial(self.on_col_hide_click, col=1), True, 1 not in self.hidden_columns),
-                (self.MATCHES, functools.partial(self.on_col_hide_click, col=2), True, 2 not in self.hidden_columns),
-                (self.EXTENSION, functools.partial(self.on_col_hide_click, col=3), True, 3 not in self.hidden_columns),
-                (self.CONTEXT, functools.partial(self.on_col_hide_click, col=4), True, 4 not in self.hidden_columns)
-            ]
+        items = [
+            (self.FILE, functools.partial(self.on_col_hide_click, col=0), True, 0 not in self.hidden_columns),
+            (self.LINE, functools.partial(self.on_col_hide_click, col=1), True, 1 not in self.hidden_columns),
+            (self.MATCHES, functools.partial(self.on_col_hide_click, col=2), True, 2 not in self.hidden_columns),
+            (self.EXTENSION, functools.partial(self.on_col_hide_click, col=3), True, 3 not in self.hidden_columns),
+            (self.CONTEXT, functools.partial(self.on_col_hide_click, col=4), True, 4 not in self.hidden_columns)
+        ]
+
+        menu_entries = []
+        for index in range(self.column_count):
+            menu_entries.append(items[self.get_real_col(index)])
+
+        menu_entries.append(
+            (
+                self.ARRANGE_COLUMNS,
+                functools.partial(self.on_arrange_click, setting_callback=Settings.set_pos_cols_content),
+                self.complete
+            )
         )
+
+        menu = ContextMenu(menu_entries)
         self.PopupMenu(menu)
         menu.Destroy()

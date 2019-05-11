@@ -72,7 +72,7 @@ Once a search or replace is initiated, the results will begin to appear in the *
 ![Content Tab](images/content_tab.png)
 
 !!! tip
-    You can hide/show columns by right clicking the list header to get a special context menu. You can then deselect or select the the column(s) you wish to hide/show respectively.
+    You can hide/show columns by right clicking the list header to get a special context menu. You can then deselect or select the the column(s) you wish to hide/show respectively. You can also reorder the columns if desired.
 
 ## Regular Expression Tester
 

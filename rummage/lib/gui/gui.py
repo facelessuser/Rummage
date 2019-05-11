@@ -2657,3 +2657,104 @@ class HtmlDialog ( wx.Dialog ):
         pass
 
 
+###########################################################################
+## Class ColumnDialog
+###########################################################################
+
+class ColumnDialog ( wx.Dialog ):
+
+    def __init__( self, parent ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Arrange Columns", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+
+        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+
+        bSizer25 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_column_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+        self.m_column_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
+
+        fgSizer58 = wx.FlexGridSizer( 2, 1, 0, 0 )
+        fgSizer58.AddGrowableCol( 0 )
+        fgSizer58.AddGrowableRow( 0 )
+        fgSizer58.SetFlexibleDirection( wx.BOTH )
+        fgSizer58.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+        gbSizer6 = wx.GridBagSizer( 0, 0 )
+        gbSizer6.SetFlexibleDirection( wx.BOTH )
+        gbSizer6.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+        m_column_listChoices = []
+        self.m_column_list = wx.ListBox( self.m_column_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_column_listChoices, wx.LB_SINGLE )
+        gbSizer6.Add( self.m_column_list, wx.GBPosition( 0, 0 ), wx.GBSpan( 3, 1 ), wx.ALL|wx.EXPAND, 5 )
+
+        self.m_up_button = wx.Button( self.m_column_panel, wx.ID_ANY, u"Up", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gbSizer6.Add( self.m_up_button, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+
+        self.m_down_button = wx.Button( self.m_column_panel, wx.ID_ANY, u"Down", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gbSizer6.Add( self.m_down_button, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+
+
+        gbSizer6.AddGrowableCol( 0 )
+        gbSizer6.AddGrowableRow( 2 )
+
+        fgSizer58.Add( gbSizer6, 1, wx.EXPAND, 5 )
+
+        fgSizer59 = wx.FlexGridSizer( 1, 4, 0, 0 )
+        fgSizer59.AddGrowableCol( 0 )
+        fgSizer59.AddGrowableCol( 3 )
+        fgSizer59.AddGrowableRow( 0 )
+        fgSizer59.SetFlexibleDirection( wx.BOTH )
+        fgSizer59.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+
+        fgSizer59.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+
+        self.m_apply_button = wx.Button( self.m_column_panel, wx.ID_ANY, u"Apply", wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer59.Add( self.m_apply_button, 0, wx.ALL, 5 )
+
+        self.m_cancel_button = wx.Button( self.m_column_panel, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer59.Add( self.m_cancel_button, 0, wx.ALL, 5 )
+
+
+        fgSizer59.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+
+
+        fgSizer58.Add( fgSizer59, 1, wx.EXPAND, 5 )
+
+
+        self.m_column_panel.SetSizer( fgSizer58 )
+        self.m_column_panel.Layout()
+        fgSizer58.Fit( self.m_column_panel )
+        bSizer25.Add( self.m_column_panel, 1, wx.EXPAND |wx.ALL, 5 )
+
+
+        self.SetSizer( bSizer25 )
+        self.Layout()
+        bSizer25.Fit( self )
+
+        self.Centre( wx.BOTH )
+
+        # Connect Events
+        self.m_up_button.Bind( wx.EVT_BUTTON, self.on_up_click )
+        self.m_down_button.Bind( wx.EVT_BUTTON, self.on_down_click )
+        self.m_apply_button.Bind( wx.EVT_BUTTON, self.on_apply_click )
+        self.m_cancel_button.Bind( wx.EVT_BUTTON, self.on_cancel_click )
+
+    def __del__( self ):
+        pass
+
+
+    # Virtual event handlers, overide them in your derived class
+    def on_up_click( self, event ):
+        event.Skip()
+
+    def on_down_click( self, event ):
+        event.Skip()
+
+    def on_apply_click( self, event ):
+        event.Skip()
+
+    def on_cancel_click( self, event ):
+        event.Skip()
+
+
