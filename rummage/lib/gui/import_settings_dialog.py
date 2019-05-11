@@ -291,8 +291,8 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
             value = None
         return value
 
-    def import_hidden_cols(self, key, value):
-        """Import hidden columns settings."""
+    def import_cols(self, key, value):
+        """Import columns settings."""
 
         if not self.is_list(value):
             value = None
@@ -392,7 +392,10 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
             value = self.import_int(key, value)
 
         elif key in ('hide_cols_file', 'hide_cols_content'):
-            value = self.import_hidden_cols(key, value)
+            value = self.import_cols(key, value)
+
+        elif key in ('pos_cols_file', 'pos_cols_content'):
+            value = self.import_cols(key, value)
 
         elif key == 'encoding_options':
             value = self.import_encoding_options(key, value)

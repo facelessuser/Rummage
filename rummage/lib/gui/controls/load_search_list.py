@@ -70,4 +70,4 @@ class SavedSearchList(DynamicList):
 
         if not absolute:
             item = self.itemIndexMap[item]
-        return self.itemDataMap[item][col]
+        return self.itemDataMap[item][self.get_real_col(col)]

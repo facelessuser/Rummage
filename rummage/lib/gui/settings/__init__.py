@@ -72,6 +72,8 @@ DEFAULT_SETTINGS = {
     "globstar": False,
     "hide_cols_content": [],
     "hide_cols_file": [],
+    "pos_cols_file": [],
+    "pos_cols_content": [],
     "international_time": False,
     "locale": "en_US",
     "matchbase": False,
@@ -326,6 +328,48 @@ class Settings(object):
         """Set hide cols content."""
 
         cls.settings["hide_cols_content"] = hide
+
+    @classmethod
+    def get_pos_cols_file(cls):
+        """Get position cols file."""
+
+        cls.reload_settings()
+        return cls.settings.get("pos_cols_file", [])
+
+    @classmethod
+    def set_pos_cols_file(cls, pos):
+        """Set position cols file."""
+
+        cls.reload_settings()
+        cls._set_pos_cols_file(pos)
+        cls.save_settings()
+
+    @classmethod
+    def _set_pos_cols_file(cls, pos):
+        """Set position cols file."""
+
+        cls.settings["pos_cols_file"] = pos
+
+    @classmethod
+    def get_pos_cols_content(cls):
+        """Get position cols content."""
+
+        cls.reload_settings()
+        return cls.settings.get("pos_cols_content", [])
+
+    @classmethod
+    def set_pos_cols_content(cls, pos):
+        """Set position cols content."""
+
+        cls.reload_settings()
+        cls._set_pos_cols_content(pos)
+        cls.save_settings()
+
+    @classmethod
+    def _set_pos_cols_content(cls, pos):
+        """Set position cols content."""
+
+        cls.settings["pos_cols_content"] = pos
 
     @classmethod
     def get_international_time(cls):
@@ -1425,6 +1469,12 @@ class Settings(object):
             cls._set_hide_cols_file(obj['hide_cols_file'])
         if 'hide_cols_content' in obj:
             cls._set_hide_cols_content(obj['hide_cols_content'])
+
+        # Position columns
+        if 'pos_cols_file' in obj:
+            cls._set_pos_cols_file(obj['pos_cols_file'])
+        if 'pos_cols_content' in obj:
+            cls._set_pos_cols_content(obj['pos_cols_content'])
 
         # International time
         if 'international_time' in obj:

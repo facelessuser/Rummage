@@ -60,12 +60,13 @@ class ErrorList(DynamicList):
     def get_item_text(self, item, col, absolute=False):
         """Return the text for the given item and col."""
 
+        real = self.get_real_col(col)
         if not absolute:
             item = self.itemIndexMap[item]
-        if col == 0:
-            return self.itemDataMap[item][col][0]
+        if real == 0:
+            return self.itemDataMap[item][real][0]
         else:
-            return self.itemDataMap[item][col]
+            return self.itemDataMap[item][real]
 
     def on_dclick(self, event):
         """Open file at in editor with optional line and column argument."""
@@ -73,7 +74,7 @@ class ErrorList(DynamicList):
         pos = event.GetPosition()
         item = self.HitTestSubItem(pos)[0]
         if item != -1:
-            file_name = self.get_map_item(item, col=1)
-            full_error = ''.join(reversed(self.get_map_item(item, col=0)))
+            file_name = self.get_map_item(item, col=self.get_virt_col(1))
+            full_error = ''.join(reversed(self.get_map_item(item, col=self.get_virt_col(0))))
             self.GetParent().GetParent().show_error("%s\n%s" % (file_name, full_error))
         event.Skip()

@@ -61,7 +61,7 @@ class EncodingList(DynamicList):
 
         if not absolute:
             item = self.itemIndexMap[item]
-        return self.itemDataMap[item][col]
+        return self.itemDataMap[item][self.get_real_col(col)]
 
     def OnGetItemImage(self, item):
         """Override method to get the image for the given item."""
