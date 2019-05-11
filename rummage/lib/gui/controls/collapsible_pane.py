@@ -76,13 +76,13 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
         """Initialization."""
 
         super(CollapseButton, self).__init__(
-            parent, -1, bitmap=data.get_bitmap('sd.png'), label=label,
+            parent, -1, bitmap=data.get_bitmap('arrow_down.png'), label=label,
             style=wx.BORDER_NONE | wx.BU_EXACTFIT | wx.TAB_TRAVERSAL
         )
         self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
         self.InitColours()
-        self.SetBitmapLabel(data.get_bitmap('sd.png', tint=self.tint))
-        self.SetBitmapSelected(data.get_bitmap('su.png', tint=self.tint))
+        self.SetBitmapLabel(data.get_bitmap('arrow_down.png', tint=self.tint))
+        self.SetBitmapSelected(data.get_bitmap('arrow_right.png', tint=self.tint))
         self.SetUseFocusIndicator(True)
 
     def InitColours(self):

@@ -501,7 +501,7 @@ class RummageFrame(gui.RummageFrame):
 
         # Controls
         self.SEARCH_REPLACE = _("Search and Replace")
-        self.LIMIT_SEARCH = _("Limit Search")
+        self.LIMIT_SEARCH = _("File search options")
         self.SEARCH_IN = _("Search in")
         self.SEARCH_FOR = _("Search for")
         self.SEARCH_CHAIN = _("Search chain")
@@ -540,7 +540,7 @@ class RummageFrame(gui.RummageFrame):
         self.SEARCH = _("Search")
         self.UP_TO_DATE = _("Current version is %s. Rummage is up to date!")
         self.NOT_UP_TO_DATE = _("There is an update available: %s.")
-        self.OPTIONS = _("Options")
+        self.OPTIONS = _("Text search options")
 
         # Menu
         self.MENU_EXPORT_RESULTS = _("Export Results")
