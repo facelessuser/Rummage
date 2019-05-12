@@ -1,5 +1,4 @@
 """Export HTML."""
-from __future__ import unicode_literals
 import webbrowser
 import re
 import time

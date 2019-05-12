@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Tests for `rumcore`."""
-from __future__ import unicode_literals
 import unittest
 import os
 import re

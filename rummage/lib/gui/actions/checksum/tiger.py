@@ -18,7 +18,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 Modified by Isaac Muse to work with `HexViewer`.
 """
-from __future__ import unicode_literals
 import struct
 import sys
 

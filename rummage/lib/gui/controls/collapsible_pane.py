@@ -1,5 +1,4 @@
 """Custom collapsible pane."""
-from __future__ import unicode_literals
 import wx
 import wx.lib.agw.pycollapsiblepane as pycollapse
 import wx.lib.buttons as buttons

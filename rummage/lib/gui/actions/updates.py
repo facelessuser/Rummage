@@ -1,5 +1,4 @@
 """Perform a check for latest versions on PyPI."""
-from __future__ import unicode_literals
 from ... import __meta__
 import json
 from urllib.request import urlopen

@@ -1,5 +1,4 @@
 """Data resource library."""
-from __future__ import unicode_literals
 import os
 import codecs
 import base64

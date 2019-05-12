@@ -4,7 +4,6 @@ Sum hashes.
 Licensed under MIT
 Copyright (c) 2013-2015 Isaac Muse <isaacmuse@gmail.com>
 """
-from __future__ import unicode_literals
 import sys
 
 PY3 = (3, 0) <= sys.version_info

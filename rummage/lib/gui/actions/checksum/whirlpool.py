@@ -30,7 +30,6 @@
 
  Modified by Isaac Muse.
 """
-from __future__ import unicode_literals
 import sys
 
 PY3 = (3, 0) <= sys.version_info
