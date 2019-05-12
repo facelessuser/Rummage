@@ -68,7 +68,7 @@ class ToolTip(wx.lib.agw.supertooltip.SuperToolTip):
             self._superToolTip.Destroy()
 
 
-class TimedStatusExtension(object):
+class TimedStatusExtension:
     """Timed status in status bar."""
 
     kill = False
@@ -136,7 +136,7 @@ class TimedStatusExtension(object):
             count += 1
 
 
-class IconTrayExtension(object):
+class IconTrayExtension:
     """Add icon tray extension."""
 
     fields = [-1]

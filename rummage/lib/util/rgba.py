@@ -23,7 +23,7 @@ def round_int(dec):
     return int(decimal.Decimal(dec).quantize(decimal.Decimal('0'), decimal.ROUND_HALF_UP))
 
 
-class RGBA(object):
+class RGBA:
     """RGBA object for converting between color formats or applying filters to the color."""
 
     r = None

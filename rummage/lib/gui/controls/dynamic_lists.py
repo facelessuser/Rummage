@@ -36,7 +36,7 @@ def cmp(a, b):
     return (a > b) - (a < b)
 
 
-class DummyLock(object):
+class DummyLock:
     """A dummy lock that does nothing."""
 
     def __enter__(self):

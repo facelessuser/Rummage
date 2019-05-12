@@ -87,7 +87,7 @@ DEFAULT_SETTINGS = {
 }
 
 
-class Settings(object):
+class Settings:
     """Handle settings."""
 
     filename = None

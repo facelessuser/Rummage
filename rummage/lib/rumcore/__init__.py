@@ -301,7 +301,7 @@ class ErrorRecord(namedtuple('ErrorRecord', ['error'])):
     """A record for non-file related errors."""
 
 
-class Search(object):
+class Search:
     """Search setup object."""
 
     def __init__(self, replace=False):
@@ -342,7 +342,7 @@ class Search(object):
         return len(self._entry)
 
 
-class ReplacePlugin(object):
+class ReplacePlugin:
     """Rummage replace plugin."""
 
     def __init__(self, file_info, flags):
@@ -395,7 +395,7 @@ class ReplacePlugin(object):
         return m.group(0)
 
 
-class _RummageFileContent(object):
+class _RummageFileContent:
     """Either return a string or memory map file object."""
 
     def __init__(self, name, size, encoding, file_content=None):
@@ -464,7 +464,7 @@ class _RummageFileContent(object):
                 return self.file_map
 
 
-class _FileSearch(object):
+class _FileSearch:
     """Search for files."""
 
     hex_tx_table = ("\ufffd" * 32) + "".join(chr(c) for c in range(32, 127)) + ("\ufffd" * 129)
@@ -1309,7 +1309,7 @@ class _DirWalker(wcmatch.WcMatch):
         )
 
 
-class Rummage(object):
+class Rummage:
     """Perform the rummaging."""
 
     def __init__(

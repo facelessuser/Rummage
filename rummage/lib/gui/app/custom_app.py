@@ -94,7 +94,7 @@ class CustomApp(wx.App):
         return self.instance_okay
 
 
-class ArgPipeThread(object):
+class ArgPipeThread:
     """Argument pipe thread for receiving arguments from another instance."""
 
     def __init__(self, app, pipe_name):

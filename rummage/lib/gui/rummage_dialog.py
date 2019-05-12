@@ -273,7 +273,7 @@ class RummageThread(threading.Thread):
             _ABORT = False
 
 
-class RummageArgs(object):
+class RummageArgs:
     """Rummage argument object."""
 
     def __init__(self):

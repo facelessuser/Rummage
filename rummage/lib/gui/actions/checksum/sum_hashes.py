@@ -14,7 +14,7 @@ BIT24_MOD = 16777216
 BIT32_MOD = 4294967296
 
 
-class sum8(object):  # noqa
+class sum8:  # noqa
     """Sum8 hash."""
 
     __name = "sum8"

@@ -140,7 +140,7 @@ def convert_markdown(title, content):
     return html
 
 
-class WebViewMixin(object):
+class WebViewMixin:
     """HTML `WebView`."""
 
     def setup_html(self, obj, control_title=None):

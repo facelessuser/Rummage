@@ -18,7 +18,7 @@ else:
 __all__ = ("get_growl", "enable_growl", "growl_enabled", "setup_growl", "has_growl", "growl_destroy")
 
 
-class Options(object):
+class Options:
     """Notification options."""
 
     icon = None
