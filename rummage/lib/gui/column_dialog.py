@@ -29,7 +29,7 @@ class ColumnDialog(gui.ColumnDialog):
     def __init__(self, parent, columns, headers):
         """Initialize search chain dialog object."""
 
-        super(ColumnDialog, self).__init__(parent)
+        super().__init__(parent)
         self.localize()
         self.refresh_localization()
 

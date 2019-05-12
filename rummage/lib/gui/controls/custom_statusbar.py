@@ -55,7 +55,7 @@ class ToolTip(wx.lib.agw.supertooltip.SuperToolTip):
     def __init__(self, target, message, header="", style="Office 2007 Blue", start_delay=.1):
         """Attach the defined tooltip to the target."""
 
-        super(ToolTip, self).__init__(message, header=header)
+        super().__init__(message, header=header)
         self.SetTarget(target)
         self.ApplyStyle(style)
         self.SetStartDelay(start_delay)
@@ -274,7 +274,7 @@ class CustomStatusBar(wx.StatusBar, CustomStatusExtension):
         """Initialize the `CustomStatusBar` object."""
 
         field_array = [-1] if not fields else fields[:]
-        super(CustomStatusBar, self).__init__(
+        super().__init__(
             parent,
             id=wx.ID_ANY,
             style=wx.STB_DEFAULT_STYLE,

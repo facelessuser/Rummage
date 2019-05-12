@@ -176,7 +176,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         self.localize()
         self.international = False
 
-        super(ResultFileList, self).__init__(
+        super().__init__(
             parent,
             [
                 self.FILE,
@@ -515,7 +515,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
 
         self.localize()
 
-        super(ResultContentList, self).__init__(
+        super().__init__(
             parent,
             [
                 self.FILE,

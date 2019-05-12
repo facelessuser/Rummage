@@ -63,7 +63,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
     def __init__(self, parent):
         """Initialize settings dialog object."""
 
-        super(SettingsDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setup_html(self.m_help_html)
         if util.platform() == "windows":
             self.m_general_panel.SetDoubleBuffered(True)

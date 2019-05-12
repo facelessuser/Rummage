@@ -32,7 +32,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
     def __init__(self, parent):
         """Initialize dialog."""
 
-        super(LoadSearchDialog, self).__init__(parent)
+        super().__init__(parent)
         self.localize()
         self.refresh_localization()
 

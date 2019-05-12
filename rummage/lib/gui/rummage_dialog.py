@@ -333,7 +333,7 @@ class RummageFrame(gui.RummageFrame):
     def __init__(self, parent, start_path, debug_mode=False):
         """Initialize the Rummage frame object."""
 
-        super(RummageFrame, self).__init__(parent)
+        super().__init__(parent)
         self.maximized = False
         if util.platform() == "windows":
             self.m_settings_panel.SetDoubleBuffered(True)

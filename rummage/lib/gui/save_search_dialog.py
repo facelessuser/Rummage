@@ -35,7 +35,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
     def __init__(self, parent, data=None):
         """Initialize save search dialog object."""
 
-        super(SaveSearchDialog, self).__init__(parent)
+        super().__init__(parent)
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
         self.localize()

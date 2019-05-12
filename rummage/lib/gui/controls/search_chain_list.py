@@ -32,7 +32,7 @@ class SearchChainList(DynamicList):
 
         self.localize()
 
-        super(SearchChainList, self).__init__(
+        super().__init__(
             parent,
             [
                 self.NAME,

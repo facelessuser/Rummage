@@ -28,7 +28,7 @@ class ErrorTextDialog(gui.ErrorTextDialog):
     def __init__(self, parent, text):
         """Initialize."""
 
-        super(ErrorTextDialog, self).__init__(parent)
+        super().__init__(parent)
         self.localize()
         self.refresh_localization()
         self.m_error_textbox.SetValue(text)

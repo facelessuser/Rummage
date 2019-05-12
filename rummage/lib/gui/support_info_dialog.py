@@ -57,7 +57,7 @@ class SupportInfoDialog(gui.SupportInfoDialog):
     def __init__(self, parent):
         """Initialize object."""
 
-        super(SupportInfoDialog, self).__init__(parent)
+        super().__init__(parent)
         if util.platform() == "windows":
             self.m_support_panel.SetDoubleBuffered(True)
         self.localize()

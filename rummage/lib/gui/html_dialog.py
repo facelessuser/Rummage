@@ -33,7 +33,7 @@ class HTMLDialog(gui.HtmlDialog, webview.WebViewMixin):
     ):
         """Initialize dialog."""
 
-        super(HTMLDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setup_html(self.m_content_html, control_title=self)
         self.SetSizeHints(wx.Size(min_width, min_height), wx.Size(max_width, max_height))
         self.localize()

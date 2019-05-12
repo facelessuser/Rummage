@@ -2242,7 +2242,7 @@ except:
                 it.extend(init)
                 return it
             def extend(self, extension):
-                super_extend = super(_array_shim, self).extend
+                super_extend = super().extend
                 if isinstance(extension, self.true_array):
                     return super_extend(extension)
                 if not isinstance(extension, (list, str)):

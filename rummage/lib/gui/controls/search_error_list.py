@@ -32,7 +32,7 @@ class ErrorList(DynamicList):
 
         self.localize()
 
-        super(ErrorList, self).__init__(
+        super().__init__(
             parent,
             [
                 self.ERROR,

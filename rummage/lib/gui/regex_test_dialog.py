@@ -50,7 +50,7 @@ class RegexTestDialog(gui.RegexTestDialog):
     def __init__(self, parent):
         """Initialize Regex Test Dialog object."""
 
-        super(RegexTestDialog, self).__init__(None)
+        super().__init__(None)
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
 

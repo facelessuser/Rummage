@@ -121,7 +121,7 @@ class DeleteDialog(gui.DeleteDialog):
         self.handling = False
         self.skipall = False
 
-        super(DeleteDialog, self).__init__(parent)
+        super().__init__(parent)
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
 

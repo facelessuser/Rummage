@@ -39,7 +39,7 @@ class ChecksumDialog(gui.ChecksumDialog):
         self.target = target
         self.handling = False
 
-        super(ChecksumDialog, self).__init__(parent)
+        super().__init__(parent)
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
 

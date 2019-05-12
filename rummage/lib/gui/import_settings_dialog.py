@@ -60,7 +60,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
     def __init__(self, parent, obj):
         """Initialize dialog."""
 
-        super(ImportSettingsDialog, self).__init__(parent)
+        super().__init__(parent)
         self.localize()
         self.refresh_localization()
 

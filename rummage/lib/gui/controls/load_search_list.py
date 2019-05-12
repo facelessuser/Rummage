@@ -32,7 +32,7 @@ class SavedSearchList(DynamicList):
 
         self.localize()
 
-        super(SavedSearchList, self).__init__(
+        super().__init__(
             parent,
             [
                 self.NAME,

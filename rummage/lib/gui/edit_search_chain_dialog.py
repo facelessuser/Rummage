@@ -35,7 +35,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
     def __init__(self, parent, chain=None):
         """Initialize dialog."""
 
-        super(EditSearchChainDialog, self).__init__(parent)
+        super().__init__(parent)
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
         self.localize()

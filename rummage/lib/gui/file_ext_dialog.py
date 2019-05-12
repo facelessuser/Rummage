@@ -29,7 +29,7 @@ class FileExtDialog(gui.FileExtDialog):
     def __init__(self, parent, extensions):
         """Initialize dialog."""
 
-        super(FileExtDialog, self).__init__(parent)
+        super().__init__(parent)
 
         self.extensions = extensions
         self.localize()

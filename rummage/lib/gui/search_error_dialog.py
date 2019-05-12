@@ -31,7 +31,7 @@ class SearchErrorDialog(gui.SearchErrorDialog):
     def __init__(self, parent, errors):
         """Initialize search error dialog."""
 
-        super(SearchErrorDialog, self).__init__(parent)
+        super().__init__(parent)
         self.Bind(wx.EVT_WINDOW_DESTROY, self.on_destroy)
         self.localize()
         self.refresh_localization()

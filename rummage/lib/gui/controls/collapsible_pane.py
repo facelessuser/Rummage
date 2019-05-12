@@ -17,7 +17,7 @@ class CollapsiblePane(pycollapse.PyCollapsiblePane):
     ):
         """Initialize."""
 
-        super(CollapsiblePane, self).__init__(
+        super().__init__(
             parent, id, label, pos, size, 0, agwStyle
         )
         btn = CollapseButton(self, label)
@@ -63,7 +63,7 @@ class CollapsiblePane(pycollapse.PyCollapsiblePane):
         """Collapse."""
 
         self._pButton.SetToggle(collapse)
-        super(CollapsiblePane, self).Collapse(collapse)
+        super().Collapse(collapse)
 
 
 class CollapseButton(buttons.GenBitmapTextToggleButton):
@@ -74,7 +74,7 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
     def __init__(self, parent, label):
         """Initialization."""
 
-        super(CollapseButton, self).__init__(
+        super().__init__(
             parent, -1, bitmap=data.get_bitmap('arrow_down.png'), label=label,
             style=wx.BORDER_NONE | wx.BU_EXACTFIT | wx.TAB_TRAVERSAL
         )

@@ -62,7 +62,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         if single_sel:
             flags |= wx.LC_SINGLE_SEL
 
-        super(DynamicList, self).__init__(
+        super().__init__(
             parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
             style=flags
         )
