@@ -102,6 +102,22 @@ class ContextMenu(wx.Menu):
 class CommonOperationsMixin:
     """Handle common operations."""
 
+    def on_enter_window(self, event):
+        """Reset last moused over item tracker on mouse entering the window."""
+
+        self.last_moused = (-1, "")
+        event.Skip()
+
+    def create_image_list(self):
+        """Create the image list."""
+
+        self.images = wx.ImageList(16, 16)
+        self.doc = self.images.Add(data.get_bitmap('doc.png'))
+        self.bin = self.images.Add(data.get_bitmap('binary.png'))
+        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
+        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
+        self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
+
     def on_arrange_click(self, event, setting_callback):
         """Handle arranging columns."""
 
@@ -224,16 +240,6 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         self.DELETE = _("Are you sure you want to delete the files?")
         self.RECYCLE = _("Are you sure you want to recycle the files?")
 
-    def create_image_list(self):
-        """Create the image list."""
-
-        self.images = wx.ImageList(16, 16)
-        self.doc = self.images.Add(data.get_bitmap('doc.png'))
-        self.bin = self.images.Add(data.get_bitmap('binary.png'))
-        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
-
     def set_international_time(self, enable):
         """Enable or disable international time output."""
 
@@ -274,12 +280,6 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                     obj.match.lineno,
                     obj.match.colno
                 )
-
-    def on_enter_window(self, event):
-        """Reset last moused over item tracker on mouse entering the window."""
-
-        self.last_moused = (-1, "")
-        event.Skip()
 
     def on_motion(self, event):
         """Display full file path in status bar on item mouseover."""
@@ -574,22 +574,6 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                 (self.itemDataMap[key1][CONTENT_PATH], self.itemDataMap[key1][CONTENT_LINE]),
                 (self.itemDataMap[key2][CONTENT_PATH], self.itemDataMap[key2][CONTENT_LINE])
             )
-
-    def create_image_list(self):
-        """Create the image list."""
-
-        self.images = wx.ImageList(16, 16)
-        self.doc = self.images.Add(data.get_bitmap('doc.png'))
-        self.bin = self.images.Add(data.get_bitmap('binary.png'))
-        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
-
-    def on_enter_window(self, event):
-        """Reset last moused over item tracker on mouse entering the window."""
-
-        self.last_moused = (-1, "")
-        event.Skip()
 
     def on_motion(self, event):
         """Display full file path in status bar on item mouseover."""
