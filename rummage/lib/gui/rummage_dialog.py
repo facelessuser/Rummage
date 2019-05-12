@@ -36,6 +36,12 @@ from .actions import export_html
 from .actions import export_csv
 from .actions import fileops
 from .actions import updates
+try:
+    from .gui import GUI_PATCHED  # noqa: F401
+except ImportError:
+    # We forgot to patch the GUI, which will cause issues,
+    # so raise a helpful error that points us to what we need to do.
+    raise RuntimeError("GUI has not been patched. Please run tools/gui_patch.py")
 from .generic_dialogs import errormsg, yesno, infomsg
 from .app.custom_app import debug, error, get_log_file
 from .controls import custom_statusbar

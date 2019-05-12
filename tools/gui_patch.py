@@ -10,7 +10,7 @@ with codecs.open(filename, 'r', encoding='utf-8') as f:
 # Add collapsible pane replacement
 text = re.sub(
     r'^((?:import|from)(?! \.controls\.collapsible_pane).*?)(\r?\n){2}',
-    r'\1\2from .controls.collapsible_pane import CollapsiblePane\2\2',
+    r'\1\2from .controls.collapsible_pane import CollapsiblePane\2\2GUI_PATCHED = True\2\2',
     text,
     flags=re.M
 )
