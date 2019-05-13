@@ -1,5 +1,6 @@
 """
 Sanitize JSON.
+
 Licensed under MIT
 Copyright (c) 2012 - 2019 Isaac Muse <isaacmuse@gmail.com>
 """
