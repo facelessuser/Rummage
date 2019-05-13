@@ -23,6 +23,7 @@ import wx.adv
 import threading
 import traceback
 import webbrowser
+import functools
 from time import time
 import os
 import re
@@ -426,11 +427,10 @@ class RummageFrame(gui.RummageFrame):
 
         self.init_search_path(start_path)
 
-        self.refresh_regex_options()
+        self.refresh_regex_options(first=True)
         self.refresh_chain_mode()
 
-        if util.platform() != "linux":
-            self.finalize_size()
+        self.finalize_size()
         self.m_searchfor_textbox.SetFocus()
 
         # So this is to fix some platform specific issues.
@@ -440,7 +440,9 @@ class RummageFrame(gui.RummageFrame):
         # Linux seems to need the resize to get its control tab
         # order right as we are hiding some items, but doing it
         # now won't work, so we delay it.
-        self.call_later = wx.CallLater(500, self.on_loaded)
+        refocus = util.platform() == 'osx'
+        resize = util.platform() == 'linux'
+        self.call_later = wx.CallLater(500, functools.partial(self.on_loaded, refocus=refocus, resize=resize))
         self.call_later.Start()
 
     def localize(self):
@@ -874,7 +876,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_searchfor_textbox.update_choices(chains)
         self.m_searchfor_textbox.SetValue(setup)
 
-    def refresh_regex_options(self):
+    def refresh_regex_options(self, first=False):
         """Refresh the regex module options."""
 
         mode = Settings.get_regex_mode()
@@ -900,9 +902,14 @@ class RummageFrame(gui.RummageFrame):
             else:
                 self.m_format_replace_checkbox.Hide()
             self.m_fullcase_checkbox.Hide()
-        self.m_options_panel.GetSizer().Layout()
-        self.m_options_collapse.GetPane().GetSizer().Layout()
-        self.m_settings_panel.GetSizer().Layout()
+
+        if not first:
+            self.m_options_collapse.InvalidateBestSize()
+            self.m_options_panel.GetSizer().Layout()
+            self.m_options_collapse.GetPane().GetSizer().Layout()
+            self.m_settings_panel.GetSizer().Layout()
+            minimize = not self.IsMaximized()
+            self.optimize_size(minimize_height=minimize)
 
     def on_options_collapse(self, event):
         """Handle on collapse for options panel."""
@@ -1850,7 +1857,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_main_panel.GetSizer().Layout()
         self.optimize_size(first_time=True)
 
-    def on_loaded(self):
+    def on_loaded(self, refocus=False, resize=False):
         """
         Stupid workarounds on load.
 
@@ -1860,12 +1867,12 @@ class RummageFrame(gui.RummageFrame):
 
         self.call_later.Stop()
 
-        if util.platform() == "osx":
+        if refocus:
             self.m_searchfor_textbox.SetFocus()
 
         self.Refresh()
 
-        if util.platform() == "linux":
+        if resize:
             self.finalize_size()
 
         if tuple(Settings.get_current_version()) < __meta__.__version_info__:
@@ -2010,8 +2017,6 @@ class RummageFrame(gui.RummageFrame):
             )
         dlg.Destroy()
         self.refresh_regex_options()
-        self.m_settings_panel.GetSizer().Layout()
-        self.optimize_size()
 
     def on_chain_toggle(self, event):
         """Handle chain toggle event."""
