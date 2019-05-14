@@ -38,6 +38,7 @@ class ColumnDialog(gui.ColumnDialog):
         self.load_columns(columns, headers)
 
         # Ensure good sizing of frame
+        self.m_column_list.SetMinSize(wx.Size(-1, 200))
         self.m_column_panel.Fit()
         self.Fit()
         self.SetMinSize(self.GetSize())
