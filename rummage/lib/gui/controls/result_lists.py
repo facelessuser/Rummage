@@ -154,6 +154,7 @@ class CommonOperationsMixin:
         if not yesno(self.RECYCLE if recycle else self.DELETE):
             return
 
+        remove = None
         files = self.get_selected_files()
         dlg = self.main_window.get_dialog('DeleteDialog')(self.main_window, files, recycle)
         dlg.ShowModal()
@@ -166,34 +167,24 @@ class CommonOperationsMixin:
         if self.main_window.m_result_list.GetItemCount():
             remove = set()
             new_index = []
-            for i in self.main_window.m_result_list.itemIndexMap:
-                v = self.main_window.m_result_list.itemDataMap[i]
-                if not os.path.exists(os.path.join(v[0][1], v[0][0])):
-                    del self.main_window.m_result_list.itemDataMap[i]
-                    remove.add(v[5])
+            for index in self.main_window.m_result_list.itemIndexMap:
+                data = self.main_window.m_result_list.itemDataMap[index]
+                if not os.path.exists(os.path.join(data[CONTENT_PATH][1], data[CONTENT_PATH][0])):
+                    del self.main_window.m_result_list.itemDataMap[index]
+                    remove.add(data[CONTENT_KEY])
                 else:
-                    new_index.append(i)
+                    new_index.append(index)
             self.main_window.m_result_list.itemIndexMap = new_index
-
-            new_index = []
-            for i in self.main_window.m_result_file_list.itemIndexMap:
-                if i in remove:
-                    del self.main_window.m_result_file_list.itemDataMap[i]
-                else:
-                    new_index.append(i)
-            self.main_window.m_result_file_list.itemIndexMap = new_index
-
             self.main_window.m_result_list.SetItemCount(len(self.main_window.m_result_list.itemDataMap))
-            self.main_window.m_result_file_list.SetItemCount(len(self.main_window.m_result_file_list.itemDataMap))
-        else:
-            new_index = []
-            for i in self.main_window.m_result_file_list.itemIndexMap:
-                if not os.path.exists(i):
-                    del self.main_window.m_result_file_list.itemDataMap[i]
-                else:
-                    new_index.append(i)
-            self.main_window.m_result_file_list.itemIndexMap = new_index
-            self.main_window.m_result_file_list.SetItemCount(len(self.main_window.m_result_file_list.itemDataMap))
+
+        new_index = []
+        for index in self.main_window.m_result_file_list.itemIndexMap:
+            if (remove is None and not os.path.exists(index)) or (remove and index in remove):
+                del self.main_window.m_result_file_list.itemDataMap[index]
+            else:
+                new_index.append(index)
+        self.main_window.m_result_file_list.itemIndexMap = new_index
+        self.main_window.m_result_file_list.SetItemCount(len(self.main_window.m_result_file_list.itemDataMap))
 
     def on_col_rclick(self, event):
         """Handle col right click."""
@@ -348,8 +339,8 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
             if item != -1:
                 actual_item = self.itemIndexMap[item]
                 if actual_item != self.last_moused[0]:
-                    d = self.itemDataMap[actual_item]
-                    self.last_moused = (actual_item, os.path.join(d[FILE_PATH], d[FILE_NAME]))
+                    data = self.itemDataMap[actual_item]
+                    self.last_moused = (actual_item, os.path.join(data[FILE_PATH], data[FILE_NAME]))
                 self.main_window.m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
