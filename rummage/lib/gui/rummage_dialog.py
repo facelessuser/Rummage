@@ -411,12 +411,8 @@ class RummageFrame(gui.RummageFrame):
         self.m_result_file_list.set_international_time(Settings.get_international_time())
         self.m_result_file_list.set_wait_lock(_LOCK)
         self.m_result_list.set_wait_lock(_LOCK)
-        self.m_result_file_list.set_hidden_columns(Settings.get_hide_cols_file())
-        self.m_result_list.set_hidden_columns(Settings.get_hide_cols_content())
         self.m_result_file_list.load_list(True)
         self.m_result_list.load_list(True)
-        self.m_result_file_list.update_virtual(Settings.get_pos_cols_file())
-        self.m_result_list.update_virtual(Settings.get_pos_cols_content())
         self.m_grep_notebook.SetSelection(0)
 
         self.refresh_localization()
