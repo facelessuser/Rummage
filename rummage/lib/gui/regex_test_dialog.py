@@ -25,6 +25,7 @@ import os
 import functools
 import codecs
 import time
+import importlib.util
 from backrefs import bre
 from collections import deque
 from . import gui
@@ -259,7 +260,7 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.test_attr
         )
 
-    def import_plugin(self, script, encoding_options):
+    def import_plugin(self, script):
         """Import replace plugin."""
 
         import types
@@ -267,19 +268,10 @@ class RegexTestDialog(gui.RegexTestDialog):
         try:
             if self.imported_plugin is None or script != self.imported_plugin[0]:
                 self.imported_plugin = None
-                module = types.ModuleType(os.path.splitext(os.path.basename(script))[0])
-                module.__dict__['__file__'] = script
-                with open(script, 'rb') as f:
-                    encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py', encoding_options)
-                with codecs.open(script, 'r', encoding=encoding.encode) as f:
-                    exec(
-                        compile(
-                            f.read(),
-                            script,
-                            'exec'
-                        ),
-                        module.__dict__
-                    )
+
+                spec = importlib.util.spec_from_file_location(os.path.splitext(os.path.basename(script))[0], script)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
 
                 # Don't let the module get garbage collected
                 # We will remove references when we are done with it.
@@ -424,8 +416,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                         time.ctime(),
                         rumcore.text_decode.Encoding('unicode', None)
                     )
-                    encoding_options = Settings.get_encoding_options()
-                    replace_test = self.import_plugin(rpattern, encoding_options)(file_info, rum_flags)._test
+                    replace_test = self.import_plugin(rpattern)(file_info, rum_flags)._test
                 elif not self.m_replace_plugin_checkbox.GetValue():
                     if not is_regex:
                         replace_test = functools.partial(replace_literal, replace=rpattern)

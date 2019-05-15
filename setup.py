@@ -6,8 +6,7 @@ from setuptools.command.sdist import sdist
 from setuptools.command.build_py import build_py
 import sys
 import os
-import codecs
-import types
+import importlib.util
 
 
 class BuildPy(build_py):
@@ -37,15 +36,14 @@ class Sdist(sdist):
 
 
 def get_version():
-    """Get version and version_info without importing the entire module."""
+    """Get `__version__` and `__version_info__` without importing the entire module."""
 
-    script = os.path.join(os.path.dirname(__file__), 'rummage', 'lib', '__meta__.py')
-    module = types.ModuleType(os.path.splitext(os.path.basename(script))[0])
-    module.__dict__['__file__'] = script
-
-    with codecs.open(script, 'r', encoding='utf-8') as f:
-        exec(compile(f.read(), script, 'exec'), module.__dict__)
-    return module.__version__, module.__version_info__._get_dev_status()
+    path = os.path.join(os.path.dirname(__file__), 'rummage', 'lib', '__meta__.py')
+    spec = importlib.util.spec_from_file_location("__meta__", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    vi = module.__version_info__
+    return vi._get_canonical(), vi._get_dev_status()
 
 
 def get_requirements(req):
@@ -82,7 +80,7 @@ setup(
         'build_py': BuildPy,
         'sdist': Sdist
     },
-    python_requires=">=3.4",
+    python_requires=">=3.5",
     version=VER,
     keywords='grep search find replace gui',
     description='A GUI search and replace app.',
@@ -105,7 +103,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
