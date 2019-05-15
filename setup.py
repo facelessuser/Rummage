@@ -6,8 +6,8 @@ from setuptools.command.sdist import sdist
 from setuptools.command.build_py import build_py
 import sys
 import os
-import imp
-import traceback
+import codecs
+import types
 
 
 class BuildPy(build_py):
@@ -39,15 +39,13 @@ class Sdist(sdist):
 def get_version():
     """Get version and version_info without importing the entire module."""
 
-    path = os.path.join(os.path.dirname(__file__), 'rummage', 'lib')
-    fp, pathname, desc = imp.find_module('__meta__', [path])
-    try:
-        meta = imp.load_module('__meta__', fp, pathname, desc)
-        return meta.__version__, meta.__version_info__._get_dev_status()
-    except Exception:
-        print(traceback.format_exc())
-    finally:
-        fp.close()
+    script = os.path.join(os.path.dirname(__file__), 'rummage', 'lib', '__meta__.py')
+    module = types.ModuleType(os.path.splitext(os.path.basename(script))[0])
+    module.__dict__['__file__'] = script
+
+    with codecs.open(script, 'r', encoding='utf-8') as f:
+        exec(compile(f.read(), script, 'exec'), module.__dict__)
+    return module.__version__, module.__version_info__._get_dev_status()
 
 
 def get_requirements(req):
