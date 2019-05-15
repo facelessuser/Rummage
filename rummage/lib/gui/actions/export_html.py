@@ -1,5 +1,4 @@
 """Export HTML."""
-from __future__ import unicode_literals
 import webbrowser
 import re
 import time
@@ -260,7 +259,9 @@ def export(export_html, chain, result_list, result_content_list):
             HTML_HEADER % {
                 "js": data.get_file('sorttable.js'),
                 "css": data.get_file('results.css'),
-                "icon": util.to_ustr(base64.b64encode(data.get_image('glass.png').GetData())),
+                "icon": util.to_ustr(
+                    base64.b64encode(data.get_image('glass.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)).GetData())
+                ),
                 "title": title,
                 "lang": get_current_domain()
             }

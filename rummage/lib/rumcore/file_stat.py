@@ -3,7 +3,6 @@ File stat.
 
 Get just what we need all in one call.
 """
-from __future__ import unicode_literals
 import os
 from .. import util
 

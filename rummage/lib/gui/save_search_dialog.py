@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import wx
 import re
 from . import gui
@@ -36,7 +35,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
     def __init__(self, parent, data=None):
         """Initialize save search dialog object."""
 
-        super(SaveSearchDialog, self).__init__(parent)
+        super().__init__(parent)
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
         self.localize()

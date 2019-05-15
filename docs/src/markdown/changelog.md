@@ -8,6 +8,7 @@
 - **FIX**: Fix an issue on Linux where tabbing past a hidden directory button would cause an error in GTK. Ensure such controls do not allow focus when they are hidden.
 - **FIX**: Fix an internal error where the autocomplete box could throw an error due to the index bounds not being checked.
 - **FIX**: When list controls are smaller than the window, don't resize last column too an excessively big width.
+- **FIX**: Fix regression with loading a plugin.
 
 ## 4.5.0
 

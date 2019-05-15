@@ -32,7 +32,7 @@ class SearchChainList(DynamicList):
 
         self.localize()
 
-        super(SearchChainList, self).__init__(
+        super().__init__(
             parent,
             [
                 self.NAME,
@@ -49,8 +49,14 @@ class SearchChainList(DynamicList):
     def create_image_list(self):
         """Create image list."""
 
+        bg = self.GetBackgroundColour()
+        rgba = data.RGBA(*bg.Get())
+        self.tint = (
+            data.RGBA(0x33, 0x33, 0x33, 0xFF) if rgba.get_luminance() > 127 else data.RGBA(0xbb, 0xbb, 0xbb, 0xFF)
+        )
+
         self.images = wx.ImageList(16, 16)
-        self.glass = self.images.Add(data.get_bitmap('glass.png'))
+        self.glass = self.images.Add(data.get_bitmap('glass.png', tint=self.tint))
         self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
         self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
         self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)

@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import wx
 import sys
 from .localization import _
@@ -32,7 +31,7 @@ class OverwriteDialog(gui.OverwriteDialog):
     def __init__(self, parent, msg=None):
         """Initialize overwrite dialog."""
 
-        super(OverwriteDialog, self).__init__(parent)
+        super().__init__(parent)
 
         self.action = False
         self.remember = False

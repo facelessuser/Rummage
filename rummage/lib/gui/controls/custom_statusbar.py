@@ -19,7 +19,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 from collections import OrderedDict
 import wx
 import wx.lib.agw.supertooltip
@@ -56,7 +55,7 @@ class ToolTip(wx.lib.agw.supertooltip.SuperToolTip):
     def __init__(self, target, message, header="", style="Office 2007 Blue", start_delay=.1):
         """Attach the defined tooltip to the target."""
 
-        super(ToolTip, self).__init__(message, header=header)
+        super().__init__(message, header=header)
         self.SetTarget(target)
         self.ApplyStyle(style)
         self.SetStartDelay(start_delay)
@@ -69,7 +68,7 @@ class ToolTip(wx.lib.agw.supertooltip.SuperToolTip):
             self._superToolTip.Destroy()
 
 
-class TimedStatusExtension(object):
+class TimedStatusExtension:
     """Timed status in status bar."""
 
     kill = False
@@ -137,7 +136,7 @@ class TimedStatusExtension(object):
             count += 1
 
 
-class IconTrayExtension(object):
+class IconTrayExtension:
     """Add icon tray extension."""
 
     fields = [-1]
@@ -275,7 +274,7 @@ class CustomStatusBar(wx.StatusBar, CustomStatusExtension):
         """Initialize the `CustomStatusBar` object."""
 
         field_array = [-1] if not fields else fields[:]
-        super(CustomStatusBar, self).__init__(
+        super().__init__(
             parent,
             id=wx.ID_ANY,
             style=wx.STB_DEFAULT_STYLE,

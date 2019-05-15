@@ -32,7 +32,7 @@ class EncodingList(DynamicList):
 
         self.localize()
 
-        super(EncodingList, self).__init__(
+        super().__init__(
             parent,
             [
                 self.FILE_TYPE,

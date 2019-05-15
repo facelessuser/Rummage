@@ -4,7 +4,6 @@ Notify.
 Copyright (c) 2013 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
-from __future__ import unicode_literals
 from __future__ import absolute_import
 import sys
 from .notify_growl import get_growl, enable_growl, growl_enabled, setup_growl, has_growl, growl_destroy
@@ -36,7 +35,7 @@ __all__ = ("info", "warning", "error", "setup_notifications", "enable_growl", "h
 ###################################
 # Fallback Notifications
 ###################################
-class NotifyFallback(object):
+class NotifyFallback:
     """Fallback class."""
 
     def __init__(self, *args, **kwargs):

@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import wx
 from .localization import _
 from . import gui
@@ -58,7 +57,7 @@ class SupportInfoDialog(gui.SupportInfoDialog):
     def __init__(self, parent):
         """Initialize object."""
 
-        super(SupportInfoDialog, self).__init__(parent)
+        super().__init__(parent)
         if util.platform() == "windows":
             self.m_support_panel.SetDoubleBuffered(True)
         self.localize()

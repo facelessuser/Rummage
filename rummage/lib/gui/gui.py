@@ -21,6 +21,8 @@ from .controls.search_error_list import ErrorList
 import wx.html2
 from .controls.collapsible_pane import CollapsiblePane
 
+GUI_PATCHED = True
+
 wx.ID_EXit = 1000
 
 ###########################################################################

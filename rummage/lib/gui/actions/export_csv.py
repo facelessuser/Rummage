@@ -1,5 +1,4 @@
 """Export CSV."""
-from __future__ import unicode_literals
 import time
 import codecs
 import subprocess

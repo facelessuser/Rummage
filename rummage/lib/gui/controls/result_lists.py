@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import time
 import wx
 import decimal
@@ -103,14 +102,43 @@ class ContextMenu(wx.Menu):
 class CommonOperationsMixin:
     """Handle common operations."""
 
-    def on_arrange_click(self, event, setting_callback):
+    def on_enter_window(self, event):
+        """Reset last moused over item tracker on mouse entering the window."""
+
+        self.last_moused = (-1, "")
+        event.Skip()
+
+    def create_image_list(self):
+        """Create the image list."""
+
+        self.images = wx.ImageList(16, 16)
+        self.doc = self.images.Add(data.get_bitmap('doc.png'))
+        self.bin = self.images.Add(data.get_bitmap('binary.png'))
+        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
+        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
+        self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
+
+    def on_col_hide_click(self, event, col=-1):
+        """Handle column hide click."""
+
+        hidden = list(self.hidden_columns)
+
+        if not event.IsChecked():
+            if col not in hidden:
+                hidden.append(col)
+        elif col in hidden:
+            del hidden[hidden.index(col)]
+        self.set_hidden_columns(hidden)
+        self.save_hidden_columns(self.hidden_columns)
+
+    def on_arrange_click(self, event):
         """Handle arranging columns."""
 
         dlg = self.main_window.get_dialog('ColumnDialog')(self.main_window, self.virtual_list, self.headers)
         dlg.ShowModal()
         if dlg.changed:
             virtual_list = self.update_virtual(dlg.virtual_columns)
-            setting_callback(virtual_list)
+            self.save_pos_columns(virtual_list)
         dlg.Destroy()
 
     def on_checksum(self, event, h, target):
@@ -126,6 +154,7 @@ class CommonOperationsMixin:
         if not yesno(self.RECYCLE if recycle else self.DELETE):
             return
 
+        remove = None
         files = self.get_selected_files()
         dlg = self.main_window.get_dialog('DeleteDialog')(self.main_window, files, recycle)
         dlg.ShowModal()
@@ -138,46 +167,60 @@ class CommonOperationsMixin:
         if self.main_window.m_result_list.GetItemCount():
             remove = set()
             new_index = []
-            for i in self.main_window.m_result_list.itemIndexMap:
-                v = self.main_window.m_result_list.itemDataMap[i]
-                if not os.path.exists(os.path.join(v[0][1], v[0][0])):
-                    del self.main_window.m_result_list.itemDataMap[i]
-                    remove.add(v[5])
+            for index in self.main_window.m_result_list.itemIndexMap:
+                data = self.main_window.m_result_list.itemDataMap[index]
+                if not os.path.exists(os.path.join(data[CONTENT_PATH][1], data[CONTENT_PATH][0])):
+                    del self.main_window.m_result_list.itemDataMap[index]
+                    remove.add(data[CONTENT_KEY])
                 else:
-                    new_index.append(i)
+                    new_index.append(index)
             self.main_window.m_result_list.itemIndexMap = new_index
-
-            new_index = []
-            for i in self.main_window.m_result_file_list.itemIndexMap:
-                if i in remove:
-                    del self.main_window.m_result_file_list.itemDataMap[i]
-                else:
-                    new_index.append(i)
-            self.main_window.m_result_file_list.itemIndexMap = new_index
-
             self.main_window.m_result_list.SetItemCount(len(self.main_window.m_result_list.itemDataMap))
-            self.main_window.m_result_file_list.SetItemCount(len(self.main_window.m_result_file_list.itemDataMap))
-        else:
-            new_index = []
-            for i in self.main_window.m_result_file_list.itemIndexMap:
-                if not os.path.exists(i):
-                    del self.main_window.m_result_file_list.itemDataMap[i]
-                else:
-                    new_index.append(i)
-            self.main_window.m_result_file_list.itemIndexMap = new_index
-            self.main_window.m_result_file_list.SetItemCount(len(self.main_window.m_result_file_list.itemDataMap))
+
+        new_index = []
+        for index in self.main_window.m_result_file_list.itemIndexMap:
+            if (remove is None and not os.path.exists(index)) or (remove and index in remove):
+                del self.main_window.m_result_file_list.itemDataMap[index]
+            else:
+                new_index.append(index)
+        self.main_window.m_result_file_list.itemIndexMap = new_index
+        self.main_window.m_result_file_list.SetItemCount(len(self.main_window.m_result_file_list.itemDataMap))
+
+    def on_col_rclick(self, event):
+        """Handle col right click."""
+
+        menu_entries = [None] * len(self.headers)
+        for index, header in enumerate(self.headers):
+            menu_entries[self.get_virt_col(index)] = (
+                header,
+                functools.partial(self.on_col_hide_click, col=index),
+                True,
+                index not in self.hidden_columns
+            )
+
+        menu_entries.append(
+            (
+                self.ARRANGE_COLUMNS,
+                functools.partial(self.on_arrange_click),
+                self.complete
+            )
+        )
+
+        menu = ContextMenu(menu_entries)
+        self.PopupMenu(menu)
+        menu.Destroy()
 
 
 class ResultFileList(CommonOperationsMixin, DynamicList):
     """Result file list."""
 
-    def __init__(self, parent, virtual_list=None):
+    def __init__(self, parent):
         """Initialize result file list object."""
 
         self.localize()
         self.international = False
 
-        super(ResultFileList, self).__init__(
+        super().__init__(
             parent,
             [
                 self.FILE,
@@ -190,7 +233,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                 self.CREATED
             ],
             False,
-            virtual_list
+            self.get_pos_columns()
         )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
@@ -198,6 +241,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_rclick)
         self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.on_col_rclick)
+        self.set_hidden_columns(self.get_hidden_columns())
 
     def localize(self):
         """Translate strings."""
@@ -225,15 +269,25 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         self.DELETE = _("Are you sure you want to delete the files?")
         self.RECYCLE = _("Are you sure you want to recycle the files?")
 
-    def create_image_list(self):
-        """Create the image list."""
+    def get_hidden_columns(self):
+        """Get hidden columns."""
 
-        self.images = wx.ImageList(16, 16)
-        self.doc = self.images.Add(data.get_bitmap('doc.png'))
-        self.bin = self.images.Add(data.get_bitmap('binary.png'))
-        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
+        return Settings.get_hide_cols_file()
+
+    def save_hidden_columns(self, hidden):
+        """Save hidden columns."""
+
+        Settings.set_hide_cols_file(hidden)
+
+    def get_pos_columns(self):
+        """Get position of columns."""
+
+        return Settings.get_pos_cols_file()
+
+    def save_pos_columns(self, pos):
+        """Save position of columns."""
+
+        Settings.set_pos_cols_file(pos)
 
     def set_international_time(self, enable):
         """Enable or disable international time output."""
@@ -276,12 +330,6 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                     obj.match.colno
                 )
 
-    def on_enter_window(self, event):
-        """Reset last moused over item tracker on mouse entering the window."""
-
-        self.last_moused = (-1, "")
-        event.Skip()
-
     def on_motion(self, event):
         """Display full file path in status bar on item mouseover."""
 
@@ -291,8 +339,8 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
             if item != -1:
                 actual_item = self.itemIndexMap[item]
                 if actual_item != self.last_moused[0]:
-                    d = self.itemDataMap[actual_item]
-                    self.last_moused = (actual_item, os.path.join(d[FILE_PATH], d[FILE_NAME]))
+                    data = self.itemDataMap[actual_item]
+                    self.last_moused = (actual_item, os.path.join(data[FILE_PATH], data[FILE_NAME]))
                 self.main_window.m_statusbar.set_timed_status(self.last_moused[1])
         event.Skip()
 
@@ -464,59 +512,16 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
             menu.Destroy()
         event.Skip()
 
-    def on_col_hide_click(self, event, col=-1):
-        """Handle column hide click."""
-
-        hidden = list(self.hidden_columns)
-
-        if not event.IsChecked():
-            if col not in hidden:
-                hidden.append(col)
-        elif col in hidden:
-            del hidden[hidden.index(col)]
-        self.set_hidden_columns(hidden)
-        Settings.set_hide_cols_file(list(self.hidden_columns))
-
-    def on_col_rclick(self, event):
-        """Handle column right click."""
-
-        items = [
-            (self.FILE, functools.partial(self.on_col_hide_click, col=0), True, 0 not in self.hidden_columns),
-            (self.MATCHES, functools.partial(self.on_col_hide_click, col=1), True, 1 not in self.hidden_columns),
-            (self.EXTENSION, functools.partial(self.on_col_hide_click, col=2), True, 2 not in self.hidden_columns),
-            (self.SIZE, functools.partial(self.on_col_hide_click, col=3), True, 3 not in self.hidden_columns),
-            (self.PATH, functools.partial(self.on_col_hide_click, col=4), True, 4 not in self.hidden_columns),
-            (self.ENCODING, functools.partial(self.on_col_hide_click, col=5), True, 5 not in self.hidden_columns),
-            (self.MODIFIED, functools.partial(self.on_col_hide_click, col=6), True, 6 not in self.hidden_columns),
-            (self.CREATED, functools.partial(self.on_col_hide_click, col=7), True, 7 not in self.hidden_columns),
-        ]
-
-        menu_entries = []
-        for index in range(self.column_count):
-            menu_entries.append(items[self.get_real_col(index)])
-
-        menu_entries.append(
-            (
-                self.ARRANGE_COLUMNS,
-                functools.partial(self.on_arrange_click, setting_callback=Settings.set_pos_cols_file),
-                self.complete
-            )
-        )
-
-        menu = ContextMenu(menu_entries)
-        self.PopupMenu(menu)
-        menu.Destroy()
-
 
 class ResultContentList(CommonOperationsMixin, DynamicList):
     """Result content list."""
 
-    def __init__(self, parent, virtual_list=None):
+    def __init__(self, parent):
         """Initialize the result content list object."""
 
         self.localize()
 
-        super(ResultContentList, self).__init__(
+        super().__init__(
             parent,
             [
                 self.FILE,
@@ -526,7 +531,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                 self.CONTEXT
             ],
             False,
-            virtual_list
+            self.get_pos_columns()
         )
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
@@ -534,6 +539,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_rclick)
         self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.on_col_rclick)
+        self.set_hidden_columns(self.get_hidden_columns())
 
     def localize(self):
         """Translate strings."""
@@ -559,6 +565,26 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
         self.DELETE = _("Are you sure you want to delete the files?")
         self.RECYCLE = _("Are you sure you want to recycle the files?")
 
+    def get_hidden_columns(self):
+        """Get hidden columns."""
+
+        return Settings.get_hide_cols_content()
+
+    def save_hidden_columns(self, hidden):
+        """Save hidden columns."""
+
+        Settings.set_hide_cols_content(hidden)
+
+    def get_pos_columns(self):
+        """Get position of columns."""
+
+        return Settings.get_pos_cols_content()
+
+    def save_pos_columns(self, pos):
+        """Save position of columns."""
+
+        Settings.set_pos_cols_content(pos)
+
     def GetSecondarySortValues(self, col, key1, key2):
         """
         Get secondary sort values.
@@ -575,22 +601,6 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                 (self.itemDataMap[key1][CONTENT_PATH], self.itemDataMap[key1][CONTENT_LINE]),
                 (self.itemDataMap[key2][CONTENT_PATH], self.itemDataMap[key2][CONTENT_LINE])
             )
-
-    def create_image_list(self):
-        """Create the image list."""
-
-        self.images = wx.ImageList(16, 16)
-        self.doc = self.images.Add(data.get_bitmap('doc.png'))
-        self.bin = self.images.Add(data.get_bitmap('binary.png'))
-        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)))
-        self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
-
-    def on_enter_window(self, event):
-        """Reset last moused over item tracker on mouse entering the window."""
-
-        self.last_moused = (-1, "")
-        event.Skip()
 
     def on_motion(self, event):
         """Display full file path in status bar on item mouseover."""
@@ -818,43 +828,3 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
             self.PopupMenu(menu, pos)
             menu.Destroy()
         event.Skip()
-
-    def on_col_hide_click(self, event, col=-1):
-        """Handle column hide click."""
-
-        hidden = list(self.hidden_columns)
-
-        if not event.IsChecked():
-            if col not in hidden:
-                hidden.append(col)
-        elif col in hidden:
-            del hidden[hidden.index(col)]
-        self.set_hidden_columns(hidden)
-        Settings.set_hide_cols_content(list(self.hidden_columns))
-
-    def on_col_rclick(self, event):
-        """Handle col right click."""
-
-        items = [
-            (self.FILE, functools.partial(self.on_col_hide_click, col=0), True, 0 not in self.hidden_columns),
-            (self.LINE, functools.partial(self.on_col_hide_click, col=1), True, 1 not in self.hidden_columns),
-            (self.MATCHES, functools.partial(self.on_col_hide_click, col=2), True, 2 not in self.hidden_columns),
-            (self.EXTENSION, functools.partial(self.on_col_hide_click, col=3), True, 3 not in self.hidden_columns),
-            (self.CONTEXT, functools.partial(self.on_col_hide_click, col=4), True, 4 not in self.hidden_columns)
-        ]
-
-        menu_entries = []
-        for index in range(self.column_count):
-            menu_entries.append(items[self.get_real_col(index)])
-
-        menu_entries.append(
-            (
-                self.ARRANGE_COLUMNS,
-                functools.partial(self.on_arrange_click, setting_callback=Settings.set_pos_cols_content),
-                self.complete
-            )
-        )
-
-        menu = ContextMenu(menu_entries)
-        self.PopupMenu(menu)
-        menu.Destroy()

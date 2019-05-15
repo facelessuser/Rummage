@@ -4,7 +4,6 @@ Sum hashes.
 Licensed under MIT
 Copyright (c) 2013-2015 Isaac Muse <isaacmuse@gmail.com>
 """
-from __future__ import unicode_literals
 import sys
 
 PY3 = (3, 0) <= sys.version_info
@@ -15,7 +14,7 @@ BIT24_MOD = 16777216
 BIT32_MOD = 4294967296
 
 
-class sum8(object):  # noqa
+class sum8:  # noqa
     """Sum8 hash."""
 
     __name = "sum8"

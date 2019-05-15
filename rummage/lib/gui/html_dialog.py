@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import wx
 from .localization import _
 from . import gui
@@ -34,7 +33,7 @@ class HTMLDialog(gui.HtmlDialog, webview.WebViewMixin):
     ):
         """Initialize dialog."""
 
-        super(HTMLDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setup_html(self.m_content_html, control_title=self)
         self.SetSizeHints(wx.Size(min_width, min_height), wx.Size(max_width, max_height))
         self.localize()

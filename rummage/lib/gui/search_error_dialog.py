@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import wx
 from .app.custom_app import error
 from .error_text_dialog import ErrorTextDialog
@@ -32,7 +31,7 @@ class SearchErrorDialog(gui.SearchErrorDialog):
     def __init__(self, parent, errors):
         """Initialize search error dialog."""
 
-        super(SearchErrorDialog, self).__init__(parent)
+        super().__init__(parent)
         self.Bind(wx.EVT_WINDOW_DESTROY, self.on_destroy)
         self.localize()
         self.refresh_localization()

@@ -11,7 +11,7 @@ import traceback
 __all__ = ("get_notify", "alert", "setup", "destroy")
 
 
-class Options(object):
+class Options:
     """Notification options."""
 
     icon = None

@@ -1,5 +1,4 @@
 """Compatibility module."""
-from __future__ import unicode_literals
 import re
 import sys
 import codecs
@@ -8,7 +7,7 @@ import os
 import subprocess
 from itertools import groupby
 from encodings.aliases import aliases
-from .file_strip.json import sanitize_json
+from .sanitize_json import sanitize
 from urllib.request import url2pathname
 from urllib.parse import urlparse
 import html
@@ -189,7 +188,7 @@ def read_json(filename):
 
     try:
         with codecs.open(filename, "r", encoding='utf-8') as f:
-            content = sanitize_json(f.read(), True)
+            content = sanitize(f.read(), True)
         obj = json.loads(content)
     except Exception:
         obj = None

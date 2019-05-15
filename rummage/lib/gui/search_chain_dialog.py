@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import wx
 from .settings import Settings
 from .edit_search_chain_dialog import EditSearchChainDialog
@@ -32,7 +31,7 @@ class SearchChainDialog(gui.SearchChainDialog):
     def __init__(self, parent, chain=None):
         """Initialize search chain dialog object."""
 
-        super(SearchChainDialog, self).__init__(parent)
+        super().__init__(parent)
         self.localize()
         self.refresh_localization()
 

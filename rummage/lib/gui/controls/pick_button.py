@@ -18,7 +18,7 @@ def pick_extend(instance, extension):
     )
 
 
-class PickButton(object):
+class PickButton:
     """Directory pick button."""
 
     DIR_TYPE = 0

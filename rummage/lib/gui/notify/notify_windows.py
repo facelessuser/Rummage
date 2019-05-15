@@ -4,7 +4,6 @@ Notify windows.
 Copyright (c) 2013 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
-from __future__ import unicode_literals
 import traceback
 import winsound
 import ctypes
@@ -96,7 +95,7 @@ class NotifyIconDataV3(ctypes.Structure):
     _fields_ = NotifyIconData._fields_[:-1]  # noqa
 
 
-class Options(object):
+class Options:
     """Notification options."""
 
     notify = None
@@ -117,7 +116,7 @@ def alert(sound=None):
     winsound.PlaySound(snd, winsound.SND_ALIAS)
 
 
-class WinNotifyLevel(object):
+class WinNotifyLevel:
     """Windows notification level."""
 
     ICON_INFORMATION = 0x01
@@ -138,7 +137,7 @@ def notify_win_fallback(title, message, sound, icon, fallback):
     fallback(title, message, sound)
 
 
-class WindowsNotify(object):
+class WindowsNotify:
     """Windows notification class."""
 
     window_handle = None

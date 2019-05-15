@@ -57,7 +57,7 @@ class HashThread(threading.Thread):
             self.error = str(traceback.format_exc())
 
 
-class ZlibAlgorithm(object):
+class ZlibAlgorithm:
     """`Zlib` hash algorithm."""
 
     __algorithm = None

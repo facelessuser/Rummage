@@ -20,7 +20,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import codecs
 import sys
 import json
@@ -95,7 +94,7 @@ class CustomApp(wx.App):
         return self.instance_okay
 
 
-class ArgPipeThread(object):
+class ArgPipeThread:
     """Argument pipe thread for receiving arguments from another instance."""
 
     def __init__(self, app, pipe_name):

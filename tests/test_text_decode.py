@@ -1,6 +1,5 @@
 """Tests for `text_decode.py`."""
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import unittest
 import mock
 import shutil

@@ -18,7 +18,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 Modified by Isaac Muse to work with `HexViewer`.
 """
-from __future__ import unicode_literals
 import struct
 import sys
 
@@ -27,7 +26,7 @@ PY3 = (3, 0) <= sys.version_info
 BIG_ENDIAN = True
 
 
-class tiger(object):
+class tiger:
     __name = 'tiger'
     __digest_size = 24
 
@@ -596,7 +595,7 @@ t4 = [
 ]
 
 
-class TigerStruct(object):
+class TigerStruct:
     def __init__(self):
         self.res = [0x0123456789ABCDEF, 0xFEDCBA9876543210, 0xF096A5B4C3B2E187]
         self.length = 0

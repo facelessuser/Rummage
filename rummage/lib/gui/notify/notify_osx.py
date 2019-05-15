@@ -4,7 +4,6 @@ Notify macOS.
 Copyright (c) 2013 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
-from __future__ import unicode_literals
 import subprocess
 import traceback
 from os.path import exists
@@ -66,7 +65,7 @@ def _is_ver_okay():
         return False
 
 
-class Options(object):
+class Options:
     """Notification options."""
 
     notify = None

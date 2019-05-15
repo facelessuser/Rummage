@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import wx
 import re
 import json
@@ -64,7 +63,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
     def __init__(self, parent):
         """Initialize settings dialog object."""
 
-        super(SettingsDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setup_html(self.m_help_html)
         if util.platform() == "windows":
             self.m_general_panel.SetDoubleBuffered(True)

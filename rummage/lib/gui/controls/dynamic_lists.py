@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from __future__ import unicode_literals
 import wx
 import wx.lib.mixins.listctrl as listmix
 import functools
@@ -37,7 +36,7 @@ def cmp(a, b):
     return (a > b) - (a < b)
 
 
-class DummyLock(object):
+class DummyLock:
     """A dummy lock that does nothing."""
 
     def __enter__(self):
@@ -63,7 +62,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         if single_sel:
             flags |= wx.LC_SINGLE_SEL
 
-        super(DynamicList, self).__init__(
+        super().__init__(
             parent, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
             style=flags
         )
