@@ -78,7 +78,7 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
             parent, -1, bitmap=data.get_bitmap('arrow_down.png'), label=label,
             style=wx.BORDER_NONE | wx.BU_EXACTFIT | wx.TAB_TRAVERSAL
         )
-        self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        self.SetBackgroundColour(parent.GetBackgroundColour())
         self.InitColours()
         self.SetBitmapLabel(data.get_bitmap('arrow_down.png', tint=self.tint))
         self.SetBitmapSelected(data.get_bitmap('arrow_right.png', tint=self.tint))

@@ -34,6 +34,7 @@ from . import data
 from .localization import _
 from .. import rumcore
 from .. import util
+from ..util import rgba
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
 else:
@@ -54,17 +55,21 @@ class RegexTestDialog(gui.RegexTestDialog):
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
 
-        test_attr = self.m_test_text.GetDefaultStyle()
-        self.highlight_attr = test_attr.Merge(
-            test_attr,
-            wx.TextAttr(wx.NullColour, colBack=wx.Colour(0xFF, 0xCC, 0x00))
+        bg = rgba.RGBA(0xFF, 0xcc, 0x00)
+        bg.blend(rgba.RGBA(*self.m_test_text.GetBackgroundColour().Get()), 60)
+        self.test_attr = wx.TextAttr(
+            self.m_test_text.GetForegroundColour(),
+            colBack=self.m_test_text.GetBackgroundColour()
         )
-        self.test_attr = test_attr.Merge(
-            test_attr,
-            wx.TextAttr(wx.NullColour, colBack=wx.Colour(0xFF, 0xFF, 0xFF))
+        self.highlight_attr = wx.TextAttr(wx.NullColour, colBack=wx.Colour(*bg.get_rgb()))
+
+        bg = rgba.RGBA(0xFF, 0, 0)
+        bg.blend(rgba.RGBA(*self.m_test_replace_text.GetBackgroundColour().Get()), 60)
+        self.replace_attr = wx.TextAttr(
+            self.m_test_replace_text.GetForegroundColour(),
+            colBack=self.m_test_replace_text.GetBackgroundColour()
         )
-        self.replace_attr = self.m_replace_text.GetDefaultStyle()
-        self.error_attr = self.replace_attr.Merge(self.replace_attr, wx.TextAttr(wx.Colour(0xFF, 0, 0)))
+        self.error_attr = wx.TextAttr(wx.Colour(0xFF, 0xFF, 0xFF), colBack=wx.Colour(*bg.get_rgb()))
 
         self.localize()
 
@@ -122,8 +127,8 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.m_replace_plugin_dir_picker.Hide()
             self.m_reload_button.Hide()
 
-        self.regex_event_code = -1
         self.testing = False
+        self.regex_event_code = -1
         self.init_regex_timer()
         self.start_regex_timer()
 
@@ -310,7 +315,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.reset_highlights()
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.replace_attr)
-                self.m_test_replace_text.SetValue(self.m_test_text.GetValue())
+                self.m_test_replace_text.WriteText(self.m_test_text.GetValue())
                 self.testing = False
                 return
 
@@ -399,7 +404,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 text = str(e)
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr)
-                self.m_test_replace_text.SetValue(text)
+                self.m_test_replace_text.WriteText(text)
                 return
 
             text = self.m_test_text.GetValue()
@@ -448,7 +453,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 text = str(traceback.format_exc())
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr)
-                self.m_test_replace_text.SetValue(text)
+                self.m_test_replace_text.WriteText(text)
                 return
             except Exception as e:
                 self.imported_plugin = None
@@ -456,7 +461,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 text = str(e)
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr)
-                self.m_test_replace_text.SetValue(text)
+                self.m_test_replace_text.WriteText(text)
                 return
 
             try:
@@ -515,7 +520,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 value = ''.join(list(new_text))
                 self.m_test_replace_text.Clear()
                 self.m_test_replace_text.SetDefaultStyle(self.error_attr if errors else self.replace_attr)
-                self.m_test_replace_text.SetValue(value)
+                self.m_test_replace_text.AppendText(value)
 
             except Exception:
                 print(str(traceback.format_exc()))
