@@ -23,7 +23,6 @@ import traceback
 import wx
 import os
 import functools
-import codecs
 import time
 import importlib.util
 from backrefs import bre
@@ -262,8 +261,6 @@ class RegexTestDialog(gui.RegexTestDialog):
 
     def import_plugin(self, script):
         """Import replace plugin."""
-
-        import types
 
         try:
             if self.imported_plugin is None or script != self.imported_plugin[0]:

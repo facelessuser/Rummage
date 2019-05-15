@@ -28,7 +28,6 @@ from time import time
 import os
 import re
 import importlib.util
-import codecs
 from datetime import datetime
 import wx.lib.newevent
 from backrefs import bre
