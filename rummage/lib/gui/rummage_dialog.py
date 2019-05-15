@@ -1228,7 +1228,7 @@ class RummageFrame(gui.RummageFrame):
 
         return flags
 
-    def set_chain_arguments(self, chain, replace, mode):
+    def set_chain_arguments(self, chain, replace, mode, encoding_options):
         """Set the search arguments."""
 
         search_chain = rumcore.Search(replace)
@@ -1236,7 +1236,7 @@ class RummageFrame(gui.RummageFrame):
         for search_name in Settings.get_chains()[chain]:
             search_obj = searches[search_name]
             if search_obj['is_function'] and replace:
-                replace_obj = self.import_plugin(search_obj['replace'])
+                replace_obj = self.import_plugin(search_obj['replace'], encoding_options)
             elif replace:
                 replace_obj = search_obj['replace']
             else:
@@ -1261,16 +1261,16 @@ class RummageFrame(gui.RummageFrame):
 
         return search_chain
 
-    def import_plugin(self, script):
+    def import_plugin(self, script, encoding_options):
         """Import replace plugin."""
 
-        import imp
+        import types
 
         if script not in self.imported_plugins:
-            module = imp.new_module(os.path.splitext(os.path.basename(script))[0])
+            module = types.ModuleType(os.path.splitext(os.path.basename(script))[0])
             module.__dict__['__file__'] = script
             with open(script, 'rb') as f:
-                encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py')
+                encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py', encoding_options)
             with codecs.open(script, 'r', encoding=encoding.encode) as f:
                 exec(
                     compile(
@@ -1392,12 +1392,12 @@ class RummageFrame(gui.RummageFrame):
 
         # Setup chain argument
         if chain:
-            search_chain = self.set_chain_arguments(args.pattern, replace, args.regex_mode)
+            search_chain = self.set_chain_arguments(args.pattern, replace, args.regex_mode, args.encoding_options)
         else:
             search_chain = rumcore.Search(args.replace is not None)
             if not self.no_pattern:
                 if self.m_replace_plugin_checkbox.GetValue() and replace:
-                    repl_obj = self.import_plugin(args.replace)
+                    repl_obj = self.import_plugin(args.replace, args.encoding_options)
                     search_chain.add(args.pattern, repl_obj, flags & rumcore.SEARCH_MASK)
                 else:
                     replace_pattern = args.replace

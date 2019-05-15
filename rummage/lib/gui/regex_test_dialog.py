@@ -259,18 +259,18 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.test_attr
         )
 
-    def import_plugin(self, script):
+    def import_plugin(self, script, encoding_options):
         """Import replace plugin."""
 
-        import imp
+        import types
 
         try:
             if self.imported_plugin is None or script != self.imported_plugin[0]:
                 self.imported_plugin = None
-                module = imp.new_module(os.path.splitext(os.path.basename(script))[0])
+                module = types.ModuleType(os.path.splitext(os.path.basename(script))[0])
                 module.__dict__['__file__'] = script
                 with open(script, 'rb') as f:
-                    encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py')
+                    encoding = rumcore.text_decode._special_encode_check(f.read(256), '.py', encoding_options)
                 with codecs.open(script, 'r', encoding=encoding.encode) as f:
                     exec(
                         compile(
@@ -424,7 +424,8 @@ class RegexTestDialog(gui.RegexTestDialog):
                         time.ctime(),
                         rumcore.text_decode.Encoding('unicode', None)
                     )
-                    replace_test = self.import_plugin(rpattern)(file_info, rum_flags)._test
+                    encoding_options = Settings.get_encoding_options()
+                    replace_test = self.import_plugin(rpattern, encoding_options)(file_info, rum_flags)._test
                 elif not self.m_replace_plugin_checkbox.GetValue():
                     if not is_regex:
                         replace_test = functools.partial(replace_literal, replace=rpattern)
