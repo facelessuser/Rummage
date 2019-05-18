@@ -323,6 +323,7 @@ class ListCtrlComboPopup(wx.ComboPopup):
         curitem = self.list.GetFirstSelected()
         if curitem < self.list.GetItemCount() - 1:
             self.list.Select(curitem + 1)
+            self.list.Focus(curitem + 1)
 
     def prev_item(self):
         """Select previous item."""
@@ -330,6 +331,7 @@ class ListCtrlComboPopup(wx.ComboPopup):
         curitem = self.list.GetFirstSelected()
         if curitem > 0 and self.list.GetItemCount() > 0:
             self.list.Select(curitem - 1)
+            self.list.Focus(curitem - 1)
 
     def set_item(self, idx):
         """Set item by index."""
@@ -380,9 +382,11 @@ class ListCtrlComboPopup(wx.ComboPopup):
         elif key == wx.WXK_DOWN:
             if self.popup_shown:
                 self.next_item()
+                return
         elif key == wx.WXK_UP:
             if self.popup_shown:
                 self.prev_item()
+                return
         event.Skip()
 
     def on_resize_dropdown(self, event):
