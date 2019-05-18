@@ -61,7 +61,8 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.m_test_text.GetForegroundColour(),
             colBack=self.m_test_text.GetBackgroundColour()
         )
-        self.highlight_attr = wx.TextAttr(wx.NullColour, colBack=wx.Colour(*bg.get_rgb()))
+        fg = (data.RGBA(0x333333FF) if bg.get_luminance() > 127 else data.RGBA(0xbbbbbbFF))
+        self.highlight_attr = wx.TextAttr(wx.Colour(*fg.get_rgb()), colBack=wx.Colour(*bg.get_rgb()))
 
         bg = rgba.RGBA(0xFF0000)
         bg.blend(rgba.RGBA(self.m_test_replace_text.GetBackgroundColour().Get()), 60)
@@ -69,7 +70,8 @@ class RegexTestDialog(gui.RegexTestDialog):
             self.m_test_replace_text.GetForegroundColour(),
             colBack=self.m_test_replace_text.GetBackgroundColour()
         )
-        self.error_attr = wx.TextAttr(wx.Colour(util.to_bgr(0xFFFFFF)), colBack=wx.Colour(*bg.get_rgb()))
+        fg = (data.RGBA(0x333333FF) if bg.get_luminance() > 127 else data.RGBA(0xbbbbbbFF))
+        self.error_attr = wx.TextAttr(wx.Colour(*fg.get_rgb()), colBack=wx.Colour(*bg.get_rgb()))
 
         self.localize()
 
