@@ -44,7 +44,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
         self.UseAltPopupWindow(True)
 
         # Create list control popup
-        self.list = ListCtrlComboPopup(parent, self.GetTextCtrl())
+        self.list = ListCtrlComboPopup(parent, self)
         self.SetPopupControl(self.list)
 
         # Key bindings and events for the object
@@ -61,15 +61,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
 
         # Add choices
         self.update_choices(choices, load_last)
-
-    def Create(self, parent):
-        """Create list."""
-
-        # Create list control popup
-        self.list = ListCtrlComboPopup(parent, self.GetTextCtrl())
-        self.SetPopupControl(self.list)
-
-        return True
 
     def set_changed_callback(self, callback):
         """Set changed callback."""
@@ -160,15 +151,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
         self.GetTextCtrl().SetValue(text)
         self.update_semaphore = False
 
-    def pick_item(self):
-        """Set the choice based on the `TextCtrl` value."""
-
-        value = self.GetTextCtrl().GetValue()
-        if value in self.choices:
-            index = self.choices.index(value)
-            if 0 <= index < self.list.list.GetItemCount():
-                self.list.set_item(index)
-
     def on_dismiss(self, event):
         """Load a previously selected choice to the `TextCtrl` on dismiss."""
 
@@ -194,12 +176,8 @@ class AutoCompleteCombo(wx.ComboCtrl):
         """
 
         key = event.GetKeyCode()
-        if key == wx.WXK_DOWN:
+        if key in (wx.WXK_DOWN, wx.WXK_UP):
             self.Popup()
-            self.pick_item()
-        elif key == wx.WXK_UP:
-            self.Popup()
-            self.pick_item()
         event.Skip()
 
     def on_key_down(self, event):
@@ -265,11 +243,12 @@ class AutoCompleteCombo(wx.ComboCtrl):
 class ListCtrlComboPopup(wx.ComboPopup):
     """List control combo popup."""
 
-    def __init__(self, parent, txt_ctrl):
+    def __init__(self, parent, combo_ctrl):
         """Initialize the `ListCtrlComboPopup` object."""
 
         self.canceled = False
-        self.txt_ctrl = txt_ctrl
+        self.txt_ctrl = combo_ctrl.GetTextCtrl()
+        self.combo_ctrl = combo_ctrl
         self.waiting_value = -1
         self.parent = parent
         self.popup_shown = False
@@ -332,11 +311,6 @@ class ListCtrlComboPopup(wx.ComboPopup):
         if curitem > 0 and self.list.GetItemCount() > 0:
             self.list.Select(curitem - 1)
             self.list.Focus(curitem - 1)
-
-    def set_item(self, idx):
-        """Set item by index."""
-
-        self.list.Select(idx)
 
     def clear(self):
         """Clear choices."""
@@ -453,10 +427,23 @@ class ListCtrlComboPopup(wx.ComboPopup):
 
         return wx.ComboPopup.GetAdjustedSize(self, minWidth, 200, maxHeight)
 
+    def pick_item(self):
+        """Set the choice based on the `TextCtrl` value."""
+
+        value = self.txt_ctrl.GetValue()
+        if value in self.combo_ctrl.choices:
+            index = self.combo_ctrl.choices.index(value)
+        else:
+            index = 0
+        if 0 <= index < self.list.GetItemCount():
+            self.list.Select(index)
+            self.list.Focus(index)
+
     def OnPopup(self):
         """Called immediately after the popup is shown."""
         self.popup_shown = True
         wx.ComboPopup.OnPopup(self)
+        self.pick_item()
 
     def OnDismiss(self):
         """Called when popup is dismissed."""

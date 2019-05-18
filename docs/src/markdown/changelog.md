@@ -5,6 +5,8 @@
 - **FIX**: Fix regression with loading replace plugins.
 - **FIX**: Fix some localization issues.
 - **FIX**: Fix regression where file actions no longer work in content tab due to internal changes for column reordering.
+- **FIX**: Better initial focus in autocomplete text boxes on platforms that had issues.
+- **FIX**: Fix focus issue when navigating entries in autocomplete boxes with arrow keys.
 
 ## 4.6.0b1
 
