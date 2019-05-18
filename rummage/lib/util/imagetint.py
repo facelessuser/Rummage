@@ -24,7 +24,7 @@ def tint_png(byte_string, color):
         start = 0
         for x in range(columns):
             rgba = color
-            rgba.apply_alpha(RGBA(*row[start:start + 3]))
+            rgba.apply_alpha(RGBA(row[start:start + 3]))
             p[y] += [rgba.r, rgba.g, rgba.b, row[start + 3]]
             start += 4
         y += 1

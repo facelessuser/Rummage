@@ -88,9 +88,9 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
         """Calculate a new set of highlight and shadow colours."""
 
         face = self.GetBackgroundColour()
-        rgba = data.RGBA(*face.Get())
+        rgba = data.RGBA(face.Get())
         self.tint = (
-            data.RGBA(0x33, 0x33, 0x33, 0xFF) if rgba.get_luminance() > 127 else data.RGBA(0xbb, 0xbb, 0xbb, 0xFF)
+            data.RGBA(0x333333FF) if rgba.get_luminance() > 127 else data.RGBA(0xbbbbbbFF)
         )
         self.faceDnClr = face
         self.shadowPenClr = face

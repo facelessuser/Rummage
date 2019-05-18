@@ -55,13 +55,49 @@ class RGBA:
     b = None
     a = None
 
-    def __init__(self, r=0, g=0, b=0, a=255):
+    def __init__(self, color):
         """Initialize."""
 
-        self.r = clamp(int(r), 0, 255)
-        self.g = clamp(int(g), 0, 255)
-        self.b = clamp(int(b), 0, 255)
-        self.a = clamp(int(a), 0, 255)
+        self.r, self.g, self.b, self.a = self.split_channels(color)
+
+    def split_channels(self, color):
+        """Split into channels."""
+
+        if isinstance(color, RGBA):
+            return color.get_rgba()
+        elif isinstance(color, int):
+            if color <= 0xFFFFFF:
+                color = (color << 8) | 0xFF
+            if color > 0xFFFFFFFF:
+                raise ValueError("Colors not in the form 'RGB' or 'RGBA'")
+
+            return (
+                clamp((color & 0xFF000000) >> 24, 0, 255),
+                clamp((color & 0xFF0000) >> 16, 0, 255),
+                clamp((color & 0xFF00) >> 8, 0, 255),
+                clamp((color & 0xFF), 0, 255)
+            )
+        else:
+            channels = []
+            for c in color:
+                channels.append(clamp(int(c), 0, 255))
+            if len(channels) == 3:
+                channels.append(0xFF)
+            if len(channels) != 4:
+                raise ValueError("Colors should contain at least channels '(R, G, B)' or optionally '(R, G, B, A)'")
+            return tuple(channels)
+
+    @property
+    def rgb(self):
+        """Return as a 24 bit color value."""
+
+        return (self.r << 16) | (self.g << 8) | self.b
+
+    @property
+    def rgba(self):
+        """Return as a 32 bit color value."""
+
+        return (self.r << 24) | (self.g << 16) | (self.b << 8) | self.a
 
     def get_rgba(self):
         """Get the RGB color with the alpha channel."""
@@ -82,7 +118,7 @@ class RGBA:
         """
 
         if self.a < 0xFF:
-            r, g, b, a = color.get_rgba()
+            r, g, b, a = self.split_channels(color)
 
             self.r = mix_channel(self.r, self.a, r, a)
             self.g = mix_channel(self.g, self.a, g, a)
@@ -125,7 +161,7 @@ class RGBA:
         """Blend color."""
 
         factor = clamp(round_int(clamp(float(percent), 0.0, 100.0) * PERCENT_TO_CHANNEL), 0, 255)
-        r, g, b, a = color.get_rgba()
+        r, g, b, a = self.split_channels(color)
 
         self.r = mix_channel(self.r, factor, r, 255)
         self.g = mix_channel(self.g, factor, g, 255)

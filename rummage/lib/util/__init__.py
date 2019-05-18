@@ -147,6 +147,28 @@ def link_type(link):
     return link_type
 
 
+def to_bgr(color):
+    """
+    Convert to `colRGB`.
+
+    This is a `wxPython` type which is basically `BGR`. We don't want to work with
+    `BGR`, so being able to simply convert `RGB` is preferable.
+    """
+
+    return ((color & 0xFF0000) >> 16) | (color & 0xFF00) | ((color & 0xFF) << 16)
+
+
+def to_rgb(color):
+    """
+    Convert from `colRGB`.
+
+    `colRGB` is a `wxPython` type which is basically `BGR`. We don't want to work with
+    `BGR`, so being able to simply convert `RGB` is preferable.
+    """
+
+    return ((color & 0xFF0000) >> 16) | (color & 0xFF00) | ((color & 0xFF) << 16)
+
+
 def char_size(c):
     """Get `UTF8` char size."""
 

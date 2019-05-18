@@ -260,7 +260,7 @@ def export(export_html, chain, result_list, result_content_list):
                 "js": data.get_file('sorttable.js'),
                 "css": data.get_file('results.css'),
                 "icon": util.to_ustr(
-                    base64.b64encode(data.get_image('glass.png', tint=data.RGBA(0x33, 0x33, 0x33, 0xFF)).GetData())
+                    base64.b64encode(data.get_image('glass.png', tint=data.RGBA(0x333333FF)).GetData())
                 ),
                 "title": title,
                 "lang": get_current_domain()

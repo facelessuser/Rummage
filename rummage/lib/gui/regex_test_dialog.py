@@ -55,21 +55,21 @@ class RegexTestDialog(gui.RegexTestDialog):
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
 
-        bg = rgba.RGBA(0xFF, 0xcc, 0x00)
-        bg.blend(rgba.RGBA(*self.m_test_text.GetBackgroundColour().Get()), 60)
+        bg = rgba.RGBA(0xFFCC00)
+        bg.blend(rgba.RGBA(self.m_test_text.GetBackgroundColour().Get()), 60)
         self.test_attr = wx.TextAttr(
             self.m_test_text.GetForegroundColour(),
             colBack=self.m_test_text.GetBackgroundColour()
         )
         self.highlight_attr = wx.TextAttr(wx.NullColour, colBack=wx.Colour(*bg.get_rgb()))
 
-        bg = rgba.RGBA(0xFF, 0, 0)
-        bg.blend(rgba.RGBA(*self.m_test_replace_text.GetBackgroundColour().Get()), 60)
+        bg = rgba.RGBA(0xFF0000)
+        bg.blend(rgba.RGBA(self.m_test_replace_text.GetBackgroundColour().Get()), 60)
         self.replace_attr = wx.TextAttr(
             self.m_test_replace_text.GetForegroundColour(),
             colBack=self.m_test_replace_text.GetBackgroundColour()
         )
-        self.error_attr = wx.TextAttr(wx.Colour(0xFF, 0xFF, 0xFF), colBack=wx.Colour(*bg.get_rgb()))
+        self.error_attr = wx.TextAttr(wx.Colour(util.to_bgr(0xFFFFFF)), colBack=wx.Colour(*bg.get_rgb()))
 
         self.localize()
 
