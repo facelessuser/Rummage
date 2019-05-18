@@ -173,7 +173,12 @@ class AutoCompleteCombo(wx.ComboCtrl):
         """Load a previously selected choice to the `TextCtrl` on dismiss."""
 
         value = self.list.is_value_waiting()
-        if value >= 0:
+        canceled = self.list.is_canceled()
+        self.list.clear_canceled()
+        if canceled:
+            self.list.set_waiting_value(-1)
+            return
+        elif value >= 0:
             self.GetTextCtrl().SetSelection(0, 0)
             self.list.select_item(value)
             self.GetTextCtrl().SetSelection(0, len(self.GetTextCtrl().GetValue()))
@@ -263,6 +268,7 @@ class ListCtrlComboPopup(wx.ComboPopup):
     def __init__(self, parent, txt_ctrl):
         """Initialize the `ListCtrlComboPopup` object."""
 
+        self.canceled = False
         self.txt_ctrl = txt_ctrl
         self.waiting_value = -1
         self.parent = parent
@@ -367,14 +373,16 @@ class ListCtrlComboPopup(wx.ComboPopup):
             if curitem != -1:
                 self.waiting_value = curitem
             wx.CallAfter(self.Dismiss)
+        elif key == wx.WXK_ESCAPE:
+            if self.popup_shown:
+                self.set_canceled()
+                wx.CallAfter(self.Dismiss)
         elif key == wx.WXK_DOWN:
             if self.popup_shown:
                 self.next_item()
-                return
         elif key == wx.WXK_UP:
             if self.popup_shown:
                 self.prev_item()
-                return
         event.Skip()
 
     def on_resize_dropdown(self, event):
@@ -382,6 +390,21 @@ class ListCtrlComboPopup(wx.ComboPopup):
 
         self.resize_dropdown()
         event.Skip()
+
+    def set_canceled(self):
+        """Set canceled."""
+
+        self.canceled = True
+
+    def clear_canceled(self):
+        """Clear canceled."""
+
+        self.canceled = False
+
+    def is_canceled(self):
+        """Check if canceled."""
+
+        return self.canceled
 
     # The following methods are those that are overridable from the
     # `ComboPopup` base class.
