@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.6.0b2
+
+- **FIX**: Fix regression with loading replace plugins.
+- **FIX**: Fix some localization issues.
+- **FIX**: Fix regression where file actions no longer work in content tab due to internal changes for column reordering.
+
 ## 4.6.0b1
 
 - **NEW**: Search options and file limit options can be collapsed in the main dialog. This allows  hiding these options if you aren't frequently using them, and provides a more compact dialog.
@@ -8,7 +14,6 @@
 - **FIX**: Fix an issue on Linux where tabbing past a hidden directory button would cause an error in GTK. Ensure such controls do not allow focus when they are hidden.
 - **FIX**: Fix an internal error where the autocomplete box could throw an error due to the index bounds not being checked.
 - **FIX**: When list controls are smaller than the window, don't resize last column too an excessively big width.
-- **FIX**: Fix regression with loading a plugin.
 
 ## 4.5.0
 
