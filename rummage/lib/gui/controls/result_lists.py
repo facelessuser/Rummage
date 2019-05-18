@@ -680,7 +680,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                 file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
                 col = str(self.get_map_item(item, col=self.get_virt_col(CONTENT_COL)))
                 path = self.main_window.m_result_file_list.get_map_item(
-                    file_row, col=self.get_virt_col(FILE_PATH), absolute=True
+                    file_row, col=self.main_window.m_result_file_list.get_virt_col(FILE_PATH), absolute=True
                 )
                 fileops.open_editor(os.path.join(os.path.normpath(path), filename), line, col)
         event.Skip()
@@ -694,7 +694,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                 file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
                 filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                 path = self.main_window.m_result_file_list.get_map_item(
-                    file_row, col=FILE_PATH, absolute=True
+                    file_row, col=self.main_window.m_result_file_list.get_virt_col(FILE_PATH), absolute=True
                 )
                 target = os.path.join(path, filename)
                 line = self.GetItem(item, col=self.get_virt_col(CONTENT_LINE)).GetText()
@@ -710,7 +710,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                     file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
                     filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                     path = self.main_window.m_result_file_list.get_map_item(
-                        file_row, col=FILE_PATH, absolute=True
+                        file_row, col=self.main_window.m_result_file_list.get_virt_col(FILE_PATH), absolute=True
                     )
                     target = os.path.join(path, filename)
                     line = self.GetItem(item, col=self.get_virt_col(CONTENT_LINE)).GetText()
@@ -732,7 +732,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                     if from_file_tab:
                         file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
                         path = self.main_window.m_result_file_list.get_map_item(
-                            file_row, col=self.get_virt_col(FILE_PATH), absolute=True
+                            file_row, col=self.main_window.m_result_file_list.get_virt_col(FILE_PATH), absolute=True
                         )
                         filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                         copy_bfr.append(os.path.join(path, filename))
@@ -760,7 +760,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                 if self.IsSelected(item):
                     file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
                     path = self.main_window.m_result_file_list.get_map_item(
-                        file_row, col=FILE_PATH, absolute=True
+                        file_row, col=self.main_window.m_result_file_list.get_virt_col(FILE_PATH), absolute=True
                     )
                     filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                     files.add(os.path.join(path, filename))
@@ -780,7 +780,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                 file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
                 filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                 path = self.main_window.m_result_file_list.get_map_item(
-                    file_row, col=self.get_virt_col(FILE_PATH), absolute=True
+                    file_row, col=self.main_window.m_result_file_list.get_virt_col(FILE_PATH), absolute=True
                 )
                 target = os.path.join(path, filename)
                 selected = self.IsSelected(item)

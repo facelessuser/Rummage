@@ -274,7 +274,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def get_map_item(self, idx, col=0, absolute=False):
         """Get attribute in in item map entry and the given index."""
 
-        return self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][self.get_virt_col(col)]
+        return self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][self.get_real_col(col)]
 
     def reset_list(self):
         """Reset the list."""
