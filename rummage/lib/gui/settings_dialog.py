@@ -27,6 +27,7 @@ from .generic_dialogs import errormsg
 from .localization import _
 from . import gui
 from . import notify
+from . import data
 from .. import rumcore
 from .. import util
 from .controls import webview
@@ -77,6 +78,18 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         if util.platform() == "windows":
             self.m_settings_notebook.SetBackgroundColour(self.m_settings_panel.GetBackgroundColour())
+
+        for x in range(self.m_settings_notebook.GetPageCount()):
+            page = self.m_settings_notebook.GetPage(x)
+            color = page.GetBackgroundColour()
+            if data.RGBA(util.to_rgb(color.GetRGB())).get_luminance() > 127:
+                factor = 94
+            else:
+                factor = 106
+            new_color = color.ChangeLightness(factor)
+            page.SetBackgroundColour(new_color)
+            if x == 0:
+                self.m_settings_notebook.SetBackgroundColour(wx.Colour(new_color.GetRGBA()))
 
         self.localize()
 

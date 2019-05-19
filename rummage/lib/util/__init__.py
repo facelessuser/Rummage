@@ -164,9 +164,37 @@ def to_rgb(color):
 
     `colRGB` is a `wxPython` type which is basically `BGR`. We don't want to work with
     `BGR`, so being able to simply convert `RGB` is preferable.
+
+    The algorithm is actually the same swapping in either direction, but having a clear name
+    makes it obvious what is wanted.
     """
 
-    return ((color & 0xFF0000) >> 16) | (color & 0xFF00) | ((color & 0xFF) << 16)
+    return to_bgr(color)
+
+
+def to_abgr(color):
+    """
+    Convert to `colRGB`.
+
+    This is a `wxPython` type which is basically `BGR`. We don't want to work with
+    `BGR`, so being able to simply convert `RGB` is preferable.
+    """
+
+    return ((color & 0xFF000000) >> 24) | ((color & 0xFF0000) >> 8) | ((color & 0xFF00) >> 8 ) | ((color & 0xFF) << 24)
+
+
+def to_rgba(color):
+    """
+    Convert from `colRGB`.
+
+    `colRGB` is a `wxPython` type which is basically `BGR`. We don't want to work with
+    `BGR`, so being able to simply convert `RGB` is preferable.
+
+    The algorithm is actually the same swapping in either direction, but having a clear name
+    makes it obvious what is wanted.
+    """
+
+    return to_abgr()
 
 
 def char_size(c):
