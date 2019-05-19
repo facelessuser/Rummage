@@ -75,6 +75,9 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         self.m_encoding_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
 
+        if util.platform() == "windows":
+            self.m_settings_notebook.SetBackgroundColour(self.m_settings_panel.GetBackgroundColour())
+
         self.localize()
 
         # Ensure OS platform select all shortcut works

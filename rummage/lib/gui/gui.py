@@ -35,7 +35,6 @@ class RummageFrame ( wx.Frame ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Rummage", pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_FRAME_STYLE|wx.RESIZE_BORDER|wx.TAB_TRAVERSAL )
 
         self.SetSizeHints( wx.Size( -1,-1 ), wx.DefaultSize )
-        self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
 
         bFrameSizer = wx.BoxSizer( wx.VERTICAL )
 
@@ -47,11 +46,7 @@ class RummageFrame ( wx.Frame ):
         fgSizer13.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
         self.m_grep_notebook = wx.Notebook( self.m_main_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.NB_FIXEDWIDTH|wx.NB_NOPAGETHEME )
-        self.m_grep_notebook.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         self.m_settings_panel = wx.Panel( self.m_grep_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_settings_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         bSizer10 = wx.BoxSizer( wx.VERTICAL )
 
         fgSizer2 = wx.FlexGridSizer( 8, 1, 0, 0 )
@@ -103,13 +98,9 @@ class RummageFrame ( wx.Frame ):
         self.m_options_collapse = CollapsiblePane( self.m_settings_panel, wx.ID_ANY, u"Text search options", wx.DefaultPosition, wx.DefaultSize, wx.CP_DEFAULT_STYLE|wx.CP_NO_TLW_RESIZE )
         self.m_options_collapse.Collapse( False )
 
-        self.m_options_collapse.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         bSizer23 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_options_panel = wx.Panel( self.m_options_collapse.GetPane(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_options_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer9 = wx.FlexGridSizer( 0, 3, 0, 0 )
         fgSizer9.AddGrowableCol( 0 )
         fgSizer9.AddGrowableCol( 2 )
@@ -242,13 +233,9 @@ class RummageFrame ( wx.Frame ):
         self.m_limit_collapse = CollapsiblePane( self.m_settings_panel, wx.ID_ANY, u"File search", wx.DefaultPosition, wx.DefaultSize, wx.CP_DEFAULT_STYLE|wx.CP_NO_TLW_RESIZE )
         self.m_limit_collapse.Collapse( False )
 
-        self.m_limit_collapse.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         bSizer26 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_limit_panel = wx.Panel( self.m_limit_collapse.GetPane(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_limit_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         gbSizer3 = wx.GridBagSizer( 0, 0 )
         gbSizer3.SetFlexibleDirection( wx.BOTH )
         gbSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -416,8 +403,6 @@ class RummageFrame ( wx.Frame ):
         bSizer10.Fit( self.m_settings_panel )
         self.m_grep_notebook.AddPage( self.m_settings_panel, u"Search", True )
         self.m_result_file_panel = wx.Panel( self.m_grep_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_result_file_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         bSizer7 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_result_file_list = ResultFileList(self.m_result_file_panel)
@@ -429,8 +414,6 @@ class RummageFrame ( wx.Frame ):
         bSizer7.Fit( self.m_result_file_panel )
         self.m_grep_notebook.AddPage( self.m_result_file_panel, u"Files", False )
         self.m_result_content_panel = wx.Panel( self.m_grep_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_result_content_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         bSizer6 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_result_list = ResultContentList(self.m_result_content_panel)
@@ -658,8 +641,6 @@ class DeleteDialog ( wx.Dialog ):
         bSizer21 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_progress_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_progress_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         bSizer22 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_progress_label = wx.StaticText( self.m_progress_panel, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -743,8 +724,6 @@ class ChecksumDialog ( wx.Dialog ):
         bSizer20 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_hash_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_hash_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer54 = wx.FlexGridSizer( 5, 1, 0, 0 )
         fgSizer54.AddGrowableCol( 0 )
         fgSizer54.AddGrowableRow( 2 )
@@ -842,8 +821,6 @@ class SupportInfoDialog ( wx.Dialog ):
         bSizer20 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_support_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_support_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer50 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer50.AddGrowableCol( 0 )
         fgSizer50.AddGrowableRow( 0 )
@@ -924,11 +901,7 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer40.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
         self.m_settings_notebook = wx.Notebook( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.NB_NOPAGETHEME )
-        self.m_settings_notebook.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         self.m_general_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_general_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer52 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer52.AddGrowableCol( 0 )
         fgSizer52.SetFlexibleDirection( wx.BOTH )
@@ -989,8 +962,6 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer52.Fit( self.m_general_panel )
         self.m_settings_notebook.AddPage( self.m_general_panel, u"General", False )
         self.m_search_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_search_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer43 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer43.AddGrowableCol( 0 )
         fgSizer43.SetFlexibleDirection( wx.BOTH )
@@ -1071,8 +1042,6 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer43.Fit( self.m_search_panel )
         self.m_settings_notebook.AddPage( self.m_search_panel, u"Search", False )
         self.m_encoding_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_encoding_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer57 = wx.FlexGridSizer( 3, 1, 0, 0 )
         fgSizer57.AddGrowableCol( 0 )
         fgSizer57.AddGrowableRow( 2 )
@@ -1110,8 +1079,6 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer57.Fit( self.m_encoding_panel )
         self.m_settings_notebook.AddPage( self.m_encoding_panel, u"Encoding", False )
         self.m_editor_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_editor_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer63 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer63.AddGrowableCol( 0 )
         fgSizer63.AddGrowableRow( 0 )
@@ -1148,8 +1115,6 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer63.Fit( self.m_editor_panel )
         self.m_settings_notebook.AddPage( self.m_editor_panel, u"Editor", False )
         self.m_notify_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_notify_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer35 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer35.AddGrowableCol( 1 )
         fgSizer35.SetFlexibleDirection( wx.BOTH )
@@ -1195,8 +1160,6 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer35.Fit( self.m_notify_panel )
         self.m_settings_notebook.AddPage( self.m_notify_panel, u"Notifications", False )
         self.m_history_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_history_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer66 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer66.AddGrowableCol( 0 )
         fgSizer66.AddGrowableRow( 1 )
@@ -1220,8 +1183,6 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer66.Add( fgSizer30, 1, wx.EXPAND, 5 )
 
         self.m_cache_textbox = wx.TextCtrl( self.m_history_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
-        self.m_cache_textbox.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer66.Add( self.m_cache_textbox, 0, wx.ALL|wx.EXPAND, 5 )
 
 
@@ -1230,8 +1191,6 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer66.Fit( self.m_history_panel )
         self.m_settings_notebook.AddPage( self.m_history_panel, u"History", False )
         self.m_backup_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_backup_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer401 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer401.AddGrowableCol( 0 )
         fgSizer401.SetFlexibleDirection( wx.BOTH )
@@ -1466,8 +1425,6 @@ class FileExtDialog ( wx.Dialog ):
         bSizer23 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_ext_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_ext_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer61 = wx.FlexGridSizer( 2, 1, 0, 0 )
         fgSizer61.AddGrowableCol( 0 )
         fgSizer61.SetFlexibleDirection( wx.BOTH )
@@ -1553,8 +1510,6 @@ class ExportSettingsDialog ( wx.Dialog ):
         bSizer17 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_export_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_export_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer42 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer42.AddGrowableCol( 0 )
         fgSizer42.SetFlexibleDirection( wx.BOTH )
@@ -1633,8 +1588,6 @@ class ImportSettingsDialog ( wx.Dialog ):
         bSizer17 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_import_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_import_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer42 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer42.AddGrowableCol( 0 )
         fgSizer42.AddGrowableRow( 3 )
@@ -1719,8 +1672,6 @@ class OverwriteDialog ( wx.Dialog ):
         bSizer12 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_overwrite_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_overwrite_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer33 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer33.AddGrowableCol( 0 )
         fgSizer33.AddGrowableRow( 0 )
@@ -1824,8 +1775,6 @@ class RegexTestDialog ( wx.Dialog ):
         bSizer8 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_tester_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_tester_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer18 = wx.FlexGridSizer( 5, 1, 0, 0 )
         fgSizer18.AddGrowableCol( 0 )
         fgSizer18.AddGrowableRow( 0 )
@@ -2110,8 +2059,6 @@ class SaveSearchDialog ( wx.Dialog ):
         bSizer9 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_save_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_save_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer24 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer24.AddGrowableCol( 0 )
         fgSizer24.AddGrowableRow( 1 )
@@ -2248,8 +2195,6 @@ class LoadSearchDialog ( wx.Dialog ):
         bSizer13 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_load_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_load_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer36 = wx.FlexGridSizer( 2, 1, 0, 0 )
         fgSizer36.AddGrowableCol( 0 )
         fgSizer36.AddGrowableRow( 0 )
@@ -2340,8 +2285,6 @@ class SearchChainDialog ( wx.Dialog ):
         bSizer16 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_chain_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_chain_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer38 = wx.FlexGridSizer( 2, 1, 0, 0 )
         fgSizer38.AddGrowableCol( 0 )
         fgSizer38.AddGrowableRow( 0 )
@@ -2433,8 +2376,6 @@ class EditSearchChainDialog ( wx.Dialog ):
         bSizer16 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_chain_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_chain_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer38 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer38.AddGrowableCol( 0 )
         fgSizer38.AddGrowableRow( 1 )
@@ -2568,8 +2509,6 @@ class SearchErrorDialog ( wx.Dialog ):
         bSizer13 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_error_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_error_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer40 = wx.FlexGridSizer( 1, 1, 0, 0 )
         fgSizer40.AddGrowableCol( 0 )
         fgSizer40.AddGrowableRow( 0 )
@@ -2609,8 +2548,6 @@ class ErrorTextDialog ( wx.Dialog ):
         bSizer14 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_error_text_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_error_text_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         bSizer15 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_error_textbox = wx.TextCtrl( self.m_error_text_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.TE_MULTILINE )
@@ -2673,8 +2610,6 @@ class ColumnDialog ( wx.Dialog ):
         bSizer25 = wx.BoxSizer( wx.VERTICAL )
 
         self.m_column_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        self.m_column_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNFACE ) )
-
         fgSizer58 = wx.FlexGridSizer( 2, 1, 0, 0 )
         fgSizer58.AddGrowableCol( 0 )
         fgSizer58.AddGrowableRow( 0 )

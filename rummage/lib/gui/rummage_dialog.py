@@ -413,6 +413,10 @@ class RummageFrame(gui.RummageFrame):
         self.m_result_list.set_wait_lock(_LOCK)
         self.m_result_file_list.load_list(True)
         self.m_result_list.load_list(True)
+        # Windows will make every panel look white if we don't manually color the background
+        # with the same color as the other panels.
+        if util.platform() == "windows":
+            self.m_grep_notebook.SetBackgroundColour(self.m_main_panel.GetBackgroundColour())
         self.m_grep_notebook.SetSelection(0)
 
         self.refresh_localization()
