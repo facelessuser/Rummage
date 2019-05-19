@@ -1946,7 +1946,12 @@ class RummageFrame(gui.RummageFrame):
     def on_esc_key(self, event):
         """Abort on escape."""
 
-        if self.thread is not None and not self.kill:
+        # Do we actually need this cancel check?
+        obj = self.FindFocus()
+        is_ac_combo = isinstance(obj, AutoCompleteCombo)
+        if is_ac_combo:
+            canceled = obj.list.is_canceled()
+        if self.thread is not None and not self.kill and not canceled:
             self.abort_search(self.m_replace_button.GetLabel() in (self.SEARCH_BTN_STOP, self.SEARCH_BTN_ABORT))
 
         event.Skip()
