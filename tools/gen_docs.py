@@ -19,7 +19,7 @@ except ImportError:
 
 __version__ = '2.0.0'
 
-FLAGS = glob.G | glob.N | glob.B
+FLAGS = glob.G | glob.N | glob.B | glob.S
 
 FILES_PATTERNS = [
     'mkdocs-internal.yml',
@@ -93,7 +93,7 @@ def hash_files(verbose, debug):
     found = []
     h = hashlib.new('md5')
     for pattern in FILES_PATTERNS:
-        for f in glob.iglob(glob.globsplit(pattern, flags=FLAGS), flags=FLAGS):
+        for f in glob.iglob(pattern, flags=FLAGS):
             name = f.replace('\\', '/')
             found.append(name)
     if verbose:
