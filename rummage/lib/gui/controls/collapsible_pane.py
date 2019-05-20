@@ -24,6 +24,12 @@ class CollapsiblePane(pycollapse.PyCollapsiblePane):
         self.SetButton(btn)
         btn.Bind(wx.EVT_CHAR_HOOK, self.on_tab)
 
+    def SetBackgroundColour(self, color):
+        """Set background color."""
+
+        super().SetBackgroundColour(color)
+        self._pButton.SetBackgroundColour(color)
+
     def AcceptsFocus(self):
         """
         Check if we should accept focus.
@@ -79,7 +85,6 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
             style=wx.BORDER_NONE | wx.BU_EXACTFIT | wx.TAB_TRAVERSAL
         )
         self.SetBackgroundColour(parent.GetBackgroundColour())
-        self.InitColours()
         self.SetBitmapLabel(data.get_bitmap('arrow_down.png', tint=self.tint))
         self.SetBitmapSelected(data.get_bitmap('arrow_right.png', tint=self.tint))
         self.SetUseFocusIndicator(True)

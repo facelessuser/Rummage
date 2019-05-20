@@ -413,10 +413,17 @@ class RummageFrame(gui.RummageFrame):
         self.m_result_list.set_wait_lock(_LOCK)
         self.m_result_file_list.load_list(True)
         self.m_result_list.load_list(True)
-        # Windows will make every panel look white if we don't manually color the background
-        # with the same color as the other panels.
-        if util.platform() == "windows":
-            self.m_grep_notebook.SetBackgroundColour(self.m_main_panel.GetBackgroundColour())
+        for x in range(self.m_grep_notebook.GetPageCount()):
+            page = self.m_grep_notebook.GetPage(x)
+            bg = page.GetBackgroundColour()
+            if util.platform() == "osx":
+                factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
+                bg = bg.ChangeLightness(factor)
+            page.SetBackgroundColour(bg)
+            if x == 0:
+                self.m_grep_notebook.SetBackgroundColour(wx.Colour(bg))
+                self.m_options_collapse.SetBackgroundColour(wx.Colour(bg))
+                self.m_limit_collapse.SetBackgroundColour(wx.Colour(bg))
         self.m_grep_notebook.SetSelection(0)
 
         self.refresh_localization()
