@@ -61,7 +61,7 @@
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
                 <object class="sizeritem" expanded="0">
-                    <property name="border">5</property>
+                    <property name="border">0</property>
                     <property name="flag">wxEXPAND | wxALL</property>
                     <property name="proportion">1</property>
                     <object class="wxPanel" expanded="0">
@@ -804,7 +804,7 @@
                                                         </object>
                                                         <object class="sizeritem" expanded="0">
                                                             <property name="border">5</property>
-                                                            <property name="flag">wxEXPAND | wxALL</property>
+                                                            <property name="flag">wxEXPAND|wxLEFT|wxRIGHT</property>
                                                             <property name="proportion">0</property>
                                                             <object class="wxCollapsiblePane" expanded="0">
                                                                 <property name="BottomDockable">1</property>
@@ -871,7 +871,7 @@
                                                                     <property name="orient">wxVERTICAL</property>
                                                                     <property name="permission">none</property>
                                                                     <object class="sizeritem" expanded="0">
-                                                                        <property name="border">5</property>
+                                                                        <property name="border">0</property>
                                                                         <property name="flag">wxEXPAND | wxALL</property>
                                                                         <property name="proportion">1</property>
                                                                         <object class="wxPanel" expanded="0">
@@ -2703,7 +2703,7 @@
                                                         </object>
                                                         <object class="sizeritem" expanded="0">
                                                             <property name="border">5</property>
-                                                            <property name="flag">wxEXPAND | wxALL</property>
+                                                            <property name="flag">wxEXPAND|wxLEFT|wxRIGHT</property>
                                                             <property name="proportion">0</property>
                                                             <object class="wxCollapsiblePane" expanded="0">
                                                                 <property name="BottomDockable">1</property>
@@ -2770,7 +2770,7 @@
                                                                     <property name="orient">wxVERTICAL</property>
                                                                     <property name="permission">none</property>
                                                                     <object class="sizeritem" expanded="0">
-                                                                        <property name="border">5</property>
+                                                                        <property name="border">0</property>
                                                                         <property name="flag">wxEXPAND | wxALL</property>
                                                                         <property name="proportion">1</property>
                                                                         <object class="wxPanel" expanded="0">

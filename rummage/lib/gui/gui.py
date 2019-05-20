@@ -193,13 +193,13 @@ class RummageFrame ( wx.Frame ):
         self.m_options_panel.SetSizer( fgSizer9 )
         self.m_options_panel.Layout()
         fgSizer9.Fit( self.m_options_panel )
-        bSizer23.Add( self.m_options_panel, 1, wx.EXPAND |wx.ALL, 5 )
+        bSizer23.Add( self.m_options_panel, 1, wx.EXPAND |wx.ALL, 0 )
 
 
         self.m_options_collapse.GetPane().SetSizer( bSizer23 )
         self.m_options_collapse.GetPane().Layout()
         bSizer23.Fit( self.m_options_collapse.GetPane() )
-        fgSizer2.Add( self.m_options_collapse, 0, wx.EXPAND |wx.ALL, 5 )
+        fgSizer2.Add( self.m_options_collapse, 0, wx.EXPAND|wx.LEFT|wx.RIGHT, 5 )
 
         self.m_staticline3 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer2.Add( self.m_staticline3, 0, wx.EXPAND |wx.ALL, 5 )
@@ -366,13 +366,13 @@ class RummageFrame ( wx.Frame ):
         self.m_limit_panel.SetSizer( gbSizer3 )
         self.m_limit_panel.Layout()
         gbSizer3.Fit( self.m_limit_panel )
-        bSizer26.Add( self.m_limit_panel, 1, wx.EXPAND |wx.ALL, 5 )
+        bSizer26.Add( self.m_limit_panel, 1, wx.EXPAND |wx.ALL, 0 )
 
 
         self.m_limit_collapse.GetPane().SetSizer( bSizer26 )
         self.m_limit_collapse.GetPane().Layout()
         bSizer26.Fit( self.m_limit_collapse.GetPane() )
-        fgSizer2.Add( self.m_limit_collapse, 0, wx.EXPAND |wx.ALL, 5 )
+        fgSizer2.Add( self.m_limit_collapse, 0, wx.EXPAND|wx.LEFT|wx.RIGHT, 5 )
 
         self.m_staticline12 = wx.StaticLine( self.m_settings_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer2.Add( self.m_staticline12, 0, wx.EXPAND |wx.ALL, 5 )
@@ -431,7 +431,7 @@ class RummageFrame ( wx.Frame ):
         self.m_main_panel.SetSizer( fgSizer13 )
         self.m_main_panel.Layout()
         fgSizer13.Fit( self.m_main_panel )
-        bFrameSizer.Add( self.m_main_panel, 1, wx.EXPAND |wx.ALL, 5 )
+        bFrameSizer.Add( self.m_main_panel, 1, wx.EXPAND |wx.ALL, 0 )
 
 
         self.SetSizer( bFrameSizer )
