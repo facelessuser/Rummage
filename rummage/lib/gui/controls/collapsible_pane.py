@@ -85,18 +85,26 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
             style=wx.BORDER_NONE | wx.BU_EXACTFIT | wx.TAB_TRAVERSAL
         )
         self.SetBackgroundColour(parent.GetBackgroundColour())
-        self.SetBitmapLabel(data.get_bitmap('arrow_down.png', tint=self.tint))
-        self.SetBitmapSelected(data.get_bitmap('arrow_right.png', tint=self.tint))
+        self.init_collapse_arrow()
         self.SetUseFocusIndicator(True)
+
+    def init_collapse_arrow(self):
+        """Initialize collapse arrow."""
+
+        color = data.RGBA(self.GetForegroundColour().Get())
+        self.SetBitmapLabel(data.get_bitmap('arrow_down.png', tint=color, alpha=0.5))
+        self.SetBitmapSelected(data.get_bitmap('arrow_right.png', tint=color, alpha=0.5))
+
+    def SetForegroundColour(self, color):
+        """Set foreground color."""
+
+        super().SetForegroundColour()
+        self.init_collapse_arrow()
 
     def InitColours(self):
         """Calculate a new set of highlight and shadow colours."""
 
         face = self.GetBackgroundColour()
-        rgba = data.RGBA(face.Get())
-        self.tint = (
-            data.RGBA(0x333333FF) if rgba.get_luminance() > 127 else data.RGBA(0xbbbbbbFF)
-        )
         self.faceDnClr = face
         self.shadowPenClr = face
         self.highlightPenClr = face

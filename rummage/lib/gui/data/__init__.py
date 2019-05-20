@@ -5,7 +5,7 @@ import base64
 from wx.lib.embeddedimage import PyEmbeddedImage
 from ... import util
 from ...util.rgba import RGBA  # noqa: F401
-from ...util.imagetint import tint_png
+from ...util import images
 
 RESOURCE_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -28,7 +28,7 @@ def get_file(file_name, raw=False):
     return text
 
 
-def get_image(file_name, b64=False, tint=None):
+def get_image(file_name, b64=False, tint=None, alpha=None):
     """Get the image as a `PyEmbeddedImage`."""
     icon = b''
     resource = os.path.join(RESOURCE_PATH, file_name)
@@ -36,7 +36,9 @@ def get_image(file_name, b64=False, tint=None):
         try:
             with open(resource, "rb") as f:
                 if tint:
-                    icon = base64.b64encode(tint_png(f.read(), tint))
+                    icon = base64.b64encode(images.tint(f.read(), tint, alpha))
+                elif alpha is not None:
+                    icon = base64.b64encode(images.transparency(f.read(), alpha))
                 else:
                     icon = base64.b64encode(f.read())
         except Exception:
@@ -44,7 +46,7 @@ def get_image(file_name, b64=False, tint=None):
     return PyEmbeddedImage(icon) if not b64 else util.to_ustr(icon)
 
 
-def get_bitmap(file_name, tint=None):
+def get_bitmap(file_name, tint=None, alpha=None):
     """
     Get bitmap.
 
@@ -59,7 +61,7 @@ def get_bitmap(file_name, tint=None):
     and load a separate 2X size for macOS retina.  But this is an okay work around for now.
     """
 
-    image = get_image(file_name, tint=tint).GetImage()
+    image = get_image(file_name, tint=tint, alpha=alpha).GetImage()
     if util.platform() == "osx":
         bm = image.ConvertToBitmap()
         bm.SetSize(

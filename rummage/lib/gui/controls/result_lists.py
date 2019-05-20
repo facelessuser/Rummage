@@ -112,10 +112,11 @@ class CommonOperationsMixin:
         """Create the image list."""
 
         self.images = wx.ImageList(16, 16)
+        self.tint = data.RGBA(self.GetForegroundColour().Get())
         self.doc = self.images.Add(data.get_bitmap('doc.png'))
         self.bin = self.images.Add(data.get_bitmap('binary.png'))
-        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=data.RGBA(0x333333FF)))
-        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=data.RGBA(0x333333FF)))
+        self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=self.tint, alpha=0.3))
+        self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=self.tint, alpha=0.3))
         self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)
 
     def on_col_hide_click(self, event, col=-1):
