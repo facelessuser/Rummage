@@ -81,15 +81,13 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         for x in range(self.m_settings_notebook.GetPageCount()):
             page = self.m_settings_notebook.GetPage(x)
-            color = page.GetBackgroundColour()
-            if data.RGBA(util.to_rgb(color.GetRGB())).get_luminance() > 127:
-                factor = 94
-            else:
-                factor = 106
-            new_color = color.ChangeLightness(factor)
-            page.SetBackgroundColour(new_color)
+            bg = page.GetBackgroundColour()
+            if util.platform() == "osx":
+                factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
+                bg = bg.ChangeLightness(factor)
+            page.SetBackgroundColour(bg)
             if x == 0:
-                self.m_settings_notebook.SetBackgroundColour(wx.Colour(new_color.GetRGBA()))
+                self.m_settings_notebook.SetBackgroundColour(wx.Colour(bg))
 
         self.localize()
 
