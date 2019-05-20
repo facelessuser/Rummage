@@ -180,7 +180,7 @@ def to_abgr(color):
     `BGR`, so being able to simply convert `RGB` is preferable.
     """
 
-    return ((color & 0xFF000000) >> 24) | ((color & 0xFF0000) >> 8) | ((color & 0xFF00) >> 8 ) | ((color & 0xFF) << 24)
+    return ((color & 0xFF000000) >> 24) | ((color & 0xFF0000) >> 8) | ((color & 0xFF00) >> 8) | ((color & 0xFF) << 24)
 
 
 def to_rgba(color):
