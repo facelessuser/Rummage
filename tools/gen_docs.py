@@ -24,7 +24,7 @@ FLAGS = glob.G | glob.N | glob.B | glob.S
 FILES_PATTERNS = [
     'mkdocs-internal.yml',
     'docs/src/markdown/**/*.{md,txt,png,gif,html}',
-    'docs/internal_theme/*.{html,css,js}'
+    'docs/internal_theme/**/*.{html,css,js}'
 ]
 
 MKDOCS_CFG = "mkdocs-internal.yml"
