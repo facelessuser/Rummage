@@ -1,7 +1,7 @@
 body {
   margin: auto;
   background-color: #ffffff;
-  padding: 14px;
+  padding: 1rem;
 }
 
 @font-face {
@@ -16,7 +16,7 @@ body {
   color: #333333;
   overflow: hidden;
   font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.6;
   word-wrap: break-word;
   padding-bottom: 2rem;
@@ -81,7 +81,7 @@ body {
 .markdown pre,
 .markdown samp {
   font-family: monospace, monospace;
-  font-size: 1em;
+  font-size: 85%;
 }
 
 .markdown input {
@@ -149,12 +149,12 @@ body {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
-  -webkit-border-top-left-radius: 3px;
-  -webkit-border-bottom-left-radius: 3px;
-  -moz-border-radius-topleft: 3px;
-  -moz-border-radius-bottomleft: 3px;
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
+  -webkit-border-top-left-radius: 0.25rem;
+  -webkit-border-bottom-left-radius: 0.25rem;
+  -moz-border-radius-topleft: 0.25rem;
+  -moz-border-radius-bottomleft: 0.25rem;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
 }
 
 .markdown .code div pre,
@@ -163,12 +163,12 @@ body {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
-  -webkit-border-top-right-radius: 3px;
-  -webkit-border-bottom-right-radius: 3px;
-  -moz-border-radius-topright: 3px;
-  -moz-border-radius-bottomright: 3px;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
+  -webkit-border-top-right-radius: 0.25rem;
+  -webkit-border-bottom-right-radius: 0.25rem;
+  -moz-border-radius-topright: 0.25rem;
+  -moz-border-radius-bottomright: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
 }
 
 .markdown * {
@@ -177,7 +177,7 @@ body {
 }
 
 .markdown input {
-  font: 13px Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  font: 0.8125rem Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
   line-height: 1.4;
 }
 
@@ -194,7 +194,7 @@ body {
 
 .markdown hr {
   height: 0;
-  margin: 15px 0;
+  margin: 0.9375rem 0;
   overflow: hidden;
   background: transparent;
   border: 0;
@@ -217,47 +217,47 @@ body {
 .markdown h4,
 .markdown h5,
 .markdown h6 {
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-top: 0.9375rem;
+  margin-bottom: 0.9375rem;
   line-height: 1.1;
 }
 
 .markdown h1 {
-  padding-bottom: 0.3em;
-  font-size: 2.25em;
+  padding-bottom: 0.3rem;
+  font-size: 2.25rem;
   line-height: 1.2;
   border-bottom: 1px solid #eee;
 }
 
 .markdown h2 {
-  padding-bottom: 0.3em;
-  font-size: 1.75em;
+  padding-bottom: 0.3rem;
+  font-size: 1.75rem;
   line-height: 1.225;
   border-bottom: 1px solid #eee;
 }
 
 .markdown h3 {
-  font-size: 1.5em;
+  font-size: 1.5rem;
   line-height: 1.43;
 }
 
 .markdown h4 {
-  font-size: 1.25em;
+  font-size: 1.25rem;
 }
 
 .markdown h5 {
-  font-size: 1em;
+  font-size: 1rem;
 }
 
 .markdown h6 {
-  font-size: 1em;
+  font-size: 1rem;
   color: #777;
 }
 
 .markdown .headerlink {
-  font: normal 400 16px fontawesome-mini;
+  font: normal 400 1rem fontawesome-mini;
   vertical-align: middle;
-  margin-left: -16px;
+  margin-left: -1rem;
   float: left;
   display: inline-block;
   text-decoration: none;
@@ -342,12 +342,12 @@ body {
   background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
   background-image: linear-gradient(#fefefe, #e7e7e7);
   background-repeat: repeat-x;
-  border-radius: 2px;
+  border-radius: 0.2rem;
   border: 1px solid #cfcfcf;
   color: #000;
-  padding: 3px 5px;
-  line-height: 10px;
-  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  padding: 0.25rem 0.3125rem;
+  line-height: 0.625rem;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   display: inline-block;
 }
 
@@ -368,13 +368,13 @@ body {
 .markdown pre,
 .markdown .admonition {
   margin-top: 0;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .markdown hr {
-  height: 4px;
+  height: 0.25rem;
   padding: 0;
-  margin: 16px 0;
+  margin: 1rem 0;
   background-color: #e7e7e7;
   border: 0 none;
 }
@@ -393,7 +393,7 @@ body {
 }
 
 .markdown li>p {
-  margin-top: 16px;
+  margin-top: 1rem;
 }
 
 .markdown dl {
@@ -402,21 +402,21 @@ body {
 
 .markdown dl dt {
   padding: 0;
-  margin-top: 16px;
+  margin-top: 1rem;
   font-size: 1em;
   font-style: italic;
   font-weight: bold;
 }
 
 .markdown dl dd {
-  padding: 0 16px;
-  margin-bottom: 16px;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
 }
 
 .markdown blockquote {
-  padding: 0 15px;
+  padding: 0 0.9375rem;
   color: #777;
-  border-left: 4px solid #ddd;
+  border-left: 0.25rem solid #ddd;
 }
 
 .markdown blockquote>:first-child {
@@ -440,7 +440,7 @@ body {
 
 .markdown table th,
 .markdown table td {
-  padding: 6px 13px;
+  padding: 0.375rem 0.8125rem;
   border: 1px solid #ddd;
 }
 
@@ -465,9 +465,8 @@ body {
   padding-top: 0.2em;
   padding-bottom: 0.2em;
   margin: 0;
-  font-size: 85%;
   background-color: rgba(27, 31, 35, 0.05);
-  border-radius: 3px;
+  border-radius: 0.25rem;
 }
 
 .markdown code:before,
@@ -487,17 +486,16 @@ body {
 }
 
 .markdown .highlight {
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .markdown .highlight pre,
 .markdown pre {
-  padding: 16px;
+  padding: 1rem;
   overflow: auto;
-  font-size: 85%;
   line-height: 1.45;
   background-color: rgba(27, 31, 35, 0.05);
-  border-radius: 3px;
+  border-radius: 0.25rem;
 }
 
 .markdown .highlight pre {
@@ -528,13 +526,13 @@ body {
 
 /* Admonition */
 .markdown .admonition {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
+  -webkit-border-radius: 0.25rem;
+  -moz-border-radius: 0.25rem;
   position: relative;
-  border-radius: 3px;
+  border-radius: 0.25rem;
   border: 1px solid #e0e0e0;
-  border-left: 6px solid #333;
-  padding: 0 10px 10px 10px;
+  border-left: 0.375rem solid #333;
+  padding: 0 0.625rem 0.625rem 0.625rem;
 }
 
 .markdown .admonition p {
@@ -543,11 +541,11 @@ body {
 
 .markdown .admonition-title {
   font-weight: 700;
-  margin-left: -10px;
-  margin-right: -10px;
-  -webkit-border-radius: 0 3px 0 0;
-  -moz-border-radius: 0 3px 0 0;
-  border-radius: 0 3px 0 0;
+  margin-left: -0.625rem;
+  margin-right: -0.625rem;
+  -webkit-border-radius: 0 0.25rem 0 0;
+  -moz-border-radius: 0 0.25rem 0 0;
+  border-radius: 0 0.25rem 0 0;
   padding: 0.5em !important;
 }
 
@@ -621,7 +619,7 @@ body {
 }
 
 .markdown .admonition>.admonition-title:before {
-  font: normal normal 16px fontawesome-mini;
+  font: normal normal 1rem fontawesome-mini;
   -moz-osx-font-smoothing: grayscale;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -715,72 +713,72 @@ body {
 }
 
 .markdown .admonition {
-  border-left: 6px solid rgb(68, 138, 255);
+  border-left: 0.625rem solid rgb(68, 138, 255);
 }
 
 .markdown .note,
 .markdown .seealso {
-  border-left: 6px solid rgb(68, 138, 255);
+  border-left: 0.625rem solid rgb(68, 138, 255);
 }
 
 .markdown .abstract,
 .markdown .summary,
 .markdown .tldr {
-  border-left: 6px solid rgb(0, 176, 255);
+  border-left: 0.625rem solid rgb(0, 176, 255);
 }
 
 .markdown .info,
 .markdown .todo {
-  border-left: 6px solid rgb(0, 184, 212);
+  border-left: 0.625rem solid rgb(0, 184, 212);
 }
 
 .markdown .tip,
 .markdown .hint,
 .markdown .important {
-  border-left: 6px solid rgb(0, 191, 165);
+  border-left: 0.625rem solid rgb(0, 191, 165);
 }
 
 .markdown .success,
 .markdown .check,
 .markdown .done {
-  border-left: 6px solid rgb(0, 200, 83);
+  border-left: 0.625rem solid rgb(0, 200, 83);
 }
 
 .markdown .question,
 .markdown .help,
 .markdown .faq {
-  border-left: 6px solid rgb(100, 221, 23);
+  border-left: 0.625rem solid rgb(100, 221, 23);
 }
 
 .markdown .caution,
 .markdown .warning,
 .markdown .attention {
-  border-left: 6px solid rgb(255, 145, 0);
+  border-left: 0.625rem solid rgb(255, 145, 0);
 }
 
 .markdown .failure,
 .markdown .fail,
 .markdown .missing {
-  border-left: 6px solid rgb(255, 82, 82);
+  border-left: 0.625rem solid rgb(255, 82, 82);
 }
 
 .markdown .danger,
 .markdown .error {
-  border-left: 6px solid rgb(255, 23, 68);
+  border-left: 0.625rem solid rgb(255, 23, 68);
 }
 
 .markdown .bug {
-  border-left: 6px solid rgb(245, 0, 87);
+  border-left: 0.625rem solid rgb(245, 0, 87);
 }
 
 .markdown .example,
 .markdown .snippet {
-  border-left: 6px solid rgb(101, 31, 255);
+  border-left: 0.625rem solid rgb(101, 31, 255);
 }
 
 .markdown .quote,
 .markdown .cite {
-  border-left: 6px solid rgb(158, 158, 158);
+  border-left: 0.625rem solid rgb(158, 158, 158);
 }
 
 .markdown .admonition>*:first-child {
@@ -791,126 +789,126 @@ body {
   margin-bottom: 0 !important;
 }
 
-/* progress bar*/
-.markdown .progress {
-  display: block;
-  width: 300px;
-  margin: 10px 0;
-  height: 24px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  background-color: #ededed;
-  position: relative;
-  box-shadow: inset -1px 1px 3px rgba(0, 0, 0, .1);
-}
-
+/* Progress bar */
 .markdown .progress-label {
   position: absolute;
+  width: 100%;
+  margin: 0;
+  color: rgba(0, 0, 0, 0.5);
+  font-weight: 700;
+  line-height: 1.4rem;
   text-align: center;
-  font-weight: bold;
-  width: 100%; margin: 0;
-  line-height: 24px;
-  color: #333;
-  text-shadow: 1px 1px 0 #fefefe, -1px -1px 0 #fefefe, -1px 1px 0 #fefefe, 1px -1px 0 #fefefe, 0 1px 0 #fefefe, 0 -1px 0 #fefefe, 1px 0 0 #fefefe, -1px 0 0 #fefefe, 1px 1px 2px #000;
-  -webkit-font-smoothing: antialiased !important;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 .markdown .progress-bar {
-  height: 24px;
+  height: 1.2rem;
   float: left;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  background-color: #96c6d7;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -1px 0 rgba(0, 0, 0, .1);
-  background-size: 30px 30px;
-  background-image: -webkit-linear-gradient(
-    135deg, rgba(255, 255, 255, .4) 27%,
-    transparent 27%,
-    transparent 52%, rgba(255, 255, 255, .4) 52%,
-    rgba(255, 255, 255, .4) 77%,
-    transparent 77%, transparent
-  );
-  background-image: -moz-linear-gradient(
-    135deg,
-    rgba(255, 255, 255, .4) 27%, transparent 27%,
-    transparent 52%, rgba(255, 255, 255, .4) 52%,
-    rgba(255, 255, 255, .4) 77%, transparent 77%,
-    transparent
-  );
-  background-image: -ms-linear-gradient(
-    135deg,
-    rgba(255, 255, 255, .4) 27%, transparent 27%,
-    transparent 52%, rgba(255, 255, 255, .4) 52%,
-    rgba(255, 255, 255, .4) 77%, transparent 77%,
-    transparent
-  );
-  background-image: -o-linear-gradient(
-    135deg,
-    rgba(255, 255, 255, .4) 27%, transparent 27%,
-    transparent 52%, rgba(255, 255, 255, .4) 52%,
-    rgba(255, 255, 255, .4) 77%, transparent 77%,
-    transparent
-  );
+  background-color: #2979ff;
+}
+
+.markdown .candystripe-animate .progress-bar {
+  -webkit-animation: animate-stripes 3s linear infinite;
+          animation: animate-stripes 3s linear infinite;
+}
+
+.markdown .progress {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 1.2rem;
+  margin: 0.5rem 0;
+  background-color: #eeeeee;
+}
+
+.markdown .progress.thin {
+  height: 0.4rem;
+  margin-top: 0.9rem;
+}
+
+.markdown .progress.thin .progress-label {
+  margin-top: -0.4rem;
+}
+
+.markdown .progress.thin .progress-bar {
+  height: 0.4rem;
+}
+
+.markdown .progress.candystripe .progress-bar {
   background-image: linear-gradient(
     135deg,
-    rgba(255, 255, 255, .4) 27%, transparent 27%,
-    transparent 52%, rgba(255, 255, 255, .4) 52%,
-    rgba(255, 255, 255, .4) 77%, transparent 77%,
-    transparent
-  );
+    rgba(255, 255, 255, 0.8) 27%, transparent 27%, transparent 52%,
+    rgba(255, 255, 255, 0.8) 52%,
+    rgba(255, 255, 255, 0.8) 77%, transparent 77%, transparent);
+  background-size: 2rem 2rem;
 }
 
 .markdown .progress-100plus .progress-bar {
-  background-color: #a6d796;
+  background-color: #00e676;
 }
 
 .markdown .progress-80plus .progress-bar {
-  background-color: #c6d796;
+  background-color: #00e676;
 }
 
 .markdown .progress-60plus .progress-bar {
-  background-color: #d7c896;
+  background-color: #fbc02d;
 }
 
 .markdown .progress-40plus .progress-bar {
-  background-color: #d7a796;
+  background-color: #ff9100;
 }
 
 .markdown .progress-20plus .progress-bar {
-  background-color: #d796a6;
+  background-color: #ff5252;
 }
 
 .markdown .progress-0plus .progress-bar {
-  background-color: #c25f77;
+  background-color: #ff1744;
 }
 
-.markdown .candystripe-animate .progress-bar{
-  -webkit-animation: animate-stripes 3s linear infinite;
-  -moz-animation: animate-stripes 3s linear infinite;
-  animation: animate-stripes 3s linear infinite;
+.markdown .progress.note .progress-bar {
+  background-color: #2979ff;
+}
+
+.markdown .progress.summary .progress-bar {
+  background-color: #00b0ff;
+}
+
+.markdown .progress.tip .progress-bar {
+  background-color: #00bfa5;
+}
+
+.markdown .progress.success .progress-bar {
+  background-color: #00e676;
+}
+
+.markdown .progress.warning .progress-bar {
+  background-color: #ff9100;
+}
+
+.markdown .progress.failure .progress-bar {
+  background-color: #ff5252;
+}
+
+.markdown .progress.danger .progress-bar {
+  background-color: #ff1744;
+}
+
+.markdown .progress.bug .progress-bar {
+  background-color: #f50057;
+}
+
+.markdown .progress.quote .progress-bar {
+  background-color: #9e9e9e;
 }
 
 @-webkit-keyframes animate-stripes {
   0% {
     background-position: 0 0;
   }
-
   100% {
-    background-position: 60px 0;
-  }
-}
-
-@-moz-keyframes animate-stripes {
-  0% {
-    background-position: 0 0;
-  }
-
-  100% {
-    background-position: 60px 0;
+    background-position: 6rem 0;
   }
 }
 
@@ -918,16 +916,9 @@ body {
   0% {
     background-position: 0 0;
   }
-
   100% {
-    background-position: 60px 0;
+    background-position: 6rem 0;
   }
-}
-
-.markdown .gloss .progress-bar {
-  box-shadow:
-    inset 0 4px 12px rgba(255, 255, 255, .7),
-    inset 0 -12px 0 rgba(0, 0, 0, .05);
 }
 
 /* MultiMarkdown Critic Blocks */
@@ -955,11 +946,11 @@ body {
 }
 
 .markdown .task-list-item+.task-list-item {
-  margin-top: 3px;
+  margin-top: 0.1875rem;
 }
 
 .markdown .task-list-item input {
-  margin: 0 4px 0.25em -20px;
+  margin: 0 0.25rem 0.25em -1.25rem;
   vertical-align: middle;
 }
 
@@ -1056,12 +1047,12 @@ body {
 
 .nav .prev-page {
   text-align: left;
-  padding-left: 45px;
+  padding-left: 2.5rem;
 }
 
 .nav .next-page {
   text-align: right;
-  padding-right: 45px;
+  padding-right: 2.5rem;
 }
 
 .nav a:active,
@@ -1085,8 +1076,8 @@ body {
 
 .__toc_wrapper {
   position: fixed;
-  left: 3px;
-  top: 3px;
+  left: 0.25rem;
+  top: 0.25rem;
   z-index:  99;
   background: transparent
 }
@@ -1095,10 +1086,10 @@ body {
   display: none;
   background-color: #f5f5f5;
   padding: 0.5rem;
-  border-radius: 3px;
+  border-radius: 0.25rem;
   border: 1px solid #e0e0e0;
-  max-height: 400px;
-  max-width: 400px;
+  max-height: 25rem;
+  max-width: 25rem;
   overflow: auto;
 }
 
@@ -1107,7 +1098,7 @@ body {
 }
 
 span.__toc_icon:before {
-  font: normal normal 16px fontawesome-mini;
+  font: normal normal 1rem fontawesome-mini;
   -moz-osx-font-smoothing: grayscale;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -1119,5 +1110,5 @@ span.__toc_icon:before {
   padding: 0.24em;
   background-color: #333333;
   color: #FFFFFF;
-  border-radius: 3px;
+  border-radius: 0.25rem;
 }
