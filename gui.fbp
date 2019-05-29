@@ -3528,7 +3528,7 @@
                                                                                         <property name="center_pane">0</property>
                                                                                         <property name="class">wxTextCtrl</property>
                                                                                         <property name="close_button">1</property>
-                                                                                        <property name="construction">self.m_modified_time_picker = TimeCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, oob_color=&quot;white&quot;, fmt24hr=True)</property>
+                                                                                        <property name="construction">self.m_modified_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True)</property>
                                                                                         <property name="context_help"></property>
                                                                                         <property name="context_menu">1</property>
                                                                                         <property name="declaration"></property>
@@ -3543,7 +3543,7 @@
                                                                                         <property name="gripper">0</property>
                                                                                         <property name="hidden">0</property>
                                                                                         <property name="id">wxID_ANY</property>
-                                                                                        <property name="include">from wx.lib.masked import TimeCtrl</property>
+                                                                                        <property name="include">from .controls.time_picker import TimePickerCtrl</property>
                                                                                         <property name="max_size"></property>
                                                                                         <property name="maximize_button">0</property>
                                                                                         <property name="maximum_size"></property>
@@ -3574,7 +3574,7 @@
                                                                                     <property name="border">5</property>
                                                                                     <property name="colspan">1</property>
                                                                                     <property name="column">4</property>
-                                                                                    <property name="flag">wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL</property>
+                                                                                    <property name="flag">wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL|wxEXPAND</property>
                                                                                     <property name="row">1</property>
                                                                                     <property name="rowspan">1</property>
                                                                                     <object class="wxSpinButton" expanded="0">
@@ -4047,7 +4047,7 @@
                                                                                         <property name="center_pane">0</property>
                                                                                         <property name="class">wxTextCtrl</property>
                                                                                         <property name="close_button">1</property>
-                                                                                        <property name="construction">self.m_created_time_picker = TimeCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, oob_color=&quot;white&quot;, fmt24hr=True)</property>
+                                                                                        <property name="construction">self.m_created_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True)</property>
                                                                                         <property name="context_help"></property>
                                                                                         <property name="context_menu">1</property>
                                                                                         <property name="declaration"></property>
@@ -4093,7 +4093,7 @@
                                                                                     <property name="border">5</property>
                                                                                     <property name="colspan">1</property>
                                                                                     <property name="column">4</property>
-                                                                                    <property name="flag">wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL</property>
+                                                                                    <property name="flag">wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_VERTICAL|wxEXPAND</property>
                                                                                     <property name="row">2</property>
                                                                                     <property name="rowspan">1</property>
                                                                                     <object class="wxSpinButton" expanded="0">

@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.6.1
+
+- **FIX**: Fix issues with time control not properly inheriting system colors.
+- **FIX**: Fix time control sizing on Linux.
+
 ## 4.6.0
 
 - **NEW**: Search options and file limit options can be collapsed in the main dialog. This allows  hiding these options if you aren't frequently using them, and provides a more compact dialog.
