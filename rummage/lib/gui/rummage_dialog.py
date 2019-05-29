@@ -1847,6 +1847,19 @@ class RummageFrame(gui.RummageFrame):
     def finalize_size(self):
         """Finalize size."""
 
+        if util.platform() == 'linux':
+            # Workaround for some GTK themes where the control is too narrow.
+            self.m_modified_time_picker.SetMinSize(
+                self.m_modified_time_picker.GetSizeFromTextSize(
+                    self.m_modified_time_picker.GetTextExtent('0' * 8)
+                )
+            )
+            self.m_created_time_picker.SetMinSize(
+                self.m_created_time_picker.GetSizeFromTextSize(
+                    self.m_created_time_picker.GetTextExtent('0' * 8)
+                )
+            )
+
         self.Fit()
         self.m_settings_panel.Fit()
         self.m_settings_panel.GetSizer().Layout()

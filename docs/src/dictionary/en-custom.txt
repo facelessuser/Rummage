@@ -86,6 +86,8 @@ checkbox
 checkboxes
 checksum
 chunking
+decrement
+decrementing
 deselect
 dev
 dialog's
