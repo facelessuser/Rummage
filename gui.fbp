@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <wxFormBuilder_Project>
     <FileVersion major="1" minor="15" />
-    <object class="Project" expanded="1">
+    <object class="Project" expanded="0">
         <property name="class_decoration"></property>
         <property name="code_generation">Python</property>
         <property name="disconnect_events">1</property>
@@ -3528,7 +3528,7 @@
                                                                                         <property name="center_pane">0</property>
                                                                                         <property name="class">wxTextCtrl</property>
                                                                                         <property name="close_button">1</property>
-                                                                                        <property name="construction">self.m_modified_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True)</property>
+                                                                                        <property name="construction">self.m_modified_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True, useFixedWidthFont=False)</property>
                                                                                         <property name="context_help"></property>
                                                                                         <property name="context_menu">1</property>
                                                                                         <property name="declaration"></property>
@@ -4047,7 +4047,7 @@
                                                                                         <property name="center_pane">0</property>
                                                                                         <property name="class">wxTextCtrl</property>
                                                                                         <property name="close_button">1</property>
-                                                                                        <property name="construction">self.m_created_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True)</property>
+                                                                                        <property name="construction">self.m_created_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True, useFixedWidthFont=False)</property>
                                                                                         <property name="context_help"></property>
                                                                                         <property name="context_menu">1</property>
                                                                                         <property name="declaration"></property>
