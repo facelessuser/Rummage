@@ -292,7 +292,7 @@ class RummageFrame ( wx.Frame ):
         self.m_modified_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True)
         gbSizer3.Add( self.m_modified_time_picker, wx.GBPosition( 1, 3 ), wx.GBSpan( 1, 1 ), wx.BOTTOM|wx.LEFT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
 
-        self.m_modified_spin = wx.SpinButton( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_modified_spin = wx.SpinButton( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_WRAP )
         gbSizer3.Add( self.m_modified_spin, wx.GBPosition( 1, 4 ), wx.GBSpan( 1, 1 ), wx.TOP|wx.BOTTOM|wx.RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 
         self.m_filematch_label = wx.StaticText( self.m_limit_panel, wx.ID_ANY, u"Files which match", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -322,7 +322,7 @@ class RummageFrame ( wx.Frame ):
         self.m_created_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True)
         gbSizer3.Add( self.m_created_time_picker, wx.GBPosition( 2, 3 ), wx.GBSpan( 1, 1 ), wx.BOTTOM|wx.LEFT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
 
-        self.m_created_spin = wx.SpinButton( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_created_spin = wx.SpinButton( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_WRAP )
         gbSizer3.Add( self.m_created_spin, wx.GBPosition( 2, 4 ), wx.GBSpan( 1, 1 ), wx.TOP|wx.BOTTOM|wx.RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 
         self.m_staticline41 = wx.StaticLine( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )

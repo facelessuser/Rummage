@@ -4,6 +4,7 @@
 
 - **FIX**: Fix issues with time control not properly inheriting system colors.
 - **FIX**: Fix time control sizing on Linux.
+- **FIX**: Fix time control issue on Linux and macOS that prevents decrement button from decrementing past initial value.
 
 ## 4.6.0
 
