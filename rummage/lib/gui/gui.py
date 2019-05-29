@@ -289,7 +289,7 @@ class RummageFrame ( wx.Frame ):
         self.m_modified_date_picker = DatePicker(self.m_limit_panel, wx.ID_ANY)
         gbSizer3.Add( self.m_modified_date_picker, wx.GBPosition( 1, 2 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
-        self.m_modified_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True)
+        self.m_modified_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True, useFixedWidthFont=False)
         gbSizer3.Add( self.m_modified_time_picker, wx.GBPosition( 1, 3 ), wx.GBSpan( 1, 1 ), wx.BOTTOM|wx.LEFT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
 
         self.m_modified_spin = wx.SpinButton( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_WRAP )
@@ -319,7 +319,7 @@ class RummageFrame ( wx.Frame ):
         self.m_created_date_picker = DatePicker(self.m_limit_panel, wx.ID_ANY)
         gbSizer3.Add( self.m_created_date_picker, wx.GBPosition( 2, 2 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
-        self.m_created_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True)
+        self.m_created_time_picker = TimePickerCtrl(self.m_limit_panel, wx.ID_ANY, style=wx.TE_PROCESS_TAB, fmt24hr=True, useFixedWidthFont=False)
         gbSizer3.Add( self.m_created_time_picker, wx.GBPosition( 2, 3 ), wx.GBSpan( 1, 1 ), wx.BOTTOM|wx.LEFT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
 
         self.m_created_spin = wx.SpinButton( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_WRAP )

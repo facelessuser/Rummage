@@ -21,8 +21,10 @@ class TimePickerCtrl(TimeCtrl):
         bg = rgba.RGBA(0xFF0000)
         bg.blend(rgba.RGBA(ctrl.GetBackgroundColour().Get()), 60)
         self._error_bg = wx.Colour(*bg.get_rgb()).GetRGB()
-        ctrl.Destroy()
         super().__init__(parent, *args, **kwargs)
+        font = ctrl.GetFont()
+        self.SetFont(wx.Font(font))
+        ctrl.Destroy()
 
     def SetParameters(self, **kwargs):
         """Force the colors we want."""

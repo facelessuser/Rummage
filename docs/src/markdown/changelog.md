@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.6.2
+
+- **FIX**: Fix issue where time control used a completely different font and font size.
+
 ## 4.6.1
 
 - **FIX**: Fix issues with time control not properly inheriting system colors.
