@@ -30,10 +30,13 @@ class Options:
 def alert(sound=None):
     """Play an alert sound for the OS."""
 
-    if exists('/usr/share/sounds/gnome/default/alerts/glass.ogg'):
-        subprocess.call(['/usr/bin/canberra-gtk-play', '-f', '/usr/share/sounds/gnome/default/alerts/glass.ogg'])
-    else:
-        subprocess.call(['/usr/bin/canberra-gtk-play', '--id', 'bell'])
+    try:
+        if exists('/usr/share/sounds/gnome/default/alerts/glass.ogg'):
+            subprocess.call(['/usr/bin/canberra-gtk-play', '-f', '/usr/share/sounds/gnome/default/alerts/glass.ogg'])
+        else:
+            subprocess.call(['/usr/bin/canberra-gtk-play', '--id', 'bell'])
+    except Exception:
+        pass
 
 
 @staticmethod

@@ -112,8 +112,11 @@ class Options:
 def alert(sound=None):
     """Play an alert sound for the OS."""
 
-    snd = sound if sound is not None else "*"
-    winsound.PlaySound(snd, winsound.SND_ALIAS)
+    try:
+        snd = sound if sound is not None else "*"
+        winsound.PlaySound(snd, winsound.SND_ALIAS)
+    except Exception:
+        pass
 
 
 class WinNotifyLevel:
