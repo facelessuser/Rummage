@@ -3,11 +3,11 @@
 ## 4.6.3
 
 - **FIX**: Notification audio failures should be handled gracefully.
+- **FIX**: Sometimes abort doesn't work.
 
 ## 4.6.2
 
 - **FIX**: Fix issue where time control used a completely different font and font size.
-- **FIX**: Regression when aborting and no files are matching.
 
 ## 4.6.1
 

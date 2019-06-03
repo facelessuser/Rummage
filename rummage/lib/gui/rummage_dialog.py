@@ -244,9 +244,6 @@ class RummageThread(threading.Thread):
             self.update_status()
             wx.WakeUpIdle()
 
-            if _ABORT:
-                self.rummage.kill()
-
     def update_benchmark(self):
         """Update benchmark."""
         self.benchmark = time() - self.start
@@ -1007,6 +1004,7 @@ class RummageFrame(gui.RummageFrame):
                 self.m_search_button.SetLabel(self.SEARCH_BTN_ABORT)
             _ABORT = True
             self.kill = True
+            self.thread.rummage.kill()
             aborted = True
         return aborted
 
