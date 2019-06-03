@@ -1471,6 +1471,8 @@ class Rummage:
         self.abort = True
         if self.searcher:
             self.searcher.kill()
+        if self.path_walker:
+            self.path_walker.kill()
 
     def _get_next_file(self):
         """Get the next file from the file crawler results."""

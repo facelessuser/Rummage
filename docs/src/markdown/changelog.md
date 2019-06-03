@@ -3,6 +3,7 @@
 ## 4.6.3
 
 - **FIX**: Notification audio failures should be handled gracefully.
+- **FIX**: Sometimes abort doesn't work.
 
 ## 4.6.2
 
