@@ -105,7 +105,11 @@ def send_notify(title, message, sound, level):
 def play_alert():
     """Play alert sound."""
 
-    alert()
+    try:
+        alert()
+    except Exception:
+        # Looks like something went wrong.
+        pass
 
 
 ###################################

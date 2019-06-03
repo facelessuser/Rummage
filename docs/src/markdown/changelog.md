@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.6.3
+
+- **FIX**: Notification audio failures should be handled gracefully.
+
 ## 4.6.2
 
 - **FIX**: Fix issue where time control used a completely different font and font size.
