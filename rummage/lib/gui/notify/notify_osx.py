@@ -88,15 +88,18 @@ class Options:
 def alert(sound=None):
     """Play an alert sound for the OS."""
 
-    subprocess.call(["afplay", "/System/Library/Sounds/Glass.aiff"])
-    # ```
-    # pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
-    # snd = _nsstring(sound if sound is not None else "Glass")
-    # soundobj = _callmethod(NSSound, "soundNamed:", snd)
-    # _callmethod(soundobj, "play")
-    # _callmethod(pool, "drain")
-    # del pool
-    # ```
+    try:
+        subprocess.call(["afplay", "/System/Library/Sounds/Glass.aiff"])
+        # ```
+        # pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
+        # snd = _nsstring(sound if sound is not None else "Glass")
+        # soundobj = _callmethod(NSSound, "soundNamed:", snd)
+        # _callmethod(soundobj, "play")
+        # _callmethod(pool, "drain")
+        # del pool
+        # ```
+    except Exception:
+        pass
 
 
 @staticmethod
