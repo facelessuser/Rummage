@@ -68,12 +68,14 @@ SIL
 Screenshots
 Sep
 TODO
+Thunar
 Tooltip
 Tox
 UI
 UTC
 Wildcard
 WxFormBuilder
+XFCE
 Xcode
 accessor
 autocomplete

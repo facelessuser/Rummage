@@ -130,6 +130,23 @@ At the time of writing, this was tested on KDE 5, so most of the commands are ap
 
 - Close all Dolphin windows and reopen to see your context menu item.  It should be found under `Actions`.
 
+#### Ubuntu Thunar (XFCE4)
+
+In Ubuntu 18.04, XFCE4 sues Thunar. Thunar has a built in way of setting custom context menu items. This may or may not apply to other distros.
+
+In Thunar, select `Edit > Configure Custom Actions...`. You will be presented with the custom actions dialog.
+
+![Thunar Custom Actions](./images/thunar-custom.png)
+
+Simply press the button with the `+` to create a new entry. Fill in the inputs as shown below (or modify to your preference):
+
+![Thunar Basic Options](./images/thunar-basic.png)
+
+Then select the `Appearance Conditions` tab and fill in the fields as shown below (or modify to your preference):
+
+![Thunar Condition Options](./images/thunar-conditions.png)
+
+Afterwards, you should have a Rummage context menu on both files and directories in Thunar.
 
 ## Localization
 
