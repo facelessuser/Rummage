@@ -20,9 +20,9 @@ IN THE SOFTWARE.
 """
 import wx
 import sys
-from .localization import _
-from . import gui
-from .messages import prompt_icon, DEFAULT_ICON_SIZE
+from ..localization import _
+from .. import gui
+from .msg_dialogs import prompt_icon, DEFAULT_ICON_SIZE
 
 
 class OverwriteDialog(gui.OverwriteDialog):

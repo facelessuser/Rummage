@@ -18,8 +18,8 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-from .localization import _
-from . import messages
+from ..localization import _
+from . import msg_dialogs
 
 
 def yesno(question, title=None, bitmap=None, yes=None, no=None, checkbox=None, checked=None):
@@ -34,7 +34,7 @@ def yesno(question, title=None, bitmap=None, yes=None, no=None, checkbox=None, c
     if checkbox is None:
         checkbox = _("Apply to all")
 
-    return messages.promptmsg(question, title, bitmap, yes, no, checkbox, checked)
+    return msg_dialogs.promptmsg(question, title, bitmap, yes, no, checkbox, checked)
 
 
 def yesno_cancel(
@@ -53,7 +53,7 @@ def yesno_cancel(
     if checkbox is None:
         checkbox = _("Apply to all")
 
-    return messages.prompt3msg(question, title, bitmap, yes, no, cancel, checkbox, checked)
+    return msg_dialogs.prompt3msg(question, title, bitmap, yes, no, cancel, checkbox, checked)
 
 
 def infomsg(msg, title=None, bitmap=None):
@@ -62,7 +62,7 @@ def infomsg(msg, title=None, bitmap=None):
     if title is None:
         title = _("INFO")
 
-    messages.infomsg(msg, title, bitmap)
+    msg_dialogs.infomsg(msg, title, bitmap)
 
 
 def errormsg(msg, title=None, bitmap=None):
@@ -71,7 +71,7 @@ def errormsg(msg, title=None, bitmap=None):
     if title is None:
         title = _("ERROR")
 
-    messages.errormsg(msg, title, bitmap)
+    msg_dialogs.errormsg(msg, title, bitmap)
 
 
 def warnmsg(msg, title=None, bitmap=None):
@@ -80,4 +80,4 @@ def warnmsg(msg, title=None, bitmap=None):
     if title is None:
         title = _("WARNING")
 
-    messages.warnmsg(msg, title, bitmap)
+    msg_dialogs.warnmsg(msg, title, bitmap)

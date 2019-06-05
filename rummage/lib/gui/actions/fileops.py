@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 import os
 from ..settings import Settings
 from ..app.custom_app import error
-from ..generic_dialogs import errormsg
+from ..dialogs.generic_dialogs import errormsg
 from ..localization import _
 from ... import util
 

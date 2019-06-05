@@ -20,11 +20,11 @@ IN THE SOFTWARE.
 """
 import wx
 import re
-from .settings import Settings
+from ..settings import Settings
 from .generic_dialogs import errormsg, yesno
-from .localization import _
-from . import gui
-from .. import util
+from ..localization import _
+from .. import gui
+from ... import util
 
 RE_KEY = re.compile(r'[\w-]+')
 

@@ -30,7 +30,7 @@ from .. import data
 from ... import util
 from ..settings import Settings
 from ..actions import checksum
-from ..generic_dialogs import yesno
+from ..dialogs.generic_dialogs import yesno
 
 CONTENT_PATH = 0
 CONTENT_LINE = 1
@@ -135,7 +135,9 @@ class CommonOperationsMixin:
     def on_arrange_click(self, event):
         """Handle arranging columns."""
 
-        dlg = self.main_window.get_dialog('ColumnDialog')(self.main_window, self.virtual_list, self.headers)
+        from ..dialogs import ColumnDialog
+
+        dlg = ColumnDialog(self.main_window, self.virtual_list, self.headers)
         dlg.ShowModal()
         if dlg.changed:
             virtual_list = self.update_virtual(dlg.virtual_columns)
@@ -145,19 +147,23 @@ class CommonOperationsMixin:
     def on_checksum(self, event, h, target):
         """Handle checksum event."""
 
-        dlg = self.main_window.get_dialog('ChecksumDialog')(self.main_window, h, target)
+        from ..dialogs import ChecksumDialog
+
+        dlg = ChecksumDialog(self.main_window, h, target)
         dlg.ShowModal()
         dlg.Destroy()
 
     def on_delete_files(self, event, recycle):
         """Delete files in the list control."""
 
+        from ..dialogs import DeleteDialog
+
         if not yesno(self.RECYCLE if recycle else self.DELETE):
             return
 
         remove = None
         files = self.get_selected_files()
-        dlg = self.main_window.get_dialog('DeleteDialog')(self.main_window, files, recycle)
+        dlg = DeleteDialog(self.main_window, files, recycle)
         dlg.ShowModal()
         dlg.Destroy()
 

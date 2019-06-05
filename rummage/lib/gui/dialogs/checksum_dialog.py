@@ -20,10 +20,10 @@ IN THE SOFTWARE.
 """
 import os
 import time
-from .localization import _
-from . import gui
-from .. import util
-from .actions import checksum
+from ..localization import _
+from .. import gui
+from ... import util
+from ..actions import checksum
 from .generic_dialogs import errormsg
 
 

@@ -19,12 +19,12 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 # from .app.custom_app import error
-from .localization import _
-from .settings import Settings
+from ..localization import _
+from ..settings import Settings
 from .generic_dialogs import errormsg, infomsg
-from .messages import filepickermsg
-from . import gui
-from .. import util
+from .msg_dialogs import filepickermsg
+from .. import gui
+from ... import util
 
 
 class ExportSettingsDialog(gui.ExportSettingsDialog):

@@ -20,11 +20,11 @@ IN THE SOFTWARE.
 """
 # from .app.custom_app import error
 import re
-from .localization import _
-from .settings import Settings
+from ..localization import _
+from ..settings import Settings
 from .generic_dialogs import errormsg
-from . import gui
-from .. import util
+from .. import gui
+from ... import util
 from .overwrite_dialog import OverwriteDialog
 
 CHAIN_TYPE = 0

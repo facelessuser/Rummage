@@ -31,22 +31,23 @@ import importlib.util
 from datetime import datetime
 import wx.lib.newevent
 from backrefs import bre
-from .settings import Settings
-from .actions import export_html
-from .actions import export_csv
-from .actions import fileops
-from .actions import updates
+from ..settings import Settings
+from ..actions import export_html
+from ..actions import export_csv
+from ..actions import fileops
+from ..actions import updates
 try:
-    from .gui import GUI_PATCHED  # noqa: F401
-except ImportError:
+    from ..gui import GUI_PATCHED  # noqa: F401
+except ImportError as e:
+    print(e)
     # We forgot to patch the GUI, which will cause issues,
     # so raise a helpful error that points us to what we need to do.
     raise RuntimeError("GUI has not been patched. Please run tools/gui_patch.py")
 from .generic_dialogs import errormsg, yesno, infomsg
-from .app.custom_app import debug, error, get_log_file
-from .controls import custom_statusbar
+from ..app.custom_app import debug, error, get_log_file
+from ..controls import custom_statusbar
 from .regex_test_dialog import RegexTestDialog
-from .controls.autocomplete_combo import AutoCompleteCombo
+from ..controls.autocomplete_combo import AutoCompleteCombo
 from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
@@ -54,21 +55,18 @@ from .search_chain_dialog import SearchChainDialog
 from .export_settings_dialog import ExportSettingsDialog
 from .import_settings_dialog import ImportSettingsDialog
 from .support_info_dialog import SupportInfoDialog
-from .checksum_dialog import ChecksumDialog  # noqa: F401
-from .delete_dialog import DeleteDialog  # noqa: F401
-from .column_dialog import ColumnDialog  # noqa: F401
 from .settings_dialog import SettingsDialog
 from . import html_dialog
-from .controls import pick_button
-from .messages import filepickermsg
-from .localization import _
-from . import gui
-from . import data
-from . import notify
-from ..util import epoch_timestamp
-from .. import __meta__
-from .. import rumcore
-from .. import util
+from ..controls import pick_button
+from .msg_dialogs import filepickermsg
+from ..localization import _
+from .. import gui
+from .. import data
+from .. import notify
+from ...util import epoch_timestamp
+from ... import __meta__
+from ... import rumcore
+from ... import util
 import decimal
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
@@ -591,11 +589,6 @@ class RummageFrame(gui.RummageFrame):
             self.TIME_EQ: "on",
             self.TIME_LT: "before"
         }
-
-    def get_dialog(self, name):
-        """Get dialog."""
-
-        return globals()[name]
 
     def refresh_localization(self):
         """Localize."""

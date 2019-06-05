@@ -19,13 +19,13 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 import wx
-from .localization import _
-from . import gui
-from .. import util
+from ..localization import _
+from .. import gui
+from ... import util
 import textwrap
 import platform
 import sys
-from .. import __meta__
+from ... import __meta__
 
 
 def list2string(obj):

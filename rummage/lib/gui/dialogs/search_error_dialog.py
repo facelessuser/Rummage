@@ -19,10 +19,10 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 import wx
-from .app.custom_app import error
+from ..app.custom_app import error
 from .error_text_dialog import ErrorTextDialog
-from .localization import _
-from . import gui
+from ..localization import _
+from .. import gui
 
 
 class SearchErrorDialog(gui.SearchErrorDialog):
