@@ -25,7 +25,7 @@ import copy
 from filelock import FileLock
 from ..app import custom_app
 from ..app.custom_app import debug, debug_struct, error
-from ..generic_dialogs import errormsg
+from ..dialogs.generic_dialogs import errormsg
 from .. import localization
 from ..localization import _
 from .. import data

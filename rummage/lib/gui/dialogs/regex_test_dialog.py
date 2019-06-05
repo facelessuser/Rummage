@@ -27,14 +27,14 @@ import time
 import importlib.util
 from backrefs import bre
 from collections import deque
-from . import gui
-from .controls.pick_button import PickButton, pick_extend
-from .settings import Settings
-from . import data
-from .localization import _
-from .. import rumcore
-from .. import util
-from ..util import rgba
+from .. import gui
+from ..controls.pick_button import PickButton, pick_extend
+from ..settings import Settings
+from .. import data
+from ..localization import _
+from ... import rumcore
+from ... import util
+from ...util import rgba
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
 else:

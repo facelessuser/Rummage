@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 import os
 from .platform_window_focus import platform_window_focus
 from .custom_app import PipeApp
-from .. import rummage_dialog
+from ..dialogs import rummage_dialog
 from ..settings import Settings
 import wx
 

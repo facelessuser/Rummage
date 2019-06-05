@@ -20,10 +20,10 @@ IN THE SOFTWARE.
 """
 import wx
 
-from .settings import Settings
-from .localization import _
+from ..settings import Settings
+from ..localization import _
 from .save_search_dialog import SaveSearchDialog
-from . import gui
+from .. import gui
 
 
 class LoadSearchDialog(gui.LoadSearchDialog):

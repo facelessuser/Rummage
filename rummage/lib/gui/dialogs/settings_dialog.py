@@ -21,16 +21,16 @@ IN THE SOFTWARE.
 import wx
 import re
 import json
-from .settings import Settings
+from ..settings import Settings
 from .file_ext_dialog import FileExtDialog
 from .generic_dialogs import errormsg
-from .localization import _
-from . import gui
-from . import notify
-from . import data
-from .. import rumcore
-from .. import util
-from .controls import webview
+from ..localization import _
+from .. import gui
+from .. import notify
+from .. import data
+from ... import rumcore
+from ... import util
+from ..controls import webview
 
 EDITOR_HELP = _("""
 Enter in the appropriate command to open files in your editor.

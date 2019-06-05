@@ -20,11 +20,11 @@ IN THE SOFTWARE.
 """
 import wx
 import re
-from . import gui
-from .settings import Settings, rumcore
+from .. import gui
+from ..settings import Settings, rumcore
 from .generic_dialogs import errormsg, yesno
-from .localization import _
-from .. import util
+from ..localization import _
+from ... import util
 
 RE_NAME = re.compile(r'[\w-]', re.UNICODE)
 

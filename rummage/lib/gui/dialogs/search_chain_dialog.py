@@ -19,10 +19,10 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 import wx
-from .settings import Settings
+from ..settings import Settings
 from .edit_search_chain_dialog import EditSearchChainDialog
-from .localization import _
-from . import gui
+from ..localization import _
+from .. import gui
 
 
 class SearchChainDialog(gui.SearchChainDialog):
