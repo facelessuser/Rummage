@@ -9,7 +9,7 @@ import json
 import subprocess
 from .. import data
 from ..localization import _, get_current_domain
-from ... import util
+from .. import util
 from ... import rumcore
 
 
@@ -213,7 +213,7 @@ def open_in_browser(name):
     """Auto open HTML."""
 
     platform = util.platform()
-    if platform == "osx":
+    if platform == "macos":
         web_handler = None
         try:
             launch_services = os.path.expanduser(

@@ -24,7 +24,7 @@ import time
 import threading
 from ..localization import _
 from .. import gui
-from ... import util
+from .. import util
 from .generic_dialogs import errormsg, yesno_cancel
 from send2trash import send2trash
 

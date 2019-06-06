@@ -3,7 +3,7 @@ import time
 import codecs
 import subprocess
 from ..localization import _
-from ... import util
+from .. import util
 from ... import rumcore
 
 if util.platform() == "windows":
@@ -100,7 +100,7 @@ def export(export_csv, chain, result_list, result_content_list):
         export_result_content_list(result_content_list, csv)
 
     platform = util.platform()
-    if platform == "osx":
+    if platform == "macos":
         subprocess.Popen(['open', csv.name])
     elif platform == "windows":
         startfile(csv.name)

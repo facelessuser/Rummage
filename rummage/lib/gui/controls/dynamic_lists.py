@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 import wx
 import wx.lib.mixins.listctrl as listmix
 import functools
-from ... import util
+from .. import util
 from collections import OrderedDict
 import locale
 
@@ -70,7 +70,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
             # Select all
             self.set_keybindings(
                 [
-                    (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.select_all)
+                    (wx.ACCEL_CMD if util.platform() == "macos" else wx.ACCEL_CTRL, ord('A'), self.select_all)
                 ]
             )
 

@@ -24,7 +24,7 @@ from .. import gui
 from ..settings import Settings, rumcore
 from .generic_dialogs import errormsg, yesno
 from ..localization import _
-from ... import util
+from .. import util
 
 RE_NAME = re.compile(r'[\w-]', re.UNICODE)
 
@@ -42,7 +42,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
 
         # Ensure OS select all shortcut works in text inputs
         self.set_keybindings(
-            [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+            [(wx.ACCEL_CMD if util.platform() == "macos" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
 
         self.parent = parent

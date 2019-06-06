@@ -32,7 +32,7 @@ from .. import data
 from .. import notify
 from ... import rumcore
 from ...rumcore import text_decode
-from ... import util
+from .. import util
 
 DEV_MODE = False
 SETTINGS_FILE = "rummage_dev.settings" if DEV_MODE else "rummage.settings"
@@ -44,7 +44,7 @@ SETTINGS_FMT = '2.4.0'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
-    "osx": ["default", "growl"],
+    "macos": ["default", "growl"],
     "windows": ["default", "growl"],
     "linux": ["default", "growl"]
 }
@@ -484,7 +484,7 @@ class Settings:
             cls.log = os.path.join(folder, LOG_FILE)
             cls.fifo = os.path.join(folder, '\\\\.\\pipe\\rummage')
             cls.config_folder = folder
-        elif platform == "osx":
+        elif platform == "macos":
             old_folder = os.path.expanduser("~/Library/Application Support/Rummage")
             folder = os.path.expanduser("~/.Rummage")
             if os.path.exists(old_folder) and not os.path.exists(folder):
@@ -923,7 +923,7 @@ class Settings:
 
         if util.platform() == "windows":
             img = icon
-        elif util.platform() == "osx":
+        elif util.platform() == "macos":
             img = icns
         else:
             img = png

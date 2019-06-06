@@ -1,9 +1,9 @@
 """Platform window focus."""
 import ctypes
 import ctypes.util
-from ... import util
+from .. import util
 
-if util.platform() == "osx":
+if util.platform() == "macos":
     appkit = ctypes.cdll.LoadLibrary(ctypes.util.find_library('AppKit'))
     objc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('objc'))
 
@@ -24,7 +24,7 @@ def platform_window_focus(frame):
     frame.Raise()
 
     # macOS specific extra to ensure raise
-    if util.platform() == "osx":
+    if util.platform() == "macos":
         try:
             nsapplication = ctypes.c_void_p(objc.objc_getClass('NSApplication'))
             nsapp = ctypes.c_void_p(objc.objc_msgSend(nsapplication, objc.sel_registerName('sharedApplication')))

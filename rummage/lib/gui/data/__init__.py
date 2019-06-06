@@ -3,9 +3,9 @@ import os
 import codecs
 import base64
 from wx.lib.embeddedimage import PyEmbeddedImage
-from ... import util
-from ...util.rgba import RGBA  # noqa: F401
-from ...util import images
+from .. import util
+from ..util.rgba import RGBA  # noqa: F401
+from ..util import images
 
 RESOURCE_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -62,7 +62,7 @@ def get_bitmap(file_name, tint=None, alpha=None):
     """
 
     image = get_image(file_name, tint=tint, alpha=alpha).GetImage()
-    if util.platform() == "osx":
+    if util.platform() == "macos":
         bm = image.ConvertToBitmap()
         bm.SetSize(
             (

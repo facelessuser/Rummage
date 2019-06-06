@@ -18,13 +18,13 @@ else:
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
 elif sys.platform == "darwin":
-    _PLATFORM = "osx"
+    _PLATFORM = "macos"
 else:
     _PLATFORM = "linux"
 
 if _PLATFORM == "windows":
     from .notify_windows import get_notify, alert, setup, windows_icons, destroy
-elif _PLATFORM == "osx":
+elif _PLATFORM == "macos":
     from .notify_osx import get_notify, alert, setup, destroy
 elif _PLATFORM == "linux":
     from .notify_linux import get_notify, alert, setup, destroy
@@ -94,7 +94,7 @@ def send_notify(title, message, sound, level):
     growl = get_growl()
     if growl_enabled():
         growl(level, title, message, sound, default_notify)
-    elif _PLATFORM in ["osx", "linux"]:
+    elif _PLATFORM in ["macos", "linux"]:
         notify(title, message, sound, default_notify)
     elif _PLATFORM == "windows":
         notify(title, message, sound, windows_icons[level], default_notify)
@@ -125,7 +125,7 @@ def setup_notifications(app_name, img=None, term_notify=(None, None)):
     setup(
         app_name,
         img,
-        term_notify if _PLATFORM == "osx" else None
+        term_notify if _PLATFORM == "macos" else None
     )
 
 

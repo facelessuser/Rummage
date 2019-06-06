@@ -27,7 +27,7 @@ from .dynamic_lists import DynamicList, USE_SAMPLE_SIZE
 from ..actions import fileops
 from ..localization import _
 from .. import data
-from ... import util
+from .. import util
 from ..settings import Settings
 from ..actions import checksum
 from ..dialogs.generic_dialogs import yesno
@@ -264,7 +264,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         self.EDITOR_LABEL = _("Open in Editor")
         self.REVEAL_LABEL = {
             "windows": _("Reveal in Explorer"),
-            "osx": _("Reveal in Finder"),
+            "macos": _("Reveal in Finder"),
             "linux": _("Reveal in File Manager")
         }
         self.COPY_NAME = _("Copy File Names")
@@ -559,7 +559,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
         self.EDITOR_LABEL = _("Open in Editor")
         self.REVEAL_LABEL = {
             "windows": _("Reveal in Explorer"),
-            "osx": _("Reveal in Finder"),
+            "macos": _("Reveal in Finder"),
             "linux": _("Reveal in File Manager")
         }
         self.COPY_NAME = _("Copy File Names")

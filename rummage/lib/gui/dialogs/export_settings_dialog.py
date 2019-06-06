@@ -21,10 +21,10 @@ IN THE SOFTWARE.
 # from .app.custom_app import error
 from ..localization import _
 from ..settings import Settings
+from ..actions import fileops
 from .generic_dialogs import errormsg, infomsg
 from .msg_dialogs import filepickermsg
 from .. import gui
-from ... import util
 
 
 class ExportSettingsDialog(gui.ExportSettingsDialog):
@@ -95,7 +95,7 @@ class ExportSettingsDialog(gui.ExportSettingsDialog):
                 export[k] = v
 
         try:
-            util.write_json(filename, export)
+            fileops.write_json(filename, export)
             infomsg(self.SUCCESS_EXPORT)
         except Exception:
             errormsg(self.ERR_FAILED_EXPORT)

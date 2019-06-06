@@ -3,9 +3,9 @@ import wx
 import wx.lib.agw.pycollapsiblepane as pycollapse
 import wx.lib.buttons as buttons
 from .. import data
-from ... import util
+from .. import util
 
-IS_MAC = util.platform() == "osx"
+IS_MAC = util.platform() == "macos"
 
 
 class CollapsiblePane(pycollapse.PyCollapsiblePane):

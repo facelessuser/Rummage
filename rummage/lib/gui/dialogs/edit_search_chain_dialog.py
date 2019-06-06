@@ -24,7 +24,7 @@ from ..settings import Settings
 from .generic_dialogs import errormsg, yesno
 from ..localization import _
 from .. import gui
-from ... import util
+from .. import util
 
 RE_KEY = re.compile(r'[\w-]+')
 

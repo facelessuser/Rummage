@@ -19,11 +19,74 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 import os
+import subprocess
+import codecs
+import json
+from .sanitize_json import sanitize
 from ..settings import Settings
 from ..app.custom_app import error
 from ..dialogs.generic_dialogs import errormsg
 from ..localization import _
-from ... import util
+from .. import util
+
+
+def call(cmd):
+    """Call command."""
+
+    fail = False
+
+    is_string = isinstance(cmd, (str, bytes))
+
+    try:
+        if util.platform() == "windows":
+            startupinfo = subprocess.STARTUPINFO()
+            subprocess.Popen(
+                cmd,
+                startupinfo=startupinfo,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                shell=is_string
+            )
+        else:
+            subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                shell=is_string
+            )
+    except Exception:
+        fail = True
+
+    return fail
+
+
+def read_json(filename):
+    """Read JSON."""
+
+    try:
+        with codecs.open(filename, "r", encoding='utf-8') as f:
+            content = sanitize(f.read(), True)
+        obj = json.loads(content)
+    except Exception:
+        obj = None
+    return obj
+
+
+def write_json(filename, obj):
+    """Write JSON."""
+
+    fail = False
+
+    try:
+        j = json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
+        with codecs.open(filename, 'w', encoding='utf-8') as f:
+            f.write(j + "\n")
+    except Exception:
+        fail = True
+
+    return fail
 
 
 def open_editor(filename, line, col):
@@ -43,7 +106,7 @@ def reveal(event, target):
 
     cmd = {
         "windows": 'explorer /select,"%s"',
-        "osx": 'open -R "%s"',
+        "macos": 'open -R "%s"',
         "linux": 'xdg-open "%s"'
     }
 

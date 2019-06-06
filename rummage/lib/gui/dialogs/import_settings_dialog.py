@@ -24,7 +24,7 @@ from ..localization import _
 from ..settings import Settings
 from .generic_dialogs import errormsg
 from .. import gui
-from ... import util
+from .. import util
 from .overwrite_dialog import OverwriteDialog
 
 CHAIN_TYPE = 0
@@ -176,7 +176,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                 value = None
             if key == "locale" and value not in Settings.get_languages():
                 value = None
-            if key == "term_notifier" and util.platform() != "osx":
+            if key == "term_notifier" and util.platform() != "macos":
                 value = ""
         return value
 
