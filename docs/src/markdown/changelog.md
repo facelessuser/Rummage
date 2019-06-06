@@ -1,5 +1,9 @@
 # Changelog
 
+## Current
+
+- **FIX**: Better attempt to get appropriate creation on all Linux systems.
+
 ## 4.6.3
 
 - **FIX**: Notification audio failures should be handled gracefully.
