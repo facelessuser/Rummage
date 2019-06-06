@@ -63,7 +63,6 @@ from ..localization import _
 from .. import gui
 from .. import data
 from .. import notify
-from ...rumcore import epoch_timestamp
 from ... import __meta__
 from ... import rumcore
 from .. import util
@@ -1355,7 +1354,7 @@ class RummageFrame(gui.RummageFrame):
             if cmp_modified:
                 args.modified_compare = (
                     LIMIT_COMPARE[cmp_modified],
-                    epoch_timestamp.local_time_to_epoch_timestamp(
+                    rumcore.util.local_time_to_epoch_timestamp(
                         self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
                         self.m_modified_time_picker.GetValue()
                     )
@@ -1363,7 +1362,7 @@ class RummageFrame(gui.RummageFrame):
             if cmp_created:
                 args.created_compare = (
                     LIMIT_COMPARE[cmp_created],
-                    epoch_timestamp.local_time_to_epoch_timestamp(
+                    rumcore.util.local_time_to_epoch_timestamp(
                         self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
                         self.m_modified_time_picker.GetValue()
                     )

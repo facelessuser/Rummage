@@ -10,7 +10,6 @@ import textwrap
 from backrefs import bre
 from backrefs import bregex
 from rummage.lib import rumcore as rc
-from rummage.lib.rumcore import epoch_timestamp as epoch
 from rummage.lib.rumcore import text_decode as td
 from wcmatch import wcmatch
 from . import util
@@ -748,7 +747,7 @@ class TestDirWalker(_FileTest):
             r'*.*', None,
             self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
-            None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')), None,
+            None, ("lt", rc.util.local_time_to_epoch_timestamp(date, '00:00:00')), None,
             None, False
         )
 
@@ -766,7 +765,7 @@ class TestDirWalker(_FileTest):
             r'*.*', None,
             self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
-            None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')), None,
+            None, ("gt", rc.util.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')), None,
             None, False
         )
 
@@ -787,7 +786,7 @@ class TestDirWalker(_FileTest):
             r'*.*', None,
             self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
-            None, None, ("lt", epoch.local_time_to_epoch_timestamp(date, '00:00:00')),
+            None, None, ("lt", rc.util.local_time_to_epoch_timestamp(date, '00:00:00')),
             None, False
         )
 
@@ -805,7 +804,7 @@ class TestDirWalker(_FileTest):
             r'*.*', None,
             self.default_flags | wcmatch.RECURSIVE | wcmatch.HIDDEN,
             False, False,
-            None, None, ("gt", epoch.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')),
+            None, None, ("gt", rc.util.local_time_to_epoch_timestamp('07/07/1980', '00:00:00')),
             None, False
         )
 
@@ -885,7 +884,7 @@ class TestFileSearch(_FileTest):
         """Get the file attributes."""
 
         name = self.norm(*path)
-        c_time, m_time = rc.get_stat(name)[:2]
+        c_time, m_time = rc.util.get_stat(name)[:2]
         return rc.FileAttrRecord(
             name,
             os.path.splitext(name)[1].lower().lstrip('.'),

@@ -2,10 +2,8 @@
 omit=
     rummage/__main__.py
     rummage/lib/gui/*
-    rummage/lib/rumcore/file_stat.py
 
 [report]
 omit=
     rummage/__main__.py
     rummage/lib/gui/*
-    rummage/lib/rumcore/file_stat.py

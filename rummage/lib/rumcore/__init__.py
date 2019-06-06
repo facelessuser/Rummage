@@ -32,7 +32,6 @@ from backrefs import bre
 from collections import deque
 from . import text_decode
 from wcmatch import wcmatch
-from .file_stat import get_stat
 from . import util
 try:
     from backrefs import bregex
@@ -1257,7 +1256,7 @@ class _DirWalker(wcmatch.WcMatch):
 
         valid = not self._is_backup(name)
         fullname = os.path.join(base, name)
-        self.created_time, self.modified_time, self.current_size = get_stat(fullname)
+        self.created_time, self.modified_time, self.current_size = util.get_stat(fullname)
         if valid:
             valid = self._is_size_okay(fullname)
         if valid:
@@ -1398,7 +1397,7 @@ class Rummage:
             )
         elif not self.buffer_input and os.path.isfile(self.target):
             try:
-                c_time, m_time = get_stat(self.target)
+                c_time, m_time = util.get_stat(self.target)
                 self.files.append(
                     FileAttrRecord(
                         self.target,
