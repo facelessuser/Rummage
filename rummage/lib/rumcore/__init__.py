@@ -33,7 +33,7 @@ from collections import deque
 from . import text_decode
 from wcmatch import wcmatch
 from .file_stat import get_stat
-from .. import util
+from . import util
 try:
     from backrefs import bregex
     import regex

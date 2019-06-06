@@ -33,12 +33,29 @@ from ..settings import Settings
 from .. import data
 from ..localization import _
 from ... import rumcore
-from ... import util
-from ...util import rgba
+from .. import util
+from ..util import rgba
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
 else:
     bregex = None
+
+
+def char_size(c):
+    """Get `UTF8` char size."""
+
+    value = ord(c)
+    if value <= 0xffff:
+        return 1
+    elif value <= 0x10ffff:
+        return 2
+    raise ValueError('Invalid code point')
+
+
+def ulen(string):
+    """Get length of string in bytes."""
+
+    return sum(char_size(c) for c in string)
 
 
 class PluginException(Exception):
@@ -257,7 +274,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         # Reset Colors
         self.m_test_text.SetStyle(
             0,
-            util.ulen(self.m_test_text.GetValue()),
+            ulen(self.m_test_text.GetValue()),
             self.test_attr
         )
 
@@ -465,7 +482,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                     reverse = False
                 new_text = deque()
                 offset = len(text) if reverse else 0
-                byte_start = util.ulen(text) if reverse else 0
+                byte_start = ulen(text) if reverse else 0
                 byte_end = byte_start
                 errors = False
                 try:
@@ -473,13 +490,13 @@ class RegexTestDialog(gui.RegexTestDialog):
                         try:
                             if reverse:
                                 value = text[m.end(0):offset]
-                                byte_end = byte_start - util.ulen(value)
-                                byte_start = byte_end - util.ulen(m.group(0))
+                                byte_end = byte_start - ulen(value)
+                                byte_start = byte_end - ulen(m.group(0))
                                 offset = m.start(0)
                             else:
                                 value = text[offset:m.start(0)]
-                                byte_start = byte_end + util.ulen(value)
-                                byte_end = byte_start + util.ulen(m.group(0))
+                                byte_start = byte_end + ulen(value)
+                                byte_end = byte_start + ulen(m.group(0))
                                 offset = m.end(0)
                             if replace_test:
                                 if reverse:

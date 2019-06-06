@@ -1,7 +1,7 @@
 """Platform window focus."""
 import ctypes
 import ctypes.util
-from ... import util
+from .. import util
 
 if util.platform() == "osx":
     appkit = ctypes.cdll.LoadLibrary(ctypes.util.find_library('AppKit'))

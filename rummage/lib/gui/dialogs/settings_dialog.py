@@ -29,7 +29,7 @@ from .. import gui
 from .. import notify
 from .. import data
 from ... import rumcore
-from ... import util
+from .. import util
 from ..controls import webview
 
 EDITOR_HELP = _("""

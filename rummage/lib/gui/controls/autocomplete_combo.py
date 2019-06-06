@@ -19,7 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 IN THE SOFTWARE.
 """
 import wx
-from ... import util
+from .. import util
 
 
 class AutoCompleteCombo(wx.ComboCtrl):

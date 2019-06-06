@@ -22,7 +22,7 @@ DEALINGS IN THE SOFTWARE.
 from collections import OrderedDict
 import wx
 import wx.lib.agw.supertooltip
-from ... import util
+from .. import util
 
 
 class ContextMenu(wx.Menu):

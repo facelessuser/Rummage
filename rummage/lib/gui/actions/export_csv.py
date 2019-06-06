@@ -3,7 +3,7 @@ import time
 import codecs
 import subprocess
 from ..localization import _
-from ... import util
+from .. import util
 from ... import rumcore
 
 if util.platform() == "windows":

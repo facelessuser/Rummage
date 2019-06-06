@@ -63,10 +63,10 @@ from ..localization import _
 from .. import gui
 from .. import data
 from .. import notify
-from ...util import epoch_timestamp
+from ...rumcore import epoch_timestamp
 from ... import __meta__
 from ... import rumcore
-from ... import util
+from .. import util
 import decimal
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
@@ -89,8 +89,6 @@ LIMIT_COMPARE = {
     2: "eq",
     3: "lt"
 }
-
-ENCODINGS = util.get_encodings()
 
 
 def eng_to_i18n(string, mapping):
@@ -339,6 +337,7 @@ class RummageFrame(gui.RummageFrame):
             data.get_image('rummage_large.png').GetIcon()
         )
 
+        self.encodings = util.get_encodings()
         self.last_pattern_search = ""
         self.no_pattern = False
         self.client_size = wx.Size(-1, -1)
@@ -614,7 +613,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_backup_checkbox.SetLabel(self.CREATE_BACKUPS)
         self.m_force_encode_checkbox.SetLabel(self.FORCE)
         self.m_force_encode_choice.Clear()
-        for x in ENCODINGS:
+        for x in self.encodings:
             self.m_force_encode_choice.Append(x)
         self.m_chains_checkbox.SetLabel(self.USE_CHAIN)
         self.m_replace_plugin_checkbox.SetLabel(self.USE_PLUGIN)
@@ -2267,7 +2266,7 @@ class RummageFrame(gui.RummageFrame):
         if filename is None:
             return
 
-        obj = util.read_json(filename)
+        obj = fileops.read_json(filename)
         if obj is None:
             errormsg(self.ERR_IMPORT)
             return

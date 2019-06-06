@@ -10,7 +10,7 @@ import textwrap
 from backrefs import bre
 from backrefs import bregex
 from rummage.lib import rumcore as rc
-from rummage.lib.util import epoch_timestamp as epoch
+from rummage.lib.rumcore import epoch_timestamp as epoch
 from rummage.lib.rumcore import text_decode as td
 from wcmatch import wcmatch
 from . import util

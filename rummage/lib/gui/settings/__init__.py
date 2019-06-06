@@ -32,7 +32,7 @@ from .. import data
 from .. import notify
 from ... import rumcore
 from ...rumcore import text_decode
-from ... import util
+from .. import util
 
 DEV_MODE = False
 SETTINGS_FILE = "rummage_dev.settings" if DEV_MODE else "rummage.settings"

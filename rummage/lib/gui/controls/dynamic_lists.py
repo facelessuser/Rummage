@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 import wx
 import wx.lib.mixins.listctrl as listmix
 import functools
-from ... import util
+from .. import util
 from collections import OrderedDict
 import locale
 

@@ -1,6 +1,6 @@
 """Custom time picker that allows us control of the control's color."""
 from wx.lib.masked import TimeCtrl
-from ... util import rgba
+from .. util import rgba
 import wx
 
 

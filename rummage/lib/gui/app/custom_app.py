@@ -28,7 +28,7 @@ import time
 import wx
 import wx.lib.newevent
 from filelock import FileLock
-from ... import util
+from .. import util
 try:
     import thread
 except ImportError:

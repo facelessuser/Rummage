@@ -24,7 +24,7 @@ from ..localization import _
 from ..settings import Settings
 from .generic_dialogs import errormsg
 from .. import gui
-from ... import util
+from .. import util
 from .overwrite_dialog import OverwriteDialog
 
 CHAIN_TYPE = 0

@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 import wx
 from ..localization import _
 from .. import gui
-from ... import util
+from .. import util
 import textwrap
 import platform
 import sys
