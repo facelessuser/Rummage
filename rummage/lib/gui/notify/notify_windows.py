@@ -100,6 +100,7 @@ class Options:
 
     notify = None
     instance = None
+    sound = None
 
     @classmethod
     def clear(cls):
@@ -107,14 +108,15 @@ class Options:
 
         cls.notify = None
         cls.instance = None
+        cls.sound = None
 
 
 def alert(sound=None):
     """Play an alert sound for the OS."""
 
     try:
-        snd = sound if sound is not None else "*"
-        winsound.PlaySound(snd, winsound.SND_ALIAS)
+        if Options.sound:
+            winsound.PlaySound(Options.sound, winsound.SND_FILENAME | winsound.SND_ASYNC)
     except Exception:
         pass
 
@@ -325,8 +327,12 @@ def NotifyWin(title, msg, sound, icon, fallback):
     Options.instance.show_notification(title, msg, sound, icon, fallback)
 
 
-def setup(app_name, icon, *args):
+def setup(app_name, icon, **kwargs):
     """Setup."""
+
+    sound = kwargs.get('sound')
+    if sound is not None and os.path.exists(sound):
+        Options.sound = sound
 
     try:
         if icon is None or not os.path.exists(icon):

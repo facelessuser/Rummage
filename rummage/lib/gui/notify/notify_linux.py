@@ -6,8 +6,11 @@ License: MIT
 """
 import subprocess
 from os.path import exists
+from . import util
 
 __all__ = ("get_notify", "alert", "setup", "destroy")
+
+PLAYERS = ('paplay', 'aplay', 'play')
 
 
 class Options:
@@ -16,6 +19,7 @@ class Options:
     icon = None
     notify = None
     app_name = ""
+    sound = None
 
     @classmethod
     def clear(cls):
@@ -24,18 +28,24 @@ class Options:
         cls.icon = None
         cls.notify = None
         cls.app_name = ""
+        cls.sound = None
 
 
 def alert(sound=None):
     """Play an alert sound for the OS."""
 
-    try:
-        if exists('/usr/share/sounds/gnome/default/alerts/glass.ogg'):
-            subprocess.call(['/usr/bin/canberra-gtk-play', '-f', '/usr/share/sounds/gnome/default/alerts/glass.ogg'])
-        else:
-            subprocess.call(['/usr/bin/canberra-gtk-play', '--id', 'bell'])
-    except Exception:
-        pass
+    if Options.sound is not None:
+        for player in PLAYERS:
+            executable = util.which(player)
+            if executable is not None:
+                try:
+                    if player == 'play':
+                        subprocess.call([executable, '-q', Options.sound])
+                    else:
+                        subprocess.call([executable, Options.sound])
+                except Exception:
+                    pass
+                break
 
 
 @staticmethod
@@ -81,13 +91,16 @@ def setup_notify_osd(app_name):
         Options.notify = notify_osd_call
 
 
-def setup(app_name, icon, *args):
+def setup(app_name, icon, **kwargs):
     """Setup."""
 
     Options.icon = None
+    sound = kwargs.get('sound')
+    if sound is not None and os.path.exists(sound):
+        Options.sound = sound
 
     try:
-        if icon is None or not exists(icon):
+        if icon is None or not os.path.exists(icon):
             raise ValueError("Icon does not appear to be valid")
         Options.icon = icon
     except Exception:

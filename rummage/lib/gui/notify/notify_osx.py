@@ -72,6 +72,7 @@ class Options:
     terminal_notifier = None
     app_name = ""
     icon = None
+    sound = None
 
     @classmethod
     def clear(cls):
@@ -82,13 +83,15 @@ class Options:
         cls.terminal_notifier = None
         cls.app_name = ""
         cls.icon = None
+        cls.sound = None
 
 
 def alert(sound=None):
     """Play an alert sound for the OS."""
 
     try:
-        subprocess.call(["afplay", "/System/Library/Sounds/Glass.aiff"])
+        if Options.sound is not None:
+            subprocess.call(["afplay", Options.sound])
         # ```
         # pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
         # snd = _nsstring(sound if sound is not None else "Glass")
@@ -114,7 +117,7 @@ def notify_osx_call(title, message, sound, fallback):
     """Notifications for macOS."""
 
     try:
-        if Options.terminal_notifier is None or not exists(Options.terminal_notifier):
+        if Options.terminal_notifier is None or not os.path.exists(Options.terminal_notifier):
             raise ValueError("Specified terminal notifier does not appear to be valid")
         # Show Notification here
         params = [Options.terminal_notifier, "-title", Options.app_name, "-timeout", "5"]
@@ -138,37 +141,39 @@ def notify_osx_call(title, message, sound, fallback):
         fallback(title, message, sound)
 
 
-def setup(app_name, icon, *args):
+def setup(app_name, icon, *kwargs):
     """Setup."""
 
     term_notify = None
     sender = None
 
-    if len(args) and len(args[0]) == 2:
-        term_notify = args[0][0]
-        sender = args[0][1]
-        notify_icon = icon
+    term_notify = kwargs.get('term_notify')
+    sender = kwargs.get('sender')
+    sound = kwargs.get('sound')
+    if sound is not None and os.path.exists(sound):
+        Options.sound = sound
+    notify_icon = icon
 
-        if term_notify is not None and isinstance(term_notify, binary_type):
-            term_notify = term_notify.decode('utf-8')
+    if term_notify is not None and isinstance(term_notify, binary_type):
+        term_notify = term_notify.decode('utf-8')
 
-        if sender is not None and isinstance(sender, binary_type):
-            sender = sender.decode('utf-8')
+    if sender is not None and isinstance(sender, binary_type):
+        sender = sender.decode('utf-8')
 
-        if _is_ver_okay():
-            notify_icon = None
-        elif notify_icon is not None and isinstance(notify_icon, binary_type):
-            notify_icon = notify_icon.decode('utf-8')
+    if _is_ver_okay():
+        notify_icon = None
+    elif notify_icon is not None and isinstance(notify_icon, binary_type):
+        notify_icon = notify_icon.decode('utf-8')
 
     Options.app_name = app_name
 
     try:
-        if term_notify is None or not exists(term_notify):
+        if term_notify is None or not os.path.exists(term_notify):
             raise ValueError("Terminal notifier does not appear to be available")
         Options.terminal_notifier = term_notify
         if sender is not None:
             Options.sender = sender
-        if notify_icon is not None and exists(notify_icon):
+        if notify_icon is not None and os.path.exists(notify_icon):
             Options.icon = notify_icon
         Options.notify = notify_osx_call
     except Exception:
