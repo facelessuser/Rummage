@@ -34,18 +34,19 @@ WS_SYSMENU = 524288
 CW_USEDEFAULT = -2147483648
 WM_USER = 1024
 
-NIM_ADD = 0
-NIM_MODIFY = 1
-NIM_DELETE = 2
-NIM_SETVERSION = 4
-NIF_ICON = 2
-NIF_MESSAGE = 1
-NIF_TIP = 4
-NIIF_INFO = 1
-NIIF_WARNING = 2
-NIIF_ERROR = 3
-NIF_INFO = 16
+NIM_ADD = 0x00
+NIM_MODIFY = 0x01
+NIM_DELETE = 0x02
+NIM_SETVERSION = 0x04
+NIF_MESSAGE = 0x01
+NIF_ICON = 0x02
+NIF_TIP = 0x04
+NIF_INFO = 0x10
 NIF_SHOWTIP = 0x80
+NIIF_INFO = 0x1
+NIIF_WARNING = 0x2
+NIIF_ERROR = 0x3
+NIIF_NOSOUND = 0x10
 
 
 class WndClassEx(ctypes.Structure):
@@ -272,7 +273,7 @@ class WindowsNotify:
         res.uVersion = 3 if self.is_xp else 4
         res.szInfo = msg[:256]
         res.szInfoTitle = title[:64]
-        res.dwInfoFlags = icon_level
+        res.dwInfoFlags = icon_level | NIIF_NOSOUND
 
         self.show_icon(res)
 
