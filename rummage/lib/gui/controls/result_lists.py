@@ -264,7 +264,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         self.EDITOR_LABEL = _("Open in Editor")
         self.REVEAL_LABEL = {
             "windows": _("Reveal in Explorer"),
-            "osx": _("Reveal in Finder"),
+            "macos": _("Reveal in Finder"),
             "linux": _("Reveal in File Manager")
         }
         self.COPY_NAME = _("Copy File Names")
@@ -559,7 +559,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
         self.EDITOR_LABEL = _("Open in Editor")
         self.REVEAL_LABEL = {
             "windows": _("Reveal in Explorer"),
-            "osx": _("Reveal in Finder"),
+            "macos": _("Reveal in Finder"),
             "linux": _("Reveal in File Manager")
         }
         self.COPY_NAME = _("Copy File Names")

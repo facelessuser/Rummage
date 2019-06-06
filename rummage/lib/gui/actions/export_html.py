@@ -213,7 +213,7 @@ def open_in_browser(name):
     """Auto open HTML."""
 
     platform = util.platform()
-    if platform == "osx":
+    if platform == "macos":
         web_handler = None
         try:
             launch_services = os.path.expanduser(

@@ -176,7 +176,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                 value = None
             if key == "locale" and value not in Settings.get_languages():
                 value = None
-            if key == "term_notifier" and util.platform() != "osx":
+            if key == "term_notifier" and util.platform() != "macos":
                 value = ""
         return value
 

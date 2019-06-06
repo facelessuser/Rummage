@@ -82,7 +82,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         for x in range(self.m_settings_notebook.GetPageCount()):
             page = self.m_settings_notebook.GetPage(x)
             bg = page.GetBackgroundColour()
-            if util.platform() == "osx":
+            if util.platform() == "macos":
                 factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
                 bg = bg.ChangeLightness(factor)
             page.SetBackgroundColour(bg)
@@ -93,7 +93,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         # Ensure OS platform select all shortcut works
         self.set_keybindings(
-            [(wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
+            [(wx.ACCEL_CMD if util.platform() == "macos" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
 
         self.history_types = [
@@ -149,7 +149,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
             locale = "en_US"
         self.m_lang_choice.SetStringSelection(locale)
         self.m_term_note_picker.SetPath(Settings.get_term_notifier())
-        if util.platform() != "osx":
+        if util.platform() != "macos":
             self.m_term_note_label.Hide()
             self.m_term_note_picker.Hide()
         else:
@@ -400,7 +400,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         string_choice = self.m_notify_choice.GetStringSelection()
         is_native = string_choice == "default"
-        if util.platform() == "osx":
+        if util.platform() == "macos":
             self.m_term_note_picker.Enable(is_native)
             self.m_term_note_label.Enable(is_native)
         Settings.set_notify_method(self.m_notify_choice.GetStringSelection())

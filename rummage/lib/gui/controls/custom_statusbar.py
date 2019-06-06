@@ -211,7 +211,7 @@ class IconTrayExtension:
         x_offset = 0
         if resize:
             platform = util.platform()
-            if platform in "osx":
+            if platform in "macos":
                 # macOS must increment by 10
                 self.SetStatusWidths([-1, len(self.sb_icons) * 20 + 10])
             elif platform == "windows":

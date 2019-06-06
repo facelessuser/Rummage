@@ -106,7 +106,7 @@ def reveal(event, target):
 
     cmd = {
         "windows": 'explorer /select,"%s"',
-        "osx": 'open -R "%s"',
+        "macos": 'open -R "%s"',
         "linux": 'xdg-open "%s"'
     }
 

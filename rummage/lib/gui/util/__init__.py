@@ -8,7 +8,7 @@ from encodings.aliases import aliases
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
 elif sys.platform == "darwin":
-    _PLATFORM = "osx"
+    _PLATFORM = "macos"
 else:
     _PLATFORM = "linux"
 

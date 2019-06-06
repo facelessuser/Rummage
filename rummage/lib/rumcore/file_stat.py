@@ -7,7 +7,7 @@ import os
 from . import util
 
 
-if util.platform() == "osx":
+if util.platform() == "macos":
     import ctypes
 
     # http://stackoverflow.com/questions/946967/get-file-creation-time-with-python-on-mac

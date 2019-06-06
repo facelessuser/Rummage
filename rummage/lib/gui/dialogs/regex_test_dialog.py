@@ -103,7 +103,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         # Ensure OS select all shortcut works in text inputs
         self.set_keybindings(
             [
-                (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)
+                (wx.ACCEL_CMD if util.platform() == "macos" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)
             ]
         )
 

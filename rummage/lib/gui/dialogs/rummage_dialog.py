@@ -365,7 +365,7 @@ class RummageFrame(gui.RummageFrame):
         # Setup debugging
         self.set_keybindings(
             [
-                (wx.ACCEL_CMD if util.platform() == "osx" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
+                (wx.ACCEL_CMD if util.platform() == "macos" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall),
                 (wx.ACCEL_NORMAL, wx.WXK_RETURN, self.on_enter_key),
                 (wx.ACCEL_NORMAL, wx.WXK_ESCAPE, self.on_esc_key)
             ]
@@ -410,7 +410,7 @@ class RummageFrame(gui.RummageFrame):
         for x in range(self.m_grep_notebook.GetPageCount()):
             page = self.m_grep_notebook.GetPage(x)
             bg = page.GetBackgroundColour()
-            if util.platform() == "osx":
+            if util.platform() == "macos":
                 factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
                 bg = bg.ChangeLightness(factor)
             page.SetBackgroundColour(bg)
@@ -441,7 +441,7 @@ class RummageFrame(gui.RummageFrame):
         # Linux seems to need the resize to get its control tab
         # order right as we are hiding some items, but doing it
         # now won't work, so we delay it.
-        refocus = util.platform() == 'osx'
+        refocus = util.platform() == 'macos'
         resize = util.platform() == 'linux'
         self.call_later = wx.CallLater(500, functools.partial(self.on_loaded, refocus=refocus, resize=resize))
         self.call_later.Start()
