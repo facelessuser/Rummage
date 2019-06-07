@@ -31,21 +31,30 @@ class Options:
         cls.sound = None
 
 
-def alert(sound=None):
+def _alert(sound=None):
     """Play an alert sound for the OS."""
 
-    if Options.sound is not None:
+    if sound is None and Options.sound is not None:
+        sound = Options.sound
+
+    if sound is not None:
         for player in PLAYERS:
             executable = util.which(player)
             if executable is not None:
                 try:
                     if player == 'play':
-                        subprocess.call([executable, '-q', Options.sound])
+                        subprocess.call([executable, '-q', sound])
                     else:
-                        subprocess.call([executable, Options.sound])
+                        subprocess.call([executable, sound])
                 except Exception:
                     pass
                 break
+
+
+def alert():
+    """Alert."""
+
+    _alert()
 
 
 @staticmethod

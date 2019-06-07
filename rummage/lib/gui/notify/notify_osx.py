@@ -86,12 +86,15 @@ class Options:
         cls.sound = None
 
 
-def alert(sound=None):
+def _alert(sound=None):
     """Play an alert sound for the OS."""
 
+    if sound is None and Options.sound is not None:
+        sound = Options.sound
+
     try:
-        if Options.sound is not None:
-            subprocess.call(["afplay", Options.sound])
+        if sound is not None:
+            subprocess.call(["afplay", sound])
         # ```
         # pool = _callmethod(_callmethod(NSAutoreleasePool, "alloc"), "init")
         # snd = _nsstring(sound if sound is not None else "Glass")
@@ -102,6 +105,12 @@ def alert(sound=None):
         # ```
     except Exception:
         pass
+
+
+def alert():
+    """Alert."""
+
+    _alert()
 
 
 @staticmethod
@@ -129,19 +138,17 @@ def notify_osx_call(title, message, sound, fallback):
             params += ["-sender", Options.sender]
         if Options.icon is not None:
             params += ["-appIcon", Options.icon]
-        if sound:
-            params += ["-sound", "Glass"]
         subprocess.Popen(params)
 
-        # if sound:
-        #     # Play sound if desired
-        #     alert()
+        if sound:
+            # Play sound if desired
+            alert()
     except Exception:
         # Fallback notification
         fallback(title, message, sound)
 
 
-def setup(app_name, icon, *kwargs):
+def setup(app_name, icon, **kwargs):
     """Setup."""
 
     term_notify = None
