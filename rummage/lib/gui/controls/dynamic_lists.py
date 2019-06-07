@@ -241,7 +241,12 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Setup columns."""
 
         for x in range(0, self.column_count):
-            self.InsertColumn(x, self.headers[self.get_real_col(x)])
+            real = self.get_real_col(x)
+            lw = self.dc.GetFullTextExtent(self.headers[real])[0]
+            width = lw + 30
+            if width > self.widest_cell[x]:
+                self.widest_cell[x] = width
+            self.InsertColumn(x, self.headers[real])
         for i in range(0, self.column_count):
             real = self.get_real_col(i)
             if real not in self.hidden_columns:
