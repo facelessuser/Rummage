@@ -16,7 +16,6 @@ class TimePickerCtrl(TimeCtrl):
         """
 
         ctrl = wx.TextCtrl(parent)
-        self._fg = ctrl.GetForegroundColour().GetRGB()
         self._bg = ctrl.GetBackgroundColour().GetRGB()
         bg = rgba.RGBA(0xFF0000)
         bg.blend(rgba.RGBA(ctrl.GetBackgroundColour().Get()), 60)
@@ -32,9 +31,9 @@ class TimePickerCtrl(TimeCtrl):
         if 'oob_color' in kwargs:
             del kwargs['oob_color']
         maskededit_kwargs = super().SetParameters(**kwargs)
-        maskededit_kwargs['emptyBackgroundColour'] = wx.Colour(self._bg)
-        maskededit_kwargs['validBackgroundColour'] = wx.Colour(self._bg)
+        maskededit_kwargs['emptyBackgroundColour'] = wx.NullColour
+        maskededit_kwargs['validBackgroundColour'] = wx.NullColour
         maskededit_kwargs['invalidBackgroundColour'] = wx.Colour(self._error_bg)
-        maskededit_kwargs['foregroundColour'] = wx.Colour(self._fg)
-        maskededit_kwargs['signedForegroundColour'] = wx.Colour(self._fg)
+        maskededit_kwargs['foregroundColour'] = wx.NullColour
+        maskededit_kwargs['signedForegroundColour'] = wx.NullColour
         return maskededit_kwargs
