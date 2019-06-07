@@ -18,4 +18,10 @@ The Font Awesome font is licensed under the [SIL OFL 1.1](http://scripts.sil.org
 
 ---
 
-Default notification sound is licensed under [CC0 1.0 Universal (CC0 1.0) Public Domain Dedication](https://creativecommons.org/publicdomain/zero/1.0/) and was acquired from https://freesound.org/people/hihirex/sounds/66876/.
+Default notification sound license:
+
+Free Sound Effects Site.
+
+Licence: License: Attribution 4.0 International (CC BY 4.0). You are allowed to use sound effects free of charge and royalty free in your multimedia projects for commercial or non-commercial purposes.
+
+http://www.freesoundslibrary.com

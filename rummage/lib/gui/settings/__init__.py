@@ -965,7 +965,7 @@ class Settings:
             img,
             term_notify=notifier,
             sender=None,
-            sound=os.path.join(data.RESOURCE_PATH, "glass-ding.wav")
+            sound=os.path.join(data.RESOURCE_PATH, "notify.wav")
         )
         notify.setup_growl_notifications("Rummage", growl_png)
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
