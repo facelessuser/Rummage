@@ -40,7 +40,7 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.4.0'
+SETTINGS_FMT = '2.5.0'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -78,6 +78,7 @@ DEFAULT_SETTINGS = {
     "matchbase": False,
     "notify_enabled": True,
     "notify_method": "default",
+    "notify_sound": os.path.join(data.RESOURCE_PATH, "notify.wav"),
     "pos_cols_content": [],
     "pos_cols_file": [],
     "regex_mode": rumcore.RE_MODE,
@@ -965,7 +966,7 @@ class Settings:
             img,
             term_notify=notifier,
             sender=None,
-            sound=os.path.join(data.RESOURCE_PATH, "notify.wav")
+            sound=cls.get_notify_sound()
         )
         notify.setup_growl_notifications("Rummage", growl_png)
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
@@ -1046,6 +1047,31 @@ class Settings:
         """Set term notifier location."""
 
         cls.settings['term_notifier'] = value
+
+    @classmethod
+    def get_notify_sound(cls):
+        """Get notifier sound."""
+
+        cls.reload_settings()
+        sound = cls.settings.get('notify_sound')
+        if sound is None or not os.path.exists(sound) or not os.path.isfile(sound):
+            sound = os.path.join(data.RESOURCE_PATH, "notify.wav")
+        return sound
+
+    @classmethod
+    def set_notify_sound(cls, value):
+        """Set notifier sound."""
+
+        cls.reload_settings()
+        cls._set_notify_sound(value)
+        cls.save_settings()
+        cls.init_notify()
+
+    @classmethod
+    def _set_notify_sound(cls, value):
+        """Set notifier sound."""
+
+        cls.settings['notify_sound'] = value
 
     @classmethod
     def get_search_setting(cls, key, default):
@@ -1483,6 +1509,9 @@ class Settings:
             update_notify = True
         if 'term_notifier' in obj:
             cls._set_term_notifier(obj['term_notifier'])
+            update_notify = True
+        if 'notify_sound' in obj:
+            cls._set_notify_sound(obj['notify_sound'])
             update_notify = True
 
         # Editor

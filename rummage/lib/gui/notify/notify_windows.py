@@ -120,7 +120,7 @@ def _alert(sound=None):
 
     try:
         if sound:
-            winsound.PlaySound(sound, winsound.SND_FILENAME | winsound.SND_ASYNC)
+            winsound.PlaySound(sound, winsound.SND_FILENAME)
     except Exception:
         pass
 

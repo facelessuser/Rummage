@@ -40,7 +40,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         "brace_expansion", "file_case_sensitive", "full_exclude_path", "full_file_path",
         "globstar", "international_time", "matchbase", "alt_list_color"
     )
-    STRING = ("backup_ext", "backup_folder", "term_notifier", "editor", "notify_method")
+    STRING = ("backup_ext", "backup_folder", "term_notifier", "editor", "notify_method", "notify_sound")
     INTEGER = ("backup_type", "regex_mode", "regex_version")
     RE_LITERAL_FLAGS = re.compile(r'[iuf]*')
     RE_REGEXP_FLAGS = re.compile(r'[iufsbewrpF]*')
@@ -179,6 +179,8 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                 value = None
             if key == "term_notifier" and util.platform() != "macos":
                 value = ""
+            if key == "notify_sound":
+                value = None
         return value
 
     def import_int(self, key, value):

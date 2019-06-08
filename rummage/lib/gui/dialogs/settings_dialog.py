@@ -169,6 +169,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_update_checkbox.SetValue(bool(Settings.get_check_updates()))
         self.m_prerelease_checkbox.SetValue(bool(Settings.get_prerelease()))
         self.m_alt_row_checkbox.SetValue(bool(Settings.get_alt_list_color()))
+        self.m_sound_picker.SetPath(Settings.get_notify_sound())
 
         self.refresh_localization()
         self.finalize_size()
