@@ -7134,7 +7134,7 @@
                                                     <object class="wxFlexGridSizer" expanded="0">
                                                         <property name="cols">3</property>
                                                         <property name="flexible_direction">wxBOTH</property>
-                                                        <property name="growablecols"></property>
+                                                        <property name="growablecols">2</property>
                                                         <property name="growablerows"></property>
                                                         <property name="hgap">0</property>
                                                         <property name="minimum_size"></property>
@@ -7275,7 +7275,7 @@
                                                         </object>
                                                         <object class="sizeritem" expanded="0">
                                                             <property name="border">5</property>
-                                                            <property name="flag">wxALL</property>
+                                                            <property name="flag">wxALL|wxALIGN_RIGHT</property>
                                                             <property name="proportion">0</property>
                                                             <object class="wxButton" expanded="0">
                                                                 <property name="BottomDockable">1</property>
@@ -8940,7 +8940,7 @@
                                                         <property name="caption"></property>
                                                         <property name="caption_visible">1</property>
                                                         <property name="center_pane">0</property>
-                                                        <property name="class"></property>
+                                                        <property name="class">wxTextCtrl</property>
                                                         <property name="close_button">1</property>
                                                         <property name="construction">self.m_help_html = wx.html2.WebView.New(self.m_editor_panel)</property>
                                                         <property name="context_help"></property>
@@ -9468,7 +9468,7 @@
                                                 </object>
                                                 <object class="sizeritem" expanded="0">
                                                     <property name="border">5</property>
-                                                    <property name="flag">wxALL|wxEXPAND</property>
+                                                    <property name="flag">wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL</property>
                                                     <property name="proportion">0</property>
                                                     <object class="CustomControl" expanded="0">
                                                         <property name="BottomDockable">1</property>
@@ -9591,9 +9591,9 @@
                                                 </object>
                                                 <object class="sizeritem" expanded="0">
                                                     <property name="border">5</property>
-                                                    <property name="flag">wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND</property>
+                                                    <property name="flag">wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL</property>
                                                     <property name="proportion">0</property>
-                                                    <object class="wxFilePickerCtrl" expanded="0">
+                                                    <object class="CustomControl" expanded="0">
                                                         <property name="BottomDockable">1</property>
                                                         <property name="LeftDockable">1</property>
                                                         <property name="RightDockable">1</property>
@@ -9607,24 +9607,27 @@
                                                         <property name="caption"></property>
                                                         <property name="caption_visible">1</property>
                                                         <property name="center_pane">0</property>
+                                                        <property name="class">wxFilePickerCtrl</property>
                                                         <property name="close_button">1</property>
+                                                        <property name="construction">self.m_term_note_picker = FilePickerCustomCtrl(self.m_notify_panel, wx.ID_ANY, wx.EmptyString, u&quot;Select file&quot;, u&quot;*&quot;, wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST)&#x0A;self.m_term_note_picker.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_term_note_change)</property>
                                                         <property name="context_help"></property>
                                                         <property name="context_menu">1</property>
+                                                        <property name="declaration"></property>
                                                         <property name="default_pane">0</property>
                                                         <property name="dock">Dock</property>
                                                         <property name="dock_fixed">0</property>
                                                         <property name="docking">Left</property>
-                                                        <property name="enabled">0</property>
+                                                        <property name="enabled">1</property>
                                                         <property name="fg"></property>
                                                         <property name="floatable">1</property>
                                                         <property name="font"></property>
                                                         <property name="gripper">0</property>
                                                         <property name="hidden">0</property>
                                                         <property name="id">wxID_ANY</property>
+                                                        <property name="include">from .controls.file_picker import FilePickerCustomCtrl</property>
                                                         <property name="max_size"></property>
                                                         <property name="maximize_button">0</property>
                                                         <property name="maximum_size"></property>
-                                                        <property name="message">Select a file</property>
                                                         <property name="min_size"></property>
                                                         <property name="minimize_button">0</property>
                                                         <property name="minimum_size"></property>
@@ -9637,22 +9640,15 @@
                                                         <property name="pin_button">1</property>
                                                         <property name="pos"></property>
                                                         <property name="resize">Resizable</property>
+                                                        <property name="settings"></property>
                                                         <property name="show">1</property>
                                                         <property name="size"></property>
-                                                        <property name="style">wxFLP_DEFAULT_STYLE|wxFLP_FILE_MUST_EXIST</property>
-                                                        <property name="subclass"></property>
+                                                        <property name="subclass">; ; forward_declare</property>
                                                         <property name="toolbar_pane">0</property>
                                                         <property name="tooltip"></property>
-                                                        <property name="validator_data_type"></property>
-                                                        <property name="validator_style">wxFILTER_NONE</property>
-                                                        <property name="validator_type">wxDefaultValidator</property>
-                                                        <property name="validator_variable"></property>
-                                                        <property name="value"></property>
-                                                        <property name="wildcard">*.*</property>
                                                         <property name="window_extra_style"></property>
                                                         <property name="window_name"></property>
                                                         <property name="window_style"></property>
-                                                        <event name="OnFileChanged">on_term_note_change</event>
                                                     </object>
                                                 </object>
                                                 <object class="sizeritem" expanded="0">

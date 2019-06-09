@@ -16,6 +16,7 @@ from .controls.result_lists import ResultFileList
 from .controls.result_lists import ResultContentList
 from .controls.encoding_list import EncodingList
 from .controls.file_picker import FilePickerAudioCtrl
+from .controls.file_picker import FilePickerCustomCtrl
 from .controls.load_search_list import SavedSearchList
 from .controls.search_chain_list import SearchChainList
 from .controls.search_error_list import ErrorList
@@ -936,6 +937,7 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer52.Add( self.m_staticline91, 0, wx.EXPAND |wx.ALL, 5 )
 
         fgSizer54 = wx.FlexGridSizer( 0, 3, 0, 0 )
+        fgSizer54.AddGrowableCol( 2 )
         fgSizer54.SetFlexibleDirection( wx.BOTH )
         fgSizer54.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
@@ -946,7 +948,7 @@ class SettingsDialog ( wx.Dialog ):
         fgSizer54.Add( self.m_prerelease_checkbox, 0, wx.ALL, 5 )
 
         self.m_check_update_button = wx.Button( self.m_general_panel, wx.ID_ANY, u"Check Now", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer54.Add( self.m_check_update_button, 0, wx.ALL, 5 )
+        fgSizer54.Add( self.m_check_update_button, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
 
 
         fgSizer52.Add( fgSizer54, 1, wx.EXPAND, 5 )
@@ -1142,7 +1144,7 @@ class SettingsDialog ( wx.Dialog ):
 
         self.m_sound_picker = FilePickerAudioCtrl(self.m_notify_panel, wx.ID_ANY, wx.EmptyString, u"Select audio file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST)
         self.m_sound_picker.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_sound_change)
-        fgSizer35.Add( self.m_sound_picker, 0, wx.ALL|wx.EXPAND, 5 )
+        fgSizer35.Add( self.m_sound_picker, 0, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
 
         self.m_term_note_label = wx.StaticText( self.m_notify_panel, wx.ID_ANY, u"Path to terminal-notifier", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_term_note_label.Wrap( -1 )
@@ -1151,10 +1153,9 @@ class SettingsDialog ( wx.Dialog ):
 
         fgSizer35.Add( self.m_term_note_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 
-        self.m_term_note_picker = wx.FilePickerCtrl( self.m_notify_panel, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST )
-        self.m_term_note_picker.Enable( False )
-
-        fgSizer35.Add( self.m_term_note_picker, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
+        self.m_term_note_picker = FilePickerCustomCtrl(self.m_notify_panel, wx.ID_ANY, wx.EmptyString, u"Select file", u"*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST)
+        self.m_term_note_picker.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_term_note_change)
+        fgSizer35.Add( self.m_term_note_picker, 0, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
 
 
         fgSizer35.Add( ( 0, 0), 1, wx.EXPAND, 5 )
@@ -1305,7 +1306,6 @@ class SettingsDialog ( wx.Dialog ):
         self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
         self.m_notify_choice.Bind( wx.EVT_CHOICE, self.on_notify_choice )
         self.m_audio_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_alert_toggle )
-        self.m_term_note_picker.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_term_note_change )
         self.m_notify_test_button.Bind( wx.EVT_BUTTON, self.on_notify_test_click )
         self.m_history_clear_button.Bind( wx.EVT_BUTTON, self.on_clear_history )
         self.m_back_ext_textbox.Bind( wx.EVT_TEXT, self.on_back_ext_changed )
@@ -1393,9 +1393,6 @@ class SettingsDialog ( wx.Dialog ):
         event.Skip()
 
     def on_alert_toggle( self, event ):
-        event.Skip()
-
-    def on_term_note_change( self, event ):
         event.Skip()
 
     def on_notify_test_click( self, event ):
