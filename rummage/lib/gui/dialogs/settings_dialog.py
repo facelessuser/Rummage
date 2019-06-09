@@ -448,6 +448,11 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         Settings.set_alert(self.m_audio_alert_checkbox.GetValue())
         event.Skip()
 
+    def on_sound_change(self, event):
+        """Update user sound."""
+
+        Settings.set_notify_sound(self.m_sound_picker.GetPath())
+
     def on_notify_test_click(self, event):
         """Handle notification test."""
 
