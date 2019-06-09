@@ -20,6 +20,7 @@ class Options:
     notify = None
     app_name = ""
     sound = None
+    player = None
 
     @classmethod
     def clear(cls):
@@ -29,26 +30,26 @@ class Options:
         cls.notify = None
         cls.app_name = ""
         cls.sound = None
+        cls.player = None
 
 
-def _alert(sound=None):
+def _alert(sound=None, player=None):
     """Play an alert sound for the OS."""
 
     if sound is None and Options.sound is not None:
         sound = Options.sound
 
-    if sound is not None:
-        for player in PLAYERS:
-            executable = util.which(player)
-            if executable is not None:
-                try:
-                    if player == 'play':
-                        subprocess.call([executable, '-q', sound])
-                    else:
-                        subprocess.call([executable, sound])
-                except Exception:
-                    pass
-                break
+    if player is None and Options.player is not None:
+        player = Options.player
+
+    if player is not None and sound is not None:
+        try:
+            if player == 'play':
+                subprocess.call([player, '-q', sound])
+            else:
+                subprocess.call([player, sound])
+        except Exception:
+            pass
 
 
 def alert():
@@ -107,6 +108,10 @@ def setup(app_name, icon, **kwargs):
     sound = kwargs.get('sound')
     if sound is not None and os.path.exists(sound):
         Options.sound = sound
+
+    player = kwargs.get('sound_player')
+    if player is not None and player not in PLAYERS and util.which(player):
+        Options.player = player
 
     try:
         if icon is None or not os.path.exists(icon):
