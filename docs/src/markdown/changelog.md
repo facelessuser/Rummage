@@ -1,9 +1,12 @@
 # Changelog
 
-## Current
+## 4.7.0 (Development)
 
 - **NEW**: Add `col0` variable for editor configuration to allow for using a zero based column value instead of one based column value for editors that require it.
 - **NEW**: Add global option to turn off alternating row colors in lists.
+- **NEW**: Include a default notification sound and use it as the default across all platforms.
+- **NEW**: Provide fallback players for Linux: `paplay`, `aplay`, and `play` (`sox`).
+- **NEW**: Provide interface for selecting custom notification sounds.
 - **FIX**: Better attempt to get appropriate creation on all Linux systems.
 - **FIX**: Better fix for time picker getting wrong background.
 - **FIX**: Ensure column sizing includes header size.
