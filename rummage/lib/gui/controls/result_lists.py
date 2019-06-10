@@ -135,7 +135,7 @@ class CommonOperationsMixin:
     def on_arrange_click(self, event):
         """Handle arranging columns."""
 
-        from ..dialogs import ColumnDialog
+        from ..dialogs.column_dialog import ColumnDialog
 
         dlg = ColumnDialog(self.main_window, self.virtual_list, self.headers)
         dlg.ShowModal()
@@ -147,7 +147,7 @@ class CommonOperationsMixin:
     def on_checksum(self, event, h, target):
         """Handle checksum event."""
 
-        from ..dialogs import ChecksumDialog
+        from ..dialogs.checksum_dialog import ChecksumDialog
 
         dlg = ChecksumDialog(self.main_window, h, target)
         dlg.ShowModal()
@@ -156,7 +156,7 @@ class CommonOperationsMixin:
     def on_delete_files(self, event, recycle):
         """Delete files in the list control."""
 
-        from ..dialogs import DeleteDialog
+        from ..dialogs.delete_dialog import DeleteDialog
 
         if not yesno(self.RECYCLE if recycle else self.DELETE):
             return
