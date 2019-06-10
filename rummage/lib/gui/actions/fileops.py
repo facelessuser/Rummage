@@ -98,7 +98,7 @@ def open_editor(filename, line, col):
         error("No editor set: %s" % cmd)
         return
 
-    return util.call(cmd)
+    return call(cmd)
 
 
 def reveal(event, target):
@@ -113,4 +113,4 @@ def reveal(event, target):
     if util.platform() == "linux":
         target = os.path.dirname(target)
 
-    return util.call(cmd[util.platform()] % target.replace('"', '\\"'))
+    return call(cmd[util.platform()] % target.replace('"', '\\"'))
