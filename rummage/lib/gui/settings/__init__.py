@@ -142,6 +142,12 @@ class Settings:
         cls.init_notify(True)
 
     @classmethod
+    def get_available_players(cls):
+        """Get the available players."""
+
+        return NOTIFY_PLAYERS[util.platform()][:]
+
+    @classmethod
     def get_settings(cls):
         """Get the entire settings object."""
 
@@ -1083,9 +1089,9 @@ class Settings:
         """Set notifier sound."""
 
         cls.reload_settings()
-        cls._set_notify_sound(value)
-        cls.save_settings()
-        cls.init_notify()
+        if cls._set_notify_sound(value):
+            cls.save_settings()
+            cls.init_notify()
 
     @classmethod
     def _set_notify_sound(cls, sound):
@@ -1093,10 +1099,11 @@ class Settings:
 
         player = cls._get_notify_player()
         if sound is None or not os.path.exists(sound) or not os.path.isfile(sound):
-            sound = os.path.join(data.RESOURCE_PATH, "notify.wav")
+            return False
         if os.path.splitext(sound)[1].lower() not in NOTIFY_EXT[player]:
-            sound = os.path.join(data.RESOURCE_PATH, "notify.wav")
+            return False
         cls.settings['notify_sound'] = sound
+        return True
 
     @classmethod
     def get_notify_player(cls):
@@ -1145,14 +1152,6 @@ class Settings:
         """Set notifier player."""
 
         player = cls.validate_player(player)
-        orig_sound = cls.settings.get('notify_sound')
-        sound = orig_sound
-        if sound is None or not os.path.exists(sound) or not os.path.isfile(sound):
-            sound = os.path.join(data.RESOURCE_PATH, "notify.wav")
-        if os.path.splitext(sound)[1].lower() not in NOTIFY_EXT[player]:
-            sound = os.path.join(data.RESOURCE_PATH, "notify.wav")
-        if sound != orig_sound:
-            cls.settings['notify_sound'] = sound
         cls.settings['notify_player'] = player
 
     @classmethod

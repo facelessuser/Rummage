@@ -1138,13 +1138,23 @@ class SettingsDialog ( wx.Dialog ):
         self.m_notify_choice.SetSelection( 0 )
         fgSizer35.Add( self.m_notify_choice, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 
-        self.m_audio_alert_checkbox = wx.CheckBox( self.m_notify_panel, wx.ID_ANY, u"Alert Sound", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_audio_alert_checkbox = wx.CheckBox( self.m_notify_panel, wx.ID_ANY, u"Alert sound", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_audio_alert_checkbox.SetValue(True)
         fgSizer35.Add( self.m_audio_alert_checkbox, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 
         self.m_sound_picker = FilePickerAudioCtrl(self.m_notify_panel, wx.ID_ANY, wx.EmptyString, u"Select audio file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST)
         self.m_sound_picker.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_sound_change)
         fgSizer35.Add( self.m_sound_picker, 0, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
+
+        self.m_sound_player_label = wx.StaticText( self.m_notify_panel, wx.ID_ANY, u"Alert player", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_sound_player_label.Wrap( -1 )
+
+        fgSizer35.Add( self.m_sound_player_label, 0, wx.ALL, 5 )
+
+        m_sound_player_choiceChoices = []
+        self.m_sound_player_choice = wx.Choice( self.m_notify_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_sound_player_choiceChoices, 0 )
+        self.m_sound_player_choice.SetSelection( 0 )
+        fgSizer35.Add( self.m_sound_player_choice, 0, wx.ALL|wx.ALIGN_RIGHT, 5 )
 
         self.m_term_note_label = wx.StaticText( self.m_notify_panel, wx.ID_ANY, u"Path to terminal-notifier", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_term_note_label.Wrap( -1 )
@@ -1306,6 +1316,7 @@ class SettingsDialog ( wx.Dialog ):
         self.m_visual_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_notify_toggle )
         self.m_notify_choice.Bind( wx.EVT_CHOICE, self.on_notify_choice )
         self.m_audio_alert_checkbox.Bind( wx.EVT_CHECKBOX, self.on_alert_toggle )
+        self.m_sound_player_choice.Bind( wx.EVT_CHOICE, self.on_player_selected )
         self.m_notify_test_button.Bind( wx.EVT_BUTTON, self.on_notify_test_click )
         self.m_history_clear_button.Bind( wx.EVT_BUTTON, self.on_clear_history )
         self.m_back_ext_textbox.Bind( wx.EVT_TEXT, self.on_back_ext_changed )
@@ -1393,6 +1404,9 @@ class SettingsDialog ( wx.Dialog ):
         event.Skip()
 
     def on_alert_toggle( self, event ):
+        event.Skip()
+
+    def on_player_selected( self, event ):
         event.Skip()
 
     def on_notify_test_click( self, event ):
