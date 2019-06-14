@@ -5,6 +5,7 @@
 - **FIX**: Better attempt to get appropriate creation on all Linux systems.
 - **FIX**: Better fix for time picker getting wrong background.
 - **FIX**: Ensure column sizing includes header size.
+- **FIX**: When showing timed status event for results in status bar (full path name), decrease length of time that the temporary status is shown and clear temporary status when the cursor leaves result items.
 
 ## 4.6.3
 
