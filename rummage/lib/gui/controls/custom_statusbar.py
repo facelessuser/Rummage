@@ -89,7 +89,17 @@ class TimedStatusExtension:
         else:
             self.saved_text = self.GetStatusText(index)
         self.SetStatusText(text, index)
-        self.text_timer[index].Start(5000, oneShot=True)
+        self.text_timer[index].Start(3000, oneShot=True)
+
+    def cancel_timed_status(self, index=0):
+        """Cancel running timed status."""
+
+        if self.kill:
+            return
+
+        if self.text_timer[index].IsRunning():
+            self.text_timer[index].Stop()
+            self.clear_text(None, index)
 
     def sb_time_setup(self, field_count):
         """Setup timer for timed status."""

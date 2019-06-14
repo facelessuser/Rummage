@@ -108,6 +108,11 @@ class CommonOperationsMixin:
         self.last_moused = (-1, "")
         event.Skip()
 
+    def on_leave_window(self, event):
+        """Clear timed status when cursor leaves window."""
+
+        self.main_window.m_statusbar.cancel_timed_status()
+
     def create_image_list(self):
         """Create the image list."""
 
@@ -245,6 +250,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
+        self.Bind(wx.EVT_LEAVE_WINDOW, self.on_leave_window)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_rclick)
         self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.on_col_rclick)
@@ -349,6 +355,8 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                     data = self.itemDataMap[actual_item]
                     self.last_moused = (actual_item, os.path.join(data[FILE_PATH], data[FILE_NAME]))
                 self.main_window.m_statusbar.set_timed_status(self.last_moused[1])
+            else:
+                self.main_window.m_statusbar.cancel_timed_status()
         event.Skip()
 
     def get_item_text(self, item, col, absolute=False):
@@ -543,6 +551,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
         self.last_moused = (-1, "")
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.Bind(wx.EVT_MOTION, self.on_motion)
+        self.Bind(wx.EVT_LEAVE_WINDOW, self.on_leave_window)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_enter_window)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_rclick)
         self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.on_col_rclick)
@@ -621,6 +630,8 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                     pth = self.itemDataMap[actual_item][CONTENT_PATH]
                     self.last_moused = (actual_item, os.path.join(pth[1], pth[0]))
                 self.main_window.m_statusbar.set_timed_status(self.last_moused[1])
+            else:
+                self.main_window.m_statusbar.cancel_timed_status()
         event.Skip()
 
     def get_item_text(self, item, col, absolute=False):
