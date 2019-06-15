@@ -5,7 +5,7 @@ Copyright (c) 2013 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import subprocess
-from os.path import exists
+import os
 from . import util
 
 __all__ = ("get_notify", "alert", "setup", "destroy")
