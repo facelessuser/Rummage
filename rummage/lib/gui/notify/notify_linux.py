@@ -6,7 +6,6 @@ License: MIT
 """
 import subprocess
 from os.path import exists
-# import traceback
 
 __all__ = ("get_notify", "alert", "setup", "destroy")
 
@@ -67,7 +66,6 @@ try:
                 # Play sound if desired
                 alert()
         except Exception:
-            # print(traceback.format_exc())
             # Fallback to wxPython notification
             fallback(title, message, sound)
 except Exception:

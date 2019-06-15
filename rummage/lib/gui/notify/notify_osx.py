@@ -12,7 +12,6 @@ from os.path import exists
 # ```
 import sys
 import platform
-# import traceback
 
 __all__ = ("get_notify", "alert", "setup", "destroy")
 
@@ -135,7 +134,6 @@ def notify_osx_call(title, message, sound, fallback):
         #     # Play sound if desired
         #     alert()
     except Exception:
-        # print(traceback.format_exc())
         # Fallback notification
         fallback(title, message, sound)
 
@@ -174,7 +172,6 @@ def setup(app_name, icon, *args):
             Options.icon = notify_icon
         Options.notify = notify_osx_call
     except Exception:
-        # print(traceback.format_exc())
         pass
 
 
