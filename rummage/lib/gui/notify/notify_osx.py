@@ -5,7 +5,6 @@ Copyright (c) 2013 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import subprocess
-import traceback
 from os.path import exists
 # ```
 # import ctypes
@@ -13,6 +12,7 @@ from os.path import exists
 # ```
 import sys
 import platform
+# import traceback
 
 __all__ = ("get_notify", "alert", "setup", "destroy")
 
@@ -115,7 +115,8 @@ def notify_osx_call(title, message, sound, fallback):
     """Notifications for macOS."""
 
     try:
-        assert(Options.terminal_notifier is not None and exists(Options.terminal_notifier))
+        if Options.terminal_notifier is None or not exists(Options.terminal_notifier):
+            raise ValueError("Specified terminal notifier does not appear to be valid")
         # Show Notification here
         params = [Options.terminal_notifier, "-title", Options.app_name, "-timeout", "5"]
         if message is not None:
@@ -134,7 +135,7 @@ def notify_osx_call(title, message, sound, fallback):
         #     # Play sound if desired
         #     alert()
     except Exception:
-        print(traceback.format_exc())
+        # print(traceback.format_exc())
         # Fallback notification
         fallback(title, message, sound)
 
@@ -164,7 +165,8 @@ def setup(app_name, icon, *args):
     Options.app_name = app_name
 
     try:
-        assert(term_notify is not None and exists(term_notify))
+        if term_notify is None or not exists(term_notify):
+            raise ValueError("Terminal notifier does not appear to be available")
         Options.terminal_notifier = term_notify
         if sender is not None:
             Options.sender = sender
@@ -172,7 +174,8 @@ def setup(app_name, icon, *args):
             Options.icon = notify_icon
         Options.notify = notify_osx_call
     except Exception:
-        print(traceback.format_exc())
+        # print(traceback.format_exc())
+        pass
 
 
 def destroy():

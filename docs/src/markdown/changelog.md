@@ -6,6 +6,7 @@
 - **FIX**: Better fix for time picker getting wrong background.
 - **FIX**: Ensure column sizing includes header size.
 - **FIX**: When showing timed status event for results in status bar (full path name), decrease length of time that the temporary status is shown and clear temporary status when the cursor leaves result items.
+- **FIX**: Don't log handled notification errors when a notification system is not found as these are handled gracefully and there is no need to worry the user.
 
 ## 4.6.3
 

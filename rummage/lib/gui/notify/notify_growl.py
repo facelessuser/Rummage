@@ -96,7 +96,8 @@ def setup_growl(app_name, icon):
     Options.icon = None
 
     try:
-        assert(icon is not None and exists(icon))
+        if icon is None or not exists(icon):
+            raise ValueError("Icon does not appear to be valid")
         with open(icon, "rb") as f:
             Options.icon = f.read()
     except Exception:

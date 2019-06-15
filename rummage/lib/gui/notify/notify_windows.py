@@ -202,7 +202,8 @@ class WindowsNotify:
 
         icon_flags = LR_LOADFROMFILE | LR_DEFAULTSIZE
         try:
-            assert icon is not None
+            if icon is None:
+                raise ValueError("Icon is not available")
             hicon = ctypes.windll.user32.LoadImageW(
                 self.hinst, icon,
                 IMAGE_ICON,
@@ -328,7 +329,8 @@ def setup(app_name, icon, *args):
     """Setup."""
 
     try:
-        assert(icon is not None and os.path.exists(icon))
+        if icon is None or not os.path.exists(icon):
+            raise ValueError("Icon does not appear to be valid")
     except Exception:
         icon = None
 

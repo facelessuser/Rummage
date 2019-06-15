@@ -6,7 +6,7 @@ License: MIT
 """
 import subprocess
 from os.path import exists
-import traceback
+# import traceback
 
 __all__ = ("get_notify", "alert", "setup", "destroy")
 
@@ -48,7 +48,8 @@ def notify_osd_fallback(title, message, sound, fallback):
 
 
 try:
-    assert(subprocess.call(["notify-send", "--version"]) == 0)
+    if subprocess.call(["notify-send", "--version"]) != 0:
+        raise ValueError("Notification support does not appear to be available")
 
     @staticmethod
     def notify_osd_call(title, message, sound, fallback):
@@ -66,7 +67,7 @@ try:
                 # Play sound if desired
                 alert()
         except Exception:
-            print(traceback.format_exc())
+            # print(traceback.format_exc())
             # Fallback to wxPython notification
             fallback(title, message, sound)
 except Exception:
@@ -88,7 +89,8 @@ def setup(app_name, icon, *args):
     Options.icon = None
 
     try:
-        assert(icon is not None and exists(icon))
+        if icon is None or not exists(icon):
+            raise ValueError("Icon does not appear to be valid")
         Options.icon = icon
     except Exception:
         pass
