@@ -166,6 +166,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.m_tester_panel.Fit()
         self.Fit()
         self.SetMinSize(self.GetSize())
+        self.Centre()
 
     def localize(self):
         """Translate strings."""

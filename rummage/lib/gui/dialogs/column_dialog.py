@@ -42,6 +42,7 @@ class ColumnDialog(gui.ColumnDialog):
         self.m_column_panel.Fit()
         self.Fit()
         self.SetMinSize(self.GetSize())
+        self.Centre()
 
         self.m_column_list.SetFocus()
         self.changed = False

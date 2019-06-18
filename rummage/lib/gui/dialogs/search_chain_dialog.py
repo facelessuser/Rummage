@@ -44,6 +44,7 @@ class SearchChainDialog(gui.SearchChainDialog):
 
         self.load_chains()
         self.m_chain_list.SetFocus()
+        self.Centre()
 
     def localize(self):
         """Translate strings."""

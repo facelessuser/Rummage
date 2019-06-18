@@ -61,6 +61,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
         self.SetMinSize(self.GetSize())
         self.SetMaxSize(wx.Size(-1, self.GetSize()[1]))
         self.m_name_text.SetFocus()
+        self.Centre()
 
     def localize(self):
         """Translate strings."""

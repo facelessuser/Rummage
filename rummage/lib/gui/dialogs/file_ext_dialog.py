@@ -44,6 +44,7 @@ class FileExtDialog(gui.FileExtDialog):
             self.SetSize(wx.Size(500, self.GetSize()[1]))
         self.SetMinSize(wx.Size(500, self.GetSize()[1]))
         self.SetMinSize(self.GetSize())
+        self.Centre()
 
     def localize(self):
         """Translate strings."""

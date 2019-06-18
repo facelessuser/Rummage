@@ -35,6 +35,7 @@ class ErrorTextDialog(gui.ErrorTextDialog):
 
         self.m_error_text_panel.Fit()
         self.Fit()
+        self.Centre()
 
     def localize(self):
         """Translate strings."""

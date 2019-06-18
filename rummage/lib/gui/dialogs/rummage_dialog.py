@@ -446,7 +446,8 @@ class RummageFrame(gui.RummageFrame):
         # now won't work, so we delay it.
         refocus = util.platform() == 'macos'
         resize = util.platform() == 'linux'
-        self.call_later = wx.CallLater(500, functools.partial(self.on_loaded, refocus=refocus, resize=resize))
+        delay = 500 if util.platform() == 'macos' else 100
+        self.call_later = wx.CallLater(delay, functools.partial(self.on_loaded, refocus=refocus, resize=resize))
         self.call_later.Start()
 
     def localize(self):
@@ -1853,12 +1854,22 @@ class RummageFrame(gui.RummageFrame):
                 )
             )
 
+        reclose = False
+        if self.m_options_collapse.IsCollapsed():
+            self.m_options_collapse.Collapse(False)
+            reclose = True
+
         self.Fit()
         self.m_settings_panel.Fit()
         self.m_settings_panel.GetSizer().Layout()
         self.m_main_panel.Fit()
         self.m_main_panel.GetSizer().Layout()
+
+        if reclose:
+            self.m_options_collapse.Collapse(True)
+
         self.optimize_size(first_time=True)
+        self.Centre()
 
     def on_loaded(self, refocus=False, resize=False):
         """

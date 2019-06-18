@@ -51,6 +51,7 @@ class ChecksumDialog(gui.ChecksumDialog):
         self.m_hash_panel.Fit()
         self.Fit()
         self.SetMinSize(self.GetSize())
+        self.Centre()
 
         self.total = os.path.getsize(self.target)
         self.start_hash()

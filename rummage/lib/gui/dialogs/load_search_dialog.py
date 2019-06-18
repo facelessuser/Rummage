@@ -42,6 +42,7 @@ class LoadSearchDialog(gui.LoadSearchDialog):
         self.m_load_panel.Fit()
         self.Fit()
         self.SetMinSize(self.GetSize())
+        self.Centre()
 
         self.load_searches()
         self.m_search_list.SetFocus()

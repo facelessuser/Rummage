@@ -41,6 +41,7 @@ class SearchErrorDialog(gui.SearchErrorDialog):
         self.SetMinSize(self.GetSize())
         self.load_errors(errors)
         self.m_error_list.SetFocus()
+        self.Centre()
 
     def localize(self):
         """Translate strings."""

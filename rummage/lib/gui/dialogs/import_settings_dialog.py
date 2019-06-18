@@ -67,6 +67,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         self.m_import_panel.Fit()
         self.Fit()
         self.SetMinSize(self.GetSize())
+        self.Centre()
 
         self.chain_remember = False
         self.chain_action = False

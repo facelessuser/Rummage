@@ -39,7 +39,7 @@ class HTMLDialog(gui.HtmlDialog, webview.WebViewMixin):
         self.localize()
         self.load(content, title, content_type)
         self.Fit()
-        self.Center()
+        self.Centre()
 
     def load(self, content, title=None, content_type=webview.HTML_FILE):
         """Reshow the dialog."""
