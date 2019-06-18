@@ -76,17 +76,17 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         self.m_encoding_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
 
-        if util.platform() == "windows":
-            self.m_settings_notebook.SetBackgroundColour(self.m_settings_panel.GetBackgroundColour())
-
         for x in range(self.m_settings_notebook.GetPageCount()):
             page = self.m_settings_notebook.GetPage(x)
-            bg = page.GetBackgroundColour()
+            if util.platform() == "linux":
+                bg = self.m_settings_notebook.GetBackgroundColour()
+            else:
+                bg = page.GetBackgroundColour()
             if util.platform() == "macos":
                 factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
                 bg = bg.ChangeLightness(factor)
             page.SetBackgroundColour(bg)
-            if x == 0:
+            if x == 0 and util.platform() != "linux":
                 self.m_settings_notebook.SetBackgroundColour(wx.Colour(bg))
 
         self.localize()
