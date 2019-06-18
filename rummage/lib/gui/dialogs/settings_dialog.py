@@ -21,6 +21,7 @@ IN THE SOFTWARE.
 import wx
 import re
 import json
+import functools
 from ..settings import Settings
 from .file_ext_dialog import FileExtDialog
 from .generic_dialogs import errormsg
@@ -168,6 +169,25 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_prerelease_checkbox.SetValue(bool(Settings.get_prerelease()))
 
         self.refresh_localization()
+        self.finalize_size()
+
+        self.call_later = wx.CallLater(100, functools.partial(self.on_loaded, resize=util.platform() == "linux"))
+        self.call_later.Start()
+
+    def on_loaded(self, resize=False, **kwargs):
+        """
+        Stupid workarounds on load.
+
+        Resize window after we are sure everything is loaded (stupid Linux workaround) to fix tab order stuff.
+        """
+
+        self.call_later.Stop()
+
+        if resize:
+            self.finalize_size()
+
+    def finalize_size(self):
+        """Finalize size."""
 
         self.m_general_panel.Fit()
         self.m_search_panel.Fit()
@@ -179,9 +199,10 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_settings_notebook.Fit()
         self.m_settings_panel.Fit()
         self.Fit()
-        if self.GetSize()[1] < 550:
-            self.SetSize(wx.Size(550, self.GetSize()[1]))
-        self.SetMinSize(wx.Size(550, self.GetSize()[1]))
+        min_width = 550
+        if self.GetSize()[0] < min_width:
+            self.SetSize(wx.Size(min_width, self.GetSize()[1]))
+        self.SetMinSize(wx.Size(min_width, self.GetSize()[1]))
 
     def localize(self):
         """Translate strings."""

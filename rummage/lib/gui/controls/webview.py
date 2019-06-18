@@ -252,7 +252,7 @@ class WebViewMixin:
 
         # Setup events
         obj.Bind(wx.html2.EVT_WEBVIEW_NAVIGATING, functools.partial(self.on_navigate, obj=obj))
-        obj.Bind(wx.html2.EVT_WEBVIEW_LOADED, functools.partial(self.on_loaded, obj=obj))
+        obj.Bind(wx.html2.EVT_WEBVIEW_LOADED, functools.partial(self.on_html_loaded, obj=obj))
         obj.Bind(wx.html2.EVT_WEBVIEW_TITLE_CHANGED, functools.partial(self.on_title_changed, obj=obj))
 
     def load_html(self, obj, content, title, content_type):
@@ -322,7 +322,7 @@ class WebViewMixin:
             title = obj.CurrentTitle
             obj.control_title.SetTitle(title)
 
-    def on_loaded(self, event, obj=None):
+    def on_html_loaded(self, event, obj=None):
         """Handle loaded event."""
 
         obj.busy = False
