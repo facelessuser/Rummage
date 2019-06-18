@@ -58,6 +58,7 @@ class OverwriteDialog(gui.OverwriteDialog):
         self.m_overwrite_panel.Fit()
         self.Fit()
         self.SetMinSize(self.GetSize())
+        self.Centre()
 
     def localize(self, msg):
         """Translate strings."""

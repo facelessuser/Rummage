@@ -143,6 +143,7 @@ class DeleteDialog(gui.DeleteDialog):
         self.m_progress_panel.Fit()
         self.Fit()
         self.SetMinSize(self.GetSize())
+        self.Centre()
 
         self.start_delete()
 

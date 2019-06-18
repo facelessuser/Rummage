@@ -54,6 +54,7 @@ class EditSearchChainDialog(gui.EditSearchChainDialog):
         self.m_chain_panel.Fit()
         self.Fit()
         self.SetMinSize(self.GetSize())
+        self.Centre()
 
     def localize(self):
         """Translate strings."""

@@ -199,10 +199,14 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_settings_notebook.Fit()
         self.m_settings_panel.Fit()
         self.Fit()
-        min_width = 550
+        max_width = self.GetParent().GetMinSize()[0]
+        min_width = 600
         if self.GetSize()[0] < min_width:
             self.SetSize(wx.Size(min_width, self.GetSize()[1]))
+        elif self.GetSize()[0] > max_width:
+            self.SetSize(wx.Size(max_width, self.GetSize()[1]))
         self.SetMinSize(wx.Size(min_width, self.GetSize()[1]))
+        self.Centre()
 
     def localize(self):
         """Translate strings."""

@@ -70,6 +70,7 @@ class SupportInfoDialog(gui.SupportInfoDialog):
         self.SetMinSize(wx.Size(300, self.GetSize()[1]))
 
         self.display_support_information()
+        self.Centre()
 
     def localize(self):
         """Translate strings."""
