@@ -956,6 +956,12 @@ class SettingsDialog ( wx.Dialog ):
         self.m_time_output_checkbox = wx.CheckBox( self.m_general_panel, wx.ID_ANY, u"International time format for file results", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer52.Add( self.m_time_output_checkbox, 0, wx.ALL, 5 )
 
+        self.m_staticline13 = wx.StaticLine( self.m_general_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer52.Add( self.m_staticline13, 0, wx.EXPAND |wx.ALL, 5 )
+
+        self.m_alt_row_checkbox = wx.CheckBox( self.m_general_panel, wx.ID_ANY, u"Show alternate row colors in lists", wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer52.Add( self.m_alt_row_checkbox, 0, wx.ALL, 5 )
+
 
         self.m_general_panel.SetSizer( fgSizer52 )
         self.m_general_panel.Layout()
@@ -1279,6 +1285,7 @@ class SettingsDialog ( wx.Dialog ):
         self.m_prerelease_checkbox.Bind( wx.EVT_CHECKBOX, self.on_prerelease_toggle )
         self.m_check_update_button.Bind( wx.EVT_BUTTON, self.on_check )
         self.m_time_output_checkbox.Bind( wx.EVT_CHECKBOX, self.on_time_output_toggle )
+        self.m_alt_row_checkbox.Bind( wx.EVT_CHECKBOX, self.on_alt_row_toggle )
         self.m_re_radio.Bind( wx.EVT_RADIOBUTTON, self.on_re_toggle )
         self.m_regex_radio.Bind( wx.EVT_RADIOBUTTON, self.on_regex_toggle )
         self.m_regex_ver_choice.Bind( wx.EVT_CHOICE, self.on_regex_ver_choice )
@@ -1330,6 +1337,9 @@ class SettingsDialog ( wx.Dialog ):
         event.Skip()
 
     def on_time_output_toggle( self, event ):
+        event.Skip()
+
+    def on_alt_row_toggle( self, event ):
         event.Skip()
 
     def on_re_toggle( self, event ):

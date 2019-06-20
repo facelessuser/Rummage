@@ -167,6 +167,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_back_folder_button.Enable(False)
         self.m_update_checkbox.SetValue(bool(Settings.get_check_updates()))
         self.m_prerelease_checkbox.SetValue(bool(Settings.get_prerelease()))
+        self.m_alt_row_checkbox.SetValue(bool(Settings.get_alt_list_color()))
 
         self.refresh_localization()
         self.finalize_size()
@@ -266,6 +267,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         ]
         self.SPECIAL = _("Special file types:")
         self.EDITOR_HELP = EDITOR_HELP
+        self.ALT_ROW_COLOR = _("Show alternate row colors in lists")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -308,6 +310,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_prerelease_checkbox.SetLabel(self.PRERELEASES)
         self.m_check_update_button.SetLabel(self.CHECK_NOW)
         self.m_filetype_label.SetLabel(self.SPECIAL)
+        self.m_alt_row_checkbox.SetLabel(self.ALT_ROW_COLOR)
 
         self.load_help(self.EDITOR_HELP)
 
@@ -589,6 +592,14 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         """Handle `matchbase` toggle."""
 
         Settings.set_matchbase(self.m_matchbase_checkbox.GetValue())
+
+    def on_alt_row_toggle(self, event):
+        """Handle alternative row color option."""
+
+        alt_row = self.m_alt_row_checkbox.GetValue()
+        Settings.set_alt_list_color(alt_row)
+        self.m_encoding_list.EnableAlternateRowColours(enable=alt_row)
+        self.m_encoding_panel.Refresh()
 
     def on_close(self, event):
         """Handle on close event."""
