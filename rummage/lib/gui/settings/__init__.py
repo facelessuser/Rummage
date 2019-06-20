@@ -54,8 +54,8 @@ BACKUP_FOLDER = 1
 
 DEFAULT_SETTINGS = {
     "__format__": SETTINGS_FMT,
-    "current_version": (0, 0, 0, 'final', 0, 0),
     "alert_enabled": True,
+    "alt_list_color": True,
     "backup_ext": "rum-bak",
     "backup_folder": ".rum-bak",
     "backup_type": BACKUP_FILE,
@@ -63,7 +63,9 @@ DEFAULT_SETTINGS = {
     "chains": {},
     "check_prerelease": False,
     "check_updates": False,
+    "current_version": (0, 0, 0, 'final', 0, 0),
     "editor": "",
+    "encoding_options": copy.deepcopy(text_decode.DEFAULT_ENCODING_OPTIONS),
     "extmatch": False,
     "file_case_sensitive": False,
     "full_exclude_path": False,
@@ -71,19 +73,18 @@ DEFAULT_SETTINGS = {
     "globstar": False,
     "hide_cols_content": [],
     "hide_cols_file": [],
-    "pos_cols_file": [],
-    "pos_cols_content": [],
     "international_time": False,
     "locale": "en_US",
     "matchbase": False,
     "notify_enabled": True,
     "notify_method": "default",
+    "pos_cols_content": [],
+    "pos_cols_file": [],
     "regex_mode": rumcore.RE_MODE,
     "regex_version": 0,
     "saved_searches": {},
     "single_instance": False,
-    "term_notifier": "",
-    "encoding_options": copy.deepcopy(text_decode.DEFAULT_ENCODING_OPTIONS)
+    "term_notifier": ""
 }
 
 
@@ -197,6 +198,27 @@ class Settings:
         if text_decode.CCDetect is None or value > text_decode.CHARDET_CLIB:
             value = text_decode.CHARDET_DEFAULT
         return value
+
+    @classmethod
+    def set_alt_list_color(cls, value):
+        """Set alternate list row color."""
+
+        cls.reload_settings()
+        cls._set_alt_list_color(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_alt_list_color(cls, value):
+        """Set alternate list row color."""
+
+        cls.settings["alt_list_color"] = value
+
+    @classmethod
+    def get_alt_list_color(cls):
+        """Get preference of alternative list row color."""
+
+        cls.reload_settings()
+        return cls.settings['alt_list_color']
 
     @classmethod
     def _set_encoding_ext(cls, values):
@@ -1468,6 +1490,10 @@ class Settings:
             cls._set_hide_cols_file(obj['hide_cols_file'])
         if 'hide_cols_content' in obj:
             cls._set_hide_cols_content(obj['hide_cols_content'])
+
+        # Alternate row colors for lists
+        if 'alt_list_color' in obj:
+            cls._set_alt_list_color(obj['alt_list_color'])
 
         # Position columns
         if 'pos_cols_file' in obj:

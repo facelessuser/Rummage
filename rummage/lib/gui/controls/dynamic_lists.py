@@ -24,6 +24,7 @@ import functools
 from .. import util
 from collections import OrderedDict
 import locale
+from ..settings import Settings
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
@@ -89,7 +90,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.first_resize = True
         self.size_sample = COLUMN_SAMPLE_SIZE
         self.widest_cell = [MINIMUM_COL_SIZE] * self.column_count
-        self.EnableAlternateRowColours()
+        self.EnableAlternateRowColours(enable=Settings.get_alt_list_color())
         self.dc = wx.ClientDC(self)
         self.dc.SetFont(self.GetFont())
         self.last_idx_sized = -1

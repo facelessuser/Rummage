@@ -38,7 +38,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         "alert_enabled", "check_updates", "check_prerelease", "debug",
         "notify_enabled", "single_instance", "extmatch",
         "brace_expansion", "file_case_sensitive", "full_exclude_path", "full_file_path",
-        "globstar", "international_time", "matchbase"
+        "globstar", "international_time", "matchbase", "alt_list_color"
     )
     STRING = ("backup_ext", "backup_folder", "term_notifier", "editor", "notify_method")
     INTEGER = ("backup_type", "regex_mode", "regex_version")
