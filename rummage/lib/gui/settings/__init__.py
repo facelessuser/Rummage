@@ -733,8 +733,15 @@ class Settings:
             ]
         else:
             # New string format
-            filename = filename.replace('"', '\\"')
-            return editor.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col))
+            return editor.replace(
+                "{$file}", filename.replace('"', '\\"')
+            ).replace(
+                "{$line}", str(line)
+            ).replace(
+                "{$col}", str(col)
+            ).replace(
+                "{$col0}", str(col - 1)
+            )
 
     @classmethod
     def set_editor(cls, editor):

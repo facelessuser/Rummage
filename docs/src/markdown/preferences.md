@@ -74,6 +74,10 @@ Argument Variables | Description
 `{$file}`          | Insert the file name.
 `{$line}`          | Insert the line number.
 `{$col}`           | Insert the column number.
+`{$col0}`          | Insert the line column offset by one so the first column is zero instead of one.
+
+!!! new "New 4.7.0"
+    Added `{$col0}` for zero based column values.
 
 ## Notifications
 
