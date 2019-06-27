@@ -710,7 +710,7 @@ class Settings:
                 cls.cache = cache
 
     @classmethod
-    def get_editor(cls, filename="", line=1, col=1, raw=False):
+    def get_editor(cls, filename=None, line=None, col=None):
         """Get editor command and replace file, line, and col symbols."""
 
         cls.reload_settings()
@@ -720,7 +720,7 @@ class Settings:
         if isinstance(editor, dict):
             editor = editor.get(util.platform(), "")
 
-        if raw:
+        if filename is None or line is None or col is None:
             return editor
 
         if isinstance(editor, (list, tuple)):
