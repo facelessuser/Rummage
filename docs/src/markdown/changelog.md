@@ -2,6 +2,8 @@
 
 ## Current
 
+- **NEW**: Add `col0` variable for editor configuration to allow for using a zero based column value instead of one based column value for editors that require it.
+- **NEW**: Add global option to turn off alternating row colors in lists.
 - **FIX**: Better attempt to get appropriate creation on all Linux systems.
 - **FIX**: Better fix for time picker getting wrong background.
 - **FIX**: Ensure column sizing includes header size.

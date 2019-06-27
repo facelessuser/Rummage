@@ -39,11 +39,12 @@ Double quote paths with spaces and parameters that *may* contain spaces after su
 
 Use the following variables for parameter substitution:
 
-Variable | Description
--------- | -----------
-`{$file}`| Insert the file path.
-`{$line}`| Insert the line number.
-`{$col}` | Insert the line column.
+Variable  | Description
+--------- | -----------
+`{$file}` | Insert the file path.
+`{$line}` | Insert the line number.
+`{$col}`  | Insert the line column.
+`{$col0}` | Insert the line column offset by one so the first column is zero instead of one.
 
 !!! example "Example"
 

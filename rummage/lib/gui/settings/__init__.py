@@ -710,7 +710,7 @@ class Settings:
                 cls.cache = cache
 
     @classmethod
-    def get_editor(cls, filename="{$file}", line="{$line}", col="{$col}"):
+    def get_editor(cls, filename=None, line=None, col=None):
         """Get editor command and replace file, line, and col symbols."""
 
         cls.reload_settings()
@@ -719,6 +719,9 @@ class Settings:
         # Handle early, old dict format.
         if isinstance(editor, dict):
             editor = editor.get(util.platform(), "")
+
+        if filename is None or line is None or col is None:
+            return editor
 
         if isinstance(editor, (list, tuple)):
             # Handle old list format
@@ -733,8 +736,15 @@ class Settings:
             ]
         else:
             # New string format
-            filename = filename.replace('"', '\\"')
-            return editor.replace("{$file}", filename).replace("{$line}", str(line)).replace("{$col}", str(col))
+            return editor.replace(
+                "{$file}", filename.replace('"', '\\"')
+            ).replace(
+                "{$line}", str(line)
+            ).replace(
+                "{$col}", str(col)
+            ).replace(
+                "{$col0}", str(col - 1)
+            )
 
     @classmethod
     def set_editor(cls, editor):
