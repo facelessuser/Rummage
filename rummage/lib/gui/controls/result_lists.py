@@ -415,8 +415,8 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                 filename = self.GetItem(item, col=self.get_virt_col(FILE_NAME)).GetText()
                 path = self.GetItem(item, col=self.get_virt_col(FILE_PATH)).GetText()
                 target = os.path.join(path, filename)
-                line = str(self.get_map_item(item, col=self.get_virt_col(FILE_LINE)))
-                col = str(self.get_map_item(item, col=self.get_virt_col(FILE_COL)))
+                line = self.get_map_item(item, col=self.get_virt_col(FILE_LINE))
+                col = self.get_map_item(item, col=self.get_virt_col(FILE_COL))
             if target:
                 fileops.open_editor(target, line, col)
         else:
@@ -427,8 +427,8 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                     filename = self.GetItem(item, col=self.get_virt_col(FILE_NAME)).GetText()
                     path = self.GetItem(item, col=self.get_virt_col(FILE_PATH)).GetText()
                     target = os.path.join(path, filename)
-                    line = str(self.get_map_item(item, col=self.get_virt_col(FILE_LINE)))
-                    col = str(self.get_map_item(item, col=self.get_virt_col(FILE_COL)))
+                    line = self.get_map_item(item, col=self.get_virt_col(FILE_LINE))
+                    col = self.get_map_item(item, col=self.get_virt_col(FILE_COL))
                 if target:
                     fileops.open_editor(target, line, col)
                 item = self.GetNextSelected(item)
@@ -694,9 +694,9 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
             item = self.HitTestSubItem(pos)[0]
             if item != -1:
                 filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
-                line = self.GetItem(item, col=self.get_virt_col(CONTENT_LINE)).GetText()
+                line = self.get_map_item(item, col=self.get_virt_col(CONTENT_LINE))
                 file_row = self.get_map_item(item, col=self.get_virt_col(CONTENT_KEY))
-                col = str(self.get_map_item(item, col=self.get_virt_col(CONTENT_COL)))
+                col = self.get_map_item(item, col=self.get_virt_col(CONTENT_COL))
                 path = self.main_window.m_result_file_list.get_map_item(
                     file_row, col=self.main_window.m_result_file_list.get_virt_col(FILE_PATH), absolute=True
                 )
@@ -715,8 +715,8 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                     file_row, col=self.main_window.m_result_file_list.get_virt_col(FILE_PATH), absolute=True
                 )
                 target = os.path.join(path, filename)
-                line = self.GetItem(item, col=self.get_virt_col(CONTENT_LINE)).GetText()
-                col = str(self.get_map_item(item, col=self.get_virt_col(CONTENT_COL)))
+                line = self.get_map_item(item, col=self.get_virt_col(CONTENT_LINE))
+                col = self.get_map_item(item, col=self.get_virt_col(CONTENT_COL))
             if target:
                 fileops.open_editor(target, line, col)
         else:
@@ -731,8 +731,8 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                         file_row, col=self.main_window.m_result_file_list.get_virt_col(FILE_PATH), absolute=True
                     )
                     target = os.path.join(path, filename)
-                    line = self.GetItem(item, col=self.get_virt_col(CONTENT_LINE)).GetText()
-                    col = str(self.get_map_item(item, col=self.get_virt_col(CONTENT_COL)))
+                    line = self.get_map_item(item, col=self.get_virt_col(CONTENT_LINE))
+                    col = self.get_map_item(item, col=self.get_virt_col(CONTENT_COL))
                 if target and target not in found:
                     found.add(target)
                     fileops.open_editor(target, line, col)

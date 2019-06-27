@@ -111,7 +111,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         history_records = Settings.get_history_record_count(self.history_types)
         self.history_records_cleared = False
 
-        self.editor = Settings.get_editor()
+        self.editor = Settings.get_editor(raw=True)
         if isinstance(self.editor, (tuple, list)):
             self.m_editor_text.SetValue(" ".join(self.editor) if len(self.editor) != 0 else "")
         else:
