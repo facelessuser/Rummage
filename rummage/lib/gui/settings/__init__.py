@@ -60,7 +60,7 @@ NOTIFY_EXT = {
     "afplay": ['.wav', '.mp3', '.aiff'],
     "windows": ['.wav'],
     "paplay": ['.wav', '.mp3', '.ogg'],
-    "aplay": ['.wav', '.mp3', '.ogg'],
+    "aplay": ['.wav', '.mp3'],
     "play": ['.wav', '.mp3'],
 }
 
@@ -94,7 +94,7 @@ DEFAULT_SETTINGS = {
     "notify_enabled": True,
     "notify_method": "default",
     "notify_player": NOTIFY_PLAYERS[util.platform()][0],
-    "notify_sound": os.path.join(data.RESOURCE_PATH, "notify.wav"),
+    "notify_sound": "",
     "pos_cols_content": [],
     "pos_cols_file": [],
     "regex_mode": rumcore.RE_MODE,
@@ -1076,12 +1076,12 @@ class Settings:
         """Get notifier sound."""
 
         cls.reload_settings()
-        sound = cls.settings.get('notify_sound')
+        sound = cls.settings.get('notify_sound', '')
         player = cls._get_notify_player()
         if sound is None or not os.path.exists(sound) or not os.path.isfile(sound):
-            sound = os.path.join(data.RESOURCE_PATH, "notify.wav")
+            sound = ''
         if os.path.splitext(sound)[1].lower() not in NOTIFY_EXT[player]:
-            sound = os.path.join(data.RESOURCE_PATH, "notify.wav")
+            sound = ''
         return sound
 
     @classmethod
@@ -1089,9 +1089,9 @@ class Settings:
         """Set notifier sound."""
 
         cls.reload_settings()
-        if cls._set_notify_sound(value):
-            cls.save_settings()
-            cls.init_notify()
+        cls._set_notify_sound(value)
+        cls.save_settings()
+        cls.init_notify()
 
     @classmethod
     def _set_notify_sound(cls, sound):
@@ -1099,11 +1099,10 @@ class Settings:
 
         player = cls._get_notify_player()
         if sound is None or not os.path.exists(sound) or not os.path.isfile(sound):
-            return False
+            sound = ''
         if os.path.splitext(sound)[1].lower() not in NOTIFY_EXT[player]:
-            return False
+            sound = ''
         cls.settings['notify_sound'] = sound
-        return True
 
     @classmethod
     def get_notify_player(cls):
