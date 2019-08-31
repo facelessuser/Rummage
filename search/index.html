@@ -1,0 +1,1048 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="A search and replace tool written in Python.">
+      
+      
+        <link rel="canonical" href="https://facelessuser.github.io/Rummage/search/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.2">
+    
+    
+      
+        <title>Search Features - Rummage Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.30686662.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#2196f3">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.74668098.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="../extra-30d8e6755c.css">
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#search-features" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://facelessuser.github.io/Rummage" title="Rummage Documentation" class="md-header-nav__button md-logo">
+          
+            <img src="../images/rummage.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Rummage Documentation
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Search Features
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/facelessuser/Rummage/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://facelessuser.github.io/Rummage" title="Rummage Documentation" class="md-nav__button md-logo">
+      
+        <img src="../images/rummage.png" width="48" height="48">
+      
+    </a>
+    Rummage Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/facelessuser/Rummage/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Rummage" class="md-nav__link">
+      Rummage
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../installation/" title="Installation" class="md-nav__link">
+      Installation
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../usage/" title="Basic Usage" class="md-nav__link">
+      Basic Usage
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Search Features
+      </label>
+    
+    <a href="./" title="Search Features" class="md-nav__link md-nav__link--active">
+      Search Features
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#search-options" class="md-nav__link">
+    Search Options
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-options" class="md-nav__link">
+    Common Options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#regex-engine-options" class="md-nav__link">
+    Regex Engine Options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rummage-options" class="md-nav__link">
+    Rummage Options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-patterns" class="md-nav__link">
+    File Patterns
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wildcard" class="md-nav__link">
+    Wildcard
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-wildcard-syntax" class="md-nav__link">
+    Basic Wildcard syntax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extended-match-syntax" class="md-nav__link">
+    Extended Match Syntax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#brace-expansion-syntax" class="md-nav__link">
+    Brace Expansion Syntax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-path-matching" class="md-nav__link">
+    Full Path Matching
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#regular-expression" class="md-nav__link">
+    Regular Expression
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#full-path-matching_1" class="md-nav__link">
+    Full Path Matching
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backrefs" class="md-nav__link">
+    Backrefs
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../preferences/" title="Settings" class="md-nav__link">
+      Settings
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../extras/" title="Extras" class="md-nav__link">
+      Extras
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../contributing/" title="Contributing & Support" class="md-nav__link">
+      Contributing &amp; Support
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../changelog/" title="Changelog" class="md-nav__link">
+      Changelog
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../license/" title="License" class="md-nav__link">
+      License
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#search-options" class="md-nav__link">
+    Search Options
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-options" class="md-nav__link">
+    Common Options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#regex-engine-options" class="md-nav__link">
+    Regex Engine Options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rummage-options" class="md-nav__link">
+    Rummage Options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-patterns" class="md-nav__link">
+    File Patterns
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wildcard" class="md-nav__link">
+    Wildcard
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-wildcard-syntax" class="md-nav__link">
+    Basic Wildcard syntax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extended-match-syntax" class="md-nav__link">
+    Extended Match Syntax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#brace-expansion-syntax" class="md-nav__link">
+    Brace Expansion Syntax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-path-matching" class="md-nav__link">
+    Full Path Matching
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#regular-expression" class="md-nav__link">
+    Regular Expression
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#full-path-matching_1" class="md-nav__link">
+    Full Path Matching
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backrefs" class="md-nav__link">
+    Backrefs
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/facelessuser/Rummage/tree/master/docs/src/markdown/search.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="search-features">Search Features<a class="headerlink" href="#search-features" title="Permanent link"></a></h1>
+<h2 id="search-options">Search Options<a class="headerlink" href="#search-options" title="Permanent link"></a></h2>
+<p>Rummage supports the default regular expression library (<a href="https://docs.python.org/3/library/re.html">Re</a>) that comes with Python and the 3<sup>rd</sup> party <a href="https://pypi.python.org/pypi/regex">Regex</a> library, and though the basic syntax and features are similar between the two, Regex provides many additional features, some of which causes the syntax to deviate greatly from Re. If you are using Re, you will not see all the options shown below. Please check out documentation for whichever engine you have chosen to learn more about its specific feature set. This documentation will only briefly cover the features that can be enabled in each engine.</p>
+<h3 id="common-options">Common Options<a class="headerlink" href="#common-options" title="Permanent link"></a></h3>
+<p>Both the Re and Regex engine have a couple of shared flags that are exposed in Rummage as checkboxes. These checkboxes are found directly under the search and replace text boxes.</p>
+<table>
+<thead>
+<tr>
+<th>Toggle</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Search&nbsp;with&nbsp;regex</td>
+<td>Alters the behavior of <code>Search for</code> and <code>Replace with</code>.  When this is checked, both text boxes require regular expression patterns opposed to literal string.</td>
+</tr>
+<tr>
+<td>Search&nbsp;case-sensitive</td>
+<td>Forces the search to be case-sensitive.</td>
+</tr>
+<tr>
+<td>Dot&nbsp;matches&nbsp;newline</td>
+<td><code>.</code> will also match newlines.</td>
+</tr>
+<tr>
+<td>Use&nbsp;Unicode&nbsp;properties</td>
+<td>Changes the behavior of <code>\w</code>, <code>\W</code>, <code>\b</code>, <code>\B</code>, <code>\d</code>, <code>\D</code>, <code>\s</code>, and <code>\S</code> to use use characters from the Unicode property database (will also modify <code>\l</code>, <code>\L</code>, <code>\c</code>, and <code>\C</code> in search patterns if using Backrefs with Re).</td>
+</tr>
+<tr>
+<td>Format&nbsp;style&nbsp;replacements</td>
+<td>Replace pattern will use <a href="https://docs.python.org/2/library/string.html#format-string-syntax">a string replace format</a> for replace. <code class="codehilite"><span class="s2">&quot;</span><span class="si">{1}</span><span class="s2"> </span><span class="si">{1[-2]}</span><span class="s2"> </span><span class="si">{group_name[-3]}</span><span class="s2">&quot;</span></code> etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode <a href="http://facelessuser.github.io/backrefs/#format-replacements">here</a>. And remember that Rummage normalizes differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="regex-engine-options">Regex Engine Options<a class="headerlink" href="#regex-engine-options" title="Permanent link"></a></h3>
+<p>If the Regex engine is being used for regular expressions, a couple of extra checkboxes will be available. Regex can be run in either <code>VERSION0</code> or <code>VERSION1</code> mode.</p>
+<p><code>VERSION0</code> is compatible with Re regular expression patterns and has the extra <code>fullcase</code> toggle. <code>VERSION1</code> does not have this toggle as it is enabled by default and can only be disabled inline via a pattern with <code>(?-f)</code>. <code>VERSION1</code> is not directly compatible with Re patterns as it adds a number of changes to the syntax allowing for more advanced search options.</p>
+<table>
+<thead>
+<tr>
+<th>Toggle</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Best&nbsp;fuzzy&nbsp;match</td>
+<td>If performing a fuzzy match, the <em>best</em> fuzzy match will be used.</td>
+</tr>
+<tr>
+<td>Improve&nbsp;fuzzy&nbsp;fit</td>
+<td>Makes fuzzy matching attempt to improve the fit of the next match that it finds.</td>
+</tr>
+<tr>
+<td>Unicode&nbsp;word&nbsp;breaks</td>
+<td>Will use proper Unicode word breaks and line separators when Unicode is enabled. See Regex documentation for more info.</td>
+</tr>
+<tr>
+<td>Use&nbsp;POSIX&nbsp;matching</td>
+<td>Use the POSIX standard for regular expression, which is to return the leftmost longest match.</td>
+</tr>
+<tr>
+<td>Search&nbsp;backwards</td>
+<td>Search backwards. The result of a reverse search is not necessarily the reverse of a forward search.</td>
+</tr>
+<tr>
+<td>Full&nbsp;case-folding</td>
+<td>Use full case folding. For Regex <code>V0</code> only as it is enabled by default for <code>V1</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rummage-options">Rummage Options<a class="headerlink" href="#rummage-options" title="Permanent link"></a></h3>
+<p>Rummage has a couple of flags that are not specific to the regular expression engine.</p>
+<table>
+<thead>
+<tr>
+<th>Toggle</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boolean&nbsp;match</td>
+<td>Will check each file up until the first match and will halt searching further.  No line context info will be gathered or displayed. Does not apply when performing replaces.</td>
+</tr>
+<tr>
+<td>Count&nbsp;only</td>
+<td>Will just count the number of matches in the file and will not display line context information. This has no effect when applying replaces.</td>
+</tr>
+<tr>
+<td>Create&nbsp;backups</td>
+<td>On replace, files with matches will be backed up before applying the replacements; backup files will have the <code>.rum-bak</code> extension.</td>
+</tr>
+<tr>
+<td>Force&nbsp;&lt;encoding&gt;</td>
+<td>Forces all files to be opened with the specified encoding opposed to trying to detect the encoding.  Encoding is hard and slow, so this is the preferred method for fast searches.  On failure, binary will be used instead.</td>
+</tr>
+<tr>
+<td>Use&nbsp;chain&nbsp;search</td>
+<td>Puts Rummage into <a href="../usage/#search-chains">"search chain" mode</a>. When in "search chain" mode, rummage will only use saved search chains for search and replace.</td>
+</tr>
+<tr>
+<td>Use&nbsp;replace&nbsp;plugin</td>
+<td>When enabled, Rummage will use a <a href="../usage/#replace-plugins">replace plugin</a> instead of a replace pattern in order to do more advanced replaces.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Encoding Guessing</p>
+<p>It is always recommended, if you know the encoding, to use <code>Force encoding</code> as it will always be the fastest. Encoding guessing can be slow and not always accurate.</p>
+<p>Encoding guessing is performed by <code>chardet</code> which is a pure Python library and is, by far, the slowest option.  If you manually install <code>cChardet</code>, you will have a much faster guessing experience.</p>
+</div>
+<h2 id="file-patterns">File Patterns<a class="headerlink" href="#file-patterns" title="Permanent link"></a></h2>
+<p><img alt="File Patterns" src="../images/file_pattern.png" /></p>
+<p>Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the <code>Regex</code> checkbox beside the pattern. Wildcard patterns and regular expression patterns will each be covered separately.</p>
+<h3 id="wildcard">Wildcard<a class="headerlink" href="#wildcard" title="Permanent link"></a></h3>
+<p>Rummage uses file patterns and folder excludes to filter which files are searched. The default is to use wild card patterns modeled after <code>fnmatch</code> and <code>glob</code>. Below is a list of the syntax that is accepted, but not all features are enabled by default.</p>
+<p>If you would prefer regular expression file patterns, please see <a href="#regular-expression">Regular Expression</a> file patterns.</p>
+<ul>
+<li>File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in <a href="../preferences/#search">Preferences</a>.</li>
+<li>Slashes are generally treated as normal characters, but on windows they will be normalized: <code>/</code> will become <code>\\</code>. There is no need to explicitly use <code>\\</code> in patterns on Windows, but if you do, it will be handled.</li>
+<li><code>.</code> is always matched by <code>*</code>, <code>?</code>, and <code>[]</code>. Enable searching of hidden files in the file search options of the <a href="../usage/#configuring-file-search"><strong>Search</strong> tab</a>.</li>
+</ul>
+<h4 id="basic-wildcard-syntax">Basic Wildcard syntax<a class="headerlink" href="#basic-wildcard-syntax" title="Permanent link"></a></h4>
+<p>Rummage uses the <a href="https://github.com/facelessuser/wcmatch"><code>wcmatch</code></a> library to implement a specialized version of <a href="https://facelessuser.github.io/wcmatch/fnmatch/#syntax"><code>fnmatch</code></a> wildcard patterns for file name matching.</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>*</code></td>
+<td>Matches everything.</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>Matches any single character.</td>
+</tr>
+<tr>
+<td><code>[seq]</code></td>
+<td>Matches any character in seq.</td>
+</tr>
+<tr>
+<td><code>[!seq]</code></td>
+<td>Matches any character not in seq.</td>
+</tr>
+<tr>
+<td><code>[[:alnum:]]</code></td>
+<td>POSIX style character classes inside sequences. The <code>C</code> locale is used for byte strings and Unicode properties for Unicode strings. See <a href="https://facelessuser.github.io/wcmatch/fnmatch/#posix-character-classes">POSIX Character Classes</a> in <code>wcmatch</code>'s documentation for more info.</td>
+</tr>
+<tr>
+<td><code>\</code></td>
+<td>Escapes characters. If applied to a meta character, it will be treated as a normal character.</td>
+</tr>
+<tr>
+<td><code>|</code></td>
+<td>Multiple patterns can be provided by separating them with <code>|</code>.</td>
+</tr>
+<tr>
+<td><code>-</code></td>
+<td>If <code>-</code> is found at the start of a pattern, it will match the inverse.</td>
+</tr>
+<tr>
+<td><code>\xhh</code></td>
+<td>By specifying <code>\x</code> followed by the hexadecimal byte value, you can specify characters directly.</td>
+</tr>
+<tr>
+<td><code>\uhhhh</code></td>
+<td>By specifying <code>\u</code> with the four value hexadecimal character value, you can specify Unicode characters directly.</td>
+</tr>
+<tr>
+<td><code>\Uhhhhhhhh</code></td>
+<td>By specifying <code>\U</code> with the eight value hexadecimal character value, you can specify wide Unicode characters directly.</td>
+</tr>
+<tr>
+<td><code>\N{name}</code></td>
+<td>By specifying <code>\N{name}</code>, where <code>name</code> is a valid Unicode character name, you can specify Unicode characters directly.</td>
+</tr>
+<tr>
+<td><code>\a</code></td>
+<td>ASCII Bell (BEL).</td>
+</tr>
+<tr>
+<td><code>\b</code></td>
+<td>ASCII Backspace (BS).</td>
+</tr>
+<tr>
+<td><code>\f</code></td>
+<td>ASCII Formfeed (FF).</td>
+</tr>
+<tr>
+<td><code>\n</code></td>
+<td>ASCII Linefeed (LF).</td>
+</tr>
+<tr>
+<td><code>\r</code></td>
+<td>ASCII Carriage Return (CR).</td>
+</tr>
+<tr>
+<td><code>\t</code></td>
+<td>ASCII Horizontal Tab (TAB).</td>
+</tr>
+<tr>
+<td><code>\v</code></td>
+<td>ASCII Vertical Tab (VT).</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition example">
+<p class="admonition-title">Example Patterns</p>
+<p>Used in the <code>Files which match</code> box, this would match all Python files of <code>.py</code> extensions excluding <code>__init__.py</code>:</p>
+<div class="codehilite"><pre><span></span>*.py|-__init__.py
+</pre></div>
+
+<p>Used in the <code>Files which match</code> box, this would match any file type that is not <code>.py</code>.</p>
+<div class="codehilite"><pre><span></span>-*.py
+</pre></div>
+
+<p>Used in the <code>Exclude folders</code>, this would exclude all folders with <code>name</code> followed by a single digit, except <code>name3</code> which we will always be included.</p>
+<div class="codehilite"><pre><span></span>name[0-9]|-name3
+</pre></div>
+
+<p>Used in the <code>Exclude folders</code>, this would exclude all folders except <code>name3</code>.</p>
+<div class="codehilite"><pre><span></span>-name3
+</pre></div>
+
+<p>If you need to escape <code>-</code> or <code>|</code>, you can put them in a sequence: <code>[-|]</code>. Remember to place <code>-</code> at the beginning of a sequence as <code>-</code> is also used to specify character ranges: <code>[a-z]</code>.</p>
+</div>
+<h4 id="extended-match-syntax">Extended Match Syntax<a class="headerlink" href="#extended-match-syntax" title="Permanent link"></a></h4>
+<p>In <a href="../preferences/#search">Preferences</a>, you can also enable extended match patterns. Extended match patterns allow you to provide pattern lists to provide more advanced logic.</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>?(pattern_list)</code></td>
+<td>The pattern matches if zero or one occurrences of any of the patterns in the <code>pattern_list</code> match the input string. Requires extended match feature to be enabled.</td>
+</tr>
+<tr>
+<td><code>*(pattern_list)</code></td>
+<td>The pattern matches if zero or more occurrences of any of the patterns in the <code>pattern_list</code> match the input string. Requires extended match feature to be enabled.</td>
+</tr>
+<tr>
+<td><code>+(pattern_list)</code></td>
+<td>The pattern matches if one or more occurrences of any of the patterns in the <code>pattern_list</code> match the input string. Requires extended match feature to be enabled.</td>
+</tr>
+<tr>
+<td><code>@(pattern_list)</code></td>
+<td>The pattern matches if exactly one occurrence of any of the patterns in the <code>pattern_list</code> match the input string. Requires extended match feature to be enabled.</td>
+</tr>
+<tr>
+<td><code>!(pattern_list)</code></td>
+<td>The pattern matches if the input string cannot be matched with any of the patterns in the <code>pattern_list</code>. Requires extended match feature to be enabled.</td>
+</tr>
+<tr>
+<td><code>{}</code></td>
+<td>Bash style brace expansions.  This is applied to patterns before anything else. Requires brace expansion feature to be enabled.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition example">
+<p class="admonition-title">Example Extended Match Patterns</p>
+<p>For example, if we wanted to match files <code>this-file.txt</code> and <code>that-file.txt</code>, we could provide the following pattern:</p>
+<div class="codehilite"><pre><span></span>@(this|that)-file.txt
+</pre></div>
+
+<p>The <code>|</code> contained within an extended match group will not split the pattern. So it is safe to combine with other patterns:</p>
+<div class="codehilite"><pre><span></span>@(this|that)-file.txt|*.py
+</pre></div>
+
+</div>
+<h4 id="brace-expansion-syntax">Brace Expansion Syntax<a class="headerlink" href="#brace-expansion-syntax" title="Permanent link"></a></h4>
+<p>In <a href="../preferences/#search">Preferences</a>, you can enables Bash style brace expansion.</p>
+<p>Brace expansion is applied before anything else. When applied, a pattern will be expanded into multiple patterns. Each pattern will then be parsed separately.</p>
+<p>This is great for specifying complex combinations of patterns: <code>a{b,{c,d}}</code> &rarr; <code>ab ac ad</code>. Since each brace will generate a separate pattern for each combination that Rummage must evaluate. For simple patterns, it may make more sense to use extended match patterns which will only generate a single pattern: <code>@(ab|ac|ad)</code>.</p>
+<p>Be careful with patterns such as <code>{1..100}</code> which would generate one hundred patterns that will all get individually parsed. Sometimes you really need such a pattern, but be mindful that it will be slower as you generate larger sets of patterns.</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{,}</code></td>
+<td>Bash style brace expansions.  This is applied to patterns before anything else. Requires brace expansion feature to be enabled.</td>
+</tr>
+<tr>
+<td><code>{n1..n2[..i]}</code></td>
+<td>Bash style sequences that expands a range of numbers or alphabetic characters by an optional increment.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition example">
+<p class="admonition-title">Example Brace Expansion</p>
+<ul>
+<li><code>a{b,{c,d}}</code> &rarr; <code>ab ac ad</code></li>
+<li><code>{1..3}</code> &rarr; <code>1 2 3</code></li>
+<li><code>{a..d}</code> &rarr; <code>a b c d</code></li>
+<li><code>{2..4..2}</code> &rarr; <code>2 4</code></li>
+<li><code>{a..e..2}</code> &rarr; <code>a c e</code></li>
+</ul>
+</div>
+<h4 id="full-path-matching">Full Path Matching<a class="headerlink" href="#full-path-matching" title="Permanent link"></a></h4>
+<p>In <a href="../preferences/#search">Preferences</a>, you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.</p>
+<p>Assuming you Provided a base folder to search of <code>/My/base/path</code>, and you were to match a file <code>/My/base/path/some/file.txt</code>, normally your file pattern would match against <code>file.txt</code>, but with full path enabled, you'd match against <code>some/file.txt</code>. This means you'd have to use pattern like <code>*/*.txt</code> instead of <code>*.txt</code>.</p>
+<p>When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in <code>[]</code>, <code>*</code>, <code>?</code>, or extended patterns like <code>*(...)</code>. Slashes can be matched by <code>**</code> if globstar (<code>**</code>) is enabled in <a href="../preferences/#search">Preferences</a>.</p>
+<p>When full path matching is not enabled, wildcard patterns use base matching. That is to say, the wildcard patterns are applied to the base filename instead of the full path. If you enable base matching for full paths in <a href="../preferences/#search">Preferences</a>, if a pattern has no slashes, it will perform base matching, and if there are slashes, it will perform a full path match.  This allows you to have the best of both worlds. For instance, the following pattern would match all Markdown files under the document directory, but would exclude any file in any subdirectory under docs whose name starts with <code>c</code>: <code>docs/**/*.md|-c*</code>. Full path is used for the <code>docs/**/*.md</code> while base matching is used for <code>-c*</code>.</p>
+<p>To learn more about full path matching with regular expression, checkout the regular expression <a href="#full-path-matching_1">section</a>.</p>
+<h3 id="regular-expression">Regular Expression<a class="headerlink" href="#regular-expression" title="Permanent link"></a></h3>
+<p>Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the <code>Regex</code> checkbox beside the pattern. The regular expression engine set in <a href="../preferences/#search">Preferences</a> is what will be used for file patterns. It will also respect the case sensitivity setting in <a href="../preferences/#search">Preferences</a> for <strong>File/Folder Matching</strong>.</p>
+<h4 id="full-path-matching_1">Full Path Matching<a class="headerlink" href="#full-path-matching_1" title="Permanent link"></a></h4>
+<p>In <a href="../preferences/#search">Preferences</a>, you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.</p>
+<p>Assuming you Provided a base folder to search of <code>/My/base/path</code>, and you were to match a file <code>/My/base/path/some/file.txt</code>, normally your file pattern would match against <code>file.txt</code>, but with full path enabled, you'd match against <code>some/file.txt</code>. This means you'd have to use pattern like <code>.*/.*.txt</code> instead of <code>.*.txt</code>.</p>
+<h2 id="backrefs">Backrefs<a class="headerlink" href="#backrefs" title="Permanent link"></a></h2>
+<p>Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official <a href="http://facelessuser.github.io/backrefs/">Backrefs documentation</a>. You can enable extended back references in the <a href="../preferences/#search">Preferences</a> dialog.</p>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../usage/" title="Basic Usage" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Basic Usage
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../preferences/" title="Settings" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Settings
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2013 - 2019 <a href="https://github.com/facelessuser">Isaac Muse</a>
+<br><span class="md-footer-custom-text">emoji provided free by </span><a href="http://www.emojione.com">EmojiOne</a>
+
+          </div>
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+  <div class="md-footer-social">
+    <link rel="stylesheet" href="../assets/fonts/font-awesome.css">
+    
+      <a href="https://github.com/facelessuser" class="md-footer-social__link fa fa-github"></a>
+    
+  </div>
+
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.c648116f.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+        <script src="../extra-0b9b22dd13.js"></script>
+      
+    
+  </body>
+</html>
