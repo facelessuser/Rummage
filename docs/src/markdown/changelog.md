@@ -1,11 +1,15 @@
 # Changelog
 
-## 4.7.0 (Development)
+## 4.7.0
+
+!!! warning "Warning"
+    Backrefs 4.2.0 has deprecated the shorthand references for alphabetic character groups in `re` search patterns: `\l`, `\L`, `\c`, and `\C`. Instead you should use: `[[:lower:]]`, `[[:^lower:]]`, `[[:upper:]]`, and `[[:^upper:]]` respectively. While the references have only been deprecated, and are technically still available, a future version of Backrefs will remove them entirely at some point. It is recommended to transition now so as not to be caught unawares.
 
 - **NEW**: Add `col0` variable for editor configuration to allow for using a zero based column value instead of one based column value for editors that require it.
 - **NEW**: Add global option to turn off alternating row colors in lists.
 - **NEW**: Provide support for different players on Linux: `paplay`, `aplay`, and `play` (`sox`). Supported sound formats vary.
 - **NEW**: Provide interface for selecting custom notification sounds.
+- **NEW**: Require `wcmatch` 4.3.1+ and `backrefs` 4.2.0+.
 - **FIX**: Better attempt to get appropriate file creation time on all Linux systems.
 - **FIX**: Better fix for time picker getting wrong background.
 - **FIX**: Ensure column sizing includes header size.

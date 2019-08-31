@@ -25,12 +25,17 @@
 
   <!-- Table of Content (Don't show for static sites) -->
     <h1 id="changelog">Changelog</h1>
-<h2 id="470-development">4.7.0 (Development)</h2>
+<h2 id="470">4.7.0</h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Backrefs 4.2.0 has deprecated the shorthand references for alphabetic character groups in <code>re</code> search patterns: <code>\l</code>, <code>\L</code>, <code>\c</code>, and <code>\C</code>. Instead you should use: <code>[[:lower:]]</code>, <code>[[:^lower:]]</code>, <code>[[:upper:]]</code>, and <code>[[:^upper:]]</code> respectively. While the references have only been deprecated, and are technically still available, a future version of Backrefs will remove them entirely at some point. It is recommended to transition now so as not to be caught unawares.</p>
+</div>
 <ul>
 <li><strong>NEW</strong>: Add <code>col0</code> variable for editor configuration to allow for using a zero based column value instead of one based column value for editors that require it.</li>
 <li><strong>NEW</strong>: Add global option to turn off alternating row colors in lists.</li>
 <li><strong>NEW</strong>: Provide support for different players on Linux: <code>paplay</code>, <code>aplay</code>, and <code>play</code> (<code>sox</code>). Supported sound formats vary.</li>
 <li><strong>NEW</strong>: Provide interface for selecting custom notification sounds.</li>
+<li><strong>NEW</strong>: Require <code>wcmatch</code> 4.3.1+ and <code>backrefs</code> 4.2.0+.</li>
 <li><strong>FIX</strong>: Better attempt to get appropriate file creation time on all Linux systems.</li>
 <li><strong>FIX</strong>: Better fix for time picker getting wrong background.</li>
 <li><strong>FIX</strong>: Ensure column sizing includes header size.</li>
