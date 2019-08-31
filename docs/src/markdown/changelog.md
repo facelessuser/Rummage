@@ -4,16 +4,13 @@
 
 - **NEW**: Add `col0` variable for editor configuration to allow for using a zero based column value instead of one based column value for editors that require it.
 - **NEW**: Add global option to turn off alternating row colors in lists.
-- **NEW**: Include a default notification sound and use it as the default across all platforms.
-- **NEW**: Provide fallback players for Linux: `paplay`, `aplay`, and `play` (`sox`).
+- **NEW**: Provide support for different players on Linux: `paplay`, `aplay`, and `play` (`sox`). Supported sound formats vary.
 - **NEW**: Provide interface for selecting custom notification sounds.
 - **FIX**: Better attempt to get appropriate file creation time on all Linux systems.
 - **FIX**: Better fix for time picker getting wrong background.
 - **FIX**: Ensure column sizing includes header size.
 - **FIX**: When showing timed status event for results in status bar (full path name), decrease length of time that the temporary status is shown and clear temporary status when the cursor leaves result items.
 - **FIX**: Don't log handled notification errors when a notification system is not found as these are handled gracefully and there is no need to worry the user.
-- **FIX**: Include a default notification sound and use it as the default across all platforms.
-- **FIX**: Provide fallback players for Linux: `paplay`, `aplay`, and `play` (`sox`).
 
 ## 4.6.3
 

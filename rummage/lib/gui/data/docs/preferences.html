@@ -153,9 +153,29 @@
 </div>
 <h2 id="notifications">Notifications</h2>
 <p><img alt="Preferences: Notifications" src="images/settings_notify.png" /></p>
-<p>The <strong>Notification</strong> panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.</p>
+<p>The <strong>Notification</strong> panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds (you must configure which sound to use).</p>
 <p>You can also select whether to use the system's built-in notifications or Growl.</p>
+<p>On Linux, you can set your preferred player: <code>paplay</code>, <code>aplay</code>, and <code>play</code> (<code>sox</code>).</p>
 <p>A test button is provided to test the configuration once set.</p>
+<div class="admonition tip">
+<p class="admonition-title">Supported Notification Sound Formats</p>
+<table>
+<thead>
+<tr>
+<th>Windows</th>
+<th>macOS</th>
+<th>Linux</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wav</code></td>
+<td><code>wav</code>, <code>mp3</code> and <code>.aiff</code></td>
+<td><code>wav</code> and <code>mp3</code> (if using <code>paplay</code>, <code>ogg</code> is also supported)</td>
+</tr>
+</tbody>
+</table>
+</div>
 <dl>
 <dt>Ubuntu</dt>
 <dd>
