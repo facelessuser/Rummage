@@ -111,7 +111,7 @@ def play_alert():
 ###################################
 # Setup Notifications
 ###################################
-def setup_notifications(app_name, img=None, term_notify=(None, None)):
+def setup_notifications(app_name, img=None, **kwargs):
     """Setup notifications for all platforms."""
 
     destroy()
@@ -125,7 +125,7 @@ def setup_notifications(app_name, img=None, term_notify=(None, None)):
     setup(
         app_name,
         img,
-        term_notify if _PLATFORM == "macos" else None
+        **kwargs
     )
 
 

@@ -5,9 +5,12 @@ Copyright (c) 2013 - 2016 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import subprocess
-from os.path import exists
+import os
+from . import util
 
 __all__ = ("get_notify", "alert", "setup", "destroy")
+
+PLAYERS = ('paplay', 'aplay', 'play')
 
 
 class Options:
@@ -16,6 +19,8 @@ class Options:
     icon = None
     notify = None
     app_name = ""
+    sound = None
+    player = None
 
     @classmethod
     def clear(cls):
@@ -24,18 +29,33 @@ class Options:
         cls.icon = None
         cls.notify = None
         cls.app_name = ""
+        cls.sound = None
+        cls.player = None
 
 
-def alert(sound=None):
+def _alert(sound=None, player=None):
     """Play an alert sound for the OS."""
 
-    try:
-        if exists('/usr/share/sounds/gnome/default/alerts/glass.ogg'):
-            subprocess.call(['/usr/bin/canberra-gtk-play', '-f', '/usr/share/sounds/gnome/default/alerts/glass.ogg'])
-        else:
-            subprocess.call(['/usr/bin/canberra-gtk-play', '--id', 'bell'])
-    except Exception:
-        pass
+    if sound is None and Options.sound is not None:
+        sound = Options.sound
+
+    if player is None and Options.player is not None:
+        player = Options.player
+
+    if player is not None and sound is not None:
+        try:
+            if player == 'play':
+                subprocess.call([player, '-q', sound])
+            else:
+                subprocess.call([player, sound])
+        except Exception:
+            pass
+
+
+def alert():
+    """Alert."""
+
+    _alert()
 
 
 @staticmethod
@@ -81,13 +101,20 @@ def setup_notify_osd(app_name):
         Options.notify = notify_osd_call
 
 
-def setup(app_name, icon, *args):
+def setup(app_name, icon, **kwargs):
     """Setup."""
 
     Options.icon = None
+    sound = kwargs.get('sound')
+    if sound is not None and os.path.exists(sound):
+        Options.sound = sound
+
+    player = kwargs.get('sound_player')
+    if player is not None and player not in PLAYERS and util.which(player):
+        Options.player = player
 
     try:
-        if icon is None or not exists(icon):
+        if icon is None or not os.path.exists(icon):
             raise ValueError("Icon does not appear to be valid")
         Options.icon = icon
     except Exception:

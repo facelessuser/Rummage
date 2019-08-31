@@ -83,11 +83,19 @@ Argument Variables | Description
 
 ![Preferences: Notifications](images/settings_notify.png)
 
-The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds.
+The **Notification** panel controls enabling/disabling and configuration of notifications.  You can enable/disable visual notifications and/or audible notification sounds (you must configure which sound to use).
 
 You can also select whether to use the system's built-in notifications or Growl.
 
+On Linux, you can set your preferred player: `paplay`, `aplay`, and `play` (`sox`).
+
 A test button is provided to test the configuration once set.
+
+!!! tip "Supported Notification Sound Formats"
+
+    Windows | macOS                    | Linux
+    ------- | ------------------------ | -----
+    `wav`   | `wav`, `mp3` and `.aiff` | `wav` and `mp3` (if using `paplay`, `ogg` is also supported)
 
 Ubuntu
 : 

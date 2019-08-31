@@ -28,6 +28,7 @@ from .generic_dialogs import errormsg
 from ..localization import _
 from .. import gui
 from .. import notify
+from ..notify.util import which
 from .. import data
 from ... import rumcore
 from .. import util
@@ -77,6 +78,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
             self.m_backup_panel.SetDoubleBuffered(True)
 
         self.m_encoding_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
+        self.alert_player = False
 
         for x in range(self.m_settings_notebook.GetPageCount()):
             page = self.m_settings_notebook.GetPage(x)
@@ -169,6 +171,12 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_update_checkbox.SetValue(bool(Settings.get_check_updates()))
         self.m_prerelease_checkbox.SetValue(bool(Settings.get_prerelease()))
         self.m_alt_row_checkbox.SetValue(bool(Settings.get_alt_list_color()))
+        alert_choices = Settings.get_available_players()
+        for x in alert_choices:
+            self.m_sound_player_choice.Append(x)
+        index = alert_choices.index(Settings.get_notify_player())
+        self.m_sound_player_choice.SetSelection(index)
+        self.m_sound_picker.SetPath(Settings.get_notify_sound())
 
         self.refresh_localization()
         self.finalize_size()
@@ -209,6 +217,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
             self.SetSize(wx.Size(max_width, self.GetSize()[1]))
         self.SetMinSize(wx.Size(min_width, self.GetSize()[1]))
         self.Centre()
+        self.alert_player = True
 
     def localize(self):
         """Translate strings."""
@@ -257,6 +266,9 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
             "Folders must be alphanumeric and can contain\n"
             "hypens, underscores, and dots."
         )
+        self.ERR_PLAYER = _(
+            "Can't find the player '{}'!"
+        )
         self.CHECK_UPDATES = _("Check updates daily")
         self.PRERELEASES = _("Include pre-releases")
         self.CHECK_NOW = _("Check now")
@@ -266,6 +278,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
             _("chardet (pure python)"),
             _("cchardet (C)")
         ]
+        self.ALERT_PLAYER = _("Alert player")
         self.SPECIAL = _("Special file types:")
         self.EDITOR_HELP = EDITOR_HELP
         self.ALT_ROW_COLOR = _("Show alternate row colors in lists")
@@ -286,6 +299,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_time_output_checkbox.SetLabel(self.INTERNATIONAL_TIME)
         self.m_visual_alert_checkbox.SetLabel(self.NOTIFY_POPUP)
         self.m_audio_alert_checkbox.SetLabel(self.ALERT)
+        self.m_sound_player_label.SetLabel(self.ALERT_PLAYER)
         self.m_term_note_label.SetLabel(self.TERM_NOTIFY_PATH)
         self.m_notify_test_button.SetLabel(self.TEST)
         self.m_language_label.SetLabel(self.LANGUAGE)
@@ -446,6 +460,20 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         Settings.set_alert(self.m_audio_alert_checkbox.GetValue())
         event.Skip()
+
+    def on_sound_change(self, event):
+        """Update user sound."""
+
+        Settings.set_notify_sound(self.m_sound_picker.GetPath())
+
+    def on_player_selected(self, event):
+        """Select player."""
+
+        if self.alert_player:
+            index = self.m_sound_player_choice.GetSelection()
+            string = self.m_sound_player_choice.GetString(index)
+            if util.platform() == 'linux' and not which(string):
+                errormsg(self.ERR_PLAYER.format(string))
 
     def on_notify_test_click(self, event):
         """Handle notification test."""

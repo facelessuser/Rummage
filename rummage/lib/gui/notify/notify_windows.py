@@ -34,18 +34,19 @@ WS_SYSMENU = 524288
 CW_USEDEFAULT = -2147483648
 WM_USER = 1024
 
-NIM_ADD = 0
-NIM_MODIFY = 1
-NIM_DELETE = 2
-NIM_SETVERSION = 4
-NIF_ICON = 2
-NIF_MESSAGE = 1
-NIF_TIP = 4
-NIIF_INFO = 1
-NIIF_WARNING = 2
-NIIF_ERROR = 3
-NIF_INFO = 16
+NIM_ADD = 0x00
+NIM_MODIFY = 0x01
+NIM_DELETE = 0x02
+NIM_SETVERSION = 0x04
+NIF_MESSAGE = 0x01
+NIF_ICON = 0x02
+NIF_TIP = 0x04
+NIF_INFO = 0x10
 NIF_SHOWTIP = 0x80
+NIIF_INFO = 0x1
+NIIF_WARNING = 0x2
+NIIF_ERROR = 0x3
+NIIF_NOSOUND = 0x10
 
 
 class WndClassEx(ctypes.Structure):
@@ -100,6 +101,7 @@ class Options:
 
     notify = None
     instance = None
+    sound = None
 
     @classmethod
     def clear(cls):
@@ -107,16 +109,26 @@ class Options:
 
         cls.notify = None
         cls.instance = None
+        cls.sound = None
 
 
-def alert(sound=None):
+def _alert(sound=None):
     """Play an alert sound for the OS."""
 
+    if sound is None and Options.sound is not None:
+        sound = Options.sound
+
     try:
-        snd = sound if sound is not None else "*"
-        winsound.PlaySound(snd, winsound.SND_ALIAS)
+        if sound:
+            winsound.PlaySound(sound, winsound.SND_FILENAME)
     except Exception:
         pass
+
+
+def alert():
+    """Alert."""
+
+    _alert()
 
 
 class WinNotifyLevel:
@@ -270,7 +282,7 @@ class WindowsNotify:
         res.uVersion = 3 if self.is_xp else 4
         res.szInfo = msg[:256]
         res.szInfoTitle = title[:64]
-        res.dwInfoFlags = icon_level
+        res.dwInfoFlags = icon_level | NIIF_NOSOUND
 
         self.show_icon(res)
 
@@ -325,8 +337,12 @@ def NotifyWin(title, msg, sound, icon, fallback):
     Options.instance.show_notification(title, msg, sound, icon, fallback)
 
 
-def setup(app_name, icon, *args):
+def setup(app_name, icon, **kwargs):
     """Setup."""
+
+    sound = kwargs.get('sound')
+    if sound is not None and os.path.exists(sound):
+        Options.sound = sound
 
     try:
         if icon is None or not os.path.exists(icon):

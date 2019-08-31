@@ -30,6 +30,7 @@ from .. import localization
 from ..localization import _
 from .. import data
 from .. import notify
+from ..notify.util import which
 from ... import rumcore
 from ...rumcore import text_decode
 from .. import util
@@ -40,13 +41,27 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.4.0'
+SETTINGS_FMT = '2.5.0'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
     "macos": ["default", "growl"],
     "windows": ["default", "growl"],
     "linux": ["default", "growl"]
+}
+
+NOTIFY_PLAYERS = {
+    "macos": ["afplay"],
+    "windows": ["windows"],
+    "linux": ["paplay", "aplay", "play"]
+}
+
+NOTIFY_EXT = {
+    "afplay": ['.wav', '.mp3', '.aiff'],
+    "windows": ['.wav'],
+    "paplay": ['.wav', '.mp3', '.ogg'],
+    "aplay": ['.wav', '.mp3'],
+    "play": ['.wav', '.mp3'],
 }
 
 BACKUP_FILE = 0
@@ -78,6 +93,8 @@ DEFAULT_SETTINGS = {
     "matchbase": False,
     "notify_enabled": True,
     "notify_method": "default",
+    "notify_player": NOTIFY_PLAYERS[util.platform()][0],
+    "notify_sound": "",
     "pos_cols_content": [],
     "pos_cols_file": [],
     "regex_mode": rumcore.RE_MODE,
@@ -123,6 +140,12 @@ class Settings:
         debug_struct(cls.settings)
         debug_struct(cls.cache)
         cls.init_notify(True)
+
+    @classmethod
+    def get_available_players(cls):
+        """Get the available players."""
+
+        return NOTIFY_PLAYERS[util.platform()][:]
 
     @classmethod
     def get_settings(cls):
@@ -963,7 +986,10 @@ class Settings:
         notify.setup_notifications(
             "Rummage",
             img,
-            (notifier, None)
+            term_notify=notifier,
+            sender=None,
+            sound=cls.get_notify_sound(),
+            sound_player=cls.get_notify_player()
         )
         notify.setup_growl_notifications("Rummage", growl_png)
         notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
@@ -1044,6 +1070,88 @@ class Settings:
         """Set term notifier location."""
 
         cls.settings['term_notifier'] = value
+
+    @classmethod
+    def get_notify_sound(cls):
+        """Get notifier sound."""
+
+        cls.reload_settings()
+        sound = cls.settings.get('notify_sound', '')
+        player = cls._get_notify_player()
+        if sound is None or not os.path.exists(sound) or not os.path.isfile(sound):
+            sound = ''
+        if os.path.splitext(sound)[1].lower() not in NOTIFY_EXT[player]:
+            sound = ''
+        return sound
+
+    @classmethod
+    def set_notify_sound(cls, value):
+        """Set notifier sound."""
+
+        cls.reload_settings()
+        cls._set_notify_sound(value)
+        cls.save_settings()
+        cls.init_notify()
+
+    @classmethod
+    def _set_notify_sound(cls, sound):
+        """Set notifier sound."""
+
+        player = cls._get_notify_player()
+        if sound is None or not os.path.exists(sound) or not os.path.isfile(sound):
+            sound = ''
+        if os.path.splitext(sound)[1].lower() not in NOTIFY_EXT[player]:
+            sound = ''
+        cls.settings['notify_sound'] = sound
+
+    @classmethod
+    def get_notify_player(cls):
+        """Get notifier player."""
+
+        cls.reload_settings()
+        player = cls._get_notify_player()
+        return player
+
+    @classmethod
+    def validate_player(cls, player):
+        """Validate player."""
+
+        if player is None or player not in NOTIFY_PLAYERS[util.platform()]:
+            player = NOTIFY_PLAYERS[util.platform()][0]
+        if util.platform() == "linux" and not which(player):
+            player = None
+            for p in NOTIFY_PLAYERS['linux']:
+                if which(p):
+                    player = p
+                    break
+        if player is None:
+            # None exist, so just go with the first
+            player = NOTIFY_PLAYERS[util.platform()][0]
+        return player
+
+    @classmethod
+    def _get_notify_player(cls):
+        """Get notifier player."""
+
+        player = cls.settings.get('notify_player')
+        player = cls.validate_player(player)
+        return player
+
+    @classmethod
+    def set_notify_player(cls, player):
+        """Set notifier player."""
+
+        cls.reload_settings()
+        cls._set_notify_player(player)
+        cls.save_settings()
+        cls.init_notify()
+
+    @classmethod
+    def _set_notify_player(cls, player):
+        """Set notifier player."""
+
+        player = cls.validate_player(player)
+        cls.settings['notify_player'] = player
 
     @classmethod
     def get_search_setting(cls, key, default):
@@ -1481,6 +1589,9 @@ class Settings:
             update_notify = True
         if 'term_notifier' in obj:
             cls._set_term_notifier(obj['term_notifier'])
+            update_notify = True
+        if 'notify_sound' in obj:
+            cls._set_notify_sound(obj['notify_sound'])
             update_notify = True
 
         # Editor

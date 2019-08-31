@@ -6,14 +6,16 @@ License: MIT
 """
 import traceback
 import sys
-from os.path import exists
+import os
 
+IS_LINUX = False
 if sys.platform.startswith('win'):
-    from .notify_windows import alert
+    from .notify_windows import _alert
 elif sys.platform == "darwin":
-    from .notify_osx import alert
+    from .notify_osx import _alert
 else:
-    from .notify_linux import alert
+    from .notify_linux import _alert
+    IS_LINUX = True
 
 __all__ = ("get_growl", "enable_growl", "growl_enabled", "setup_growl", "has_growl", "growl_destroy")
 
@@ -25,6 +27,8 @@ class Options:
     enabled = False
     growl = None
     notify = None
+    sound = None
+    player = None
 
     @classmethod
     def clear(cls):
@@ -34,6 +38,8 @@ class Options:
         cls.enabled = False
         cls.growl = None
         cls.notify = None
+        cls.sound = None
+        cls.player = None
 
 
 @staticmethod
@@ -90,13 +96,31 @@ def growl_enabled():
     return has_growl() and Options.enabled
 
 
-def setup_growl(app_name, icon):
+def alert():
+    """Alert."""
+
+    if IS_LINUX:
+        _alert(Options.sound, player=Options.player)
+    else:
+        _alert(Options.sound)
+
+
+def setup_growl(app_name, icon, **kwargs):
     """Setup growl."""
 
     Options.icon = None
+    Options.player = None
+
+    sound = kwargs.get('sound')
+    if sound is not None and os.path.exists(sound):
+        Options.sound = sound
+
+    player = kwargs.get('sound_player')
+    if IS_LINUX:
+        Options.player = player
 
     try:
-        if icon is None or not exists(icon):
+        if icon is None or not os.path.exists(icon):
             raise ValueError("Icon does not appear to be valid")
         with open(icon, "rb") as f:
             Options.icon = f.read()
