@@ -1340,7 +1340,7 @@ class Rummage:
         if self.file_flags & BRACE:
             self.wcmatch_flags |= wcmatch.B
         if self.file_flags & FILECASE:
-            self.wcmatch_flags |= wcmatch.F
+            self.wcmatch_flags |= wcmatch.C
         if self.file_flags & DIRPATHNAME:
             self.wcmatch_flags |= wcmatch.DP
         if self.file_flags & FILEPATHNAME:
