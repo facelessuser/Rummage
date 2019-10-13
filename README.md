@@ -1,5 +1,4 @@
-[![Unix Build Status][travis-image]][travis-link]
-[![Windows Build Status][appveyor-image]][appveyor-link]
+[![Build Status][github-ci-image]][github-ci-link]
 [![Coverage][codecov-image]][codecov-link]
 [![Requirements Status][requires-image]][requires-link]
 [![PyPI Version][pypi-image]][pypi-link]
@@ -37,10 +36,8 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-[travis-image]: https://img.shields.io/travis/facelessuser/Rummage/master.svg?label=Unix%20Build
-[travis-link]: https://travis-ci.org/facelessuser/Rummage
-[appveyor-image]: https://img.shields.io/appveyor/ci/facelessuser/Rummage/master.svg?label=Windows%20Build
-[appveyor-link]: https://ci.appveyor.com/project/facelessuser/Rummage
+[github-ci-image]: https://github.com/facelessuser/Rummage/workflows/Master%20Health/badge.svg
+[github-ci-link]: https://github.com/facelessuser/Rummage/actions?workflow=Master+Health
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
 [codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg
 [codecov-link]: http://codecov.io/github/facelessuser/Rummage?branch=master
