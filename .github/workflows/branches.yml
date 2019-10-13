@@ -1,6 +1,12 @@
-name: Python package
+name: Branch Health
 
-on: [push]
+# If we have a special branch we'd like to monitor,
+# like say we are currently maintaining a 1.X branch and master (2.X),
+# We may want to monitor master and 1.X separately.
+on:
+  push:
+    branches:
+      - '!**'
 
 jobs:
   tests:
