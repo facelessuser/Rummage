@@ -1,6 +1,9 @@
-name: pull request
+name: build
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - 'master'
 
 jobs:
   tests:
