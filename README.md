@@ -1,4 +1,6 @@
 [![Build][github-ci-image]][github-ci-link]
+[![Unix Build Status][travis-image]][travis-link]
+[![Windows Build Status][appveyor-image]][appveyor-link]
 [![Coverage][codecov-image]][codecov-link]
 [![Requirements Status][requires-image]][requires-link]
 [![PyPI Version][pypi-image]][pypi-link]
@@ -38,6 +40,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 [github-ci-image]: https://github.com/facelessuser/Rummage/workflows/build/badge.svg
 [github-ci-link]: https://github.com/facelessuser/Rummage/actions?workflow=build
+[travis-image]: https://img.shields.io/travis/facelessuser/Rummage/master.svg?label=Unix%20Build
+[travis-link]: https://travis-ci.org/facelessuser/Rummage
+[appveyor-image]: https://img.shields.io/appveyor/ci/facelessuser/Rummage/master.svg?label=Windows%20Build
+[appveyor-link]: https://ci.appveyor.com/project/facelessuser/Rummage
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
 [codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg
 [codecov-link]: http://codecov.io/github/facelessuser/Rummage?branch=master
