@@ -51,7 +51,7 @@ jobs:
           pip install --upgrade setuptools
           python setup.py sdist
       - name: Publish
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publishv1.0.0a0
         with:
           user: __token__
           password: ${{ secrets.PYPI_PWD }}

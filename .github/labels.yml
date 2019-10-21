@@ -27,21 +27,29 @@ labels:
   color: support
   description: Support request.
 
-- name: search-replace
+- name: tests
   color: category
-  description: Related to the search and replace logic.
+  description: Related to testing.
 
-- name: user-interface
+- name: infrastructure
   color: category
-  description: Related to the user interface.
+  description: Related to project infrastructure.
 
-- name: integration
+- name: source
   color: category
-  description: Related to packaging and/or testing.
+  description: Related to source code.
 
 - name: docs
   color: category
   description: Related to documentation.
+
+- name: search-replace
+  color: subcategory
+  description: Related to the search and replace logic.
+
+- name: user-interface
+  color: subcategory
+  description: Related to the user interface.
 
 - name: more-info-needed
   color: pending

@@ -1,0 +1,21 @@
+brace_expansion: true
+extended_glob: true
+
+rules:
+  - labels: [infrastructure]
+    patterns: ['*|{tools,requirements,.github}/**|-README.md']
+
+  - labels: [source]
+    patterns: ['rummage/**']
+
+  - labels: [tests]
+    patterns: ['tests/**']
+
+  - labels: [docs]
+    patterns: ['docs/**|README.md']
+
+  - labels: [user-interface]
+    patterns: ['rummage/lib/gui/**']
+
+  - labels: [search-replace]
+    patterns: ['rummage/lib/rumcore/**|test_{rumcore,text_decode}.py']
