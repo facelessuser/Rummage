@@ -14,8 +14,32 @@ rules:
   - labels: [docs]
     patterns: ['docs/**|README.md']
 
-  - labels: [user-interface]
+  - labels: [gui]
     patterns: ['rummage/lib/gui/**']
 
   - labels: [search-replace]
-    patterns: ['rummage/lib/rumcore/**|test_{rumcore,text_decode}.py']
+    patterns: ['rummage/lib/rumcore/**|tests/**/test_{rumcore,text_decode}.py']
+
+  - labels: [localization]
+    patterns: ['rummage/lib/gui/localization/**']
+
+  - labels: [notifications]
+    patterns: ['rummage/lib/gui/notify/**']
+
+  - labels: [data]
+    patterns: ['rummage/lib/gui/data/**']
+
+  - labels: [dialogs]
+    patterns: ['rummage/lib/gui/dialogs/**']
+
+  - labels: [controls]
+    patterns: ['rummage/lib/gui/controls/**']
+
+  - labels: [settings]
+    patterns: ['rummage/lib/gui/settings/**']
+
+  - labels: [app]
+    patterns: ['rummage/lib/gui/app/**']
+
+  - labels: [actions]
+    patterns: ['rummage/lib/gui/actions/**']

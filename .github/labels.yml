@@ -47,9 +47,42 @@ labels:
   color: subcategory
   description: Related to the search and replace logic.
 
-- name: user-interface
+- name: gui
+  renamed: user-interface
   color: subcategory
-  description: Related to the user interface.
+  description: Related to the GUI.
+
+- name: localization
+  color: subcategory
+  description: Related to localization.
+
+- name: notifications
+  color: subcategory
+  description: Related to notifications.
+
+- name: data
+  color: subcategory
+  description: Related to data.
+
+- name: dialogs
+  color: subcategory
+  description: Related to GUI dialogs.
+
+- name: controls
+  color: subcategory
+  description: Related to GUI controls.
+
+- name: settings
+  color: subcategory
+  description: Related to settings managment.
+
+- name: app
+  color: subcategory
+  description: Related to application level code.
+
+- name: actions
+  color: subcategory
+  description: Related to GUI actions.
 
 - name: more-info-needed
   color: pending
