@@ -1,3 +1,65 @@
+# Wildcard labels
+
+brace_expansion: true
+extended_glob: true
+
+rules:
+  - labels: [infrastructure]
+    patterns: ['*|{tools,requirements,.github}/**|-README.md']
+
+  - labels: [source]
+    patterns: ['rummage/**']
+
+  - labels: [tests]
+    patterns: ['tests/**']
+
+  - labels: [docs]
+    patterns: ['docs/**|README.md']
+
+  - labels: [gui]
+    patterns: ['rummage/lib/gui/**']
+
+  - labels: [search-replace]
+    patterns: ['rummage/lib/rumcore/**|tests/**/test_{rumcore,text_decode}.py']
+
+  - labels: [localization]
+    patterns: ['rummage/lib/gui/localization/**']
+
+  - labels: [notifications]
+    patterns: ['rummage/lib/gui/notify/**']
+
+  - labels: [data]
+    patterns: ['rummage/lib/gui/data/**']
+
+  - labels: [dialogs]
+    patterns: ['rummage/lib/gui/dialogs/**']
+
+  - labels: [controls]
+    patterns: ['rummage/lib/gui/controls/**']
+
+  - labels: [settings]
+    patterns: ['rummage/lib/gui/settings/**']
+
+  - labels: [app]
+    patterns: ['rummage/lib/gui/app/**']
+
+  - labels: [actions]
+    patterns: ['rummage/lib/gui/actions/**']
+
+# WIP labels
+
+wip:
+  - work-in-progress
+  - needs-review
+  - needs-decision
+  - needs-confirmation
+  - requires-changes
+  - rejected
+
+# Label Management
+
+delete_labels: true
+
 colors:
     bug: '#c45b46'
     feature: '#7b17d8'
@@ -83,6 +145,10 @@ labels:
 - name: actions
   color: subcategory
   description: Related to GUI actions.
+
+- name: triage
+  color: pending
+  description: Issue needs triage.
 
 - name: more-info-needed
   color: pending
