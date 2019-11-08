@@ -18,6 +18,9 @@ class FilePickerCustomCtrl(wx.FilePickerCtrl):
         self.localize()
         self.message = self.MESSAGE
 
+        if util.platform() == 'linux':
+            style |= wx.FLP_USE_TEXTCTRL
+
         wildcard = self.wildcard_override(wildcard)
 
         super().__init__(parent, id, path, message, wildcard, pos, size, style, validator, name)
