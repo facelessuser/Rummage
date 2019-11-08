@@ -110,7 +110,7 @@ def setup(app_name, icon, **kwargs):
         Options.sound = sound
 
     player = kwargs.get('sound_player')
-    if player is not None and player not in PLAYERS and util.which(player):
+    if player is not None and player in PLAYERS and util.which(player):
         Options.player = player
 
     try:
