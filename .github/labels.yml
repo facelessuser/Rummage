@@ -6,88 +6,97 @@ brace_expansion: true
 extended_glob: true
 
 rules:
-  - labels: [infrastructure]
+  - labels: ['C: infrastructure']
     patterns: ['*|{tools,requirements,.github}/**|-*.md']
 
-  - labels: [source]
+  - labels: ['C: source']
     patterns: ['rummage/**']
 
-  - labels: [tests]
+  - labels: ['C: tests']
     patterns: ['tests/**']
 
-  - labels: [docs]
+  - labels: ['C: docs']
     patterns: ['docs/**|*.md']
 
-  - labels: [gui]
+  - labels: ['C: gui']
     patterns: ['rummage/lib/gui/**']
 
-  - labels: [search-replace]
+  - labels: ['C: search-replace']
     patterns: ['rummage/lib/rumcore/**|tests/**/test_{rumcore,text_decode}.py']
 
-  - labels: [localization]
+  - labels: ['C: localization']
     patterns: ['rummage/lib/gui/localization/**']
 
-  - labels: [notifications]
+  - labels: ['C: notifications']
     patterns: ['rummage/lib/gui/notify/**']
 
-  - labels: [data]
+  - labels: ['C: data']
     patterns: ['rummage/lib/gui/data/**']
 
-  - labels: [dialogs]
+  - labels: ['C: dialogs']
     patterns: ['rummage/lib/gui/dialogs/**']
 
-  - labels: [controls]
+  - labels: ['C: controls']
     patterns: ['rummage/lib/gui/controls/**']
 
-  - labels: [settings]
+  - labels: ['C: settings']
     patterns: ['rummage/lib/gui/settings/**']
 
-  - labels: [app]
+  - labels: ['C: app']
     patterns: ['rummage/lib/gui/app/**']
 
-  - labels: [actions]
+  - labels: ['C: actions']
     patterns: ['rummage/lib/gui/actions/**']
 
 # Label Management
 
 labels:
-- name: search-replace
+- name: 'C: search-replace'
+  renamed: search-replace
   color: subcategory
   description: Related to the search and replace logic.
 
-- name: gui
-  renamed: user-interface
+- name: 'C: gui'
+  renamed: gui
   color: subcategory
   description: Related to the GUI.
 
-- name: localization
+- name: 'C: localization'
+  renamed: localization
   color: subcategory
   description: Related to localization.
 
-- name: notifications
+- name: 'C: notifications'
+  renamed: notifications
   color: subcategory
   description: Related to notifications.
 
-- name: data
+- name: 'C: data'
+  renamed: data
   color: subcategory
   description: Related to data.
 
-- name: dialogs
+- name: 'C: dialogs'
+  renamed: dialogs
   color: subcategory
   description: Related to GUI dialogs.
 
-- name: controls
+- name: 'C: controls'
+  renamed: controls
   color: subcategory
   description: Related to GUI controls.
 
-- name: settings
+- name: 'C: settings'
+  renamed: settings
   color: subcategory
   description: Related to settings managment.
 
-- name: app
+- name: 'C: app'
+  renamed: app
   color: subcategory
   description: Related to application level code.
 
-- name: actions
+- name: 'C: actions'
+  renamed: actions
   color: subcategory
   description: Related to GUI actions.
