@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.7.2
+
+- **FIX**: Fix for notification sounds on Linux.
+
 ## 4.7.1
 
 - **FIX**: Require `wcmatch` 5.0 and make adjustments to support it.
