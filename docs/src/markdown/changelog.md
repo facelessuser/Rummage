@@ -2,7 +2,8 @@
 
 ## 4.7.2
 
-- **FIX**: Fix for notification sounds on Linux.
+- **FIX**: Fix for notification sound display in settings dialog.
+- **FIX**: Fix notification sound not playing on Linux when configured.
 
 ## 4.7.1
 
