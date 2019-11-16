@@ -92,6 +92,9 @@ setup(
     packages=find_packages(exclude=['tests', 'tools']),
     setup_requires=get_requirements("requirements/setup.txt"),
     install_requires=get_requirements("requirements/project.txt"),
+    extras_require={
+        'extras': get_requirements("requirements/extras.txt")
+    },
     zip_safe=False,
     entry_points=entry_points,
     include_package_data=True,
