@@ -1074,6 +1074,11 @@ body {
   padding-left: 0;
 }
 
+.markdown .twemoji{
+  width:1rem;
+  vertical-align:text-top;
+}
+
 .__toc_wrapper {
   position: fixed;
   left: 0.25rem;
