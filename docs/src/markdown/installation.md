@@ -83,10 +83,10 @@ Install:
 pip install rummage
 ```
 
-Install with optional module. Upgrades of optional modules will have to be manually upgraded when needed as well as they are not tracked in Rummage's requirements.
+Install with optional modules.
 
 ```bash
-pip install rummage regex cchardet
+pip install rummage[extras]
 ```
 
 Upgrade:

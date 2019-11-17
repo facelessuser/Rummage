@@ -1,7 +1,8 @@
 # Changelog
 
-## 4.7.2
+## 4.8.0
 
+- **NEW**: Supports installing extras via `pip install rummage[extras]`.
 - **FIX**: Fix for notification sound display in settings dialog.
 - **FIX**: Fix notification sound not playing on Linux when configured.
 
