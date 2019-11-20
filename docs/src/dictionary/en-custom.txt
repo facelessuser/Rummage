@@ -28,6 +28,7 @@ Formfeed
 GTK
 Gandy
 GitHub
+Gitter
 Homebrew
 JSON
 Jan
