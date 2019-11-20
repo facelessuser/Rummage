@@ -1,10 +1,10 @@
+[![Gitter][gitter-image]][gitter-link]
 [![Build][github-ci-image]][github-ci-link]
 [![Unix Build Status][travis-image]][travis-link]
 [![Windows Build Status][appveyor-image]][appveyor-link]
 [![Coverage][codecov-image]][codecov-link]
-[![Gitter][gitter-image]][gitter-link]
-[![Requirements Status][requires-image]][requires-link]
 [![PyPI Version][pypi-image]][pypi-link]
+[![PyPI - Python Version][python-image]][pypi-link]
 ![License][license-image-mit]
 
 Rummage
@@ -41,17 +41,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 [github-ci-image]: https://github.com/facelessuser/Rummage/workflows/build/badge.svg
 [github-ci-link]: https://github.com/facelessuser/Rummage/actions?workflow=build
-[travis-image]: https://img.shields.io/travis/facelessuser/Rummage/master.svg?label=Unix%20Build
+[travis-image]: https://img.shields.io/travis/facelessuser/Rummage/master.svg?label=travis&logo=travis%20ci&logoColor=white
 [travis-link]: https://travis-ci.org/facelessuser/Rummage
-[appveyor-image]: https://img.shields.io/appveyor/ci/facelessuser/Rummage/master.svg?label=Windows%20Build
+[appveyor-image]: https://img.shields.io/appveyor/ci/facelessuser/Rummage/master.svg?label=appveyor&logo=appveyor&logoColor=white
 [appveyor-link]: https://ci.appveyor.com/project/facelessuser/Rummage
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
-[codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg
+[codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg?logo=codecov&logoColor=white
 [codecov-link]: http://codecov.io/github/facelessuser/Rummage?branch=master
-[gitter-image]: https://img.shields.io/gitter/room/facelessuser/Rummage.svg
+[gitter-image]: https://img.shields.io/gitter/room/facelessuser/Rummage.svg?logo=gitter&color=fuchsia
 [gitter-link]: https://gitter.im/facelessuser/Rummage
-[requires-image]: https://img.shields.io/requires/github/facelessuser/Rummage/master.svg
-[requires-link]: https://requires.io/github/facelessuser/Rummage/requirements/?branch=master
-[pypi-image]: https://img.shields.io/pypi/v/Rummage.svg
+[pypi-image]: https://img.shields.io/pypi/v/Rummage.svg?logo=pypi&logoColor=white
 [pypi-link]: https://pypi.python.org/pypi/Rummage
+[python-image]: https://img.shields.io/pypi/pyversions/Rummage?logo=python&logoColor=white
 [license-image-mit]: https://img.shields.io/badge/license-MIT-blue.svg
