@@ -41,16 +41,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 [github-ci-image]: https://github.com/facelessuser/Rummage/workflows/build/badge.svg
 [github-ci-link]: https://github.com/facelessuser/Rummage/actions?workflow=build
-[travis-image]: https://img.shields.io/travis/facelessuser/Rummage/master.svg?label=travis&logo=travis%20ci&logoColor=white
+[travis-image]: https://img.shields.io/travis/facelessuser/Rummage/master.svg?label=travis&logo=travis%20ci&logoColor=cccccc
 [travis-link]: https://travis-ci.org/facelessuser/Rummage
-[appveyor-image]: https://img.shields.io/appveyor/ci/facelessuser/Rummage/master.svg?label=appveyor&logo=appveyor&logoColor=white
+[appveyor-image]: https://img.shields.io/appveyor/ci/facelessuser/Rummage/master.svg?label=appveyor&logo=appveyor&logoColor=cccccc
 [appveyor-link]: https://ci.appveyor.com/project/facelessuser/Rummage
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
-[codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg?logo=codecov&logoColor=white
+[codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg?logo=codecov&logoColor=cccccc
 [codecov-link]: http://codecov.io/github/facelessuser/Rummage?branch=master
-[gitter-image]: https://img.shields.io/gitter/room/facelessuser/Rummage.svg?logo=gitter&color=fuchsia
+[gitter-image]: https://img.shields.io/gitter/room/facelessuser/Rummage.svg?logo=gitter&color=fuchsia&logoColor=cccccc
 [gitter-link]: https://gitter.im/facelessuser/Rummage
-[pypi-image]: https://img.shields.io/pypi/v/Rummage.svg?logo=pypi&logoColor=white
+[pypi-image]: https://img.shields.io/pypi/v/Rummage.svg?logo=pypi&logoColor=cccccc
 [pypi-link]: https://pypi.python.org/pypi/Rummage
-[python-image]: https://img.shields.io/pypi/pyversions/Rummage?logo=python&logoColor=white
+[python-image]: https://img.shields.io/pypi/pyversions/Rummage?logo=python&logoColor=cccccc
 [license-image-mit]: https://img.shields.io/badge/license-MIT-blue.svg
