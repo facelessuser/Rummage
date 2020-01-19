@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.9.0
+
+- **NEW**: Require `wcmatch` 5.1.0+, `bracex` 1.4.0, and `backrefs` `1.3.0` to include latest bug fixes.
+
 ## 4.8.0
 
 - **NEW**: Supports installing extras via `pip install rummage[extras]`.

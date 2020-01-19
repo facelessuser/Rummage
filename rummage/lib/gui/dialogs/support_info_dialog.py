@@ -115,7 +115,7 @@ class SupportInfoDialog(gui.SupportInfoDialog):
 
         try:
             import backrefs
-            info["backrefs"] = format_version(backrefs, 'version')
+            info["backrefs"] = format_version(backrefs, '__version__')
         except Exception:
             info["backrefs"] = 'Version could not be acquired!'
 
