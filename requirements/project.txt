@@ -1,8 +1,8 @@
 gntp>=1.0.2
 chardet>=3.0.4
-wcmatch>=5.0,<6.0
-backrefs>=4.2,<5.0
-bracex>=1.1.1
+wcmatch>=5.1,<6.0
+backrefs>=4.3,<5.0
+bracex>=1.4
 wxpython>=4.0.1
 filelock
 send2trash

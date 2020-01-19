@@ -24,7 +24,7 @@ Rummage is written in Python and is currently available on Python 3.4+ (some old
 
 # Documentation
 
-http://facelessuser.github.io/Rummage/
+https://facelessuser.github.io/Rummage/
 
 License
 =======
