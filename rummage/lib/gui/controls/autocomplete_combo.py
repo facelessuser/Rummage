@@ -41,7 +41,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
         self.update_semaphore = False
         self.choices = None
         self.changed_callback = changed_callback
-        self.UseAltPopupWindow(True)
+        self.UseAltPopupWindow(False)
 
         # Create list control popup
         self.list = ListCtrlComboPopup(parent, self)
@@ -176,8 +176,11 @@ class AutoCompleteCombo(wx.ComboCtrl):
         """
 
         key = event.GetKeyCode()
-        if key in (wx.WXK_DOWN, wx.WXK_UP):
+        if key in (wx.WXK_DOWN, wx.WXK_UP) and not self.list.popup_shown:
             self.Popup()
+        elif key in (wx.WXK_ESCAPE, wx.WXK_RETURN) and self.list.popup_shown:
+            # Quirk with Windows: make sure we capture escape key
+            self.list.on_key_down(event)
         event.Skip()
 
     def on_key_down(self, event):
@@ -190,7 +193,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
             else:
                 self.tab_forward()
             return
-        elif key in [wx.WXK_DELETE, wx.WXK_BACK]:
+        elif key in (wx.WXK_DELETE, wx.WXK_BACK):
             self.update_semaphore = True
         event.Skip()
 
