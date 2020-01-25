@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.10.0
+
+- **NEW**: Pattern save dialog now uses a drop down list so you can easily update an existing saved pattern.
+
 ## 4.9.0
 
 - **NEW**: Require `wcmatch` 5.1.0+, `bracex` 1.4.0, and `backrefs` `1.3.0` to include latest bug fixes.
