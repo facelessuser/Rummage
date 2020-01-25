@@ -96,7 +96,7 @@ class SaveSearchDialog(gui.SaveSearchDialog):
     def setup(self, data):
         """Setup."""
 
-        self.m_name_text.update_choices(list(Settings.get_search().keys()), True)
+        self.m_name_text.update_choices(list(Settings.get_search().keys()))
 
         if data is not None:
             self.m_name_text.SetValue(data[0])
