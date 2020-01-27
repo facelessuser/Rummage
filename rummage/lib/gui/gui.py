@@ -2097,7 +2097,7 @@ class SaveSearchDialog ( wx.Dialog ):
 
         gbSizer5.Add( self.m_name_label, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_RIGHT, 5 )
 
-        self.m_name_text = wx.TextCtrl( self.m_save_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_name_text = AutoCompleteCombo(self.m_save_panel, wx.ID_ANY)
         gbSizer5.Add( self.m_name_text, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
         self.m_comment_label = wx.StaticText( self.m_save_panel, wx.ID_ANY, u"Comment", wx.DefaultPosition, wx.DefaultSize, 0 )
