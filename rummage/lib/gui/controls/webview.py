@@ -26,7 +26,6 @@ IN THE SOFTWARE.
 import wx.html2
 import markdown
 import pymdownx.slugs as slugs
-import pymdownx
 import os
 import re
 import html
