@@ -38,8 +38,6 @@ import webbrowser
 from .. import util
 import functools
 
-PMDX6 = pymdownx.version_info >= (6, 0, 0)
-
 HTML_FILE = 0
 HTML_STRING = 1
 MARKDOWN_STRING = 2
@@ -108,12 +106,6 @@ EXTENSION_CONFIGS = {
         "absolute": True
     }
 }
-
-# No need to use `base64` as `pathconverter` issues have been fixed in version 6.0.0
-if not PMDX6:
-    EXTENSION_CONFIGS["pymdownx.b64"] = {
-        "base_path": os.path.join(data.RESOURCE_PATH, 'docs')
-    }
 
 TEMPLATE = """<!DOCTYPE html>
 <html>

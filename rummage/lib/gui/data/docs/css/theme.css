@@ -122,8 +122,7 @@ body {
   border: 0;
 }
 
-.markdown .highlighttable pre,
-.markdown .highlighttable div.highlight {
+.markdown .highlighttable pre {
   margin: 0;
 }
 

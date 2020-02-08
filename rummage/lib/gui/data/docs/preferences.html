@@ -222,7 +222,7 @@
 <p><img alt="Settings: Export" src="images/settings_import.png" /></p>
 <p>The general settings are meant to be transferred between installations, not specifically configured by hand, so all the supported settings will not be covered here, but the chain and search format will be discussed in details.</p>
 <p>The chain format for importing is shown below:</p>
-<div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
     <span class="s2">&quot;chains&quot;</span><span class="o">:</span> <span class="p">{</span>                 <span class="c1">// The key that denotes this setting is the &quot;chains&quot; setting.</span>
         <span class="s2">&quot;a-chain&quot;</span><span class="o">:</span> <span class="p">[</span>            <span class="c1">// Unique chain ID.  Must be composed of letters, numbers, underscores, and hyphens.</span>
             <span class="s2">&quot;example-1&quot;</span><span class="p">,</span>        <span class="c1">// A list of references to specific unique search IDs.</span>
@@ -234,10 +234,10 @@
         <span class="p">]</span>
     <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 <p>The search/replace format for importing is show below:</p>
-<div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
     <span class="s2">&quot;saved_searches&quot;</span><span class="o">:</span> <span class="p">{</span>                                         <span class="c1">// The key that denotes this setting is the &quot;chains&quot; setting.</span>
         <span class="s2">&quot;Copyright-update&quot;</span><span class="o">:</span> <span class="p">{</span>                                   <span class="c1">// Unique search ID.  Must be composed of letters, numbers, underscores, and hyphens.</span>
             <span class="s2">&quot;flags&quot;</span><span class="o">:</span> <span class="s2">&quot;is&quot;</span><span class="p">,</span>                                      <span class="c1">// Search and replace flags (covered below).</span>
@@ -249,7 +249,7 @@
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 <p>Below is a table containing valid flags for the <code>flags</code> parameter.  Literal searches only allow flags <code>i</code>, <code>u</code>, and <code>f</code>.  Regular expression patterns can use <code>i</code>, <code>u</code>, <code>f</code>, <code>s</code>, <code>b</code>, <code>e</code>, <code>w</code>, <code>r</code>, <code>p</code>, and <code>F</code> (though flags are applicable depending on whether you are using Re, Regex, or one of the two with Backrefs).</p>
 <table>
