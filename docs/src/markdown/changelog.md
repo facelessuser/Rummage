@@ -3,6 +3,7 @@
 ## 4.10.0
 
 - **NEW**: Pattern save dialog now uses a drop down list so you can easily update an existing saved pattern.
+- **FIX**: Fix issue with web view rendering and `pymdown-extensions`.
 
 ## 4.9.0
 

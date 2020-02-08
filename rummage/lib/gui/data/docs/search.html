@@ -305,20 +305,20 @@
 <div class="admonition example">
 <p class="admonition-title">Example Patterns</p>
 <p>Used in the <code>Files which match</code> box, this would match all Python files of <code>.py</code> extensions excluding <code>__init__.py</code>:</p>
-<div class="highlight"><pre><span></span>*.py|-__init__.py
-</pre></div>
+<div class="highlight"><pre><span></span><code>*.py|-__init__.py
+</code></pre></div>
 
 <p>Used in the <code>Files which match</code> box, this would match any file type that is not <code>.py</code>.</p>
-<div class="highlight"><pre><span></span>-*.py
-</pre></div>
+<div class="highlight"><pre><span></span><code>-*.py
+</code></pre></div>
 
 <p>Used in the <code>Exclude folders</code>, this would exclude all folders with <code>name</code> followed by a single digit, except <code>name3</code> which we will always be included.</p>
-<div class="highlight"><pre><span></span>name[0-9]|-name3
-</pre></div>
+<div class="highlight"><pre><span></span><code>name[0-9]|-name3
+</code></pre></div>
 
 <p>Used in the <code>Exclude folders</code>, this would exclude all folders except <code>name3</code>.</p>
-<div class="highlight"><pre><span></span>-name3
-</pre></div>
+<div class="highlight"><pre><span></span><code>-name3
+</code></pre></div>
 
 <p>If you need to escape <code>-</code> or <code>|</code>, you can put them in a sequence: <code>[-|]</code>. Remember to place <code>-</code> at the beginning of a sequence as <code>-</code> is also used to specify character ranges: <code>[a-z]</code>.</p>
 </div>
@@ -361,12 +361,12 @@
 <div class="admonition example">
 <p class="admonition-title">Example Extended Match Patterns</p>
 <p>For example, if we wanted to match files <code>this-file.txt</code> and <code>that-file.txt</code>, we could provide the following pattern:</p>
-<div class="highlight"><pre><span></span>@(this|that)-file.txt
-</pre></div>
+<div class="highlight"><pre><span></span><code>@(this|that)-file.txt
+</code></pre></div>
 
 <p>The <code>|</code> contained within an extended match group will not split the pattern. So it is safe to combine with other patterns:</p>
-<div class="highlight"><pre><span></span>@(this|that)-file.txt|*.py
-</pre></div>
+<div class="highlight"><pre><span></span><code>@(this|that)-file.txt|*.py
+</code></pre></div>
 
 </div>
 <h4 id="brace-expansion-syntax">Brace Expansion Syntax</h4>

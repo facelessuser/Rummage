@@ -142,8 +142,8 @@
 <p>Rummage requires wxPython in order to run. If you have a recent Linux distro that has a pre-built, installable wxPython package for your version of Python, then it may make sense to just install the pre-built package via your Linux package manager (<code>apt-get</code> for Ubuntu). The version must meet the version requirement above.</p>
 <p>If you have installed a version of Python on your machine that does not have a pre-built wxPython package, or if your distro simply doesn't have a pre-built package that satisfies the requirements, then it may make sense to either install via <code>pip</code> or to manually compile and install. In both of these cases, you will have to install the appropriate prerequisites for your Linux distro. Rummage is generally tested on Ubuntu, so instructions are generally most up to date for Ubuntu. Remember, wxPython is a separate project and our instructions may get out of sync, so please check wxPython's official documentation on prerequisites before installing. Particularly under <a href="https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites">this section</a>.</p>
 <p>Due to recent changes in PyPI, it is probably best to ensure you have at least version 10.0 or greater of <code>pip</code>.  Ubuntu provides a method for installing pip with <code>sudo apt-get install python3-pip</code>, but this usually installs an older version.  It is recommended to install <code>pip</code> with the command shown below (where <code>python3</code> is a call to the installed Python version of your choice):</p>
-<div class="highlight"><pre><span></span>curl https://bootstrap.pypa.io/get-pip.py | sudo python3
-</pre></div>
+<div class="highlight"><pre><span></span><code>curl https://bootstrap.pypa.io/get-pip.py | sudo python3
+</code></pre></div>
 
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -152,16 +152,16 @@
 <dl>
 <dt>Ubuntu</dt>
 <dd>
-<div class="highlight"><pre><span></span>sudo apt-get install python3.6-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base1.0-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
-</pre></div>
+<div class="highlight"><pre><span></span><code>sudo apt-get install python3.6-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base1.0-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
+</code></pre></div>
 
 <p>Replace <code>python3.6-dev</code> with the Python version you are using.</p>
 </dd>
 <dt>Fedora 26</dt>
 <dd>
 <p>For Fedora 26, it has been reported that you need fewer dependencies to build wxPython; I have not personally confirmed this.</p>
-<div class="highlight"><pre><span></span>sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
-</pre></div>
+<div class="highlight"><pre><span></span><code>sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
+</code></pre></div>
 
 <p>If your Linux distribution has <code>gstreamer</code> 1.0 available (like the Fedora distro), you can install the dev packages for that instead of the 0.10 version.</p>
 </dd>
@@ -180,21 +180,21 @@
 <h2 id="installation_1">Installation</h2>
 <p>Here are a couple of ways to install and upgrade. Keep in mind if you are a Linux user, you have some <a href="#linux-prerequisites">prerequisites</a> to install before proceeding.</p>
 <p>Install:</p>
-<div class="highlight"><pre><span></span>pip install rummage
-</pre></div>
+<div class="highlight"><pre><span></span><code>pip install rummage
+</code></pre></div>
 
 <p>Install with optional modules.</p>
-<div class="highlight"><pre><span></span>pip install rummage<span class="o">[</span>extras<span class="o">]</span>
-</pre></div>
+<div class="highlight"><pre><span></span><code>pip install rummage<span class="o">[</span>extras<span class="o">]</span>
+</code></pre></div>
 
 <p>Upgrade:</p>
-<div class="highlight"><pre><span></span>pip install --upgrade rummage
-</pre></div>
+<div class="highlight"><pre><span></span><code>pip install --upgrade rummage
+</code></pre></div>
 
 <h2 id="installing-in-virtual-environments-macos">Installing in Virtual Environments (macOS)</h2>
 <p>If installing in a virtual environment via <code>virtualenv</code>, you may run into the following error:</p>
 <p>This used to be a fairly annoying issue to workaround, but in wxPython 4+, it's not too bad.  The wxPython wiki is a bit out of date.  You don't have to symlink <code>wx.pth</code> or anything like that anymore as the design of wxPython is a bit different now.  All you have to do is place the script below in <code>my_virtual_env/bin</code>.  In this example I call it <code>fwpy</code> for "framework python" (make sure to adjust paths or Python versions to match your installation).</p>
-<div class="highlight"><pre><span></span>#!/bin/bash
+<div class="highlight"><pre><span></span><code>#!/bin/bash
 
 # what real Python executable to use
 PYVER=2.7
@@ -207,11 +207,11 @@ echo $ENV
 # now run Python with the virtualenv set as Python&#39;s HOME
 export PYTHONHOME=$ENV
 exec $PYTHON &quot;$@&quot;
-</pre></div>
+</code></pre></div>
 
 <h2 id="installing-in-homebrew-macos">Installing in Homebrew (macOS)</h2>
 <p>Homebrew from what I read used to have issues running wxPython in versions less than 4, but this doesn't seem to be an issue with wxPython 4 with Homebrew (at least in my testing).</p>
-<div class="highlight"><pre><span></span>Faceless-MacBook-Pro:~ facelessuser$ brew install python
+<div class="highlight"><pre><span></span><code>Faceless-MacBook-Pro:~ facelessuser$ brew install python
 ...a lot of install stuff
 
 Faceless-MacBook-Pro:~ facelessuser$ /usr/local/Cellar/python/2.7.13_1/bin/pip install rummage
@@ -231,7 +231,7 @@ Installing collected packages: regex, backrefs, gntp, chardet, six, wxpython, ru
 Successfully installed backrefs-1.0.1 chardet-3.0.4 gntp-1.0.3 regex-2017.7.11 rummage-2.3 six-1.10.0 wxpython-4.0.0a3
 
 Faceless-MacBook-Pro:~ facelessuser$ /usr/local/Cellar/python/2.7.13_1/bin/python2 -m rummage
-</pre></div>
+</code></pre></div>
 
 <h2 id="installing-in-anaconda">Installing in Anaconda</h2>
 <p>Anaconda can run Rummage fine from my testing on macOS.  The important thing to note is you must launch it with <code>pythonw -m rummage</code> on Windows and <strong>not</strong> <code>python -m rummage</code>. While this worked on macOS, results may vary on other systems.</p>
