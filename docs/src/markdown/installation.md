@@ -4,18 +4,18 @@
 
 Rummage has a few requirements when installing.  These will all be taken care of when installing via `pip`.
 
-Name                                        | Details
-------------------------------------------- | -------
-[`wxPython`\ 4.0.1+][wxpython]              | The new wxPython Phoenix 4.0.0 is required for the GUI.
-[`backrefs`\ 4.0.2+][backrefs]              | Used to extend the `re` or `regex` regular expression engine with additional back references.
-[`bracex` 1.1.1+][bracex]                   | Bash style brace expansion for file patterns.
-[`wcmatch` 3.0.0+][wcmatch]                 | File name matching library.
-[`chardet`\ 3.0.4+][chardet]                | Used for file encoding guessing when an encoding is not specified.
-[`filelock`][filelock]                      | Used for file locking to allow different instances of Rummage to access the same file.
-[`gntp`][gntp]                              | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
-[`send2trash`][send2trash]                  | Used for sending files to trash/recycle bin on each platform.
-[`pymdown-extensions`][pymdown-extensions]  | An extension pack used in conjunction with [Python Markdown][markdown] to render some dynamic content into HTML that is embedded into the GUI.
-[`pygments`][pygments]                      | Used to provide syntax highlighting in some of the dynamically generated HTML help.
+Name                                              | Details
+------------------------------------------------- | -------
+[`wxPython`\ 4.0.1+][wxpython]                    | The new wxPython Phoenix 4.0.0 is required for the GUI.
+[`backrefs`\ 4.3+][backrefs]                      | Used to extend the `re` or `regex` regular expression engine with additional back references.
+[`bracex`\ 1.4+][bracex]                          | Bash style brace expansion for file patterns.
+[`wcmatch`\ 5.1+][wcmatch]                        | File name matching library.
+[`chardet`\ 3.0.4+][chardet]                      | Used for file encoding guessing when an encoding is not specified.
+[`filelock`][filelock]                            | Used for file locking to allow different instances of Rummage to access the same file.
+[`gntp`\ 1.0.2+][gntp]                            | Used to send notifications to Growl via the the Growl Notification Transport Protocol for all platforms (macOS, Windows, and Linux).
+[`send2trash`][send2trash]                        | Used for sending files to trash/recycle bin on each platform.
+[`pymdown-extensions`\ 6.3+][pymdown-extensions]  | An extension pack used in conjunction with [Python Markdown][markdown] to render some dynamic content into HTML that is embedded into the GUI.
+[`pygments`][pygments]                            | Used to provide syntax highlighting in some of the dynamically generated HTML help.
 
 Some optional modules that can be manually installed.
 
