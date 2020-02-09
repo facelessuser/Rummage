@@ -36,7 +36,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.0">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.2">
     
     
       
@@ -44,7 +44,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.1b62728e.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.adb8469c.css">
       
         <link rel="stylesheet" href="../assets/stylesheets/application-palette.a8b3c06d.css">
       
@@ -55,7 +55,7 @@
       
     
     
-      <script src="../assets/javascripts/modernizr.268332fc.js"></script>
+      <script src="../assets/javascripts/modernizr.86422ebf.js"></script>
     
     
       
@@ -67,7 +67,7 @@
     <link rel="stylesheet" href="../assets/fonts/material-icons.css">
     
     
-      <link rel="stylesheet" href="../extra-174a536342.css">
+      <link rel="stylesheet" href="../extra-b1410d454c.css">
     
     
       
@@ -91,7 +91,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#basic-usage" tabindex="1" class="md-skip">
+      <a href="#basic-usage" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -100,9 +100,9 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="https://facelessuser.github.io/Rummage" title="Rummage Documentation" class="md-header-nav__button md-logo">
+        <a href="https://facelessuser.github.io/Rummage" title="Rummage Documentation" aria-label="Rummage Documentation" class="md-header-nav__button md-logo">
           
-            <img src="../images/rummage.png" width="24" height="24">
+            <img alt="logo" src="../images/rummage.png" width="24" height="24">
           
         </a>
       </div>
@@ -131,7 +131,7 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <input type="text" class="md-search__input" aria-label="search" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
       <label class="md-icon md-search__icon" for="__search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
         &#xE5CD;
@@ -194,7 +194,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="https://facelessuser.github.io/Rummage" title="Rummage Documentation" class="md-nav__button md-logo">
       
-        <img src="../images/rummage.png" width="48" height="48">
+        <img alt="logo" src="../images/rummage.png" width="48" height="48">
       
     </a>
     Rummage Documentation
@@ -600,16 +600,16 @@
 <p>Rummage also comes with a simple regular expression tester to test out patterns. It also provides a feature where patterns can be saved for later and/or frequent use. You can even create chains that will apply a series of saved searches.</p>
 <h2 id="running">Running<a class="headerlink" href="#running" title="Permanent link"></a></h2>
 <p>Once Rummage is installed, you can run it from the command line (assuming your Python scripts/bin folder is in your system path):</p>
-<div class="codehilite"><pre><span></span>rummage
-</pre></div>
+<div class="highlight"><pre><span></span><code>rummage
+</code></pre></div>
 
 <p>If you have multiple Python versions installed, you can call Rummage for that specific Python version by appending the major and minor Python version to the end:</p>
-<div class="codehilite"><pre><span></span>rummage3.6
-</pre></div>
+<div class="highlight"><pre><span></span><code>rummage3.6
+</code></pre></div>
 
 <p>In some environments, it may make sense to run Rummage with <code>pythonw</code> which is mainly for launching GUI scripts (<code>pythonw</code> is not available on Linux). In some environments, it may be required (see <a href="../installation/#running-in-anaconda">Running in Anaconda</a>).</p>
-<div class="codehilite"><pre><span></span>pythonw -m rummage
-</pre></div>
+<div class="highlight"><pre><span></span><code>pythonw -m rummage
+</code></pre></div>
 
 <h2 id="searching--replacing">Searching &amp; Replacing<a class="headerlink" href="#searching--replacing" title="Permanent link"></a></h2>
 <p><img alt="Search Tab" src="../images/search_tab.png" /></p>
@@ -675,7 +675,7 @@ file's filesystem attributes to determine if the system is potentially hiding th
 <h3 id="writing-a-plugin">Writing a Plugin<a class="headerlink" href="#writing-a-plugin" title="Permanent link"></a></h3>
 <p>Replace plugins should contain two things. The first is a plugin class derived from the <code>rummage.lib.rumcore.ReplacePlugin</code> class.  The second is a function called <code>get_replace</code> that returns your class.</p>
 <p>The plugin class is fairly straight forward and is shown below.</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ReplacePlugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReplacePlugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Rummage replace plugin.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_info</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
@@ -712,16 +712,16 @@ file's filesystem attributes to determine if the system is potentially hiding th
         <span class="sd">&quot;&quot;&quot;Make replacement.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 <p><code>ReplacePlugin</code>'s <code>replace</code> function will receive the parameter <code>m</code> which is either a <code>regex</code> or <code>re</code> match object (depending on what regular expression engine is selected). The return value must be either a Unicode string or byte string (for binary files).</p>
 <p>The <code>ReplacePlugin</code>'s <code>file_info</code> property is a named tuple providing information about the current file such as name, size, creation date, etc.</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">FileInfoRecord</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;FileInfoRecord&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;modified&#39;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">,</span> <span class="s1">&#39;encoding&#39;</span><span class="p">])):</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">FileInfoRecord</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;FileInfoRecord&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;modified&#39;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">,</span> <span class="s1">&#39;encoding&#39;</span><span class="p">])):</span>
     <span class="sd">&quot;&quot;&quot;A record for tracking file info.&quot;&quot;&quot;</span>
-</pre></div>
+</code></pre></div>
 
 <p>The <code>ReplacePlugin</code>'s <code>flags</code> property contains only Rummage search related flags (the flags are abstracted at this level and are converted to the appropriate regular expression flags later). They can also be accessed from <code>rummage.lib.rumcore</code>. The flags are shown below.</p>
-<div class="codehilite"><pre><span></span><span class="c1"># Common regular expression flags (re|regex)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Common regular expression flags (re|regex)</span>
 <span class="n">IGNORECASE</span> <span class="o">=</span> <span class="mh">0x1</span>  <span class="c1"># (?i)</span>
 <span class="n">DOTALL</span> <span class="o">=</span> <span class="mh">0x2</span>      <span class="c1"># (?s)</span>
 <span class="n">MULTILINE</span> <span class="o">=</span> <span class="mh">0x4</span>   <span class="c1"># (?m)</span>
@@ -741,12 +741,12 @@ file's filesystem attributes to determine if the system is potentially hiding th
 
 <span class="c1"># Rumcore search related flags</span>
 <span class="n">LITERAL</span> <span class="o">=</span> <span class="mh">0x10000</span>           <span class="c1"># Literal search</span>
-</pre></div>
+</code></pre></div>
 
 <div class="admonition example">
 <p class="admonition-title">Example Plugin</p>
 <p>In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is assumed this is not a binary replace, so a Unicode string is returned.</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
 <span class="kn">from</span> <span class="nn">rummage.lib</span> <span class="kn">import</span> <span class="n">rumcore</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
@@ -765,7 +765,7 @@ file's filesystem attributes to determine if the system is potentially hiding th
     <span class="sd">&quot;&quot;&quot;Get the replace object.&quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">TestReplace</span>
-</pre></div>
+</code></pre></div>
 
 </div>
 <h2 id="export-to-csv-or-html">Export to CSV or HTML<a class="headerlink" href="#export-to-csv-or-html" title="Permanent link"></a></h2>
@@ -840,16 +840,16 @@ file's filesystem attributes to determine if the system is potentially hiding th
           </div>
         
         powered by
-        <a href="https://www.mkdocs.org">MkDocs</a>
+        <a href="https://www.mkdocs.org" target="_blank" rel="noopener">MkDocs</a>
         and
-        <a href="https://squidfunk.github.io/mkdocs-material/">
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs</a>
       </div>
       
   <div class="md-footer-social">
     <link rel="stylesheet" href="../assets/fonts/font-awesome.css">
     
-      <a href="https://github.com/facelessuser" class="md-footer-social__link fa fa-github"></a>
+      <a href="https://github.com/facelessuser" target="_blank" rel="noopener" title="github" class="md-footer-social__link fa fa-github"></a>
     
   </div>
 
@@ -859,7 +859,7 @@ file's filesystem attributes to determine if the system is potentially hiding th
       
     </div>
     
-      <script src="../assets/javascripts/application.808e90bb.js"></script>
+      <script src="../assets/javascripts/application.c33a9706.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
       
