@@ -165,6 +165,18 @@ class SupportInfoDialog(gui.SupportInfoDialog):
         except Exception:
             info["gntp"] = 'Version could not be acquired!'
 
+        try:
+            import markdown
+            info['markdown'] = format_version(markdown, '__version__')
+        except Exception:
+            info["markdown"] = 'Version could not be acquired'
+
+        try:
+            import pymdownx
+            info['pymdownx'] = format_version(pymdownx, '__version__')
+        except Exception:
+            info["pymdownx"] = 'Version could not be acquired'
+
         self.info = textwrap.dedent(
             """\
             - Arch: %(arch)s
@@ -180,6 +192,8 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             - Regex: %(regex)s
             - Filelock: %(filelock)s
             - Gntp: %(gntp)s
+            - Markdown: %(markdown)s
+            - Pymdown Extensions: %(pymdownx)s
             """ % info
         )
 
