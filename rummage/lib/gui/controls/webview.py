@@ -103,6 +103,9 @@ EXTENSION_CONFIGS = {
     "pymdownx.pathconverter": {
         "base_path": os.path.join(data.RESOURCE_PATH, 'docs'),
         "absolute": True
+    },
+    "pymdownx.b64": {
+        "base_path": os.path.join(data.RESOURCE_PATH, 'docs')
     }
 }
 

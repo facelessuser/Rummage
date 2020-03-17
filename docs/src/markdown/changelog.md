@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.11.0
+
+- **FIX**: Fix logo not loading in about dialog.
+
 ## 4.10.0
 
 - **NEW**: Pattern save dialog now uses a drop down list so you can easily update an existing saved pattern.
