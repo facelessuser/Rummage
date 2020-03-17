@@ -197,4 +197,9 @@ Assuming you Provided a base folder to search of `/My/base/path`, and you were t
 
 Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the [Preferences](./preferences.md#search) dialog.
 
+
+#### Pattern Limit
+
+Glob style patterns, by default, allow expanding a pattern by splitting on `|` or expanding the pattern with brace expansion: `a{b,c}` --> `ab ac`. This can turn one pattern into many patterns. The underlying expansion code limits expansion to `1000`. But this is configurable in [Preferences](./preferences.md#search). To raise or lower the limit, simply set the value higher or lower. To disable the limit entirely, set it to `0`.
+
 --8<-- "refs.txt"

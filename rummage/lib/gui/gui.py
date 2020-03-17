@@ -969,7 +969,7 @@ class SettingsDialog ( wx.Dialog ):
         self.m_general_panel.SetSizer( fgSizer52 )
         self.m_general_panel.Layout()
         fgSizer52.Fit( self.m_general_panel )
-        self.m_settings_notebook.AddPage( self.m_general_panel, u"General", False )
+        self.m_settings_notebook.AddPage( self.m_general_panel, u"General", True )
         self.m_search_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
         fgSizer43 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer43.AddGrowableCol( 0 )
@@ -1014,33 +1014,59 @@ class SettingsDialog ( wx.Dialog ):
 
         sbSizer9 = wx.StaticBoxSizer( wx.StaticBox( self.m_search_panel, wx.ID_ANY, u"File/Folder Matching" ), wx.VERTICAL )
 
-        fgSizer61 = wx.FlexGridSizer( 0, 2, 0, 0 )
-        fgSizer61.SetFlexibleDirection( wx.BOTH )
-        fgSizer61.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        gbSizer7 = wx.GridBagSizer( 0, 0 )
+        gbSizer7.SetFlexibleDirection( wx.BOTH )
+        gbSizer7.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
         self.m_extmatch_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Extended match", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer61.Add( self.m_extmatch_checkbox, 0, wx.ALL, 5 )
+        gbSizer7.Add( self.m_extmatch_checkbox, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 
         self.m_brace_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Brace expansion", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer61.Add( self.m_brace_checkbox, 0, wx.ALL, 5 )
+        gbSizer7.Add( self.m_brace_checkbox, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
         self.m_case_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Case sensitive", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer61.Add( self.m_case_checkbox, 0, wx.ALL, 5 )
+        gbSizer7.Add( self.m_case_checkbox, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 
         self.m_globstar_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Globstar (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer61.Add( self.m_globstar_checkbox, 0, wx.ALL, 5 )
+        gbSizer7.Add( self.m_globstar_checkbox, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
         self.m_matchbase_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Match base (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer61.Add( self.m_matchbase_checkbox, 0, wx.ALL, 5 )
+        gbSizer7.Add( self.m_matchbase_checkbox, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
         self.m_fullpath_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path directory match", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer61.Add( self.m_fullpath_checkbox, 0, wx.ALL, 5 )
+        gbSizer7.Add( self.m_fullpath_checkbox, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 
         self.m_fullfile_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path file match", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer61.Add( self.m_fullfile_checkbox, 0, wx.ALL, 5 )
+        gbSizer7.Add( self.m_fullfile_checkbox, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+
+        self.m_staticline14 = wx.StaticLine( sbSizer9.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        gbSizer7.Add( self.m_staticline14, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND |wx.ALL, 5 )
+
+        gbSizer8 = wx.GridBagSizer( 0, 0 )
+        gbSizer8.SetFlexibleDirection( wx.BOTH )
+        gbSizer8.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+        self.m_pattern_limit_label = wx.StaticText( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Pattern Limit", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_pattern_limit_label.Wrap( -1 )
+
+        gbSizer8.Add( self.m_pattern_limit_label, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+
+        self.m_pattern_limit_textbox = wx.TextCtrl( sbSizer9.GetStaticBox(), wx.ID_ANY, u"1000", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gbSizer8.Add( self.m_pattern_limit_textbox, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
+
+        self.m_pattern_limit_button = wx.Button( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gbSizer8.Add( self.m_pattern_limit_button, wx.GBPosition( 0, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 
 
-        sbSizer9.Add( fgSizer61, 1, wx.EXPAND, 5 )
+        gbSizer8.AddGrowableCol( 1 )
+        gbSizer8.AddGrowableRow( 0 )
+
+        gbSizer7.Add( gbSizer8, wx.GBPosition( 5, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND, 5 )
+
+
+        gbSizer7.AddGrowableCol( 1 )
+
+        sbSizer9.Add( gbSizer7, 1, wx.EXPAND, 5 )
 
 
         fgSizer43.Add( sbSizer9, 1, wx.EXPAND, 5 )
@@ -1310,6 +1336,8 @@ class SettingsDialog ( wx.Dialog ):
         self.m_matchbase_checkbox.Bind( wx.EVT_CHECKBOX, self.on_matchbase_toggle )
         self.m_fullpath_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullpath_toggle )
         self.m_fullfile_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullfile_toggle )
+        self.m_pattern_limit_textbox.Bind( wx.EVT_TEXT, self.on_pattern_limit_changed )
+        self.m_pattern_limit_button.Bind( wx.EVT_BUTTON, self.on_pattern_limit_click )
         self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
         self.m_editor_text.Bind( wx.EVT_TEXT, self.on_editor_changed )
         self.m_editor_button.Bind( wx.EVT_BUTTON, self.on_editor_change )
@@ -1386,6 +1414,12 @@ class SettingsDialog ( wx.Dialog ):
         event.Skip()
 
     def on_fullfile_toggle( self, event ):
+        event.Skip()
+
+    def on_pattern_limit_changed( self, event ):
+        event.Skip()
+
+    def on_pattern_limit_click( self, event ):
         event.Skip()
 
     def on_chardet( self, event ):

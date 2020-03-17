@@ -161,13 +161,16 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
             self.m_term_note_label.Enable(is_native)
             self.m_term_note_picker.Enable(is_native)
 
+        self.pattern_limit = str(Settings.get_pattern_limit())
         self.backup_ext = Settings.get_backup_ext()
         self.backup_folder = Settings.get_backup_folder()
+        self.m_pattern_limit_textbox.SetValue(self.pattern_limit)
         self.m_back_ext_textbox.SetValue(self.backup_ext)
         self.m_back_folder_textbox.SetValue(self.backup_folder)
         self.m_back2folder_checkbox.SetValue(bool(Settings.get_backup_type()))
         self.m_back_ext_button.Enable(False)
         self.m_back_folder_button.Enable(False)
+        self.m_pattern_limit_button.Enable(False)
         self.m_update_checkbox.SetValue(bool(Settings.get_check_updates()))
         self.m_prerelease_checkbox.SetValue(bool(Settings.get_prerelease()))
         self.m_alt_row_checkbox.SetValue(bool(Settings.get_alt_list_color()))
@@ -245,6 +248,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.GLOBSTAR = _("Globstar (full path)")
         self.MATCHBASE = _("Match base (full path)")
         self.REGEX_GROUP = _("Regular Expressions")
+        self.PATTERN_LIMIT = _("Pattern Limit")
         self.FILE_MATCH_GROUP = _("File/Folder Matching")
         self.RE = _("Use Re module")
         self.REGEX = _("Use Regex module")
@@ -268,6 +272,9 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         )
         self.ERR_PLAYER = _(
             "Can't find the player '{}'!"
+        )
+        self.ERR_INVALID_PATTERN_LIMIT = _(
+            "'{}' is not a valid number"
         )
         self.CHECK_UPDATES = _("Check updates daily")
         self.PRERELEASES = _("Include pre-releases")
@@ -313,6 +320,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_fullfile_checkbox.SetLabel(self.FULL_FILE)
         self.m_globstar_checkbox.SetLabel(self.GLOBSTAR)
         self.m_matchbase_checkbox.SetLabel(self.MATCHBASE)
+        self.m_pattern_limit_label.SetLabel(self.PATTERN_LIMIT)
         self.m_editor_button.SetLabel(self.SAVE)
         self.m_history_clear_button.SetLabel(self.CLEAR)
         self.m_back_ext_label.SetLabel(self.BACK_EXT)
@@ -399,6 +407,27 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         """Check updates."""
 
         self.GetParent().on_check_update(event)
+
+    def on_pattern_limit_click(self, event):
+        """Handle pattern limit button click."""
+
+        try:
+            value = int(self.m_pattern_limit_textbox.GetValue())
+        except Exception:
+            value = ''
+        if isinstance(value, int):
+            Settings.set_pattern_limit(value)
+            self.pattern_limit = self.m_pattern_limit_textbox.GetValue()
+            self.m_pattern_limit_button.Enable(False)
+        else:
+            errormsg(self.ERR_INVALID_PATTERN_LIMIT.format(self.m_pattern_limit_textbox.GetValue()))
+
+        Settings.set_pattern_limit(self.m_pattern_limit_textbox.GetValue())
+
+    def on_pattern_limit_changed(self, event):
+        """Handle text change event."""
+
+        self.m_pattern_limit_button.Enable(self.m_pattern_limit_textbox.GetValue() != self.pattern_limit)
 
     def on_editor_changed(self, event):
         """Handle on editor changed."""

@@ -29,6 +29,7 @@ GTK
 Gandy
 GitHub
 Gitter
+Glob
 Homebrew
 JSON
 Jan

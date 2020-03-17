@@ -25,6 +25,14 @@
 
   <!-- Table of Content (Don't show for static sites) -->
     <h1 id="changelog">Changelog</h1>
+<h2 id="4110">4.11.0</h2>
+<ul>
+<li><strong>NEW</strong>: <code>wcmatch</code> the file search library that Rummage uses, is now at version 6 which imposes a pattern limit to
+  protect against patterns such as <code>{1..1000000}</code> which would expand to a large amount of patterns if brace expansion
+  is enabled. Rummage exposes control of this.</li>
+<li><strong>FIX</strong>: By using <code>wcmatch</code> version 6, complex issues involving pattern splitting with <code>|</code> and <code>{,}</code> are resolved.</li>
+<li><strong>FIX</strong>: Fix logo not loading in about dialog.</li>
+</ul>
 <h2 id="4100">4.10.0</h2>
 <ul>
 <li><strong>NEW</strong>: Pattern save dialog now uses a drop down list so you can easily update an existing saved pattern.</li>

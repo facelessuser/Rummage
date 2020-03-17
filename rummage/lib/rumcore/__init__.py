@@ -1118,8 +1118,8 @@ class _DirWalker(wcmatch.WcMatch):
     """Walk the directory."""
 
     def on_init(
-        self, file_regex_match, folder_regex_exclude_match, size, modified, created,
-        backup_location, backup_to_folder, regex_mode=RE_MODE, regex_ver=0
+        self, file_regex_match=False, folder_regex_exclude_match=False, size=None, modified=None, created=None,
+        backup_location='', backup_to_folder=False, regex_mode=RE_MODE, regex_ver=0
     ):
         self.file_regex_match = file_regex_match
         self.folder_regex_exclude_match = folder_regex_exclude_match
@@ -1312,7 +1312,7 @@ class Rummage:
     """Perform the rummaging."""
 
     def __init__(
-        self, target, searches, file_pattern=None, folder_exclude=None,
+        self, target, searches, file_pattern=None, folder_exclude=None, limit=1000,
         flags=0, context=(0, 0), max_count=None, encoding=None, size=None,
         modified=None, created=None, backup_location=None, regex_mode=RE_MODE,
         encoding_options=None
@@ -1375,64 +1375,69 @@ class Rummage:
         self.path_walker = None
         self.is_binary = False
         self.files = deque()
+        self.setup_error = None
 
-        # Initialize search objects:
-        # - `_DirWalker` for if target is a folder
-        # - Append `FileAttrRecord` if target is a file or buffer
-        if not self.buffer_input and os.path.isdir(self.target):
-            self.path_walker = _DirWalker(
-                self.target,
-                file_pattern,
-                folder_exclude,
-                self.wcmatch_flags,
-                file_regex_match,
-                dir_regex_match,
-                size,
-                modified,
-                created,
-                self.backup_location if bool(self.file_flags & BACKUP) else None,
-                bool(self.file_flags & BACKUP_FOLDER),
-                self.regex_mode,
-                0 if flags & VERSION1 else 1
-            )
-        elif not self.buffer_input and os.path.isfile(self.target):
-            try:
-                c_time, m_time = util.get_stat(self.target)
+        try:
+            # Initialize search objects:
+            # - `_DirWalker` for if target is a folder
+            # - Append `FileAttrRecord` if target is a file or buffer
+            if not self.buffer_input and os.path.isdir(self.target):
+                self.path_walker = _DirWalker(
+                    self.target,
+                    file_pattern=file_pattern,
+                    exclude_pattern=folder_exclude,
+                    flags=self.wcmatch_flags,
+                    limit=limit,
+                    file_regex_match=file_regex_match,
+                    folder_regex_exclude_match=dir_regex_match,
+                    size=size,
+                    modified=modified,
+                    created=created,
+                    backup_location=self.backup_location if bool(self.file_flags & BACKUP) else None,
+                    backup_to_folder=bool(self.file_flags & BACKUP_FOLDER),
+                    regex_mode=self.regex_mode,
+                    regex_ver=0 if flags & VERSION1 else 1
+                )
+            elif not self.buffer_input and os.path.isfile(self.target):
+                try:
+                    c_time, m_time = util.get_stat(self.target)
+                    self.files.append(
+                        FileAttrRecord(
+                            self.target,
+                            os.path.splitext(self.target)[1].lower().lstrip('.'),
+                            os.path.getsize(self.target),
+                            m_time,
+                            c_time,
+                            False,
+                            None
+                        )
+                    )
+                except Exception:
+                    self.files.append(
+                        FileAttrRecord(
+                            self.target,
+                            None,
+                            None,
+                            None,
+                            None,
+                            False,
+                            get_exception()
+                        )
+                    )
+            elif self.buffer_input:
                 self.files.append(
                     FileAttrRecord(
-                        self.target,
-                        os.path.splitext(self.target)[1].lower().lstrip('.'),
-                        os.path.getsize(self.target),
-                        m_time,
-                        c_time,
+                        None,
+                        None,
+                        len(self.target),
+                        ctime(),
+                        ctime(),
                         False,
                         None
                     )
                 )
-            except Exception:
-                self.files.append(
-                    FileAttrRecord(
-                        self.target,
-                        None,
-                        None,
-                        None,
-                        None,
-                        False,
-                        get_exception()
-                    )
-                )
-        elif self.buffer_input:
-            self.files.append(
-                FileAttrRecord(
-                    None,
-                    None,
-                    len(self.target),
-                    ctime(),
-                    ctime(),
-                    False,
-                    None
-                )
-            )
+        except Exception:
+            self.setup_error = ErrorRecord(get_exception())
 
     def _verify_encoding(self, encoding):
         """Verify the encoding is okay."""
@@ -1558,36 +1563,39 @@ class Rummage:
         self.idx = -1
         self.skipped = 0
 
-        if len(self.files):
-            # Single target
-            if len(self.search_params):
-                # Search the file
-                for result in self.search_file(self.target if self.buffer_input else None):
-                    yield result
-            else:
-                # Single file with no search pattern, so just return the file
-                self.records += 1
-                yield self._get_next_file()
+        if self.setup_error:
+            yield self.setup_error
         else:
-            # Directory to crawl
-            if len(self.search_params):
-                # Crawl directory and search files.
-                try:
-                    for result in self.walk_files():
+            if len(self.files):
+                # Single target
+                if len(self.search_params):
+                    # Search the file
+                    for result in self.search_file(self.target if self.buffer_input else None):
                         yield result
-                except Exception:  # pragma: no cover
-                    yield ErrorRecord(get_exception())
-            else:
-                # No search pattern, so just return files that *would* be searched.
-                for f in self.path_walker.imatch():
-                    self.idx += 1
+                else:
+                    # Single file with no search pattern, so just return the file
                     self.records += 1
-                    if isinstance(f, FileAttrRecord) and f.skipped:
-                        self.skipped += 1
-                    yield f
-                    if self.abort:
-                        break
+                    yield self._get_next_file()
+            else:
+                # Directory to crawl
+                if len(self.search_params):
+                    # Crawl directory and search files.
+                    try:
+                        for result in self.walk_files():
+                            yield result
+                    except Exception:  # pragma: no cover
+                        yield ErrorRecord(get_exception())
+                else:
+                    # No search pattern, so just return files that *would* be searched.
+                    for f in self.path_walker.imatch():
+                        self.idx += 1
+                        self.records += 1
+                        if isinstance(f, FileAttrRecord) and f.skipped:
+                            self.skipped += 1
+                        yield f
+                        if self.abort:
+                            break
 
-                if self.abort:
-                    self.files.clear()
-                self.skipped = self.path_walker.get_skipped()
+                    if self.abort:
+                        self.files.clear()
+                    self.skipped = self.path_walker.get_skipped()

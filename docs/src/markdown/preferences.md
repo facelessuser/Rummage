@@ -50,6 +50,7 @@ Under **File/Folder Matching** are a number options for file and folder matching
 - [Match base](./search.md#full-path-matching).
 - [Full path directory matching](./search.md#full-path-matching).
 - [Full path file matching](./search.md#full-path-matching).
+- [Pattern limit](./search#pattern-limit)
 
 ## Encoding
 
