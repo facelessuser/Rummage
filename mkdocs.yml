@@ -11,7 +11,6 @@ copyright: |
 docs_dir: docs/src/markdown
 theme:
   name: material
-  custom_dir: docs/theme
   palette:
     primary: blue
     accent: blue
@@ -34,7 +33,7 @@ nav:
 markdown_extensions:
   - markdown.extensions.toc:
       slugify: !!python/name:pymdownx.slugs.uslugify
-      permalink: "\ue157"
+      permalink: ""
   - markdown.extensions.admonition:
   - markdown.extensions.smarty:
       smart_quotes: false
@@ -47,7 +46,7 @@ markdown_extensions:
   - pymdownx.extrarawhtml:
   - pymdownx.superfences:
       preserve_tabs: true
-      custom_fences: 
+      custom_fences:
         - name: flow
           class: uml-flowchart
           format: !!python/name:pymdownx.superfences.fence_code_format
@@ -96,12 +95,16 @@ markdown_extensions:
   - pymdownx.keys:
       separator: "\uff0b"
   - pymdownx.details:
+  - pymdownx.tabbed:
 
 extra:
   social:
-    - type: github
+    - icon: fontawesome/brands/github
       link: https://github.com/facelessuser
-extra_css:
-  - extra-b1410d454c.css
-extra_javascript:
-  - extra-0d9305e748.js
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/UjXwf4F
+
+plugins:
+  - search
+  - git-revision-date-localized
+  - mkdocs_pymdownx_material_extras
