@@ -1,8 +1,6 @@
 [![Donate via PayPal][donate-image]][donate-link]
 [![Discord][discord-image]][discord-link]
 [![Build][github-ci-image]][github-ci-link]
-[![Unix Build Status][travis-image]][travis-link]
-[![Windows Build Status][appveyor-image]][appveyor-link]
 [![Coverage][codecov-image]][codecov-link]
 [![PyPI Version][pypi-image]][pypi-link]
 [![PyPI - Python Version][python-image]][pypi-link]
@@ -54,10 +52,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 [discord-link]:https://discord.gg/UjXwf4F
 [codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg?logo=codecov&logoColor=aaaaaa&labelColor=333333
 [codecov-link]: https://codecov.io/github/facelessuser/Rummage
-[appveyor-image]: https://img.shields.io/appveyor/ci/facelessuser/Rummage/master.svg?label=appveyor&logo=appveyor&logoColor=aaaaaa&labelColor=333333
-[appveyor-link]: https://ci.appveyor.com/project/facelessuser/Rummage
-[travis-image]: https://img.shields.io/travis/facelessuser/Rummage/master.svg?label=travis&logo=travis%20ci&logoColor=aaaaaa&labelColor=333333
-[travis-link]: https://travis-ci.org/facelessuser/Rummage
 [pypi-image]: https://img.shields.io/pypi/v/Rummage.svg?logo=pypi&logoColor=aaaaaa&labelColor=333333
 [pypi-link]: https://pypi.python.org/pypi/Rummage
 [python-image]: https://img.shields.io/pypi/pyversions/Rummage?logo=python&logoColor=aaaaaa&labelColor=333333
