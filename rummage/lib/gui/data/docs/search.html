@@ -72,6 +72,10 @@
       <ul class="__toc_list_5">
       
       </ul>
+      <li class="__toc_level_5"><a href="#pattern-limit">Pattern Limit</a></li>
+      <ul class="__toc_list_5">
+      
+      </ul>
       </ul>
       <li class="__toc_level_4"><a href="#regular-expression">Regular Expression</a></li>
       <ul class="__toc_list_4">
@@ -85,10 +89,6 @@
       <li class="__toc_level_3"><a href="#backrefs">Backrefs</a></li>
       <ul class="__toc_list_3">
       
-      <li class="__toc_level_5"><a href="#pattern-limit">Pattern Limit</a></li>
-      <ul class="__toc_list_5">
-      
-      </ul>
       </ul>
       </ul>
     </ul>
@@ -412,6 +412,8 @@
 <p>When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in <code>[]</code>, <code>*</code>, <code>?</code>, or extended patterns like <code>*(...)</code>. Slashes can be matched by <code>**</code> if globstar (<code>**</code>) is enabled in <a href="preferences.html#search">Preferences</a>.</p>
 <p>When full path matching is not enabled, wildcard patterns use base matching. That is to say, the wildcard patterns are applied to the base filename instead of the full path. If you enable base matching for full paths in <a href="preferences.html#search">Preferences</a>, if a pattern has no slashes, it will perform base matching, and if there are slashes, it will perform a full path match.  This allows you to have the best of both worlds. For instance, the following pattern would match all Markdown files under the document directory, but would exclude any file in any subdirectory under docs whose name starts with <code>c</code>: <code>docs/**/*.md|-c*</code>. Full path is used for the <code>docs/**/*.md</code> while base matching is used for <code>-c*</code>.</p>
 <p>To learn more about full path matching with regular expression, checkout the regular expression <a href="#full-path-matching_1">section</a>.</p>
+<h4 id="pattern-limit">Pattern Limit</h4>
+<p>Glob style patterns, by default, allow expanding a pattern by splitting on <code>|</code> or expanding the pattern with brace expansion: <code>a{b,c}</code> &rarr; <code>ab ac</code>. This can turn one pattern into many patterns. The underlying expansion code limits expansion to <code>1000</code>. But this is configurable in <a href="preferences.html#search">Preferences</a>. To raise or lower the limit, simply set the value higher or lower. To disable the limit entirely, set it to <code>0</code>.</p>
 <h3 id="regular-expression">Regular Expression</h3>
 <p>Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the <code>Regex</code> checkbox beside the pattern. The regular expression engine set in <a href="preferences.html#search">Preferences</a> is what will be used for file patterns. It will also respect the case sensitivity setting in <a href="preferences.html#search">Preferences</a> for <strong>File/Folder Matching</strong>.</p>
 <h4 id="full-path-matching_1">Full Path Matching</h4>
@@ -419,8 +421,6 @@
 <p>Assuming you Provided a base folder to search of <code>/My/base/path</code>, and you were to match a file <code>/My/base/path/some/file.txt</code>, normally your file pattern would match against <code>file.txt</code>, but with full path enabled, you'd match against <code>some/file.txt</code>. This means you'd have to use pattern like <code>.*/.*.txt</code> instead of <code>.*.txt</code>.</p>
 <h2 id="backrefs">Backrefs</h2>
 <p>Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official <a href="http://facelessuser.github.io/backrefs/">Backrefs documentation</a>. You can enable extended back references in the <a href="preferences.html#search">Preferences</a> dialog.</p>
-<h4 id="pattern-limit">Pattern Limit</h4>
-<p>Glob style patterns, by default, allow expanding a pattern by splitting on <code>|</code> or expanding the pattern with brace expansion: <code>a{b,c}</code> &rarr; <code>ab ac</code>. This can turn one pattern into many patterns. The underlying expansion code limits expansion to <code>1000</code>. But this is configurable in <a href="preferences.html#search">Preferences</a>. To raise or lower the limit, simply set the value higher or lower. To disable the limit entirely, set it to <code>0</code>.</p>
   </div>
 
   <!-- Navigation -->
