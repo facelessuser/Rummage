@@ -41,7 +41,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         "globstar", "international_time", "matchbase", "alt_list_color"
     )
     STRING = ("backup_ext", "backup_folder", "term_notifier", "editor", "notify_method", "notify_sound")
-    INTEGER = ("backup_type", "regex_mode", "regex_version")
+    INTEGER = ("backup_type", "regex_mode", "regex_version", "patten_limit")
     RE_LITERAL_FLAGS = re.compile(r'[iuf]*')
     RE_REGEXP_FLAGS = re.compile(r'[iufsbewrpF]*')
     RE_STRING_REFS = re.compile(r'[\a\b\f\r\t\n\v]')

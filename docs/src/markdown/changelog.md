@@ -2,6 +2,10 @@
 
 ## 4.11.0
 
+- **NEW**: `wcmatch` the file search library that Rummage uses, is now at version 6 which imposes a pattern limit to
+  protect against patterns such as `{1..1000000}` which would expand to a large amount of patterns if brace expansion
+  is enabled. Rummage exposes control of this.
+- **FIX**: By using `wcmatch` version 6, complex issues involving pattern splitting with `|` and `{,}` are resolved.
 - **FIX**: Fix logo not loading in about dialog.
 
 ## 4.10.0

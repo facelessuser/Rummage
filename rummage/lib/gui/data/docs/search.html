@@ -31,60 +31,64 @@
     <div class="__toc_wrapper"><span class="__toc_icon"></span>
     <div class="__toc_content">
     <ul class="__toc_list">
-      <li class="__toc_level_1"><a href="#search-features">Search Features</a></li>
-      <ul class="__toc_list_1">
-      
-      <li class="__toc_level_2"><a href="#search-options">Search Options</a></li>
+      <li class="__toc_level_2"><a href="#search-features">Search Features</a></li>
       <ul class="__toc_list_2">
       
-      <li class="__toc_level_3"><a href="#common-options">Common Options</a></li>
+      <li class="__toc_level_3"><a href="#search-options">Search Options</a></li>
       <ul class="__toc_list_3">
       
-      </ul>
-      <li class="__toc_level_3"><a href="#regex-engine-options">Regex Engine Options</a></li>
-      <ul class="__toc_list_3">
-      
-      </ul>
-      <li class="__toc_level_3"><a href="#rummage-options">Rummage Options</a></li>
-      <ul class="__toc_list_3">
-      
-      </ul>
-      </ul>
-      <li class="__toc_level_2"><a href="#file-patterns">File Patterns</a></li>
-      <ul class="__toc_list_2">
-      
-      <li class="__toc_level_3"><a href="#wildcard">Wildcard</a></li>
-      <ul class="__toc_list_3">
-      
-      <li class="__toc_level_4"><a href="#basic-wildcard-syntax">Basic Wildcard syntax</a></li>
+      <li class="__toc_level_4"><a href="#common-options">Common Options</a></li>
       <ul class="__toc_list_4">
       
       </ul>
-      <li class="__toc_level_4"><a href="#extended-match-syntax">Extended Match Syntax</a></li>
+      <li class="__toc_level_4"><a href="#regex-engine-options">Regex Engine Options</a></li>
       <ul class="__toc_list_4">
       
       </ul>
-      <li class="__toc_level_4"><a href="#brace-expansion-syntax">Brace Expansion Syntax</a></li>
-      <ul class="__toc_list_4">
-      
-      </ul>
-      <li class="__toc_level_4"><a href="#full-path-matching">Full Path Matching</a></li>
+      <li class="__toc_level_4"><a href="#rummage-options">Rummage Options</a></li>
       <ul class="__toc_list_4">
       
       </ul>
       </ul>
-      <li class="__toc_level_3"><a href="#regular-expression">Regular Expression</a></li>
+      <li class="__toc_level_3"><a href="#file-patterns">File Patterns</a></li>
       <ul class="__toc_list_3">
       
-      <li class="__toc_level_4"><a href="#full-path-matching_1">Full Path Matching</a></li>
+      <li class="__toc_level_4"><a href="#wildcard">Wildcard</a></li>
       <ul class="__toc_list_4">
       
-      </ul>
-      </ul>
-      </ul>
-      <li class="__toc_level_2"><a href="#backrefs">Backrefs</a></li>
-      <ul class="__toc_list_2">
+      <li class="__toc_level_5"><a href="#basic-wildcard-syntax">Basic Wildcard syntax</a></li>
+      <ul class="__toc_list_5">
       
+      </ul>
+      <li class="__toc_level_5"><a href="#extended-match-syntax">Extended Match Syntax</a></li>
+      <ul class="__toc_list_5">
+      
+      </ul>
+      <li class="__toc_level_5"><a href="#brace-expansion-syntax">Brace Expansion Syntax</a></li>
+      <ul class="__toc_list_5">
+      
+      </ul>
+      <li class="__toc_level_5"><a href="#full-path-matching">Full Path Matching</a></li>
+      <ul class="__toc_list_5">
+      
+      </ul>
+      </ul>
+      <li class="__toc_level_4"><a href="#regular-expression">Regular Expression</a></li>
+      <ul class="__toc_list_4">
+      
+      <li class="__toc_level_5"><a href="#full-path-matching_1">Full Path Matching</a></li>
+      <ul class="__toc_list_5">
+      
+      </ul>
+      </ul>
+      </ul>
+      <li class="__toc_level_3"><a href="#backrefs">Backrefs</a></li>
+      <ul class="__toc_list_3">
+      
+      <li class="__toc_level_5"><a href="#pattern-limit">Pattern Limit</a></li>
+      <ul class="__toc_list_5">
+      
+      </ul>
       </ul>
       </ul>
     </ul>
@@ -415,6 +419,8 @@
 <p>Assuming you Provided a base folder to search of <code>/My/base/path</code>, and you were to match a file <code>/My/base/path/some/file.txt</code>, normally your file pattern would match against <code>file.txt</code>, but with full path enabled, you'd match against <code>some/file.txt</code>. This means you'd have to use pattern like <code>.*/.*.txt</code> instead of <code>.*.txt</code>.</p>
 <h2 id="backrefs">Backrefs</h2>
 <p>Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official <a href="http://facelessuser.github.io/backrefs/">Backrefs documentation</a>. You can enable extended back references in the <a href="preferences.html#search">Preferences</a> dialog.</p>
+<h4 id="pattern-limit">Pattern Limit</h4>
+<p>Glob style patterns, by default, allow expanding a pattern by splitting on <code>|</code> or expanding the pattern with brace expansion: <code>a{b,c}</code> &rarr; <code>ab ac</code>. This can turn one pattern into many patterns. The underlying expansion code limits expansion to <code>1000</code>. But this is configurable in <a href="preferences.html#search">Preferences</a>. To raise or lower the limit, simply set the value higher or lower. To disable the limit entirely, set it to <code>0</code>.</p>
   </div>
 
   <!-- Navigation -->

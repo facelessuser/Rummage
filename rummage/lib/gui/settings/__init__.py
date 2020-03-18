@@ -41,7 +41,7 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.5.0'
+SETTINGS_FMT = '2.6.0'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -95,6 +95,7 @@ DEFAULT_SETTINGS = {
     "notify_method": "default",
     "notify_player": NOTIFY_PLAYERS[util.platform()][0],
     "notify_sound": "",
+    "pattern_limit": 1000,
     "pos_cols_content": [],
     "pos_cols_file": [],
     "regex_mode": rumcore.RE_MODE,
@@ -1433,6 +1434,31 @@ class Settings:
         return cls.settings.get('brace_expansion', False)
 
     @classmethod
+    def get_pattern_limit(cls):
+        """Get pattern_limit."""
+
+        cls.reload_settings()
+        value = cls.settings.get('pattern_limit', DEFAULT_SETTINGS['pattern_limit'])
+        if not isinstance(value, int):
+            value = DEFAULT_SETTINGS['pattern_limit']
+        return value
+
+    @classmethod
+    def set_pattern_limit(cls, value):
+        """Set pattern_limit."""
+
+        cls.reload_settings()
+        cls._set_pattern_limit(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_pattern_limit(cls, value):
+        """Set pattern_limit."""
+
+        if isinstance(value, int):
+            cls.settings['pattern_limit'] = value
+
+    @classmethod
     def _set_file_case_sensitive(cls, value):
         """Set file_case_sensitive."""
 
@@ -1577,6 +1603,8 @@ class Settings:
             cls._set_globstar(obj['globstar'])
         if 'matchbase' in obj:
             cls._set_matchbase(obj['matchbase'])
+        if 'pattern_limit' in obj:
+            cls._set_pattern_limit(obj['pattern_limit'])
 
         # Notifications
         update_notify = False

@@ -172,6 +172,7 @@ class RummageThread(threading.Thread):
             searches=args['chain'],
             file_pattern=self.not_none(args['filepattern']),
             folder_exclude=self.not_none(args['directory_exclude']),
+            limit=args['limit'],
             flags=args['flags'],
             encoding=args['force_encode'],
             modified=args['modified_compare'],
@@ -286,6 +287,7 @@ class RummageArgs:
         self.regexfilepattern = None
         self.filepattern = None
         self.pattern = None
+        self.limit = 1000
         self.target = None
         self.show_hidden = False
         self.follow_links = False
@@ -1325,6 +1327,7 @@ class RummageFrame(gui.RummageFrame):
         args.pattern = self.m_searchfor_textbox.Value
         args.replace = self.m_replace_textbox.Value if replace else None
         args.encoding_options = Settings.get_encoding_options()
+        args.limit = Settings.get_pattern_limit()
 
         # Limit Options
         if os.path.isdir(args.target):
@@ -1412,6 +1415,7 @@ class RummageFrame(gui.RummageFrame):
             'chain': search_chain,
             'flags': flags & rumcore.FILE_MASK,
             'filepattern': args.filepattern,
+            'limit': args.limit,
             'directory_exclude': args.directory_exclude,
             'force_encode': args.force_encode,
             'modified_compare': args.modified_compare,

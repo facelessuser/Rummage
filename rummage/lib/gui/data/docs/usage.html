@@ -31,55 +31,55 @@
     <div class="__toc_wrapper"><span class="__toc_icon"></span>
     <div class="__toc_content">
     <ul class="__toc_list">
-      <li class="__toc_level_1"><a href="#basic-usage">Basic Usage</a></li>
-      <ul class="__toc_list_1">
-      
-      <li class="__toc_level_2"><a href="#overview">Overview</a></li>
+      <li class="__toc_level_2"><a href="#basic-usage">Basic Usage</a></li>
       <ul class="__toc_list_2">
       
-      </ul>
-      <li class="__toc_level_2"><a href="#running">Running</a></li>
-      <ul class="__toc_list_2">
-      
-      </ul>
-      <li class="__toc_level_2"><a href="#searching--replacing">Searching &amp; Replacing</a></li>
-      <ul class="__toc_list_2">
-      
-      <li class="__toc_level_3"><a href="#configuring-text-search">Configuring Text Search</a></li>
+      <li class="__toc_level_3"><a href="#overview">Overview</a></li>
       <ul class="__toc_list_3">
       
       </ul>
-      <li class="__toc_level_3"><a href="#configuring-file-search">Configuring File Search</a></li>
+      <li class="__toc_level_3"><a href="#running">Running</a></li>
       <ul class="__toc_list_3">
       
       </ul>
-      <li class="__toc_level_3"><a href="#results">Results</a></li>
+      <li class="__toc_level_3"><a href="#searching--replacing">Searching &amp; Replacing</a></li>
+      <ul class="__toc_list_3">
+      
+      <li class="__toc_level_4"><a href="#configuring-text-search">Configuring Text Search</a></li>
+      <ul class="__toc_list_4">
+      
+      </ul>
+      <li class="__toc_level_4"><a href="#configuring-file-search">Configuring File Search</a></li>
+      <ul class="__toc_list_4">
+      
+      </ul>
+      <li class="__toc_level_4"><a href="#results">Results</a></li>
+      <ul class="__toc_list_4">
+      
+      </ul>
+      </ul>
+      <li class="__toc_level_3"><a href="#regular-expression-tester">Regular Expression Tester</a></li>
       <ul class="__toc_list_3">
       
       </ul>
-      </ul>
-      <li class="__toc_level_2"><a href="#regular-expression-tester">Regular Expression Tester</a></li>
-      <ul class="__toc_list_2">
-      
-      </ul>
-      <li class="__toc_level_2"><a href="#saving-and-loading-regular-expressions">Saving and Loading Regular Expressions</a></li>
-      <ul class="__toc_list_2">
-      
-      </ul>
-      <li class="__toc_level_2"><a href="#search-chains">Search Chains</a></li>
-      <ul class="__toc_list_2">
-      
-      </ul>
-      <li class="__toc_level_2"><a href="#replace-plugins">Replace plugins</a></li>
-      <ul class="__toc_list_2">
-      
-      <li class="__toc_level_3"><a href="#writing-a-plugin">Writing a Plugin</a></li>
+      <li class="__toc_level_3"><a href="#saving-and-loading-regular-expressions">Saving and Loading Regular Expressions</a></li>
       <ul class="__toc_list_3">
       
       </ul>
+      <li class="__toc_level_3"><a href="#search-chains">Search Chains</a></li>
+      <ul class="__toc_list_3">
+      
       </ul>
-      <li class="__toc_level_2"><a href="#export-to-csv-or-html">Export to CSV or HTML</a></li>
-      <ul class="__toc_list_2">
+      <li class="__toc_level_3"><a href="#replace-plugins">Replace plugins</a></li>
+      <ul class="__toc_list_3">
+      
+      <li class="__toc_level_4"><a href="#writing-a-plugin">Writing a Plugin</a></li>
+      <ul class="__toc_list_4">
+      
+      </ul>
+      </ul>
+      <li class="__toc_level_3"><a href="#export-to-csv-or-html">Export to CSV or HTML</a></li>
+      <ul class="__toc_list_3">
       
       </ul>
       </ul>
@@ -172,7 +172,7 @@ file's filesystem attributes to determine if the system is potentially hiding th
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReplacePlugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Rummage replace plugin.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_info</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_info</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">file_info</span> <span class="o">=</span> <span class="n">file_info</span>
@@ -240,8 +240,8 @@ file's filesystem attributes to determine if the system is potentially hiding th
 <div class="admonition example">
 <p class="admonition-title">Example Plugin</p>
 <p>In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is assumed this is not a binary replace, so a Unicode string is returned.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
-<span class="kn">from</span> <span class="nn">rummage.lib</span> <span class="k">import</span> <span class="n">rumcore</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">rummage.lib</span> <span class="kn">import</span> <span class="n">rumcore</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
 
