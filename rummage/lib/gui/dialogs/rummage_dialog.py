@@ -2355,14 +2355,14 @@ class RummageFrame(gui.RummageFrame):
     def on_changelog(self, event):
         """Open documentation site."""
 
-        dlg = html_dialog.HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
+        dlg = html_dialog.HTMLDialog(self, 'about/changelog.html', self.MENU_CHANGELOG)
         dlg.ShowModal()
         dlg.Destroy()
 
     def on_license(self, event):
         """Open documentation site."""
 
-        dlg = html_dialog.HTMLDialog(self, 'license.html', self.MENU_CHANGELOG)
+        dlg = html_dialog.HTMLDialog(self, 'about/license.html', self.MENU_LICENSE)
         dlg.ShowModal()
         dlg.Destroy()
 
