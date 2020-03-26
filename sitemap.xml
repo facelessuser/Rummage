@@ -1,48 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url>
      <loc>https://facelessuser.github.io/Rummage/</loc>
-     <lastmod>2020-02-09</lastmod>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
+    </url><url>
      <loc>https://facelessuser.github.io/Rummage/installation/</loc>
-     <lastmod>2020-02-09</lastmod>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
+    </url><url>
      <loc>https://facelessuser.github.io/Rummage/usage/</loc>
-     <lastmod>2020-02-09</lastmod>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
+    </url><url>
      <loc>https://facelessuser.github.io/Rummage/search/</loc>
-     <lastmod>2020-02-09</lastmod>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
+    </url><url>
      <loc>https://facelessuser.github.io/Rummage/preferences/</loc>
-     <lastmod>2020-02-09</lastmod>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
+    </url><url>
      <loc>https://facelessuser.github.io/Rummage/extras/</loc>
-     <lastmod>2020-02-09</lastmod>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://facelessuser.github.io/Rummage/contributing/</loc>
-     <lastmod>2020-02-09</lastmod>
+    </url><url>
+     <loc>https://facelessuser.github.io/Rummage/about/contributing/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://facelessuser.github.io/Rummage/changelog/</loc>
-     <lastmod>2020-02-09</lastmod>
+    </url><url>
+     <loc>https://facelessuser.github.io/Rummage/about/changelog/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://facelessuser.github.io/Rummage/license/</loc>
-     <lastmod>2020-02-09</lastmod>
+    </url><url>
+     <loc>https://facelessuser.github.io/Rummage/about/license/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>
