@@ -55,7 +55,7 @@ Current version being used is **3.8.1**.
     tox
     ```
 
-    Tox should install necessary dependencies and run the tests. If you are a Linux user, please check out information on [requirements](./installation.md#requirements).
+    Tox should install necessary dependencies and run the tests. If you are a Linux user, please check out information on [requirements](../installation.md#requirements).
 
 ## Documentation Improvements
 
