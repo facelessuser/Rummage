@@ -14,7 +14,7 @@ theme:
   palette:
     primary: drac-purple
     accent: drac-purple
-  logo: images/rummage.png
+  logo: images/logo.svg
   font:
     text: Roboto
     code: Roboto Mono
