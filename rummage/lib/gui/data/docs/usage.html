@@ -172,7 +172,7 @@ file's filesystem attributes to determine if the system is potentially hiding th
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReplacePlugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Rummage replace plugin.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_info</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_info</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">file_info</span> <span class="o">=</span> <span class="n">file_info</span>
@@ -240,8 +240,8 @@ file's filesystem attributes to determine if the system is potentially hiding th
 <div class="admonition example">
 <p class="admonition-title">Example Plugin</p>
 <p>In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is assumed this is not a binary replace, so a Unicode string is returned.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
-<span class="kn">from</span> <span class="nn">rummage.lib</span> <span class="kn">import</span> <span class="n">rumcore</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">rummage.lib</span> <span class="k">import</span> <span class="n">rumcore</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
 
