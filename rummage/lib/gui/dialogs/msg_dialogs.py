@@ -1269,18 +1269,12 @@ class Messages(wx.Dialog):
             if icn is not None:
                 # We use a large icon size but half it so it will
                 # work on retina.
-                if sys.platform == "darwin":
-                    bm = icn.GetBitmap()
-                    bm.SetHeight(DEFAULT_ICON_SIZE)
-                    bm.SetWidth(DEFAULT_ICON_SIZE)
-                    icon = MessageIcon(bm, DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
-                else:
-                    scaled = icn.GetImage().Rescale(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
-                    icon = MessageIcon(
-                        scaled.ConvertToBitmap(),
-                        DEFAULT_ICON_SIZE,
-                        DEFAULT_ICON_SIZE
-                    )
+                scaled = icn.GetImage().Rescale(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
+                icon = MessageIcon(
+                    scaled.ConvertToBitmap(),
+                    DEFAULT_ICON_SIZE,
+                    DEFAULT_ICON_SIZE
+                )
 
         return icon
 

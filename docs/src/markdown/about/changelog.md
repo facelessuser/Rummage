@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.11.1
+
+- **FIX**: Internal color fixes.
+- **FIX**: Fix Rummage crashing with wxPython 4.1.X due to image sizing bug on macOS.
+
 ## 4.11.0
 
 - **NEW**: `wcmatch` the file search library that Rummage uses, is now at version 6 which imposes a pattern limit to
