@@ -23,7 +23,6 @@ IN THE SOFTWARE.
 """
 import wx
 import re
-import sys
 from collections import namedtuple
 from wx.lib.embeddedimage import PyEmbeddedImage
 
