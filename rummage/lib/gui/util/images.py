@@ -59,8 +59,9 @@ def transparency(byte_string, transparency):
         columns = int(len(row) / 4)
         start = 0
         for x in range(columns):
-            alpha = round_int(clamp(row[start + 3] + (255.0 * transparency) - 255.0, 0.0, 255.0))
-            p[y] += row[start:start + 3] + [alpha]
+            alpha = row[start + 3]
+            alpha = round_int(clamp(alpha + (255.0 * transparency) - 255.0, 0.0, 255.0))
+            p[y] += [row[start], row[start + 1], row[start + 2], alpha]
             start += 4
         y += 1
 

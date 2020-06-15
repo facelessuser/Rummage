@@ -17,7 +17,7 @@ class TimePickerCtrl(TimeCtrl):
 
         ctrl = wx.TextCtrl(parent)
         self._bg = ctrl.GetBackgroundColour().GetRGB()
-        bg = rgba.RGBA(0xFF0000)
+        bg = rgba.RGBA(0xFF0000FF)
         bg.blend(rgba.RGBA(ctrl.GetBackgroundColour().Get()), 60)
         self._error_bg = wx.Colour(*bg.get_rgb()).GetRGB()
         super().__init__(parent, *args, **kwargs)

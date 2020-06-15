@@ -66,8 +66,6 @@ class RGBA:
         if isinstance(color, RGBA):
             return color.get_rgba()
         elif isinstance(color, int):
-            if color <= 0xFFFFFF:
-                color = (color << 8) | 0xFF
             if color > 0xFFFFFFFF:
                 raise ValueError("Colors not in the form 'RGB' or 'RGBA'")
 
