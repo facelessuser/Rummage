@@ -4,6 +4,7 @@
 
 - **FIX**: Internal color fixes.
 - **FIX**: Fix Rummage crashing with wxPython 4.1.X due to image sizing bug on macOS.
+- **FIX**: Resolve issue where changelog would not show after an update.
 
 ## 4.11.0
 

@@ -62,7 +62,6 @@ def get_bitmap(file_name, tint=None, alpha=None):
     """
 
     image = get_image(file_name, tint=tint, alpha=alpha).GetImage()
-    print(image)
     scaled = image.Rescale(
         int(image.GetWidth() / 2),
         int(image.GetHeight() / 2)
