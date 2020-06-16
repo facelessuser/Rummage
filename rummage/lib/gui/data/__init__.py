@@ -62,19 +62,11 @@ def get_bitmap(file_name, tint=None, alpha=None):
     """
 
     image = get_image(file_name, tint=tint, alpha=alpha).GetImage()
-    if util.platform() == "macos":
-        bm = image.ConvertToBitmap()
-        bm.SetSize(
-            (
-                int(bm.GetWidth() / 2),
-                int(bm.GetHeight() / 2)
-            )
-        )
-    else:
-        scaled = image.Rescale(
-            int(image.GetWidth() / 2),
-            int(image.GetHeight() / 2)
-        )
-        bm = scaled.ConvertToBitmap()
+    print(image)
+    scaled = image.Rescale(
+        int(image.GetWidth() / 2),
+        int(image.GetHeight() / 2)
+    )
+    bm = scaled.ConvertToBitmap()
 
     return bm
