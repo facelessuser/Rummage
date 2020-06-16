@@ -1895,7 +1895,7 @@ class RummageFrame(gui.RummageFrame):
 
         if tuple(Settings.get_current_version()) < __meta__.__version_info__:
             Settings.set_current_version(__meta__.__version_info__)
-            dlg = html_dialog.HTMLDialog(self, 'changelog.html', self.MENU_CHANGELOG)
+            dlg = html_dialog.HTMLDialog(self, 'about/changelog.html', self.MENU_CHANGELOG)
             dlg.ShowModal()
             dlg.Destroy()
 
