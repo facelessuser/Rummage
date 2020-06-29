@@ -396,7 +396,7 @@ class CustomLogGui(wx.LogGui):
         except Exception:
             self.file_name = None
 
-        wx.LogGui.__init__(self)
+        super().__init__()
 
     def DoLogText(self, msg):
         """Log the text."""
@@ -415,8 +415,6 @@ class CustomLogGui(wx.LogGui):
             sys.stdout.write(
                 (self.format % {"message": msg})
             )
-
-        wx.LogGui.DoLogText(self, msg)
 
     def DoLogTextAtLevel(self, level, msg):
         """Perform log at level."""
