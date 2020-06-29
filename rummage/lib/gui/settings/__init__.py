@@ -41,7 +41,7 @@ CACHE_FILE = "rummage_dev.cache" if DEV_MODE else "rummage.cache"
 LOG_FILE = "rummage.log"
 FIFO = "rummage.fifo"
 
-SETTINGS_FMT = '2.6.0'
+SETTINGS_FMT = '2.6.1'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
@@ -91,6 +91,7 @@ DEFAULT_SETTINGS = {
     "international_time": False,
     "locale": "en_US",
     "matchbase": False,
+    "minusnegate": True,
     "notify_enabled": True,
     "notify_method": "default",
     "notify_player": NOTIFY_PLAYERS[util.platform()][0],
@@ -1564,6 +1565,27 @@ class Settings:
         return cls.settings.get('matchbase', False)
 
     @classmethod
+    def _set_minusnegate(cls, value):
+        """Set `minusnegate`."""
+
+        cls.settings['minusnegate'] = value
+
+    @classmethod
+    def set_minusnegate(cls, value):
+        """Set `minusnegate`."""
+
+        cls.reload_settings()
+        cls._set_minusnegate(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_minusnegate(cls):
+        """Get `minusnegate`."""
+
+        cls.reload_settings()
+        return cls.settings.get('minusnegate', False)
+
+    @classmethod
     def import_settings(cls, obj):
         """Import settings."""
 
@@ -1603,6 +1625,8 @@ class Settings:
             cls._set_globstar(obj['globstar'])
         if 'matchbase' in obj:
             cls._set_matchbase(obj['matchbase'])
+        if 'minusnegate' in obj:
+            cls._set_minusnegate(obj['minusnegate'])
         if 'pattern_limit' in obj:
             cls._set_pattern_limit(obj['pattern_limit'])
 

@@ -1,12 +1,20 @@
 # Changelog
 
+## 4.12
+
+- **NEW**: Add new option to use `!` instead of `-` for exclusion patterns. Rummage has always used `-` due to issues
+  with distinguishing between exclusion patterns (`!exclude`) and extended globbing exclude patterns
+  (`!(exclude_1| exclude 2)`). `wcmatch` 6.1 now resolves this by requiring `(` to be escaped if the pattern starts with
+  `!(` and it is not meant to be an extended glob pattern `!(..)`.
+- **NEW**: Require `wcmatch` 6.1 that comes with a number of enhancements and bug fixes.
+
 ## 4.11.1
 
 - **FIX**: Internal color fixes.
 - **FIX**: Fix Rummage crashing with wxPython 4.1.X due to image sizing bug on macOS.
 - **FIX**: Resolve issue where changelog would not show after an update.
 
-## 4.11.0
+## 4.11
 
 - **NEW**: `wcmatch` the file search library that Rummage uses, is now at version 6 which imposes a pattern limit to
   protect against patterns such as `{1..1000000}` which would expand to a large amount of patterns if brace expansion
@@ -14,16 +22,16 @@
 - **FIX**: By using `wcmatch` version 6, complex issues involving pattern splitting with `|` and `{,}` are resolved.
 - **FIX**: Fix logo not loading in about dialog.
 
-## 4.10.0
+## 4.10
 
 - **NEW**: Pattern save dialog now uses a drop down list so you can easily update an existing saved pattern.
 - **FIX**: Fix issue with web view rendering and `pymdown-extensions`.
 
-## 4.9.0
+## 4.9
 
 - **NEW**: Require `wcmatch` 5.1.0+, `bracex` 1.4.0, and `backrefs` `1.3.0` to include latest bug fixes.
 
-## 4.8.0
+## 4.8
 
 - **NEW**: Supports installing extras via `pip install rummage[extras]`.
 - **FIX**: Fix for notification sound display in settings dialog.
@@ -33,7 +41,7 @@
 
 - **FIX**: Require `wcmatch` 5.0 and make adjustments to support it.
 
-## 4.7.0
+## 4.7
 
 !!! warning "Warning"
     Backrefs 4.2.0 has deprecated the shorthand references for alphabetic character groups in `re` search patterns: `\l`, `\L`, `\c`, and `\C`. Instead you should use: `[[:lower:]]`, `[[:^lower:]]`, `[[:upper:]]`, and `[[:^upper:]]` respectively. While the references have only been deprecated, and are technically still available, a future version of Backrefs will remove them entirely at some point. It is recommended to transition now so as not to be caught unawares.
@@ -64,7 +72,7 @@
 - **FIX**: Fix time control sizing on Linux.
 - **FIX**: Fix time control issue on Linux and macOS that prevents decrement button from decrementing past initial value.
 
-## 4.6.0
+## 4.6
 
 - **NEW**: Search options and file limit options can be collapsed in the main dialog. This allows  hiding these options if you aren't frequently using them, and provides a more compact dialog.
 - **NEW**: There is no longer an option to hide the file limit options as now you can just collapse them.
@@ -76,7 +84,7 @@
 - **FIX**: Better initial focus in autocomplete text boxes on platforms that had issues.
 - **FIX**: Fix some localization issues.
 
-## 4.5.0
+## 4.5
 
 - **NEW**: Add **Match base** search option. **Match base** affects full path patterns when **Full path directory match** or **Full path file match** is enabled. When a full path pattern has no slashes, it will cause the pattern to only match the base file name. This allows you to have traditional base match patterns and more specific full path patterns usage simultaneously. Requires `wcmatch` 4.0 which is now the minimum requirement.
 - **FIX**: Ensure settings version is upgraded properly.
@@ -85,7 +93,7 @@
 
 - **FIX**: Increase performance by reducing number of `stat`/`lstat` calls during crawls.
 
-## 4.4.0
+## 4.4
 
 - **NEW**: Add the ability to follow symlinks via a new symlink toggle in the limit panel (disabled by default).
 
@@ -112,7 +120,7 @@
 - **FIX**: Minor cleanup and performance increase in core.
 - **FIX**: When search error dialog is shown from the status bar, fix error with window destruction.
 
-## 4.3.0
+## 4.3
 
 - **NEW**: Documents are now included locally in installation and can be viewed directly in Rummage via a `webview` dialog.
 - **NEW**: License can now be viewed from the application menu.
@@ -138,7 +146,7 @@
 - **FIX**: Better default input focus on Linux when selecting the search tab.
 - **FIX**: Properly select "Search for" as the default when chains mode is enabled.
 
-## 4.2.0
+## 4.2
 
 - **NEW**: File time result format has been updated for better readability.
 - **NEW**: International file time result format for modified and created times has been added and can be enabled in the global preferences.
@@ -159,7 +167,7 @@
 - **FIX**: Fix regression where raw character translations (`\xXX` etc.) are no longer working.
 - **FIX**: Style tweaks to HTML output.
 
-## 4.1.0
+## 4.1
 
 - **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Old legacy editor configuration is now removed. Only the new is allowed.
@@ -207,7 +215,7 @@
 - **FIX**: All list objects should be finalized properly to allow sorting.
 - **FIX**: Make encoding list style in settings dialog consistent with the look and feel of other list objects.
 
-## 4.0.0
+## 4.0
 
 - **NEW**: Drop Python 2.7 support.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
@@ -219,7 +227,7 @@
 - **FIX**: Don't feed Regex version flags into Re patterns.
 - **FIX**: Style tweaks to HTML output.
 
-## 3.7.0
+## 3.7
 
 - **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
@@ -247,7 +255,7 @@
 - **FIX**: All list objects should be finalized properly to allow sorting.
 - **FIX**: Make encoding list style in settings dialog consistent with the look and feel of other list objects.
 
-## 3.6.0
+## 3.6
 
 - **NEW**: Rummage will use `cchardet` by default if found.
 - **NEW**: Expose way to specify `cchardet` being used.
@@ -268,7 +276,7 @@
 - **FIX**: Rework highlighting in tester dialog to properly highlight 32 bit characters.
 - **FIX**: Single instance regression.
 
-## 3.5.0
+## 3.5
 
 - **NEW**: Add context menu to content tab just like file tab with all the same entries.
 - **NEW**: Add copy commands to context menus to copy selected file names, paths, or content of match (content tab only).
@@ -296,7 +304,7 @@
 
 - **FIX**: Regression where installed CLI command would fail on launch.
 
-## 3.4.0
+## 3.4
 
 - **NEW**: Require latest Backrefs 3.0.1.
 - **NEW**: Add extension column in results.
@@ -307,7 +315,7 @@
 - **FIX**: Result item hover not showing file name in status bar.
 - **FIX**: Warnings in plugin system.
 
-## 3.3.0
+## 3.3
 
 - **NEW**: Add changelog link in menu for quick reference.
 - **NEW**: Encoding list is generated from the Python installation being used.
@@ -323,12 +331,12 @@
 - **FIX**: Windows status bar flicker.
 - **FIX**: Results not showing when notifications is set to only play audio alerts.
 
-## 3.1.0
+## 3.1
 
 - **NEW**: Add export/import of settings and/or regular expression rules and chains.
 - **NEW**: Add support info dialog to gather info when filing issues.
 
-## 3.0.0
+## 3.0
 
 - **NEW**: Allow Backrefs' replace references to work with format replaces.
 - **NEW**: Add support for format replace with Re (with Backrefs only).
@@ -349,14 +357,14 @@
 - **FIX**: `wxPython` 4.0.0b1 removed label parameter from constructor.
 - **FIX**: Debug Unicode issue.
 
-## 2.3.0
+## 2.3
 
 - **NEW**: Add reveal right click menu option in "File" tab results.
 - **NEW**: Expose backup configuration and allow putting all backups in a folder if desired.
 - **FIX**: Windows Unicode input path issues from command line and through the pipe during single instance argument transfer.
 - **FIX**: Windows Unicode issue when calling a shell command to open file in editor.
 
-## 2.2.0
+## 2.2
 
 - **NEW**: Redesign of the preferences dialog.
 - **NEW**: Editor configurations are now sent through the shell which changes and simplifies the interface to set it up.
@@ -366,7 +374,7 @@
 - **FIX**: Window is only resized by force on initial load, and if the dialog is ever too small when showing something that was hidden.
 - **FIX**: Revert ensuring window is never bigger than usable size for now.
 
-## 2.1.0
+## 2.1
 
 - **NEW**: Add new chained search feature.
 - **NEW**: Add new replace plugin support.
@@ -412,7 +420,7 @@
 
 - **FIX**: Release binary in path as `rummage` and `rummage<version>`. So for 2.7, it would be `rummage2.7`.
 
-## 2.0.0
+## 2.0
 
 - **NEW**: Python 3 support via the new wxPython 4.0.0 Phoenix!
 - **NEW**: Dropped classic wxPython (<4.0.0) as it is too much work to maintain legacy support as well.
@@ -431,6 +439,6 @@
 
 - **FIX**: Fixed issue where literal replace was not actually literal replace.
 
-## 1.0.0
+## 1.0
 
 - **NEW**: Initial release

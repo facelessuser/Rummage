@@ -83,6 +83,7 @@ DIRPATHNAME = 0x800000000    # Full directory exclude path match
 FILEPATHNAME = 0x1000000000  # Full file name path match
 GLOBSTAR = 0x2000000000      # Use globstar (**) in full paths
 MATCHBASE = 0x4000000000     # Match base names when no slashes are present (full path)
+MINUSNEGATE = 0x8000000000   # Use - instead of ! for exclusion patterns.
 
 RE_MODE = 0
 BRE_MODE = 1
@@ -1334,7 +1335,7 @@ class Rummage:
         self.file_flags = flags & FILE_MASK
 
         # `wcmatch` flags
-        self.wcmatch_flags = wcmatch.I | wcmatch.M | wcmatch.R
+        self.wcmatch_flags = wcmatch.I | wcmatch.R
         if self.file_flags & EXTMATCH:
             self.wcmatch_flags |= wcmatch.E
         if self.file_flags & BRACE:
@@ -1349,6 +1350,8 @@ class Rummage:
             self.wcmatch_flags |= wcmatch.G
         if self.file_flags & MATCHBASE:
             self.wcmatch_flags |= wcmatch.X
+        if self.file_flags & MINUSNEGATE:
+            self.wcmatch_flags |= wcmatch.M
         if self.file_flags & RECURSIVE:
             self.wcmatch_flags |= wcmatch.RV
         if self.file_flags & SHOW_HIDDEN:

@@ -113,6 +113,7 @@ filesystem
 fnmatch
 formatters
 fullmatch
+globbing
 globstar
 grepWin
 inline
