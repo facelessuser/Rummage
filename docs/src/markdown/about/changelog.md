@@ -7,6 +7,8 @@
   (`!(exclude_1| exclude 2)`). `wcmatch` 6.1 now resolves this by requiring `(` to be escaped if the pattern starts with
   `!(` and it is not meant to be an extended glob pattern `!(..)`.
 - **NEW**: Require `wcmatch` 6.1 that comes with a number of enhancements and bug fixes.
+- **NEW**: Proper support for system color changes. Allows proper transitioning on macOS between light and dark mode.
+- **FIX**: Minor fixes to selection colors in regex tester.
 
 ## 4.11.1
 

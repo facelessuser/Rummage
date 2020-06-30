@@ -377,6 +377,7 @@ class RummageFrame(gui.RummageFrame):
         self.Bind(wx.EVT_IDLE, self.on_idle)
         self.Bind(wx.EVT_SIZE, self.on_resize)
         self.Bind(EVT_POST_RESIZE, self.on_post_resize)
+        self.Bind(wx.EVT_SYS_COLOUR_CHANGED, self.on_color_change)
 
         # Extend the status bar
         custom_statusbar.extend_sb(self.m_statusbar)
@@ -409,21 +410,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_result_list.set_wait_lock(_LOCK)
         self.m_result_file_list.load_list(True)
         self.m_result_list.load_list(True)
-        for x in range(self.m_grep_notebook.GetPageCount()):
-            page = self.m_grep_notebook.GetPage(x)
-            if util.platform() == "linux":
-                bg = self.m_grep_notebook.GetBackgroundColour()
-            else:
-                bg = page.GetBackgroundColour()
-            if util.platform() == "macos":
-                factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
-                bg = bg.ChangeLightness(factor)
-            page.SetBackgroundColour(bg)
-            if x == 0:
-                if util.platform() != "linux":
-                    self.m_grep_notebook.SetBackgroundColour(wx.Colour(bg))
-                self.m_options_collapse.SetBackgroundColour(wx.Colour(bg))
-                self.m_limit_collapse.SetBackgroundColour(wx.Colour(bg))
+        self.update_tab_page_colors()
         self.m_grep_notebook.SetSelection(0)
 
         self.refresh_localization()
@@ -452,6 +439,30 @@ class RummageFrame(gui.RummageFrame):
         delay = 500 if util.platform() == 'macos' else 100
         self.call_later = wx.CallLater(delay, functools.partial(self.on_loaded, refocus=refocus, resize=resize))
         self.call_later.Start()
+
+    def on_color_change(self, event):
+        """Update panel colors for tabs."""
+
+        self.update_tab_page_colors()
+
+        if event:
+            event.Skip()
+
+    def update_tab_page_colors(self):
+        """Update panel colors for tabs."""
+
+        for x in range(self.m_grep_notebook.GetPageCount()):
+            page = self.m_grep_notebook.GetPage(x)
+            bg = self.GetBackgroundColour()
+            if util.platform() == "macos":
+                factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
+                bg = bg.ChangeLightness(factor)
+            page.SetBackgroundColour(bg)
+            if x == 0:
+                if util.platform() != "linux":
+                    self.m_grep_notebook.SetBackgroundColour(wx.Colour(bg))
+                self.m_options_collapse.SetBackgroundColour(wx.Colour(bg))
+                self.m_limit_collapse.SetBackgroundColour(wx.Colour(bg))
 
     def localize(self):
         """Translate strings."""
