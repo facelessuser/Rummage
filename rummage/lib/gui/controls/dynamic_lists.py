@@ -103,6 +103,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         """Handle color change."""
 
         self.EnableAlternateRowColours(enable=Settings.get_alt_list_color())
+        self.create_image_list()
         self.Refresh()
 
         if event:
