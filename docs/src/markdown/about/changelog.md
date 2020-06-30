@@ -9,6 +9,7 @@
 - **NEW**: Require `wcmatch` 6.1 that comes with a number of enhancements and bug fixes.
 - **NEW**: Proper support for system color changes. Allows proper transitioning on macOS between light and dark mode.
 - **FIX**: Minor fixes to selection colors in regex tester.
+- **FIX**: Remove old macOS workaround to force focus on search input.
 
 ## 4.11.1
 

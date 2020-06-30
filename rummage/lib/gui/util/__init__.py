@@ -2,15 +2,33 @@
 import re
 import sys
 import codecs
+import platform as plat
 from itertools import groupby
 from encodings.aliases import aliases
+
+_MAC_VER = (0, 0)
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
 elif sys.platform == "darwin":
     _PLATFORM = "macos"
+    _MAC_VER = tuple([int(x) for x in plat.mac_ver()[0].split('.')[:2]])
 else:
     _PLATFORM = "linux"
+
+
+if _MAC_VER >= (10, 15):
+    MAC_LIGHT = 98
+    MAC_DARK = 109
+else:
+    MAC_LIGHT = 94
+    MAC_DARK = 106
+
+
+def mac_ver():
+    """Get macOS version."""
+
+    return _MAC_VER
 
 
 def platform():
