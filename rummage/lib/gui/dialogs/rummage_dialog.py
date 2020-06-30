@@ -428,16 +428,12 @@ class RummageFrame(gui.RummageFrame):
         self.m_searchfor_textbox.SetFocus()
 
         # So this is to fix some platform specific issues.
-        # We will wait until we are sure we are loaded, then
-        # We will fix mac focusing random elements, and we will
-        # process and resize the window to fix Linux tab issues.
+        # We will wait until we are sure we are loaded,
+        # then we will fix Linux tab issues.
         # Linux seems to need the resize to get its control tab
         # order right as we are hiding some items, but doing it
         # now won't work, so we delay it.
-        refocus = util.platform() == 'macos'
-        resize = util.platform() == 'linux'
-        delay = 500 if util.platform() == 'macos' else 100
-        self.call_later = wx.CallLater(delay, functools.partial(self.on_loaded, refocus=refocus, resize=resize))
+        self.call_later = wx.CallLater(100, functools.partial(self.on_loaded, resize=util.platform() == 'linux'))
         self.call_later.Start()
 
     def on_color_change(self, event):
@@ -1895,14 +1891,10 @@ class RummageFrame(gui.RummageFrame):
         """
         Stupid workarounds on load.
 
-        Focus after loaded (stupid macOS workaround) and select the appropriate entry.
         Resize window after we are sure everything is loaded (stupid Linux workaround) to fix tab order stuff.
         """
 
         self.call_later.Stop()
-
-        if refocus:
-            self.m_searchfor_textbox.SetFocus()
 
         self.Refresh()
 
