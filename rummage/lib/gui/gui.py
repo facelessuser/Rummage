@@ -969,7 +969,7 @@ class SettingsDialog ( wx.Dialog ):
         self.m_general_panel.SetSizer( fgSizer52 )
         self.m_general_panel.Layout()
         fgSizer52.Fit( self.m_general_panel )
-        self.m_settings_notebook.AddPage( self.m_general_panel, u"General", True )
+        self.m_settings_notebook.AddPage( self.m_general_panel, u"General", False )
         self.m_search_panel = wx.Panel( self.m_settings_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
         fgSizer43 = wx.FlexGridSizer( 0, 1, 0, 0 )
         fgSizer43.AddGrowableCol( 0 )
@@ -1030,14 +1030,17 @@ class SettingsDialog ( wx.Dialog ):
         self.m_globstar_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Globstar (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
         gbSizer7.Add( self.m_globstar_checkbox, wx.GBPosition( 1, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
+        self.m_minusnegate_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Exclude with '-' (instead of '!')", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gbSizer7.Add( self.m_minusnegate_checkbox, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+
         self.m_matchbase_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Match base (full path)", wx.DefaultPosition, wx.DefaultSize, 0 )
-        gbSizer7.Add( self.m_matchbase_checkbox, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
+        gbSizer7.Add( self.m_matchbase_checkbox, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
         self.m_fullpath_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path directory match", wx.DefaultPosition, wx.DefaultSize, 0 )
         gbSizer7.Add( self.m_fullpath_checkbox, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 
         self.m_fullfile_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path file match", wx.DefaultPosition, wx.DefaultSize, 0 )
-        gbSizer7.Add( self.m_fullfile_checkbox, wx.GBPosition( 2, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+        gbSizer7.Add( self.m_fullfile_checkbox, wx.GBPosition( 3, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 
         self.m_staticline14 = wx.StaticLine( sbSizer9.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         gbSizer7.Add( self.m_staticline14, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND |wx.ALL, 5 )
@@ -1333,6 +1336,7 @@ class SettingsDialog ( wx.Dialog ):
         self.m_brace_checkbox.Bind( wx.EVT_CHECKBOX, self.on_brace_toggle )
         self.m_case_checkbox.Bind( wx.EVT_CHECKBOX, self.on_case_toggle )
         self.m_globstar_checkbox.Bind( wx.EVT_CHECKBOX, self.on_globstar_toggle )
+        self.m_minusnegate_checkbox.Bind( wx.EVT_CHECKBOX, self.on_minusnegate_toggle )
         self.m_matchbase_checkbox.Bind( wx.EVT_CHECKBOX, self.on_matchbase_toggle )
         self.m_fullpath_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullpath_toggle )
         self.m_fullfile_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullfile_toggle )
@@ -1405,6 +1409,9 @@ class SettingsDialog ( wx.Dialog ):
         event.Skip()
 
     def on_globstar_toggle( self, event ):
+        event.Skip()
+
+    def on_minusnegate_toggle( self, event ):
         event.Skip()
 
     def on_matchbase_toggle( self, event ):

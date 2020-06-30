@@ -2,8 +2,8 @@ gntp>=1.0.2
 chardet>=3.0.4
 backrefs>=4.3,<5.0
 wcmatch>=6.0,<7.0
-wxpython>=4.0.1
+wxpython>=4.1.0
 filelock
 send2trash
-pymdown-extensions>=6.3
+pymdown-extensions>=7.0
 pygments

@@ -138,6 +138,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_fullfile_checkbox.SetValue(Settings.get_full_file_path())
         self.m_globstar_checkbox.SetValue(Settings.get_globstar())
         self.m_matchbase_checkbox.SetValue(Settings.get_matchbase())
+        self.m_minusnegate_checkbox.SetValue(Settings.get_minusnegate())
         self.m_visual_alert_checkbox.SetValue(Settings.get_notify())
         self.m_audio_alert_checkbox.SetValue(Settings.get_alert())
         self.alert_methods = Settings.get_platform_notify()
@@ -247,6 +248,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.FULL_FILE = _("Full path file match")
         self.GLOBSTAR = _("Globstar (full path)")
         self.MATCHBASE = _("Match base (full path)")
+        self.MINUSNEGATE = _("Exclude with '-'' (instead of '!')")
         self.REGEX_GROUP = _("Regular Expressions")
         self.PATTERN_LIMIT = _("Pattern Limit")
         self.FILE_MATCH_GROUP = _("File/Folder Matching")
@@ -320,6 +322,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_fullfile_checkbox.SetLabel(self.FULL_FILE)
         self.m_globstar_checkbox.SetLabel(self.GLOBSTAR)
         self.m_matchbase_checkbox.SetLabel(self.MATCHBASE)
+        self.m_minusnegate_checkbox.SetLabel(self.MINUSNEGATE)
         self.m_pattern_limit_label.SetLabel(self.PATTERN_LIMIT)
         self.m_editor_button.SetLabel(self.SAVE)
         self.m_history_clear_button.SetLabel(self.CLEAR)
@@ -650,6 +653,11 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         """Handle `matchbase` toggle."""
 
         Settings.set_matchbase(self.m_matchbase_checkbox.GetValue())
+
+    def on_minusnegate_toggle(self, event):
+        """Handle `minusnegate` toggle."""
+
+        Settings.set_minusnegate(self.m_minusnegate_checkbox.GetValue())
 
     def on_alt_row_toggle(self, event):
         """Handle alternative row color option."""
