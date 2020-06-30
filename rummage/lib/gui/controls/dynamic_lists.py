@@ -74,6 +74,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
                     (wx.ACCEL_CMD if util.platform() == "macos" else wx.ACCEL_CTRL, ord('A'), self.select_all)
                 ]
             )
+        self.Bind(wx.EVT_SYS_COLOUR_CHANGED, self.on_color_change)
 
         self.hidden_columns = set()
         self.main_window = self.GetParent().GetParent().GetParent().GetParent()
@@ -97,6 +98,15 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
         self.create_image_list()
         self.setup_columns()
         self.itemIndexMap = []
+
+    def on_color_change(self, event):
+        """Handle color change."""
+
+        self.EnableAlternateRowColours(enable=Settings.get_alt_list_color())
+        self.Refresh()
+
+        if event:
+            event.Skip()
 
     def setup_virtual(self, virtual_list):
         """Setup virtual list."""

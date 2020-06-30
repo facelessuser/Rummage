@@ -79,19 +79,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         self.m_encoding_list.Bind(wx.EVT_LEFT_DCLICK, self.on_dclick)
         self.alert_player = False
-
-        for x in range(self.m_settings_notebook.GetPageCount()):
-            page = self.m_settings_notebook.GetPage(x)
-            if util.platform() == "linux":
-                bg = self.m_settings_notebook.GetBackgroundColour()
-            else:
-                bg = page.GetBackgroundColour()
-            if util.platform() == "macos":
-                factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
-                bg = bg.ChangeLightness(factor)
-            page.SetBackgroundColour(bg)
-            if x == 0 and util.platform() != "linux":
-                self.m_settings_notebook.SetBackgroundColour(wx.Colour(bg))
+        self.update_tab_page_colors()
 
         self.localize()
 
@@ -99,6 +87,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.set_keybindings(
             [(wx.ACCEL_CMD if util.platform() == "macos" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)]
         )
+        self.Bind(wx.EVT_SYS_COLOUR_CHANGED, self.on_color_change)
 
         self.history_types = [
             "target",
@@ -187,6 +176,27 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         self.call_later = wx.CallLater(100, functools.partial(self.on_loaded, resize=util.platform() == "linux"))
         self.call_later.Start()
+
+    def on_color_change(self, event):
+        """Handle color change event."""
+
+        self.update_tab_page_colors()
+
+        if event:
+            event.Skip()
+
+    def update_tab_page_colors(self):
+        """Update tab page colors."""
+
+        for x in range(self.m_settings_notebook.GetPageCount()):
+            page = self.m_settings_notebook.GetPage(x)
+            bg = self.GetBackgroundColour()
+            if util.platform() == "macos":
+                factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
+                bg = bg.ChangeLightness(factor)
+            page.SetBackgroundColour(bg)
+            if x == 0 and util.platform() != "linux":
+                self.m_settings_notebook.SetBackgroundColour(wx.Colour(bg))
 
     def on_loaded(self, resize=False, **kwargs):
         """

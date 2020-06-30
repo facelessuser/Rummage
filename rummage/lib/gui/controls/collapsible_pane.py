@@ -84,9 +84,24 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
             parent, -1, bitmap=data.get_bitmap('arrow_down.png'), label=label,
             style=wx.BORDER_NONE | wx.BU_EXACTFIT | wx.TAB_TRAVERSAL
         )
-        self.SetBackgroundColour(parent.GetBackgroundColour())
-        self.init_collapse_arrow()
+
+        self.Bind(wx.EVT_SYS_COLOUR_CHANGED, self.on_color_change)
+        self.set_colors()
         self.SetUseFocusIndicator(True)
+
+    def on_color_change(self, event):
+        """On color change."""
+
+        self.set_colors()
+
+        if event:
+            event.Skip()
+
+    def set_colors(self):
+        """On color change."""
+
+        self.SetBackgroundColour(self.GetParent().GetBackgroundColour())
+        self.init_collapse_arrow()
 
     def init_collapse_arrow(self):
         """Initialize collapse arrow."""

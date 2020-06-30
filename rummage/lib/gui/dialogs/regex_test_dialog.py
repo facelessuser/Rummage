@@ -72,23 +72,7 @@ class RegexTestDialog(gui.RegexTestDialog):
         if util.platform() == "windows":
             self.SetDoubleBuffered(True)
 
-        bg = rgba.RGBA(0xFFCC00)
-        bg.blend(rgba.RGBA(self.m_test_text.GetBackgroundColour().Get()), 60)
-        self.test_attr = wx.TextAttr(
-            self.m_test_text.GetForegroundColour(),
-            colBack=self.m_test_text.GetBackgroundColour()
-        )
-        fg = (data.RGBA(0x333333FF) if bg.get_luminance() > 127 else data.RGBA(0xbbbbbbFF))
-        self.highlight_attr = wx.TextAttr(wx.Colour(*fg.get_rgb()), colBack=wx.Colour(*bg.get_rgb()))
-
-        bg = rgba.RGBA(0xFF0000)
-        bg.blend(rgba.RGBA(self.m_test_replace_text.GetBackgroundColour().Get()), 60)
-        self.replace_attr = wx.TextAttr(
-            self.m_test_replace_text.GetForegroundColour(),
-            colBack=self.m_test_replace_text.GetBackgroundColour()
-        )
-        fg = (data.RGBA(0x333333FF) if bg.get_luminance() > 127 else data.RGBA(0xbbbbbbFF))
-        self.error_attr = wx.TextAttr(wx.Colour(*fg.get_rgb()), colBack=wx.Colour(*bg.get_rgb()))
+        self.calculate_colors()
 
         self.localize()
 
@@ -106,6 +90,7 @@ class RegexTestDialog(gui.RegexTestDialog):
                 (wx.ACCEL_CMD if util.platform() == "macos" else wx.ACCEL_CTRL, ord('A'), self.on_textctrl_selectall)
             ]
         )
+        self.Bind(wx.EVT_SYS_COLOUR_CHANGED, self.on_color_change)
 
         pick_extend(self.m_replace_plugin_dir_picker, PickButton)
         self.m_replace_plugin_dir_picker.pick_init(
@@ -167,6 +152,37 @@ class RegexTestDialog(gui.RegexTestDialog):
         self.Fit()
         self.SetMinSize(self.GetSize())
         self.Centre()
+
+    def on_color_change(self, event):
+        """Handle color change."""
+
+        self.calculate_colors()
+
+        if event:
+            event.Skip()
+
+        self.regex_start_event(event)
+
+    def calculate_colors(self):
+        """Calculate colors."""
+
+        bg = rgba.RGBA(0xFFCC00FF)
+        bg.blend(rgba.RGBA(self.m_test_text.GetBackgroundColour().Get()), 50)
+        self.test_attr = wx.TextAttr(
+            self.m_test_text.GetForegroundColour(),
+            colBack=self.m_test_text.GetBackgroundColour()
+        )
+        fg = (data.RGBA(0x333333FF) if bg.get_luminance() > 127 else data.RGBA(0xbbbbbbFF))
+        self.highlight_attr = wx.TextAttr(wx.Colour(*fg.get_rgb()), colBack=wx.Colour(*bg.get_rgb()))
+
+        bg = rgba.RGBA(0xFF0000FF)
+        bg.blend(rgba.RGBA(self.m_test_replace_text.GetBackgroundColour().Get()), 50)
+        self.replace_attr = wx.TextAttr(
+            self.m_test_replace_text.GetForegroundColour(),
+            colBack=self.m_test_replace_text.GetBackgroundColour()
+        )
+        fg = (data.RGBA(0x333333FF) if bg.get_luminance() > 127 else data.RGBA(0xbbbbbbFF))
+        self.error_attr = wx.TextAttr(wx.Colour(*fg.get_rgb()), colBack=wx.Colour(*bg.get_rgb()))
 
     def localize(self):
         """Translate strings."""
