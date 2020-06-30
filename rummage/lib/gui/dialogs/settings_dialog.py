@@ -263,7 +263,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.FULL_FILE = _("Full path file match")
         self.GLOBSTAR = _("Globstar (full path)")
         self.MATCHBASE = _("Match base (full path)")
-        self.MINUSNEGATE = _("Exclude with '-'' (instead of '!')")
+        self.MINUSNEGATE = _("Exclude with '-' (instead of '!')")
         self.REGEX_GROUP = _("Regular Expressions")
         self.PATTERN_LIMIT = _("Pattern Limit")
         self.FILE_MATCH_GROUP = _("File/Folder Matching")
