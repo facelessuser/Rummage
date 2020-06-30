@@ -449,9 +449,14 @@ class RummageFrame(gui.RummageFrame):
 
         for x in range(self.m_grep_notebook.GetPageCount()):
             page = self.m_grep_notebook.GetPage(x)
-            bg = self.GetBackgroundColour()
+            if util.platform() == "linux":
+                self.m_grep_notebook.SetBackgroundColour(wx.NullColour)
+                bg = self.m_grep_notebook.GetBackgroundColour()
+            else:
+                page.SetBackgroundColour(wx.NullColour)
+                bg = page.GetBackgroundColour()
             if util.platform() == "macos":
-                factor = 94 if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else 106
+                factor = util.MAC_LIGHT if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else util.MAC_DARK
                 bg = bg.ChangeLightness(factor)
             page.SetBackgroundColour(bg)
             if x == 0:
