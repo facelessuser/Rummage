@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.12.1
+
+- **FIX**: On color change, macOS would reset time picker values.
+
 ## 4.12
 
 - **NEW**: Add new option to use `!` instead of `-` for exclusion patterns. Rummage has always used `-` due to issues
