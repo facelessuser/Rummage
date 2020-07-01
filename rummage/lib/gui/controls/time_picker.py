@@ -37,6 +37,7 @@ class TimePickerCtrl(TimeCtrl):
     def set_error_bg_color(self):
         """Set error background color."""
 
+        value = self.GetValue()
         ctrl = wx.TextCtrl(self.GetParent())
         self._bg = ctrl.GetBackgroundColour().GetRGB()
         bg = rgba.RGBA(0xFF0000FF)
@@ -44,6 +45,7 @@ class TimePickerCtrl(TimeCtrl):
         self._invalidBackgroundColour = wx.Colour(*bg.get_rgb())
         ctrl.Destroy()
         self.SetParameters()
+        self.SetValue(value)
 
     def SetParameters(self, **kwargs):
         """Force the colors we want."""
