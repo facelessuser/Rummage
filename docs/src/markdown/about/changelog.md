@@ -47,18 +47,26 @@
 ## 4.7
 
 !!! warning "Warning"
-    Backrefs 4.2.0 has deprecated the shorthand references for alphabetic character groups in `re` search patterns: `\l`, `\L`, `\c`, and `\C`. Instead you should use: `[[:lower:]]`, `[[:^lower:]]`, `[[:upper:]]`, and `[[:^upper:]]` respectively. While the references have only been deprecated, and are technically still available, a future version of Backrefs will remove them entirely at some point. It is recommended to transition now so as not to be caught unawares.
+    Backrefs 4.2.0 has deprecated the shorthand references for alphabetic character groups in `re` search patterns:
+    `\l`, `\L`, `\c`, and `\C`. Instead you should use: `[[:lower:]]`, `[[:^lower:]]`, `[[:upper:]]`, and `[[:^upper:]]`
+    respectively. While the references have only been deprecated, and are technically still available, a future version
+    of Backrefs will remove them entirely at some point. It is recommended to transition now so as not to be caught
+    unawares.
 
-- **NEW**: Add `col0` variable for editor configuration to allow for using a zero based column value instead of one based column value for editors that require it.
+- **NEW**: Add `col0` variable for editor configuration to allow for using a zero based column value instead of one
+  based column value for editors that require it.
 - **NEW**: Add global option to turn off alternating row colors in lists.
-- **NEW**: Provide support for different players on Linux: `paplay`, `aplay`, and `play` (`sox`). Supported sound formats vary.
+- **NEW**: Provide support for different players on Linux: `paplay`, `aplay`, and `play` (`sox`). Supported sound
+  formats vary.
 - **NEW**: Provide interface for selecting custom notification sounds.
 - **NEW**: Require `wcmatch` 4.3.1+ and `backrefs` 4.2.0+.
 - **FIX**: Better attempt to get appropriate file creation time on all Linux systems.
 - **FIX**: Better fix for time picker getting wrong background.
 - **FIX**: Ensure column sizing includes header size.
-- **FIX**: When showing timed status event for results in status bar (full path name), decrease length of time that the temporary status is shown and clear temporary status when the cursor leaves result items.
-- **FIX**: Don't log handled notification errors when a notification system is not found as these are handled gracefully and there is no need to worry the user.
+- **FIX**: When showing timed status event for results in status bar (full path name), decrease length of time that the
+  temporary status is shown and clear temporary status when the cursor leaves result items.
+- **FIX**: Don't log handled notification errors when a notification system is not found as these are handled gracefully
+  and there is no need to worry the user.
 
 ## 4.6.3
 
@@ -73,15 +81,20 @@
 
 - **FIX**: Fix issues with time control not properly inheriting system colors.
 - **FIX**: Fix time control sizing on Linux.
-- **FIX**: Fix time control issue on Linux and macOS that prevents decrement button from decrementing past initial value.
+- **FIX**: Fix time control issue on Linux and macOS that prevents decrement button from decrementing past initial
+  value.
 
 ## 4.6
 
-- **NEW**: Search options and file limit options can be collapsed in the main dialog. This allows  hiding these options if you aren't frequently using them, and provides a more compact dialog.
+- **NEW**: Search options and file limit options can be collapsed in the main dialog. This allows  hiding these options
+  if you aren't frequently using them, and provides a more compact dialog.
 - **NEW**: There is no longer an option to hide the file limit options as now you can just collapse them.
-- **NEW**: Added context menu option to allow reordering of columns in the result lists. Positions are remembered across sessions.
-- **FIX**: Fix an issue on Linux where tabbing past a hidden directory button would cause an error in GTK. Ensure such controls do not allow focus when they are hidden.
-- **FIX**: Fix an internal error where the autocomplete box could throw an error due to the index bounds not being checked.
+- **NEW**: Added context menu option to allow reordering of columns in the result lists. Positions are remembered across
+  sessions.
+- **FIX**: Fix an issue on Linux where tabbing past a hidden directory button would cause an error in GTK. Ensure such
+  controls do not allow focus when they are hidden.
+- **FIX**: Fix an internal error where the autocomplete box could throw an error due to the index bounds not being
+  checked.
 - **FIX**: When list controls are smaller than the window, don't resize last column too an excessively big width.
 - **FIX**: Fix regression with loading replace plugins.
 - **FIX**: Better initial focus in autocomplete text boxes on platforms that had issues.
@@ -89,7 +102,10 @@
 
 ## 4.5
 
-- **NEW**: Add **Match base** search option. **Match base** affects full path patterns when **Full path directory match** or **Full path file match** is enabled. When a full path pattern has no slashes, it will cause the pattern to only match the base file name. This allows you to have traditional base match patterns and more specific full path patterns usage simultaneously. Requires `wcmatch` 4.0 which is now the minimum requirement.
+- **NEW**: Add **Match base** search option. **Match base** affects full path patterns when **Full path directory
+  match** or **Full path file match** is enabled. When a full path pattern has no slashes, it will cause the pattern to
+  only match the base file name. This allows you to have traditional base match patterns and more specific full path
+  patterns usage simultaneously. Requires `wcmatch` 4.0 which is now the minimum requirement.
 - **FIX**: Ensure settings version is upgraded properly.
 
 ## 4.4.1
@@ -111,21 +127,25 @@
 
 ## 4.3.2
 
-- **FIX**: Require Backrefs 4.0.1 which includes a number of bug fixes, particularly one that sometimes caused Backrefs not to install properly.
+- **FIX**: Require Backrefs 4.0.1 which includes a number of bug fixes, particularly one that sometimes caused Backrefs
+  not to install properly.
 
 ## 4.3.1
 
 - **FIX**: Python file encoding detection should default to the Python 3 assumed default, not Python 2.
-- **FIX**: Consolidate internal HTML logic and avoid using base 64 encoded images if using latest Markdown extensions that include path conversion fix.
+- **FIX**: Consolidate internal HTML logic and avoid using base 64 encoded images if using latest Markdown extensions
+  that include path conversion fix.
 - **FIX**: Refresh status less to improve on overall speed.
-- **FIX**: Simplify status: no need to display `ACITVE` or `DONE` as button will change back to `Search` to signify completion along with the display of the `Benchmark` or even the notification if enabled.
+- **FIX**: Simplify status: no need to display `ACITVE` or `DONE` as button will change back to `Search` to signify
+  completion along with the display of the `Benchmark` or even the notification if enabled.
 - **FIX**: Ensure single file search with no pattern works like multi-file search with no pattern (just return file).
 - **FIX**: Minor cleanup and performance increase in core.
 - **FIX**: When search error dialog is shown from the status bar, fix error with window destruction.
 
 ## 4.3
 
-- **NEW**: Documents are now included locally in installation and can be viewed directly in Rummage via a `webview` dialog.
+- **NEW**: Documents are now included locally in installation and can be viewed directly in Rummage via a `webview`
+  dialog.
 - **NEW**: License can now be viewed from the application menu.
 - **NEW**: Show changelog on next launch after upgrade.
 - **NEW**: Render editor instructions as HTML in the settings dialog.
@@ -138,7 +158,8 @@
 
 ## 4.2.3
 
-- **FIX**: Process preview in regular expression test dialog when replace pattern is empty. If replace plugin is enabled, we must have a plugin specified.
+- **FIX**: Process preview in regular expression test dialog when replace pattern is empty. If replace plugin is
+  enabled, we must have a plugin specified.
 
 ## 4.2.2
 
@@ -152,9 +173,11 @@
 ## 4.2
 
 - **NEW**: File time result format has been updated for better readability.
-- **NEW**: International file time result format for modified and created times has been added and can be enabled in the global preferences.
+- **NEW**: International file time result format for modified and created times has been added and can be enabled in the
+  global preferences.
 - **NEW**: Add ability to hide result columns.
-- **FIX**: Use wxPython API to highlight alternate rows in lists in order to properly highlight rows on systems with dark themes etc.
+- **FIX**: Use wxPython API to highlight alternate rows in lists in order to properly highlight rows on systems with
+  dark themes etc.
 
 ## 4.1.3
 
@@ -162,8 +185,11 @@
 
 ## 4.1.2
 
-- **FIX**: Require `wcmatch` 1.0.1 which fixes a number of bugs, most notably a fix for POSIX character classes not properly being handled when at the start of sequence followed by range syntax (`[[:ascii:]-z]`) which will now be handled properly.
-- **FIX**: When full path is enabled, and no file pattern is specified, all files will properly be matched like they are when full path is not enabled.
+- **FIX**: Require `wcmatch` 1.0.1 which fixes a number of bugs, most notably a fix for POSIX character classes not
+  properly being handled when at the start of sequence followed by range syntax (`[[:ascii:]-z]`) which will now be
+  handled properly.
+- **FIX**: When full path is enabled, and no file pattern is specified, all files will properly be matched like they are
+  when full path is not enabled.
 
 ## 4.1.1
 
@@ -199,8 +225,10 @@
 
 ## 4.0.4
 
-- **FIX**: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format string replace with the added ability to use format string align and fill.
-- **FIX**: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex replace templates without Backrefs. Require explicit `{{` or `}}`.
+- **FIX**: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format
+  string replace with the added ability to use format string align and fill.
+- **FIX**: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex
+  replace templates without Backrefs. Require explicit `{{` or `}}`.
 
 ## 4.0.3
 
@@ -222,8 +250,10 @@
 
 - **NEW**: Drop Python 2.7 support.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
-- **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
-- **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
+- **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left
+  empty.
+- **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works
+  for both folder exclude and file pattern inputs).
 
 ## 3.7.1
 
@@ -234,13 +264,16 @@
 
 - **NEW**: Escape key will terminate a search or replace from any main tab.
 - **NEW**: Lines are calculated incrementally as needed opposed to all up front.
-- **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left empty.
-- **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works for both folder exclude and file pattern inputs).
+- **NEW**: File pattern input will default to `*` or `.*` (for wildcard or regular expression respectively) if left
+  empty.
+- **NEW**: Wildcard patterns starting with `-` will now work as expected even if no other patterns are applied (works
+  for both folder exclude and file pattern inputs).
 - **NEW**: Old legacy editor configuration is now removed. Only the new is allowed.
 - **NEW**: Show history in the settings dialog's history panel.
 - **NEW**: Add notification test button in settings.
 - **NEW**: Regular expression file patterns will respect the user's preference for the Regex libraries version choice.
-- **NEW**: Don't force ASCII in regular expression file patterns, but use the default for the Python version. Let user choose by sending in `(?a)` or `(?u)` flag.
+- **NEW**: Don't force ASCII in regular expression file patterns, but use the default for the Python version. Let user
+  choose by sending in `(?a)` or `(?u)` flag.
 - **FIX**: History clearing did not clear replace plugin history.
 - **FIX**: Growl notifications timing out due to image being to large.
 - **FIX**: Notifications sound not working when just alert sounds are enabled or sound is enabled with Growl.
@@ -249,8 +282,10 @@
 - **FIX**: Update localization.
 - **FIX**: Fixes to Windows notifications.
 - **FIX**: Single instance handling regression #217.
-- **FIX**: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format string replace with the added ability to use format string align and fill.
-- **FIX**: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex replace templates without Backrefs. Require explicit `{{` or `}}`.
+- **FIX**: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format
+  string replace with the added ability to use format string align and fill.
+- **FIX**: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex
+  replace templates without Backrefs. Require explicit `{{` or `}}`.
 - **FIX**: Regression that causes crash when using reverse flag with Regex **and** Backrefs.
 - **FIX**: In test dialog, when an expression doesn't match, the result box is empty.
 - **FIX**: Cleanup some object leaks.
@@ -262,17 +297,23 @@
 
 - **NEW**: Rummage will use `cchardet` by default if found.
 - **NEW**: Expose way to specify `cchardet` being used.
-- **NEW**: Expose special file type encoding handling, and allow user to modify extension list. Covers: `bin`, `python`, `html`, and `xml`.
-- **NEW**: Detect middle endian 32 bit BOMs (even if Python has no encoder to actually handle them so we'll just default to binary).
+- **NEW**: Expose special file type encoding handling, and allow user to modify extension list. Covers: `bin`, `python`,
+  `html`, and `xml`.
+- **NEW**: Detect middle endian 32 bit BOMs (even if Python has no encoder to actually handle them so we'll just default
+  to binary).
 - **NEW**: Speed up and tweak binary detection.
 - **NEW**: Add copy button to support info dialog and ensure support info is read only.
 - **NEW**: Don't copy notification icons to user folder for use, but use the packaged icons directly from library.
-- **NEW**: Provide better support for localization.  Build current language translation on install and bundle in library directly.
+- **NEW**: Provide better support for localization.  Build current language translation on install and bundle in library
+  directly.
 - **FIX**: Wildcard pattern splitting on `|` inside a sequence.
-- **FIX**: Wildcard patterns not allowing character tokens such as `\x70`, `\u0070`, `\N{unicode name}`, `\160`, and standard escapes like `\t` etc.
+- **FIX**: Wildcard patterns not allowing character tokens such as `\x70`, `\u0070`, `\N{unicode name}`, `\160`, and
+  standard escapes like `\t` etc.
 - **FIX**: Incorrect documentation on wildcard patterns.
 - **FIX**: Python 2.7 not translating Unicode escapes #196.
-- **FIX**: Require Backrefs 3.1.2. Some bug fixes, but notably, Backrefs switched from using `\<` and `\>` for start and end word boundaries to `\m` and `\M`.  This is because of an oversight as Python versions less than 3.7 would escape `<` and `>` in `re.escpae` (even though it is unnecessary). Also some Unicode table generation fixes.
+- **FIX**: Require Backrefs 3.1.2. Some bug fixes, but notably, Backrefs switched from using `\<` and `\>` for start and
+  end word boundaries to `\m` and `\M`.  This is because of an oversight as Python versions less than 3.7 would escape
+  `<` and `>` in `re.escpae` (even though it is unnecessary). Also some Unicode table generation fixes.
 - **FIX**: Crashes in Python 2.7 related to not handling 32 bit Unicode in the GUI properly on narrow systems.
 - **FIX**: Python 2.7 will translate 32 bit characters to escaped surrogate pairs on narrow systems.
 - **FIX**: Tester will replace 32 bit Unicode characters with escaped surrogate pairs place holder in results.
@@ -286,12 +327,14 @@
 - **NEW**: Add "delete" and "send to trash" options to context menu.
 - **NEW**: Add checksum/hash options to context menu.
 - **NEW**: Add feature to check for updates. Also add auto update check (disabled by default).
-- **NEW**: Install command line as tool as `rummage` and `rummageX.X` where X.X is the major and minor version of the Python in use.
+- **NEW**: Install command line as tool as `rummage` and `rummageX.X` where X.X is the major and minor version of the
+  Python in use.
 - **FIX**: Fix some leaky objects. Ensure all items are destroyed.
 - **FIX**: Rework main application object to fix related issues.
 - **FIX**: Limit bulk file open to 20 items to prevent issues when open massive amount of files at once.
 - **FIX**: Regression with exports due to recent column addition and order change.
-- **FIX**: Search error list destroying parent/main dialog when closed. Also ensure destruction of error list dialog on main window closing.
+- **FIX**: Search error list destroying parent/main dialog when closed. Also ensure destruction of error list dialog on
+  main window closing.
 - **FIX**: Python 2.7 not processing Unicode escapes in search patterns.
 
 ## 3.4.3
@@ -314,7 +357,8 @@
 - **NEW**: Status now just shows `[ACTIVE]` or `[DONE]` instead of a misleading percentage.
 - **NEW**: Can now multi-select and mass open files in your editor.
 - **NEW**: Better error feedback in regex tester.
-- **NEW**: Remove current directory from Python path when opening Rummage to prevent it from importing local libraries when launched inside a Python project.  This mainly affects `python -m rummage` and `pythonw -m rummage` launching.
+- **NEW**: Remove current directory from Python path when opening Rummage to prevent it from importing local libraries
+  when launched inside a Python project.  This mainly affects `python -m rummage` and `pythonw -m rummage` launching.
 - **FIX**: Result item hover not showing file name in status bar.
 - **FIX**: Warnings in plugin system.
 
@@ -344,7 +388,8 @@
 - **NEW**: Allow Backrefs' replace references to work with format replaces.
 - **NEW**: Add support for format replace with Re (with Backrefs only).
 - **NEW**: Rummage requires Backrefs 2.1.0+.
-- **FIX**: Regex's format replacement (without Backrefs) and Re (without Backrefs) handling of back slashes Unicode, byte, notation was different that Backrefs and other Regex modes. Normalize the differences to give the expected feel.
+- **FIX**: Regex's format replacement (without Backrefs) and Re (without Backrefs) handling of back slashes Unicode,
+  byte, notation was different that Backrefs and other Regex modes. Normalize the differences to give the expected feel.
 - **FIX**: Ensure replace (in all cases) isn't populated during a search only.
 
 ## 2.3.3
@@ -364,7 +409,8 @@
 
 - **NEW**: Add reveal right click menu option in "File" tab results.
 - **NEW**: Expose backup configuration and allow putting all backups in a folder if desired.
-- **FIX**: Windows Unicode input path issues from command line and through the pipe during single instance argument transfer.
+- **FIX**: Windows Unicode input path issues from command line and through the pipe during single instance argument
+  transfer.
 - **FIX**: Windows Unicode issue when calling a shell command to open file in editor.
 
 ## 2.2
@@ -374,7 +420,8 @@
 - **FIX**: Simplify dialog initial resize.
 - **FIX**: Clean up of closing events: ensure we return a code, destroy objects, and skip unnecessary actions.
 - **FIX**: Use double buffering on certain windows and panels in Windows to reduce text flickering on resize.
-- **FIX**: Window is only resized by force on initial load, and if the dialog is ever too small when showing something that was hidden.
+- **FIX**: Window is only resized by force on initial load, and if the dialog is ever too small when showing something
+  that was hidden.
 - **FIX**: Revert ensuring window is never bigger than usable size for now.
 
 ## 2.1
@@ -382,13 +429,18 @@
 - **NEW**: Add new chained search feature.
 - **NEW**: Add new replace plugin support.
 - **NEW**: Restructure internal API to support chained search.
-- **NEW**: Saved searches will now require a unique name and an optional comment. Old legacy saves will be converted on first access. The old legacy name will be the comment, and a unique name will be generated from the comment.
+- **NEW**: Saved searches will now require a unique name and an optional comment. Old legacy saves will be converted on
+  first access. The old legacy name will be the comment, and a unique name will be generated from the comment.
 - **NEW**: Saved search names and comments can be edited from the "Load Search" panel.
-- **NEW**: Internal API no longer will guess and decode strings, only files.  It is expected that the caller handles encoding of string buffers.  A Unicode buffer will be searched as usual, and a binary string buffer will be treated as binary.
+- **NEW**: Internal API no longer will guess and decode strings, only files.  It is expected that the caller handles
+  encoding of string buffers.  A Unicode buffer will be searched as usual, and a binary string buffer will be treated as
+  binary.
 - **NEW**: Tester dialog will now process literal searches as well.
-- **NEW**: Literal searches will now utilize the Unicode related flags. This is particularly notable if using the Regex module and wanting to have full case-folding applied in case-insensitive matches.
+- **NEW**: Literal searches will now utilize the Unicode related flags. This is particularly notable if using the Regex
+  module and wanting to have full case-folding applied in case-insensitive matches.
 - **FIX**: Visual inconsistencies in regard to text box size relative to siblings, alignment of labels, etc.
-- **FIX**: Content text box in tester dialog will now allow entering tab characters on all platforms instead of navigating to next control.
+- **FIX**: Content text box in tester dialog will now allow entering tab characters on all platforms instead of
+  navigating to next control.
 - **FIX**: Fix wxPython deprecation noise in the console.
 - **FIX**: Fix some binary related replace issues.
 - **FIX**: Fix search not aborting.
