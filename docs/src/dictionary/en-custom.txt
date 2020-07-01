@@ -150,6 +150,7 @@ timestamp
 tooltip
 tuple
 un
+uncheck
 unhandled
 useable
 validator

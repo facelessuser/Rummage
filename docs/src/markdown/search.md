@@ -2,29 +2,39 @@
 
 ## Search Options
 
-Rummage supports the default regular expression library ([Re][re]) that comes with Python and the 3rd party [Regex][regex] library, and though the basic syntax and features are similar between the two, Regex provides many additional features, some of which causes the syntax to deviate greatly from Re. If you are using Re, you will not see all the options shown below. Please check out documentation for whichever engine you have chosen to learn more about its specific feature set. This documentation will only briefly cover the features that can be enabled in each engine.
+Rummage supports the default regular expression library ([Re][re]) that comes with Python and the 3rd party
+[Regex][regex] library, and though the basic syntax and features are similar between the two, Regex provides many
+additional features, some of which causes the syntax to deviate greatly from Re. If you are using Re, you will not see
+all the options shown below. Please check out documentation for whichever engine you have chosen use in order to learn
+more about its specific feature set. This documentation will only briefly cover the features that can be enabled in each
+engine.
 
 ### Common Options
 
-Both the Re and Regex engine have a couple of shared flags that are exposed in Rummage as checkboxes. These checkboxes are found directly under the search and replace text boxes.
+Both the Re and Regex engine have a couple of shared flags that are exposed in Rummage as checkboxes. These checkboxes
+are found directly under the search and replace text boxes.
 
 Toggle                      | Description
 --------------------------- | -----------
 Search\ with\ regex         | Alters the behavior of `Search for` and `Replace with`.  When this is checked, both text boxes require regular expression patterns opposed to literal string.
 Search\ case-sensitive      | Forces the search to be case-sensitive.
-Dot\ matches\ newline       | `.` will also match newlines.
-Use\ Unicode\ properties    | Changes the behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use use characters from the Unicode property database (will also modify `\l`, `\L`, `\c`, and `\C` in search patterns if using Backrefs with Re).
+Dot\ matches\ newline       | `.` will also match newlines in regular expressions.
+Use\ Unicode\ properties    | Changes the regular expression behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use characters from the Unicode property database (will also affect `\l`, `\L`, `\c`, and `\C` in search patterns if using [Backrefs](#backrefs) with Re).
 Format\ style\ replacements | Replace pattern will use [a string replace format][format-string] for replace. `#!py3 "{1} {1[-2]} {group_name[-3]}"` etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode [here][backrefs-format]. And remember that Rummage normalizes differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.
 
 ### Regex Engine Options
 
-If the Regex engine is being used for regular expressions, a couple of extra checkboxes will be available. Regex can be run in either `VERSION0` or `VERSION1` mode.
+If the Regex engine is being used for regular expressions, a couple of extra checkboxes will be available. Regex can be
+run in either `VERSION0` or `VERSION1` mode.
 
-`VERSION0` is compatible with Re regular expression patterns and has the extra `fullcase` toggle. `VERSION1` does not have this toggle as it is enabled by default and can only be disabled inline via a pattern with `(?-f)`. `VERSION1` is not directly compatible with Re patterns as it adds a number of changes to the syntax allowing for more advanced search options.
+`VERSION0` is compatible with Re regular expression patterns and has the extra `fullcase` toggle. `VERSION1` does not
+have this toggle as it is enabled by default and can only be disabled inline via a pattern of `(?-f)`. `VERSION1` is not
+directly compatible with Re patterns as it adds a number of changes to the syntax allowing for more advanced search
+options.
 
 Toggle                      | Description
 --------------------------- | -----------
-Best\ fuzzy\ match          | If performing a fuzzy match, the *best* fuzzy match will be used.
+Best\ fuzzy\ match          | If performing a fuzzy match, the *best* fuzzy match will be returned.
 Improve\ fuzzy\ fit         | Makes fuzzy matching attempt to improve the fit of the next match that it finds.
 Unicode\ word\ breaks       | Will use proper Unicode word breaks and line separators when Unicode is enabled. See Regex documentation for more info.
 Use\ POSIX\ matching        | Use the POSIX standard for regular expression, which is to return the leftmost longest match.
@@ -46,29 +56,40 @@ Use\ replace\ plugin    | When enabled, Rummage will use a [replace plugin](./us
 
 !!! tip "Encoding Guessing"
 
-    It is always recommended, if you know the encoding, to use `Force encoding` as it will always be the fastest. Encoding guessing can be slow and not always accurate.
+    It is always recommended, if you know the encoding, to use `Force encoding` as it will always be the fastest.
+    Encoding guessing can be slow and not always accurate.
 
-    Encoding guessing is performed by `chardet` which is a pure Python library and is, by far, the slowest option.  If you manually install `cChardet`, you will have a much faster guessing experience.
+    Encoding guessing is performed by `chardet` which is a pure Python library and is, by far, the slowest option.  If
+    you manually install `cChardet`, you will have a much faster guessing experience.
 
 ## File Patterns
 
 ![File Patterns](images/file_pattern.png)
 
-Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the `Regex` checkbox beside the pattern. Wildcard patterns and regular expression patterns will each be covered separately.
+Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used
+instead by selecting the `Regex` checkbox beside the pattern. Wildcard patterns and regular expression patterns will
+each be covered separately.
 
 ### Wildcard
 
-Rummage uses file patterns and folder excludes to filter which files are searched. The default is to use wild card patterns modeled after `fnmatch` and `glob`. Below is a list of the syntax that is accepted, but not all features are enabled by default.
+Rummage uses file patterns with optional folder exclude patterns to filter which files are searched. The default is to
+use wild card patterns modeled after `fnmatch` and `glob`. Below is a list of the syntax that is accepted, but not all
+features are enabled by default.
 
-If you would prefer regular expression file patterns, please see [Regular Expression](#regular-expression) file patterns.
+If you would prefer regular expression file patterns, please see [Regular Expression](#regular-expression) file
+patterns.
 
-- File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in [Preferences](./preferences.md#search).
-- Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`. There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.
-- `.` is always matched by `*`, `?`, and `[]`. Enable searching of hidden files in the file search options of the [**Search** tab](./usage.md#configuring-file-search).
+- File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in
+  [Preferences](./preferences.md#search).
+- Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`.
+  There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.
+- `.` is always matched by `*`, `?`, `[]`, etc. To prevent hidden files from being matched, you should uncheck the
+  "Include hidden" option.
 
 #### Basic Wildcard syntax
 
-Rummage uses the [`wcmatch`][wcmatch] library to implement a specialized version of [`fnmatch`][wcmatch-fnmatch] wildcard patterns for file name matching.
+Rummage uses the [`wcmatch`][wcmatch] library to implement a specialized version of [`fnmatch`][wcmatch-fnmatch]
+wildcard patterns for file name matching.
 
 Pattern           | Meaning
 ----------------- | -------
@@ -79,7 +100,7 @@ Pattern           | Meaning
 `[[:alnum:]]`     | POSIX style character classes inside sequences. The `C` locale is used for byte strings and Unicode properties for Unicode strings. See [POSIX Character Classes][posix] in `wcmatch`'s documentation for more info.
 `\`               | Escapes characters. If applied to a meta character, it will be treated as a normal character.
 `|`               | Multiple patterns can be provided by separating them with `|`.
-`-`               | If `-` is found at the start of a pattern, it will match the inverse.
+`-` / `!`         | By default, if `-` is found at the start of a pattern, it will match the inverse. This can be changed to use `!` instead in [Preferences](./preferences.md#search).
 `\xhh`            | By specifying `\x` followed by the hexadecimal byte value, you can specify characters directly.
 `\uhhhh`          | By specifying `\u` with the four value hexadecimal character value, you can specify Unicode characters directly.
 `\Uhhhhhhhh`      | By specifying `\U` with the eight value hexadecimal character value, you can specify wide Unicode characters directly.
@@ -107,7 +128,8 @@ Pattern           | Meaning
     -*.py
     ```
 
-    Used in the `Exclude folders`, this would exclude all folders with `name` followed by a single digit, except `name3` which we will always be included.
+    Used in the `Exclude folders`, this would exclude all folders with `name` followed by a single digit, except `name3`
+    which we will always be included.
 
     ```
     name[0-9]|-name3
@@ -119,11 +141,13 @@ Pattern           | Meaning
     -name3
     ```
 
-    If you need to escape `-` or `|`, you can put them in a sequence: `[-|]`. Remember to place `-` at the beginning of a sequence as `-` is also used to specify character ranges: `[a-z]`.
+    If you need to escape `-` or `|`, you can put them in a sequence: `[-|]`. Remember to place `-` at the beginning of
+    a sequence as `-` is also used to specify character ranges: `[a-z]`.
 
 #### Extended Match Syntax
 
-In [Preferences](./preferences.md#search), you can also enable extended match patterns. Extended match patterns allow you to provide pattern lists to provide more advanced logic.
+In [Preferences](./preferences.md#search), you can also enable extended match patterns. Extended match patterns allow
+you to provide pattern lists to provide more advanced logic.
 
 Pattern           | Meaning
 ----------------- | -------
@@ -148,20 +172,30 @@ Pattern           | Meaning
     @(this|that)-file.txt|*.py
     ```
 
+!!! tip "`!` and Extended Match Syntax"
+    If you have changed Rummage to use `!` instead of `-` for exclusion patterns and have enabled extended match
+    patterns, you must escape `(` at the start of a file if you want the pattern to be recognized as an exclusion
+    pattern instead of treating it as the start of an extended match pattern (`!(...)`).
+
 #### Brace Expansion Syntax
 
 In [Preferences](./preferences.md#search), you can enables Bash style brace expansion.
 
-Brace expansion is applied before anything else. When applied, a pattern will be expanded into multiple patterns. Each pattern will then be parsed separately.
+Brace expansion is applied before anything else. When applied, a pattern will be expanded into multiple patterns. Each
+pattern will then be parsed separately.
 
-This is great for specifying complex combinations of patterns: `a{b,{c,d}}` --> `ab ac ad`. Since each brace will generate a separate pattern for each combination that Rummage must evaluate. For simple patterns, it may make more sense to use extended match patterns which will only generate a single pattern: `@(ab|ac|ad)`.
+This is great for specifying complex combinations of patterns: `a{b,{c,d}}` --> `ab ac ad`. For simple patterns, it may
+make more sense to use extended match patterns which will only generate a single pattern and be quicker to evaluate:
+`@(ab|ac|ad)`.
 
-Be careful with patterns such as `{1..100}` which would generate one hundred patterns that will all get individually parsed. Sometimes you really need such a pattern, but be mindful that it will be slower as you generate larger sets of patterns.
+Be careful with patterns such as `{1..100}` which would generate one hundred patterns that will all get individually
+parsed. Sometimes you really need such a pattern, but be mindful that it will be slower as you generate larger sets of
+patterns.
 
 Pattern           | Meaning
 ----------------- | -------
 `{,}`             | Bash style brace expansions.  This is applied to patterns before anything else. Requires brace expansion feature to be enabled.
-`{n1..n2[..i]}`     | Bash style sequences that expands a range of numbers or alphabetic characters by an optional increment.
+`{n1..n2[..i]}`   | Bash style sequences that expands a range of numbers or alphabetic characters by an optional increment.
 
 !!! example "Example Brace Expansion"
 
@@ -173,33 +207,63 @@ Pattern           | Meaning
 
 #### Full Path Matching
 
-In [Preferences](./preferences.md#search), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
+In [Preferences](./preferences.md#search), you can enable full path search for either file patterns and/or folder
+exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred
+to as "full path", it is still relative to the provided base path.
 
-Assuming you Provided a base folder to search of `/My/base/path`, and you were to match a file `/My/base/path/some/file.txt`, normally your file pattern would match against `file.txt`, but with full path enabled, you'd match against `some/file.txt`. This means you'd have to use pattern like `*/*.txt` instead of `*.txt`.
+Assuming you Provided a base folder of `/My/base/path` to search, and as Rummage was crawling directories, it needed to
+evaluate the file `/My/base/path/some/file.txt`, normally your provided file pattern would match against `file.txt`, but
+with full path enabled, you'd match against `some/file.txt` (which is relative portion to your base path). This means
+you'd have to use pattern like `*/*.txt` instead of `*.txt`.
 
-When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in `[]`, `*`, `?`, or extended patterns like `*(...)`. Slashes can be matched by `**` if globstar (`**`) is enabled in [Preferences](./preferences.md#search).
+When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in
+`[]`, `*`, `?`, or in extended patterns like `*(...)`. Slashes can be matched by `**` if the "globstar (`**`)"" option
+is enabled in [Preferences](./preferences.md#search).
 
-When full path matching is not enabled, wildcard patterns use base matching. That is to say, the wildcard patterns are applied to the base filename instead of the full path. If you enable base matching for full paths in [Preferences](./preferences.md#search), if a pattern has no slashes, it will perform base matching, and if there are slashes, it will perform a full path match.  This allows you to have the best of both worlds. For instance, the following pattern would match all Markdown files under the document directory, but would exclude any file in any subdirectory under docs whose name starts with `c`: `docs/**/*.md|-c*`. Full path is used for the `docs/**/*.md` while base matching is used for `-c*`.
+When full path matching is not enabled, wildcard patterns use base matching. That is to say, the wildcard patterns are
+applied to the base filename instead of the full path. If you enable base matching for full paths in [Preferences](./preferences.md#search),
+if a pattern has no slashes, it will perform base matching, and if there are slashes, it will perform a full path match.
+This allows you to have the best of both worlds. For instance, the following pattern would match all Markdown files
+under the document directory, but would exclude any file in any subdirectory under docs whose name starts with `c`:
+`docs/**/*.md|-c*`. Full path is used for the `docs/**/*.md` pattern while base matching is used for `-c*`.
+
+Full path matching can be enabled for both file the file pattern box and the folder exclude box. Each can be controlled
+separately in [Preferences](./preferences.md#search).
 
 To learn more about full path matching with regular expression, checkout the regular expression [section](#full-path-matching_1).
 
 #### Pattern Limit
 
-Glob style patterns, by default, allow expanding a pattern by splitting on `|` or expanding the pattern with brace expansion: `a{b,c}` --> `ab ac`. This can turn one pattern into many patterns. The underlying expansion code limits expansion to `1000`. But this is configurable in [Preferences](./preferences.md#search). To raise or lower the limit, simply set the value higher or lower. To disable the limit entirely, set it to `0`.
-
+Glob style patterns, by default, allow expanding a pattern by splitting on `|` or expanding the pattern with brace
+expansion: `a{b,c}` --> `ab ac`. This can turn one pattern into many patterns. The underlying expansion code limits
+expansion to `1000` patterns. This limit can be configured in [Preferences](./preferences.md#search). To raise or lower
+the limit, simply set the value higher or lower. To disable the limit entirely, set it to `0`.
 
 ### Regular Expression
 
-Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used instead by selecting the `Regex` checkbox beside the pattern. The regular expression engine set in [Preferences](./preferences.md#search) is what will be used for file patterns. It will also respect the case sensitivity setting in [Preferences](./preferences.md#search) for **File/Folder Matching**.
+Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used
+instead by selecting the `Regex` checkbox beside the pattern. The regular expression engine set in [Preferences](./preferences.md#search)
+is what will be used for file patterns. It will also respect the case sensitivity setting in [Preferences](./preferences.md#search)
+for **File/Folder Matching**.
 
 #### Full Path Matching
 
-In [Preferences](./preferences.md#search), you can enable full path search for either file patterns and/or folder exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred to as "full path", it is still relative to the provided base path.
+In [Preferences](./preferences.md#search), you can enable full path search for either file patterns and/or folder
+exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred
+to as "full path", it is still relative to the provided base path.
 
-Assuming you Provided a base folder to search of `/My/base/path`, and you were to match a file `/My/base/path/some/file.txt`, normally your file pattern would match against `file.txt`, but with full path enabled, you'd match against `some/file.txt`. This means you'd have to use pattern like `.*/.*.txt` instead of `.*.txt`.
+Assuming you Provided a base folder to search of `/My/base/path`, and as Rummage was crawling directories, it needed to
+evaluate the file `/My/base/path/some/file.txt`, normally your file pattern would match against `file.txt`, but with
+full path enabled, you'd match against `some/file.txt`. This means you'd have to use a pattern like `.*/.*.txt` instead
+of `.*.txt`.
 
 ## Backrefs
 
-Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.  The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance, Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the [Preferences](./preferences.md#search) dialog.
+Rummage has the option of using a special wrapper called Backrefs. Backrefs can be applied to either Re or Regex. It
+adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.
+The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance,
+Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about what
+Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the
+[Preferences](./preferences.md#search) dialog.
 
 --8<-- "refs.txt"
