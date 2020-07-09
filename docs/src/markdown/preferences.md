@@ -130,7 +130,6 @@ A test button is provided to test the configuration once set.
 
 Ubuntu
 : 
-   - Growl: [Support for Linux][growl-linux].
    - Native: OSD via `notify-send`.
 
     !!! info "Other Distros"
@@ -141,7 +140,6 @@ Ubuntu
 
 macOS
 : 
-    - Growl: [Support for macOS][growl-macos].
     - Native: Notification Center via [terminal-notifier][terminal-notifier]. Path to `terminal-notifier` must be
       configured.
 
@@ -156,7 +154,6 @@ macOS
 
 Windows
 : 
-    - Growl: [Support for Windows][growl-win].
     - Native: Native windows taskbar notifications.
 
 

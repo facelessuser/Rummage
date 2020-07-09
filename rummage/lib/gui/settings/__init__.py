@@ -45,9 +45,9 @@ SETTINGS_FMT = '2.6.1'
 CACHE_FMT = '2.0.0'
 
 NOTIFY_STYLES = {
-    "macos": ["default", "growl"],
-    "windows": ["default", "growl"],
-    "linux": ["default", "growl"]
+    "macos": ["default"],
+    "windows": ["default"],
+    "linux": ["default"]
 }
 
 NOTIFY_PLAYERS = {
@@ -940,7 +940,7 @@ class Settings:
 
     @classmethod
     def init_notify(cls, first_time=False):
-        """Setup growl notification."""
+        """Setup notification."""
 
         pth = cls.get_config_folder()
 
@@ -958,7 +958,6 @@ class Settings:
         png = os.path.join(data.RESOURCE_PATH, "rummage_hires.png")
         icon = os.path.join(data.RESOURCE_PATH, "rummage_tray.ico")
         icns = os.path.join(data.RESOURCE_PATH, "rummage.icns")
-        growl_png = os.path.join(data.RESOURCE_PATH, "rummage_large.png")
 
         if not os.path.exists(png):
             png = None
@@ -993,8 +992,6 @@ class Settings:
             sound=cls.get_notify_sound(),
             sound_player=cls.get_notify_player()
         )
-        notify.setup_growl_notifications("Rummage", growl_png)
-        notify.enable_growl(cls.get_notify_method() == "growl" and notify.has_growl())
 
     @classmethod
     def get_notify(cls):
@@ -1047,7 +1044,7 @@ class Settings:
     def _set_notify_method(cls, notify_method):
         """Set notification style."""
 
-        if notify_method not in ["native", "growl"]:
+        if notify_method not in ["native"]:
             notify_method = NOTIFY_STYLES[util.platform()][0]
         cls.settings["notify_method"] = notify_method
 

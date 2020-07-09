@@ -1,9 +1,10 @@
 # Changelog
 
-## 4.12.1
+## 4.13
 
-- **FIX**: On color change, macOS would reset time picker values.
+- **NEW**: Drop growl notification support.
 - **FIX**: Replace macOS rocket dock icon and Window's default Python task bar icon with Rummage icon.
+- **FIX**: On color change, macOS would reset time picker values.
 
 ## 4.12
 

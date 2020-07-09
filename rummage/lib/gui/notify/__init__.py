@@ -6,7 +6,6 @@ License: MIT
 """
 from __future__ import absolute_import
 import sys
-from .notify_growl import get_growl, enable_growl, growl_enabled, setup_growl, has_growl, growl_destroy
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
 
@@ -29,7 +28,7 @@ elif _PLATFORM == "macos":
 elif _PLATFORM == "linux":
     from .notify_linux import get_notify, alert, setup, destroy
 
-__all__ = ("info", "warning", "error", "setup_notifications", "enable_growl", "has_growl", "destroy_notifications")
+__all__ = ("info", "warning", "error", "setup_notifications", "destroy_notifications")
 
 
 ###################################
@@ -91,10 +90,7 @@ def send_notify(title, message, sound, level):
         DEFAULT_NOTIFY(title, message, sound=sound).Show()
 
     notify = get_notify()
-    growl = get_growl()
-    if growl_enabled():
-        growl(level, title, message, sound, default_notify)
-    elif _PLATFORM in ["macos", "linux"]:
+    if _PLATFORM in ["macos", "linux"]:
         notify(title, message, sound, default_notify)
     elif _PLATFORM == "windows":
         notify(title, message, sound, windows_icons[level], default_notify)
@@ -129,19 +125,7 @@ def setup_notifications(app_name, img=None, **kwargs):
     )
 
 
-def setup_growl_notifications(app_name, png):
-    """Setup growl notifications."""
-
-    growl_destroy()
-
-    if isinstance(app_name, binary_type):
-        app_name = app_name.decode('utf-8')
-
-    setup_growl(app_name, png)
-
-
 def destroy_notifications():
     """Destroy notifications if possible."""
 
-    growl_destroy()
     destroy()
