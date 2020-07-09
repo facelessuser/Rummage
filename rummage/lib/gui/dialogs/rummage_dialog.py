@@ -340,7 +340,7 @@ class RummageFrame(gui.RummageFrame):
             data.get_image('rummage_large.png').GetIcon()
         )
 
-        if util.platform() == "macos":
+        if util.platform() != "linux":
             self.tbicon = TaskBarIcon(self, "Rummage", data.get_image('rummage_large.png').GetIcon())
 
         self.encodings = util.get_encodings()
@@ -2231,7 +2231,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_result_file_list.destroy()
         self.m_statusbar.tear_down()
         notify.destroy_notifications()
-        if util.platform() == "macos":
+        if util.platform() != "linux":
             self.tbicon.Destroy()
         event.Skip()
 
