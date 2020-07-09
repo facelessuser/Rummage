@@ -24,6 +24,7 @@ from .custom_app import PipeApp
 from ..dialogs import rummage_dialog
 from ..settings import Settings
 import wx
+from .. import util
 
 __all__ = ('RummageApp',)
 
@@ -33,6 +34,11 @@ class RummageApp(PipeApp):
 
     def __init__(self, argv, **kwargs):
         """Initialize Rummage app object."""
+
+        if util.platform() == "windows":
+            import ctypes
+
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('facelessuser.rummage.app.version')
 
         self.debug_mode = argv.debug
         self.path = argv.path if argv.path is not None else None
