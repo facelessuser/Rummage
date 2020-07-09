@@ -116,8 +116,6 @@ Argument Variables | Description
 The **Notification** panel controls configuration of notifications.  You can enable/disable visual notifications and/or
 audible notification sounds (you must configure which sound to use).
 
-You can also select whether to use the system's built-in notifications or Growl.
-
 On Linux, you can set your preferred player: `paplay`, `aplay`, and `play` (`sox`).
 
 A test button is provided to test the configuration once set.
@@ -134,9 +132,9 @@ Ubuntu
 
     !!! info "Other Distros"
         Though Rummage should run on any Linux distro, the native dialog option was built around Ubuntu's native
-        notifications called OSD.  Notifications will not work on other distros that do not use OSD *unless* they use
-        Growl.  Even without Growl, other distros will probably still get the audible cue, but as each distro varies, it
-        is difficult to be certain.  As notifications are not crucial to usage, this is minor concern.
+        notifications called OSD.  Currently, notifications will not work on other distros that do not use OSD. Other
+        distros will probably still get the audible cue, but as each distro varies, it is difficult to be certain. As
+        notifications are not crucial to usage, this is minor concern.
 
 macOS
 : 
