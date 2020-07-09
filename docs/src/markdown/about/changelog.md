@@ -3,6 +3,7 @@
 ## 4.12.1
 
 - **FIX**: On color change, macOS would reset time picker values.
+- **FIX**: Replace macOS rocket dock icon and Window's default Python task bar icon with Rummage icon.
 
 ## 4.12
 
