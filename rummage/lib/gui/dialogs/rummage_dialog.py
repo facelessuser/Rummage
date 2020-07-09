@@ -48,6 +48,7 @@ from ..app.custom_app import debug, error, get_log_file
 from ..controls import custom_statusbar
 from .regex_test_dialog import RegexTestDialog
 from ..controls.autocomplete_combo import AutoCompleteCombo
+from ..controls.dock_icon import TaskBarIcon
 from .load_search_dialog import LoadSearchDialog
 from .save_search_dialog import SaveSearchDialog
 from .search_error_dialog import SearchErrorDialog
@@ -338,6 +339,9 @@ class RummageFrame(gui.RummageFrame):
         self.SetIcon(
             data.get_image('rummage_large.png').GetIcon()
         )
+
+        if util.platform() == "macos":
+            self.tbicon = TaskBarIcon(self, "Rummage", data.get_image('rummage_large.png').GetIcon())
 
         self.encodings = util.get_encodings()
         self.last_pattern_search = ""
@@ -2227,6 +2231,8 @@ class RummageFrame(gui.RummageFrame):
         self.m_result_file_list.destroy()
         self.m_statusbar.tear_down()
         notify.destroy_notifications()
+        if util.platform() == "macos":
+            self.tbicon.Destroy()
         event.Skip()
 
     def on_test_regex(self, event):
