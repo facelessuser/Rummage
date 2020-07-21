@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.13.1
+
+- **FIX**: Notifications should work better on Windows.
+
 ## 4.13
 
 - **NEW**: Drop growl notification support.

@@ -956,7 +956,7 @@ class Settings:
                 pass
 
         png = os.path.join(data.RESOURCE_PATH, "rummage_hires.png")
-        icon = os.path.join(data.RESOURCE_PATH, "rummage_tray.ico")
+        icon = os.path.join(data.RESOURCE_PATH, "rummage.ico")
         icns = os.path.join(data.RESOURCE_PATH, "rummage.icns")
 
         if not os.path.exists(png):
