@@ -1,5 +1,5 @@
 comment: false
 
-# coverage:
-#   status:
-#     patch: false
+coverage:
+  status:
+    patch: false
