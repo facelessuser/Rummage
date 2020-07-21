@@ -2,7 +2,7 @@
 
 ## 4.13.1
 
-- **FIX**: Notifications should work more like they should on Windows.
+- **FIX**: Notifications should work better on Windows.
 
 ## 4.13
 
