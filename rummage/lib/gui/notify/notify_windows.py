@@ -304,7 +304,8 @@ class WindowsNotify:
             res.cbSize = ctypes.sizeof(res)
             res.hWnd = hwnd
             res.uID = 0
-            res.uFlags = NIF_INFO | NIF_ICON | NIF_STATE | NIF_MESSAGE
+            # `NIF_SHOWTIP` and `NIF_TIP` is probably not needed for Windows 8+, but maybe for 7?
+            res.uFlags = NIF_INFO | NIF_ICON | NIF_STATE | NIF_SHOWTIP | NIF_TIP | NIF_MESSAGE
             res.uCallbackMessage = WM_USER + 20
             res.hIcon = self.hicon
             res.szTip = self.app_name[:128]
