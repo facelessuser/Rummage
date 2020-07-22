@@ -9,7 +9,6 @@ import winsound
 import ctypes
 import ctypes.wintypes as wintypes
 import os
-import platform
 
 __all__ = ("get_notify", "alert", "setup", "windows_icons", "destroy")
 
@@ -53,6 +52,8 @@ NIFF_USER = 0x00000004
 
 NIS_HIDDEN = 0x01
 
+HWND_MESSAGE = -3
+
 
 class WndClassEx(ctypes.Structure):
     """The `WNDCLASSEX` structure."""
@@ -93,12 +94,6 @@ class NotifyIconData(ctypes.Structure):
         ("guidItem", ctypes.c_char * 16),
         ("hBalloonIcon", HANDLE),
     ]
-
-
-class NotifyIconDataV3(ctypes.Structure):
-    """The `NOTIFYICONDATA_V3` structure."""
-
-    _fields_ = NotifyIconData._fields_[:-1]  # noqa
 
 
 class Options:
@@ -184,7 +179,6 @@ class WindowsNotify:
             return hwnd
 
         self.tooltip = tooltip
-        self.is_xp = platform.release().lower() == 'xp'
         self.visible = False
         self.app_name = app_name
 
@@ -259,14 +253,14 @@ class WindowsNotify:
             hwnd = WindowsNotify.window_handle
         else:
             hwnd = ctypes.windll.user32.FindWindowExW(
-                None, None, WindowsNotify.wc.lpszClassName, None
+                HWND_MESSAGE, None, WindowsNotify.wc.lpszClassName, None
             )
         if not hwnd:
             style = WS_OVERLAPPED | WS_SYSMENU
             hwnd = ctypes.windll.user32.CreateWindowExW(
                 0, WindowsNotify.wc.lpszClassName, WindowsNotify.wc.lpszClassName, style,
                 0, 0, CW_USEDEFAULT, CW_USEDEFAULT,
-                None, 0, self.hinst, None
+                HWND_MESSAGE, 0, self.hinst, None
             )
             if hwnd:
                 WindowsNotify.window_handle = hwnd
@@ -277,7 +271,18 @@ class WindowsNotify:
         """Destroy the window."""
 
         if WindowsNotify.window_handle:
-            self.hide_icon(WindowsNotify.window_handle)
+            if self.visible:
+                res = NotifyIconData()
+                res.cbSize = ctypes.sizeof(res)
+                res.hWnd = WindowsNotify.window_handle
+                res.uID = 0
+                res.uFlags = 0
+                res.uVersion = 4
+
+                ctypes.windll.shell32.Shell_NotifyIconW(NIM_DELETE, ctypes.byref(res))
+                ctypes.windll.user32.UpdateWindow(WindowsNotify.window_handle)
+            self.visible = False
+
             ctypes.windll.user32.DestroyWindow(WindowsNotify.window_handle)
             WindowsNotify.window_handle = None
 
@@ -295,59 +300,27 @@ class WindowsNotify:
         hwnd = self._get_window()
 
         if hwnd:
-            res = NotifyIconDataV3() if self.is_xp else NotifyIconData()
+            res = NotifyIconData()
             res.cbSize = ctypes.sizeof(res)
             res.hWnd = hwnd
             res.uID = 0
-            res.uFlags = NIF_INFO | NIF_ICON | NIF_STATE | NIF_SHOWTIP | NIF_TIP | NIF_MESSAGE
+            res.uFlags = NIF_INFO | NIF_ICON | NIF_STATE | NIF_MESSAGE
             res.uCallbackMessage = WM_USER + 20
             res.hIcon = self.hicon
             res.szTip = self.app_name[:128]
-            res.uVersion = 3 if self.is_xp else 4
+            res.uVersion = 4
             res.szInfo = msg[:256]
             res.szInfoTitle = title[:64]
             res.dwInfoFlags = icon_level | NIIF_NOSOUND | NIFF_USER
 
-            self.show_icon(res, hwnd)
+            if not ctypes.windll.shell32.Shell_NotifyIconW(NIM_MODIFY, ctypes.byref(res)):
+                if not self.visible and WindowsNotify.window_handle:
+                    ctypes.windll.shell32.Shell_NotifyIconW(NIM_ADD, ctypes.byref(res))
+                    ctypes.windll.shell32.Shell_NotifyIconW(NIM_SETVERSION, ctypes.byref(res))
+                self.visible = WindowsNotify.window_handle is not None
 
             if sound:
                 alert()
-
-    def show_icon(self, res, hwnd):
-        """Display the taskbar icon."""
-
-        if not ctypes.windll.shell32.Shell_NotifyIconW(NIM_MODIFY, ctypes.byref(res)):
-            if not self.visible and WindowsNotify.window_handle:
-                tres = NotifyIconDataV3() if self.is_xp else NotifyIconData()
-                tres.cbSize = ctypes.sizeof(tres)
-                tres.hWnd = hwnd
-                tres.uID = 0
-                tres.uFlags = NIF_MESSAGE | NIF_STATE
-                tres.uCallbackMessage = WM_USER + 20
-                tres.hIcon = self.hicon
-                tres.szTip = self.app_name[:128]
-                tres.uVersion = 3 if self.is_xp else 4
-                ctypes.windll.shell32.Shell_NotifyIconW(NIM_ADD, ctypes.byref(tres))
-                ctypes.windll.shell32.Shell_NotifyIconW(NIM_SETVERSION, ctypes.byref(tres))
-
-            ctypes.windll.shell32.Shell_NotifyIconW(NIM_MODIFY, ctypes.byref(res))
-
-        self.visible = WindowsNotify.window_handle is not None
-
-    def hide_icon(self, hwnd):
-        """Hide icon."""
-
-        if self.visible:
-            res = NotifyIconDataV3() if self.is_xp else NotifyIconData()
-            res.cbSize = ctypes.sizeof(res)
-            res.hWnd = hwnd
-            res.uID = 0
-            res.uFlags = 0
-            res.uVersion = 3 if self.is_xp else 4
-
-            ctypes.windll.shell32.Shell_NotifyIconW(NIM_DELETE, ctypes.byref(res))
-            ctypes.windll.user32.UpdateWindow(hwnd)
-        self.visible = False
 
     def destroy(self):
         """Destroy."""
