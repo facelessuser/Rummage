@@ -54,6 +54,11 @@ NIS_HIDDEN = 0x01
 
 HWND_MESSAGE = -3
 
+NIN_BALLOONSHOW = WM_USER + 2
+NIN_BALLOONHIDE = WM_USER + 3
+NIN_BALLOONTIMEOUT = WM_USER + 4
+NIN_BALLOONUSERCLICK = WM_USER + 5
+
 
 class WndClassEx(ctypes.Structure):
     """The `WNDCLASSEX` structure."""
@@ -167,14 +172,9 @@ class WindowsNotify:
         """
 
         def winproc(hwnd, msg, wparam, lparam):
-            """
-            Handle `winproc` events.
+            """Handle `winproc` events."""
 
-            Code `0x404` seems to be when the message does a timeout,
-            `0x405` seems to be if message is clicked.
-            """
-
-            if msg == WM_USER + 20 and lparam in (0x404, 0x405):
+            if msg == WM_USER + 20 and lparam in (NIN_BALLOONTIMEOUT, NIN_BALLOONUSERCLICK):
                 pass
             return hwnd
 
