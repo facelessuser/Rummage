@@ -126,15 +126,13 @@ A test button is provided to test the configuration once set.
     ------- | ------------------------ | -----
     `wav`   | `wav`, `mp3` and `.aiff` | `wav` and `mp3` (if using `paplay`, `ogg` is also supported)
 
-Ubuntu
+Linux
 : 
-   - Native: OSD via `notify-send`.
+   - Native: Notifications via `notify-send`.
 
     !!! info "Other Distros"
-        Though Rummage should run on any Linux distro, the native dialog option was built around Ubuntu's native
-        notifications called OSD.  Currently, notifications will not work on other distros that do not use OSD. Other
-        distros will probably still get the audible cue, but as each distro varies, it is difficult to be certain. As
-        notifications are not crucial to usage, this is minor concern.
+        Though Rummage should run on any Linux distro, the native notification option was built around `notify-send` and
+        only tested on Ubuntu. If other distros have a `notify-send` it may also work.
 
 macOS
 : 

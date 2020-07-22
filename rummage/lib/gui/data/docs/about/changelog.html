@@ -28,6 +28,9 @@
 <h2 id="4131">4.13.1</h2>
 <ul>
 <li><strong>FIX</strong>: Notifications should work better on Windows.</li>
+<li><strong>FIX</strong>: On some Linux systems, the down key, while one of the autocomplete combo boxes have focus, will cause the
+  cursor to to jump to a widget below the current and then process the <code>on_key_up</code> event which is meant to trigger the
+  drop down history of the prior autocomplete combo box. </li>
 </ul>
 <h2 id="413">4.13</h2>
 <ul>

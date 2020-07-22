@@ -187,6 +187,9 @@ class AutoCompleteCombo(wx.ComboCtrl):
         """Swallow up and down arrow event if popup shown."""
 
         key = event.GetKeyCode()
+        if key == wx.WXK_DOWN:
+            # Swallow this event. Some OS use this to navigate to another widget.
+            return
         if util.platform() == "linux" and key == wx.WXK_TAB:
             if event.ShiftDown():
                 self.tab_back()
