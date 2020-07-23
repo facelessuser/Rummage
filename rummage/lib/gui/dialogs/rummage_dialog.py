@@ -1996,13 +1996,20 @@ class RummageFrame(gui.RummageFrame):
         """Abort on escape."""
 
         # Do we actually need this cancel check?
+        canceled = True
         obj = self.FindFocus()
-        is_ac_combo = isinstance(obj, AutoCompleteCombo)
+        is_ac_combo = (
+            isinstance(obj, wx.ListCtrl) and
+            isinstance(obj.GetParent(), wx.PopupTransientWindow) and
+            isinstance(obj.GetParent().GetParent(), AutoCompleteCombo)
+        )
+        obj = obj.GetParent().GetParent()
         if is_ac_combo:
             canceled = obj.list.is_canceled()
-        if self.thread is not None and not self.kill and not canceled:
+            if not canceled and util.platform() == "windows":
+                obj.Dismiss()
+        if self.thread is not None and not self.kill and canceled:
             self.abort_search(self.m_replace_button.GetLabel() in (self.SEARCH_BTN_STOP, self.SEARCH_BTN_ABORT))
-
         event.Skip()
 
     def on_textctrl_selectall(self, event):
