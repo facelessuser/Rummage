@@ -28,6 +28,8 @@
 <h2 id="414">4.14</h2>
 <ul>
 <li><strong>NEW</strong>: Calculate better looking, alternating list colors instead of relying on wxPython to provide.</li>
+<li><strong>NEW</strong>: Linux now uses the same autocomplete logic in autocomplete combo boxes that Windows and macOS uses. This
+  removes a workaround that required Linux to use different logic that has been resolved in wxPython 4.1.</li>
 <li><strong>FIX</strong>: Notifications should work better on Windows.</li>
 <li><strong>FIX</strong>: On some Linux systems, the down key, while one of the autocomplete combo boxes have focus, will cause the
   cursor to to jump to a widget below the current and then process the <code>on_key_up</code> event which is meant to trigger the
