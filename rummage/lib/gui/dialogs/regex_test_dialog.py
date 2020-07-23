@@ -76,9 +76,17 @@ class RegexTestDialog(gui.RegexTestDialog):
 
         self.localize()
 
-        self.SetIcon(
-            data.get_image('rummage_large.png').GetIcon()
-        )
+        bundle = wx.IconBundle()
+        bundle.AddIcon(data.get_image('rummage_16.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_32.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_40.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_128.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_256.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_512.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_1024.png').GetIcon())
+
+        self.SetIcons(bundle)
+
         self.parent = parent
         self.regex_mode = Settings.get_regex_mode()
         self.regex_version = Settings.get_regex_version()

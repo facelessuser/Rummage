@@ -337,15 +337,18 @@ class RummageFrame(gui.RummageFrame):
         self.localize()
 
         bundle = wx.IconBundle()
-        bundle.AddIcon(data.get_image('rummage_hires.png').GetIcon())
-        bundle.AddIcon(data.get_image('rummage_large.png').GetIcon())
-        bundle.AddIcon(data.get_image('rummage_medium.png').GetIcon())
-        bundle.AddIcon(data.get_image('rummage.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_16.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_32.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_40.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_128.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_256.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_512.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_1024.png').GetIcon())
 
         self.SetIcons(bundle)
 
         if util.platform() == "macos":
-            self.tbicon = TaskBarIcon(self, "Rummage", data.get_image('rummage_large.png').GetIcon())
+            self.tbicon = TaskBarIcon(self, "Rummage", data.get_image('rummage_512.png').GetIcon())
 
         self.encodings = util.get_encodings()
         self.last_pattern_search = ""
