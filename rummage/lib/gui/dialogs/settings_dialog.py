@@ -679,8 +679,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
 
         alt_row = self.m_alt_row_checkbox.GetValue()
         Settings.set_alt_list_color(alt_row)
-        self.m_encoding_list.EnableAlternateRowColours(enable=alt_row)
-        self.m_encoding_panel.Refresh()
+        self.m_encoding_list.update_colors()
 
     def on_close(self, event):
         """Handle on close event."""

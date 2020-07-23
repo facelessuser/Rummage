@@ -2071,11 +2071,8 @@ class RummageFrame(gui.RummageFrame):
             )
         dlg.Destroy()
         self.refresh_regex_options()
-        alt_row = Settings.get_alt_list_color()
-        self.m_result_file_list.EnableAlternateRowColours(enable=alt_row)
-        self.Refresh()
-        self.m_result_list.EnableAlternateRowColours(enable=alt_row)
-        self.Refresh()
+        self.m_result_file_list.update_colors()
+        self.m_result_list.update_colors()
 
     def on_chain_toggle(self, event):
         """Handle chain toggle event."""

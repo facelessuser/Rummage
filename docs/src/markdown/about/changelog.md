@@ -1,7 +1,8 @@
 # Changelog
 
-## 4.13.1
+## 4.14
 
+- **NEW**: Calculate better looking, alternating list colors instead of relying on wxPython to provide.
 - **FIX**: Notifications should work better on Windows.
 - **FIX**: On some Linux systems, the down key, while one of the autocomplete combo boxes have focus, will cause the
   cursor to to jump to a widget below the current and then process the `on_key_up` event which is meant to trigger the
