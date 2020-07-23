@@ -7,6 +7,8 @@
   cursor to to jump to a widget below the current and then process the `on_key_up` event which is meant to trigger the
   drop down history of the prior autocomplete combo box.
 - **FIX**: Latest wxPython changes made escape not close the autocomplete combo boxes. Handle new changes.
+- **FIX**: Different Linux Desktop Environments need different size icons to show up properly in their taskbar, provide
+  an icon bundle to ensure there is always one of appropriate size.
 
 ## 4.13
 

@@ -204,7 +204,7 @@ class WindowsNotify:
 
         self.hicon = self.get_icon(icon)
 
-        self._show_notification('', '', False, self.hicon)
+        self._show_notification('', '', False, 0)
 
     def get_icon(self, icon):
         """
@@ -218,14 +218,12 @@ class WindowsNotify:
             ctypes.windll.user32.DestroyIcon(wintypes.HICON(WindowsNotify.taskbar_icon))
             WindowsNotify.taskbar_icon = None
 
-        icon_flags = LR_LOADFROMFILE
+        hicon = wintypes.HICON()
         try:
             if icon is None:
                 raise ValueError("Icon is not available")
-            hicon = ctypes.windll.user32.LoadImageW(
-                self.hinst, icon,
-                IMAGE_ICON,
-                0, 0, icon_flags
+            ctypes.windll.comctl32.LoadIconWithScaleDown(
+                None, icon, 48, 48, ctypes.byref(hicon)
             )
         except Exception:
             hicon = ctypes.windll.user32.LoadIconA(0, IDI_APPLICATION)

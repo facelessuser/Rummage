@@ -955,7 +955,7 @@ class Settings:
             except Exception:
                 pass
 
-        png = os.path.join(data.RESOURCE_PATH, "rummage_hires.png")
+        png = os.path.join(data.RESOURCE_PATH, "rummage_1024.png")
         icon = os.path.join(data.RESOURCE_PATH, "rummage.ico")
         icns = os.path.join(data.RESOURCE_PATH, "rummage.icns")
 

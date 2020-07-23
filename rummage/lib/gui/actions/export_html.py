@@ -269,7 +269,7 @@ def export(export_html, chain, result_list, result_content_list):
         html.write(
             BODY_START % {
                 "title": title,
-                "icon": util.to_ustr(base64.b64encode(data.get_image('rummage.png').GetData()))
+                "icon": util.to_ustr(base64.b64encode(data.get_image('rummage_128.png').GetData()))
             }
         )
 

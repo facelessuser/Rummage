@@ -118,7 +118,7 @@ At the time of writing, this was tested on KDE 5, so most of the commands are ap
 
     [Desktop Action rummage]
     Name=Rummage Here...
-    Icon=/usr/local/lib/python3.5/dist-packages/rummage/lib/gui/data/rummage_hires.png
+    Icon=/usr/local/lib/python3.5/dist-packages/rummage/lib/gui/data/rummage_1024.png
     Exec=rummage --path "%f"
     ```
 
