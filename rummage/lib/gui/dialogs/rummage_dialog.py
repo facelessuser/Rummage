@@ -336,9 +336,13 @@ class RummageFrame(gui.RummageFrame):
             self.m_settings_panel.SetDoubleBuffered(True)
         self.localize()
 
-        self.SetIcon(
-            data.get_image('rummage_large.png').GetIcon()
-        )
+        bundle = wx.IconBundle()
+        bundle.AddIcon(data.get_image('rummage_hires.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_large.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage_medium.png').GetIcon())
+        bundle.AddIcon(data.get_image('rummage.png').GetIcon())
+
+        self.SetIcons(bundle)
 
         if util.platform() == "macos":
             self.tbicon = TaskBarIcon(self, "Rummage", data.get_image('rummage_large.png').GetIcon())
