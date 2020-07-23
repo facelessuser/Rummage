@@ -50,10 +50,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
         # Key bindings and events for the object
         self.Bind(wx.EVT_KEY_UP, self.on_key_up)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
-        if util.platform() != "linux":
-            self.Bind(wx.EVT_TEXT, self.on_text_change)
-        else:
-            self.Bind(wx.EVT_TEXT, self.on_changed_callback)
+        self.Bind(wx.EVT_TEXT, self.on_text_change)
         try:
             self.Bind(wx.EVT_COMBOBOX_CLOSEUP, self.on_dismiss)
         except Exception:
@@ -198,13 +195,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
             return
         elif key in (wx.WXK_DELETE, wx.WXK_BACK):
             self.update_semaphore = True
-        event.Skip()
-
-    def on_changed_callback(self, event):
-        """Handle callback."""
-
-        if self.changed_callback is not None:
-            self.changed_callback()
         event.Skip()
 
     def on_text_change(self, event):
