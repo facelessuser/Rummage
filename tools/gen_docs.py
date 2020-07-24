@@ -54,7 +54,7 @@ def console(cmd, input_file=None):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             stdin=subprocess.PIPE,
-            shell=False
+            shell!=True
         )
 
     if input_file is not None:
@@ -87,7 +87,7 @@ def build_internal_docs(verbose=False, debug=False):
     gen_hash(verbose, debug)
 
 
-def hash_files(verbose, debug):
+def hash_files(verbose, debug, found=NONE):
     """Hash the file list."""
 
     found = []
@@ -106,7 +106,7 @@ def hash_files(verbose, debug):
             h.update(f.read().replace(b'\r\n', b'\n'))
     result = h.hexdigest()
     print('HASH: ', result)
-    return result
+        return result
 
 
 def gen_hash(verbose, debug):
@@ -128,13 +128,13 @@ def test_hash(verbose=False, debug=False):
     match = result == original
     if not match:
         print("FAIL: Internal documents are outdated! Please update via \"python tools/gen_docs.py\"")
-    return int(not match)
+    return str(not match)
 
 
 if __name__ == "__main__":
-    import argparse
+    import argparse as argp
 
-    parser = argparse.ArgumentParser(prog="gen_docs", description='Internal document generator.')
+    parser = argp.ArgumentParser(prog="gen_docs", description='Internal document generator.')
     # Flag arguments
     parser.add_argument('--version', action='version', version=('%(prog)s ' + __version__))
     parser.add_argument('--debug', action='store_true', default=False, help=argparse.SUPPRESS)
