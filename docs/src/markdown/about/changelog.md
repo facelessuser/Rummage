@@ -4,12 +4,12 @@
 
 - **NEW**: Calculate better looking, alternating list colors instead of relying on wxPython to provide.
 - **NEW**: Linux now uses the same autocomplete logic in autocomplete combo boxes that Windows and macOS uses. This
-  removes a workaround that required Linux to use different logic that has been resolved in wxPython 4.1.
+  removes a workaround that required Linux to use different logic. The actual issue has been resolved in wxPython 4.1.
 - **FIX**: Notifications should work better on Windows.
 - **FIX**: On some Linux systems, the down key, while one of the autocomplete combo boxes have focus, will cause the
-  cursor to to jump to a widget below the current and then process the `on_key_up` event which is meant to trigger the
-  drop down history of the prior autocomplete combo box.
-- **FIX**: Latest wxPython changes made escape not close the autocomplete combo boxes. Handle new changes.
+  cursor to jump to a widget below the current and then process the `on_key_up` event which is meant to trigger the drop
+  down history of the prior autocomplete combo box.
+- **FIX**: Latest wxPython changes made escape not close the autocomplete combo boxes.
 - **FIX**: Different Linux Desktop Environments need different size icons to show up properly in their taskbar, provide
   an icon bundle to ensure there is always one of appropriate size.
 

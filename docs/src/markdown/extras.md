@@ -4,25 +4,25 @@
 
 ### macOS
 
-- Open Automator.
-- Create new Service.
-- Set the following:
+1. Open Automator.
+2. Create new Service.
+3. Set the following:
     - Service receives selected `files or folders` in `any Application`.
     - Shell: `/bin/sh`.
     - Pass input: `as arguments`.
     - Content of script:
 
-        ```
+        ```bash
         (/Library/Frameworks/Python.framework/Versions/3.6/bin/rummage --path "$1")>/dev/null 2>&1 &
         ```
 
         This is just an example. You will need to determine the location of your Python install.
 
-- Save to `/Users/<username>/Library/Services/Rummage Here...`.
+4. Save to `/Users/<username>/Library/Services/Rummage Here...`.
 
 ### Windows
 
-- Create a file `rummage.reg` with the content from one of the entries below. Replace `<python_install_path>` with the actual path to your Python directory (usually something like: `c:\Python35`).  Remember to escape backslashes appropriately. Also note that we quote `%1` to allow spaces in the command line argument. Paths may vary, and it is left up to the user to discover where their Python install directory is.
+1. Create a file `rummage.reg` with the content from one of the entries below. Replace `<python_install_path>` with the actual path to your Python directory (usually something like: `c:\Python35`).  Remember to escape backslashes appropriately. Also note that we quote `%1` to allow spaces in the command line argument. Paths may vary, and it is left up to the user to discover where their Python install directory is.
 
     !!! warning
         This isn't a guide in how to do registry editing proper, so only edit the registry if you are certain of what you are doing.
@@ -65,8 +65,8 @@
 
     ```
 
-- Save file.
-- Double click the registry file to add the context menu into Windows Explorer.
+2. Save file.
+3. Double click the registry file to add the context menu into Windows Explorer.
 
 ### Linux
 
@@ -76,7 +76,7 @@ There are many different flavors of Linux using different file managers.  This m
 
 Paths might vary depending on Ubuntu version etc.
 
-- Create an executable file called `Rummage Here...` in `~/.local/share/nautilus/scripts/` with the following content (RUMMAGE_PATH should be the binary created when installing rummage in Python which is usually `/usr/local/bin/rummage`).
+1. Create an executable file called `Rummage Here...` in `~/.local/share/nautilus/scripts/` with the following content (RUMMAGE_PATH should be the binary created when installing rummage in Python which is usually `/usr/local/bin/rummage`).
 
     ```py3
     #!/usr/bin/python
@@ -92,22 +92,22 @@ Paths might vary depending on Ubuntu version etc.
             subprocess.Popen([RUMMAGE_PATH, "--path", paths[0]])
     ```
 
-- Restart of Nautilus may or may not be needed, but context menu item should appear under `Scripts` and should work on files and folders.
+2. Restart of Nautilus may or may not be needed, but context menu item should appear under `Scripts` and should work on files and folders.
 
 #### Ubuntu Dolphin (KDE)
 
 At the time of writing, this was tested on KDE 5, so most of the commands are appended with '5'.
 
-- To discover where you can store your context menu entries, run the following command:
+1. To discover where you can store your context menu entries, run the following command:
 
     ```
     facelessuser@facelessuser:~$ kf5-config --path services
     /home/facelessuser/.local/share/kservices5/:/usr/share/kservices5/
     ```
 
-- Next create your `.desktop` file in one of these locations creating the necessary folder(s) if needed.  In this example, the file will be created at `~/.local/share/kservices5/ServiceMenus/rummage.desktoop`.
+2. Next create your `.desktop` file in one of these locations creating the necessary folder(s) if needed.  In this example, the file will be created at `~/.local/share/kservices5/ServiceMenus/rummage.desktoop`.
 
-- Provide the necessary configuration to specify the entry type, file targets, command to execute, icon, etc. In our case, we specify `all/all` to target both files and folders. We also point to one of the PNG files that ship in the package for the icon.
+3. Provide the necessary configuration to specify the entry type, file targets, command to execute, icon, etc. In our case, we specify `all/all` to target both files and folders. We also point to one of the PNG files that ship in the package for the icon.
 
     ```ini
     [Desktop Entry]
@@ -122,27 +122,29 @@ At the time of writing, this was tested on KDE 5, so most of the commands are ap
     Exec=rummage --path "%f"
     ```
 
-- Lastly we rebuild and refresh the desktop entries:
+4. Lastly we rebuild and refresh the desktop entries:
 
     ```console
     facelessuser@facelessuser:~$ kbuildsycoca5
     ```
 
-- Close all Dolphin windows and reopen to see your context menu item.  It should be found under `Actions`.
+5. Close all Dolphin windows and reopen to see your context menu item.  It should be found under `Actions`.
 
 #### Ubuntu Thunar (XFCE4)
 
-In Ubuntu 18.04, XFCE4 sues Thunar. Thunar has a built in way of setting custom context menu items. This may or may not apply to other distros.
+In Ubuntu 18.04, XFCE4 uses Thunar. Thunar has a built in way of setting custom context menu items. This may or may not
+apply to other distros.
 
-In Thunar, select `Edit > Configure Custom Actions...`. You will be presented with the custom actions dialog.
+1. In Thunar, select `Edit > Configure Custom Actions...`. You will be presented with the custom actions dialog.
 
 ![Thunar Custom Actions](./images/thunar-custom.png)
 
-Simply press the button with the `+` to create a new entry. Fill in the inputs as shown below (or modify to your preference):
+2. Simply press the button with the `+` to create a new entry. Fill in the inputs as shown below (or modify to your
+   preference):
 
 ![Thunar Basic Options](./images/thunar-basic.png)
 
-Then select the `Appearance Conditions` tab and fill in the fields as shown below (or modify to your preference):
+3. Then select the `Appearance Conditions` tab and fill in the fields as shown below (or modify to your preference):
 
 ![Thunar Condition Options](./images/thunar-conditions.png)
 
