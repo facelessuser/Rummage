@@ -102,7 +102,6 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def update_colors(self):
         """Update colors."""
 
-        self.SetBackgroundColour(wx.NullColour)
         bg = rgba.RGBA(self.GetBackgroundColour().Get())
         factor = 0.93 if bg.get_luminance() >= 127 else 1.07
         if Settings.get_alt_list_color():
