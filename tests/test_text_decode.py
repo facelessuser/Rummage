@@ -1,7 +1,7 @@
 """Tests for `text_decode.py`."""
 # -*- coding: utf-8 -*-
 import unittest
-import mock
+import unittest.mock as mock
 import shutil
 import os
 import textwrap
