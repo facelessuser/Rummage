@@ -12,6 +12,7 @@
 - **FIX**: Latest wxPython changes made escape not close the autocomplete combo boxes.
 - **FIX**: Different Linux Desktop Environments need different size icons to show up properly in their taskbar, provide
   an icon bundle to ensure there is always one of appropriate size.
+- **FIX**: Use `wcmatch` 7.0 which includes a few bug fixes.
 
 ## 4.13
 
