@@ -953,6 +953,12 @@ body {
   vertical-align: middle;
 }
 
+.markdown span.twemoji svg {
+  width:  1.125em;
+  max-height: 100%;
+  fill: currentColor;
+}
+
 /* Syntax highlighted code */
 .markdown .highlight .hll {background-color: #f8eec7;}
 .markdown .highlight .mf{color:#945277}
