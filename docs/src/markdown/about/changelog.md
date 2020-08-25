@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.14.1
+
+- **FIX**: Our old method of raising macOS windows no longer works. Raise via an `osascript` call.
+
 ## 4.14
 
 - **NEW**: Calculate better looking, alternating list colors instead of relying on wxPython to provide.
