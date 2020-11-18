@@ -106,7 +106,6 @@
 <p>Content of script:</p>
 <div class="highlight"><pre><span></span><code><span class="o">(</span>/Library/Frameworks/Python.framework/Versions/3.6/bin/rummage --path <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="o">)</span>&gt;/dev/null <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">&amp;</span>
 </code></pre></div>
-
 <p>This is just an example. You will need to determine the location of your Python install.</p>
 </li>
 </ul>
@@ -137,7 +136,6 @@
 <span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...\command]</span>
 <span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span>
 </code></pre></div>
-
 <p>Optionally, you can also include the Rummage icon beside your context menu entry by adding a few additional lines:</p>
 <div class="highlight"><pre><span></span><code><span class="na">Windows Registry Editor Version 5.00</span>
 
@@ -155,7 +153,6 @@
 <span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...\command]</span>
 <span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span>
 </code></pre></div>
-
 </li>
 <li>
 <p>Save file.</p>
@@ -181,7 +178,6 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">RUMMAGE_PATH</span><span class="p">,</span> <span class="s2">&quot;--path&quot;</span><span class="p">,</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
 </code></pre></div>
-
 </li>
 <li>
 <p>Restart of Nautilus may or may not be needed, but context menu item should appear under <code>Scripts</code> and should work on files and folders.</p>
@@ -195,7 +191,6 @@
 <div class="highlight"><pre><span></span><code>facelessuser@facelessuser:~$ kf5-config --path services
 /home/facelessuser/.local/share/kservices5/:/usr/share/kservices5/
 </code></pre></div>
-
 </li>
 <li>
 <p>Next create your <code>.desktop</code> file in one of these locations creating the necessary folder(s) if needed.  In this example, the file will be created at <code>~/.local/share/kservices5/ServiceMenus/rummage.desktoop</code>.</p>
@@ -213,13 +208,11 @@
 <span class="na">Icon</span><span class="o">=</span><span class="s">/usr/local/lib/python3.5/dist-packages/rummage/lib/gui/data/rummage_1024.png</span>
 <span class="na">Exec</span><span class="o">=</span><span class="s">rummage --path &quot;%f&quot;</span>
 </code></pre></div>
-
 </li>
 <li>
 <p>Lastly we rebuild and refresh the desktop entries:</p>
 <div class="highlight"><pre><span></span><code><span class="gp">facelessuser@facelessuser:~$</span> kbuildsycoca5
 </code></pre></div>
-
 </li>
 <li>
 <p>Close all Dolphin windows and reopen to see your context menu item.  It should be found under <code>Actions</code>.</p>
@@ -252,12 +245,10 @@ apply to other distros.</p>
 <div class="highlight"><pre><span></span><code>msgid &quot;About&quot;
 msgstr &quot;&lt;my_translation&gt;&quot;
 </code></pre></div>
-
 <h3 id="generate-new-template-from-source">Generate New Template from Source</h3>
 <p>In the Python source, you'll notice that translatable strings are represented as <code>_("some text")</code>. <code>_</code> is the function that retrieves the proper translations. In order to provide translations, we have to build up a template of all of these strings in a <code>.pot</code> file.  This is done by running:</p>
 <div class="highlight"><pre><span></span><code>python setup.py extract_messages
 </code></pre></div>
-
 <p>This will scan the Python source and generate a template at <code>rummage/lib/gui/localization/locale/rummage.pot</code>.</p>
 <p>If you update the source in a way that requires generating a new <code>.pot</code> file, then you will most likely need to update existing <code>.po</code> files as well. See <a href="#update-translation-files">Update Translation Files</a> to see how.</p>
 <p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#extract-messages"><code>extract_messages</code></a> for more info.</p>
@@ -265,23 +256,19 @@ msgstr &quot;&lt;my_translation&gt;&quot;
 <p>When new strings are added in the source, or strings are changed, you will need to re-generate the <code>.pot</code> file and then update the <code>.po</code> files. This should update all <code>.po</code> files.</p>
 <div class="highlight"><pre><span></span><code>python setup.py update_catalog
 </code></pre></div>
-
 <p>If you need to only update a specific <code>.po</code> file:</p>
 <div class="highlight"><pre><span></span><code>python setup.py update_catalog -l en_US
 </code></pre></div>
-
 <p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#update-catalog"><code>update_catalog</code></a> for more info.</p>
 <h3 id="create-new-translations">Create New Translations</h3>
 <p>To create a translation <code>.po</code> file to edit, all you need to do is run the command below specifying your locale. The command should create a <code>.po</code> file to edit and the associated directory structure.</p>
 <div class="highlight"><pre><span></span><code>python setup.py init_catalog -l en_US
 </code></pre></div>
-
 <p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#init-catalog"><code>init_catalog</code></a> for more info.</p>
 <h3 id="build-translations">Build Translations</h3>
 <p>Building translations is also pretty easy:</p>
 <div class="highlight"><pre><span></span><code>python setup.py compile_catalog
 </code></pre></div>
-
 <p>This should build <code>.mo</code> files for all languages.  See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#compile-catalog"><code>compile_catalog</code></a> for more info.</p>
   </div>
 

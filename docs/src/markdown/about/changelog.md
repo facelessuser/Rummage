@@ -3,6 +3,7 @@
 ## 4.14.1
 
 - **FIX**: Our old method of raising macOS windows no longer works. Raise via an `osascript` call.
+- **FIX**: Fix internal flag mask issue that would prevent preference for `-` to negatively filter files from working.
 
 ## 4.14
 

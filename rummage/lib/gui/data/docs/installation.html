@@ -109,15 +109,12 @@ installation of Rummage to fail if <code>wxpython</code> fails due to not having
 <p>Install:</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$</span> pip install rummage
 </code></pre></div>
-
 <p>Install with optional modules.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$</span> pip install rummage<span class="o">[</span>extras<span class="o">]</span>
 </code></pre></div>
-
 <p>Upgrade:</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$</span> pip install --upgrade rummage
 </code></pre></div>
-
 <h2 id="linux-prerequisites">Linux Prerequisites</h2>
 <p>Linux is by far the more involved system to install wxPython on, but it is getting easier.</p>
 <h3 id="recommended">Recommended</h3>
@@ -135,7 +132,6 @@ wheels are not available through on PyPI. More information on why and details on
 <p>Use <code>pip</code> and the server's location like so.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$</span> pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04 wxPython
 </code></pre></div>
-
 </li>
 </ol>
 <p>While the wheel should install fine, when you actually run Rummage, you may see some libraries missing. A common one
@@ -148,7 +144,6 @@ Ubuntu, you can install <code>apt-find</code> and search for the package contain
 <span class="go">libsdl2-2.0-0: /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.10.0</span>
 <span class="gp">$</span> sudo apt install libsdl2-2.0-0
 </code></pre></div>
-
 <h4 id="pre-build-packages">Pre-build Packages</h4>
 <p>If you have a recent Linux distro that has a pre-built, installable wxPython package for your version of Python, then
 it may make sense to just install the pre-built package via your Linux package manager. The version must meet the
@@ -168,13 +163,11 @@ of date:</p>
 <dd>
 <div class="highlight"><pre><span></span><code><span class="gp">$</span> sudo apt-get install python3.6-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base1.0-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
 </code></pre></div>
-
 </dd>
 <dt>Fedora 26</dt>
 <dd>
 <div class="highlight"><pre><span></span><code><span class="gp">$</span> sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
 </code></pre></div>
-
 </dd>
 </dl>
 <p>Once dependencies are in place, you can finally install wxPython with pip (<code>pip install wxpython</code>). Be patient when
