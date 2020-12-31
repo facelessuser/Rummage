@@ -69,6 +69,7 @@ Rummage's
 SIL
 Screenshots
 Sep
+Sur
 TODO
 Thunar
 Tooltip

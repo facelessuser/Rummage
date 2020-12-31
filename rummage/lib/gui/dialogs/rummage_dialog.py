@@ -348,7 +348,7 @@ class RummageFrame(gui.RummageFrame):
         self.SetIcons(bundle)
 
         if util.platform() == "macos":
-            self.tbicon = TaskBarIcon(self, "Rummage", data.get_image('rummage_512.png').GetIcon())
+            self.tbicon = TaskBarIcon(self, "Rummage", data.get_image('rummage_mac.png').GetIcon())
 
         self.encodings = util.get_encodings()
         self.last_pattern_search = ""
