@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.15
+
+- **NEW**: Formally support Python 3.9.
+- **NEW**: Formally drop Python 3.5.
+- **NEW**: Use Apple's Big Sur template for the macOS dock icon.
+
 ## 4.14.1
 
 - **FIX**: Our old method of raising macOS windows no longer works. Raise via an `osascript` call.
