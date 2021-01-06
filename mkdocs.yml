@@ -4,7 +4,7 @@ repo_url: https://github.com/facelessuser/Rummage
 edit_uri: tree/master/docs/src/markdown
 site_description: A search and replace tool written in Python.
 copyright: |
-  Copyright &copy; 2013 - 2020 <a href="https://github.com/facelessuser">Isaac Muse</a>
+  Copyright &copy; 2013 - 2021 <a href="https://github.com/facelessuser">Isaac Muse</a>
   <br><span class="md-footer-custom-text">emoji provided free by </span>
   <a href="https://github.com/twitter/twemoji">Twemoji</a>
 
