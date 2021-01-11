@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.15.1
+
+- **FIX**: High Sierra and below don't work the same in regard to colors. Add special logic to skip dynamic color in old
+  macOS versions as they will result in black UI controls.
+
 ## 4.15
 
 - **NEW**: Formally support Python 3.9.

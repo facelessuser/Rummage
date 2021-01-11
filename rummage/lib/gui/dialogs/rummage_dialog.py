@@ -466,7 +466,7 @@ class RummageFrame(gui.RummageFrame):
             else:
                 page.SetBackgroundColour(wx.NullColour)
                 bg = page.GetBackgroundColour()
-            if util.platform() == "macos":
+            if util.platform() == "macos" and not util.MAC_OLD:
                 factor = util.MAC_LIGHT if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else util.MAC_DARK
                 bg = bg.ChangeLightness(factor)
             page.SetBackgroundColour(bg)

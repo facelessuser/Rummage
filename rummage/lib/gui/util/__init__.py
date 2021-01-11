@@ -24,6 +24,9 @@ else:
     MAC_LIGHT = 94
     MAC_DARK = 106
 
+# High Sierra and below
+MAC_OLD = _MAC_VER < (10, 14)
+
 
 def mac_ver():
     """Get macOS version."""

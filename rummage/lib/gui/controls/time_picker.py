@@ -1,6 +1,7 @@
 """Custom time picker that allows us control of the control's color."""
 from wx.lib.masked import TimeCtrl
 from .. util import rgba
+from .. import util
 import wx
 
 
@@ -53,9 +54,10 @@ class TimePickerCtrl(TimeCtrl):
         if 'oob_color' in kwargs:
             del kwargs['oob_color']
         maskededit_kwargs = super().SetParameters(**kwargs)
-        maskededit_kwargs['emptyBackgroundColour'] = wx.NullColour
-        maskededit_kwargs['validBackgroundColour'] = wx.NullColour
+        if not util.MAC_OLD:
+            maskededit_kwargs['emptyBackgroundColour'] = wx.NullColour
+            maskededit_kwargs['validBackgroundColour'] = wx.NullColour
+            maskededit_kwargs['foregroundColour'] = wx.NullColour
+            maskededit_kwargs['signedForegroundColour'] = wx.NullColour
         maskededit_kwargs['invalidBackgroundColour'] = wx.Colour(self._error_bg)
-        maskededit_kwargs['foregroundColour'] = wx.NullColour
-        maskededit_kwargs['signedForegroundColour'] = wx.NullColour
         return maskededit_kwargs
