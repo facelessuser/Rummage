@@ -1,3 +1,5 @@
+coverage.xml
+
 *.py[cod]
 
 # C extensions
