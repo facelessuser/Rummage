@@ -105,15 +105,18 @@ searches.</p>
 system path):</p>
 <div class="highlight"><pre><span></span><code>rummage
 </code></pre></div>
+
 <p>If you have multiple Python versions installed, you can call Rummage for that specific Python version by appending the
 major and minor Python version to the end:</p>
 <div class="highlight"><pre><span></span><code>rummage3.6
 </code></pre></div>
+
 <p>In some environments, it may make sense to run Rummage with <code>pythonw</code> which is mainly for launching GUI scripts
 (<code>pythonw</code> is not available on Linux). In some environments, it may be required (see
 <a href="installation.html#running-in-anaconda">Running in Anaconda</a>).</p>
 <div class="highlight"><pre><span></span><code>pythonw -m rummage
 </code></pre></div>
+
 <h2 id="searching--replacing">Searching &amp; Replacing</h2>
 <p><img alt="Search Tab" src="images/search_tab.png" /></p>
 <p>Search and replaces are configured in the <strong>Search</strong> tab. The search tab can essentially be broken up into two sections:
@@ -259,6 +262,7 @@ environment.</p>
 
         <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </code></pre></div>
+
 <p><code>ReplacePlugin</code>'s <code>replace</code> function will receive the parameter <code>m</code> which is either a <code>regex</code> or <code>re</code> match object
 (depending on what regular expression engine is selected). The return value must be either a Unicode string or byte
 string (for binary files).</p>
@@ -267,6 +271,7 @@ size, creation date, etc.</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">FileInfoRecord</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;FileInfoRecord&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;modified&#39;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">,</span> <span class="s1">&#39;encoding&#39;</span><span class="p">])):</span>
     <span class="sd">&quot;&quot;&quot;A record for tracking file info.&quot;&quot;&quot;</span>
 </code></pre></div>
+
 <p>The <code>ReplacePlugin</code>'s <code>flags</code> property contains only Rummage search related flags (the flags are abstracted at this
 level and are converted to the appropriate regular expression flags later). They can also be accessed from
 <code>rummage.lib.rumcore</code>. The flags are shown below.</p>
@@ -291,6 +296,7 @@ level and are converted to the appropriate regular expression flags later). They
 <span class="c1"># Rumcore search related flags</span>
 <span class="n">LITERAL</span> <span class="o">=</span> <span class="mh">0x10000</span>           <span class="c1"># Literal search</span>
 </code></pre></div>
+
 <div class="admonition example">
 <p class="admonition-title">Example Plugin</p>
 <p>In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is
@@ -315,6 +321,7 @@ assumed this is not a binary replace, so a Unicode string is returned.</p>
 
     <span class="k">return</span> <span class="n">TestReplace</span>
 </code></pre></div>
+
 </div>
 <h2 id="export-to-csv-or-html">Export to CSV or HTML</h2>
 <p><img alt="HTML Export" src="images/html_export.png" /></p>
