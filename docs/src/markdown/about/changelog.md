@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.16.0
+
+- **NEW**: Require `backrefs` 5.0+ which provides significant Unicode improvements and bug fixes when paired with Re.
+  One notable change is that Unicode properties now respect the Unicode Properties flags and Unicode properties will be
+  limited to the ASCII range when not enabled just like Regex does. Also POSIX style patterns have been expanded to
+  handle any Unicode property, POSIX and otherwise. Check out [Backrefs' documentation][backrefs] for more information.
+  Also, the deprecated search references (`\l`, `\L`, `\c`, and `\C`) are no longer available, though you can always
+  use the other forms of `[[:lower:]]`, `\p{lower}`, etc.
+- **NEW**: Require new `wcmatch` 8.0.1+.
+- **FIX**: Remove old `gntp` from support info dialog as we no longer use that package.
+
 ## 4.15.1
 
 - **FIX**: High Sierra and below don't work the same in regard to colors. Add special logic to skip dynamic color in old
@@ -534,3 +545,5 @@
 ## 1.0
 
 - **NEW**: Initial release
+
+--8<-- "links.txt"

@@ -127,7 +127,7 @@ are found directly under the search and replace text boxes.</p>
 </tr>
 <tr>
 <td>Use&nbsp;Unicode&nbsp;properties</td>
-<td>Changes the regular expression behavior of <code>\w</code>, <code>\W</code>, <code>\b</code>, <code>\B</code>, <code>\d</code>, <code>\D</code>, <code>\s</code>, and <code>\S</code> to use characters from the Unicode property database (will also affect <code>\l</code>, <code>\L</code>, <code>\c</code>, and <code>\C</code> in search patterns if using <a href="#backrefs">Backrefs</a> with Re).</td>
+<td>Changes the regular expression behavior of <code>\w</code>, <code>\W</code>, <code>\b</code>, <code>\B</code>, <code>\d</code>, <code>\D</code>, <code>\s</code>, <code>\S</code>, and Unicode properties (<code>\p{name}</code> or <code>[[:name]]</code>) to use characters from the Unicode property database instead of ASCII.</td>
 </tr>
 <tr>
 <td>Format&nbsp;style&nbsp;replacements</td>
@@ -332,16 +332,20 @@ wildcard patterns for file name matching.</p>
 <p>Used in the <code>Files which match</code> box, this would match all Python files of <code>.py</code> extensions excluding <code>__init__.py</code>:</p>
 <div class="highlight"><pre><span></span><code>*.py|-__init__.py
 </code></pre></div>
+
 <p>Used in the <code>Files which match</code> box, this would match any file type that is not <code>.py</code>.</p>
 <div class="highlight"><pre><span></span><code>-*.py
 </code></pre></div>
+
 <p>Used in the <code>Exclude folders</code>, this would exclude all folders with <code>name</code> followed by a single digit, except <code>name3</code>
 which we will always be included.</p>
 <div class="highlight"><pre><span></span><code>name[0-9]|-name3
 </code></pre></div>
+
 <p>Used in the <code>Exclude folders</code>, this would exclude all folders except <code>name3</code>.</p>
 <div class="highlight"><pre><span></span><code>-name3
 </code></pre></div>
+
 <p>If you need to escape <code>-</code> or <code>|</code>, you can put them in a sequence: <code>[-|]</code>. Remember to place <code>-</code> at the beginning of
 a sequence as <code>-</code> is also used to specify character ranges: <code>[a-z]</code>.</p>
 </div>
@@ -387,9 +391,11 @@ you to provide pattern lists to provide more advanced logic.</p>
 <p>For example, if we wanted to match files <code>this-file.txt</code> and <code>that-file.txt</code>, we could provide the following pattern:</p>
 <div class="highlight"><pre><span></span><code>@(this|that)-file.txt
 </code></pre></div>
+
 <p>The <code>|</code> contained within an extended match group will not split the pattern. So it is safe to combine with other patterns:</p>
 <div class="highlight"><pre><span></span><code>@(this|that)-file.txt|*.py
 </code></pre></div>
+
 </div>
 <div class="admonition tip">
 <p class="admonition-title"><code>!</code> and Extended Match Syntax</p>

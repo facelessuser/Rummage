@@ -19,7 +19,7 @@ Toggle                      | Description
 Search\ with\ regex         | Alters the behavior of `Search for` and `Replace with`.  When this is checked, both text boxes require regular expression patterns opposed to literal string.
 Search\ case-sensitive      | Forces the search to be case-sensitive.
 Dot\ matches\ newline       | `.` will also match newlines in regular expressions.
-Use\ Unicode\ properties    | Changes the regular expression behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, and `\S` to use characters from the Unicode property database (will also affect `\l`, `\L`, `\c`, and `\C` in search patterns if using [Backrefs](#backrefs) with Re).
+Use\ Unicode\ properties    | Changes the regular expression behavior of `\w`, `\W`, `\b`, `\B`, `\d`, `\D`, `\s`, `\S`, and Unicode properties (`\p{name}` or `[[:name]]`) to use characters from the Unicode property database instead of ASCII.
 Format\ style\ replacements | Replace pattern will use [a string replace format][format-string] for replace. `#!py3 "{1} {1[-2]} {group_name[-3]}"` etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode [here][backrefs-format]. And remember that Rummage normalizes differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.
 
 ### Regex Engine Options

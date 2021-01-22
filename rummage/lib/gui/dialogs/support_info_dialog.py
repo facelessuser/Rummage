@@ -160,12 +160,6 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             info["filelock"] = 'Version could not be acquired!'
 
         try:
-            import gntp.version
-            info["gntp"] = format_version(gntp.version, '__version__')
-        except Exception:
-            info["gntp"] = 'Version could not be acquired!'
-
-        try:
             import markdown
             info['markdown'] = format_version(markdown, '__version__')
         except Exception:
