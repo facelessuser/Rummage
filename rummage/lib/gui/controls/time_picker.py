@@ -54,7 +54,7 @@ class TimePickerCtrl(TimeCtrl):
         if 'oob_color' in kwargs:
             del kwargs['oob_color']
         maskededit_kwargs = super().SetParameters(**kwargs)
-        if not util.MAC_OLD:
+        if util.platform() != "macos" or not util.MAC_OLD:
             maskededit_kwargs['emptyBackgroundColour'] = wx.NullColour
             maskededit_kwargs['validBackgroundColour'] = wx.NullColour
             maskededit_kwargs['foregroundColour'] = wx.NullColour
