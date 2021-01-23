@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.16.1
+
+- **FIX**: Linux regression of date time control color due to recent color fix for macOS in 4.15.1.
+
 ## 4.16.0
 
 - **NEW**: Require `backrefs` 5.0+ which provides significant Unicode improvements and bug fixes when paired with Re.
