@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.16.2
+
+- **FIX**: Support info won't open.
+- **FIX**: Small internal code improvements.
+
 ## 4.16.1
 
 - **FIX**: Linux regression of date time control color due to recent color fix for macOS in 4.15.1.

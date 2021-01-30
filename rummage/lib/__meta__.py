@@ -153,10 +153,13 @@ class Version(namedtuple("Version", ["major", "minor", "micro", "release", "pre"
         return ver
 
 
-def parse_version(ver, pre=False):
+def parse_version(ver):
     """Parse version into a comparable Version tuple."""
 
     m = RE_VER.match(ver)
+
+    if m is None:
+        raise ValueError("'{}' is not a valid version".format(ver))
 
     # Handle major, minor, micro
     major = int(m.group('major'))
@@ -186,7 +189,7 @@ def parse_version(ver, pre=False):
 
 
 #   (major, minor, micro, release type, pre-release build, post-release build, development-release)
-__version_info__ = Version(4, 16, 1, 'final')
+__version_info__ = Version(4, 16, 2, 'final')
 __version__ = __version_info__._get_canonical()
 __app__ = "Rummage"
 __status__ = __version_info__[3]
