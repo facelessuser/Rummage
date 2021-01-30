@@ -9,7 +9,7 @@
 
 - **FIX**: Linux regression of date time control color due to recent color fix for macOS in 4.15.1.
 
-## 4.16.0
+## 4.16
 
 - **NEW**: Require `backrefs` 5.0+ which provides significant Unicode improvements and bug fixes when paired with Re.
   One notable change is that Unicode properties now respect the Unicode Properties flags and Unicode properties will be
