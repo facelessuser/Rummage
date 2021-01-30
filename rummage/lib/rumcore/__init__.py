@@ -41,7 +41,7 @@ try:
 except ImportError:  # pragma: no cover
     REGEX_SUPPORT = False
 
-SUPPORT_NEW_WC_OVERRIDE = wc_version > (8, 0, 1)
+SUPPORT_NEW_WC_OVERRIDE = wc_version >= (8, 0, 2)
 
 # Common regex flags (re|regex)
 IGNORECASE = 0x1  # (?i)
