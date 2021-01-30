@@ -185,7 +185,6 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             - cChardet: %(cchardet)s
             - Regex: %(regex)s
             - Filelock: %(filelock)s
-            - Gntp: %(gntp)s
             - Markdown: %(markdown)s
             - Pymdown Extensions: %(pymdownx)s
             """ % info
