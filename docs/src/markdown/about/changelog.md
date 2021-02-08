@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.16.3
+
+- **FIX**: Use latest `wcmatch` (8.1) which does a better job at bailing out of really large expansions. Patterns
+  like `{1..1000000}`, while they used to bail according to the set limit, would hang a bit before they do. The whole
+  point of bailing was to avoid hangs (if possible) if the intent was disallow such a large pattern now they assert
+  much quicker.
+- **FIX**: Fix internal documentation "Home" link. On certain pages, the link could be broken.
+
 ## 4.16.2
 
 - **FIX**: Support info won't open.

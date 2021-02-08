@@ -70,7 +70,7 @@
         <span class="prev-page">&#8592; Prev</span>
       {%- endif %}
 
-      <a href="./sitemap.html">Home</a>
+      <a href="{{ 'sitemap.html' | url }}">Home</a>
 
       {%- if page.next_page %}
         <a href="{{ page.next_page.url|url }}" class="next-page" title="{{ page.next_page.title }}"/>Next &#8594;</a>

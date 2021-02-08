@@ -25,6 +25,14 @@
 
   <!-- Table of Content (Don't show for static sites) -->
     <h1 id="changelog">Changelog</h1>
+<h2 id="4163">4.16.3</h2>
+<ul>
+<li><strong>FIX</strong>: Use latest <code>wcmatch</code> (8.1) which does a better job at bailing out of really large expansions. Patterns
+  like <code>{1..1000000}</code>, while they used to bail according to the set limit, would hang a bit before they do. The whole
+  point of bailing was to avoid hangs (if possible) if the intent was disallow such a large pattern now they assert
+  much quicker.</li>
+<li><strong>FIX</strong>: Fix internal documentation "Home" link. On certain pages, the link could be broken.</li>
+</ul>
 <h2 id="4162">4.16.2</h2>
 <ul>
 <li><strong>FIX</strong>: Support info won't open.</li>
