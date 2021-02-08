@@ -24,12 +24,13 @@ theme:
     - navigation.tabs
 
 nav:
-  - Rummage: index.md
-  - Installation: installation.md
-  - Basic Usage: usage.md
-  - Search Features: search.md
-  - Settings: preferences.md
-  - Extras: extras.md
+  - Home:
+    - Rummage: index.md
+    - Installation: installation.md
+    - Basic Usage: usage.md
+    - Search Features: search.md
+    - Settings: preferences.md
+    - Extras: extras.md
   - About:
     - Contributing &amp; Support: about/contributing.md
     - Changelog: about/changelog.md

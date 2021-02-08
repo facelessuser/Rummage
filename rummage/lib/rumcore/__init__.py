@@ -32,7 +32,6 @@ from backrefs import bre
 from collections import deque
 from . import text_decode
 from wcmatch import wcmatch
-from wcmatch import __version_info__ as wc_version
 from . import util
 try:
     from backrefs import bregex
@@ -40,8 +39,6 @@ try:
     REGEX_SUPPORT = True
 except ImportError:  # pragma: no cover
     REGEX_SUPPORT = False
-
-SUPPORT_NEW_WC_OVERRIDE = wc_version >= (8, 0, 2)
 
 # Common regex flags (re|regex)
 IGNORECASE = 0x1  # (?i)
@@ -1144,20 +1141,11 @@ class _DirWalker(wcmatch.WcMatch):
             self.backup_ext = None
             self.backup_folder = None
 
-        if SUPPORT_NEW_WC_OVERRIDE:
-            if self.pattern_file and self.file_regex_match:
-                self.file_check = self._compile_regexp(self.pattern_file)
+        if self.pattern_file and self.file_regex_match:
+            self.file_check = self._compile_regexp(self.pattern_file)
 
-            if self.pattern_folder_exclude and self.folder_regex_exclude_match:
-                self.folder_exclude_check = self._compile_regexp(self.pattern_folder_exclude)
-        else:
-            if not isinstance(self.file_pattern, wcmatch._wcparse.WcRegexp):
-                if self.file_regex_match:
-                    self.file_pattern = self._compile_regexp(self.file_pattern)
-
-            if not isinstance(self.exclude_pattern, wcmatch._wcparse.WcRegexp):
-                if self.folder_regex_exclude_match:
-                    self.exclude_pattern = self._compile_regexp(self.exclude_pattern)
+        if self.pattern_folder_exclude and self.folder_regex_exclude_match:
+            self.folder_exclude_check = self._compile_regexp(self.pattern_folder_exclude)
 
     def _compile_regexp(self, string, force_default=False):
         r"""Compile or format the inclusion\exclusion pattern."""

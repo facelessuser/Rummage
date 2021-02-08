@@ -1,6 +1,6 @@
 chardet>=3.0.4
 backrefs>=5,<6.0
-wcmatch>=8.0.1,<9.0
+wcmatch>=8.1,<9.0
 wxpython>=4.1.0
 filelock
 send2trash
