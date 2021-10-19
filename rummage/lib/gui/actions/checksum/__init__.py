@@ -110,7 +110,6 @@ class ZlibAlgorithm:
 
 
 class crc32(ZlibAlgorithm):  # noqa
-
     """`crc32` hash."""
 
     def __init__(self, arg=b''):
@@ -120,7 +119,6 @@ class crc32(ZlibAlgorithm):  # noqa
 
 
 class adler32(ZlibAlgorithm):  # noqa
-
     """`adler32` hash."""
 
     def __init__(self, arg=b''):
