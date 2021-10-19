@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Oct 26 2018)
+## Python code generated with wxFormBuilder (version 3.10.0-4761b0c)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO *NOT* EDIT THIS FILE!
@@ -540,7 +540,7 @@ class RummageFrame ( wx.Frame ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_close( self, event ):
         event.Skip()
 
@@ -698,7 +698,7 @@ class DeleteDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_close( self, event ):
         event.Skip()
 
@@ -795,7 +795,7 @@ class ChecksumDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_close( self, event ):
         event.Skip()
 
@@ -874,7 +874,7 @@ class SupportInfoDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_copy( self, event ):
         event.Skip()
 
@@ -1362,7 +1362,7 @@ class SettingsDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_close( self, event ):
         event.Skip()
 
@@ -1552,7 +1552,7 @@ class FileExtDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_okay_click( self, event ):
         event.Skip()
 
@@ -1630,7 +1630,7 @@ class ExportSettingsDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_export_click( self, event ):
         event.Skip()
 
@@ -1714,7 +1714,7 @@ class ImportSettingsDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_import_click( self, event ):
         event.Skip()
 
@@ -1817,7 +1817,7 @@ class OverwriteDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_overwrite( self, event ):
         event.Skip()
 
@@ -2050,7 +2050,7 @@ class RegexTestDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_close( self, event ):
         event.Skip()
 
@@ -2233,7 +2233,7 @@ class SaveSearchDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_toggle( self, event ):
         event.Skip()
 
@@ -2318,7 +2318,7 @@ class LoadSearchDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_close( self, event ):
         event.Skip()
 
@@ -2409,7 +2409,7 @@ class SearchChainDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_close( self, event ):
         event.Skip()
 
@@ -2539,7 +2539,7 @@ class EditSearchChainDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_add_click( self, event ):
         event.Skip()
 
@@ -2745,7 +2745,7 @@ class ColumnDialog ( wx.Dialog ):
         pass
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def on_up_click( self, event ):
         event.Skip()
 

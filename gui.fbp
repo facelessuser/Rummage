@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <wxFormBuilder_Project>
-    <FileVersion major="1" minor="15" />
+    <FileVersion major="1" minor="16" />
     <object class="Project" expanded="1">
         <property name="class_decoration"></property>
         <property name="code_generation">Python</property>
@@ -14,6 +14,7 @@
         <property name="file">rummage/lib/gui/gui</property>
         <property name="first_id">1000</property>
         <property name="help_provider">none</property>
+        <property name="image_path_wrapper_function_name"></property>
         <property name="indent_with_spaces">1</property>
         <property name="internationalize">0</property>
         <property name="name">Rummage</property>
@@ -25,6 +26,7 @@
         <property name="skip_php_events">1</property>
         <property name="skip_python_events">1</property>
         <property name="ui_table">UI</property>
+        <property name="use_array_enum">0</property>
         <property name="use_enum">0</property>
         <property name="use_microsoft_bom">0</property>
         <object class="Frame" expanded="0">
@@ -50,6 +52,7 @@
             <property name="subclass"></property>
             <property name="title">Rummage</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style">wxTAB_TRAVERSAL</property>
@@ -413,6 +416,7 @@
                                                                         <property name="aui_name"></property>
                                                                         <property name="aui_position"></property>
                                                                         <property name="aui_row"></property>
+                                                                        <property name="auth_needed">0</property>
                                                                         <property name="best_size"></property>
                                                                         <property name="bg"></property>
                                                                         <property name="bitmap"></property>
@@ -741,6 +745,7 @@
                                                                         <property name="aui_name"></property>
                                                                         <property name="aui_position"></property>
                                                                         <property name="aui_row"></property>
+                                                                        <property name="auth_needed">0</property>
                                                                         <property name="best_size"></property>
                                                                         <property name="bg"></property>
                                                                         <property name="bitmap"></property>
@@ -2352,6 +2357,7 @@
                                                                         <property name="aui_name"></property>
                                                                         <property name="aui_position"></property>
                                                                         <property name="aui_row"></property>
+                                                                        <property name="auth_needed">0</property>
                                                                         <property name="best_size"></property>
                                                                         <property name="bg"></property>
                                                                         <property name="bitmap"></property>
@@ -2435,6 +2441,7 @@
                                                                         <property name="aui_name"></property>
                                                                         <property name="aui_position"></property>
                                                                         <property name="aui_row"></property>
+                                                                        <property name="auth_needed">0</property>
                                                                         <property name="best_size"></property>
                                                                         <property name="bg"></property>
                                                                         <property name="bitmap"></property>
@@ -2508,6 +2515,7 @@
                                                                         <property name="aui_name"></property>
                                                                         <property name="aui_position"></property>
                                                                         <property name="aui_row"></property>
+                                                                        <property name="auth_needed">0</property>
                                                                         <property name="best_size"></property>
                                                                         <property name="bg"></property>
                                                                         <property name="bitmap"></property>
@@ -2581,6 +2589,7 @@
                                                                         <property name="aui_name"></property>
                                                                         <property name="aui_position"></property>
                                                                         <property name="aui_row"></property>
+                                                                        <property name="auth_needed">0</property>
                                                                         <property name="best_size"></property>
                                                                         <property name="bg"></property>
                                                                         <property name="bitmap"></property>
@@ -4611,6 +4620,7 @@
                                                                         <property name="aui_name"></property>
                                                                         <property name="aui_position"></property>
                                                                         <property name="aui_row"></property>
+                                                                        <property name="auth_needed">0</property>
                                                                         <property name="best_size"></property>
                                                                         <property name="bg"></property>
                                                                         <property name="bitmap"></property>
@@ -4684,6 +4694,7 @@
                                                                         <property name="aui_name"></property>
                                                                         <property name="aui_position"></property>
                                                                         <property name="aui_row"></property>
+                                                                        <property name="auth_needed">0</property>
                                                                         <property name="best_size"></property>
                                                                         <property name="bg"></property>
                                                                         <property name="bitmap"></property>
@@ -5039,7 +5050,6 @@
                 <property name="font"></property>
                 <property name="hidden">0</property>
                 <property name="id">wxID_ANY</property>
-                <property name="label"></property>
                 <property name="maximum_size"></property>
                 <property name="minimum_size"></property>
                 <property name="name">m_menu</property>
@@ -5305,6 +5315,7 @@
             <property name="subclass"></property>
             <property name="title">Delete</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -5539,6 +5550,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -5612,6 +5624,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -5712,6 +5725,7 @@
             <property name="subclass"></property>
             <property name="title">Hash</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -6078,6 +6092,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -6151,6 +6166,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -6251,6 +6267,7 @@
             <property name="subclass"></property>
             <property name="title">Support Info</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -6429,6 +6446,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -6502,6 +6520,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -6602,6 +6621,7 @@
             <property name="subclass"></property>
             <property name="title">Preferences</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -7286,6 +7306,7 @@
                                                                 <property name="aui_name"></property>
                                                                 <property name="aui_position"></property>
                                                                 <property name="aui_row"></property>
+                                                                <property name="auth_needed">0</property>
                                                                 <property name="best_size"></property>
                                                                 <property name="bg"></property>
                                                                 <property name="bitmap"></property>
@@ -8826,6 +8847,7 @@
                                                                                 <property name="aui_name"></property>
                                                                                 <property name="aui_position"></property>
                                                                                 <property name="aui_row"></property>
+                                                                                <property name="auth_needed">0</property>
                                                                                 <property name="best_size"></property>
                                                                                 <property name="bg"></property>
                                                                                 <property name="bitmap"></property>
@@ -9516,6 +9538,7 @@
                                                                 <property name="aui_name"></property>
                                                                 <property name="aui_position"></property>
                                                                 <property name="aui_row"></property>
+                                                                <property name="auth_needed">0</property>
                                                                 <property name="best_size"></property>
                                                                 <property name="bg"></property>
                                                                 <property name="bitmap"></property>
@@ -10177,6 +10200,7 @@
                                                         <property name="aui_name"></property>
                                                         <property name="aui_position"></property>
                                                         <property name="aui_row"></property>
+                                                        <property name="auth_needed">0</property>
                                                         <property name="best_size"></property>
                                                         <property name="bg"></property>
                                                         <property name="bitmap"></property>
@@ -10397,6 +10421,7 @@
                                                                 <property name="aui_name"></property>
                                                                 <property name="aui_position"></property>
                                                                 <property name="aui_row"></property>
+                                                                <property name="auth_needed">0</property>
                                                                 <property name="best_size"></property>
                                                                 <property name="bg"></property>
                                                                 <property name="bitmap"></property>
@@ -10748,6 +10773,7 @@
                                                                 <property name="aui_name"></property>
                                                                 <property name="aui_position"></property>
                                                                 <property name="aui_row"></property>
+                                                                <property name="auth_needed">0</property>
                                                                 <property name="best_size"></property>
                                                                 <property name="bg"></property>
                                                                 <property name="bitmap"></property>
@@ -10947,6 +10973,7 @@
                                                                 <property name="aui_name"></property>
                                                                 <property name="aui_position"></property>
                                                                 <property name="aui_row"></property>
+                                                                <property name="auth_needed">0</property>
                                                                 <property name="best_size"></property>
                                                                 <property name="bg"></property>
                                                                 <property name="bitmap"></property>
@@ -11176,6 +11203,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -11276,6 +11304,7 @@
             <property name="subclass"></property>
             <property name="title">File Extensions</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -11533,6 +11562,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -11606,6 +11636,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -11706,6 +11737,7 @@
             <property name="subclass"></property>
             <property name="title">Export Settings</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -12012,6 +12044,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -12085,6 +12118,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -12185,6 +12219,7 @@
             <property name="subclass"></property>
             <property name="title">Import Settings</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -12555,6 +12590,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -12628,6 +12664,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -12728,6 +12765,7 @@
             <property name="subclass"></property>
             <property name="title">Overwrite</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -13061,6 +13099,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -13134,6 +13173,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -13234,6 +13274,7 @@
             <property name="subclass"></property>
             <property name="title"></property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -13796,6 +13837,7 @@
                                                             <property name="aui_name"></property>
                                                             <property name="aui_position"></property>
                                                             <property name="aui_row"></property>
+                                                            <property name="auth_needed">0</property>
                                                             <property name="best_size"></property>
                                                             <property name="bg"></property>
                                                             <property name="bitmap"></property>
@@ -13868,6 +13910,7 @@
                                                             <property name="aui_name"></property>
                                                             <property name="aui_position"></property>
                                                             <property name="aui_row"></property>
+                                                            <property name="auth_needed">0</property>
                                                             <property name="best_size"></property>
                                                             <property name="bg"></property>
                                                             <property name="bitmap"></property>
@@ -14925,6 +14968,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -14998,6 +15042,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -15098,6 +15143,7 @@
             <property name="subclass"></property>
             <property name="title">Save Search and Replace</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -16079,6 +16125,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -16152,6 +16199,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -16252,6 +16300,7 @@
             <property name="subclass"></property>
             <property name="title">Searches</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -16429,6 +16478,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -16502,6 +16552,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -16575,6 +16626,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -16648,6 +16700,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -16748,6 +16801,7 @@
             <property name="subclass"></property>
             <property name="title">Search Chains</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -16925,6 +16979,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -16998,6 +17053,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -17071,6 +17127,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -17144,6 +17201,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -17244,6 +17302,7 @@
             <property name="subclass"></property>
             <property name="title">Edit/Create Search Chain</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -17573,6 +17632,7 @@
                                                     <property name="aui_name"></property>
                                                     <property name="aui_position"></property>
                                                     <property name="aui_row"></property>
+                                                    <property name="auth_needed">0</property>
                                                     <property name="best_size"></property>
                                                     <property name="bg"></property>
                                                     <property name="bitmap"></property>
@@ -17649,6 +17709,7 @@
                                                     <property name="aui_name"></property>
                                                     <property name="aui_position"></property>
                                                     <property name="aui_row"></property>
+                                                    <property name="auth_needed">0</property>
                                                     <property name="best_size"></property>
                                                     <property name="bg"></property>
                                                     <property name="bitmap"></property>
@@ -17725,6 +17786,7 @@
                                                     <property name="aui_name"></property>
                                                     <property name="aui_position"></property>
                                                     <property name="aui_row"></property>
+                                                    <property name="auth_needed">0</property>
                                                     <property name="best_size"></property>
                                                     <property name="bg"></property>
                                                     <property name="bitmap"></property>
@@ -17801,6 +17863,7 @@
                                                     <property name="aui_name"></property>
                                                     <property name="aui_position"></property>
                                                     <property name="aui_row"></property>
+                                                    <property name="auth_needed">0</property>
                                                     <property name="best_size"></property>
                                                     <property name="bg"></property>
                                                     <property name="bitmap"></property>
@@ -17904,6 +17967,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -17977,6 +18041,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -18077,6 +18142,7 @@
             <property name="subclass"></property>
             <property name="title">Errors</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -18242,6 +18308,7 @@
             <property name="subclass"></property>
             <property name="title">Error</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -18402,6 +18469,7 @@
             <property name="subclass">; ; forward_declare</property>
             <property name="title">Html Dialog</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -18497,6 +18565,7 @@
             <property name="subclass">; ; forward_declare</property>
             <property name="title">Arrange Columns</property>
             <property name="tooltip"></property>
+            <property name="two_step_creation">0</property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
@@ -18669,6 +18738,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -18745,6 +18815,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -18846,6 +18917,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
@@ -18919,6 +18991,7 @@
                                             <property name="aui_name"></property>
                                             <property name="aui_position"></property>
                                             <property name="aui_row"></property>
+                                            <property name="auth_needed">0</property>
                                             <property name="best_size"></property>
                                             <property name="bg"></property>
                                             <property name="bitmap"></property>
