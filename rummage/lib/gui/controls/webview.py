@@ -79,7 +79,7 @@ EXTENSIONS = [
 
 EXTENSION_CONFIGS = {
     "markdown.extensions.toc": {
-        "slugify": slugs.uslugify,
+        "slugify": slugs.slugify(case='lower'),
     },
     "pymdownx.inlinehilite": {
         "style_plain_text": True

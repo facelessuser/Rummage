@@ -18,18 +18,20 @@ theme:
 plugins: []
 
 nav:
-  - Rummage: index.md
-  - Installation: installation.md
-  - Basic Usage: usage.md
-  - Search Features: search.md
-  - Settings: preferences.md
-  - Extras: extras.md
-  - Contributing &amp; Support: about/contributing.md
+  - Home:
+    - Rummage: index.md
+    - Installation: installation.md
+    - Basic Usage: usage.md
+    - Search Features: search.md
+    - Settings: preferences.md
+    - Extras: extras.md
+  - About:
+    - Contributing &amp; Support: about/contributing.md
+    - Changelog: about/changelog.md
 
 markdown_extensions:
   - markdown.extensions.toc:
-      slugify: !!python/name:pymdownx.slugs.uslugify
-      # permalink: "\uf0c1"
+      slugify: !!python/object/apply:pymdownx.slugs.slugify {kwds: {case: lower}}
   - markdown.extensions.admonition:
   - markdown.extensions.smarty:
       smart_quotes: false
@@ -43,10 +45,6 @@ markdown_extensions:
   - pymdownx.superfences:
   - pymdownx.highlight:
       extend_pygments_lang:
-        - name: php-inline
-          lang: php
-          options:
-            startinline: true
         - name: pycon3
           lang: pycon
           options:
