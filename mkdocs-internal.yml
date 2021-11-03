@@ -18,16 +18,13 @@ theme:
 plugins: []
 
 nav:
-  - Home:
-    - Rummage: index.md
-    - Installation: installation.md
-    - Basic Usage: usage.md
-    - Search Features: search.md
-    - Settings: preferences.md
-    - Extras: extras.md
-  - About:
-    - Contributing &amp; Support: about/contributing.md
-    - Changelog: about/changelog.md
+  - Rummage: index.md
+  - Installation: installation.md
+  - Basic Usage: usage.md
+  - Search Features: search.md
+  - Settings: preferences.md
+  - Extras: extras.md
+  - Contributing &amp; Support: about/contributing.md
 
 markdown_extensions:
   - markdown.extensions.toc:
