@@ -731,6 +731,7 @@ class _FileSearch:
                 else:
                     pattern = _re_literal_pattern(pattern, flags, self.is_binary)
             else:
+                self.literal = False
                 if self.regex_mode == BREGEX_MODE:
                     pattern = _bregex_pattern(pattern, flags, self.is_binary)
                     if replace is not None and not self.is_plugin_replace:

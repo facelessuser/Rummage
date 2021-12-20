@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.16.4
+
+- **FIX**: When chaining literal and regular expression patterns together, the mode could get stuck in literal mode
+  when applying replacements.
+
 ## 4.16.3
 
 - **FIX**: Use latest `wcmatch` (8.1) which does a better job at bailing out of really large expansions. Patterns

@@ -25,6 +25,11 @@
 
   <!-- Table of Content (Don't show for static sites) -->
     <h1 id="changelog">Changelog</h1>
+<h2 id="4164">4.16.4</h2>
+<ul>
+<li><strong>FIX</strong>: When chaining literal and regular expression patterns together, the mode could get stuck in literal mode
+  when applying replacements.</li>
+</ul>
 <h2 id="4163">4.16.3</h2>
 <ul>
 <li><strong>FIX</strong>: Use latest <code>wcmatch</code> (8.1) which does a better job at bailing out of really large expansions. Patterns
@@ -312,7 +317,7 @@ unawares.</p>
 </ul>
 <h2 id="405">4.0.5</h2>
 <ul>
-<li><strong>FIX</strong>: Single instance handling regression <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/217" title="GitHub Issue: facelessuser/Rummage#217">#217</a>.</li>
+<li><strong>FIX</strong>: Single instance handling regression <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/217" title="GitHub Issue: facelessuser/Rummage #217">#217</a>.</li>
 </ul>
 <h2 id="404">4.0.4</h2>
 <ul>
@@ -372,7 +377,7 @@ unawares.</p>
 <li><strong>FIX</strong>: Update requests should use <code>https</code>.</li>
 <li><strong>FIX</strong>: Update localization.</li>
 <li><strong>FIX</strong>: Fixes to Windows notifications.</li>
-<li><strong>FIX</strong>: Single instance handling regression <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/217" title="GitHub Issue: facelessuser/Rummage#217">#217</a>.</li>
+<li><strong>FIX</strong>: Single instance handling regression <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/217" title="GitHub Issue: facelessuser/Rummage #217">#217</a>.</li>
 <li><strong>FIX</strong>: Require Backrefs 3.5.0 which includes fixes for: pattern caching, named Unicode bug.  Also adds better format
   string replace with the added ability to use format string align and fill.</li>
 <li><strong>FIX</strong>: Don't escape curly brackets in format strings just because they are string escaped when preprocessing Regex
@@ -401,7 +406,7 @@ unawares.</p>
 <li><strong>FIX</strong>: Wildcard patterns not allowing character tokens such as <code>\x70</code>, <code>\u0070</code>, <code>\N{unicode name}</code>, <code>\160</code>, and
   standard escapes like <code>\t</code> etc.</li>
 <li><strong>FIX</strong>: Incorrect documentation on wildcard patterns.</li>
-<li><strong>FIX</strong>: Python 2.7 not translating Unicode escapes <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/196" title="GitHub Issue: facelessuser/Rummage#196">#196</a>.</li>
+<li><strong>FIX</strong>: Python 2.7 not translating Unicode escapes <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/196" title="GitHub Issue: facelessuser/Rummage #196">#196</a>.</li>
 <li><strong>FIX</strong>: Require Backrefs 3.1.2. Some bug fixes, but notably, Backrefs switched from using <code>\&lt;</code> and <code>\&gt;</code> for start and
   end word boundaries to <code>\m</code> and <code>\M</code>.  This is because of an oversight as Python versions less than 3.7 would escape
   <code>&lt;</code> and <code>&gt;</code> in <code>re.escpae</code> (even though it is unnecessary). Also some Unicode table generation fixes.</li>
@@ -465,7 +470,7 @@ unawares.</p>
 </ul>
 <h2 id="320">3.2.0</h2>
 <ul>
-<li><strong>NEW</strong>: Results update live. Progress has been removed. (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/140" title="GitHub Issue: facelessuser/Rummage#140">#140</a>)</li>
+<li><strong>NEW</strong>: Results update live. Progress has been removed. (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/facelessuser/Rummage/issues/140" title="GitHub Issue: facelessuser/Rummage #140">#140</a>)</li>
 <li><strong>FIX</strong>: Windows status bar flicker.</li>
 <li><strong>FIX</strong>: Results not showing when notifications is set to only play audio alerts.</li>
 </ul>
