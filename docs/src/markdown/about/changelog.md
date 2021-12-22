@@ -2,6 +2,11 @@
 
 ## 4.16.4
 
+- **FIX**: Pick up latest `wcmatch` (8.3), `bracex` (2.2), and `backrefs` (5.2) to acquire latest related bug fixes
+  related to file search patterns and regular expressions (if using `backrefs`).
+- **FIX**: Update internal Markdown and extensions (`markdown` 3.3.4 and `pymdown-extensions` 9.0 and M) to ensure
+  latest changes and fixes for UI elements that render Markdown to HTML.
+- **FIX**: Update to latest `chardet` (4.0).
 - **FIX**: When chaining literal and regular expression patterns together, the mode could get stuck in literal mode
   when applying replacements.
 

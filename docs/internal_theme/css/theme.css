@@ -954,6 +954,7 @@ body {
 }
 
 .markdown span.twemoji svg {
+  height:  1.125em;
   width:  1.125em;
   max-height: 100%;
   fill: currentColor;
