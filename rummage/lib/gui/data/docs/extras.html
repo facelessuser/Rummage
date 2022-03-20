@@ -254,7 +254,7 @@ msgstr &quot;&lt;my_translation&gt;&quot;
 </code></pre></div>
 <p>This will scan the Python source and generate a template at <code>rummage/lib/gui/localization/locale/rummage.pot</code>.</p>
 <p>If you update the source in a way that requires generating a new <code>.pot</code> file, then you will most likely need to update existing <code>.po</code> files as well. See <a href="#update-translation-files">Update Translation Files</a> to see how.</p>
-<p>See Babel's documentation on [<code>extract_messages</code>][babel_extract_messages] for more info.</p>
+<p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#extract-messages"><code>extract_messages</code></a> for more info.</p>
 <h3 id="update-translation-files">Update Translation Files</h3>
 <p>When new strings are added in the source, or strings are changed, you will need to re-generate the <code>.pot</code> file and then update the <code>.po</code> files. This should update all <code>.po</code> files.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>pybabel update --domain<span class="o">=</span>rummage --input-file<span class="o">=</span>rummage/lib/gui/localization/locale/rummage.pot --output-dir<span class="o">=</span>rummage/lib/gui/localization/locale
@@ -262,17 +262,17 @@ msgstr &quot;&lt;my_translation&gt;&quot;
 <p>If you need to only update a specific <code>.po</code> file:</p>
 <div class="highlight"><pre><span></span><code><span class="go">pybabel update --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale -l en_US</span>
 </code></pre></div>
-<p>See Babel's documentation on [<code>update_catalog</code>][babel_update_catalog] for more info.</p>
+<p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#update-catalog"><code>update_catalog</code></a> for more info.</p>
 <h3 id="create-new-translations">Create New Translations</h3>
 <p>To create a translation <code>.po</code> file to edit, all you need to do is run the command below specifying your locale. The command should create a <code>.po</code> file to edit and the associated directory structure.</p>
 <div class="highlight"><pre><span></span><code><span class="go">pybabel init --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale -l en_US</span>
 </code></pre></div>
-<p>See Babel's documentation on [<code>init_catalog</code>][babel_init_catalog] for more info.</p>
+<p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#init-catalog"><code>init_catalog</code></a> for more info.</p>
 <h3 id="build-translations">Build Translations</h3>
 <p>Building translations is also pretty easy:</p>
 <div class="highlight"><pre><span></span><code><span class="go">pybabel compile --domain=rummage --directory=rummage/lib/gui/localization/locale</span>
 </code></pre></div>
-<p>This should build <code>.mo</code> files for all languages.  See Babel's documentation on [<code>compile_catalog</code>][babel_compile_catalog] for more info.</p>
+<p>This should build <code>.mo</code> files for all languages.  See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#compile-catalog"><code>compile_catalog</code></a> for more info.</p>
   </div>
 
   <!-- Navigation -->
