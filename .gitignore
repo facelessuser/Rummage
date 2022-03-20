@@ -18,7 +18,7 @@ sdist
 develop-eggs
 .installed.cfg
 lib64
-.eggs/*
+.eggs/
 
 # Installer logs
 pip-log.txt
@@ -40,21 +40,21 @@ nosetests.xml
 *.DS_Store
 
 # Mkdocs
-site/*
+site/
 
 # Pytest
-.pytest_cache/*
+.pytest_cache/
 
 # Miscellaneous
 .cache
-.idea/*
+.idea/
 *.log
 *.bak
 *.patch
-rummage/lib/gui/data/docs/_snippets/*
+rummage/lib/gui/data/docs/_snippets/
 rummage/lib/gui/data/docs/sitemap.xml
 rummage/lib/gui/data/docs/sitemap.xml.gz
 docs/src/dictionary/hunspell/
 
 # Virtual environments
-venv/*
+venv/
