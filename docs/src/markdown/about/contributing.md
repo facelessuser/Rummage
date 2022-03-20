@@ -97,5 +97,3 @@ the docs if you install these packages via the requirements file.  The command f
 
 When providing documentation updates, please generate Rummage's internal documentation via `python tools/gen_docs.py`.
 Pull requests will currently fail if the documentation is not updated along with the requested changes.
-
---8<-- "links.txt"

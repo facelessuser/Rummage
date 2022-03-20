@@ -19,5 +19,3 @@ things like fuzzy searching and more.
 h1 {text-align: center;}
 .svg-logo {display: inline; padding: 0; margin: 0; height: 48px; width: 48px; vertical-align: bottom;}
 </style>
-
---8<-- "links.txt"

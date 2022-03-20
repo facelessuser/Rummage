@@ -28,33 +28,16 @@ def get_requirements(root, requirements):
     return install_requires
 
 
-class CustomBuildHook(BuildHookInterface):
-    def initialize(self, version, build_data):
-        if self.target_name != 'wheel':
-            return
-
-        # Lazily import in case hook is disabled but file is still loaded
-        from babel.messages.frontend import compile_catalog
-
-        compiled_catalog = compile_catalog()
-        compiled_catalog.directory = os.path.join(self.root, 'rummage', 'lib', 'gui', 'localization', 'locale')
-
-        compiled_catalog.finalize_options()
-        compiled_catalog.run()
-
-
 class CustomMetadataHook(MetadataHookInterface):
     """Our metadata hook."""
+
+    PLUGIN_NAME = 'custom'
 
     def update(self, metadata):
         """See https://ofek.dev/hatch/latest/plugins/metadata-hook/ for more information."""
 
-        metadata['gui_scripts'] = {
-                'rummage': 'rummage.__main__:main',
-                f'rummage{".".join(sys.version_info[:2])}': 'rummage.__main__:main'
-        }
         metadata["dependencies"] = get_requirements(self.root, "requirements/project.txt")
-        metadata['optional-dependencies'] = get_requirements(self.root, "requirements/extras.txt")
+        metadata['optional-dependencies'] = {'extras': get_requirements(self.root, "requirements/extras.txt")}
         metadata["classifiers"] = [
             f"Development Status :: {get_version_dev_status(self.root)}",
             "Environment :: Console",
@@ -71,3 +54,27 @@ class CustomMetadataHook(MetadataHookInterface):
             "Topic :: Text Processing :: Filters",
             "Topic :: Text Processing :: Markup :: HTML",
         ]
+        metadata['gui-scripts'] = {
+            'rummage': 'rummage.__main__:main',
+            f'rummage{".".join([str(x)for x in sys.version_info[:2]])}': 'rummage.__main__:main'
+        }
+
+
+class CustomBuildHook(BuildHookInterface):
+    """Custom build hook for Babel."""
+
+    PLUGIN_NAME = 'custom'
+
+    def initialize(self, version, build_data):
+        """Build localization files."""
+
+        # Lazily import in case hook is disabled but file is still loaded
+        from babel.messages.frontend import compile_catalog
+
+        compiled_catalog = compile_catalog()
+        compiled_catalog.domain = 'rummage'
+        compile_catalog.statistics = True
+        compiled_catalog.directory = os.path.join(self.root, 'rummage', 'lib', 'gui', 'localization', 'locale')
+
+        compiled_catalog.finalize_options()
+        compiled_catalog.run()

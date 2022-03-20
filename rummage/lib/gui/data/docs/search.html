@@ -96,8 +96,8 @@
     </div>
     <h1 id="search-features">Search Features</h1>
 <h2 id="search-options">Search Options</h2>
-<p>Rummage supports the default regular expression library (<a href="https://docs.python.org/3/library/re.html">Re</a>) that comes with Python and the 3<sup>rd</sup> party
-<a href="https://pypi.python.org/pypi/regex">Regex</a> library, and though the basic syntax and features are similar between the two, Regex provides many
+<p>Rummage supports the default regular expression library ([Re][re]) that comes with Python and the 3<sup>rd</sup> party
+[Regex][regex] library, and though the basic syntax and features are similar between the two, Regex provides many
 additional features, some of which causes the syntax to deviate greatly from Re. If you are using Re, you will not see
 all the options shown below. Please check out documentation for whichever engine you have chosen use in order to learn
 more about its specific feature set. This documentation will only briefly cover the features that can be enabled in each
@@ -131,7 +131,7 @@ are found directly under the search and replace text boxes.</p>
 </tr>
 <tr>
 <td>Format&nbsp;style&nbsp;replacements</td>
-<td>Replace pattern will use <a href="https://docs.python.org/2/library/string.html#format-string-syntax">a string replace format</a> for replace. <code class="highlight"><span class="s2">&quot;</span><span class="si">{1}</span><span class="s2"> </span><span class="si">{1[-2]}</span><span class="s2"> </span><span class="si">{group_name[-3]}</span><span class="s2">&quot;</span></code> etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode <a href="http://facelessuser.github.io/backrefs/#format-replacements">here</a>. And remember that Rummage normalizes differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.</td>
+<td>Replace pattern will use [a string replace format][format-string] for replace. <code class="highlight"><span class="s2">&quot;</span><span class="si">{1}</span><span class="s2"> </span><span class="si">{1[-2]}</span><span class="s2"> </span><span class="si">{group_name[-3]}</span><span class="s2">&quot;</span></code> etc. This is not available for Re without Backrefs, and is limited when using Re with Backrefs. Read more about format mode [here][backrefs-format]. And remember that Rummage normalizes differences in Backrefs' and Regex's handling of back slash escapes in format replace mode.</td>
 </tr>
 </tbody>
 </table>
@@ -239,7 +239,7 @@ patterns.</p>
   "Include hidden" option.</li>
 </ul>
 <h4 id="basic-wildcard-syntax">Basic Wildcard syntax</h4>
-<p>Rummage uses the <a href="https://github.com/facelessuser/wcmatch"><code>wcmatch</code></a> library to implement a specialized version of <a href="https://facelessuser.github.io/wcmatch/fnmatch/#syntax"><code>fnmatch</code></a>
+<p>Rummage uses the [<code>wcmatch</code>][wcmatch] library to implement a specialized version of [<code>fnmatch</code>][wcmatch-fnmatch]
 wildcard patterns for file name matching.</p>
 <table>
 <thead>
@@ -267,7 +267,7 @@ wildcard patterns for file name matching.</p>
 </tr>
 <tr>
 <td><code>[[:alnum:]]</code></td>
-<td>POSIX style character classes inside sequences. The <code>C</code> locale is used for byte strings and Unicode properties for Unicode strings. See <a href="https://facelessuser.github.io/wcmatch/fnmatch/#posix-character-classes">POSIX Character Classes</a> in <code>wcmatch</code>'s documentation for more info.</td>
+<td>POSIX style character classes inside sequences. The <code>C</code> locale is used for byte strings and Unicode properties for Unicode strings. See [POSIX Character Classes][posix] in <code>wcmatch</code>'s documentation for more info.</td>
 </tr>
 <tr>
 <td><code>\</code></td>
@@ -478,7 +478,7 @@ of <code>.*.txt</code>.</p>
 adds various back references that are known to some regular expression engines, but not to Python's Re or Regex modules.
 The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance,
 Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about what
-Backrefs adds, read the official <a href="http://facelessuser.github.io/backrefs/">Backrefs documentation</a>. You can enable extended back references in the
+Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the
 <a href="preferences.html#search">Preferences</a> dialog.</p>
   </div>
 

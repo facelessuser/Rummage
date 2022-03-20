@@ -158,6 +158,12 @@ Translations should be compiled and included by default requiring no additional 
 
 I only speak English, so I do not maintain the translations. If the UI changes, someone from the community will need to update them appropriately via pull requests or they will remain out of date.
 
+To modify localization, you first must install `babel`.
+
+```console
+$ pip install babel
+```
+
 ### Editing Existing Translations
 
 Translations are stored at `rummage/lib/gui/localization/locale/<LOCALE>/LC_MESSAGES/rummage.po`. Just edit the `rummage.po` for the appropriate `<LOCALE>`.
@@ -173,8 +179,8 @@ msgstr "<my_translation>"
 
 In the Python source, you'll notice that translatable strings are represented as `_("some text")`. `_` is the function that retrieves the proper translations. In order to provide translations, we have to build up a template of all of these strings in a `.pot` file.  This is done by running:
 
-```
-python setup.py extract_messages
+```console
+$ pybabel extract --input-dirs=rummage --output-file=rummage/lib/gui/localization/locale/rummage.pot
 ```
 
 This will scan the Python source and generate a template at `rummage/lib/gui/localization/locale/rummage.pot`.
@@ -187,14 +193,14 @@ See Babel's documentation on [`extract_messages`][babel_extract_messages] for mo
 
 When new strings are added in the source, or strings are changed, you will need to re-generate the `.pot` file and then update the `.po` files. This should update all `.po` files.
 
-```
-python setup.py update_catalog
+```console
+$ pybabel update --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale
 ```
 
 If you need to only update a specific `.po` file:
 
-```
-python setup.py update_catalog -l en_US
+```console
+pybabel update --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale -l en_US
 ```
 
 See Babel's documentation on [`update_catalog`][babel_update_catalog] for more info.
@@ -203,8 +209,8 @@ See Babel's documentation on [`update_catalog`][babel_update_catalog] for more i
 
 To create a translation `.po` file to edit, all you need to do is run the command below specifying your locale. The command should create a `.po` file to edit and the associated directory structure.
 
-```
-python setup.py init_catalog -l en_US
+```console
+pybabel init --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale -l en_US
 ```
 
 See Babel's documentation on [`init_catalog`][babel_init_catalog] for more info.
@@ -213,10 +219,8 @@ See Babel's documentation on [`init_catalog`][babel_init_catalog] for more info.
 
 Building translations is also pretty easy:
 
-```
-python setup.py compile_catalog
+```console
+pybabel compile --domain=rummage --directory=rummage/lib/gui/localization/locale
 ```
 
 This should build `.mo` files for all languages.  See Babel's documentation on [`compile_catalog`][babel_compile_catalog] for more info.
-
---8<-- "refs.txt"

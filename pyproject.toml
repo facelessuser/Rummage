@@ -24,13 +24,19 @@ dynamic = [
     "classifiers",
     "dependencies",
     "version",
-    "entry_points"
+    "gui-scripts",
+    "optional-dependencies"
 ]
-zip_safe = false
-include_package_data = true
 
 [project.urls]
 Homepage = "https://github.com/facelessuser/Rummage"
+
+[tool.hatch.build]
+artifacts = [
+  "*.mo"
+]
+
+[tool.hatch.metadata.hooks.custom]
 
 [tool.hatch.build.targets.wheel.hooks.custom]
 dependencies = [
@@ -43,33 +49,32 @@ path = "rummage/lib/__meta__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/rummage/*.py",
-    "/rummage/lib/gui/data/*.md",
-    "/rummage/lib/gui/data/*.png",
-    "/rummage/lib/gui/data/*.gif",
-    "/rummage/lib/gui/data/*.js",
-    "/rummage/lib/gui/data/*.css",
-    "/rummage/lib/gui/data/*.html",
-    "/rummage/lib/gui/data/*.svg",
-    "/tests/*.txt",
-    "/tests/*.py",
-    "/tests/*.hidden_file",
-    "/tests/*.rum-bak",
-    "/tools/*.py",
-    "/rummage/lib/gui/localization/locale/*.po",
-    "/docs/src/markdown/*.md",
-    "/docs/src/markdown/*.png",
-    "/docs/src/markdown/*.svg",
-    "/docs/src/markdown/*.gif",
-    "/docs/src/markdown/*.icns",
-    "/docs/src/markdown/*.ico",
-    "/docs/src/markdown/*.js",
-    "/docs/src/markdown/*.css",
-    "/docs/src/markdown/*.html",
-    "/docs/src/markdown/*.svg",
-    "/docs/theme/*.js",
-    "/docs/theme/*.html",
-    "/docs/theme/*.css",
+    "/rummage/**/*.py",
+    "/rummage/lib/gui/data/**/*.md",
+    "/rummage/lib/gui/data/**/*.png",
+    "/rummage/lib/gui/data/**/*.gif",
+    "/rummage/lib/gui/data/**/*.js",
+    "/rummage/lib/gui/data/**/*.css",
+    "/rummage/lib/gui/data/**/*.html",
+    "/rummage/lib/gui/data/**/*.svg",
+    "/tests/**/*.py",
+    "/tools/**/*.py",
+    "/rummage/lib/gui/localization/locale/**/*.po",
+    "/docs/src/markdown/**/*.md",
+    "/docs/src/markdown/**/*.png",
+    "/docs/src/markdown/**/*.svg",
+    "/docs/src/markdown/**/*.gif",
+    "/docs/src/markdown/**/*.icns",
+    "/docs/src/markdown/**/*.ico",
+    "/docs/src/markdown/**/*.js",
+    "/docs/src/markdown/**/*.css",
+    "/docs/src/markdown/**/*.html",
+    "/docs/src/markdown/**/*.svg",
+    "/docs/theme/**/*.js",
+    "/docs/theme/**/*.html",
+    "/docs/theme/**/*.css",
+    "/requirements/*.txt",
+    "/setup.cfg",
     "/tox.ini",
     "/gui.fbp",
     "/mkdocs.yml",
@@ -80,5 +85,5 @@ include = [
 
 [tool.hatch.build.targets.wheel]
 include = [
-    "/rummage",
+    "/rummage"
 ]

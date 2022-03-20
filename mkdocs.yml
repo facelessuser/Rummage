@@ -87,7 +87,11 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.striphtml:
   - pymdownx.snippets:
-      base_path: docs/src/markdown/_snippets
+      base_path:
+      - docs/src/markdown/.snippets
+      - LICENSE.md
+      auto_append:
+      - refs.txt
   - pymdownx.keys:
       separator: "\uff0b"
   - pymdownx.details:

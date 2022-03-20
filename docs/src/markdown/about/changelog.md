@@ -572,5 +572,3 @@
 ## 1.0
 
 - **NEW**: Initial release
-
---8<-- "links.txt"
