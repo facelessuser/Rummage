@@ -87,3 +87,16 @@ include = [
 include = [
     "/rummage"
 ]
+
+[tool.hatch.envs.locale]
+skip_install = true
+dependencies = [
+  "pip>=22.0.4",
+  "babel"
+]
+
+[tool.hatch.envs.locale.scripts]
+extract = "pybabel extract --input-dirs=rummage --output-file=rummage/lib/gui/localization/locale/rummage.pot"
+init = "pybabel init --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale"
+update = "pybabel update --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale"
+compile = "pybabel compile --domain=rummage --directory=rummage/lib/gui/localization/locale"
