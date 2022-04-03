@@ -265,5 +265,3 @@ The supported back references actually vary depending on whether it is being app
 Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about what
 Backrefs adds, read the official [Backrefs documentation][backrefs]. You can enable extended back references in the
 [Preferences](./preferences.md#search) dialog.
-
---8<-- "refs.txt"

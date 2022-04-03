@@ -20,7 +20,7 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip setuptools
+        python -m pip install --upgrade pip build setuptools wheel
         python -m pip install -r requirements/docs.txt
     - name: Deploy documents
       run: |
@@ -32,10 +32,6 @@ jobs:
         git push gh-token gh-pages
 
   pypi:
-    strategy:
-      matrix:
-        distribution: [sdist]
-
     runs-on: ubuntu-latest
 
     steps:
@@ -45,8 +41,8 @@ jobs:
           python-version: 3.9
       - name: Package
         run: |
-          pip install --upgrade setuptools wheel
-          python setup.py ${{ matrix.distribution }}
+          pip install --upgrade build
+          python -m build -s
       - name: Publish
         uses: pypa/gh-action-pypi-publish@v1.4.1
         with:

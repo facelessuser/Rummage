@@ -132,5 +132,3 @@ there will be some C code compilation performed by `pip` which will require Xcod
 3. Click the button to install the Command Line Tools.
 4. Open Terminal (Applications/Terminal) and run `xcode-select --install`. You will be prompted to install the Xcode
    Command Line Tools.
-
---8<-- "links.txt"
