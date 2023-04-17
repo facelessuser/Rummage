@@ -269,30 +269,30 @@ import results in the text box.</p>
 supported settings will not be covered here, but the chain and search format will be discussed in details.</p>
 <p>The chain format for importing is shown below:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-    <span class="s2">&quot;chains&quot;</span><span class="o">:</span> <span class="p">{</span>                 <span class="c1">// The key that denotes this setting is the &quot;chains&quot; setting.</span>
-        <span class="s2">&quot;a-chain&quot;</span><span class="o">:</span> <span class="p">[</span>            <span class="c1">// Unique chain ID.  Must be composed of letters, numbers, underscores, and hyphens.</span>
-            <span class="s2">&quot;example-1&quot;</span><span class="p">,</span>        <span class="c1">// A list of references to specific unique search IDs.</span>
-            <span class="s2">&quot;example-2&quot;</span>
-        <span class="p">],</span>
-        <span class="s2">&quot;another-chain&quot;</span><span class="o">:</span> <span class="p">[</span>
-            <span class="s2">&quot;example-3&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;example-4&quot;</span>
-        <span class="p">]</span>
-    <span class="p">}</span>
+<span class="w">    </span><span class="s2">&quot;chains&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w">                 </span><span class="c1">// The key that denotes this setting is the &quot;chains&quot; setting.</span>
+<span class="w">        </span><span class="s2">&quot;a-chain&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="w">            </span><span class="c1">// Unique chain ID.  Must be composed of letters, numbers, underscores, and hyphens.</span>
+<span class="w">            </span><span class="s2">&quot;example-1&quot;</span><span class="p">,</span><span class="w">        </span><span class="c1">// A list of references to specific unique search IDs.</span>
+<span class="w">            </span><span class="s2">&quot;example-2&quot;</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="s2">&quot;another-chain&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;example-3&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;example-4&quot;</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>The search/replace format for importing is show below:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-    <span class="s2">&quot;saved_searches&quot;</span><span class="o">:</span> <span class="p">{</span>                                         <span class="c1">// The key that denotes this setting is the &quot;chains&quot; setting.</span>
-        <span class="s2">&quot;Copyright-update&quot;</span><span class="o">:</span> <span class="p">{</span>                                   <span class="c1">// Unique search ID.  Must be composed of letters, numbers, underscores, and hyphens.</span>
-            <span class="s2">&quot;flags&quot;</span><span class="o">:</span> <span class="s2">&quot;is&quot;</span><span class="p">,</span>                                      <span class="c1">// Search and replace flags (covered below).</span>
-            <span class="s2">&quot;is_function&quot;</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>                               <span class="c1">// Boolean stating whether the replace pattern is a function or not.</span>
-            <span class="s2">&quot;is_regex&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>                                   <span class="c1">// Boolean stating whether the search pattern is a regular expression or literal string.</span>
-            <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Copyright update&quot;</span><span class="p">,</span>                         <span class="c1">// A more user friendly name or description of the pattern.</span>
-            <span class="s2">&quot;replace&quot;</span><span class="o">:</span> <span class="s2">&quot;\\g&lt;1&gt;16&quot;</span><span class="p">,</span>                              <span class="c1">// The replace pattern, or in case `is_function` is `true`, the path to the Python replace plugin file.</span>
-            <span class="s2">&quot;search&quot;</span><span class="o">:</span> <span class="s2">&quot;(Copyright \\(c\\) \\d+ - 20)(\\d{2})&quot;</span>   <span class="c1">// The search pattern.</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
+<span class="w">    </span><span class="s2">&quot;saved_searches&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w">                                         </span><span class="c1">// The key that denotes this setting is the &quot;chains&quot; setting.</span>
+<span class="w">        </span><span class="s2">&quot;Copyright-update&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w">                                   </span><span class="c1">// Unique search ID.  Must be composed of letters, numbers, underscores, and hyphens.</span>
+<span class="w">            </span><span class="s2">&quot;flags&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;is&quot;</span><span class="p">,</span><span class="w">                                      </span><span class="c1">// Search and replace flags (covered below).</span>
+<span class="w">            </span><span class="s2">&quot;is_function&quot;</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">                               </span><span class="c1">// Boolean stating whether the replace pattern is a function or not.</span>
+<span class="w">            </span><span class="s2">&quot;is_regex&quot;</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">                                   </span><span class="c1">// Boolean stating whether the search pattern is a regular expression or literal string.</span>
+<span class="w">            </span><span class="s2">&quot;name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Copyright update&quot;</span><span class="p">,</span><span class="w">                         </span><span class="c1">// A more user friendly name or description of the pattern.</span>
+<span class="w">            </span><span class="s2">&quot;replace&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;\\g&lt;1&gt;16&quot;</span><span class="p">,</span><span class="w">                              </span><span class="c1">// The replace pattern, or in case `is_function` is `true`, the path to the Python replace plugin file.</span>
+<span class="w">            </span><span class="s2">&quot;search&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;(Copyright \\(c\\) \\d+ - 20)(\\d{2})&quot;</span><span class="w">   </span><span class="c1">// The search pattern.</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>Below is a table containing valid flags for the <code>flags</code> parameter.  Literal searches only allow flags <code>i</code>, <code>u</code>, and <code>f</code>.

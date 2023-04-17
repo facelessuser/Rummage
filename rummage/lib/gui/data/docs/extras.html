@@ -104,7 +104,7 @@
 <li>Pass input: <code>as arguments</code>.</li>
 <li>
 <p>Content of script:</p>
-<div class="highlight"><pre><span></span><code><span class="o">(</span>/Library/Frameworks/Python.framework/Versions/3.6/bin/rummage --path <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="o">)</span>&gt;/dev/null <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">&amp;</span>
+<div class="highlight"><pre><span></span><code><span class="o">(</span>/Library/Frameworks/Python.framework/Versions/3.6/bin/rummage<span class="w"> </span>--path<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="o">)</span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span>
 </code></pre></div>
 <p>This is just an example. You will need to determine the location of your Python install.</p>
 </li>
@@ -122,36 +122,36 @@
 <p class="admonition-title">Warning</p>
 <p>This isn't a guide in how to do registry editing proper, so only edit the registry if you are certain of what you are doing.</p>
 </div>
-<div class="highlight"><pre><span></span><code><span class="na">Windows Registry Editor Version 5.00</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="na">Windows Registry Editor Version 5.00</span>
 
-<span class="k">[HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...]</span><span class="w"></span>
-<span class="na">@</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="w"></span>
+<span class="k">[HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...]</span>
+<span class="na">@</span><span class="o">=</span><span class="s">&quot;&quot;</span>
 
-<span class="k">[HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...\command]</span><span class="w"></span>
-<span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span><span class="w"></span>
+<span class="k">[HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...\command]</span>
+<span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span>
 
-<span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...]</span><span class="w"></span>
-<span class="na">@</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="w"></span>
+<span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...]</span>
+<span class="na">@</span><span class="o">=</span><span class="s">&quot;&quot;</span>
 
-<span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...\command]</span><span class="w"></span>
-<span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span><span class="w"></span>
+<span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...\command]</span>
+<span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span>
 </code></pre></div>
 <p>Optionally, you can also include the Rummage icon beside your context menu entry by adding a few additional lines:</p>
-<div class="highlight"><pre><span></span><code><span class="na">Windows Registry Editor Version 5.00</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="na">Windows Registry Editor Version 5.00</span>
 
-<span class="k">[HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...]</span><span class="w"></span>
-<span class="na">@</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="w"></span>
-<span class="na">&quot;Icon&quot;</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Lib\\site-packages\\rummage\\lib\\gui\\data\\rummage.ico&quot;</span><span class="w"></span>
+<span class="k">[HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...]</span>
+<span class="na">@</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+<span class="na">&quot;Icon&quot;</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Lib\\site-packages\\rummage\\lib\\gui\\data\\rummage.ico&quot;</span>
 
-<span class="k">[HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...\command]</span><span class="w"></span>
-<span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span><span class="w"></span>
+<span class="k">[HKEY_CLASSES_ROOT\Folder\shell\Rummage Here...\command]</span>
+<span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span>
 
-<span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...]</span><span class="w"></span>
-<span class="na">@</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="w"></span>
-<span class="na">&quot;Icon&quot;</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Lib\\site-packages\\rummage\\lib\\gui\\data\\rummage.ico&quot;</span><span class="w"></span>
+<span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...]</span>
+<span class="na">@</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+<span class="na">&quot;Icon&quot;</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Lib\\site-packages\\rummage\\lib\\gui\\data\\rummage.ico&quot;</span>
 
-<span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...\command]</span><span class="w"></span>
-<span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span><span class="w"></span>
+<span class="k">[HKEY_CLASSES_ROOT\*\shell\Rummage Here...\command]</span>
+<span class="na">@</span><span class="o">=</span><span class="s">&quot;&lt;python_install_path&gt;\\Scripts\\rummage.exe --path \&quot;%1\&quot;&quot;</span>
 </code></pre></div>
 </li>
 <li>
@@ -197,16 +197,16 @@
 </li>
 <li>
 <p>Provide the necessary configuration to specify the entry type, file targets, command to execute, icon, etc. In our case, we specify <code>all/all</code> to target both files and folders. We also point to one of the PNG files that ship in the package for the icon.</p>
-<div class="highlight"><pre><span></span><code><span class="k">[Desktop Entry]</span><span class="w"></span>
-<span class="na">Type</span><span class="o">=</span><span class="s">Service</span><span class="w"></span>
-<span class="na">X-KDE-ServiceTypes</span><span class="o">=</span><span class="s">KonqPopupMenu/Plugin</span><span class="w"></span>
-<span class="na">MimeType</span><span class="o">=</span><span class="s">all/all;</span><span class="w"></span>
-<span class="na">Actions</span><span class="o">=</span><span class="s">rummage</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">[Desktop Entry]</span>
+<span class="na">Type</span><span class="o">=</span><span class="s">Service</span>
+<span class="na">X-KDE-ServiceTypes</span><span class="o">=</span><span class="s">KonqPopupMenu/Plugin</span>
+<span class="na">MimeType</span><span class="o">=</span><span class="s">all/all</span><span class="c1">;</span>
+<span class="na">Actions</span><span class="o">=</span><span class="s">rummage</span>
 
-<span class="k">[Desktop Action rummage]</span><span class="w"></span>
-<span class="na">Name</span><span class="o">=</span><span class="s">Rummage Here...</span><span class="w"></span>
-<span class="na">Icon</span><span class="o">=</span><span class="s">/usr/local/lib/python3.5/dist-packages/rummage/lib/gui/data/rummage_1024.png</span><span class="w"></span>
-<span class="na">Exec</span><span class="o">=</span><span class="s">rummage --path &quot;%f&quot;</span><span class="w"></span>
+<span class="k">[Desktop Action rummage]</span>
+<span class="na">Name</span><span class="o">=</span><span class="s">Rummage Here...</span>
+<span class="na">Icon</span><span class="o">=</span><span class="s">/usr/local/lib/python3.5/dist-packages/rummage/lib/gui/data/rummage_1024.png</span>
+<span class="na">Exec</span><span class="o">=</span><span class="s">rummage --path &quot;%f&quot;</span>
 </code></pre></div>
 </li>
 <li>
@@ -240,7 +240,7 @@ apply to other distros.</p>
 <p>Translations should be compiled and included by default requiring no additional steps starting in version 3.6.0.</p>
 <p>I only speak English, so I do not maintain the translations. If the UI changes, someone from the community will need to update them appropriately via pull requests or they will remain out of date.</p>
 <p>To modify localization, you first must install <code>babel</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="gp">$ </span>pip install babel
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>babel
 </code></pre></div>
 <h3 id="editing-existing-translations">Editing Existing Translations</h3>
 <p>Translations are stored at <code>rummage/lib/gui/localization/locale/&lt;LOCALE&gt;/LC_MESSAGES/rummage.po</code>. Just edit the <code>rummage.po</code> for the appropriate <code>&lt;LOCALE&gt;</code>.</p>
@@ -250,14 +250,14 @@ msgstr &quot;&lt;my_translation&gt;&quot;
 </code></pre></div>
 <h3 id="generate-new-template-from-source">Generate New Template from Source</h3>
 <p>In the Python source, you'll notice that translatable strings are represented as <code>_("some text")</code>. <code>_</code> is the function that retrieves the proper translations. In order to provide translations, we have to build up a template of all of these strings in a <code>.pot</code> file.  This is done by running:</p>
-<div class="highlight"><pre><span></span><code><span class="gp">$ </span>pybabel extract --input-dirs<span class="o">=</span>rummage --output-file<span class="o">=</span>rummage/lib/gui/localization/locale/rummage.pot
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>pybabel<span class="w"> </span>extract<span class="w"> </span>--input-dirs<span class="o">=</span>rummage<span class="w"> </span>--output-file<span class="o">=</span>rummage/lib/gui/localization/locale/rummage.pot
 </code></pre></div>
 <p>This will scan the Python source and generate a template at <code>rummage/lib/gui/localization/locale/rummage.pot</code>.</p>
 <p>If you update the source in a way that requires generating a new <code>.pot</code> file, then you will most likely need to update existing <code>.po</code> files as well. See <a href="#update-translation-files">Update Translation Files</a> to see how.</p>
 <p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#extract-messages"><code>extract_messages</code></a> for more info.</p>
 <h3 id="update-translation-files">Update Translation Files</h3>
 <p>When new strings are added in the source, or strings are changed, you will need to re-generate the <code>.pot</code> file and then update the <code>.po</code> files. This should update all <code>.po</code> files.</p>
-<div class="highlight"><pre><span></span><code><span class="gp">$ </span>pybabel update --domain<span class="o">=</span>rummage --input-file<span class="o">=</span>rummage/lib/gui/localization/locale/rummage.pot --output-dir<span class="o">=</span>rummage/lib/gui/localization/locale
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>pybabel<span class="w"> </span>update<span class="w"> </span>--domain<span class="o">=</span>rummage<span class="w"> </span>--input-file<span class="o">=</span>rummage/lib/gui/localization/locale/rummage.pot<span class="w"> </span>--output-dir<span class="o">=</span>rummage/lib/gui/localization/locale
 </code></pre></div>
 <p>If you need to only update a specific <code>.po</code> file:</p>
 <div class="highlight"><pre><span></span><code><span class="go">pybabel update --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale -l en_US</span>

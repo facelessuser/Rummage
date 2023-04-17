@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.17
+
+- **NEW**: Officially support Python 3.10.
+
 ## 4.16.4
 
 - **FIX**: Pick up latest `wcmatch` (8.3), `bracex` (2.2), and `backrefs` (5.2) to acquire latest related bug fixes
