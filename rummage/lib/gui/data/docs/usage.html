@@ -112,7 +112,7 @@ major and minor Python version to the end:</p>
 <p>In some environments, it may make sense to run Rummage with <code>pythonw</code> which is mainly for launching GUI scripts
 (<code>pythonw</code> is not available on Linux). In some environments, it may be required (see
 <a href="installation.html#running-in-anaconda">Running in Anaconda</a>).</p>
-<div class="highlight"><pre><span></span><code>pythonw -m rummage
+<div class="highlight"><pre><span></span><code>pythonw<span class="w"> </span>-m<span class="w"> </span>rummage
 </code></pre></div>
 <h2 id="searching--replacing">Searching &amp; Replacing</h2>
 <p><img alt="Search Tab" src="images/search_tab.png" /></p>
@@ -222,40 +222,40 @@ environment.</p>
 </ol>
 <p>The plugin class is fairly straight forward and is shown below.</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReplacePlugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Rummage replace plugin.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rummage replace plugin.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_info</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">file_info</span> <span class="o">=</span> <span class="n">file_info</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_init</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">on_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Override this function to add initialization setup.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override this function to add initialization setup.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get flags.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get flags.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flags</span>
 
     <span class="k">def</span> <span class="nf">get_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get file name.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get file name.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_info</span><span class="o">.</span><span class="n">name</span>
 
     <span class="k">def</span> <span class="nf">is_binary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Is a binary search.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Is a binary search.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_info</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">encode</span> <span class="o">==</span> <span class="s1">&#39;bin&#39;</span>
 
     <span class="k">def</span> <span class="nf">is_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Is a literal search.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Is a literal search.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">LITERAL</span>
 
     <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Make replacement.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Make replacement.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </code></pre></div>
@@ -265,7 +265,7 @@ string (for binary files).</p>
 <p>The <code>ReplacePlugin</code>'s <code>file_info</code> property is a named tuple providing information about the current file such as name,
 size, creation date, etc.</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">FileInfoRecord</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;FileInfoRecord&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;modified&#39;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">,</span> <span class="s1">&#39;encoding&#39;</span><span class="p">])):</span>
-    <span class="sd">&quot;&quot;&quot;A record for tracking file info.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A record for tracking file info.&quot;&quot;&quot;</span>
 </code></pre></div>
 <p>The <code>ReplacePlugin</code>'s <code>flags</code> property contains only Rummage search related flags (the flags are abstracted at this
 level and are converted to the appropriate regular expression flags later). They can also be accessed from
@@ -301,17 +301,17 @@ assumed this is not a binary replace, so a Unicode string is returned.</p>
 
 
 <span class="k">class</span> <span class="nc">TestReplace</span><span class="p">(</span><span class="n">rumcore</span><span class="o">.</span><span class="n">ReplacePlugin</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Replace object.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Replace object.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Replace method.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Replace method.&quot;&quot;&quot;</span>
 
         <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_file_name</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">name</span>
 
 
 <span class="k">def</span> <span class="nf">get_replace</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Get the replace object.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the replace object.&quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">TestReplace</span>
 </code></pre></div>

@@ -4,9 +4,7 @@ repo_url: https://github.com/facelessuser/Rummage
 edit_uri: tree/master/docs/src/markdown
 site_description: A search and replace tool written in Python.
 copyright: |
-  Copyright &copy; 2013 - 2021 <a href="https://github.com/facelessuser">Isaac Muse</a>
-  <br><span class="md-footer-custom-text">emoji provided free by </span>
-  <a href="https://github.com/twitter/twemoji">Twemoji</a>
+  Copyright &copy; 2013 - 2023 <a href="https://github.com/facelessuser" target="_blank" rel="noopener">Isaac Muse</a>
 
 docs_dir: docs/src/markdown
 theme:
@@ -23,7 +21,15 @@ theme:
   features:
     - navigation.tabs
     - navigation.top
-    - naviagtion.instant
+    - navigation.instant
+    - navigation.sections
+    - navigation.indexes
+    - toc.follow
+    - content.code.copy
+    - navigation.footer
+    - search.share
+    - search.highlight
+    - search.suggest
   pymdownx:
     sponsor: "https://github.com/sponsors/facelessuser"
 
@@ -107,7 +113,9 @@ extra:
 
 plugins:
   - search
-  - git-revision-date-localized
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+      strict: false
   - mkdocs_pymdownx_material_extras
   - minify:
       minify_html: true
