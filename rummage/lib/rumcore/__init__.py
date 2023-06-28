@@ -25,7 +25,6 @@ import mmap
 import os
 import re
 import shutil
-import sre_parse
 from collections import namedtuple
 from time import ctime
 from backrefs import bre
@@ -39,6 +38,11 @@ try:
     REGEX_SUPPORT = True
 except ImportError:  # pragma: no cover
     REGEX_SUPPORT = False
+
+if sys.version_info >= (3, 11):
+    import re._parser as _parser
+else:
+    import sre_parse as _parser
 
 # Common regex flags (re|regex)
 IGNORECASE = 0x1  # (?i)
@@ -745,8 +749,8 @@ class _FileSearch:
                 else:
                     pattern = _re_pattern(pattern, flags, self.is_binary)
                     if replace is not None and not self.is_plugin_replace:
-                        template = sre_parse.parse_template(replace, pattern)
-                        self.expand = lambda m, t=template: sre_parse.expand_template(t, m)
+                        template = _parser.parse_template(replace, pattern)
+                        self.expand = lambda m, t=template: _parser.expand_template(t, m)
 
             if REGEX_SUPPORT and isinstance(pattern, (bregex._REGEX_TYPE, bregex.Bregex)):
                 self.reverse = bool(pattern.flags & regex.REVERSE)

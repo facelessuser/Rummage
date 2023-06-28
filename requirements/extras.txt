@@ -1,2 +1,2 @@
-cchardet
-regex
+faust-cchardet>=2.1.18
+regex>=2023.6.3
