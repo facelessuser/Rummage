@@ -54,12 +54,10 @@ RE_URL = re.compile('(http|ftp)s?|data|mailto|tel|news')
 EXTENSIONS = [
     "markdown.extensions.toc",
     "markdown.extensions.attr_list",
-    "markdown.extensions.def_list",
     "markdown.extensions.smarty",
     "markdown.extensions.footnotes",
     "markdown.extensions.tables",
     "markdown.extensions.sane_lists",
-    "markdown.extensions.admonition",
     "markdown.extensions.md_in_html",
     "pymdownx.highlight",
     "pymdownx.inlinehilite",
@@ -74,7 +72,10 @@ EXTENSIONS = [
     "pymdownx.caret",
     "pymdownx.mark",
     "pymdownx.b64",
-    "pymdownx.pathconverter"
+    "pymdownx.pathconverter",
+    "pymdownx.blocks.admonition",
+    "pymdownx.blocks.html",
+    "pymdownx.blocks.definition"
 ]
 
 EXTENSION_CONFIGS = {
@@ -106,6 +107,24 @@ EXTENSION_CONFIGS = {
     },
     "pymdownx.b64": {
         "base_path": os.path.join(data.RESOURCE_PATH, 'docs')
+    },
+    "pymdownx.blocks.admonition": {
+        "types": [
+            "new",
+            "settings",
+            "note",
+            "abstract",
+            "info",
+            "tip",
+            "success",
+            "question",
+            "warning",
+            "failure",
+            "danger",
+            "bug",
+            "example",
+            "quote"
+        ]
     }
 }
 

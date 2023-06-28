@@ -84,17 +84,19 @@ be configured.</p>
 <dl>
 <dt>Single Instance</dt>
 <dd>By default, Rummage will allow for multiple windows to be open.  If this option is enabled, the first window will be
-be the only window to open.  All subsequent instances will pass their arguments to the first and close without
-showing a window.</dd>
+    be the only window to open.  All subsequent instances will pass their arguments to the first and close without
+    showing a window.</dd>
 <dt>Language</dt>
 <dd>Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian
-is outdated but includes a fair bit of the needed translations. See <a href="extras.html#localization">Localization</a> to
-learn more about improving current translations or adding additional translations.</dd>
-<dt>Updates</dt>
-<dd>
+    is outdated but includes a fair bit of the needed translations. See <a href="extras.html#localization">Localization</a> to
+    learn more about improving current translations or adding additional translations.</dd>
+</dl>
+<p>Updates</p>
+<ul>
+<li>
 <p>Controls whether Rummage will check for new updates daily and allows controlling whether you want to be notified of
-prereleases as well. A button has also been provided to check for updates right away after configuring your update
-settings.</p>
+    prereleases as well. A button has also been provided to check for updates right away after configuring your update
+    settings.</p>
 <p>The check is only a check for new versions and doesn't perform an upgrade.  Rummage must be upgraded via <code>pip</code> from
 command line.</p>
 <div class="admonition info">
@@ -108,11 +110,13 @@ will use <code>pip</code> to install <code>certifi</code> and creates a symlink 
 bundle location. If you are using something like macports, then you'll probably have to research to find out how
 to do the same thing.</p>
 </div>
-</dd>
-<dt>International Time</dt>
-<dd>Rummage displays file creation and modified time in the form <code>Jul 01, 2018, 03:00:00 AM</code>, but you can enable this
-option to display the times in international format: <code>2018-07-01 03:00:00</code>.</dd>
-</dl>
+</li>
+</ul>
+<p>International Time</p>
+<ul>
+<li>Rummage displays file creation and modified time in the form <code>Jul 01, 2018, 03:00:00 AM</code>, but you can enable this
+    option to display the times in international format: <code>2018-07-01 03:00:00</code>.</li>
+</ul>
 <h2 id="search">Search</h2>
 <p><img alt="Preferences: Search" src="images/settings_search.png" /></p>
 <p>The <strong>Regular Expression</strong> panel is where the desired regular expression engine that Rummage uses can be selected and
@@ -121,7 +125,7 @@ be selected instead.  There is also the option of using Re or Regex with <a href
 that adds a couple of special escapes and features).</p>
 <p>If using Regex, you can set it to the version of your choice. <code>V0</code> tries to be completely compatible with Re patterns
 with non-breaking additional features, while <code>V1</code> breaks compatibility with Re and adds even more useful features.
-Please see <a href="https://pypi.python.org/pypi/regex">Regex documentation</a> to learn more.</p>
+Please see <a href="https://pypi.org/project/regex/">Regex documentation</a> to learn more.</p>
 <p>Under <strong>File/Folder Matching</strong> are a number options for file and folder matching patterns. Follow the links to learn
 more about each feature:</p>
 <ul>
@@ -207,23 +211,22 @@ audible notification sounds (you must configure which sound to use).</p>
 </table>
 </div>
 <dl>
-<dt>Linux</dt>
-<dd>
+<p>Linux</p>
 <ul>
-<li>Native: Notifications via <code>notify-send</code>.</li>
-</ul>
+<li>
+<p>Native: Notifications via <code>notify-send</code>.</p>
 <div class="admonition info">
 <p class="admonition-title">Other Distros</p>
 <p>Though Rummage should run on any Linux distro, the native notification option was built around <code>notify-send</code> and
 only tested on Ubuntu. If other distros have a <code>notify-send</code> it may also work.</p>
 </div>
-</dd>
-<dt>macOS</dt>
-<dd>
-<ul>
-<li>Native: Notification Center via <a href="https://github.com/alloy/terminal-notifier">terminal-notifier</a>. Path to <code>terminal-notifier</code> must be
-  configured.</li>
+</li>
 </ul>
+<p>macOS</p>
+<ul>
+<li>
+<p>Native: Notification Center via <a href="https://github.com/alloy/terminal-notifier">terminal-notifier</a>. Path to <code>terminal-notifier</code> must be
+    configured.</p>
 <div class="admonition info">
 <p class="admonition-title">Configuring macOS Native</p>
 <p>When selecting <code>native</code> on macOS, an option to select the path to terminal notifier will be available since
@@ -233,14 +236,12 @@ configured or <em>native</em> notifications will not work.</p>
 (depending on how you installed <code>terminal-notifier</code>).  When selecting the <code>.app</code> bundle, Rummage will know how
 to access the binary inside the bundle.</p>
 </div>
-</dd>
-<dt>Windows</dt>
-<dd>
+</li>
+</ul>
+<p>Windows</p>
 <ul>
 <li>Native: Native windows taskbar notifications.</li>
 </ul>
-</dd>
-</dl>
 <h2 id="history">History</h2>
 <p><img alt="Preferences: History" src="images/settings_history.png" /></p>
 <p>The <strong>History</strong> panel is where all text box, drop down history can be cleared.</p>
@@ -359,6 +360,7 @@ depending on whether you are using Re, Regex, or one of the two with Backrefs).<
 </tr>
 </tbody>
 </table>
+</dl>
   </div>
 
   <!-- Navigation -->

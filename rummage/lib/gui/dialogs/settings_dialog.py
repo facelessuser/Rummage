@@ -47,11 +47,11 @@ Variable  | Description
 `{$col}`  | Insert the line column.
 `{$col0}` | Insert the line column offset by one so the first column is zero instead of one.
 
-!!! example "Example"
-
-    ```bash
-    "C:\\Program Files\\Sublime Text 3\\subl.exe" "{$file}:{$line}:{$col}"
-    ```
+/// example | Example
+```bash
+"C:\\Program Files\\Sublime Text 3\\subl.exe" "{$file}:{$line}:{$col}"
+```
+///
 """)
 
 # We really need a better validator

@@ -18,9 +18,10 @@ other systems, there may be some prerequisites. If on Linux, it is recommended t
 first. This is due to the fact that installation of that library may require special instructions and will cause the
 installation of Rummage to fail if `wxpython` fails due to not having the necessary prerequisites.
 
-!!! warning "Prerequisites"
-    - [Linux](#linux-prerequisites)
-    - [macOS](#macos-prerequisites)
+/// warning | Prerequisites
+-   [Linux](#linux-prerequisites)
+-   [macOS](#macos-prerequisites)
+///
 
 Assuming prerequisites are satisfied, installing Rummage is easy.
 
@@ -57,9 +58,9 @@ https://www.wxpython.org/pages/downloads/.
 
 Simplified instructions:
 
-1. Find the folder for your distro over at https://extras.wxpython.org/wxPython4/extras/linux/.
+1.  Find the folder for your distro over at https://extras.wxpython.org/wxPython4/extras/linux/.
 
-2. Use `pip` and the server's location like so.
+2.  Use `pip` and the server's location like so.
 
     ```shell-session
     $ pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04 wxPython
@@ -99,19 +100,21 @@ each prerequisites may vary from distro to distro or from distro release to dist
 Usually the requirements deal with `gstreamer`, `gtk`, `libsdl`, etc. Below are some examples, but are most likely out
 of date:
 
+/// define
 Ubuntu 18.04
-: 
 
+- 
     ```shell-session
     $ sudo apt-get install python3.6-dev dpkg-dev build-essential libwebkitgtk-dev libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base1.0-dev libnotify-dev freeglut3 freeglut3-dev libgtk-3-dev libwebkitgtk-3.0-dev
     ```
 
 Fedora 26
-: 
 
+- 
     ```shell-session
     $ sudo dnf install gcc-c++ wxGTK-devel gstreamer-devel webkitgtk-devel GConf2-devel gstreamer-plugins-base-devel
     ```
+///
 
 Once dependencies are in place, you can finally install wxPython with pip (`pip install wxpython`). Be patient when
 installing wxPython manually as Linux must build the package, and it won't give much in the way of status while it
@@ -127,8 +130,8 @@ On macOS, Rummage uses either pure Python modules, or modules that provide wheel
 compilation is required to install Rummage; therefore, no prior steps are needed. But if you want to install `regex`,
 there will be some C code compilation performed by `pip` which will require Xcode to be installed.
 
-1. Download Xcode from the Mac App Store.
-2. Navigate to Xcode > Preferences > Downloads tab.
-3. Click the button to install the Command Line Tools.
-4. Open Terminal (Applications/Terminal) and run `xcode-select --install`. You will be prompted to install the Xcode
-   Command Line Tools.
+1.  Download Xcode from the Mac App Store.
+2.  Navigate to Xcode > Preferences > Downloads tab.
+3.  Click the button to install the Command Line Tools.
+4.  Open Terminal (Applications/Terminal) and run `xcode-select --install`. You will be prompted to install the Xcode
+    Command Line Tools.

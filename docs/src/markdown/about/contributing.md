@@ -4,40 +4,38 @@
 
 Contribution from the community is encouraged and can be done in a variety of ways:
 
-- Bug reports.
-- Reviewing code.
-- Code patches via pull requests.
-- Documentation improvements via pull requests.
+-   Bug reports.
+-   Reviewing code.
+-   Code patches via pull requests.
+-   Documentation improvements via pull requests.
 
 ## Become a Sponsor :octicons-heart-fill-16:{: .heart-throb}
 
+
 Open source projects take time and money. Help support the project by becoming a sponsor. You can add your support at
-any tier you feel comfortable with. No amount is too little.
+any tier you feel comfortable with. No amount is too little. We also accept one time contributions via PayPal.
 
-:octicons-mark-github-16: [GitHub Sponsors ](https://github.com/sponsors/facelessuser)
-
-If you'd like to do a one time contribution, you can do so via PayPal.
-
-:fontawesome-brands-paypal: [PayPal](https://www.paypal.me/facelessuser)
+[:octicons-mark-github-16: GitHub Sponsors](https://github.com/sponsors/facelessuser){.md-button .md-button--primary}
+[:fontawesome-brands-paypal: PayPal](https://www.paypal.me/facelessuser){.md-button}
 
 ## Bug Reports
 
-1. Please **read the documentation** and **search the issue tracker** to try to find the answer to your question
-  **before** posting an issue.
+1.  Please **read the documentation** and **search the issue tracker** to try to find the answer to your question
+    **before** posting an issue.
 
-2. When creating an issue on the repository, please provide as much info as possible:
+2.  When creating an issue on the repository, please provide as much info as possible:
 
-    - Version being used.
-    - Operating system.
-    - Errors in console.
-    - Detailed description of the problem.
-    - Examples for reproducing the error.  You can post pictures, but if specific text or code is required to reproduce
-      the issue, please provide the text in a plain text format for easy copy/paste.
+    -   Version being used.
+    -   Operating system.
+    -   Errors in console.
+    -   Detailed description of the problem.
+    -   Examples for reproducing the error.  You can post pictures, but if specific text or code is required to
+        reproduce the issue, please provide the text in a plain text format for easy copy/paste.
 
     The more info provided the greater the chance someone will take the time to answer, implement, or fix the issue.
 
-3. Be prepared to answer questions and provide additional information if required.  Issues in which the creator refuses
-   to respond to follow up questions will be marked as stale and closed.
+3.  Be prepared to answer questions and provide additional information if required.  Issues in which the creator refuses
+    to respond to follow up questions will be marked as stale and closed.
 
 ## Reviewing Code
 
@@ -67,13 +65,13 @@ Currently `tools/gui_patch.py` should be run on the output before running Rummag
 
 ### Running Validation Tests
 
-1. Make sure that Tox is installed:
+1.  Make sure that Tox is installed:
 
     ```
     pip install tox
     ```
 
-2. Run Tox:
+2.  Run Tox:
 
     ```
     tox
