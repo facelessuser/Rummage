@@ -3,6 +3,9 @@
 ## 4.18
 
 - **NEW**: Officially support Python 3.11.
+- **NEW**: Use [`faust-cchardet`][cchardet] as the [original `cchardet`][cchardet-legacy] is no longer maintained and
+  does not build on Python 3.11+.
+- **NEW**: Update required minimum versions for many of our dependencies.
 
 ## 4.17
 

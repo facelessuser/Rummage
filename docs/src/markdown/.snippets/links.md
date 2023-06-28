@@ -5,9 +5,10 @@
 [backrefs]: http://facelessuser.github.io/backrefs/
 [backrefs-format]: http://facelessuser.github.io/backrefs/#format-replacements
 [bracex]: https://github.com/facelessuser/bracex
-[cchardet]: https://pypi.python.org/pypi/cchardet
-[chardet]: https://pypi.python.org/pypi/chardet
-[filelock]: https://pypi.python.org/pypi/filelock/
+[cchardet]: https://pypi.org/project/faust-cchardet/
+[cchardet-legacy]: https://pypi.org/project/cchardet/
+[chardet]: https://pypi.org/project/chardet/
+[filelock]: https://pypi.org/project/filelock/
 [fnmatch]: https://docs.python.org/3.6/library/fnmatch.html
 [format-string]: https://docs.python.org/2/library/string.html#format-string-syntax
 [fullmatch]: https://docs.python.org/3/library/re.html#re.fullmatch
@@ -19,10 +20,10 @@
 [pygments]: http://pygments.org/
 [pymdown-extensions]: https://github.com/facelessuser/pymdown-extensions
 [re]: https://docs.python.org/3/library/re.html
-[regex]: https://pypi.python.org/pypi/regex
-[send2trash]: https://pypi.python.org/pypi/Send2Trash
+[regex]: https://pypi.org/project/regex/
+[send2trash]: https://pypi.org/project/Send2Trash/
 [terminal-notifier]: https://github.com/alloy/terminal-notifier
 [wcmatch]: https://github.com/facelessuser/wcmatch
 [wcmatch-fnmatch]: https://facelessuser.github.io/wcmatch/fnmatch/#syntax
-[wxpython]: https://pypi.python.org/pypi/wxPython/
+[wxpython]: https://pypi.org/project/wxPython/
 [wxpython-prereq]: https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites
