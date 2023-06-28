@@ -87,12 +87,14 @@ You can also restrict which files get searched by providing wild card patterns (
 default, the patterns are applied to the base file or folder name. See [File Patterns](./search.md#wildcard) to learn
 more about accepted wild card pattern syntax and how to configure optional file pattern features.
 
-!!! tip "Hidden Files"
-    Rummage assumes dot files as hidden on all systems. Additionally, on Windows and macOS, it will also look at a
-    file's filesystem attributes to determine if the system is potentially hiding the file as well.
+/// tip | Hidden Files
+Rummage assumes dot files as hidden on all systems. Additionally, on Windows and macOS, it will also look at a
+file's filesystem attributes to determine if the system is potentially hiding the file as well.
+///
 
-!!! new "New 4.4.0"
-    Added symlink following via the **Follow symlinks** toggle.
+/// new | New 4.4.0
+Added symlink following via the **Follow symlinks** toggle.
+///
 
 ### Results
 
@@ -104,9 +106,10 @@ options.
 
 ![Content Tab](images/content_tab.png)
 
-!!! tip "Column Options"
-    You can hide/show columns by right clicking the list header to get a special context menu. You can then deselect or
-    select the the column(s) you wish to hide/show respectively. You can also reorder the columns if desired.
+/// tip | Column Options
+You can hide/show columns by right clicking the list header to get a special context menu. You can then deselect or
+select the the column(s) you wish to hide/show respectively. You can also reorder the columns if desired.
+///
 
 ## Regular Expression Tester
 
@@ -191,8 +194,8 @@ environment.
 
 Replace plugins should contain two things:
 
-1. A plugin class derived from the `rummage.lib.rumcore.ReplacePlugin` class.
-2. A function called `get_replace` that returns your class.
+1.  A plugin class derived from the `rummage.lib.rumcore.ReplacePlugin` class.
+2.  A function called `get_replace` that returns your class.
 
 The plugin class is fairly straight forward and is shown below.
 
@@ -275,31 +278,32 @@ POSIX = 0x2000          # (?p)
 LITERAL = 0x10000           # Literal search
 ```
 
-!!! example "Example Plugin"
-    In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is
-    assumed this is not a binary replace, so a Unicode string is returned.
+/// example | Example Plugin
+In the example below, we have a replace plugin that replaces the search result with the name of the file.  It is
+assumed this is not a binary replace, so a Unicode string is returned.
 
-    ```py3
-    from __future__ import unicode_literals
-    from rummage.lib import rumcore
-    import os
-
-
-    class TestReplace(rumcore.ReplacePlugin):
-        """Replace object."""
-
-        def replace(self, m):
-            """Replace method."""
-
-            name = os.path.basename(self.get_file_name())
-            return name
+```py3
+from __future__ import unicode_literals
+from rummage.lib import rumcore
+import os
 
 
-    def get_replace():
-        """Get the replace object."""
+class TestReplace(rumcore.ReplacePlugin):
+    """Replace object."""
 
-        return TestReplace
-    ```
+    def replace(self, m):
+        """Replace method."""
+
+        name = os.path.basename(self.get_file_name())
+        return name
+
+
+def get_replace():
+    """Get the replace object."""
+
+    return TestReplace
+```
+///
 
 ## Export to CSV or HTML
 
@@ -309,6 +313,7 @@ Rummage allows the exporting of the results to either CSV or HTML. Simply select
 **CSV** or **HTML**.  The HTML output will be styled similar to the GUI interface with the results in tables with
 sortable columns.
 
-!!! info "Large Result Sets"
-    Really, really large sets of results will probably be best suited for CSV as a browser may have a hard time loading
-    the entire data set at once.
+/// info | Large Result Sets
+Really, really large sets of results will probably be best suited for CSV as a browser may have a hard time loading
+the entire data set at once.
+///

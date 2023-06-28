@@ -11,41 +11,44 @@ be configured.
 
 The **General** tab contains a couple of useful settings.
 
+/// define
 Single Instance
-: 
-    By default, Rummage will allow for multiple windows to be open.  If this option is enabled, the first window will be
+
+-   By default, Rummage will allow for multiple windows to be open.  If this option is enabled, the first window will be
     be the only window to open.  All subsequent instances will pass their arguments to the first and close without
     showing a window.
 
 Language
-: 
-    Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian
+
+-   Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian
     is outdated but includes a fair bit of the needed translations. See [Localization](./extras.md#localization) to
     learn more about improving current translations or adding additional translations.
+///
 
 Updates
-: 
-    Controls whether Rummage will check for new updates daily and allows controlling whether you want to be notified of
+
+-   Controls whether Rummage will check for new updates daily and allows controlling whether you want to be notified of
     prereleases as well. A button has also been provided to check for updates right away after configuring your update
     settings.
 
     The check is only a check for new versions and doesn't perform an upgrade.  Rummage must be upgraded via `pip` from
     command line.
 
-    !!! info "Update Issues: Python 3.6+ on macOS"
-        There is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates
-        required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
+    /// info | Update Issues: Python 3.6+ on macOS
+    There is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates
+    required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
 
-        It is possible that a given installation method resolves this automatically, but if not, the following steps
-        should help. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to
-        navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script
-        will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed
-        bundle location. If you are using something like macports, then you'll probably have to research to find out how
-        to do the same thing.
+    It is possible that a given installation method resolves this automatically, but if not, the following steps
+    should help. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to
+    navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script
+    will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed
+    bundle location. If you are using something like macports, then you'll probably have to research to find out how
+    to do the same thing.
+    ///
 
 International Time
-: 
-    Rummage displays file creation and modified time in the form `Jul 01, 2018, 03:00:00 AM`, but you can enable this
+
+-   Rummage displays file creation and modified time in the form `Jul 01, 2018, 03:00:00 AM`, but you can enable this
     option to display the times in international format: `2018-07-01 03:00:00`.
 
 ## Search
@@ -64,15 +67,15 @@ Please see [Regex documentation][regex] to learn more.
 Under **File/Folder Matching** are a number options for file and folder matching patterns. Follow the links to learn
 more about each feature:
 
-- [Extended match](./search.md#extended-match-syntax).
-- [Brace expansion](./search.md#brace-expansion-syntax).
-- Case sensitive for [wildcard match](./search.md#wildcard) and for [regular expression match](#regular-expression).
-- [Globstar](./search.md#full-path-matching).
-- [Exclude with `-`](./search.md#basic-wildcard-syntax) which is the default.
-- [Match base](./search.md#full-path-matching).
-- [Full path directory matching](./search.md#full-path-matching).
-- [Full path file matching](./search.md#full-path-matching).
-- [Pattern limit](./search.md#pattern-limit)
+-   [Extended match](./search.md#extended-match-syntax).
+-   [Brace expansion](./search.md#brace-expansion-syntax).
+-   Case sensitive for [wildcard match](./search.md#wildcard) and for [regular expression match](#regular-expression).
+-   [Globstar](./search.md#full-path-matching).
+-   [Exclude with `-`](./search.md#basic-wildcard-syntax) which is the default.
+-   [Match base](./search.md#full-path-matching).
+-   [Full path directory matching](./search.md#full-path-matching).
+-   [Full path file matching](./search.md#full-path-matching).
+-   [Pattern limit](./search.md#pattern-limit)
 
 ## Encoding
 
@@ -106,8 +109,9 @@ Argument Variables | Description
 `{$col}`           | Insert the column number.
 `{$col0}`          | Insert the line column offset by one so the first column is zero instead of one.
 
-!!! new "New 4.7.0"
-    Added `{$col0}` for zero based column values.
+/// new | New 4.7.0
+Added `{$col0}` for zero based column values.
+///
 
 ## Notifications
 
@@ -120,38 +124,41 @@ On Linux, you can set your preferred player: `paplay`, `aplay`, and `play` (`sox
 
 A test button is provided to test the configuration once set.
 
-!!! tip "Supported Notification Sound Formats"
+/// tip | Supported Notification Sound Formats
 
-    Windows | macOS                    | Linux
-    ------- | ------------------------ | -----
-    `wav`   | `wav`, `mp3` and `.aiff` | `wav` and `mp3` (if using `paplay`, `ogg` is also supported)
+Windows | macOS                    | Linux
+------- | ------------------------ | -----
+`wav`   | `wav`, `mp3` and `.aiff` | `wav` and `mp3` (if using `paplay`, `ogg` is also supported)
+///
 
+/// define
 Linux
-: 
-   - Native: Notifications via `notify-send`.
 
-    !!! info "Other Distros"
-        Though Rummage should run on any Linux distro, the native notification option was built around `notify-send` and
-        only tested on Ubuntu. If other distros have a `notify-send` it may also work.
+-   Native: Notifications via `notify-send`.
+
+    /// info | Other Distros
+    Though Rummage should run on any Linux distro, the native notification option was built around `notify-send` and
+    only tested on Ubuntu. If other distros have a `notify-send` it may also work.
+    ///
 
 macOS
-: 
-    - Native: Notification Center via [terminal-notifier][terminal-notifier]. Path to `terminal-notifier` must be
-      configured.
 
-    !!! info "Configuring macOS Native"
-        When selecting `native` on macOS, an option to select the path to terminal notifier will be available since
-        native dialogs rely on `terminal-notifier` to send notifications to the Notification Center. This must be
-        configured or *native* notifications will not work.
+-   Native: Notification Center via [terminal-notifier][terminal-notifier]. Path to `terminal-notifier` must be
+    configured.
 
-        When selecting the `terminal-notifier` path, you can select either the binary directly or the `.<app` bundle
-        (depending on how you installed `terminal-notifier`).  When selecting the `.app` bundle, Rummage will know how
-        to access the binary inside the bundle.
+    /// info | Configuring macOS Native
+    When selecting `native` on macOS, an option to select the path to terminal notifier will be available since
+    native dialogs rely on `terminal-notifier` to send notifications to the Notification Center. This must be
+    configured or *native* notifications will not work.
+
+    When selecting the `terminal-notifier` path, you can select either the binary directly or the `.<app` bundle
+    (depending on how you installed `terminal-notifier`).  When selecting the `.app` bundle, Rummage will know how
+    to access the binary inside the bundle.
+    ///
 
 Windows
-: 
-    - Native: Native windows taskbar notifications.
 
+-   Native: Native windows taskbar notifications.
 
 ## History
 

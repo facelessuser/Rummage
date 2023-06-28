@@ -54,13 +54,14 @@ Force\ &lt;encoding&gt; | Forces all files to be opened with the specified encod
 Use\ chain\ search      | Puts Rummage into ["search chain" mode](./usage.md#search-chains). When in "search chain" mode, rummage will only use saved search chains for search and replace.
 Use\ replace\ plugin    | When enabled, Rummage will use a [replace plugin](./usage.md#replace-plugins) instead of a replace pattern in order to do more advanced replaces.
 
-!!! tip "Encoding Guessing"
+/// tip | Encoding Guessing
 
-    It is always recommended, if you know the encoding, to use `Force encoding` as it will always be the fastest.
-    Encoding guessing can be slow and not always accurate.
+It is always recommended, if you know the encoding, to use `Force encoding` as it will always be the fastest.
+Encoding guessing can be slow and not always accurate.
 
-    Encoding guessing is performed by `chardet` which is a pure Python library and is, by far, the slowest option.  If
-    you manually install `cChardet`, you will have a much faster guessing experience.
+Encoding guessing is performed by `chardet` which is a pure Python library and is, by far, the slowest option.  If
+you manually install `cChardet`, you will have a much faster guessing experience.
+///
 
 ## File Patterns
 
@@ -79,12 +80,12 @@ features are enabled by default.
 If you would prefer regular expression file patterns, please see [Regular Expression](#regular-expression) file
 patterns.
 
-- File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in
-  [Preferences](./preferences.md#search).
-- Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`.
-  There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.
-- `.` is always matched by `*`, `?`, `[]`, etc. To prevent hidden files from being matched, you should uncheck the
-  "Include hidden" option.
+-   File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in
+    [Preferences](./preferences.md#search).
+-   Slashes are generally treated as normal characters, but on windows they will be normalized: `/` will become `\\`.
+    There is no need to explicitly use `\\` in patterns on Windows, but if you do, it will be handled.
+-   `.` is always matched by `*`, `?`, `[]`, etc. To prevent hidden files from being matched, you should uncheck the
+    "Include hidden" option.
 
 #### Basic Wildcard syntax
 
@@ -114,35 +115,36 @@ Pattern           | Meaning
 `\v`              |  ASCII Vertical Tab (VT).
 
 
-!!! example "Example Patterns"
+/// example | Example Patterns
 
-    Used in the `Files which match` box, this would match all Python files of `.py` extensions excluding `__init__.py`:
+Used in the `Files which match` box, this would match all Python files of `.py` extensions excluding `__init__.py`:
 
-    ```
-    *.py|-__init__.py
-    ```
+```
+*.py|-__init__.py
+```
 
-    Used in the `Files which match` box, this would match any file type that is not `.py`.
+Used in the `Files which match` box, this would match any file type that is not `.py`.
 
-    ```
-    -*.py
-    ```
+```
+-*.py
+```
 
-    Used in the `Exclude folders`, this would exclude all folders with `name` followed by a single digit, except `name3`
-    which we will always be included.
+Used in the `Exclude folders`, this would exclude all folders with `name` followed by a single digit, except `name3`
+which we will always be included.
 
-    ```
-    name[0-9]|-name3
-    ```
+```
+name[0-9]|-name3
+```
 
-    Used in the `Exclude folders`, this would exclude all folders except `name3`.
+Used in the `Exclude folders`, this would exclude all folders except `name3`.
 
-    ```
-    -name3
-    ```
+```
+-name3
+```
 
-    If you need to escape `-` or `|`, you can put them in a sequence: `[-|]`. Remember to place `-` at the beginning of
-    a sequence as `-` is also used to specify character ranges: `[a-z]`.
+If you need to escape `-` or `|`, you can put them in a sequence: `[-|]`. Remember to place `-` at the beginning of
+a sequence as `-` is also used to specify character ranges: `[a-z]`.
+///
 
 #### Extended Match Syntax
 
@@ -158,24 +160,25 @@ Pattern           | Meaning
 `!(pattern_list)` | The pattern matches if the input string cannot be matched with any of the patterns in the `pattern_list`. Requires extended match feature to be enabled.
 `{}`              | Bash style brace expansions.  This is applied to patterns before anything else. Requires brace expansion feature to be enabled.
 
-!!! example "Example Extended Match Patterns"
+/// example | Example Extended Match Patterns
+For example, if we wanted to match files `this-file.txt` and `that-file.txt`, we could provide the following pattern:
 
-    For example, if we wanted to match files `this-file.txt` and `that-file.txt`, we could provide the following pattern:
+```
+@(this|that)-file.txt
+```
 
-    ```
-    @(this|that)-file.txt
-    ```
+The `|` contained within an extended match group will not split the pattern. So it is safe to combine with other patterns:
 
-    The `|` contained within an extended match group will not split the pattern. So it is safe to combine with other patterns:
+```
+@(this|that)-file.txt|*.py
+```
+///
 
-    ```
-    @(this|that)-file.txt|*.py
-    ```
-
-!!! tip "`!` and Extended Match Syntax"
-    If you have changed Rummage to use `!` instead of `-` for exclusion patterns and have enabled extended match
-    patterns, you must escape `(` at the start of a file if you want the pattern to be recognized as an exclusion
-    pattern instead of treating it as the start of an extended match pattern (`!(...)`).
+/// tip | `!` and Extended Match Syntax
+If you have changed Rummage to use `!` instead of `-` for exclusion patterns and have enabled extended match
+patterns, you must escape `(` at the start of a file if you want the pattern to be recognized as an exclusion
+pattern instead of treating it as the start of an extended match pattern (`!(...)`).
+///
 
 #### Brace Expansion Syntax
 
@@ -197,13 +200,13 @@ Pattern           | Meaning
 `{,}`             | Bash style brace expansions.  This is applied to patterns before anything else. Requires brace expansion feature to be enabled.
 `{n1..n2[..i]}`   | Bash style sequences that expands a range of numbers or alphabetic characters by an optional increment.
 
-!!! example "Example Brace Expansion"
-
-    - `a{b,{c,d}}` --> `ab ac ad`
-    - `{1..3}` --> `1 2 3`
-    - `{a..d}` --> `a b c d`
-    - `{2..4..2}` --> `2 4`
-    - `{a..e..2}` --> `a c e`
+/// example | Example Brace Expansion
+-   `a{b,{c,d}}` --> `ab ac ad`
+-   `{1..3}` --> `1 2 3`
+-   `{a..d}` --> `a b c d`
+-   `{2..4..2}` --> `2 4`
+-   `{a..e..2}` --> `a c e`
+///
 
 #### Full Path Matching
 

@@ -117,10 +117,14 @@
 <h3 id="windows">Windows</h3>
 <ol>
 <li>
-<p>Create a file <code>rummage.reg</code> with the content from one of the entries below. Replace <code>&lt;python_install_path&gt;</code> with the actual path to your Python directory (usually something like: <code>c:\Python35</code>).  Remember to escape backslashes appropriately. Also note that we quote <code>%1</code> to allow spaces in the command line argument. Paths may vary, and it is left up to the user to discover where their Python install directory is.</p>
+<p>Create a file <code>rummage.reg</code> with the content from one of the entries below. Replace <code>&lt;python_install_path&gt;</code> with the
+   actual path to your Python directory (usually something like: <code>c:\Python35</code>).  Remember to escape backslashes
+   appropriately. Also note that we quote <code>%1</code> to allow spaces in the command line argument. Paths may vary, and it is
+   left up to the user to discover where their Python install directory is.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>This isn't a guide in how to do registry editing proper, so only edit the registry if you are certain of what you are doing.</p>
+<p>This isn't a guide in how to do registry editing proper, so only edit the registry if you are certain of what you
+are doing.</p>
 </div>
 <div class="highlight"><pre><span></span><code><span class="na">Windows Registry Editor Version 5.00</span>
 
@@ -160,12 +164,16 @@
 <li>Double click the registry file to add the context menu into Windows Explorer.</li>
 </ol>
 <h3 id="linux">Linux</h3>
-<p>There are many different flavors of Linux using different file managers.  This makes it difficult to give a guide to cover all cases.  Please research about your specific distro's file manager and how to add context menus.  If you would like to include the info here, please issue a pull request to update the documentation.</p>
+<p>There are many different flavors of Linux using different file managers.  This makes it difficult to give a guide to
+cover all cases.  Please research about your specific distro's file manager and how to add context menus.  If you would
+like to include the info here, please issue a pull request to update the documentation.</p>
 <h4 id="ubuntu-nautilus-gnome">Ubuntu Nautilus (Gnome)</h4>
 <p>Paths might vary depending on Ubuntu version etc.</p>
 <ol>
 <li>
-<p>Create an executable file called <code>Rummage Here...</code> in <code>~/.local/share/nautilus/scripts/</code> with the following content (RUMMAGE_PATH should be the binary created when installing rummage in Python which is usually <code>/usr/local/bin/rummage</code>).</p>
+<p>Create an executable file called <code>Rummage Here...</code> in <code>~/.local/share/nautilus/scripts/</code> with the following content
+    (RUMMAGE_PATH should be the binary created when installing rummage in Python which is usually
+    <code>/usr/local/bin/rummage</code>).</p>
 <div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/python</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
@@ -180,7 +188,8 @@
 </code></pre></div>
 </li>
 <li>
-<p>Restart of Nautilus may or may not be needed, but context menu item should appear under <code>Scripts</code> and should work on files and folders.</p>
+<p>Restart of Nautilus may or may not be needed, but context menu item should appear under <code>Scripts</code> and should work on
+    files and folders.</p>
 </li>
 </ol>
 <h4 id="ubuntu-dolphin-kde">Ubuntu Dolphin (KDE)</h4>
@@ -193,10 +202,13 @@
 </code></pre></div>
 </li>
 <li>
-<p>Next create your <code>.desktop</code> file in one of these locations creating the necessary folder(s) if needed.  In this example, the file will be created at <code>~/.local/share/kservices5/ServiceMenus/rummage.desktoop</code>.</p>
+<p>Next create your <code>.desktop</code> file in one of these locations creating the necessary folder(s) if needed.  In this
+    example, the file will be created at <code>~/.local/share/kservices5/ServiceMenus/rummage.desktoop</code>.</p>
 </li>
 <li>
-<p>Provide the necessary configuration to specify the entry type, file targets, command to execute, icon, etc. In our case, we specify <code>all/all</code> to target both files and folders. We also point to one of the PNG files that ship in the package for the icon.</p>
+<p>Provide the necessary configuration to specify the entry type, file targets, command to execute, icon, etc. In our
+    case, we specify <code>all/all</code> to target both files and folders. We also point to one of the PNG files that ship in the
+    package for the icon.</p>
 <div class="highlight"><pre><span></span><code><span class="k">[Desktop Entry]</span>
 <span class="na">Type</span><span class="o">=</span><span class="s">Service</span>
 <span class="na">X-KDE-ServiceTypes</span><span class="o">=</span><span class="s">KonqPopupMenu/Plugin</span>
@@ -222,41 +234,52 @@
 <p>In Ubuntu 18.04, XFCE4 uses Thunar. Thunar has a built in way of setting custom context menu items. This may or may not
 apply to other distros.</p>
 <ol>
-<li>In Thunar, select <code>Edit &gt; Configure Custom Actions...</code>. You will be presented with the custom actions dialog.</li>
-</ol>
+<li>
+<p>In Thunar, select <code>Edit &gt; Configure Custom Actions...</code>. You will be presented with the custom actions dialog.</p>
 <p><img alt="Thunar Custom Actions" src="images/thunar-custom.png" /></p>
-<ol>
-<li>Simply press the button with the <code>+</code> to create a new entry. Fill in the inputs as shown below (or modify to your
-   preference):</li>
-</ol>
+</li>
+<li>
+<p>Simply press the button with the <code>+</code> to create a new entry. Fill in the inputs as shown below (or modify to your
+    preference):</p>
 <p><img alt="Thunar Basic Options" src="images/thunar-basic.png" /></p>
-<ol>
-<li>Then select the <code>Appearance Conditions</code> tab and fill in the fields as shown below (or modify to your preference):</li>
-</ol>
+</li>
+<li>
+<p>Then select the <code>Appearance Conditions</code> tab and fill in the fields as shown below (or modify to your preference):</p>
 <p><img alt="Thunar Condition Options" src="images/thunar-conditions.png" /></p>
+</li>
+</ol>
 <p>Afterwards, you should have a Rummage context menu on both files and directories in Thunar.</p>
 <h2 id="localization">Localization</h2>
-<p>Rummage provides an i18n localization framework to allow support for displaying the UI in other locales. Currently the project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).</p>
+<p>Rummage provides an i18n localization framework to allow support for displaying the UI in other locales. Currently the
+project only has an incomplete Russian translation (I don't speak Russian, so I can't complete it).</p>
 <p>Translations should be compiled and included by default requiring no additional steps starting in version 3.6.0.</p>
-<p>I only speak English, so I do not maintain the translations. If the UI changes, someone from the community will need to update them appropriately via pull requests or they will remain out of date.</p>
+<p>I only speak English, so I do not maintain the translations. If the UI changes, someone from the community will need to
+update them appropriately via pull requests or they will remain out of date.</p>
 <p>To modify localization, you first must install <code>babel</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>babel
 </code></pre></div>
 <h3 id="editing-existing-translations">Editing Existing Translations</h3>
-<p>Translations are stored at <code>rummage/lib/gui/localization/locale/&lt;LOCALE&gt;/LC_MESSAGES/rummage.po</code>. Just edit the <code>rummage.po</code> for the appropriate <code>&lt;LOCALE&gt;</code>.</p>
-<p>Inside each <code>.po</code> file there will be a <code>msgid</code> for each unique translatable string.  Each <code>msgid</code> represents the actual US English text that is shown in Rummage. Underneath each <code>msgid</code>, you'll also find a <code>msgstr</code> which represents the translation for the <code>msgid</code>. Just edit the corresponding <code>msgstr</code> for each <code>msgid</code> in the existing <code>rummage.po</code> file.</p>
+<p>Translations are stored at <code>rummage/lib/gui/localization/locale/&lt;LOCALE&gt;/LC_MESSAGES/rummage.po</code>. Just edit the
+<code>rummage.po</code> for the appropriate <code>&lt;LOCALE&gt;</code>.</p>
+<p>Inside each <code>.po</code> file there will be a <code>msgid</code> for each unique translatable string.  Each <code>msgid</code> represents the actual
+US English text that is shown in Rummage. Underneath each <code>msgid</code>, you'll also find a <code>msgstr</code> which represents the
+translation for the <code>msgid</code>. Just edit the corresponding <code>msgstr</code> for each <code>msgid</code> in the existing <code>rummage.po</code> file.</p>
 <div class="highlight"><pre><span></span><code>msgid &quot;About&quot;
 msgstr &quot;&lt;my_translation&gt;&quot;
 </code></pre></div>
 <h3 id="generate-new-template-from-source">Generate New Template from Source</h3>
-<p>In the Python source, you'll notice that translatable strings are represented as <code>_("some text")</code>. <code>_</code> is the function that retrieves the proper translations. In order to provide translations, we have to build up a template of all of these strings in a <code>.pot</code> file.  This is done by running:</p>
+<p>In the Python source, you'll notice that translatable strings are represented as <code>_("some text")</code>. <code>_</code> is the function
+that retrieves the proper translations. In order to provide translations, we have to build up a template of all of these
+strings in a <code>.pot</code> file.  This is done by running:</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>pybabel<span class="w"> </span>extract<span class="w"> </span>--input-dirs<span class="o">=</span>rummage<span class="w"> </span>--output-file<span class="o">=</span>rummage/lib/gui/localization/locale/rummage.pot
 </code></pre></div>
 <p>This will scan the Python source and generate a template at <code>rummage/lib/gui/localization/locale/rummage.pot</code>.</p>
-<p>If you update the source in a way that requires generating a new <code>.pot</code> file, then you will most likely need to update existing <code>.po</code> files as well. See <a href="#update-translation-files">Update Translation Files</a> to see how.</p>
+<p>If you update the source in a way that requires generating a new <code>.pot</code> file, then you will most likely need to update
+existing <code>.po</code> files as well. See <a href="#update-translation-files">Update Translation Files</a> to see how.</p>
 <p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#extract-messages"><code>extract_messages</code></a> for more info.</p>
 <h3 id="update-translation-files">Update Translation Files</h3>
-<p>When new strings are added in the source, or strings are changed, you will need to re-generate the <code>.pot</code> file and then update the <code>.po</code> files. This should update all <code>.po</code> files.</p>
+<p>When new strings are added in the source, or strings are changed, you will need to re-generate the <code>.pot</code> file and then
+update the <code>.po</code> files. This should update all <code>.po</code> files.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>pybabel<span class="w"> </span>update<span class="w"> </span>--domain<span class="o">=</span>rummage<span class="w"> </span>--input-file<span class="o">=</span>rummage/lib/gui/localization/locale/rummage.pot<span class="w"> </span>--output-dir<span class="o">=</span>rummage/lib/gui/localization/locale
 </code></pre></div>
 <p>If you need to only update a specific <code>.po</code> file:</p>
@@ -264,7 +287,8 @@ msgstr &quot;&lt;my_translation&gt;&quot;
 </code></pre></div>
 <p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#update-catalog"><code>update_catalog</code></a> for more info.</p>
 <h3 id="create-new-translations">Create New Translations</h3>
-<p>To create a translation <code>.po</code> file to edit, all you need to do is run the command below specifying your locale. The command should create a <code>.po</code> file to edit and the associated directory structure.</p>
+<p>To create a translation <code>.po</code> file to edit, all you need to do is run the command below specifying your locale. The
+command should create a <code>.po</code> file to edit and the associated directory structure.</p>
 <div class="highlight"><pre><span></span><code><span class="go">pybabel init --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale -l en_US</span>
 </code></pre></div>
 <p>See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#init-catalog"><code>init_catalog</code></a> for more info.</p>
@@ -272,7 +296,8 @@ msgstr &quot;&lt;my_translation&gt;&quot;
 <p>Building translations is also pretty easy:</p>
 <div class="highlight"><pre><span></span><code><span class="go">pybabel compile --domain=rummage --directory=rummage/lib/gui/localization/locale</span>
 </code></pre></div>
-<p>This should build <code>.mo</code> files for all languages.  See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#compile-catalog"><code>compile_catalog</code></a> for more info.</p>
+<p>This should build <code>.mo</code> files for all languages.  See Babel's documentation on <a href="http://babel.pocoo.org/en/latest/setup.html#compile-catalog"><code>compile_catalog</code></a>
+for more info.</p>
   </div>
 
   <!-- Navigation -->

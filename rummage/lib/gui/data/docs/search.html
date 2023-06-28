@@ -97,7 +97,7 @@
     <h1 id="search-features">Search Features</h1>
 <h2 id="search-options">Search Options</h2>
 <p>Rummage supports the default regular expression library (<a href="https://docs.python.org/3/library/re.html">Re</a>) that comes with Python and the 3<sup>rd</sup> party
-<a href="https://pypi.python.org/pypi/regex">Regex</a> library, and though the basic syntax and features are similar between the two, Regex provides many
+<a href="https://pypi.org/project/regex/">Regex</a> library, and though the basic syntax and features are similar between the two, Regex provides many
 additional features, some of which causes the syntax to deviate greatly from Re. If you are using Re, you will not see
 all the options shown below. Please check out documentation for whichever engine you have chosen use in order to learn
 more about its specific feature set. This documentation will only briefly cover the features that can be enabled in each
@@ -232,11 +232,11 @@ features are enabled by default.</p>
 patterns.</p>
 <ul>
 <li>File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in
-  <a href="preferences.html#search">Preferences</a>.</li>
+    <a href="preferences.html#search">Preferences</a>.</li>
 <li>Slashes are generally treated as normal characters, but on windows they will be normalized: <code>/</code> will become <code>\\</code>.
-  There is no need to explicitly use <code>\\</code> in patterns on Windows, but if you do, it will be handled.</li>
+    There is no need to explicitly use <code>\\</code> in patterns on Windows, but if you do, it will be handled.</li>
 <li><code>.</code> is always matched by <code>*</code>, <code>?</code>, <code>[]</code>, etc. To prevent hidden files from being matched, you should uncheck the
-  "Include hidden" option.</li>
+    "Include hidden" option.</li>
 </ul>
 <h4 id="basic-wildcard-syntax">Basic Wildcard syntax</h4>
 <p>Rummage uses the <a href="https://github.com/facelessuser/wcmatch"><code>wcmatch</code></a> library to implement a specialized version of <a href="https://facelessuser.github.io/wcmatch/fnmatch/#syntax"><code>fnmatch</code></a>
