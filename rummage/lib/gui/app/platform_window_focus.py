@@ -5,7 +5,8 @@ import subprocess
 
 MAC_RAISE_OSASCRIPT = '''\
 tell application "System Events"
-  set procName to name of first process whose unix id is %s
+  set procName to name of first process whose unix id is {}
+  do shell script "echo " & quoted form of procName
 end tell
 tell application procName to activate
 '''

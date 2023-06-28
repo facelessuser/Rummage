@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.18
+
+- **NEW**: Officially support Python 3.11.
+
 ## 4.17
 
 - **NEW**: Officially support Python 3.10.
