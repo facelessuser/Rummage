@@ -133,6 +133,11 @@ class RummageApp(PipeApp):
 
         return args
 
+    def MacNewFile(self, fileName=None):
+        """Handle new window event."""
+
+        self.MacReopenApp()
+
     def MacReopenApp(self):  # noqa
         """Ensure that app will be un-minimized in macOS on dock icon click."""
 
