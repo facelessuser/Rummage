@@ -788,7 +788,7 @@ class RummageFrame(gui.RummageFrame):
                 self.SetSize(wx.Size(width, min_height))
 
         # TODO: Remove once visuals for vertical lines is fixed on mac
-        if WX_VERT_LINE_WORKAROUND and util.platform() == 'macos':
+        if WX_VERT_LINE_WORKAROUND and util.platform() == 'macos':  # pragma: no cover
             self.m_staticline41.Hide()
 
         self.Refresh()
