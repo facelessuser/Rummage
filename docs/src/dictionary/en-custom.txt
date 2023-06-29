@@ -61,6 +61,7 @@ Prerelease
 PyMdown
 PyPI
 PyPI
+RGB
 Re
 Regex
 Regex's
