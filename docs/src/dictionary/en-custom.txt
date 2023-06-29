@@ -160,3 +160,4 @@ wiki
 wildcard
 wxPython
 wxPython's
+wxWidgets
