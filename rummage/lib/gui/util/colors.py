@@ -1,3 +1,4 @@
+"""Color management."""
 from coloraide import Color as Base
 from coloraide import algebra as alg
 
