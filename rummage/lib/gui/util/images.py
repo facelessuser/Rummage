@@ -23,7 +23,7 @@ def tint(byte_string, color, transparency=None):
         p.append([])
         columns = int(len(row) / 4)
         start = 0
-        for _ in range(columns):
+        for x in range(columns):
             color.compose(Color.from_rgb(row[start:start + 3]))
             alpha = row[start + 3]
             # Adjust transparency of image if also desired
@@ -60,7 +60,7 @@ def transparency(byte_string, transparency):
         start = 0
         for x in range(columns):
             alpha = row[start + 3]
-            alpha = round_int(clamp(alpha + (255.0 * transparency) - 255.0, 0.0, 255.0))
+            alpha = int(alg.round_half_up(alg.clamp(alpha + (255.0 * transparency) - 255.0, 0.0, 255.0)))
             p[y] += [row[start], row[start + 1], row[start + 2], alpha]
             start += 4
         y += 1
