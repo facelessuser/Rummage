@@ -53,7 +53,7 @@ class ErrorList(DynamicList):
         """Create image list."""
 
         self.images = wx.ImageList(16, 16)
-        self.tint = Color.from_rgb(self.GetForegroundColour().Get()[:3])
+        self.tint = Color.from_wxbgr(self.GetForegroundColour().GetRGBA(), alpha=False)
         self.error_symbol = self.images.Add(data.get_bitmap('error.png'))
         self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=self.tint, alpha=0.3))
         self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=self.tint, alpha=0.3))

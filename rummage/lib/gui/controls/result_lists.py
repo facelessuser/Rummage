@@ -118,7 +118,7 @@ class CommonOperationsMixin:
         """Create the image list."""
 
         self.images = wx.ImageList(16, 16)
-        self.tint = Color.from_rgb(self.GetForegroundColour().Get()[:3])
+        self.tint = Color.from_wxbgr(self.GetForegroundColour().GetRGBA(), alpha=False)
         self.doc = self.images.Add(data.get_bitmap('doc.png'))
         self.bin = self.images.Add(data.get_bitmap('binary.png'))
         self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=self.tint, alpha=0.3))

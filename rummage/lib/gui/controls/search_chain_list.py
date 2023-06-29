@@ -50,7 +50,7 @@ class SearchChainList(DynamicList):
     def create_image_list(self):
         """Create image list."""
 
-        self.tint = Color.from_rgb(self.GetForegroundColour().Get()[:3])
+        self.tint = Color.from_wxbgr(self.GetForegroundColour().GetRGBA(), alpha=False)
         self.images = wx.ImageList(16, 16)
         self.glass = self.images.Add(data.get_bitmap('glass.png', tint=self.tint))
         self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=self.tint, alpha=0.3))

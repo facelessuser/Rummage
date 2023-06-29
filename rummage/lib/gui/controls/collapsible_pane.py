@@ -104,7 +104,7 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
     def init_collapse_arrow(self):
         """Initialize collapse arrow."""
 
-        tint = Color.from_rgb(self.GetForegroundColour().Get()[:3])
+        tint = Color.from_wxbgr(self.GetForegroundColour().GetRGBA(), alpha=False)
         self.SetBitmapLabel(data.get_bitmap('arrow_down.png', tint=tint, alpha=0.5))
         self.SetBitmapSelected(data.get_bitmap('arrow_right.png', tint=tint, alpha=0.5))
 

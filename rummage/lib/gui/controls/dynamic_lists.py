@@ -102,11 +102,11 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def update_colors(self):
         """Update colors."""
 
-        bg = Color.from_rgb(self.GetBackgroundColour().Get())
-        factor = 0.93 if bg.luminance() >= 0.5 else 1.07
+        bg = Color.from_wxbgr(self.GetBackgroundColour().GetRGBA())
+        factor = 0.93 if bg.luminance() >= 0.5 else 1.10
         if Settings.get_alt_list_color():
-            bg.set('oklab.l', lambda l: l + (1.0 * factor) - 1.0)
-        self.SetAlternateRowColour(wx.Colour(*bg.to_rgb()))
+            bg.set('lab.l', lambda l: l + (100.0 * factor) - 100.0)
+        self.SetAlternateRowColour(wx.Colour(bg.to_wxbgr(alpha=False)))
         self.create_image_list()
         self.Refresh()
 
