@@ -18,6 +18,7 @@ Changelog
 Chardet
 Checkboxes
 Chunked
+ColorAide
 Dec
 Decrement
 Edstrom
