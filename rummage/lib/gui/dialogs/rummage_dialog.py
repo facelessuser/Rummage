@@ -91,6 +91,10 @@ LIMIT_COMPARE = {
     3: "lt"
 }
 
+# Hide vertical separator as they don't look good on 4.2.1
+# TODO: Remove once wxWidgets or wxPython (which ever is the cause) fixes this.
+WX_VERT_LINE_WORKAROUND = wx.__version__ >= '4.2.1'
+
 
 def eng_to_i18n(string, mapping):
     """Convert English to i18n."""
@@ -741,6 +745,7 @@ class RummageFrame(gui.RummageFrame):
 
         # Get this windows useable display size
         display = wx.Display()
+        rect = None
         index = display.GetFromWindow(self)
         if index != wx.NOT_FOUND:
             display = wx.Display(index)
@@ -749,7 +754,8 @@ class RummageFrame(gui.RummageFrame):
         if first_time:
             debug('----Intial screen resize----')
             debug('Screen Index: %d' % index)
-            debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
+            if rect:
+                debug('Screen Client Size: %d x %d' % (rect.GetWidth(), rect.GetHeight()))
             width = mainframe[0]
             height = mainframe[1] + offset
             debug('Window Size: %d x %d' % (width, height))
@@ -780,6 +786,10 @@ class RummageFrame(gui.RummageFrame):
 
             if minimize_height:
                 self.SetSize(wx.Size(width, min_height))
+
+        # TODO: Remove once visuals for vertical lines is fixed on mac
+        if WX_VERT_LINE_WORKAROUND and util.platform() == 'macos':
+            self.m_staticline41.Hide()
 
         self.Refresh()
 

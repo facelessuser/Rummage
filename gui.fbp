@@ -4163,7 +4163,7 @@
                                                                                     <property name="border">5</property>
                                                                                     <property name="colspan">1</property>
                                                                                     <property name="column">5</property>
-                                                                                    <property name="flag">wxEXPAND | wxALL</property>
+                                                                                    <property name="flag">wxALL|wxEXPAND|wxRESERVE_SPACE_EVEN_IF_HIDDEN</property>
                                                                                     <property name="row">0</property>
                                                                                     <property name="rowspan">3</property>
                                                                                     <object class="wxStaticLine" expanded="0">

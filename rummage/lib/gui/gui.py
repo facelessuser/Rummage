@@ -328,7 +328,7 @@ class RummageFrame ( wx.Frame ):
         gbSizer3.Add( self.m_created_spin, wx.GBPosition( 2, 4 ), wx.GBSpan( 1, 1 ), wx.TOP|wx.BOTTOM|wx.RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 
         self.m_staticline41 = wx.StaticLine( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
-        gbSizer3.Add( self.m_staticline41, wx.GBPosition( 0, 5 ), wx.GBSpan( 3, 1 ), wx.EXPAND |wx.ALL, 5 )
+        gbSizer3.Add( self.m_staticline41, wx.GBPosition( 0, 5 ), wx.GBSpan( 3, 1 ), wx.ALL|wx.EXPAND|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5 )
 
         fgSizer32 = wx.FlexGridSizer( 0, 6, 0, 0 )
         fgSizer32.AddGrowableCol( 0 )
