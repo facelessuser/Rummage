@@ -34,7 +34,7 @@ from .. import data
 from ..localization import _
 from ... import rumcore
 from .. import util
-from ..util import rgba
+from ..util.colors import Color
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
 else:
@@ -174,23 +174,25 @@ class RegexTestDialog(gui.RegexTestDialog):
     def calculate_colors(self):
         """Calculate colors."""
 
-        bg = rgba.RGBA(0xFFCC00FF)
-        bg.blend(rgba.RGBA(self.m_test_text.GetBackgroundColour().Get()), 50)
+        bg = Color('#ffcc00')
+        bg.mix(Color.from_rgb(self.m_test_text.GetBackgroundColour().Get()), 0.5)
         self.test_attr = wx.TextAttr(
             self.m_test_text.GetForegroundColour(),
             colBack=self.m_test_text.GetBackgroundColour()
         )
-        fg = (data.RGBA(0x333333FF) if bg.get_luminance() > 127 else data.RGBA(0xbbbbbbFF))
-        self.highlight_attr = wx.TextAttr(wx.Colour(*fg.get_rgb()), colBack=wx.Colour(*bg.get_rgb()))
 
-        bg = rgba.RGBA(0xFF0000FF)
-        bg.blend(rgba.RGBA(self.m_test_replace_text.GetBackgroundColour().Get()), 50)
+        fg = Color('#111' if bg.contrast('#111') > bg.contrast('#eee') else '#eee')
+        self.highlight_attr = wx.TextAttr(wx.Colour(*fg.to_rgb()), colBack=wx.Colour(*bg.to_rgb()))
+
+        bg = Color('#ff0000')
+        bg.mix(Color.from_rgb(self.m_test_replace_text.GetBackgroundColour().Get()), 0.5)
         self.replace_attr = wx.TextAttr(
             self.m_test_replace_text.GetForegroundColour(),
             colBack=self.m_test_replace_text.GetBackgroundColour()
         )
-        fg = (data.RGBA(0x333333FF) if bg.get_luminance() > 127 else data.RGBA(0xbbbbbbFF))
-        self.error_attr = wx.TextAttr(wx.Colour(*fg.get_rgb()), colBack=wx.Colour(*bg.get_rgb()))
+
+        fg = Color('#111' if bg.contrast('#111') > bg.contrast('#eee') else '#eee')
+        self.error_attr = wx.TextAttr(wx.Colour(*fg.to_rgb()), colBack=wx.Colour(*bg.to_rgb()))
 
     def localize(self):
         """Translate strings."""

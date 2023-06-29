@@ -1,6 +1,6 @@
 """Custom time picker that allows us control of the control's color."""
 from wx.lib.masked import TimeCtrl
-from .. util import rgba
+from .. util.colors import Color
 from .. import util
 import wx
 
@@ -18,9 +18,9 @@ class TimePickerCtrl(TimeCtrl):
 
         ctrl = wx.TextCtrl(parent)
         self._bg = ctrl.GetBackgroundColour().GetRGB()
-        bg = rgba.RGBA(0xFF0000FF)
-        bg.blend(rgba.RGBA(ctrl.GetBackgroundColour().Get()), 50)
-        self._error_bg = wx.Colour(*bg.get_rgb()).GetRGB()
+        bg = Color('red')
+        bg.mix(Color.from_rgb(ctrl.GetBackgroundColour().Get()), 0.5, in_place=True)
+        self._error_bg = wx.Colour(*bg.to_rgb()).GetRGB()
         super().__init__(parent, *args, **kwargs)
         font = ctrl.GetFont()
         self.SetFont(wx.Font(font))
@@ -41,9 +41,9 @@ class TimePickerCtrl(TimeCtrl):
         value = self.GetValue()
         ctrl = wx.TextCtrl(self.GetParent())
         self._bg = ctrl.GetBackgroundColour().GetRGB()
-        bg = rgba.RGBA(0xFF0000FF)
-        bg.blend(rgba.RGBA(ctrl.GetBackgroundColour().Get()), 50)
-        self._invalidBackgroundColour = wx.Colour(*bg.get_rgb())
+        bg = Color('red')
+        bg.mix(Color.from_rgb(ctrl.GetBackgroundColour().Get()), 0.5, in_place=True)
+        self._invalidBackgroundColour = wx.Colour(*bg.to_rgb())
         ctrl.Destroy()
         self.SetParameters()
         self.SetValue(value)

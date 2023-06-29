@@ -31,6 +31,7 @@ from .. import util
 from ..settings import Settings
 from ..actions import checksum
 from ..dialogs.generic_dialogs import yesno
+from ..util.colors import Color
 
 CONTENT_PATH = 0
 CONTENT_LINE = 1
@@ -117,7 +118,7 @@ class CommonOperationsMixin:
         """Create the image list."""
 
         self.images = wx.ImageList(16, 16)
-        self.tint = data.RGBA(self.GetForegroundColour().Get()[:3])
+        self.tint = Color.from_rgb(self.GetForegroundColour().Get()[:3])
         self.doc = self.images.Add(data.get_bitmap('doc.png'))
         self.bin = self.images.Add(data.get_bitmap('binary.png'))
         self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=self.tint, alpha=0.3))

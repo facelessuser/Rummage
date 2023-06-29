@@ -8,3 +8,4 @@ send2trash>=1.8.2
 markdown>=3.3.4
 pymdown-extensions>=10.0.1
 pygments>=2.14.1
+coloraide>=2.4

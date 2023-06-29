@@ -18,8 +18,8 @@ else:
 
 
 if _MAC_VER >= (10, 15):
-    MAC_LIGHT = 98
-    MAC_DARK = 109
+    MAC_LIGHT = 132
+    MAC_DARK = 105
 else:
     MAC_LIGHT = 94
     MAC_DARK = 106
