@@ -5,7 +5,8 @@ Licensed under MIT
 Copyright (c) 2015 - 2016 Isaac Muse <isaacmuse@gmail.com>
 """
 from .png import Reader, Writer
-from .rgba import RGBA, round_int, clamp
+from .colors import Color
+from coloraide import algebra as alg
 import io
 
 
@@ -22,14 +23,13 @@ def tint(byte_string, color, transparency=None):
         p.append([])
         columns = int(len(row) / 4)
         start = 0
-        for x in range(columns):
-            rgba = color
-            rgba.apply_alpha(RGBA(row[start:start + 3]))
+        for _ in range(columns):
+            color.compose(Color.from_rgb(row[start:start + 3]))
             alpha = row[start + 3]
             # Adjust transparency of image if also desired
             if transparency is not None:
-                alpha = round_int(clamp(alpha + (255.0 * transparency) - 255.0, 0.0, 255.0))
-            p[y] += [rgba.r, rgba.g, rgba.b, alpha]
+                alpha = int(alg.round_half_up(alg.clamp(alpha + (255.0 * transparency) - 255.0, 0.0, 255.0)))
+            p[y] += color.to_rgb() + [alpha]
             start += 4
         y += 1
 

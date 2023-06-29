@@ -22,6 +22,7 @@ import wx
 from .dynamic_lists import DynamicList
 from ..localization import _
 from .. import data
+from ..util.colors import Color
 
 
 class EncodingList(DynamicList):
@@ -52,7 +53,7 @@ class EncodingList(DynamicList):
         self.images = wx.ImageList(16, 16)
         self.doc = self.images.Add(data.get_bitmap('doc.png'))
         self.bin = self.images.Add(data.get_bitmap('binary.png'))
-        self.tint = data.RGBA(self.GetForegroundColour().Get()[:3])
+        self.tint = Color.from_rgb(self.GetForegroundColour().Get()[:3])
         self.sort_up = self.images.Add(data.get_bitmap('arrow_up.png', tint=self.tint, alpha=0.3))
         self.sort_down = self.images.Add(data.get_bitmap('arrow_down.png', tint=self.tint, alpha=0.3))
         self.AssignImageList(self.images, wx.IMAGE_LIST_SMALL)

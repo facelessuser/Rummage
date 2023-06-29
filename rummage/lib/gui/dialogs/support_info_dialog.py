@@ -126,6 +126,12 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             info["bracex"] = 'Version could not be acquired!'
 
         try:
+            import coloraide
+            info["coloraide"] = format_version(coloraide, '__version__')
+        except Exception:
+            info["coloraide"] = 'Version could not be acquired!'
+
+        try:
             import wcmatch
             info["wcmatch"] = format_version(wcmatch, '__version__')
         except Exception:
@@ -180,6 +186,7 @@ class SupportInfoDialog(gui.SupportInfoDialog):
             - WxPython: %(wxpython)s
             - Backrefs: %(backrefs)s
             - Bracex: %(bracex)s
+            - ColorAide: %(coloraide)s
             - Wcmatch: %(wcmatch)s
             - Chardet: %(chardet)s
             - cChardet: %(cchardet)s

@@ -3,6 +3,7 @@ import wx
 import wx.lib.agw.pycollapsiblepane as pycollapse
 import wx.lib.buttons as buttons
 from .. import data
+from ..util.colors import Color
 
 
 class CollapsiblePane(pycollapse.PyCollapsiblePane):
@@ -103,9 +104,9 @@ class CollapseButton(buttons.GenBitmapTextToggleButton):
     def init_collapse_arrow(self):
         """Initialize collapse arrow."""
 
-        color = data.RGBA(self.GetForegroundColour().Get()[:3])
-        self.SetBitmapLabel(data.get_bitmap('arrow_down.png', tint=color, alpha=0.5))
-        self.SetBitmapSelected(data.get_bitmap('arrow_right.png', tint=color, alpha=0.5))
+        tint = Color.from_rgb(self.GetForegroundColour().Get()[:3])
+        self.SetBitmapLabel(data.get_bitmap('arrow_down.png', tint=tint, alpha=0.5))
+        self.SetBitmapSelected(data.get_bitmap('arrow_right.png', tint=tint, alpha=0.5))
 
     def SetForegroundColour(self, color):
         """Set foreground color."""

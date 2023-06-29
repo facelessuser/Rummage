@@ -4,7 +4,6 @@ import codecs
 import base64
 from wx.lib.embeddedimage import PyEmbeddedImage
 from .. import util
-from ..util.rgba import RGBA  # noqa: F401
 from ..util import images
 
 RESOURCE_PATH = os.path.abspath(os.path.dirname(__file__))

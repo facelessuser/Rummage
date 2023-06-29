@@ -25,7 +25,7 @@ from .. import util
 from collections import OrderedDict
 import locale
 from ..settings import Settings
-from .. util import rgba
+from .. util.colors import Color
 
 MINIMUM_COL_SIZE = 100
 COLUMN_SAMPLE_SIZE = 100
@@ -102,11 +102,11 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def update_colors(self):
         """Update colors."""
 
-        bg = rgba.RGBA(self.GetBackgroundColour().Get())
-        factor = 0.93 if bg.get_luminance() >= 127 else 1.07
+        bg = Color.from_rgb(self.GetBackgroundColour().Get())
+        factor = 0.93 if bg.luminance() >= 0.5 else 1.07
         if Settings.get_alt_list_color():
-            bg.brightness(factor)
-        self.SetAlternateRowColour(wx.Colour(*bg.get_rgb()))
+            bg.set('oklab.l', lambda l: l + (1.0 * factor) - 1.0)
+        self.SetAlternateRowColour(wx.Colour(*bg.to_rgb()))
         self.create_image_list()
         self.Refresh()
 

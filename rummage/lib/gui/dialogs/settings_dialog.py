@@ -29,9 +29,9 @@ from ..localization import _
 from .. import gui
 from .. import notify
 from ..notify.util import which
-from .. import data
 from ... import rumcore
 from .. import util
+from ..util.colors import Color
 from ..controls import webview
 
 EDITOR_HELP = _("""
@@ -197,7 +197,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
                 page.SetBackgroundColour(wx.NullColour)
                 bg = page.GetBackgroundColour()
             if util.platform() == "macos" and not util.MAC_OLD:
-                factor = util.MAC_LIGHT if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else util.MAC_DARK
+                factor = util.MAC_LIGHT if Color.from_wxbgr(bg.GetRGB()).luminance() > 0.5 else util.MAC_DARK
                 bg = bg.ChangeLightness(factor)
             page.SetBackgroundColour(bg)
             if x == 0 and util.platform() != "linux":

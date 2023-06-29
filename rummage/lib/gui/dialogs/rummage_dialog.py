@@ -67,6 +67,7 @@ from .. import notify
 from ... import __meta__
 from ... import rumcore
 from .. import util
+from ..util.colors import Color
 import decimal
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
@@ -467,7 +468,8 @@ class RummageFrame(gui.RummageFrame):
                 page.SetBackgroundColour(wx.NullColour)
                 bg = page.GetBackgroundColour()
             if util.platform() == "macos" and not util.MAC_OLD:
-                factor = util.MAC_LIGHT if data.RGBA(util.to_rgb(bg.GetRGB())).get_luminance() > 127 else util.MAC_DARK
+                color = Color.from_wxbgr(bg.GetRGB())
+                factor = util.MAC_LIGHT if color.luminance() > 0.5 else util.MAC_DARK
                 bg = bg.ChangeLightness(factor)
             page.SetBackgroundColour(bg)
             if x == 0:
