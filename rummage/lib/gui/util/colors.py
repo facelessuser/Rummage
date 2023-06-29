@@ -17,16 +17,16 @@ def reverse_channels(color, alpha=False):
 class Color(Base):
     """Color object."""
 
-    def to_wxbgr(self):
+    def to_wxbgr(self, alpha=True):
         """Get the the wxPython RGB value."""
 
         r, g, b = [alg.clamp(int(alg.round_half_up(c * 255)), 0, 255) for c in self.convert('srgb').coords(nans=False)]
-        a = alg.clamp(int(alg.round_half_up(self.alpha(nans=False))))
+        a = alg.clamp(int(alg.round_half_up(self.alpha(nans=False)))) if alpha else 0xFF
         color = (r << 24) | (g << 16) | (b << 8) | a
         return reverse_channels(color, alpha=True)
 
     @classmethod
-    def from_wxbgr(cls, color):
+    def from_wxbgr(cls, color, alpha=True):
         """Get a color object from the wxPython RGB value."""
 
         color = reverse_channels(color, alpha=True)
@@ -39,22 +39,5 @@ class Color(Base):
             alg.clamp((color & 0xFF0000) >> 16, 0, 255) / 255,
             alg.clamp((color & 0xFF00) >> 8, 0, 255) / 255
         )
-        a = alg.clamp((color & 0xFF), 0, 255) / 255
+        a = (alg.clamp((color & 0xFF), 0, 255) / 255) if alpha else 1
         return cls('srgb', rgb, a)
-
-    @classmethod
-    def from_rgb(cls, color):
-        """Get color from RGB values between (0 - 255)."""
-
-        if len(color) == 3:
-            return cls('srgb', [c / 255 for c in color])
-        else:
-            return cls('srgb', [c / 255 for c in color[:-1]], color[-1] / 255)
-
-    def to_rgb(self, alpha=False):
-        """Get RGB values between 0 - 255."""
-
-        values = [alg.clamp(int(alg.round_half_up(c * 255)), 0, 255) for c in self.coords(nans=False)]
-        if alpha:
-            values.append(alg.clamp(int(alg.round_half_up(self.alpha(nans=False) * 255)), 0, 255))
-        return values

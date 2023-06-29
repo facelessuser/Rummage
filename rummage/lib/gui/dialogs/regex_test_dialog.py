@@ -175,24 +175,27 @@ class RegexTestDialog(gui.RegexTestDialog):
         """Calculate colors."""
 
         bg = Color('#ffcc00')
-        bg.mix(Color.from_rgb(self.m_test_text.GetBackgroundColour().Get()), 0.5)
+        bg.mix(Color.from_wxbgr(self.m_test_text.GetBackgroundColour().GetRGBA()), 0.5)
         self.test_attr = wx.TextAttr(
             self.m_test_text.GetForegroundColour(),
             colBack=self.m_test_text.GetBackgroundColour()
         )
 
         fg = Color('#111' if bg.contrast('#111') > bg.contrast('#eee') else '#eee')
-        self.highlight_attr = wx.TextAttr(wx.Colour(*fg.to_rgb()), colBack=wx.Colour(*bg.to_rgb()))
+        self.highlight_attr = wx.TextAttr(
+            wx.Colour(fg.to_wxbgr(alpha=False)),
+            colBack=wx.Colour(bg.to_wxbgr(alpha=False))
+        )
 
         bg = Color('#ff0000')
-        bg.mix(Color.from_rgb(self.m_test_replace_text.GetBackgroundColour().Get()), 0.5)
+        bg.mix(Color.from_wxbgr(self.m_test_replace_text.GetBackgroundColour().GetRGBA()), 0.5)
         self.replace_attr = wx.TextAttr(
             self.m_test_replace_text.GetForegroundColour(),
             colBack=self.m_test_replace_text.GetBackgroundColour()
         )
 
         fg = Color('#111' if bg.contrast('#111') > bg.contrast('#eee') else '#eee')
-        self.error_attr = wx.TextAttr(wx.Colour(*fg.to_rgb()), colBack=wx.Colour(*bg.to_rgb()))
+        self.error_attr = wx.TextAttr(wx.Colour(fg.to_wxbgr(alpha=False)), colBack=wx.Colour(bg.to_wxbgr(alpha=False)))
 
     def localize(self):
         """Translate strings."""
