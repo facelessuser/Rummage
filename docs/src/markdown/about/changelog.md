@@ -7,6 +7,7 @@
     does not build on Python 3.11+.
 -   **NEW**: Update required minimum versions for many of our dependencies.
 -   **NEW**: Add ColorAide dependency to manage colors.
+-   **NEW**: More precisely match mac window background colors without wallpaper tinting.
 -   **FIX**: Hide vertical separator on macOS as there is a visual glitch with vertical separators in the latest
     wxPython and/or wxWidgets.
 

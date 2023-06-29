@@ -1,4 +1,5 @@
 """Compatibility module."""
+import wx
 import re
 import sys
 import codecs
@@ -17,12 +18,14 @@ else:
     _PLATFORM = "linux"
 
 
-if _MAC_VER >= (10, 15):
-    MAC_LIGHT = 132
-    MAC_DARK = 105
+WX_420 = wx.__version__ >= '4.2.0'
+
+if WX_420:
+    MAC_LIGHT = 1.023
+    MAC_DARK = 1.043
 else:
-    MAC_LIGHT = 94
-    MAC_DARK = 106
+    MAC_LIGHT = 0.99
+    MAC_DARK = 1.085
 
 # High Sierra and below
 MAC_OLD = _MAC_VER < (10, 14)

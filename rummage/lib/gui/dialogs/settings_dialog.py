@@ -197,8 +197,10 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
                 page.SetBackgroundColour(wx.NullColour)
                 bg = page.GetBackgroundColour()
             if util.platform() == "macos" and not util.MAC_OLD:
-                factor = util.MAC_LIGHT if Color.from_wxbgr(bg.GetRGB()).luminance() > 0.5 else util.MAC_DARK
-                bg = bg.ChangeLightness(factor)
+                color = Color.from_wxbgr(bg.GetRGB())
+                factor = util.MAC_LIGHT if color.luminance() > 0.5 else util.MAC_DARK
+                color.set('lab-d65.lightness', lambda l: l + (100.0 * factor) - 100.0)
+                bg.SetRGB(color.to_wxbgr())
             page.SetBackgroundColour(bg)
             if x == 0 and util.platform() != "linux":
                 self.m_settings_notebook.SetBackgroundColour(wx.Colour(bg))

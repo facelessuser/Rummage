@@ -93,7 +93,7 @@ LIMIT_COMPARE = {
 
 # Hide vertical separator as they don't look good on 4.2.1
 # TODO: Remove once wxWidgets or wxPython (which ever is the cause) fixes this.
-WX_VERT_LINE_WORKAROUND = wx.__version__ >= '4.2.1'
+WX_VERT_LINE_WORKAROUND = wx.__version__ >= '4.2.0'
 
 
 def eng_to_i18n(string, mapping):
@@ -474,7 +474,8 @@ class RummageFrame(gui.RummageFrame):
             if util.platform() == "macos" and not util.MAC_OLD:
                 color = Color.from_wxbgr(bg.GetRGB())
                 factor = util.MAC_LIGHT if color.luminance() > 0.5 else util.MAC_DARK
-                bg = bg.ChangeLightness(factor)
+                color.set('lab-d65.lightness', lambda l: l + (100.0 * factor) - 100.0)
+                bg.SetRGB(color.to_wxbgr())
             page.SetBackgroundColour(bg)
             if x == 0:
                 if util.platform() != "linux":
