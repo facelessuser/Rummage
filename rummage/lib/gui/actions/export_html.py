@@ -145,7 +145,7 @@ def export_result_list(res, html):
     )
 
     for item in res.values():
-        content.append(
+        content.append(  # noqa: PERF401
             RESULT_ROW % {
                 "file": html_encode(item[0]),
                 "matches": util.to_ustr(item[1]),
@@ -189,7 +189,7 @@ def export_result_content_list(res, html):
     )
 
     for item in res.values():
-        content.append(
+        content.append(  # noqa: PERF401
             RESULT_CONTENT_ROW % {
                 "file_sort": html_encode(os.path.join(item[0][1], item[0][0])),
                 "file": html_encode(item[0][0]),
@@ -282,7 +282,7 @@ def export(export_html, chain, result_list, result_content_list):
 
         search_label_regex = html_encode(_("Regex search:"))
         search_label_literal = html_encode(_("Literal search:"))
-        for pattern, replace, flags in chain:
+        for pattern, _replace, flags in chain:
             html.write(
                 TABS_END % {
                     "search": html_encode(pattern),

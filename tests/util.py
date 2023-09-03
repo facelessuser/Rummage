@@ -27,6 +27,7 @@ def change_cwd(path, quiet=False):
     Return a context manager that changes the current working directory.
 
     Arguments:
+    ---------
       path: the directory to use as the temporary current working directory.
       quiet: if False (the default), the context manager raises an exception
         on error.  Otherwise, it issues only a warning and keeps the current

@@ -469,9 +469,11 @@ class Settings:
         languages = []
         base = localization.locale_path
         if os.path.exists(base):
-            for file_obj in os.listdir(base):
-                if os.path.isdir(os.path.join(base, file_obj)):
-                    languages.append(file_obj)
+            languages = [
+                os.path.isdir(os.path.join(base, file_obj))
+                for file_obj in os.listdir(base)
+                if os.path.isdir(os.path.join(base, file_obj))
+            ]
         if len(languages) == 0 or "en_US" not in languages:
             languages.append("en_US")
         languages.sort()
@@ -952,7 +954,7 @@ class Settings:
             try:
                 if os.path.exists(img):
                     os.remove(img)
-            except Exception:
+            except Exception:  # noqa: PERF203
                 pass
 
         png = os.path.join(data.RESOURCE_PATH, "rummage_1024.png")

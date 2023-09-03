@@ -468,7 +468,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                     path = self.GetItem(item, col=self.get_virt_col(FILE_PATH)).GetText()
                     files.add(os.path.join(path, filename))
                 item = self.GetNextItem(item)
-        return sorted(list(files))
+        return sorted(files)
 
     def on_rclick(self, event):
         """Show context menu on right click."""
@@ -498,9 +498,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
             if not enabled:
                 item = -1
 
-            hash_entries = []
-            for h in checksum.VALID_HASH:
-                hash_entries.append((h, functools.partial(self.on_checksum, h=h, target=target)))
+            hash_entries = [(h, functools.partial(self.on_checksum, h=h, target=target)) for h in checksum.VALID_HASH]
 
             # Open menu
             menu = ContextMenu(
@@ -784,7 +782,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                     filename = self.GetItem(item, col=self.get_virt_col(CONTENT_PATH)).GetText()
                     files.add(os.path.join(path, filename))
                 item = self.GetNextItem(item)
-        return sorted(list(files))
+        return sorted(files)
 
     def on_rclick(self, event):
         """Show context menu on right click."""
@@ -817,9 +815,7 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
             if not enabled:
                 item = -1
 
-            hash_entries = []
-            for h in checksum.VALID_HASH:
-                hash_entries.append((h, functools.partial(self.on_checksum, h=h, target=target)))
+            hash_entries = [(h, functools.partial(self.on_checksum, h=h, target=target)) for h in checksum.VALID_HASH]
 
             # Open menu
             menu = ContextMenu(

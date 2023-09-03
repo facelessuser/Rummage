@@ -62,7 +62,7 @@ def _strip_comments(text, preserve_lines=False):
         g = m.groupdict()
         return g["code"] if g["code"] is not None else remove_comments(g["comments"], preserve_lines)
 
-    return ''.join(map(lambda m: evaluate(m, preserve_lines), regex.finditer(text)))
+    return ''.join((evaluate(m, preserve_lines) for m in regex.finditer(text)))
 
 
 def _strip_dangling_commas(text, preserve_lines=False):
@@ -89,7 +89,7 @@ def _strip_dangling_commas(text, preserve_lines=False):
         g = m.groupdict()
         return remove_comma(g, preserve_lines) if g["code"] is None else g["code"]
 
-    return ''.join(map(lambda m: evaluate(m, preserve_lines), regex.finditer(text)))
+    return ''.join((evaluate(m, preserve_lines) for m in regex.finditer(text)))
 
 
 def sanitize(text, preserve_lines=False):

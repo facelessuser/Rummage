@@ -237,10 +237,10 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
                 good_keys.add('encoding_options.%s' % k)
 
         for k in bad_keys:
-            self.results.append(self.IMPORT_FAIL_CHAIN % k)
+            self.results.append(self.IMPORT_FAIL_CHAIN % k)  # noqa: PERF401
 
         for k in good_keys:
-            self.results.append(self.IMPORT_SUCCESS_CHAIN % k)
+            self.results.append(self.IMPORT_SUCCESS_CHAIN % k)  # noqa: PERF401
 
         return new_value
 
@@ -287,7 +287,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
             del value[k]
 
         for k in good_keys:
-            self.results.append(self.IMPORT_SUCCESS_CHAIN % k)
+            self.results.append(self.IMPORT_SUCCESS_CHAIN % k)  # noqa: PERF401
 
         if not value:
             value = None
@@ -370,7 +370,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
             del value[k]
 
         for k in good_keys:
-            self.results.append(self.IMPORT_SUCCESS_SEARCH % k)
+            self.results.append(self.IMPORT_SUCCESS_SEARCH % k)  # noqa: PERF401
 
         if not value:
             value = None

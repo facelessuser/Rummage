@@ -134,11 +134,11 @@ def _verify_hashes(hashes):
         try:
             hashlib.new(item)
             VALID_HASH.append(item)
-        except Exception:
+        except Exception:  # noqa: PERF203
             pass
 
 
-_available_hashes = list(set([x.lower() for x in hashlib.algorithms_available]))
+_available_hashes = list({x.lower() for x in hashlib.algorithms_available})
 _verify_hashes(_available_hashes)
 
 _additional_hashes = {
@@ -153,10 +153,10 @@ _additional_hashes = {
     'whirlpool': whirlpool.whirlpool
 }
 
-for k, v in _additional_hashes.items():
+for k in _additional_hashes.keys():
     try:
         hashlib.new(k)
-    except Exception:
+    except Exception:  # noqa: PERF203
         VALID_HASH.append(k)
 
 VALID_HASH.sort()

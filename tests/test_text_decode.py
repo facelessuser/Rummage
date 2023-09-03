@@ -24,7 +24,7 @@ class _Encoding(unittest.TestCase):
                 try:
                     os.makedirs(base)
                     retry = 0
-                except Exception:
+                except Exception:  # noqa: PERF203
                     retry -= 1
         util.create_empty_file(filename, content)
 
@@ -51,7 +51,7 @@ class _Encoding(unittest.TestCase):
             try:
                 shutil.rmtree(self.tempdir)
                 retry = 0
-            except Exception:
+            except Exception:  # noqa: PERF203
                 retry -= 1
 
     def inspect_bom(self, *parts, content=b''):

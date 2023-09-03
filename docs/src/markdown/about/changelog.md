@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.19
+
+-   **NEW**: Officially support Python 3.12.
+-   **NEW**: Drop support for Python 3.7.
+-   **NEW**: Update some dependencies for latest bug fixes and improvements.
+-   **FIX**: Minor bug fixes.
+
 ## 4.18
 
 -   **NEW**: Officially support Python 3.11.

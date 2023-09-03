@@ -121,9 +121,7 @@ class ColumnDialog(gui.ColumnDialog):
         """Add new chain."""
 
         length = len(self.virtual_columns)
-        self.virtual_columns = []
-        for virt in range(length):
-            self.virtual_columns.append(self.virt2col[virt])
+        self.virtual_columns = [self.virt2col[virt] for virt in range(length)]
         self.changed = True
         self.Close()
 
