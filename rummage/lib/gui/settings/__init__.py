@@ -470,7 +470,7 @@ class Settings:
         base = localization.locale_path
         if os.path.exists(base):
             languages = [
-                os.path.isdir(os.path.join(base, file_obj))
+                file_obj
                 for file_obj in os.listdir(base)
                 if os.path.isdir(os.path.join(base, file_obj))
             ]
