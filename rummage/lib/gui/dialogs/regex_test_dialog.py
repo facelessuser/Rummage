@@ -324,8 +324,8 @@ class RegexTestDialog(gui.RegexTestDialog):
                 self.imported_plugin = (script, module)
 
             return self.imported_plugin[1].get_replace()
-        except Exception:
-            raise PluginException(str(traceback.format_exc()))
+        except Exception as e:
+            raise PluginException(str(traceback.format_exc())) from e
 
     def test_regex(self):
         """Test and highlight search results in content buffer."""

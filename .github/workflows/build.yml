@@ -17,7 +17,7 @@ jobs:
       max-parallel: 4
       matrix:
         platform: [ubuntu-latest, windows-latest]
-        python-version: [3.7, 3.8, 3.9, '3.10', 3.11]
+        python-version: [3.8, 3.9, '3.10', 3.11, 3.12]
         include:
           - python-version: 3.7
             tox-env: py37
@@ -29,8 +29,8 @@ jobs:
             tox-env: py310
           - python-version: '3.11'
             tox-env: py311
-          # - python-version: '3.12'
-          #   tox-env: py312
+          - python-version: '3.12'
+            tox-env: py311
 
     env:
       TOXENV: ${{ matrix.tox-env }}
@@ -43,6 +43,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip build coverage tox

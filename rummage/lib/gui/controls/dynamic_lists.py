@@ -283,7 +283,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
     def set_item_map(self, idx, *args):
         """Set new entry in item map."""
 
-        self.itemDataMap[idx] = tuple([a for a in args])
+        self.itemDataMap[idx] = tuple(args)
         self.itemIndexMap.append(idx)
         # Sample the first "size_sample" to determine
         # column width for when table first loads

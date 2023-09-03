@@ -100,3 +100,86 @@ extract = "pybabel extract --input-dirs=rummage --output-file=rummage/lib/gui/lo
 init = "pybabel init --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale"
 update = "pybabel update --domain=rummage --input-file=rummage/lib/gui/localization/locale/rummage.pot --output-dir=rummage/lib/gui/localization/locale"
 compile = "pybabel compile --domain=rummage --directory=rummage/lib/gui/localization/locale"
+
+[tool.ruff]
+line-length = 120
+
+extend-exclude = [
+    "rummage/lib/gui/gui.py",
+    "tests/encodings/*",
+    "*tiger.py",
+    "*whirlpool.py",
+    "*png.py"
+]
+
+select = [
+    "A",    # flake8-builtins
+    "B",    # flake8-bugbear
+    "D",    # pydocstyle
+    "C4",   # flake8-comprehensions
+    "N",    # pep8-naming
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "PGH",  # pygrep-hooks
+    "RUF",  # ruff
+    # "UP",   # pyupgrade
+    "W",    # pycodestyle
+    "YTT",  # flake8-2020,
+    "PERF"  # Perflint
+]
+
+ignore = [
+    "B034",
+    "E741",
+    "D202",
+    "D401",
+    "D212",
+    "D203",
+    "D417",
+    "N802",
+    "N801",
+    "N803",
+    "N806",
+    "N818",
+    "RUF012",
+    "RUF005",
+    "PGH004",
+    "RUF100"
+]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+skipsdist=true
+envlist=
+    {py38,py39,py310,py311,py312},
+    lint
+
+[testenv]
+passenv = *
+deps=
+    -r requirements/test-project.txt
+    -r requirements/extras.txt
+    -r requirements/test.txt
+commands=
+    {envbindir}/py.test --cov rummage --cov-append tests
+    {envbindir}/coverage html -d {envtmpdir}/coverage
+    {envbindir}/coverage xml
+    {envbindir}/coverage report --show-missing
+
+[testenv:lint]
+passenv = *
+deps=
+    -r requirements/lint.txt
+commands=
+    "{envbindir}"/ruff check .
+
+[testenv:documents]
+passenv = *
+deps=
+    -r requirements/docs.txt
+commands=
+    {envpython} -m mkdocs build --clean --verbose --strict
+    {envpython} -m pyspelling
+    {envpython} {toxinidir}/tools/gen_docs.py --verbose --test
+"""

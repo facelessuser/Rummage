@@ -39,10 +39,9 @@ from ..actions import updates
 try:
     from ..gui import GUI_PATCHED  # noqa: F401
 except ImportError as e:
-    print(e)
     # We forgot to patch the GUI, which will cause issues,
     # so raise a helpful error that points us to what we need to do.
-    raise RuntimeError("GUI has not been patched. Please run tools/gui_patch.py")
+    raise RuntimeError("GUI has not been patched. Please run tools/gui_patch.py") from e
 from .generic_dialogs import errormsg, yesno, infomsg
 from ..app.custom_app import debug, error, get_log_file
 from ..controls import custom_statusbar
@@ -474,7 +473,7 @@ class RummageFrame(gui.RummageFrame):
             if util.platform() == "macos" and not util.MAC_OLD:
                 color = Color.from_wxbgr(bg.GetRGB())
                 factor = util.MAC_LIGHT if color.luminance() > 0.5 else util.MAC_DARK
-                color.set('lab-d65.lightness', lambda l: l + (100.0 * factor) - 100.0)
+                color.set('lab-d65.lightness', lambda l, f=factor: l + (100.0 * f) - 100.0)
                 bg.SetRGB(color.to_wxbgr())
             page.SetBackgroundColour(bg)
             if x == 0:
@@ -818,7 +817,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_force_encode_checkbox.SetValue(Settings.get_search_setting("force_encode_toggle", False))
         encode_val = util.normalize_encoding_name(Settings.get_search_setting("force_encode", "ASCII"))
         if encode_val is None:
-            encode_val == "ASCII"
+            encode_val = "ASCII"
         index = self.m_force_encode_choice.FindString(encode_val)
         if index != wx.NOT_FOUND:
             self.m_force_encode_choice.SetSelection(index)
@@ -899,7 +898,7 @@ class RummageFrame(gui.RummageFrame):
 
         is_selected = False
         selected = self.m_searchfor_textbox.Value
-        chains = sorted(list(Settings.get_chains().keys()))
+        chains = sorted(Settings.get_chains().keys())
 
         for x in range(len(chains)):
             string = chains[x]

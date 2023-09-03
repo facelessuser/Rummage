@@ -89,7 +89,7 @@ def export(export_csv, chain, result_list, result_content_list):
     literal_search = csv_encode(_("Literal Search"))
 
     with codecs.open(export_csv, "w", encoding="utf-8-sig") as csv:
-        for pattern, replace, flags in chain:
+        for pattern, _replace, flags in chain:
             csv.write(
                 "%s,%s\n" % (
                     (literal_search if flags & rumcore.LITERAL else regex_search), csv_encode(pattern)

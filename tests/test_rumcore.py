@@ -30,7 +30,7 @@ class _FileTest(unittest.TestCase):
                 try:
                     os.makedirs(base)
                     retry = 0
-                except Exception:
+                except Exception:  # noqa: PERF203
                     retry -= 1
         util.create_empty_file(filename, content)
 
@@ -57,7 +57,7 @@ class _FileTest(unittest.TestCase):
             try:
                 shutil.rmtree(self.tempdir)
                 retry = 0
-            except Exception:
+            except Exception:  # noqa: PERF203
                 retry -= 1
 
 
@@ -624,7 +624,7 @@ class TestDirWalker(_FileTest):
         )
 
         records = 0
-        for f in walker.imatch():
+        for _f in walker.imatch():
             records += 1
             walker.kill()
 
@@ -641,7 +641,7 @@ class TestDirWalker(_FileTest):
 
         walker.kill()
         records = 0
-        for f in walker.imatch():
+        for _f in walker.imatch():
             records += 1
 
         self.assertTrue(records == 0 or walker.get_skipped() == 0)
@@ -908,7 +908,7 @@ class TestFileSearch(_FileTest):
             max_count
         )
 
-        results = [r for r in fs.run()]
+        results = list(fs.run())
         print(results)
         self.assertEqual(len(results), 2)
 
@@ -952,7 +952,7 @@ class TestFileSearch(_FileTest):
             max_count
         )
 
-        results = [r for r in fs.run()]
+        results = list(fs.run())
         print(results)
         self.assertEqual(len(results), 4)
 
@@ -1060,7 +1060,7 @@ class TestFileSearch(_FileTest):
             max_count
         )
 
-        results = [r for r in fs.run()]
+        results = list(fs.run())
         print(results)
         self.assertEqual(len(results), 2)
 
@@ -1104,7 +1104,7 @@ class TestFileSearch(_FileTest):
             max_count
         )
 
-        results = [r for r in fs.run()]
+        results = list(fs.run())
         print(results)
         self.assertEqual(len(results), 4)
 

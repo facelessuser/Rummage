@@ -366,9 +366,8 @@ class ReplacePlugin:
 
         try:
             return self.replace(m)
-        except Exception:
-            import traceback
-            raise RummageTestException(str(traceback.format_exc()))
+        except Exception as e:
+            raise RummageTestException('Exception raised') from e
 
     def on_init(self):
         """Override this function to add initialization setup."""
@@ -442,9 +441,9 @@ class _RummageFileContent:
             self.file_obj = open(self.name, "rb")
             if self.size != 0:
                 self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)
-        except Exception:
+        except Exception as e:
             # _read_bin has no other fallbacks, so we issue this if it fails.
-            raise RummageException("Could not access or read file.")
+            raise RummageException("Could not access or read file.") from e
 
     def _read_file(self):
         """Read the file in."""
@@ -568,9 +567,9 @@ class _FileSearch:
 
     def _get_line_endings_count(self, count):
         """Get line ending up to the given point."""
+        found = 0
         try:
-            found = 0
-            for x in range(count):
+            for _x in range(count):
                 lend = next(self.line_iter)
                 self.line_map.append(lend.end() - 1)
                 self.last_line = lend.end()
@@ -714,13 +713,13 @@ class _FileSearch:
         if self.is_binary:
             try:
                 pattern = bytes(search_pattern, 'ascii')
-            except UnicodeEncodeError:
-                raise RummageException('Unicode chars in binary search pattern')
+            except UnicodeEncodeError as e:
+                raise RummageException('Unicode chars in binary search pattern') from e
             if replace_pattern is not None and not self.is_plugin_replace:
                 try:
                     replace = bytes(replace_pattern, 'ascii')
-                except UnicodeEncodeError:
-                    raise RummageException('Unicode chars in binary replace pattern')
+                except UnicodeEncodeError as e:
+                    raise RummageException('Unicode chars in binary replace pattern') from e
         else:
             pattern = search_pattern
             replace = replace_pattern
@@ -1172,7 +1171,7 @@ class _DirWalker(wcmatch.WcMatch):
                 flags = re.IGNORECASE if not self.case_sensitive else 0
                 pattern = re.compile(string, flags)
 
-        return wcmatch._wcparse.WcRegexp((pattern,), tuple())
+        return wcmatch._wcparse.WcRegexp((pattern,), ())
 
     def _compare_value(self, limit_check, current):
         """Compare file attribute against limits."""

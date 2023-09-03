@@ -1344,6 +1344,7 @@ def prompt3msg(
 ):
     """Prompt with "yes" "no" type object."""
 
+    check_value = ''
     dlg = Messages(
         None, question, caption, style=PROMPT_CANCEL, yes=yes, no=no, cancel=cancel,
         bitmap=bitmap, checkbox=checkbox, checked=checked
@@ -1351,7 +1352,7 @@ def prompt3msg(
 
     result = dlg.ShowModal()
     if result == wx.ID_OK:
-        result == wx.ID_YES
+        result = wx.ID_YES
 
     if checked is not None:
         check_value = dlg.m_prompt_checkbox.GetValue()
@@ -1369,6 +1370,7 @@ def promptmsg(
 ):
     """Prompt with "yes" "no" type object."""
 
+    check_value = ''
     dlg = Messages(
         None, question, caption, style=PROMPT, yes=yes, no=no,
         bitmap=bitmap, checkbox=checkbox, checked=checked

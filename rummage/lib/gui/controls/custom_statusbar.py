@@ -111,7 +111,7 @@ class TimedStatusExtension:
         self.saved_text = [""] * field_count
         self.text_timer = [wx.Timer(self)] * field_count
         count = 0
-        for x in self.text_timer:
+        for _x in self.text_timer:
             self.Bind(wx.EVT_TIMER, lambda event, index=count: self.clear_text(event, index), self.text_timer[count])
             count += 1
 
@@ -250,9 +250,7 @@ class IconTrayExtension:
     def destroy_icons(self):
         """Destroy Icons."""
 
-        icons = []
-        for name in self.sb_icons.keys():
-            icons.append(name)
+        icons = list(self.sb_icons.keys())
         for name in icons:
             self.remove_icon(name)
 
