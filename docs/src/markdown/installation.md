@@ -18,42 +18,42 @@ installation can be done quickly and easily through `pip`. Some platforms, like 
 hoops that you must jump through. Additionally, wxPython, the GUI library that Rummage depends on, may sometimes have
 support lagging for the latest Python version.
 
-Install:
+In general, it is always recommended to try and install `wxpython` first and make sure it is properly available
+before installing Rummage. The wxPython installation may be more complicated depending on the platform. But in general,
+for non-Linux systems, the following steps are usually sufficient.
+
+Make sure wxPython is installed first. It is important to first ensure wxPython can be installed for your platform and
+specific Python version first.
+
+```console
+$ pip install wxpython
+```
+
+Install Rummage:
 
 ```console
 $ pip install rummage
 ```
 
-Install with optional modules.
+Install Rummage with optional modules.
 
 ```console
 $ pip install rummage[extras]
 ```
 
-Upgrade:
+Upgrade Rummage:
 
 ```console
 $ pip install --upgrade rummage
 ```
 
-### Windows
+### Windows and macOS
 
-On systems like Windows, installation is pretty straight forward as wheels are provided for all packages in `pip`.
-Support for the latest Python version may not always be available as the development cycle for wxPython can take a bit
-to catch up.
+On Windows, installation is pretty straight forward as wheels are provided for all packages in `pip`. In recent years,
+macOS installation also usually has wheels available as well. Support for the latest Python version may not always be
+available as the development cycle for wxPython can take a bit to catch up.
 
 Simply using `pip` to install is sufficient.
-
-```console
-$ pip install rummage
-```
-
-### MacOS
-
-In recent years, wheels are usually available for wxPython on macOS. Support for the latest Python version may not
-always be available as the development cycle for wxPython can take a bit to catch up.
-
-Usually, you can just use `pip` to install:
 
 ```console
 $ pip install rummage
