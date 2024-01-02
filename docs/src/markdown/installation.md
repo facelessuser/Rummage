@@ -13,58 +13,115 @@ Name                   | Details
 
 ## Installation
 
-On systems like Windows, installation is pretty straight forward as wheels are provided for all packages in `pip`. On
-other systems, there may be some prerequisites. If on Linux, it is recommended to make sure you can install `wxpython`
-first. This is due to the fact that installation of that library may require special instructions and will cause the
-installation of Rummage to fail if `wxpython` fails due to not having the necessary prerequisites.
-
-/// warning | Prerequisites
--   [Linux](#linux-prerequisites)
--   [macOS](#macos-prerequisites)
-///
-
-Assuming prerequisites are satisfied, installing Rummage is easy.
+For well supported platforms, Python wheels are usually available for Rummage and its dependencies. In most cases,
+installation can be done quickly and easily through `pip`. Some platforms, like Linux,  may require some additional
+hoops that you must jump through. Additionally, wxPython, the GUI library that Rummage depends on, may sometimes have
+support lagging for the latest Python version.
 
 Install:
 
-```shell-session
+```console
 $ pip install rummage
 ```
 
 Install with optional modules.
 
-```shell-session
+```console
 $ pip install rummage[extras]
 ```
 
 Upgrade:
 
-```shell-session
+```console
 $ pip install --upgrade rummage
 ```
 
-## Linux Prerequisites
+### Windows
 
-Linux is by far the more involved system to install wxPython on, but it is getting easier.
+On systems like Windows, installation is pretty straight forward as wheels are provided for all packages in `pip`.
+Support for the latest Python version may not always be available as the development cycle for wxPython can take a bit
+to catch up.
 
-### Recommended
+Simply using `pip` to install is sufficient.
 
-#### Pre-built Wheels
+```console
+$ pip install rummage
+```
 
-The wxPython project has started providing wheels for certain distros. While not all distros have wheels, this may
-be an attractive solution if you run one of the distros that do have pre-built wheels. The one downside is that the
-wheels are not available through on PyPI. More information on why and details on installation can be found here:
-https://www.wxpython.org/pages/downloads/.
+### MacOS
 
-Simplified instructions:
+In recent years, wheels are usually available for wxPython on macOS. Support for the latest Python version may not
+always be available as the development cycle for wxPython can take a bit to catch up.
 
-1.  Find the folder for your distro over at https://extras.wxpython.org/wxPython4/extras/linux/.
+Usually, you can just use `pip` to install:
 
-2.  Use `pip` and the server's location like so.
+```console
+$ pip install rummage
+```
 
-    ```shell-session
-    $ pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04 wxPython
-    ```
+### Linux
+
+Linux doesn't often have pre-built wheels for wxPython, so often, you must first ensure some prerequisites are in place
+before using `pip install` (or other methods). Additionally, Linux, in recent years, has made managing libraries and
+applications in Python a bit more complex with its new restrictions. Despite all of this, Rummage is still supported,
+but may require slightly more complex installation.
+
+#### pipx
+
+If installing Rummage on Linux, you may consider `pipx`, especially if your distro has a new enough wxPython [distro
+packages](#distro-packages). On Ubuntu, installation may look similar to the following:
+
+``` console
+$ sudo apt install python3-wgtk4.0 python3-wxgtk-webview4.0
+$ pipx install --system-site-packages rummage
+```
+
+The `--system-site-packages` flag is necessary as by default, `pipx` will create a brand new virtual environment that
+does not have access to the globally available distro package.
+
+#### venv
+
+Another approach on Linux is to use the `venv` package to install Rummage and its dependencies. If your distro has a new
+enough wxPython [distro package](#distro-packages), you can install the wxPython and then create your virtual
+environment with the `--system-site-packages` flag to ensure it has access to the installed package. On Ubuntu, it may
+look similar to:
+
+``` console
+$ sudo apt install python3-wgtk4.0 python3-wxgtk-webview4.0
+$ python3 -m venv --system-site-packages ./venv/rummage
+$ source ./venv/rummage/bin/activate
+$ (rummage) $ pip install rummage
+```
+
+If your distro does not have a proper wxPython package, you may have to install it from another source under your
+virtual environment.
+
+#### Prerequisites
+
+The most important prerequisite to getting Rummage installed is `wxpython`. It is always recommended to ensure it is
+installed before trying to install Rummage. If it is not, installation may try and download `wxpython` and build it
+from scratch. This can take a long time and can fail.
+
+##### Distro Packages
+
+Many Linux distros make wxPython available via their package manager. Assuming the package is not too old and is still
+supported by Rummage, this should automatically fulfill all the needed requirements. As an example, on Ubuntu, you must
+install the following:
+
+``` console
+$ sudo apt install python3-wgtk4.0 python3-wxgtk-webview4.0
+```
+
+##### Pre-built Wheels
+
+Another option, if your distro packages are too old, is to see if there is a readily available pre-built wheel from the
+wxPython team. These are usually kept here: https://extras.wxpython.org/wxPython4/extras/linux/.  It is possible through
+that even after this, there may be some Linux dependencies missing. The wheel can be installed in a virtual environment
+using pip:
+
+```console
+$ pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04 wxPython
+```
 
 While the wheel should install fine, when you actually run Rummage, you may see some libraries missing. A common one
 on Ubuntu is `libSDL` libraries. If you see a complaint about a library not being found or loaded, and you are on
@@ -79,13 +136,7 @@ libsdl2-2.0-0: /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.10.0
 $ sudo apt install libsdl2-2.0-0
 ```
 
-#### Pre-build Packages
-
-If you have a recent Linux distro that has a pre-built, installable wxPython package for your version of Python, then
-it may make sense to just install the pre-built package via your Linux package manager. The version must meet the
-version requirements of the Rummage package you are installing.
-
-### Manual
+##### Manual Building
 
 If you have installed a version of Python on your machine that does not have a pre-built wxPython package, or are using
 a distro that does not have a pre-built wheel, you may have to build it.
@@ -124,14 +175,6 @@ For a complete list of dependencies please check wxPython's official documentati
 Particularly under [this section][wxpython-prereq]. If they are out of date, please contact the wxPython team for better
 instructions.
 
-## macOS Prerequisites
-
-On macOS, Rummage uses either pure Python modules, or modules that provide wheels. What this means is that no C code
-compilation is required to install Rummage; therefore, no prior steps are needed. But if you want to install `regex`,
-there will be some C code compilation performed by `pip` which will require Xcode to be installed.
-
-1.  Download Xcode from the Mac App Store.
-2.  Navigate to Xcode > Preferences > Downloads tab.
-3.  Click the button to install the Command Line Tools.
-4.  Open Terminal (Applications/Terminal) and run `xcode-select --install`. You will be prompted to install the Xcode
-    Command Line Tools.
+other systems, there may be some prerequisites. If on Linux, it is recommended to make sure you can install `wxpython`
+first. This is due to the fact that installation of that library may require special instructions and will cause the
+installation of Rummage to fail if `wxpython` fails due to not having the necessary prerequisites.
