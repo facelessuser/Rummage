@@ -22,7 +22,7 @@ def get_requirements(root, requirements):
 
     install_requires = []
     with open(os.path.join(root, requirements)) as f:
-        install_requires = [install_requires.append(line.strip()) for line in f if not line.startswith("#")]
+        install_requires = [line.strip() for line in f if not line.startswith("#")]
     return install_requires
 
 
