@@ -41,11 +41,7 @@
       <li class="__toc_level_3"><a href="#installation_1">Installation</a></li>
       <ul class="__toc_list_3">
       
-      <li class="__toc_level_4"><a href="#windows">Windows</a></li>
-      <ul class="__toc_list_4">
-      
-      </ul>
-      <li class="__toc_level_4"><a href="#macos">MacOS</a></li>
+      <li class="__toc_level_4"><a href="#windows-and-macos">Windows and macOS</a></li>
       <ul class="__toc_list_4">
       
       </ul>
@@ -110,26 +106,27 @@ dependencies. If desired, you can install these dependencies manually, or instal
 installation can be done quickly and easily through <code>pip</code>. Some platforms, like Linux,  may require some additional
 hoops that you must jump through. Additionally, wxPython, the GUI library that Rummage depends on, may sometimes have
 support lagging for the latest Python version.</p>
-<p>Install:</p>
+<p>In general, it is always recommended to try and install <code>wxpython</code> first and make sure it is properly available
+before installing Rummage. The wxPython installation may be more complicated depending on the platform. But in general,
+for non-Linux systems, the following steps are usually sufficient.</p>
+<p>Make sure wxPython is installed first. It is important to first ensure wxPython can be installed for your platform and
+specific Python version first.</p>
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>wxpython
+</code></pre></div>
+<p>Install Rummage:</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>rummage
 </code></pre></div>
-<p>Install with optional modules.</p>
+<p>Install Rummage with optional modules.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>rummage<span class="o">[</span>extras<span class="o">]</span>
 </code></pre></div>
-<p>Upgrade:</p>
+<p>Upgrade Rummage:</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>rummage
 </code></pre></div>
-<h3 id="windows">Windows</h3>
-<p>On systems like Windows, installation is pretty straight forward as wheels are provided for all packages in <code>pip</code>.
-Support for the latest Python version may not always be available as the development cycle for wxPython can take a bit
-to catch up.</p>
+<h3 id="windows-and-macos">Windows and macOS</h3>
+<p>On Windows, installation is pretty straight forward as wheels are provided for all packages in <code>pip</code>. In recent years,
+macOS installation also usually has wheels available as well. Support for the latest Python version may not always be
+available as the development cycle for wxPython can take a bit to catch up.</p>
 <p>Simply using <code>pip</code> to install is sufficient.</p>
-<div class="highlight"><pre><span></span><code><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>rummage
-</code></pre></div>
-<h3 id="macos">MacOS</h3>
-<p>In recent years, wheels are usually available for wxPython on macOS. Support for the latest Python version may not
-always be available as the development cycle for wxPython can take a bit to catch up.</p>
-<p>Usually, you can just use <code>pip</code> to install:</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>rummage
 </code></pre></div>
 <h3 id="linux">Linux</h3>
