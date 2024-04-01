@@ -23,7 +23,6 @@ Language
 -   Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian
     is outdated but includes a fair bit of the needed translations. See [Localization](./extras.md#localization) to
     learn more about improving current translations or adding additional translations.
-///
 
 Updates
 
@@ -34,7 +33,7 @@ Updates
     The check is only a check for new versions and doesn't perform an upgrade.  Rummage must be upgraded via `pip` from
     command line.
 
-    /// info | Update Issues: Python 3.6+ on macOS
+    //// info | Update Issues: Python 3.6+ on macOS
     There is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates
     required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
 
@@ -44,12 +43,25 @@ Updates
     will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed
     bundle location. If you are using something like macports, then you'll probably have to research to find out how
     to do the same thing.
-    ///
+    ////
 
 International Time
 
 -   Rummage displays file creation and modified time in the form `Jul 01, 2018, 03:00:00 AM`, but you can enable this
     option to display the times in international format: `2018-07-01 03:00:00`.
+
+Alternate Row Colors
+
+-   In search results, Rummage can show alternating colors for each row. This can be enabled/disabled.
+
+Autocomplete
+
+-   For certain text boxes that retain a history of previous inputs, Rummage will employ an autocomplete feature.
+    Unfortunately, in some Linux distros, this autocomplete doesn't work quite right. Autocomplete can be
+    enabled/disabled for those who are having trouble with the feature.
+
+///
+
 
 ## Search
 

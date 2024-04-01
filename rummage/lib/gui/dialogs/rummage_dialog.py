@@ -135,7 +135,7 @@ def setup_timepicker(obj, spin, key):
     obj.BindSpinButton(spin)
 
 
-def setup_autocomplete_combo(obj, key, load_last=False, changed_callback=None, default=None):
+def setup_autocomplete_combo(obj, key, load_last=False, changed_callback=None, default=None, autocomplete=None):
     """Setup autocomplete object."""
 
     if default is None:
@@ -146,9 +146,11 @@ def setup_autocomplete_combo(obj, key, load_last=False, changed_callback=None, d
     if changed_callback is not None:
         obj.set_changed_callback(changed_callback)
     obj.update_choices(choices, load_last=load_last)
+    if autocomplete is not None:
+        obj.set_autocomplete(autocomplete)
 
 
-def update_autocomplete(obj, key, load_last=False, default=None):
+def update_autocomplete(obj, key, load_last=False, default=None, autocomplete=None):
     """Convenience function for updating the `AutoCompleteCombo` choices."""
 
     if default is None:
@@ -157,6 +159,8 @@ def update_autocomplete(obj, key, load_last=False, default=None):
     if choices == [] and choices != default:
         choices = default
     obj.update_choices(choices, load_last)
+    if autocomplete is not None:
+        obj.set_autocomplete(autocomplete)
 
 
 class RummageThread(threading.Thread):
@@ -796,6 +800,7 @@ class RummageFrame(gui.RummageFrame):
     def setup_inputs(self):
         """Setup and configure input objects."""
 
+        autocomplete = Settings.get_autocomplete()
         self.m_regex_search_checkbox.SetValue(Settings.get_search_setting("regex_toggle", True))
         self.m_fileregex_checkbox.SetValue(Settings.get_search_setting("regex_file_toggle", False))
         self.m_dirregex_checkbox.SetValue(Settings.get_search_setting("regex_dir_toggle", False))
@@ -858,12 +863,18 @@ class RummageFrame(gui.RummageFrame):
         setup_datepicker(self.m_created_date_picker, "created_date_string")
         setup_timepicker(self.m_modified_time_picker, self.m_modified_spin, "modified_time_string")
         setup_timepicker(self.m_created_time_picker, self.m_created_spin, "created_time_string")
-        setup_autocomplete_combo(self.m_searchin_text, "target", changed_callback=self.on_searchin_changed)
+        setup_autocomplete_combo(
+            self.m_searchin_text,
+            "target",
+            changed_callback=self.on_searchin_changed,
+            autocomplete=autocomplete
+        )
 
         if not self.m_chains_checkbox.GetValue():
             setup_autocomplete_combo(
                 self.m_searchfor_textbox,
-                "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search"
+                "regex_search" if self.m_regex_search_checkbox.GetValue() else "literal_search",
+                autocomplete=autocomplete
             )
         else:
             self.setup_chains(Settings.get_search_setting("chain", ""))
@@ -873,24 +884,28 @@ class RummageFrame(gui.RummageFrame):
             self.m_replace_plugin_dir_picker.Show()
             setup_autocomplete_combo(
                 self.m_replace_textbox,
-                "replace_plugin"
+                "replace_plugin",
+                autocomplete=autocomplete
             )
         else:
             self.m_replace_plugin_dir_picker.Hide()
             setup_autocomplete_combo(
                 self.m_replace_textbox,
-                "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace"
+                "regex_replace" if self.m_regex_search_checkbox.GetValue() else "literal_replace",
+                autocomplete=autocomplete
             )
         setup_autocomplete_combo(
             self.m_exclude_textbox,
             "regex_folder_exclude" if self.m_dirregex_checkbox.GetValue() else "folder_exclude",
-            load_last=True
+            load_last=True,
+            autocomplete=autocomplete
         )
         setup_autocomplete_combo(
             self.m_filematch_textbox,
             "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search",
             load_last=True,
-            default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
+            default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"]),
+            autocomplete=autocomplete
         )
 
     def setup_chains(self, setup=None):
@@ -2081,6 +2096,16 @@ class RummageFrame(gui.RummageFrame):
                 "regex_file_search" if self.m_fileregex_checkbox.GetValue() else "file_search",
                 default=([".*"] if self.m_fileregex_checkbox.GetValue() else ["*?"])
             )
+
+        # Update autocomplete
+        autocomplete = Settings.get_autocomplete()
+        self.m_searchin_text.set_autocomplete(autocomplete)
+        self.m_searchfor_textbox.set_autocomplete(autocomplete)
+        self.m_replace_textbox.set_autocomplete(autocomplete)
+        self.m_replace_textbox.set_autocomplete(autocomplete)
+        self.m_exclude_textbox.set_autocomplete(autocomplete)
+        self.m_filematch_textbox.set_autocomplete(autocomplete)
+
         dlg.Destroy()
         self.refresh_regex_options()
         self.m_result_file_list.update_colors()

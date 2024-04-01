@@ -32,6 +32,7 @@ class AutoCompleteCombo(wx.ComboCtrl):
             choices = []
 
         self.focusing = False
+        self.enable_autocomplete = True
 
         wx.ComboCtrl.__init__(
             self, parent, wx_id,
@@ -58,6 +59,11 @@ class AutoCompleteCombo(wx.ComboCtrl):
 
         # Add choices
         self.update_choices(choices, load_last)
+
+    def set_autocomplete(self, option):
+        """Set autocomplete."""
+
+        self.enable_autocomplete = option
 
     def set_changed_callback(self, callback):
         """Set changed callback."""
@@ -199,6 +205,10 @@ class AutoCompleteCombo(wx.ComboCtrl):
 
     def on_text_change(self, event):
         """Autocomplete on text change event."""
+
+        if not self.enable_autocomplete:
+            event.Skip()
+            return
 
         found = False
         if not self.update_semaphore:

@@ -3,89 +3,89 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-06-30 15:34-0600\n"
+"POT-Creation-Date: 2024-04-01 07:04-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru_RU\n"
 "Language-Team: ru_RU <LL@li.org>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.12.1\n"
 
 #: rummage/lib/gui/actions/export_csv.py:37
 #: rummage/lib/gui/actions/export_csv.py:66
-#: rummage/lib/gui/actions/export_html.py:135
-#: rummage/lib/gui/actions/export_html.py:182
-#: rummage/lib/gui/controls/result_lists.py:262
-#: rummage/lib/gui/controls/result_lists.py:563
-#: rummage/lib/gui/dialogs/rummage_dialog.py:581
+#: rummage/lib/gui/actions/export_html.py:136
+#: rummage/lib/gui/actions/export_html.py:183
+#: rummage/lib/gui/controls/result_lists.py:263
+#: rummage/lib/gui/controls/result_lists.py:562
+#: rummage/lib/gui/dialogs/rummage_dialog.py:602
 msgid "File"
 msgstr "Файл"
 
 #: rummage/lib/gui/actions/export_csv.py:37
 #: rummage/lib/gui/actions/export_csv.py:66
-#: rummage/lib/gui/actions/export_html.py:136
-#: rummage/lib/gui/actions/export_html.py:184
-#: rummage/lib/gui/controls/result_lists.py:264
-#: rummage/lib/gui/controls/result_lists.py:565
+#: rummage/lib/gui/actions/export_html.py:137
+#: rummage/lib/gui/actions/export_html.py:185
+#: rummage/lib/gui/controls/result_lists.py:265
+#: rummage/lib/gui/controls/result_lists.py:564
 msgid "Matches"
 msgstr "Найдено"
 
 #: rummage/lib/gui/actions/export_csv.py:37
 #: rummage/lib/gui/actions/export_csv.py:66
-#: rummage/lib/gui/actions/export_html.py:137
-#: rummage/lib/gui/actions/export_html.py:185
-#: rummage/lib/gui/controls/encoding_list.py:47
-#: rummage/lib/gui/controls/result_lists.py:265
+#: rummage/lib/gui/actions/export_html.py:138
+#: rummage/lib/gui/actions/export_html.py:186
+#: rummage/lib/gui/controls/encoding_list.py:48
+#: rummage/lib/gui/controls/result_lists.py:266
 #: rummage/lib/gui/dialogs/file_ext_dialog.py:53
 msgid "Extensions"
 msgstr ""
 
 #: rummage/lib/gui/actions/export_csv.py:37
-#: rummage/lib/gui/actions/export_html.py:138
-#: rummage/lib/gui/controls/result_lists.py:263
+#: rummage/lib/gui/actions/export_html.py:139
+#: rummage/lib/gui/controls/result_lists.py:264
 msgid "Size"
 msgstr "Размер"
 
 #: rummage/lib/gui/actions/export_csv.py:37
-#: rummage/lib/gui/actions/export_html.py:139
-#: rummage/lib/gui/controls/result_lists.py:266
+#: rummage/lib/gui/actions/export_html.py:140
+#: rummage/lib/gui/controls/result_lists.py:267
 msgid "Path"
 msgstr "Директория"
 
 #: rummage/lib/gui/actions/export_csv.py:37
-#: rummage/lib/gui/actions/export_html.py:140
-#: rummage/lib/gui/controls/result_lists.py:267
-#: rummage/lib/gui/dialogs/settings_dialog.py:299
+#: rummage/lib/gui/actions/export_html.py:141
+#: rummage/lib/gui/controls/result_lists.py:268
+#: rummage/lib/gui/dialogs/settings_dialog.py:302
 msgid "Encoding"
 msgstr "Кодировка"
 
 #: rummage/lib/gui/actions/export_csv.py:37
-#: rummage/lib/gui/actions/export_html.py:141
-#: rummage/lib/gui/controls/result_lists.py:268
-#: rummage/lib/gui/dialogs/rummage_dialog.py:543
+#: rummage/lib/gui/actions/export_html.py:142
+#: rummage/lib/gui/controls/result_lists.py:269
+#: rummage/lib/gui/dialogs/rummage_dialog.py:564
 msgid "Modified"
 msgstr "Изменен"
 
 #: rummage/lib/gui/actions/export_csv.py:37
-#: rummage/lib/gui/actions/export_html.py:142
-#: rummage/lib/gui/controls/result_lists.py:269
-#: rummage/lib/gui/dialogs/rummage_dialog.py:544
+#: rummage/lib/gui/actions/export_html.py:143
+#: rummage/lib/gui/controls/result_lists.py:270
+#: rummage/lib/gui/dialogs/rummage_dialog.py:565
 msgid "Created"
 msgstr "Создан"
 
 #: rummage/lib/gui/actions/export_csv.py:66
-#: rummage/lib/gui/actions/export_html.py:183
-#: rummage/lib/gui/controls/result_lists.py:564
+#: rummage/lib/gui/actions/export_html.py:184
+#: rummage/lib/gui/controls/result_lists.py:563
 msgid "Line"
 msgstr "Номер строки"
 
 #: rummage/lib/gui/actions/export_csv.py:66
-#: rummage/lib/gui/actions/export_html.py:186
-#: rummage/lib/gui/controls/result_lists.py:567
+#: rummage/lib/gui/actions/export_html.py:187
+#: rummage/lib/gui/controls/result_lists.py:566
 msgid "Context"
 msgstr "Контекст"
 
@@ -97,24 +97,24 @@ msgstr "Поиск регулярным выражением"
 msgid "Literal Search"
 msgstr "Обычный поиск"
 
-#: rummage/lib/gui/actions/export_html.py:125
-#: rummage/lib/gui/actions/export_html.py:166
+#: rummage/lib/gui/actions/export_html.py:126
+#: rummage/lib/gui/actions/export_html.py:167
 msgid "Files"
 msgstr "Файлы"
 
-#: rummage/lib/gui/actions/export_html.py:205
+#: rummage/lib/gui/actions/export_html.py:206
 msgid "Content"
 msgstr "Содержимое"
 
-#: rummage/lib/gui/actions/export_html.py:255
+#: rummage/lib/gui/actions/export_html.py:256
 msgid "Rummage Results"
 msgstr "Результаты работы Rummage"
 
-#: rummage/lib/gui/actions/export_html.py:282
+#: rummage/lib/gui/actions/export_html.py:283
 msgid "Regex search:"
 msgstr "Поиск регулярным выражением:"
 
-#: rummage/lib/gui/actions/export_html.py:283
+#: rummage/lib/gui/actions/export_html.py:284
 msgid "Literal search:"
 msgstr "Обычный поиск:"
 
@@ -122,7 +122,7 @@ msgstr "Обычный поиск:"
 msgid "No editor is currently set!"
 msgstr "Не выбран предпочитаемый редактор файлов!"
 
-#: rummage/lib/gui/controls/encoding_list.py:46
+#: rummage/lib/gui/controls/encoding_list.py:47
 #, fuzzy
 msgid "File type"
 msgstr "файл"
@@ -135,133 +135,133 @@ msgstr ""
 msgid "Select audio file"
 msgstr ""
 
-#: rummage/lib/gui/controls/load_search_list.py:51
-#: rummage/lib/gui/controls/search_chain_list.py:46
+#: rummage/lib/gui/controls/load_search_list.py:52
+#: rummage/lib/gui/controls/search_chain_list.py:47
 #: rummage/lib/gui/dialogs/edit_search_chain_dialog.py:70
 #: rummage/lib/gui/dialogs/save_search_dialog.py:72
 msgid "Name"
 msgstr "Имя файла"
 
-#: rummage/lib/gui/controls/load_search_list.py:52
+#: rummage/lib/gui/controls/load_search_list.py:53
 #: rummage/lib/gui/dialogs/save_search_dialog.py:73
 msgid "Comment"
 msgstr ""
 
-#: rummage/lib/gui/controls/load_search_list.py:53
-#: rummage/lib/gui/dialogs/rummage_dialog.py:484
-#: rummage/lib/gui/dialogs/rummage_dialog.py:572
+#: rummage/lib/gui/controls/load_search_list.py:54
+#: rummage/lib/gui/dialogs/rummage_dialog.py:505
+#: rummage/lib/gui/dialogs/rummage_dialog.py:593
 #: rummage/lib/gui/dialogs/save_search_dialog.py:74
-#: rummage/lib/gui/dialogs/settings_dialog.py:246
+#: rummage/lib/gui/dialogs/settings_dialog.py:249
 msgid "Search"
 msgstr "Поиск"
 
-#: rummage/lib/gui/controls/load_search_list.py:54
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:211
-#: rummage/lib/gui/dialogs/rummage_dialog.py:486
+#: rummage/lib/gui/controls/load_search_list.py:55
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:224
+#: rummage/lib/gui/dialogs/rummage_dialog.py:507
 #: rummage/lib/gui/dialogs/save_search_dialog.py:75
 msgid "Replace"
 msgstr ""
 
-#: rummage/lib/gui/controls/load_search_list.py:55
+#: rummage/lib/gui/controls/load_search_list.py:56
 #: rummage/lib/gui/dialogs/save_search_dialog.py:76
 msgid "Flags"
 msgstr ""
 
-#: rummage/lib/gui/controls/load_search_list.py:56
+#: rummage/lib/gui/controls/load_search_list.py:57
 msgid "Type"
 msgstr "Тип"
 
-#: rummage/lib/gui/controls/load_search_list.py:57
+#: rummage/lib/gui/controls/load_search_list.py:58
 msgid "Replace Type"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:270
-#: rummage/lib/gui/controls/result_lists.py:568
+#: rummage/lib/gui/controls/result_lists.py:271
+#: rummage/lib/gui/controls/result_lists.py:567
 #, fuzzy
 msgid "Open in Editor"
 msgstr "Настроить редактор"
 
-#: rummage/lib/gui/controls/result_lists.py:272
-#: rummage/lib/gui/controls/result_lists.py:570
+#: rummage/lib/gui/controls/result_lists.py:273
+#: rummage/lib/gui/controls/result_lists.py:569
 msgid "Reveal in Explorer"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:273
-#: rummage/lib/gui/controls/result_lists.py:571
+#: rummage/lib/gui/controls/result_lists.py:274
+#: rummage/lib/gui/controls/result_lists.py:570
 msgid "Reveal in Finder"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:274
-#: rummage/lib/gui/controls/result_lists.py:572
+#: rummage/lib/gui/controls/result_lists.py:275
+#: rummage/lib/gui/controls/result_lists.py:571
 msgid "Reveal in File Manager"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:276
-#: rummage/lib/gui/controls/result_lists.py:574
+#: rummage/lib/gui/controls/result_lists.py:277
+#: rummage/lib/gui/controls/result_lists.py:573
 msgid "Copy File Names"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:277
-#: rummage/lib/gui/controls/result_lists.py:575
+#: rummage/lib/gui/controls/result_lists.py:278
+#: rummage/lib/gui/controls/result_lists.py:574
 msgid "Copy File Paths"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:278
-#: rummage/lib/gui/controls/result_lists.py:577
+#: rummage/lib/gui/controls/result_lists.py:279
+#: rummage/lib/gui/controls/result_lists.py:576
 msgid "Checksum"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:279
-#: rummage/lib/gui/controls/result_lists.py:578
+#: rummage/lib/gui/controls/result_lists.py:280
+#: rummage/lib/gui/controls/result_lists.py:577
 #: rummage/lib/gui/dialogs/edit_search_chain_dialog.py:65
 #: rummage/lib/gui/dialogs/search_chain_dialog.py:55
 msgid "Delete"
 msgstr "Удалить"
 
-#: rummage/lib/gui/controls/result_lists.py:280
-#: rummage/lib/gui/controls/result_lists.py:579
+#: rummage/lib/gui/controls/result_lists.py:281
+#: rummage/lib/gui/controls/result_lists.py:578
 msgid "Send to Trash"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:281
+#: rummage/lib/gui/controls/result_lists.py:282
 msgid "Reorder columns"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:282
-#: rummage/lib/gui/controls/result_lists.py:581
+#: rummage/lib/gui/controls/result_lists.py:283
+#: rummage/lib/gui/controls/result_lists.py:580
 msgid "Are you sure you want to delete the files?"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:283
-#: rummage/lib/gui/controls/result_lists.py:582
+#: rummage/lib/gui/controls/result_lists.py:284
+#: rummage/lib/gui/controls/result_lists.py:581
 msgid "Are you sure you want to recycle the files?"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:566
+#: rummage/lib/gui/controls/result_lists.py:565
 msgid "Extension"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:576
+#: rummage/lib/gui/controls/result_lists.py:575
 msgid "Copy File Content"
 msgstr ""
 
-#: rummage/lib/gui/controls/result_lists.py:580
+#: rummage/lib/gui/controls/result_lists.py:579
 msgid "Reorder Columns"
 msgstr ""
 
-#: rummage/lib/gui/controls/search_chain_list.py:47
+#: rummage/lib/gui/controls/search_chain_list.py:48
 #: rummage/lib/gui/dialogs/edit_search_chain_dialog.py:71
 #, fuzzy
 msgid "Chain"
 msgstr "изменить"
 
-#: rummage/lib/gui/controls/search_error_list.py:48
+#: rummage/lib/gui/controls/search_error_list.py:49
 #: rummage/lib/gui/dialogs/error_text_dialog.py:43
 #, fuzzy
 msgid "Error"
 msgstr "ошибки"
 
-#: rummage/lib/gui/controls/search_error_list.py:49
+#: rummage/lib/gui/controls/search_error_list.py:50
 #, fuzzy
 msgid "File Name"
 msgstr "файл"
@@ -274,9 +274,9 @@ msgstr "файл"
 #: rummage/lib/gui/dialogs/checksum_dialog.py:81
 #: rummage/lib/gui/dialogs/delete_dialog.py:164
 #: rummage/lib/gui/dialogs/export_settings_dialog.py:52
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:85
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:192
-#: rummage/lib/gui/dialogs/settings_dialog.py:274
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:86
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:205
+#: rummage/lib/gui/dialogs/settings_dialog.py:277
 #: rummage/lib/gui/dialogs/support_info_dialog.py:79
 msgid "Close"
 msgstr "Закрыть"
@@ -400,23 +400,23 @@ msgid "Chain must contain at least one search!"
 msgstr ""
 
 #: rummage/lib/gui/dialogs/export_settings_dialog.py:48
-#: rummage/lib/gui/dialogs/rummage_dialog.py:579
+#: rummage/lib/gui/dialogs/rummage_dialog.py:600
 msgid "Export Settings"
 msgstr ""
 
 #: rummage/lib/gui/dialogs/export_settings_dialog.py:49
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:82
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:83
 msgid "General settings"
 msgstr ""
 
 #: rummage/lib/gui/dialogs/export_settings_dialog.py:50
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:83
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:84
 #, fuzzy
 msgid "Chains"
 msgstr "изменить"
 
 #: rummage/lib/gui/dialogs/export_settings_dialog.py:51
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:84
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:85
 msgid "Search/replace patterns"
 msgstr ""
 
@@ -425,7 +425,7 @@ msgid "Export"
 msgstr "Экспорт"
 
 #: rummage/lib/gui/dialogs/export_settings_dialog.py:54
-#: rummage/lib/gui/dialogs/rummage_dialog.py:491
+#: rummage/lib/gui/dialogs/rummage_dialog.py:512
 msgid "Export to..."
 msgstr "Сохранить в..."
 
@@ -448,7 +448,7 @@ msgstr ""
 
 #: rummage/lib/gui/dialogs/file_ext_dialog.py:54
 #: rummage/lib/gui/dialogs/save_search_dialog.py:70
-#: rummage/lib/gui/dialogs/settings_dialog.py:275
+#: rummage/lib/gui/dialogs/settings_dialog.py:278
 msgid "Save"
 msgstr "Сохранить"
 
@@ -491,71 +491,71 @@ msgstr "Предупреждение"
 msgid "Untitled"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:81
-#: rummage/lib/gui/dialogs/rummage_dialog.py:580
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:82
+#: rummage/lib/gui/dialogs/rummage_dialog.py:601
 msgid "Import Settings"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:86
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:87
 #, fuzzy
 msgid "Import"
 msgstr "Экспорт"
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:87
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:88
 #, fuzzy
 msgid "There are no settings selected for import!"
 msgstr "Нет ничего на экспорт"
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:88
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:89
 #, python-format
 msgid "ERROR: Could not import key '%s'"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:89
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:90
 #, python-format
 msgid "ERROR: Could not import chain '%s'"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:90
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:91
 #, python-format
 msgid "ERROR: Could not import search '%s'"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:91
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:92
 #, python-format
 msgid "SKIPPED: Chain '%s'"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:92
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:93
 #, python-format
 msgid "SKIPPED: Search '%s'"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:93
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:94
 #, python-format
 msgid "SUCCESS: Imported '%s'"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:94
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:95
 #, python-format
 msgid "SUCCESS: Imported chain '%s'"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:95
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:96
 #, python-format
 msgid "SUCCESS: Imported search '%s'"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:96
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:97
 msgid "=== Finished import! ==="
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:97
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:98
 #, python-format
 msgid "Overwrite the chain (%s)?"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/import_settings_dialog.py:98
+#: rummage/lib/gui/dialogs/import_settings_dialog.py:99
 #, python-format
 msgid "Overwrite the search (%s)?"
 msgstr ""
@@ -573,12 +573,12 @@ msgid "Load"
 msgstr "Загрузить"
 
 #: rummage/lib/gui/dialogs/load_search_dialog.py:58
-#: rummage/lib/gui/dialogs/rummage_dialog.py:568
+#: rummage/lib/gui/dialogs/rummage_dialog.py:589
 msgid "Regex"
 msgstr "Регулярное выражение"
 
 #: rummage/lib/gui/dialogs/load_search_dialog.py:59
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:205
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:218
 msgid "Text"
 msgstr "Текст"
 
@@ -600,171 +600,171 @@ msgstr ""
 msgid "Overwrite?"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:190
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:203
 msgid "Regex Tester"
 msgstr "Тестирование регулярного выражения"
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:191
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:204
 msgid "Use"
 msgstr "Использовать"
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:193
-#: rummage/lib/gui/dialogs/rummage_dialog.py:490
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:206
+#: rummage/lib/gui/dialogs/rummage_dialog.py:511
 msgid "Select replace script"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:194
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:207
 #, fuzzy
 msgid "Regex search"
 msgstr "Поиск регулярным выражением:"
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:195
-#: rummage/lib/gui/dialogs/rummage_dialog.py:548
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:208
+#: rummage/lib/gui/dialogs/rummage_dialog.py:569
 msgid "Search case-sensitive"
 msgstr "Поиск регистрозависимый"
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:196
-#: rummage/lib/gui/dialogs/rummage_dialog.py:549
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:209
+#: rummage/lib/gui/dialogs/rummage_dialog.py:570
 msgid "Dot matches newline"
 msgstr "Точка обозначает завершение строки"
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:197
-#: rummage/lib/gui/dialogs/rummage_dialog.py:550
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:210
+#: rummage/lib/gui/dialogs/rummage_dialog.py:571
 msgid "Use Unicode properties"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:198
-#: rummage/lib/gui/dialogs/rummage_dialog.py:557
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:211
+#: rummage/lib/gui/dialogs/rummage_dialog.py:578
 msgid "Best fuzzy match"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:199
-#: rummage/lib/gui/dialogs/rummage_dialog.py:558
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:212
+#: rummage/lib/gui/dialogs/rummage_dialog.py:579
 msgid "Improve fuzzy fit"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:200
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:213
 msgid "Unicode word break"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:201
-#: rummage/lib/gui/dialogs/rummage_dialog.py:560
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:214
+#: rummage/lib/gui/dialogs/rummage_dialog.py:581
 #, fuzzy
 msgid "Search backwards"
 msgstr "Поиск отменен"
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:202
-#: rummage/lib/gui/dialogs/rummage_dialog.py:561
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:215
+#: rummage/lib/gui/dialogs/rummage_dialog.py:582
 msgid "Use POSIX matching"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:203
-#: rummage/lib/gui/dialogs/rummage_dialog.py:562
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:216
+#: rummage/lib/gui/dialogs/rummage_dialog.py:583
 msgid "Format style replacements"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:204
-#: rummage/lib/gui/dialogs/rummage_dialog.py:563
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:217
+#: rummage/lib/gui/dialogs/rummage_dialog.py:584
 msgid "Full case-folding"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:206
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:219
 msgid "Result"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:207
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:220
 msgid "Regex Input"
 msgstr "Регулярное выражение"
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:208
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:221
 msgid "Find"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:209
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:222
 msgid "Use replace plugin"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:210
-#: rummage/lib/gui/dialogs/rummage_dialog.py:541
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:223
+#: rummage/lib/gui/dialogs/rummage_dialog.py:562
 msgid "Replace plugin"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/regex_test_dialog.py:212
+#: rummage/lib/gui/dialogs/regex_test_dialog.py:225
 #, fuzzy
 msgid "Reload"
 msgstr "Создан"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:191
+#: rummage/lib/gui/dialogs/rummage_dialog.py:200
 #, python-format
 msgid "%01.2f seconds"
 msgstr "%01.2f секунд"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:472
+#: rummage/lib/gui/dialogs/rummage_dialog.py:493
 msgid "any"
 msgstr "любой"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:473
+#: rummage/lib/gui/dialogs/rummage_dialog.py:494
 msgid "greater than"
 msgstr "больше чем"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:474
+#: rummage/lib/gui/dialogs/rummage_dialog.py:495
 msgid "equal to"
 msgstr "равно"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:475
+#: rummage/lib/gui/dialogs/rummage_dialog.py:496
 msgid "less than"
 msgstr "меньше чем"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:477
+#: rummage/lib/gui/dialogs/rummage_dialog.py:498
 msgid "on any"
 msgstr "любой"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:478
+#: rummage/lib/gui/dialogs/rummage_dialog.py:499
 msgid "after"
 msgstr "после"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:479
+#: rummage/lib/gui/dialogs/rummage_dialog.py:500
 msgid "on"
 msgstr "в"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:480
+#: rummage/lib/gui/dialogs/rummage_dialog.py:501
 msgid "before"
 msgstr "до"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:483
+#: rummage/lib/gui/dialogs/rummage_dialog.py:504
 msgid "Stop"
 msgstr "Стоп"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:485
+#: rummage/lib/gui/dialogs/rummage_dialog.py:506
 msgid "Aborting"
 msgstr "Отменяется..."
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:489
+#: rummage/lib/gui/dialogs/rummage_dialog.py:510
 msgid "Select directory to rummage"
 msgstr "Выбрать директорию"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:492
+#: rummage/lib/gui/dialogs/rummage_dialog.py:513
 #, fuzzy
 msgid "Import from..."
 msgstr "Сохранить в..."
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:495
+#: rummage/lib/gui/dialogs/rummage_dialog.py:516
 msgid "Are you sure you want to replace all instances?"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:496
+#: rummage/lib/gui/dialogs/rummage_dialog.py:517
 msgid "Backups are currently disabled."
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:499
+#: rummage/lib/gui/dialogs/rummage_dialog.py:520
 msgid "Search Aborted"
 msgstr "Поиск отменен"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:500
+#: rummage/lib/gui/dialogs/rummage_dialog.py:521
 msgid "Search Completed"
 msgstr "Поиск завершен"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:501
+#: rummage/lib/gui/dialogs/rummage_dialog.py:522
 #, python-format
 msgid ""
 "\n"
@@ -773,297 +773,297 @@ msgstr ""
 "\n"
 "найдено: %d результатов!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:504
+#: rummage/lib/gui/dialogs/rummage_dialog.py:525
 msgid "Cannot find log file!"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:505
+#: rummage/lib/gui/dialogs/rummage_dialog.py:526
 msgid "There is no search to save!"
 msgstr "Нет результатов для сохранения!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:506
+#: rummage/lib/gui/dialogs/rummage_dialog.py:527
 msgid "There was a problem exporting the HTML!  See the log for more info."
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:507
+#: rummage/lib/gui/dialogs/rummage_dialog.py:528
 msgid "There was a problem exporting the CSV!  See the log for more info."
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:508
+#: rummage/lib/gui/dialogs/rummage_dialog.py:529
 msgid "There is nothing to export!"
 msgstr "Нет ничего на экспорт"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:509
+#: rummage/lib/gui/dialogs/rummage_dialog.py:530
 msgid "There was an error in setup! Please check the log."
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:510
+#: rummage/lib/gui/dialogs/rummage_dialog.py:531
 msgid "There was an error checking for updates!"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:511
+#: rummage/lib/gui/dialogs/rummage_dialog.py:532
 msgid "Please enter a valid search path!"
 msgstr "Введите корректную директрию поиска!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:512
+#: rummage/lib/gui/dialogs/rummage_dialog.py:533
 msgid "Please enter a valid search!"
 msgstr "Введите корректный поисковы запрос!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:513
+#: rummage/lib/gui/dialogs/rummage_dialog.py:534
 #, fuzzy
 msgid "There are no searches in this this chain!"
 msgstr "Нет результатов для сохранения!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:514
+#: rummage/lib/gui/dialogs/rummage_dialog.py:535
 #, python-format
 msgid "'%s' is not found in saved searches!"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:515
+#: rummage/lib/gui/dialogs/rummage_dialog.py:536
 #, fuzzy
 msgid "Please enter a valid chain!"
 msgstr "Введите корректный поисковы запрос!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:516
+#: rummage/lib/gui/dialogs/rummage_dialog.py:537
 #, python-format
 msgid "Saved search '%s' does not contain a valid search pattern!"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:517
+#: rummage/lib/gui/dialogs/rummage_dialog.py:538
 msgid "Please enter a valid file pattern!"
 msgstr "Введите коррекный паттерн по файлу!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:518
+#: rummage/lib/gui/dialogs/rummage_dialog.py:539
 msgid "Please enter a valid exlcude directory regex!"
 msgstr "Введите корректное регулярное выражение для директорий!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:519
+#: rummage/lib/gui/dialogs/rummage_dialog.py:540
 msgid "Please enter a valid size!"
 msgstr "Введите корректный размер файла!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:520
+#: rummage/lib/gui/dialogs/rummage_dialog.py:541
 msgid "Please enter a modified date!"
 msgstr "Введите дату изменения!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:521
+#: rummage/lib/gui/dialogs/rummage_dialog.py:542
 msgid "Please enter a created date!"
 msgstr "Введите дату создания!"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:522
+#: rummage/lib/gui/dialogs/rummage_dialog.py:543
 msgid "There was an error attempting to read the settings file!"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:525
+#: rummage/lib/gui/dialogs/rummage_dialog.py:546
 #, fuzzy
 msgid "Searched: 0 Skipped: 0 Matches: 0"
 msgstr "Поиск: 0/0 0% Найдено: 0"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:526
+#: rummage/lib/gui/dialogs/rummage_dialog.py:547
 #, fuzzy, python-format
 msgid "Searched: %d Skipped: %d Matches: %d"
 msgstr "Поиск: %d Пропущенные: %d Найдено: %d"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:527
+#: rummage/lib/gui/dialogs/rummage_dialog.py:548
 #, fuzzy, python-format
 msgid "Searched: %d Skipped: %d Matches: %d Benchmark: %s"
 msgstr "Поиск: %d Пропущенные: %d Найдено: %d Производительность: %s"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:530
+#: rummage/lib/gui/dialogs/rummage_dialog.py:551
 msgid "errors"
 msgstr "ошибки"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:531
+#: rummage/lib/gui/dialogs/rummage_dialog.py:552
 #, python-format
 msgid ""
 "%d errors\n"
 "Click to see errors."
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:534
+#: rummage/lib/gui/dialogs/rummage_dialog.py:555
 msgid "Search and Replace"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:535
+#: rummage/lib/gui/dialogs/rummage_dialog.py:556
 msgid "File search options"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:536
+#: rummage/lib/gui/dialogs/rummage_dialog.py:557
 #, fuzzy
 msgid "Search in"
 msgstr "Поиск"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:537
+#: rummage/lib/gui/dialogs/rummage_dialog.py:558
 #, fuzzy
 msgid "Search for"
 msgstr "Поиск отменен"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:538
+#: rummage/lib/gui/dialogs/rummage_dialog.py:559
 msgid "Search chain"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:539
+#: rummage/lib/gui/dialogs/rummage_dialog.py:560
 #: rummage/lib/gui/dialogs/search_chain_dialog.py:52
 msgid "Search Chains"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:540
+#: rummage/lib/gui/dialogs/rummage_dialog.py:561
 msgid "Replace with"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:542
+#: rummage/lib/gui/dialogs/rummage_dialog.py:563
 msgid "Size is"
 msgstr "Размер файла"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:545
+#: rummage/lib/gui/dialogs/rummage_dialog.py:566
 msgid "Exclude folders"
 msgstr "Не искать в директориях"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:546
+#: rummage/lib/gui/dialogs/rummage_dialog.py:567
 msgid "Files which match"
 msgstr "Найденные файлы"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:547
+#: rummage/lib/gui/dialogs/rummage_dialog.py:568
 msgid "Search with regex"
 msgstr "Поиск регулярным выражением"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:551
+#: rummage/lib/gui/dialogs/rummage_dialog.py:572
 msgid "Boolean match"
 msgstr "Булев поиск"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:552
+#: rummage/lib/gui/dialogs/rummage_dialog.py:573
 msgid "Count only"
 msgstr "Только подсчет количества"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:553
+#: rummage/lib/gui/dialogs/rummage_dialog.py:574
 msgid "Create backups"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:554
+#: rummage/lib/gui/dialogs/rummage_dialog.py:575
 #, fuzzy
 msgid "Force"
 msgstr "до"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:555
+#: rummage/lib/gui/dialogs/rummage_dialog.py:576
 msgid "Use chain search"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:556
+#: rummage/lib/gui/dialogs/rummage_dialog.py:577
 msgid "Use plugin replace"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:559
+#: rummage/lib/gui/dialogs/rummage_dialog.py:580
 msgid "Unicode word breaks"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:564
+#: rummage/lib/gui/dialogs/rummage_dialog.py:585
 msgid "Include subfolders"
 msgstr "Рекурсивно просматривать каталоги"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:565
+#: rummage/lib/gui/dialogs/rummage_dialog.py:586
 msgid "Include hidden"
 msgstr "Искать в скрытых файлах"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:566
+#: rummage/lib/gui/dialogs/rummage_dialog.py:587
 msgid "Follow symlinks"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:567
+#: rummage/lib/gui/dialogs/rummage_dialog.py:588
 msgid "Include binary files"
 msgstr "Искать в бинарных файлах"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:569
+#: rummage/lib/gui/dialogs/rummage_dialog.py:590
 msgid "Test Regex"
 msgstr "Протестировать регулярное выражение"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:570
+#: rummage/lib/gui/dialogs/rummage_dialog.py:591
 msgid "Save Search"
 msgstr "Сохранить результаты поиска"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:571
+#: rummage/lib/gui/dialogs/rummage_dialog.py:592
 msgid "Load Search"
 msgstr "Загрузить результаты поиска"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:573
+#: rummage/lib/gui/dialogs/rummage_dialog.py:594
 #, python-format
 msgid "Current version is %s. Rummage is up to date!"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:574
+#: rummage/lib/gui/dialogs/rummage_dialog.py:595
 #, python-format
 msgid "There is an update available: %s."
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:575
+#: rummage/lib/gui/dialogs/rummage_dialog.py:596
 msgid "Text search options"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:578
+#: rummage/lib/gui/dialogs/rummage_dialog.py:599
 msgid "Export Results"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:582
+#: rummage/lib/gui/dialogs/rummage_dialog.py:603
 msgid "View"
 msgstr "Вид"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:583
+#: rummage/lib/gui/dialogs/rummage_dialog.py:604
 msgid "Help"
 msgstr "Справка"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:584
+#: rummage/lib/gui/dialogs/rummage_dialog.py:605
 msgid "&Preferences"
 msgstr "&Настройки"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:585
+#: rummage/lib/gui/dialogs/rummage_dialog.py:606
 msgid "&Exit"
 msgstr "&Выход"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:586
+#: rummage/lib/gui/dialogs/rummage_dialog.py:607
 msgid "HTML"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:587
+#: rummage/lib/gui/dialogs/rummage_dialog.py:608
 msgid "CSV"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:588
+#: rummage/lib/gui/dialogs/rummage_dialog.py:609
 msgid "Open Log File"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:589
+#: rummage/lib/gui/dialogs/rummage_dialog.py:610
 msgid "&About Rummage"
 msgstr "О Rummage"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:590
+#: rummage/lib/gui/dialogs/rummage_dialog.py:611
 msgid "Check for Updates"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:591
+#: rummage/lib/gui/dialogs/rummage_dialog.py:612
 msgid "Documentation"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:592
+#: rummage/lib/gui/dialogs/rummage_dialog.py:613
 #, fuzzy
 msgid "Changelog"
 msgstr "изменить"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:593
+#: rummage/lib/gui/dialogs/rummage_dialog.py:614
 msgid "License"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:594
+#: rummage/lib/gui/dialogs/rummage_dialog.py:615
 msgid "Help and Support"
 msgstr "Справка и поддержка"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:2397
+#: rummage/lib/gui/dialogs/rummage_dialog.py:2451
 msgid "About"
 msgstr "О нас"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:2398
+#: rummage/lib/gui/dialogs/rummage_dialog.py:2452
 #, python-format
 msgid "Version: %s %s"
 msgstr "Версия: %s %s"
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:2399
+#: rummage/lib/gui/dialogs/rummage_dialog.py:2453
 #, fuzzy
 msgid "Developer(s)"
 msgstr ""
@@ -1121,153 +1121,153 @@ msgid ""
 "`{$col0}` | Insert the line column offset by one so the first column is "
 "zero instead of one.\n"
 "\n"
-"!!! example \"Example\"\n"
-"\n"
-"    ```bash\n"
-"    \"C:\\Program Files\\Sublime Text 3\\subl.exe\" "
+"/// example | Example\n"
+"```bash\n"
+"\"C:\\Program Files\\Sublime Text 3\\subl.exe\" "
 "\"{$file}:{$line}:{$col}\"\n"
-"    ```\n"
+"```\n"
+"///\n"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:244
+#: rummage/lib/gui/dialogs/settings_dialog.py:247
 msgid "Preferences"
 msgstr "Настройки"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:245
+#: rummage/lib/gui/dialogs/settings_dialog.py:248
 msgid "General"
 msgstr "Общие"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:247
+#: rummage/lib/gui/dialogs/settings_dialog.py:250
 msgid "Editor"
 msgstr "Редактор"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:248
+#: rummage/lib/gui/dialogs/settings_dialog.py:251
 msgid "Notifications"
 msgstr "Уведомления"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:249
+#: rummage/lib/gui/dialogs/settings_dialog.py:252
 msgid "History"
 msgstr "История"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:250
+#: rummage/lib/gui/dialogs/settings_dialog.py:253
 msgid "Single Instance (applies to new instances)"
 msgstr "Один экземпляр (работает только при последующих запусках)"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:251
+#: rummage/lib/gui/dialogs/settings_dialog.py:254
 msgid "International time format for file results"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:252
+#: rummage/lib/gui/dialogs/settings_dialog.py:255
 #, fuzzy
 msgid "Rummage Test"
 msgstr "Результаты работы Rummage"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:253
+#: rummage/lib/gui/dialogs/settings_dialog.py:256
 #, fuzzy
 msgid "Test complete!"
 msgstr "Поиск завершен"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:254
+#: rummage/lib/gui/dialogs/settings_dialog.py:257
 msgid "Notification popup"
 msgstr "Всплывающие уведомления"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:255
+#: rummage/lib/gui/dialogs/settings_dialog.py:258
 msgid "Alert Sound"
 msgstr "Звук предупреждения"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:256
+#: rummage/lib/gui/dialogs/settings_dialog.py:259
 msgid "Path to terminal-notifier"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:257
+#: rummage/lib/gui/dialogs/settings_dialog.py:260
 msgid "Test"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:258
+#: rummage/lib/gui/dialogs/settings_dialog.py:261
 msgid "Language (restart required)"
 msgstr "Язык (понадобится перезапуск программы)"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:259
+#: rummage/lib/gui/dialogs/settings_dialog.py:262
 msgid "Extended match"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:260
+#: rummage/lib/gui/dialogs/settings_dialog.py:263
 msgid "Brace expansion"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:261
+#: rummage/lib/gui/dialogs/settings_dialog.py:264
 #, fuzzy
 msgid "Case sensitive"
 msgstr "Поиск регистрозависимый"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:262
+#: rummage/lib/gui/dialogs/settings_dialog.py:265
 msgid "Full path directory match"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:263
+#: rummage/lib/gui/dialogs/settings_dialog.py:266
 msgid "Full path file match"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:264
+#: rummage/lib/gui/dialogs/settings_dialog.py:267
 msgid "Globstar (full path)"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:265
+#: rummage/lib/gui/dialogs/settings_dialog.py:268
 msgid "Match base (full path)"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:266
+#: rummage/lib/gui/dialogs/settings_dialog.py:269
 msgid "Exclude with '-' (instead of '!')"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:267
+#: rummage/lib/gui/dialogs/settings_dialog.py:270
 msgid "Regular Expressions"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:268
+#: rummage/lib/gui/dialogs/settings_dialog.py:271
 #, fuzzy
 msgid "Pattern Limit"
 msgstr "после"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:269
+#: rummage/lib/gui/dialogs/settings_dialog.py:272
 msgid "File/Folder Matching"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:270
+#: rummage/lib/gui/dialogs/settings_dialog.py:273
 msgid "Use Re module"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:271
+#: rummage/lib/gui/dialogs/settings_dialog.py:274
 msgid "Use Regex module"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:272
+#: rummage/lib/gui/dialogs/settings_dialog.py:275
 msgid "Enable Backrefs"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:273
+#: rummage/lib/gui/dialogs/settings_dialog.py:276
 msgid "Clear"
 msgstr "Очистить"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:276
+#: rummage/lib/gui/dialogs/settings_dialog.py:279
 #, python-format
 msgid "%d Records"
 msgstr "Записей: %d"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:277
+#: rummage/lib/gui/dialogs/settings_dialog.py:280
 msgid "Backup extension"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:278
+#: rummage/lib/gui/dialogs/settings_dialog.py:281
 #, fuzzy
 msgid "Backup folder"
 msgstr "Не искать в директориях"
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:279
+#: rummage/lib/gui/dialogs/settings_dialog.py:282
 msgid "Backup to folder"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:280
+#: rummage/lib/gui/dialogs/settings_dialog.py:283
 msgid ""
 "Invalid extension! Please enter a valid extension.\n"
 "\n"
@@ -1275,7 +1275,7 @@ msgid ""
 "hypens, underscores, and dots."
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:285
+#: rummage/lib/gui/dialogs/settings_dialog.py:288
 msgid ""
 "Invalid folder! Please enter a valid folder.\n"
 "\n"
@@ -1283,68 +1283,73 @@ msgid ""
 "hypens, underscores, and dots."
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:290
+#: rummage/lib/gui/dialogs/settings_dialog.py:293
 msgid "Can't find the player '{}'!"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:293
+#: rummage/lib/gui/dialogs/settings_dialog.py:296
 msgid "'{}' is not a valid number"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:296
+#: rummage/lib/gui/dialogs/settings_dialog.py:299
 msgid "Check updates daily"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:297
+#: rummage/lib/gui/dialogs/settings_dialog.py:300
 msgid "Include pre-releases"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:298
+#: rummage/lib/gui/dialogs/settings_dialog.py:301
 msgid "Check now"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:301
+#: rummage/lib/gui/dialogs/settings_dialog.py:304
 msgid "Fastest"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:302
+#: rummage/lib/gui/dialogs/settings_dialog.py:305
 msgid "chardet (pure python)"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:303
+#: rummage/lib/gui/dialogs/settings_dialog.py:306
 msgid "cchardet (C)"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:305
+#: rummage/lib/gui/dialogs/settings_dialog.py:308
 msgid "Alert player"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:306
+#: rummage/lib/gui/dialogs/settings_dialog.py:309
 msgid "Special file types:"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/settings_dialog.py:308
+#: rummage/lib/gui/dialogs/settings_dialog.py:311
 msgid "Show alternate row colors in lists"
 msgstr ""
+
+#: rummage/lib/gui/dialogs/settings_dialog.py:312
+#, fuzzy
+msgid "Enable autocomplete"
+msgstr "Поиск завершен"
 
 #: rummage/lib/gui/dialogs/support_info_dialog.py:78
 msgid "Support Info"
 msgstr ""
 
-#: rummage/lib/gui/settings/__init__.py:121
+#: rummage/lib/gui/settings/__init__.py:122
 msgid "Failed to load settings file!"
 msgstr "Не удалось загрузить файл настроек!"
 
-#: rummage/lib/gui/settings/__init__.py:122
+#: rummage/lib/gui/settings/__init__.py:123
 #, fuzzy
 msgid "Failed to load cache file!"
 msgstr "Не удалось сохранить файл кеша!"
 
-#: rummage/lib/gui/settings/__init__.py:123
+#: rummage/lib/gui/settings/__init__.py:124
 msgid "Failed to save settings file!"
 msgstr "Не удалось сохранить файл настроек!"
 
-#: rummage/lib/gui/settings/__init__.py:124
+#: rummage/lib/gui/settings/__init__.py:125
 msgid "Failed to save cache file!"
 msgstr "Не удалось сохранить файл кеша!"
 
@@ -1520,5 +1525,31 @@ msgstr "Не удалось сохранить файл кеша!"
 #~ msgstr ""
 
 #~ msgid "Exclude with '-'' (instead of '!')"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "Enter in the appropriate command to open files in your editor.\n"
+#~ "Double quote paths with spaces and "
+#~ "parameters that *may* contain spaces "
+#~ "after substitution.\n"
+#~ "\n"
+#~ "Use the following variables for parameter substitution:\n"
+#~ "\n"
+#~ "Variable  | Description\n"
+#~ "--------- | -----------\n"
+#~ "`{$file}` | Insert the file path.\n"
+#~ "`{$line}` | Insert the line number.\n"
+#~ "`{$col}`  | Insert the line column.\n"
+#~ "`{$col0}` | Insert the line column "
+#~ "offset by one so the first column"
+#~ " is zero instead of one.\n"
+#~ "\n"
+#~ "!!! example \"Example\"\n"
+#~ "\n"
+#~ "    ```bash\n"
+#~ "    \"C:\\Program Files\\Sublime Text "
+#~ "3\\subl.exe\" \"{$file}:{$line}:{$col}\"\n"
+#~ "    ```\n"
 #~ msgstr ""
 

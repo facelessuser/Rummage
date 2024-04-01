@@ -71,6 +71,7 @@ DEFAULT_SETTINGS = {
     "__format__": SETTINGS_FMT,
     "alert_enabled": True,
     "alt_list_color": True,
+    "autocomplete": True,
     "backup_ext": "rum-bak",
     "backup_folder": ".rum-bak",
     "backup_type": BACKUP_FILE,
@@ -244,6 +245,27 @@ class Settings:
 
         cls.reload_settings()
         return cls.settings['alt_list_color']
+
+    @classmethod
+    def set_autocomplete(cls, value):
+        """Set autocomplete."""
+
+        cls.reload_settings()
+        cls._set_autocomplete(value)
+        cls.save_settings()
+
+    @classmethod
+    def _set_autocomplete(cls, value):
+        """Set autocomplete."""
+
+        cls.settings["autocomplete"] = value
+
+    @classmethod
+    def get_autocomplete(cls):
+        """Get autocomplete."""
+
+        cls.reload_settings()
+        return cls.settings['autocomplete']
 
     @classmethod
     def _set_encoding_ext(cls, values):
@@ -1666,6 +1688,10 @@ class Settings:
         # Alternate row colors for lists
         if 'alt_list_color' in obj:
             cls._set_alt_list_color(obj['alt_list_color'])
+
+        # Enable/disable autocomplete
+        if 'autocomplete' in obj:
+            cls._set_autocomplete(obj['autocomplete'])
 
         # Position columns
         if 'pos_cols_file' in obj:
