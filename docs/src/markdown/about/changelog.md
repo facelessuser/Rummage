@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.20
+
+-   **NEW**: Add new autocomplete setting to disable/enable autocomplete. Mainly for Linux systems where autocomplete
+    functionality can sometimes work well or not so well depending on the distro.
+
 ## 4.19
 
 -   **NEW**: Drop support for Python 3.7.

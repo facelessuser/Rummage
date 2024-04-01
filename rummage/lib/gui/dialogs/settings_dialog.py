@@ -164,6 +164,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_update_checkbox.SetValue(bool(Settings.get_check_updates()))
         self.m_prerelease_checkbox.SetValue(bool(Settings.get_prerelease()))
         self.m_alt_row_checkbox.SetValue(bool(Settings.get_alt_list_color()))
+        self.m_autocomplete_checkbox.SetValue(bool(Settings.get_autocomplete()))
         alert_choices = Settings.get_available_players()
         for x in alert_choices:
             self.m_sound_player_choice.Append(x)
@@ -308,6 +309,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.SPECIAL = _("Special file types:")
         self.EDITOR_HELP = EDITOR_HELP
         self.ALT_ROW_COLOR = _("Show alternate row colors in lists")
+        self.AUTOCOMPLETE = _("Enable autocomplete")
 
     def refresh_localization(self):
         """Localize dialog."""
@@ -354,6 +356,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_check_update_button.SetLabel(self.CHECK_NOW)
         self.m_filetype_label.SetLabel(self.SPECIAL)
         self.m_alt_row_checkbox.SetLabel(self.ALT_ROW_COLOR)
+        self.m_autocomplete.SetLabel(self.AUTOCOMPLETE)
 
         self.load_help(self.EDITOR_HELP)
 
@@ -682,6 +685,12 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         alt_row = self.m_alt_row_checkbox.GetValue()
         Settings.set_alt_list_color(alt_row)
         self.m_encoding_list.update_colors()
+
+    def on_autocomplete_toggle(self, event):
+        """Handle auto-complete toggle."""
+
+        autocomplete = self.m_autocomplete_checkbox.GetValue()
+        Settings.set_autocomplete(autocomplete)
 
     def on_close(self, event):
         """Handle on close event."""

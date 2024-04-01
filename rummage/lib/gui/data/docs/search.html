@@ -401,7 +401,7 @@ pattern instead of treating it as the start of an extended match pattern (<code>
 <p>In <a href="preferences.html#search">Preferences</a>, you can enables Bash style brace expansion.</p>
 <p>Brace expansion is applied before anything else. When applied, a pattern will be expanded into multiple patterns. Each
 pattern will then be parsed separately.</p>
-<p>This is great for specifying complex combinations of patterns: <code>a{b,{c,d}}</code> &rarr; <code>ab ac ad</code>. For simple patterns, it may
+<p>This is great for specifying complex combinations of patterns: <code>a{b,{c,d}}</code> &ndash;&gt; <code>ab ac ad</code>. For simple patterns, it may
 make more sense to use extended match patterns which will only generate a single pattern and be quicker to evaluate:
 <code>@(ab|ac|ad)</code>.</p>
 <p>Be careful with patterns such as <code>{1..100}</code> which would generate one hundred patterns that will all get individually
@@ -428,11 +428,11 @@ patterns.</p>
 <div class="admonition example">
 <p class="admonition-title">Example Brace Expansion</p>
 <ul>
-<li><code>a{b,{c,d}}</code> &rarr; <code>ab ac ad</code></li>
-<li><code>{1..3}</code> &rarr; <code>1 2 3</code></li>
-<li><code>{a..d}</code> &rarr; <code>a b c d</code></li>
-<li><code>{2..4..2}</code> &rarr; <code>2 4</code></li>
-<li><code>{a..e..2}</code> &rarr; <code>a c e</code></li>
+<li><code>a{b,{c,d}}</code> &ndash;&gt; <code>ab ac ad</code></li>
+<li><code>{1..3}</code> &ndash;&gt; <code>1 2 3</code></li>
+<li><code>{a..d}</code> &ndash;&gt; <code>a b c d</code></li>
+<li><code>{2..4..2}</code> &ndash;&gt; <code>2 4</code></li>
+<li><code>{a..e..2}</code> &ndash;&gt; <code>a c e</code></li>
 </ul>
 </div>
 <h4 id="full-path-matching">Full Path Matching</h4>
@@ -457,7 +457,7 @@ separately in <a href="preferences.html#search">Preferences</a>.</p>
 <p>To learn more about full path matching with regular expression, checkout the regular expression <a href="#full-path-matching_1">section</a>.</p>
 <h4 id="pattern-limit">Pattern Limit</h4>
 <p>Glob style patterns, by default, allow expanding a pattern by splitting on <code>|</code> or expanding the pattern with brace
-expansion: <code>a{b,c}</code> &rarr; <code>ab ac</code>. This can turn one pattern into many patterns. The underlying expansion code limits
+expansion: <code>a{b,c}</code> &ndash;&gt; <code>ab ac</code>. This can turn one pattern into many patterns. The underlying expansion code limits
 expansion to <code>1000</code> patterns. This limit can be configured in <a href="preferences.html#search">Preferences</a>. To raise or lower
 the limit, simply set the value higher or lower. To disable the limit entirely, set it to <code>0</code>.</p>
 <h3 id="regular-expression">Regular Expression</h3>
