@@ -2007,14 +2007,10 @@ class RummageFrame(gui.RummageFrame):
         """Search on enter."""
 
         obj = self.FindFocus()
-        is_ac_combo = isinstance(obj, AutoCompleteCombo)
         is_date_picker = isinstance(obj, wx.adv.GenericDatePickerCtrl)
         is_button = isinstance(obj, wx.Button)
         if (
-            (
-                is_ac_combo and not obj.IsPopupShown() or
-                (not is_ac_combo and not is_date_picker and not is_button)
-            ) and
+            (not is_date_picker and not is_button) and
             self.m_grep_notebook.GetSelection() == 0
         ):
             self.start_search()
@@ -2024,25 +2020,11 @@ class RummageFrame(gui.RummageFrame):
                 wx.PyCommandEvent(wx.EVT_BUTTON.typeId, obj.GetId())
             )
 
-        event.Skip()
-
     def on_esc_key(self, event):
         """Abort on escape."""
 
         # Do we actually need this cancel check?
-        canceled = True
-        obj = self.FindFocus()
-        is_ac_combo = (
-            isinstance(obj, wx.ListCtrl) and
-            isinstance(obj.GetParent(), wx.PopupTransientWindow) and
-            isinstance(obj.GetParent().GetParent(), AutoCompleteCombo)
-        )
-        obj = obj.GetParent().GetParent()
-        if is_ac_combo:
-            canceled = obj.list.is_canceled()
-            if not canceled and util.platform() == "windows":
-                obj.Dismiss()
-        if self.thread is not None and not self.kill and canceled:
+        if self.thread is not None and not self.kill:
             self.abort_search(self.m_replace_button.GetLabel() in (self.SEARCH_BTN_STOP, self.SEARCH_BTN_ABORT))
         event.Skip()
 

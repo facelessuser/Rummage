@@ -181,9 +181,6 @@ class AutoCompleteCombo(wx.ComboCtrl):
         key = event.GetKeyCode()
         if key in (wx.WXK_DOWN, wx.WXK_UP) and not self.list.popup_shown:
             self.Popup()
-        elif key in (wx.WXK_ESCAPE, wx.WXK_RETURN) and self.list.popup_shown:
-            # Quirk with Windows: make sure we capture escape key
-            self.list.on_key_down(event)
         event.Skip()
 
     def on_key_down(self, event):
@@ -346,19 +343,22 @@ class ListCtrlComboPopup(wx.ComboPopup):
         wx.CallAfter(self.Dismiss)
         event.Skip()
 
-    def on_key_down(self, event):
+    def on_char_hook(self, event):
         """Select item and dismiss popup on return key."""
 
         key = event.GetKeyCode()
         if key == wx.WXK_RETURN:
-            curitem = self.list.GetFirstSelected()
-            if curitem != -1:
-                self.waiting_value = curitem
-            wx.CallAfter(self.Dismiss)
+            if self.popup_shown:
+                curitem = self.list.GetFirstSelected()
+                if curitem != -1:
+                    self.waiting_value = curitem
+                wx.CallAfter(self.Dismiss)
+                return
         elif key == wx.WXK_ESCAPE:
             if self.popup_shown:
                 self.set_canceled()
                 wx.CallAfter(self.Dismiss)
+                return
         elif key == wx.WXK_DOWN:
             if self.popup_shown:
                 self.next_item()
@@ -411,7 +411,7 @@ class ListCtrlComboPopup(wx.ComboPopup):
             parent,
             style=wx.LC_REPORT | wx.LC_NO_HEADER | wx.LC_SINGLE_SEL | wx.SIMPLE_BORDER
         )
-        self.list.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
+        self.list.Bind(wx.EVT_CHAR_HOOK, self.on_char_hook)
         self.list.Bind(wx.EVT_MOTION, self.on_motion)
         self.list.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.list.Bind(wx.EVT_SIZE, self.on_resize_dropdown)
@@ -447,15 +447,18 @@ class ListCtrlComboPopup(wx.ComboPopup):
 
     def OnPopup(self):
         """Called immediately after the popup is shown."""
+
         self.popup_shown = True
         wx.ComboPopup.OnPopup(self)
         self.pick_item()
 
     def OnDismiss(self):
         """Called when popup is dismissed."""
+
         self.popup_shown = False
         wx.ComboPopup.OnDismiss(self)
 
     def LazyCreate(self):
         """Lazy create."""
+
         return wx.ComboPopup.LazyCreate(self)

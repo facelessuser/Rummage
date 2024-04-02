@@ -4,6 +4,7 @@
 
 -   **NEW**: Add new autocomplete setting to disable/enable autocomplete. Mainly for Linux systems where autocomplete
     functionality can sometimes work well or not so well depending on the distro.
+-   **FIX**: Fix issue with autocomplete shortcuts not working on every platform.
 
 ## 4.19
 
