@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.20.1
+
+-   **Fix**: Fix preference window not being able to open.
+
 ## 4.20
 
 -   **NEW**: Add new autocomplete setting to disable/enable autocomplete. Mainly for Linux systems where autocomplete

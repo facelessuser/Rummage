@@ -356,7 +356,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_check_update_button.SetLabel(self.CHECK_NOW)
         self.m_filetype_label.SetLabel(self.SPECIAL)
         self.m_alt_row_checkbox.SetLabel(self.ALT_ROW_COLOR)
-        self.m_autocomplete.SetLabel(self.AUTOCOMPLETE)
+        self.m_autocomplete_checkbox.SetLabel(self.AUTOCOMPLETE)
 
         self.load_help(self.EDITOR_HELP)
 
