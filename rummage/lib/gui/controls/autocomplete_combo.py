@@ -204,6 +204,8 @@ class AutoCompleteCombo(wx.ComboCtrl):
         """Autocomplete on text change event."""
 
         if not self.enable_autocomplete:
+            if self.changed_callback is not None:
+                self.changed_callback()
             event.Skip()
             return
 

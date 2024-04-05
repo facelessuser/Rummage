@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.20.2
+
+-   **Fix**: Fix title not updating when autocomplete is disabled.
+
 ## 4.20.1
 
 -   **Fix**: Fix preference window not being able to open.
