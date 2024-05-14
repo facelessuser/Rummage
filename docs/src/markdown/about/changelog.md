@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.20.3
+
+-   **FIX**: Fix issues related to Babel on Python versions greater than 3.11.
+
 ## 4.20.2
 
 -   **Fix**: Fix title not updating when autocomplete is disabled.
