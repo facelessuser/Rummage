@@ -41,6 +41,7 @@ artifacts = [
 [tool.hatch.build.targets.wheel.hooks.custom]
 dependencies = [
   "babel",
+  "setuptools; python_version >= '3.12'"
 ]
 
 [tool.hatch.version]
@@ -90,7 +91,8 @@ include = [
 skip_install = true
 dependencies = [
   "pip>=22.0.4",
-  "babel"
+  "babel",
+  "setuptools; python_version >= '3.12'"
 ]
 
 [tool.hatch.envs.locale.scripts]
@@ -110,7 +112,7 @@ extend-exclude = [
     "*png.py"
 ]
 
-select = [
+lint.select = [
     "A",    # flake8-builtins
     "B",    # flake8-bugbear
     "D",    # pydocstyle
@@ -126,7 +128,7 @@ select = [
     "PERF"  # Perflint
 ]
 
-ignore = [
+lint.ignore = [
     "B034",
     "E741",
     "D202",
