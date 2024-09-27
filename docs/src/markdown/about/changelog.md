@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.21
+
+-   **NEW**: Officially support Python 3.12 and Python 3.13, requires latest wxPython (4.2.2).
+
 ## 4.20.3
 
 -   **FIX**: Fix issues related to Babel on Python versions greater than 3.11.
