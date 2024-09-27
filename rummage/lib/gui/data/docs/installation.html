@@ -137,7 +137,7 @@ but may require slightly more complex installation.</p>
 <h4 id="pipx">pipx</h4>
 <p>If installing Rummage on Linux, you may consider <code>pipx</code>, especially if your distro has a new enough wxPython <a href="#distro-packages">distro
 packages</a>. On Ubuntu, installation may look similar to the following:</p>
-<div class="highlight"><pre><span></span><code><span class="gp">$ </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-wgtk4.0<span class="w"> </span>python3-wxgtk-webview4.0
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-wxgtk4.0<span class="w"> </span>python3-wxgtk-webview4.0
 <span class="gp">$ </span>pipx<span class="w"> </span>install<span class="w"> </span>--system-site-packages<span class="w"> </span>rummage
 </code></pre></div>
 <p>The <code>--system-site-packages</code> flag is necessary as by default, <code>pipx</code> will create a brand new virtual environment that
@@ -147,7 +147,7 @@ does not have access to the globally available distro package.</p>
 enough wxPython <a href="#distro-packages">distro package</a>, you can install the wxPython and then create your virtual
 environment with the <code>--system-site-packages</code> flag to ensure it has access to the installed package. On Ubuntu, it may
 look similar to:</p>
-<div class="highlight"><pre><span></span><code><span class="gp">$ </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-wgtk4.0<span class="w"> </span>python3-wxgtk-webview4.0
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-wxgtk4.0<span class="w"> </span>python3-wxgtk-webview4.0
 <span class="gp">$ </span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>--system-site-packages<span class="w"> </span>./venv/rummage
 <span class="gp">$ </span><span class="nb">source</span><span class="w"> </span>./venv/rummage/bin/activate
 <span class="gp">$ </span><span class="o">(</span>rummage<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>rummage
