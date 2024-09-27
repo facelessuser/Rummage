@@ -72,7 +72,7 @@ If installing Rummage on Linux, you may consider `pipx`, especially if your dist
 packages](#distro-packages). On Ubuntu, installation may look similar to the following:
 
 ``` console
-$ sudo apt install python3-wgtk4.0 python3-wxgtk-webview4.0
+$ sudo apt install python3-wxgtk4.0 python3-wxgtk-webview4.0
 $ pipx install --system-site-packages rummage
 ```
 
@@ -87,7 +87,7 @@ environment with the `--system-site-packages` flag to ensure it has access to th
 look similar to:
 
 ``` console
-$ sudo apt install python3-wgtk4.0 python3-wxgtk-webview4.0
+$ sudo apt install python3-wxgtk4.0 python3-wxgtk-webview4.0
 $ python3 -m venv --system-site-packages ./venv/rummage
 $ source ./venv/rummage/bin/activate
 $ (rummage) $ pip install rummage
