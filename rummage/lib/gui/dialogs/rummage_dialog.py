@@ -92,7 +92,7 @@ LIMIT_COMPARE = {
 
 # Hide vertical separator as they don't look good on 4.2.1
 # TODO: Remove once wxWidgets or wxPython (which ever is the cause) fixes this.
-WX_VERT_LINE_WORKAROUND = wx.__version__ >= '4.2.0'
+WX_VERT_LINE_WORKAROUND = '4.2.2' > wx.__version__ >= '4.2.0'
 
 
 def eng_to_i18n(string, mapping):
