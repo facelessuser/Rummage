@@ -3,6 +3,7 @@
 ## 4.21
 
 -   **NEW**: Officially support Python 3.12 and Python 3.13, requires latest wxPython (4.2.2).
+-   **NEW**: Update minimum required dependencies for bug fixes.
 
 ## 4.20.3
 
