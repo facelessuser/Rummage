@@ -1,5 +1,4 @@
 [![Donate via PayPal][donate-image]][donate-link]
-[![Discord][discord-image]][discord-link]
 [![Build][github-ci-image]][github-ci-link]
 [![Coverage][codecov-image]][codecov-link]
 [![PyPI Version][pypi-image]][pypi-link]
@@ -33,8 +32,6 @@ Rummage is released under the MIT license.
 
 [github-ci-image]: https://github.com/facelessuser/Rummage/workflows/build/badge.svg
 [github-ci-link]: https://github.com/facelessuser/Rummage/actions?workflow=build
-[discord-image]: https://img.shields.io/discord/678289859768745989?logo=discord&logoColor=aaaaaa&color=mediumpurple&labelColor=333333
-[discord-link]:https://discord.gg/UjXwf4F
 [codecov-image]: https://img.shields.io/codecov/c/github/facelessuser/Rummage/master.svg?logo=codecov&logoColor=aaaaaa&labelColor=333333
 [codecov-link]: https://codecov.io/github/facelessuser/Rummage
 [pypi-image]: https://img.shields.io/pypi/v/Rummage.svg?logo=pypi&logoColor=aaaaaa&labelColor=333333
