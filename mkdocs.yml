@@ -117,7 +117,7 @@ markdown_extensions:
   - pymdownx.blocks.html:
   - pymdownx.blocks.definition:
   - pymdownx.fancylists:
-    inject_style: true
+      inject_style: true
 
 extra:
   social:
