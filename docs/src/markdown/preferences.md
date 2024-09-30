@@ -15,8 +15,8 @@ The **General** tab contains a couple of useful settings.
 Single Instance
 
 -   By default, Rummage will allow for multiple windows to be open.  If this option is enabled, the first window will be
-    be the only window to open.  All subsequent instances will pass their arguments to the first and close without
-    showing a window.
+    the only window to open.  All subsequent instances will pass their arguments to the first and close without showing
+    a window.
 
 Language
 

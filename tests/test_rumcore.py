@@ -956,6 +956,137 @@ class TestFileSearch(_FileTest):
         print(results)
         self.assertEqual(len(results), 4)
 
+    def test_re_chain_replace(self):
+        """Test for `re` search and replace."""
+
+        self.mktemp(
+            'searches.txt',
+            content=self.dedent(
+                '''
+                search1
+                search1
+
+                search2
+                search2
+
+                search3
+                search3
+
+                search1, search2, search3
+                '''
+            ).encode('utf-8')
+        )
+
+        after = self.dedent(
+            '''
+            replace1
+            replace1
+
+            replace2
+            replace2
+
+            search3
+            search3
+
+            replace1, replace2, search3
+            '''
+        )
+
+        search_params = rc.Search(True)
+        search_params.add('search1', 'replace1', rc.IGNORECASE)
+        search_params.add('search2', 'replace2', rc.IGNORECASE)
+
+        file_id = 0
+        encoding = None
+        context = (0, 0)
+        flags = 0
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('searches.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count
+        )
+
+        for result in fs.run():
+            if result.error is not None:
+                print(''.join(result.error))
+
+        with codecs.open(self.norm('searches.txt'), 'r', encoding='utf-8') as f:
+            self.assertEqual(f.read(), after)
+
+    def test_regex_chain_replace(self):
+        """Test for `regex` search and replace."""
+
+        self.mktemp(
+            'searches.txt',
+            content=self.dedent(
+                '''
+                search1
+                search1
+
+                search2
+                search2
+
+                search3
+                search3
+
+                search1, search2, search3
+                '''
+            ).encode('utf-8')
+        )
+
+        after = self.dedent(
+            '''
+            replace1
+            replace1
+
+            replace2
+            replace2
+
+            search3
+            search3
+
+            replace1, replace2, search3
+            '''
+        )
+
+        search_params = rc.Search(True)
+        search_params.add('search1', 'replace1', rc.IGNORECASE)
+        search_params.add('search2', 'replace2', rc.IGNORECASE)
+
+        file_id = 0
+        encoding = None
+        context = (0, 0)
+        flags = 0
+        backup_ext = 'rum-bak',
+        max_count = None
+
+        fs = rc._FileSearch(
+            search_params,
+            self.get_file_attr('searches.txt'),
+            file_id,
+            flags,
+            context,
+            encoding,
+            backup_ext,
+            max_count,
+            regex_mode=rc.REGEX_MODE
+        )
+
+        for result in fs.run():
+            if result.error is not None:
+                print(''.join(result.error))
+
+        with codecs.open(self.norm('searches.txt'), 'r', encoding='utf-8') as f:
+            self.assertEqual(f.read(), after)
+
     def test_literal_chain_replace(self):
         """Test for literal search and replace."""
 

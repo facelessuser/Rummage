@@ -531,7 +531,7 @@ class RummageFrame(gui.RummageFrame):
         self.ERR_UPDATE = _("There was an error checking for updates!")
         self.ERR_INVALID_SEARCH_PTH = _("Please enter a valid search path!")
         self.ERR_INVALID_SEARCH = _("Please enter a valid search!")
-        self.ERR_EMPTY_CHAIN = _("There are no searches in this this chain!")
+        self.ERR_EMPTY_CHAIN = _("There are no searches in this chain!")
         self.ERR_MISSING_SEARCH = _("'%s' is not found in saved searches!")
         self.ERR_INVALID_CHAIN = _("Please enter a valid chain!")
         self.ERR_INVALID_CHAIN_SEARCH = _("Saved search '%s' does not contain a valid search pattern!")
