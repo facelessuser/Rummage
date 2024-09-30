@@ -39,11 +39,6 @@ try:
 except ImportError:  # pragma: no cover
     REGEX_SUPPORT = False
 
-if sys.version_info >= (3, 11):
-    import re._parser as _parser
-else:
-    import sre_parse as _parser
-
 # Common regex flags (re|regex)
 IGNORECASE = 0x1  # (?i)
 DOTALL = 0x2      # (?s)
@@ -309,7 +304,7 @@ class Search:
     """Search setup object."""
 
     def __init__(self, replace=False):
-        """Setup search object as as a search only or search and replace object."""
+        """Setup search object as a search only or search and replace object."""
 
         self._entry = []
         self._is_replace = replace
@@ -747,9 +742,6 @@ class _FileSearch:
                         self.expand = pattern.compile(replace, (bre.FORMAT if bool(flags & FORMATREPLACE) else 0))
                 else:
                     pattern = _re_pattern(pattern, flags, self.is_binary)
-                    if replace is not None and not self.is_plugin_replace:
-                        template = _parser.parse_template(replace, pattern)
-                        self.expand = lambda m, t=template: _parser.expand_template(t, m)
 
             if REGEX_SUPPORT and isinstance(pattern, (bregex._REGEX_TYPE, bregex.Bregex)):
                 self.reverse = bool(pattern.flags & regex.REVERSE)
@@ -981,7 +973,7 @@ class _FileSearch:
 
                 if not self.abort and text:
                     # Update the file or buffer depending on what is being used.
-                    # For a buffer, we will actually return the the content via a `BufferRecord`.
+                    # For a buffer, we will actually return the content via a `BufferRecord`.
                     if is_buffer:
                         yield self._update_buffer(text)
                         file_record_sent = True

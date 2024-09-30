@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.21.1
+
+-   **FIX**: Fix issue with `re` replace in Python 3.12 and Python 3.13.
+
 ## 4.21
 
 -   **NEW**: Officially support Python 3.12 and Python 3.13, requires latest wxPython (4.2.2).

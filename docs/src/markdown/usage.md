@@ -108,7 +108,7 @@ options.
 
 /// tip | Column Options
 You can hide/show columns by right clicking the list header to get a special context menu. You can then deselect or
-select the the column(s) you wish to hide/show respectively. You can also reorder the columns if desired.
+select the column(s) you wish to hide/show respectively. You can also reorder the columns if desired.
 ///
 
 ## Regular Expression Tester

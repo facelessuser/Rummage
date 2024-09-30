@@ -29,7 +29,7 @@ class ContextMenu(wx.Menu):
     """Context Menu."""
 
     def __init__(self, menu):
-        """Attach the context menu to to the parent with the defined items."""
+        """Attach the context menu to the parent with the defined items."""
 
         wx.Menu.__init__(self)
         self._callbacks = {}

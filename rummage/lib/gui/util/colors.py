@@ -18,7 +18,7 @@ class Color(Base):
     """Color object."""
 
     def to_wxbgr(self, alpha=True):
-        """Get the the wxPython RGB value."""
+        """Get the wxPython RGB value."""
 
         r, g, b = [alg.clamp(int(alg.round_half_up(c * 255)), 0, 255) for c in self.convert('srgb').coords(nans=False)]
         a = alg.clamp(int(alg.round_half_up(self.alpha(nans=False)))) if alpha else 0xFF

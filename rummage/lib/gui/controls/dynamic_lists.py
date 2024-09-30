@@ -298,7 +298,7 @@ class DynamicList(wx.ListCtrl, listmix.ColumnSorterMixin):
             self.size_sample -= 1
 
     def get_map_item(self, idx, col=0, absolute=False):
-        """Get attribute in in item map entry and the given index."""
+        """Get attribute in item map entry and the given index."""
 
         return self.itemDataMap[self.itemIndexMap[idx] if not absolute else idx][self.get_real_col(col)]
 
