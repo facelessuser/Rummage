@@ -59,6 +59,6 @@ def local_time_to_epoch_timestamp(date, time):
 
     d = date.split("/")
     t = time.split(":")
-    dt = datetime(int(d[2]), int(d[0]), int(d[1]), int(t[0]), int(t[1]), int(t[2]), 0, UTC)
+    dt = datetime(int(d[2]), int(d[0]), int(d[1]), int(t[0]), int(t[1]), int(t[2]), 0).astimezone()
     delta = dt - EPOCH
     return (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10 ** 6) / 1e6
