@@ -1,2 +1,2 @@
 """Time Picker."""
-from wx.adv import TimePickerCtrl
+from wx.adv import TimePickerCtrl  # noqa: F401

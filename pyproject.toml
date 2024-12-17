@@ -144,7 +144,8 @@ lint.ignore = [
     "RUF012",
     "RUF005",
     "PGH004",
-    "RUF100"
+    "RUF100",
+    "RUF022"
 ]
 
 [tool.tox]
