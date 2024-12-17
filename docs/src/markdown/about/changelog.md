@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.21.2
+
+-  **FIX**: Use a different wxPython time control on macOS as the previous one would crash on the M series chips.
+-  **FIX**: Fix an issue with local time to UTC conversion.
+-  **FIX**: Fix an issue where created time comparisons was actually being done on modified times.
+
 ## 4.21.1
 
 -   **FIX**: Fix issue with `re` replace in Python 3.12 and Python 3.13.

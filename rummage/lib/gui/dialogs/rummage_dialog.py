@@ -127,12 +127,12 @@ def setup_datepicker(obj, key):
         obj.SetValue(day)
 
 
-def setup_timepicker(obj, spin, key):
+def setup_timepicker(obj, key):
     """Setup time control object."""
 
-    t = Settings.get_search_setting(key, wx.DateTime.Now().Format("%H:%M:%S"))
-    obj.SetValue(t)
-    obj.BindSpinButton(spin)
+    dt = wx.DateTime()
+    dt.ParseFormat(Settings.get_search_setting(key, wx.DateTime.Now().Format("%H:%M:%S")), "%H:%M:%S")
+    obj.SetValue(dt)
 
 
 def setup_autocomplete_combo(obj, key, load_last=False, changed_callback=None, default=None, autocomplete=None):
@@ -861,8 +861,8 @@ class RummageFrame(gui.RummageFrame):
 
         setup_datepicker(self.m_modified_date_picker, "modified_date_string")
         setup_datepicker(self.m_created_date_picker, "created_date_string")
-        setup_timepicker(self.m_modified_time_picker, self.m_modified_spin, "modified_time_string")
-        setup_timepicker(self.m_created_time_picker, self.m_created_spin, "created_time_string")
+        setup_timepicker(self.m_modified_time_picker, "modified_time_string")
+        setup_timepicker(self.m_created_time_picker, "created_time_string")
         setup_autocomplete_combo(
             self.m_searchin_text,
             "target",
@@ -1419,15 +1419,15 @@ class RummageFrame(gui.RummageFrame):
                     LIMIT_COMPARE[cmp_modified],
                     rumcore.util.local_time_to_epoch_timestamp(
                         self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
-                        self.m_modified_time_picker.GetValue()
+                        self.m_modified_time_picker.GetValue().Format("%H:%M:%S")
                     )
                 )
             if cmp_created:
                 args.created_compare = (
                     LIMIT_COMPARE[cmp_created],
                     rumcore.util.local_time_to_epoch_timestamp(
-                        self.m_modified_date_picker.GetValue().Format("%m/%d/%Y"),
-                        self.m_modified_time_picker.GetValue()
+                        self.m_created_date_picker.GetValue().Format("%m/%d/%Y"),
+                        self.m_created_time_picker.GetValue().Format("%H:%M:%S")
                     )
                 )
         else:
@@ -1567,12 +1567,18 @@ class RummageFrame(gui.RummageFrame):
         if eng_mod != "on any":
             strings += [
                 ("modified_date_string", self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")),
-                ("modified_time_string", self.m_modified_time_picker.GetValue())
+                (
+                    "modified_time_string",
+                    self.m_modified_time_picker.GetValue().Format("%H:%M:%S")
+                )
             ]
         if eng_cre != "on any":
             strings += [
                 ("created_date_string", self.m_created_date_picker.GetValue().Format("%m/%d/%Y")),
-                ("created_time_string", self.m_created_time_picker.GetValue())
+                (
+                    "created_time_string",
+                    self.m_created_time_picker.GetValue().Format("%H:%M:%S")
+                )
             ]
 
         Settings.add_search_settings(history, toggles, strings)
