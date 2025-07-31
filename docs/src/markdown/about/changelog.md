@@ -2,6 +2,7 @@
 
 ## 4.22
 
+-   **NEW**: Upgrade dependencies to pick up bug fixes.
 -   **FIX**: Custom focus is not needed to focus the app from macOS dock anymore.
 
 ## 4.21.2
