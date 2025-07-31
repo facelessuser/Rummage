@@ -1,10 +1,14 @@
 # Changelog
 
+## 4.22
+
+-   **FIX**: Custom focus is not needed to focus the app from macOS dock anymore.
+
 ## 4.21.2
 
--  **FIX**: Use a different wxPython time control on macOS as the previous one would crash on the M series chips.
--  **FIX**: Fix an issue with local time to UTC conversion.
--  **FIX**: Fix an issue where created time comparisons was actually being done on modified times.
+-   **FIX**: Use a different wxPython time control on macOS as the previous one would crash on the M series chips.
+-   **FIX**: Fix an issue with local time to UTC conversion.
+-   **FIX**: Fix an issue where created time comparisons was actually being done on modified times.
 
 ## 4.21.1
 

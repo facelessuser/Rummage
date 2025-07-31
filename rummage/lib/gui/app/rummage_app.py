@@ -137,9 +137,3 @@ class RummageApp(PipeApp):
         """Handle new window event."""
 
         self.MacReopenApp()
-
-    def MacReopenApp(self):  # noqa
-        """Ensure that app will be un-minimized in macOS on dock icon click."""
-
-        frame = self.GetTopWindow()
-        platform_window_focus(frame)

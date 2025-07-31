@@ -1409,7 +1409,7 @@ class RummageFrame(gui.RummageFrame):
             cmp_size = self.m_logic_choice.GetSelection()
             if cmp_size:
                 size = decimal.Decimal(self.m_size_text.GetValue())
-                args.size_compare = (LIMIT_COMPARE[cmp_size], int(round(size * decimal.Decimal(1024))))
+                args.size_compare = (LIMIT_COMPARE[cmp_size], round(size * decimal.Decimal(1024)))
             else:
                 args.size_compare = None
             cmp_modified = self.m_modified_choice.GetSelection()
