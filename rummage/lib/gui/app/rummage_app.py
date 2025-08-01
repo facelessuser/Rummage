@@ -136,4 +136,5 @@ class RummageApp(PipeApp):
     def MacNewFile(self, fileName=None):
         """Handle new window event."""
 
-        self.MacReopenApp()
+        frame = self.GetTopWindow()
+        platform_window_focus(frame)
