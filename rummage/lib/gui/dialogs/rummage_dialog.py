@@ -2357,7 +2357,7 @@ class RummageFrame(gui.RummageFrame):
         else:
             pattern = f'**/*.{backup_location}'
             flags = glob.G | glob.O
-        dlg = DeleteDialog(self, glob.iglob(pattern, flags=flags, root_dir=target), False)
+        dlg = DeleteDialog(self, glob.iglob(pattern, flags=flags, root_dir=target), True)
         dlg.ShowModal()
         dlg.Destroy()
 
