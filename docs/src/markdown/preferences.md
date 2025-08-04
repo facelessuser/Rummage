@@ -186,6 +186,8 @@ The **Backups** panel allows you to configure where Rummage creates backups. You
 placed in the same folder as the original source, or if they are put into a subfolder. You can also configure the name
 of the subfolder used or the extension used when not writing to a subfolder.
 
+If you need to quickly delete all backups, you can select `File -> Delete Backups` from the main menu.
+
 ## Import/Export Settings
 
 If desired, Rummage's settings can be exported to a JSON file or imported from a JSON file.  This can be particularly

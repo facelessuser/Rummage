@@ -4,6 +4,7 @@
 
 -   **NEW**: Drop Python 3.8 support.
 -   **NEW**: Upgrade dependencies to pick up bug fixes.
+-   **NEW**: Add a command under the main menu to delete backups recursively under the current working directory.
 -   **FIX**: Custom focus is not needed to focus the app from macOS dock anymore.
 -   **FIX**: Fix some issues with context menu right click selection in list controls.
 

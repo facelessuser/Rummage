@@ -21,6 +21,7 @@ IN THE SOFTWARE.
 import wx
 import os
 import time
+import shutil
 import threading
 from ..localization import _
 from .. import gui
@@ -68,7 +69,10 @@ class DeleteThread(threading.Thread):
                             if self.recycle:
                                 send2trash(self.trouble_file)
                             else:
-                                os.remove(self.trouble_file)
+                                if os.path.isdir(self.trouble_file):
+                                    shutil.rmtree(self.trouble_file)
+                                else:
+                                    os.remove(self.trouble_file)
                         deleted = True
                         self.trouble_file = None
                     except Exception:
@@ -88,7 +92,10 @@ class DeleteThread(threading.Thread):
                     if self.recycle:
                         send2trash(f)
                     else:
-                        os.remove(f)
+                        if os.path.isdir(f):
+                            shutil.rmtree(f)
+                        else:
+                            os.remove(f)
                 self.count += 1
             except Exception:
                 self.trouble_file = f
@@ -115,7 +122,7 @@ class DeleteDialog(gui.DeleteDialog):
         self.file = None
         self.busy = False
         self.thread = None
-        self.total = len(file_list)
+        self.total = len(file_list) if isinstance(file_list, list) else 0
         self.message = None
         self.processing = False
         self.handling = False
@@ -128,15 +135,18 @@ class DeleteDialog(gui.DeleteDialog):
         title = None
         if self.action == ACTION_DELETE:
             title = _("Deleting Files")
-            self.message = _("Deleting %d/%d...")
+            self.message = _("Deleting %d/%d...") if self.total else _("Deleting %d...")
         elif self.action == ACTION_RECYCLE:
             title = _("Recycling Files")
-            self.message = _("Recycling %d/%d...")
+            self.message = _("Recycling %d/%d...") if self.total else _("Recycling %d...")
 
         self.localize()
         self.refresh_localization(title)
         if self.message:
-            self.m_progress_label.SetLabel(self.message % (0, self.total))
+            if self.total:
+                self.m_progress_label.SetLabel(self.message % (0, self.total))
+            else:
+                self.m_progress_label.SetLabel(self.message % 0)
 
         # Ensure good sizing of frame
         self.m_progress.SetValue(0)
@@ -201,7 +211,10 @@ class DeleteDialog(gui.DeleteDialog):
             ratio = (float(count) / float(self.total)) if self.total else 0
             percent = int(ratio * 100)
             self.m_progress.SetValue(percent)
-            self.m_progress_label.SetLabel(self.message % (count, self.total))
+            if self.total:
+                self.m_progress_label.SetLabel(self.message % (count, self.total))
+            else:
+                self.m_progress_label.SetLabel(self.message % count)
 
             if self.thread.request is True:
                 self.thread.request = False
@@ -226,7 +239,10 @@ class DeleteDialog(gui.DeleteDialog):
             if not self.thread.is_alive():
                 self.processing = False
                 self.m_progress.SetValue(100)
-                self.m_progress_label.SetLabel(self.message % (self.thread.count, self.total))
+                if self.total:
+                    self.m_progress_label.SetLabel(self.message % (self.thread.count, self.total))
+                else:
+                    self.m_progress_label.SetLabel(self.message % self.thread.count)
 
                 if not self.thread.abort:
                     if self.thread.errors:

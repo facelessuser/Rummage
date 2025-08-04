@@ -458,6 +458,11 @@ class RummageFrame ( wx.Frame ):
 
         self.m_file_menu.AppendSeparator()
 
+        self.m_delete_backups_menuitem = wx.MenuItem( self.m_file_menu, wx.ID_ANY, u"Delete Backups", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_file_menu.Append( self.m_delete_backups_menuitem )
+
+        self.m_file_menu.AppendSeparator()
+
         self.m_quit_menuitem = wx.MenuItem( self.m_file_menu, wx.ID_EXit, u"&Exit", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_file_menu.Append( self.m_quit_menuitem )
 
@@ -520,6 +525,7 @@ class RummageFrame ( wx.Frame ):
         self.Bind( wx.EVT_MENU, self.on_export_csv, id = self.m_export_csv_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_export_settings, id = self.m_export_settings_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_import_settings, id = self.m_import_settings_menuitem.GetId() )
+        self.Bind( wx.EVT_MENU, self.on_delete_backups, id = self.m_delete_backups_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_exit, id = self.m_quit_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_about, id = self.m_about_menuitem.GetId() )
         self.Bind( wx.EVT_MENU, self.on_check_update, id = self.m_update_menuitem.GetId() )
@@ -593,6 +599,9 @@ class RummageFrame ( wx.Frame ):
         event.Skip()
 
     def on_import_settings( self, event ):
+        event.Skip()
+
+    def on_delete_backups( self, event ):
         event.Skip()
 
     def on_exit( self, event ):

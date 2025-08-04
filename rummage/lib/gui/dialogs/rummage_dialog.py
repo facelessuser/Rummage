@@ -36,6 +36,7 @@ from ..actions import export_html
 from ..actions import export_csv
 from ..actions import fileops
 from ..actions import updates
+from wcmatch import glob
 try:
     from ..gui import GUI_PATCHED  # noqa: F401
 except ImportError as e:
@@ -599,6 +600,7 @@ class RummageFrame(gui.RummageFrame):
         self.MENU_EXPORT_RESULTS = _("Export Results")
         self.MENU_EXPORT_SETTINGS = _("Export Settings")
         self.MENU_IMPORT_SETTINGS = _("Import Settings")
+        self.MENU_DELETE_BACKUPS = _("Delete Backups")
         self.MENU_FILE = _("File")
         self.MENU_VIEW = _("View")
         self.MENU_HELP = _("Help")
@@ -686,6 +688,7 @@ class RummageFrame(gui.RummageFrame):
         self.m_export_csv_menuitem.SetItemLabel(self.MENU_CSV)
         self.m_export_settings_menuitem.SetItemLabel(self.MENU_EXPORT_SETTINGS)
         self.m_import_settings_menuitem.SetItemLabel(self.MENU_IMPORT_SETTINGS)
+        self.m_delete_backups_menuitem.SetItemLabel(self.MENU_DELETE_BACKUPS)
         self.m_log_menuitem.SetItemLabel(self.MENU_OPEN_LOG)
         self.m_about_menuitem.SetItemLabel(self.MENU_ABOUT)
         self.m_update_menuitem.SetItemLabel(self.MENU_UPDATE)
@@ -2336,6 +2339,27 @@ class RummageFrame(gui.RummageFrame):
         exporter = ExportSettingsDialog(self)
         exporter.ShowModal()
         exporter.Destroy()
+
+    def on_delete_backups(self, event):
+        """Delete Backups."""
+
+        from ..dialogs.delete_dialog import DeleteDialog
+
+        if not yesno(_("Are you sure you wish to delete all backup files/folders?")):
+            return
+
+        target = self.m_searchin_text.GetValue()
+        backup_folder = bool(Settings.get_backup_type())
+        backup_location = Settings.get_backup_folder() if backup_folder else Settings.get_backup_ext()
+        if backup_folder:
+            pattern = f'**/{backup_location}/'
+            flags = glob.G
+        else:
+            pattern = f'**/*.{backup_location}'
+            flags = glob.G | glob.O
+        dlg = DeleteDialog(self, glob.iglob(pattern, flags=flags, root_dir=target), False)
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def on_import_settings(self, event):
         """Import settings."""

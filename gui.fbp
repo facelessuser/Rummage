@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <wxFormBuilder_Project>
   <FileVersion major="1" minor="18"/>
-  <object class="Project" expanded="true">
+  <object class="Project" expanded="false">
     <property name="code_generation">Python</property>
     <property name="cpp_class_decoration"></property>
     <property name="cpp_disconnect_events">1</property>
@@ -5101,6 +5101,24 @@
           </object>
           <object class="separator" expanded="false">
             <property name="name">m_separator41</property>
+            <property name="permission">none</property>
+          </object>
+          <object class="wxMenuItem" expanded="false">
+            <property name="bitmap"></property>
+            <property name="checked">0</property>
+            <property name="enabled">1</property>
+            <property name="help"></property>
+            <property name="id">wxID_ANY</property>
+            <property name="kind">wxITEM_NORMAL</property>
+            <property name="label">Delete Backups</property>
+            <property name="name">m_delete_backups_menuitem</property>
+            <property name="permission">none</property>
+            <property name="shortcut"></property>
+            <property name="unchecked_bitmap"></property>
+            <event name="OnMenuSelection">on_delete_backups</event>
+          </object>
+          <object class="separator" expanded="false">
+            <property name="name">m_separator5</property>
             <property name="permission">none</property>
           </object>
           <object class="wxMenuItem" expanded="false">
