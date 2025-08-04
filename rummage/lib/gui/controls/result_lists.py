@@ -60,6 +60,13 @@ COPY_PATH = 1
 COPY_CONTENT = 2
 
 
+def display_menu(obj, m, p):
+    """Display menu."""
+
+    obj.PopupMenu(m, p)
+    m.Destroy()
+
+
 class ContextMenu(wx.Menu):
     """Context Menu."""
 
@@ -490,10 +497,9 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                 # Select if not already
                 if not selected:
                     s = self.GetFirstSelected()
-                    while s != -1:
-                        if s != item:
-                            self.Select(s, False)
-                        s = self.GetNextSelected(s)
+                    if s == -1:
+                        self.Select(item, True)
+
         if target is not None:
             if not enabled:
                 item = -1
@@ -522,8 +528,8 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                     )
                 ]
             )
-            self.PopupMenu(menu, pos)
-            menu.Destroy()
+
+            wx.CallLater(1, lambda obj=self, m=menu, p=pos: display_menu(obj, m, p))
         event.Skip()
 
 
@@ -807,10 +813,9 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                 # Select if not already
                 if not selected:
                     s = self.GetFirstSelected()
-                    while s != -1:
-                        if s != item:
-                            self.Select(s, False)
-                        s = self.GetNextSelected(s)
+                    if s == -1:
+                        self.Select(item, True)
+
         if target is not None:
             if not enabled:
                 item = -1
@@ -840,6 +845,5 @@ class ResultContentList(CommonOperationsMixin, DynamicList):
                     )
                 ]
             )
-            self.PopupMenu(menu, pos)
-            menu.Destroy()
+            wx.CallLater(1, lambda obj=self, m=menu, p=pos: display_menu(obj, m, p))
         event.Skip()

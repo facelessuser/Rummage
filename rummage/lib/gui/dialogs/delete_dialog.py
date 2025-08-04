@@ -198,7 +198,7 @@ class DeleteDialog(gui.DeleteDialog):
         if self.processing and not self.handling:
             self.handling = True
             count = self.thread.count
-            ratio = float(count) / float(self.total)
+            ratio = (float(count) / float(self.total)) if self.total else 0
             percent = int(ratio * 100)
             self.m_progress.SetValue(percent)
             self.m_progress_label.SetLabel(self.message % (count, self.total))
