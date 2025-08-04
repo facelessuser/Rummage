@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-03 23:58-0600\n"
+"POT-Creation-Date: 2025-08-04 08:38-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1044,20 +1044,28 @@ msgstr ""
 msgid "Help and Support"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:2348
+#: rummage/lib/gui/dialogs/rummage_dialog.py:2349
 msgid "Are you sure you wish to delete all backup files/folders?"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:2463
+#: rummage/lib/gui/dialogs/rummage_dialog.py:2350
+msgid "Recycle"
+msgstr ""
+
+#: rummage/lib/gui/dialogs/rummage_dialog.py:2351
+msgid "Trash"
+msgstr ""
+
+#: rummage/lib/gui/dialogs/rummage_dialog.py:2470
 msgid "About"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:2464
+#: rummage/lib/gui/dialogs/rummage_dialog.py:2471
 #, python-format
 msgid "Version: %s %s"
 msgstr ""
 
-#: rummage/lib/gui/dialogs/rummage_dialog.py:2465
+#: rummage/lib/gui/dialogs/rummage_dialog.py:2472
 msgid "Developer(s)"
 msgstr ""
 

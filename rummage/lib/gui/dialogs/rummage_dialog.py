@@ -43,7 +43,7 @@ except ImportError as e:
     # We forgot to patch the GUI, which will cause issues,
     # so raise a helpful error that points us to what we need to do.
     raise RuntimeError("GUI has not been patched. Please run tools/gui_patch.py") from e
-from .generic_dialogs import errormsg, yesno, infomsg
+from .generic_dialogs import errormsg, yesno, infomsg, yesno_cancel
 from ..app.custom_app import debug, error, get_log_file
 from ..controls import custom_statusbar
 from .regex_test_dialog import RegexTestDialog
@@ -2345,8 +2345,15 @@ class RummageFrame(gui.RummageFrame):
 
         from ..dialogs.delete_dialog import DeleteDialog
 
-        if not yesno(_("Are you sure you wish to delete all backup files/folders?")):
+        result = yesno_cancel(
+            _("Are you sure you wish to delete all backup files/folders?"),
+            yes=_('Recycle'),
+            no=_('Trash')
+        )
+
+        if result == wx.ID_CANCEL:
             return
+        recycle = result == wx.ID_YES
 
         target = self.m_searchin_text.GetValue()
         backup_folder = bool(Settings.get_backup_type())
@@ -2357,7 +2364,7 @@ class RummageFrame(gui.RummageFrame):
         else:
             pattern = f'**/*.{backup_location}'
             flags = glob.G | glob.O
-        dlg = DeleteDialog(self, glob.iglob(pattern, flags=flags, root_dir=target), True)
+        dlg = DeleteDialog(self, glob.iglob(pattern, flags=flags, root_dir=target), recycle)
         dlg.ShowModal()
         dlg.Destroy()
 
