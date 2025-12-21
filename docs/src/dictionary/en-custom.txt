@@ -83,6 +83,7 @@ Wildcard
 WxFormBuilder
 XFCE
 Xcode
+Zensical
 accessor
 autocomplete
 backend

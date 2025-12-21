@@ -232,7 +232,7 @@ def link_type(link):
 
     link_type = OTHER_LINK
     try:
-        scheme, netloc, path, params, query, fragment, is_url, is_absolute, is_blank = parse_url(link)
+        scheme, _, path, _, _, _, is_url, _, is_blank = parse_url(link)
         if is_url:
             link_type = URL_LINK
         elif is_blank:

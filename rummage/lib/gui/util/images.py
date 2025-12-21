@@ -14,7 +14,7 @@ def tint(byte_string, color, transparency=None):
     """Tint the image and return a byte string."""
 
     # Read the byte string as a `RGBA` image.
-    width, height, pixels, meta = Reader(bytes=byte_string).asRGBA()
+    width, height, pixels, _ = Reader(bytes=byte_string).asRGBA()
 
     # Tint
     p = []
@@ -50,7 +50,7 @@ def transparency(byte_string, transparency):
     """Adjust image transparency."""
 
     # Read the byte string as a `RGBA` image.
-    width, height, pixels, meta = Reader(bytes=byte_string).asRGBA()
+    width, height, pixels, _ = Reader(bytes=byte_string).asRGBA()
 
     p = []
     y = 0

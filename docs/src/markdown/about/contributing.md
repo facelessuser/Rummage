@@ -88,10 +88,10 @@ with documentation is always appreciated and can be done via pull requests.  The
 validation tests if only updating documentation.
 
 To build the documentation, you will need the necessary requirements. You can get them by running
-`pip install -r requirements/docs.txt`. We currently use a combination of [MkDocs][mkdocs], the
-[Material theme][mkdocs-material], and [PyMdown Extensions][pymdown-extensions] to render the docs.  You can preview
-the docs if you install these packages via the requirements file.  The command for previewing the docs is
-`mkdocs serve`. It should be run from the root directory. You can then view the documents at `localhost:8000`.
+`pip install -r requirements/docs.txt`. We currently use [Zensical][zensical] and [PyMdown Extensions][pymdown-extensions]
+to render the docs.  You can preview the docs if you install these packages via the requirements file.  The command for
+previewing the docs is `zensical serve`. It should be run from the root directory. You can then view the documents at
+`localhost:8000`.
 
 When providing documentation updates, please generate Rummage's internal documentation via `python tools/gen_docs.py`.
 Pull requests will currently fail if the documentation is not updated along with the requested changes.
