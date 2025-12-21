@@ -1,2 +1,2 @@
-faust-cchardet>=2.1.18
+faust-cchardet>=2.1.19
 regex>=2025.7.34
