@@ -173,7 +173,9 @@ def parse_url(url):
 
     Try to determine if the following is a file path or
     (as we will call anything else) a URL.
+
     We return it slightly modified and combine the path parts.
+
     We also assume if we see something like c:/ it is a Windows path.
     We don't bother checking if this **is** a Windows system, but
     'nix users really shouldn't be creating weird names like c: for their folder.
@@ -207,7 +209,7 @@ def parse_url(url):
         is_absolute = True
     elif RE_WIN_DRIVE_LETTER.match(scheme):
         # c:/path
-        path = '/%s:%s' % (scheme, path.replace('\\', '/'))
+        path = '/{}:{}'.format(scheme, path.replace('\\', '/'))
         scheme = 'file'
         netloc = ''
         is_absolute = True
@@ -218,7 +220,7 @@ def parse_url(url):
         netloc = ''
         is_absolute = True
     elif scheme != '' and netloc != '':
-        # A non file path or strange URL
+        # A non-file path or strange URL
         is_url = True
     elif path.startswith(('/', '\\')):
         # /root path
@@ -311,7 +313,7 @@ class WebViewMixin:
             event.Veto()
         # 'Nix systems treat "blank" (HTML string) pages as root paths most of the time.
         # So if we get `file:///` that is not empty and not linking to a target, we are
-        # Linking outside or page, but not to an external site.
+        # Linking outside our page, but not to an external site.
         elif obj.content_type == HTML_STRING and not (url == 'file:///' or url.startswith('file:///#')):
             obj.busy = False
             event.Veto()
