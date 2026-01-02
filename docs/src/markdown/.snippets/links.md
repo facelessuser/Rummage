@@ -14,8 +14,6 @@
 [fullmatch]: https://docs.python.org/3/library/re.html#re.fullmatch
 [grepwin]: http://stefanstools.sourceforge.net/grepWin.html
 [markdown]: https://github.com/Python-Markdown/markdown
-[mkdocs]: https://github.com/mkdocs/mkdocs
-[mkdocs-material]: https://github.com/squidfunk/mkdocs-material
 [posix]: https://facelessuser.github.io/wcmatch/fnmatch/#posix-character-classes
 [pygments]: http://pygments.org/
 [pymdown-extensions]: https://github.com/facelessuser/pymdown-extensions
@@ -27,3 +25,4 @@
 [wcmatch-fnmatch]: https://facelessuser.github.io/wcmatch/fnmatch/#syntax
 [wxpython]: https://pypi.org/project/wxPython/
 [wxpython-prereq]: https://github.com/wxWidgets/Phoenix/blob/master/README.rst#prerequisites
+[zensical]: https://github.com/zensical/zensical

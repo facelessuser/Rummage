@@ -200,7 +200,9 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
             if util.platform() == "macos" and not util.MAC_OLD:
                 color = Color.from_wxbgr(bg.GetRGB())
                 factor = util.MAC_LIGHT if color.luminance() > 0.5 else util.MAC_DARK
-                color.set('lab-d65.lightness', lambda l, f=factor: l + (100.0 * f) - 100.0)
+                color.set('alpha', 1.0).mix(
+                    'black' if color.luminance() > 0.5 else 'white', factor, space='srgb', in_place=True
+                ).set('alpha', 1.0)
                 bg.SetRGB(color.to_wxbgr())
             page.SetBackgroundColour(bg)
             if x == 0 and util.platform() != "linux":

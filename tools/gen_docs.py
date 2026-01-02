@@ -2,15 +2,17 @@
 import sys
 import os
 import subprocess
+import shutil
 from wcmatch import glob
 import hashlib
 try:
-    import mkdocs  # noqa
+    import zensical  # noqa
+    import markdown  # noqa
     import pymdownx  # noqa
 except ImportError:
     print(
         '========================================================================================\n'
-        'gen_docs requires mkdocs and pymdown-extensions to be installed properly.\n'
+        'gen_docs requires zensical, markdown, and pymdown-extensions to be installed properly.\n'
         'You can install requirements with the command `pip install -r requirements/docs.txt`.\n'
         'Please reslove the issues and try again.\n'
         '========================================================================================\n'
@@ -22,13 +24,13 @@ __version__ = '2.0.0'
 FLAGS = glob.G | glob.N | glob.B | glob.S
 
 FILES_PATTERNS = [
-    'mkdocs-internal.yml',
+    'zensical-internal.yml',
     'docs/src/markdown/**/*.{md,txt,png,gif,html}',
     'docs/internal_theme/**/*.{html,css,js}'
 ]
 
-MKDOCS_CFG = "mkdocs-internal.yml"
-MKDOCS_BUILD = "rummage/lib/gui/data/docs"
+ZENSICAL_CFG = "zensical-internal.yml"
+ZENSICAL_BUILD = "rummage/lib/gui/data/docs"
 
 
 def console(cmd, input_file=None):
@@ -74,16 +76,23 @@ def build_internal_docs(verbose=False, debug=False):
     """Build internal docs."""
 
     print('Building Docs...')
+    if os.path.exists(ZENSICAL_BUILD):
+        shutil.rmtree(ZENSICAL_BUILD)
     print(
         console(
             [
                 sys.executable,
-                '-m', 'mkdocs', 'build', '--clean',
-                '-d', MKDOCS_BUILD,
-                '-f', MKDOCS_CFG
+                '-m', 'zensical', 'build', '--clean',
+                '-f', ZENSICAL_CFG
             ]
         )
     )
+
+    # Move to output location
+    shutil.move('site', ZENSICAL_BUILD)
+    # Remove unnecessary files
+    shutil.rmtree(os.path.join(ZENSICAL_BUILD, 'assets'))
+    os.remove(os.path.join(ZENSICAL_BUILD, 'search.json'))
     gen_hash(verbose, debug)
 
 
@@ -113,7 +122,7 @@ def gen_hash(verbose, debug):
     """Generate hash."""
 
     result = hash_files(verbose, debug)
-    with open(os.path.join(MKDOCS_BUILD, '.dochash'), 'w') as f:
+    with open(os.path.join(ZENSICAL_BUILD, '.dochash'), 'w') as f:
         f.write(result)
     return 0
 
@@ -121,7 +130,7 @@ def gen_hash(verbose, debug):
 def test_hash(verbose=False, debug=False):
     """Test hash."""
 
-    with open(os.path.join(MKDOCS_BUILD, '.dochash'), 'r') as f:
+    with open(os.path.join(ZENSICAL_BUILD, '.dochash'), 'r') as f:
         original = f.read()
 
     result = hash_files(verbose, debug)

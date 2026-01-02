@@ -17,7 +17,7 @@ jobs:
       max-parallel: 4
       matrix:
         platform: [ubuntu-latest, windows-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14]
         include:
           - python-version: 3.9
             tox-env: py39
@@ -29,6 +29,8 @@ jobs:
             tox-env: py312
           - python-version: '3.13'
             tox-env: py313
+          - python-version: '3.14'
+            tox-env: py314
 
     env:
       TOXENV: ${{ matrix.tox-env }}
@@ -50,9 +52,9 @@ jobs:
         python -m tox
     - name: Upload Results
       if: success()
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
-        file: ./coverage.xml
+        files: ./coverage.xml
         flags: unittests
         name: ${{ matrix.platform }}-${{ matrix.tox-env }}
         token: ${{ secrets.CODECOV_TOKEN }} # required

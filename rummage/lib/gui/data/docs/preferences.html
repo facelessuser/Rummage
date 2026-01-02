@@ -88,7 +88,7 @@ be configured.</p>
     a window.</dd>
 <dt>Language</dt>
 <dd>Rummage has internal support to display dialog labels in different languages. Currently Rummage has English. Russian
-    is outdated but includes a fair bit of the needed translations. See <a href="extras.html#localization">Localization</a> to
+    is outdated but includes a fair bit of the needed translations. See <a href="./extras.html#localization">Localization</a> to
     learn more about improving current translations or adding additional translations.</dd>
 <dt>Updates</dt>
 <dd>
@@ -123,7 +123,7 @@ to do the same thing.</p>
 <p><img alt="Preferences: Search" src="images/settings_search.png" /></p>
 <p>The <strong>Regular Expression</strong> panel is where the desired regular expression engine that Rummage uses can be selected and
 configured.  By default, Rummage will use Re, but if the Regex module is installed in your Python installation, it can
-be selected instead.  There is also the option of using Re or Regex with <a href="search.html#backrefs">Backrefs</a> (a wrapper
+be selected instead.  There is also the option of using Re or Regex with <a href="./search.html#backrefs">Backrefs</a> (a wrapper
 that adds a couple of special escapes and features).</p>
 <p>If using Regex, you can set it to the version of your choice. <code>V0</code> tries to be completely compatible with Re patterns
 with non-breaking additional features, while <code>V1</code> breaks compatibility with Re and adds even more useful features.
@@ -131,15 +131,15 @@ Please see <a href="https://pypi.org/project/regex/">Regex documentation</a> to 
 <p>Under <strong>File/Folder Matching</strong> are a number options for file and folder matching patterns. Follow the links to learn
 more about each feature:</p>
 <ul>
-<li><a href="search.html#extended-match-syntax">Extended match</a>.</li>
-<li><a href="search.html#brace-expansion-syntax">Brace expansion</a>.</li>
-<li>Case sensitive for <a href="search.html#wildcard">wildcard match</a> and for <a href="#regular-expression">regular expression match</a>.</li>
-<li><a href="search.html#full-path-matching">Globstar</a>.</li>
-<li><a href="search.html#basic-wildcard-syntax">Exclude with <code>-</code></a> which is the default.</li>
-<li><a href="search.html#full-path-matching">Match base</a>.</li>
-<li><a href="search.html#full-path-matching">Full path directory matching</a>.</li>
-<li><a href="search.html#full-path-matching">Full path file matching</a>.</li>
-<li><a href="search.html#pattern-limit">Pattern limit</a></li>
+<li><a href="./search.html#extended-match-syntax">Extended match</a>.</li>
+<li><a href="./search.html#brace-expansion-syntax">Brace expansion</a>.</li>
+<li>Case sensitive for <a href="./search.html#wildcard">wildcard match</a> and for <a href="#regular-expression">regular expression match</a>.</li>
+<li><a href="./search.html#full-path-matching">Globstar</a>.</li>
+<li><a href="./search.html#basic-wildcard-syntax">Exclude with <code>-</code></a> which is the default.</li>
+<li><a href="./search.html#full-path-matching">Match base</a>.</li>
+<li><a href="./search.html#full-path-matching">Full path directory matching</a>.</li>
+<li><a href="./search.html#full-path-matching">Full path file matching</a>.</li>
+<li><a href="./search.html#pattern-limit">Pattern limit</a></li>
 </ul>
 <h2 id="encoding">Encoding</h2>
 <p><img alt="Preferences: Encoding" src="images/settings_encoding.png" /></p>
@@ -314,52 +314,52 @@ depending on whether you are using Re, Regex, or one of the two with Backrefs).<
 <tr>
 <td><code>i</code></td>
 <td>All</td>
-<td><a href="search.html#common-options">Search case-sensitive.</a></td>
+<td><a href="./search.html#common-options">Search case-sensitive.</a></td>
 </tr>
 <tr>
 <td><code>u</code></td>
 <td>All</td>
-<td><a href="search.html#common-options">Use Unicode properties.</a></td>
+<td><a href="./search.html#common-options">Use Unicode properties.</a></td>
 </tr>
 <tr>
 <td><code>s</code></td>
 <td>All</td>
-<td><a href="search.html#common-options">Dot matches newline.</a></td>
+<td><a href="./search.html#common-options">Dot matches newline.</a></td>
 </tr>
 <tr>
 <td><code>f</code></td>
 <td>Regex, Regex&nbsp;+ Backrefs</td>
-<td><a href="search.html#regex-options">Full case-folding.</a></td>
+<td><a href="./search.html#regex-options">Full case-folding.</a></td>
 </tr>
 <tr>
 <td><code>b</code></td>
 <td>Regex, Regex&nbsp;+ Backrefs</td>
-<td><a href="search.html#regex-options">Best fuzzy match.</a></td>
+<td><a href="./search.html#regex-options">Best fuzzy match.</a></td>
 </tr>
 <tr>
 <td><code>e</code></td>
 <td>Regex, Regex&nbsp;+ Backrefs</td>
-<td><a href="search.html#regex-options">Improve fuzzy fit.</a></td>
+<td><a href="./search.html#regex-options">Improve fuzzy fit.</a></td>
 </tr>
 <tr>
 <td><code>w</code></td>
 <td>Regex, Regex&nbsp;+ Backrefs</td>
-<td><a href="search.html#regex-options">Unicode word breaks.</a></td>
+<td><a href="./search.html#regex-options">Unicode word breaks.</a></td>
 </tr>
 <tr>
 <td><code>r</code></td>
 <td>Regex, Regex&nbsp;+ Backrefs</td>
-<td><a href="search.html#regex-options">Search backwards.</a></td>
+<td><a href="./search.html#regex-options">Search backwards.</a></td>
 </tr>
 <tr>
 <td><code>p</code></td>
 <td>Regex, Regex&nbsp;+ Backrefs</td>
-<td><a href="search.html#regex-options">Use POSIX matching.</a></td>
+<td><a href="./search.html#regex-options">Use POSIX matching.</a></td>
 </tr>
 <tr>
 <td><code>F</code></td>
 <td>Regex, Regex&nbsp;+ Backrefs, Re&nbsp;+ Backrefs</td>
-<td><a href="search.html#common-options">Format style replacements.</a></td>
+<td><a href="./search.html#common-options">Format style replacements.</a></td>
 </tr>
 </tbody>
 </table>

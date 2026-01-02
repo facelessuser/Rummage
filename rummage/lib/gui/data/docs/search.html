@@ -204,11 +204,11 @@ options.</p>
 </tr>
 <tr>
 <td>Use&nbsp;chain&nbsp;search</td>
-<td>Puts Rummage into <a href="usage.html#search-chains">"search chain" mode</a>. When in "search chain" mode, rummage will only use saved search chains for search and replace.</td>
+<td>Puts Rummage into <a href="./usage.html#search-chains">"search chain" mode</a>. When in "search chain" mode, rummage will only use saved search chains for search and replace.</td>
 </tr>
 <tr>
 <td>Use&nbsp;replace&nbsp;plugin</td>
-<td>When enabled, Rummage will use a <a href="usage.html#replace-plugins">replace plugin</a> instead of a replace pattern in order to do more advanced replaces.</td>
+<td>When enabled, Rummage will use a <a href="./usage.html#replace-plugins">replace plugin</a> instead of a replace pattern in order to do more advanced replaces.</td>
 </tr>
 </tbody>
 </table>
@@ -232,7 +232,7 @@ features are enabled by default.</p>
 patterns.</p>
 <ul>
 <li>File patterns are case insensitive by default, even for Linux/Unix systems. Case sensitivity can be enabled in
-    <a href="preferences.html#search">Preferences</a>.</li>
+    <a href="./preferences.html#search">Preferences</a>.</li>
 <li>Slashes are generally treated as normal characters, but on windows they will be normalized: <code>/</code> will become <code>\\</code>.
     There is no need to explicitly use <code>\\</code> in patterns on Windows, but if you do, it will be handled.</li>
 <li><code>.</code> is always matched by <code>*</code>, <code>?</code>, <code>[]</code>, etc. To prevent hidden files from being matched, you should uncheck the
@@ -279,7 +279,7 @@ wildcard patterns for file name matching.</p>
 </tr>
 <tr>
 <td><code>-</code> / <code>!</code></td>
-<td>By default, if <code>-</code> is found at the start of a pattern, it will match the inverse. This can be changed to use <code>!</code> instead in <a href="preferences.html#search">Preferences</a>.</td>
+<td>By default, if <code>-</code> is found at the start of a pattern, it will match the inverse. This can be changed to use <code>!</code> instead in <a href="./preferences.html#search">Preferences</a>.</td>
 </tr>
 <tr>
 <td><code>\xhh</code></td>
@@ -346,7 +346,7 @@ which we will always be included.</p>
 a sequence as <code>-</code> is also used to specify character ranges: <code>[a-z]</code>.</p>
 </div>
 <h4 id="extended-match-syntax">Extended Match Syntax</h4>
-<p>In <a href="preferences.html#search">Preferences</a>, you can also enable extended match patterns. Extended match patterns allow
+<p>In <a href="./preferences.html#search">Preferences</a>, you can also enable extended match patterns. Extended match patterns allow
 you to provide pattern lists to provide more advanced logic.</p>
 <table>
 <thead>
@@ -398,7 +398,7 @@ patterns, you must escape <code>(</code> at the start of a file if you want the 
 pattern instead of treating it as the start of an extended match pattern (<code>!(...)</code>).</p>
 </div>
 <h4 id="brace-expansion-syntax">Brace Expansion Syntax</h4>
-<p>In <a href="preferences.html#search">Preferences</a>, you can enables Bash style brace expansion.</p>
+<p>In <a href="./preferences.html#search">Preferences</a>, you can enables Bash style brace expansion.</p>
 <p>Brace expansion is applied before anything else. When applied, a pattern will be expanded into multiple patterns. Each
 pattern will then be parsed separately.</p>
 <p>This is great for specifying complex combinations of patterns: <code>a{b,{c,d}}</code> &rarr; <code>ab ac ad</code>. For simple patterns, it may
@@ -436,7 +436,7 @@ patterns.</p>
 </ul>
 </div>
 <h4 id="full-path-matching">Full Path Matching</h4>
-<p>In <a href="preferences.html#search">Preferences</a>, you can enable full path search for either file patterns and/or folder
+<p>In <a href="./preferences.html#search">Preferences</a>, you can enable full path search for either file patterns and/or folder
 exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred
 to as "full path", it is still relative to the provided base path.</p>
 <p>Assuming you Provided a base folder of <code>/My/base/path</code> to search, and as Rummage was crawling directories, it needed to
@@ -445,28 +445,28 @@ with full path enabled, you'd match against <code>some/file.txt</code> (which is
 you'd have to use pattern like <code>*/*.txt</code> instead of <code>*.txt</code>.</p>
 <p>When full path matching is enabled for a pattern, slashes are generally treated special. Slashes will not be matched in
 <code>[]</code>, <code>*</code>, <code>?</code>, or in extended patterns like <code>*(...)</code>. Slashes can be matched by <code>**</code> if the "globstar (<code>**</code>)"" option
-is enabled in <a href="preferences.html#search">Preferences</a>.</p>
+is enabled in <a href="./preferences.html#search">Preferences</a>.</p>
 <p>When full path matching is not enabled, wildcard patterns use base matching. That is to say, the wildcard patterns are
-applied to the base filename instead of the full path. If you enable base matching for full paths in <a href="preferences.html#search">Preferences</a>,
+applied to the base filename instead of the full path. If you enable base matching for full paths in <a href="./preferences.html#search">Preferences</a>,
 if a pattern has no slashes, it will perform base matching, and if there are slashes, it will perform a full path match.
 This allows you to have the best of both worlds. For instance, the following pattern would match all Markdown files
 under the document directory, but would exclude any file in any subdirectory under docs whose name starts with <code>c</code>:
 <code>docs/**/*.md|-c*</code>. Full path is used for the <code>docs/**/*.md</code> pattern while base matching is used for <code>-c*</code>.</p>
 <p>Full path matching can be enabled for both file the file pattern box and the folder exclude box. Each can be controlled
-separately in <a href="preferences.html#search">Preferences</a>.</p>
+separately in <a href="./preferences.html#search">Preferences</a>.</p>
 <p>To learn more about full path matching with regular expression, checkout the regular expression <a href="#full-path-matching_1">section</a>.</p>
 <h4 id="pattern-limit">Pattern Limit</h4>
 <p>Glob style patterns, by default, allow expanding a pattern by splitting on <code>|</code> or expanding the pattern with brace
 expansion: <code>a{b,c}</code> &rarr; <code>ab ac</code>. This can turn one pattern into many patterns. The underlying expansion code limits
-expansion to <code>1000</code> patterns. This limit can be configured in <a href="preferences.html#search">Preferences</a>. To raise or lower
+expansion to <code>1000</code> patterns. This limit can be configured in <a href="./preferences.html#search">Preferences</a>. To raise or lower
 the limit, simply set the value higher or lower. To disable the limit entirely, set it to <code>0</code>.</p>
 <h3 id="regular-expression">Regular Expression</h3>
 <p>Wildcard patterns are the default for file and folder exclude patterns, but regular expression patterns can be used
-instead by selecting the <code>Regex</code> checkbox beside the pattern. The regular expression engine set in <a href="preferences.html#search">Preferences</a>
-is what will be used for file patterns. It will also respect the case sensitivity setting in <a href="preferences.html#search">Preferences</a>
+instead by selecting the <code>Regex</code> checkbox beside the pattern. The regular expression engine set in <a href="./preferences.html#search">Preferences</a>
+is what will be used for file patterns. It will also respect the case sensitivity setting in <a href="./preferences.html#search">Preferences</a>
 for <strong>File/Folder Matching</strong>.</p>
 <h4 id="full-path-matching_1">Full Path Matching</h4>
-<p>In <a href="preferences.html#search">Preferences</a>, you can enable full path search for either file patterns and/or folder
+<p>In <a href="./preferences.html#search">Preferences</a>, you can enable full path search for either file patterns and/or folder
 exclude patterns. This will allow for matching against a full path instead of the base file name. While it is referred
 to as "full path", it is still relative to the provided base path.</p>
 <p>Assuming you Provided a base folder to search of <code>/My/base/path</code>, and as Rummage was crawling directories, it needed to
@@ -479,7 +479,7 @@ adds various back references that are known to some regular expression engines, 
 The supported back references actually vary depending on whether it is being applied to Re or Regex. For instance,
 Backrefs only adds Unicode Properties to Re since Regex already has Unicode properties. To learn more about what
 Backrefs adds, read the official <a href="http://facelessuser.github.io/backrefs/">Backrefs documentation</a>. You can enable extended back references in the
-<a href="preferences.html#search">Preferences</a> dialog.</p>
+<a href="./preferences.html#search">Preferences</a> dialog.</p>
   </div>
 
   <!-- Navigation -->

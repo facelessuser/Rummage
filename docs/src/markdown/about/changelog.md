@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.23
+
+-   **NEW**: Add support for Python 3.14.
+-   **NEW**: Upgrade dependencies.
+
 ## 4.22
 
 -   **NEW**: Drop Python 3.8 support.

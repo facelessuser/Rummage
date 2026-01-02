@@ -42,7 +42,7 @@
       <ul class="__toc_list_3">
       
       </ul>
-      <li class="__toc_level_3"><a href="#searching--replacing">Searching &amp; Replacing</a></li>
+      <li class="__toc_level_3"><a href="#searching-replacing">Searching &amp; Replacing</a></li>
       <ul class="__toc_list_3">
       
       <li class="__toc_level_4"><a href="#configuring-text-search">Configuring Text Search</a></li>
@@ -95,7 +95,7 @@ narrowed with patterns and filters.</p>
 <p>Rummage uses the default regular expression library (<a href="https://docs.python.org/3/library/re.html">Re</a>) that comes with Python. It also optionally works with the
 3<sup>rd</sup> party <a href="https://pypi.org/project/regex/">Regex</a> library (if installed).</p>
 <p>As matches are found, general info about the matches will be displayed in the <strong>Files</strong> and <strong>Content</strong> tabs. You can
-double click files to open them in your favorite editor (see <a href="preferences.html#editor">Editor Preferences</a> to configure
+double click files to open them in your favorite editor (see <a href="./preferences.html#editor">Editor Preferences</a> to configure
 Rummage for your editor).</p>
 <p>Rummage also comes with a simple regular expression tester to test out patterns. It also provides a feature where
 patterns can be saved for later and/or frequent use. You can even create chains that will apply a series of saved
@@ -111,15 +111,15 @@ major and minor Python version to the end:</p>
 </code></pre></div>
 <p>In some environments, it may make sense to run Rummage with <code>pythonw</code> which is mainly for launching GUI scripts
 (<code>pythonw</code> is not available on Linux). In some environments, it may be required (see
-<a href="installation.html#running-in-anaconda">Running in Anaconda</a>).</p>
+<a href="./installation.html#running-in-anaconda">Running in Anaconda</a>).</p>
 <div class="highlight"><pre><span></span><code>pythonw<span class="w"> </span>-m<span class="w"> </span>rummage
 </code></pre></div>
-<h2 id="searching--replacing">Searching &amp; Replacing</h2>
+<h2 id="searching-replacing">Searching &amp; Replacing</h2>
 <p><img alt="Search Tab" src="images/search_tab.png" /></p>
 <p>Search and replaces are configured in the <strong>Search</strong> tab. The search tab can essentially be broken up into two sections:
 text search configuration and file search configuration.</p>
 <h3 id="configuring-text-search">Configuring Text Search</h3>
-<p><img alt="Search and Replace Inputs" src="images/search_replace_inputs.png" /></p>
+<p><img alt="Search and Replace Inputs" src="./images/search_replace_inputs.png" /></p>
 <p>The first part of the <strong>Search</strong> tab contains mostly text search inputs, with the exception of the very first control,
 which is used to configure where to search. The second text box is used to specify what we are searching for in the
 content of each file. The last text box specified what we want to replace the found text with. Each text box retains a
@@ -130,7 +130,7 @@ Rummage will simply return files that match the provided file patterns (covered 
 <p>Below the text boxes is a collapsible panel that contains the text search options. The options consist of various
 checkboxes and controls that enable/disable search and replace features. The available features will vary depending on
 which regular expression engine you are using. Each feature is documented in
-<a href="search.html#search-options">Search Options</a>.</p>
+<a href="./search.html#search-options">Search Options</a>.</p>
 <p><img alt="Search and Replace Checkboxes" src="images/search_replace_panel.png" /></p>
 <p>Lastly, Rummage provides buttons to launch a <a href="#regular-expression-tester">regular expression tester</a>, dialogs to
 <a href="#saving-and-loading-regular-expressions">save or load</a> frequently used regular expressions, and a dialog to create and
@@ -142,7 +142,7 @@ manage <a href="#search-chains">regular expression chains</a>.</p>
 available that can narrow the actual files that get searched. You can filter out hidden files, symlinks, files of
 specific sizes, or creation/modification dates.</p>
 <p>You can also restrict which files get searched by providing wild card patterns (or regular expression if preferred). By
-default, the patterns are applied to the base file or folder name. See <a href="search.html#wildcard">File Patterns</a> to learn
+default, the patterns are applied to the base file or folder name. See <a href="./search.html#wildcard">File Patterns</a> to learn
 more about accepted wild card pattern syntax and how to configure optional file pattern features.</p>
 <div class="admonition tip">
 <p class="admonition-title">Hidden Files</p>

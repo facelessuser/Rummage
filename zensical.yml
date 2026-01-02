@@ -4,7 +4,7 @@ repo_url: https://github.com/facelessuser/Rummage
 edit_uri: tree/master/docs/src/markdown
 site_description: A search and replace tool written in Python.
 copyright: |
-  Copyright &copy; 2013 - 2025 <a href="https://github.com/facelessuser" target="_blank" rel="noopener">Isaac Muse</a>
+  Copyright &copy; 2013 - 2026 <a href="https://github.com/facelessuser" target="_blank" rel="noopener">Isaac Muse</a>
 
 docs_dir: docs/src/markdown
 theme:
@@ -12,26 +12,47 @@ theme:
   custom_dir: docs/theme
   logo: images/logo.svg
   palette:
-    scheme: dracula
-    primary: deep purple
-    accent: deep purple
+    # Palette toggle for system
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: lucide/sun
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: lucide/moon
+        name: Switch to light mode
   font:
     text: Roboto
     code: Roboto Mono
   features:
+    - announce.dismiss
     - navigation.tabs
     - navigation.top
     - navigation.instant
     - navigation.sections
     - navigation.indexes
+    - content.tabs.link
+    - navigation.footer
     - toc.follow
     - content.code.copy
     - navigation.footer
     - search.share
     - search.highlight
     - search.suggest
-  pymdownx:
-    sponsor: "https://github.com/sponsors/facelessuser"
 
 nav:
   - Home:
@@ -65,6 +86,9 @@ markdown_extensions:
           class: uml-flowchart
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
+      line_spans: __codeline
+      line_anchors: __codelineno
+      anchor_linenums: True
       extend_pygments_lang:
         - name: pycon3
           lang: pycon
@@ -118,17 +142,15 @@ markdown_extensions:
   - pymdownx.blocks.definition:
   - pymdownx.fancylists:
       inject_style: true
+  - pymdownx.quotes:
+      callouts: true
 
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/facelessuser
 
-plugins:
-  - search
-  - git-revision-date-localized:
-      fallback_to_build_date: true
-      strict: false
-  - mkdocs_pymdownx_material_extras
-  - minify:
-      minify_html: true
+extra_css:
+  - assets/pymdownx-extras/extra-928cef6c86.css
+extra_javascript:
+  - assets/pymdownx-extras/extra-loader-Ccztcqfq.js
