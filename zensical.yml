@@ -4,7 +4,7 @@ repo_url: https://github.com/facelessuser/Rummage
 edit_uri: tree/master/docs/src/markdown
 site_description: A search and replace tool written in Python.
 copyright: |
-  Copyright &copy; 2013 - 2025 <a href="https://github.com/facelessuser" target="_blank" rel="noopener">Isaac Muse</a>
+  Copyright &copy; 2013 - 2026 <a href="https://github.com/facelessuser" target="_blank" rel="noopener">Isaac Muse</a>
 
 docs_dir: docs/src/markdown
 theme:
@@ -86,6 +86,9 @@ markdown_extensions:
           class: uml-flowchart
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
+      line_spans: __codeline
+      line_anchors: __codelineno
+      anchor_linenums: True
       extend_pygments_lang:
         - name: pycon3
           lang: pycon
@@ -139,6 +142,8 @@ markdown_extensions:
   - pymdownx.blocks.definition:
   - pymdownx.fancylists:
       inject_style: true
+  - pymdownx.quotes:
+      callouts: true
 
 extra:
   social:
@@ -146,6 +151,6 @@ extra:
       link: https://github.com/facelessuser
 
 extra_css:
-  - assets/pymdownx-extras/extra-835c322b67.css
+  - assets/pymdownx-extras/extra-928cef6c86.css
 extra_javascript:
   - assets/pymdownx-extras/extra-loader-Ccztcqfq.js

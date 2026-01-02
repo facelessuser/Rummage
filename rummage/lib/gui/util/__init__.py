@@ -20,15 +20,19 @@ else:
 
 WX_420 = wx.__version__ >= '4.2.0'
 
-if WX_420:
+# High Sierra and below
+MAC_OLD = _MAC_VER < (10, 14)
+MAC_TAHOE = _MAC_VER >= (26, 0)
+
+if MAC_TAHOE:
+    MAC_LIGHT = 0.98
+    MAC_DARK = 1.09
+elif WX_420:
     MAC_LIGHT = 1.023
     MAC_DARK = 1.043
 else:
     MAC_LIGHT = 0.99
     MAC_DARK = 1.085
-
-# High Sierra and below
-MAC_OLD = _MAC_VER < (10, 14)
 
 
 def mac_ver():
