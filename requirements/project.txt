@@ -6,6 +6,6 @@ wxpython>=4.1.0
 filelock>=3.16
 send2trash>=1.8.3
 markdown>=3.10
-pymdown-extensions>=10.19.1
+pymdown-extensions>=10.20
 pygments>=2.19.2
 coloraide>=6.2
