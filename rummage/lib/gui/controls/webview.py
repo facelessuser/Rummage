@@ -75,7 +75,8 @@ EXTENSIONS = [
     "pymdownx.pathconverter",
     "pymdownx.blocks.admonition",
     "pymdownx.blocks.html",
-    "pymdownx.blocks.definition"
+    "pymdownx.blocks.definition",
+    "pymdownx.quotes"
 ]
 
 EXTENSION_CONFIGS = {
@@ -125,6 +126,9 @@ EXTENSION_CONFIGS = {
             "example",
             "quote"
         ]
+    },
+    "pymdownx.quotes": {
+        "callouts": True
     }
 }
 

@@ -91,3 +91,5 @@ markdown_extensions:
   - pymdownx.blocks.definition:
   - pymdownx.fancylists:
       inject_style: true
+  - pymdownx.quotes:
+      callouts: true

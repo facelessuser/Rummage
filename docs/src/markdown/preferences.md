@@ -33,17 +33,16 @@ Updates
     The check is only a check for new versions and doesn't perform an upgrade.  Rummage must be upgraded via `pip` from
     command line.
 
-    //// info | Update Issues: Python 3.6+ on macOS
-    There is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates
-    required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
-
-    It is possible that a given installation method resolves this automatically, but if not, the following steps
-    should help. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to
-    navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script
-    will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed
-    bundle location. If you are using something like macports, then you'll probably have to research to find out how
-    to do the same thing.
-    ////
+    > [!info] Update Issues: Python 3.6+ on macOS
+    > There is a small issue on macOS with Python 3.6+: Python 3.6 changed how it gets the default certificates
+    > required to properly check URLs. The details are actually documented here: https://bugs.python.org/issue28150#msg276516.
+    >
+    > It is possible that a given installation method resolves this automatically, but if not, the following steps
+    > should help. Assuming that Python 3.6+ was installed using the macOS installer from Python.org, you just need to
+    > navigate to `/Applications/Python 3.6/Install Certificates.command` and double click the command.  The script
+    > will use `pip` to install `certifi` and creates a symlink in the OpenSSL directory to `certifi`'s installed
+    > bundle location. If you are using something like macports, then you'll probably have to research to find out how
+    > to do the same thing.
 
 International Time
 
@@ -121,9 +120,8 @@ Argument Variables | Description
 `{$col}`           | Insert the column number.
 `{$col0}`          | Insert the line column offset by one so the first column is zero instead of one.
 
-/// new | New 4.7.0
-Added `{$col0}` for zero based column values.
-///
+> [!new] New 4.7.0
+> Added `{$col0}` for zero based column values.
 
 ## Notifications
 
@@ -136,37 +134,34 @@ On Linux, you can set your preferred player: `paplay`, `aplay`, and `play` (`sox
 
 A test button is provided to test the configuration once set.
 
-/// tip | Supported Notification Sound Formats
-
-Windows | macOS                    | Linux
-------- | ------------------------ | -----
-`wav`   | `wav`, `mp3` and `.aiff` | `wav` and `mp3` (if using `paplay`, `ogg` is also supported)
-///
+> [!tip] Supported Notification Sound Formats
+>
+> Windows | macOS                    | Linux
+> ------- | ------------------------ | -----
+> `wav`   | `wav`, `mp3` and `.aiff` | `wav` and `mp3` (if using `paplay`, `ogg` is also supported)
 
 /// define
 Linux
 
 -   Native: Notifications via `notify-send`.
 
-    /// info | Other Distros
-    Though Rummage should run on any Linux distro, the native notification option was built around `notify-send` and
-    only tested on Ubuntu. If other distros have a `notify-send` it may also work.
-    ///
+    > [!info] Other Distros
+    > Though Rummage should run on any Linux distro, the native notification option was built around `notify-send` and
+    > only tested on Ubuntu. If other distros have a `notify-send` it may also work.
 
 macOS
 
 -   Native: Notification Center via [terminal-notifier][terminal-notifier]. Path to `terminal-notifier` must be
     configured.
 
-    /// info | Configuring macOS Native
-    When selecting `native` on macOS, an option to select the path to terminal notifier will be available since
-    native dialogs rely on `terminal-notifier` to send notifications to the Notification Center. This must be
-    configured or *native* notifications will not work.
-
-    When selecting the `terminal-notifier` path, you can select either the binary directly or the `.<app` bundle
-    (depending on how you installed `terminal-notifier`).  When selecting the `.app` bundle, Rummage will know how
-    to access the binary inside the bundle.
-    ///
+    > [!info] Configuring macOS Native
+    > When selecting `native` on macOS, an option to select the path to terminal notifier will be available since
+    > native dialogs rely on `terminal-notifier` to send notifications to the Notification Center. This must be
+    > configured or *native* notifications will not work.
+    >
+    > When selecting the `terminal-notifier` path, you can select either the binary directly or the `.<app` bundle
+    > (depending on how you installed `terminal-notifier`).  When selecting the `.app` bundle, Rummage will know how
+    > to access the binary inside the bundle.
 
 Windows
 

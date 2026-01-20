@@ -28,10 +28,9 @@
    appropriately. Also note that we quote `%1` to allow spaces in the command line argument. Paths may vary, and it is
    left up to the user to discover where their Python install directory is.
 
-    /// warning
-    This isn't a guide in how to do registry editing proper, so only edit the registry if you are certain of what you
-    are doing.
-    ///
+    > [!warning]
+    > This isn't a guide in how to do registry editing proper, so only edit the registry if you are certain of what you
+    > are doing.
 
     ```ini
     Windows Registry Editor Version 5.00

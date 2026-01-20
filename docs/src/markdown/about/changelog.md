@@ -188,13 +188,12 @@
 
 ## 4.7
 
-/// warning | Warning
-Backrefs 4.2.0 has deprecated the shorthand references for alphabetic character groups in `re` search patterns:
-`\l`, `\L`, `\c`, and `\C`. Instead you should use: `[[:lower:]]`, `[[:^lower:]]`, `[[:upper:]]`, and `[[:^upper:]]`
-respectively. While the references have only been deprecated, and are technically still available, a future version
-of Backrefs will remove them entirely at some point. It is recommended to transition now so as not to be caught
-unawares.
-///
+> [!warning] Warning
+> Backrefs 4.2.0 has deprecated the shorthand references for alphabetic character groups in `re` search patterns:
+> `\l`, `\L`, `\c`, and `\C`. Instead you should use: `[[:lower:]]`, `[[:^lower:]]`, `[[:upper:]]`, and `[[:^upper:]]`
+> respectively. While the references have only been deprecated, and are technically still available, a future version
+> of Backrefs will remove them entirely at some point. It is recommended to transition now so as not to be caught
+> unawares.
 
 -   **NEW**: Add `col0` variable for editor configuration to allow for using a zero based column value instead of one
     based column value for editors that require it.
