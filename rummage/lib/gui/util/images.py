@@ -24,7 +24,7 @@ def tint(byte_string, color, transparency=None):
         columns = int(len(row) / 4)
         start = 0
         for _x in range(columns):
-            color.compose(Color('srgb', [c / 255 for c in row[start:start + 3]]))
+            color = Color.layer([color, Color('srgb', [c / 255 for c in row[start:start + 3]])])
             alpha = row[start + 3]
             # Adjust transparency of image if also desired
             if transparency is not None:

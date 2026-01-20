@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.23.1
+
+-   **FIX**: Fix for latest ColorAide.
+
 ## 4.23
 
 -   **NEW**: Add support for Python 3.14.
