@@ -20,7 +20,6 @@ IN THE SOFTWARE.
 """
 import os
 import subprocess
-import codecs
 import json
 from .sanitize_json import sanitize
 from ..settings import Settings
@@ -66,7 +65,7 @@ def read_json(filename):
     """Read JSON."""
 
     try:
-        with codecs.open(filename, "r", encoding='utf-8') as f:
+        with open(filename, "r", encoding='utf-8', errors='strict') as f:
             content = sanitize(f.read(), True)
         obj = json.loads(content)
     except Exception:
@@ -81,7 +80,7 @@ def write_json(filename, obj):
 
     try:
         j = json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
-        with codecs.open(filename, 'w', encoding='utf-8') as f:
+        with open(filename, 'w', encoding='utf-8', errors='strict') as f:
             f.write(j + "\n")
     except Exception:
         fail = True

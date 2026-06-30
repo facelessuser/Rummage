@@ -20,7 +20,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-import codecs
 import sys
 import json
 import os
@@ -138,7 +137,7 @@ class ArgPipeThread:
             # It's okay if the pipe is broken, our goal is just to break the
             # wait loop for receiving pipe data.
             try:
-                with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
+                with open(self.pipe_name, "w", encoding="utf-8", errors='strict') as pipeout:
                     try:
                         pipeout.write('\n')
                     except IOError:
@@ -188,7 +187,7 @@ class ArgPipeThread:
                 os.mkfifo(self.pipe_name)
 
             while self.check_pipe:
-                with codecs.open(self.pipe_name, "r", 'utf-8') as pipein:
+                with open(self.pipe_name, "r", 'utf-8', errors='strict') as pipein:
                     while self.check_pipe:
                         line = pipein.readline()[:-1]
                         if line != "":
@@ -252,7 +251,7 @@ class PipeApp(CustomApp):
             )
             ctypes.windll.kernel32.CloseHandle(file_handle)
         else:
-            with codecs.open(self.pipe_name, "w", encoding="utf-8") as pipeout:
+            with open(self.pipe_name, "w", encoding="utf-8", errors='strict') as pipeout:
                 args = self.process_args(argv)
                 pipeout.write(json.dumps(args) + '\n')
 
@@ -299,7 +298,7 @@ class CustomLog(wx.Log):
 
         try:
             with self.file_lock.acquire(1):
-                with codecs.open(self.file_name, "w", "utf-8") as f:
+                with open(self.file_name, "w", "utf-8", errors='strict') as f:
                     f.write("")
         except Exception:
             self.file_name = None
@@ -314,7 +313,7 @@ class CustomLog(wx.Log):
         try:
             if self.file_name is not None:
                 with self.file_lock.acquire(1):
-                    with codecs.open(self.file_name, 'a', encoding='utf-8') as f:
+                    with open(self.file_name, 'a', encoding='utf-8', errors='strict') as f:
                         f.write(msg)
             else:
                 msg = "[ERROR] Could not acquire lock for log!\n" + msg
@@ -391,7 +390,7 @@ class CustomLogGui(wx.LogGui):
 
         try:
             with self.file_lock.acquire(1):
-                with codecs.open(self.file_name, "w", "utf-8") as f:
+                with open(self.file_name, "w", "utf-8", errors='strict') as f:
                     f.write("")
         except Exception:
             self.file_name = None
@@ -404,7 +403,7 @@ class CustomLogGui(wx.LogGui):
         try:
             if self.file_name is not None:
                 with self.file_lock.acquire(1):
-                    with codecs.open(self.file_name, 'a', encoding='utf-8') as f:
+                    with open(self.file_name, 'a', encoding='utf-8', errors='strict') as f:
                         f.write(msg)
             else:
                 msg = "[ERROR] Could not acquire lock for log!\n" + msg

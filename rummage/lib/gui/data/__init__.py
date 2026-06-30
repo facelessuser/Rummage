@@ -1,6 +1,5 @@
 """Data resource library."""
 import os
-import codecs
 import base64
 from wx.lib.embeddedimage import PyEmbeddedImage
 from .. import util
@@ -20,7 +19,7 @@ def get_file(file_name, raw=False):
                 with open(resource, 'rb') as f:
                     text = f.read()
             else:
-                with codecs.open(resource, 'r', encoding='utf-8') as f:
+                with open(resource, 'r', encoding='utf-8', errors='strict') as f:
                     text = f.read()
         except Exception:
             pass

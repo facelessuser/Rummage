@@ -1,6 +1,5 @@
 """Export CSV."""
 import time
-import codecs
 import subprocess
 from ..localization import _
 from .. import util
@@ -88,7 +87,7 @@ def export(export_csv, chain, result_list, result_content_list):
     regex_search = csv_encode(_("Regex Search"))
     literal_search = csv_encode(_("Literal Search"))
 
-    with codecs.open(export_csv, "w", encoding="utf-8-sig") as csv:
+    with open(export_csv, "w", encoding="utf-8-sig", errors='strict') as csv:
         for pattern, _replace, flags in chain:
             csv.write(
                 "%s,%s\n" % (

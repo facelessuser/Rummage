@@ -18,7 +18,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
-import codecs
 import json
 import os
 import copy
@@ -598,7 +597,7 @@ class Settings:
 
         try:
             with cls.settings_lock.acquire(2):
-                with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
+                with open(cls.settings_file, "r", encoding="utf-8", errors='strict') as f:
                     cls.settings = json.loads(f.read())
         except Exception:
             errormsg(cls.ERR_LOAD_SETTINGS_FAILED)
@@ -613,7 +612,7 @@ class Settings:
 
         try:
             with cls.settings_lock.acquire(2):
-                with codecs.open(settings, "w", encoding="utf-8") as f:
+                with open(settings, "w", encoding="utf-8", errors='strict') as f:
                     f.write(json.dumps(default_settings, sort_keys=True, indent=4, separators=(',', ': ')))
         except Exception:
             # It's okay that we couldn't do it this time.
@@ -687,7 +686,7 @@ class Settings:
         success = False
         try:
             with cls.cache_lock.acquire(2):
-                with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
+                with open(cls.cache_file, "r", encoding="utf-8", errors='strict') as f:
                     cls.cache = json.loads(f.read())
             success = True
         except Exception:
@@ -703,7 +702,7 @@ class Settings:
 
         try:
             with cls.cache_lock.acquire(2):
-                with codecs.open(cache, "w", encoding="utf-8") as f:
+                with open(cache, "w", encoding="utf-8", errors='strict') as f:
                     f.write(json.dumps(default_cache, sort_keys=True, indent=4, separators=(',', ': ')))
         except Exception:
             # It's okay that we couldn't do it this time.
@@ -746,10 +745,10 @@ class Settings:
             if cls.settings_file is not None:
                 try:
                     with cls.settings_lock.acquire(2):
-                        with codecs.open(cls.settings_file, "r", encoding="utf-8") as f:
+                        with open(cls.settings_file, "r", encoding="utf-8", errors='strict') as f:
                             settings = json.loads(f.read())
                     with cls.cache_lock:
-                        with codecs.open(cls.cache_file, "r", encoding="utf-8") as f:
+                        with open(cls.cache_file, "r", encoding="utf-8", errors='strict') as f:
                             cache = json.loads(f.read())
                 except Exception:
                     pass
@@ -1738,7 +1737,7 @@ class Settings:
         try:
             cls.settings['__format__'] = SETTINGS_FMT
             with cls.settings_lock.acquire(2):
-                with codecs.open(cls.settings_file, "w", encoding="utf-8") as f:
+                with open(cls.settings_file, "w", encoding="utf-8", errors='strict') as f:
                     f.write(json.dumps(cls.settings, sort_keys=True, indent=4, separators=(',', ': ')))
         except Exception:
             errormsg(cls.ERR_SAVE_SETTINGS_FAILED)
@@ -1750,7 +1749,7 @@ class Settings:
         try:
             cls.cache['__format__'] = CACHE_FMT
             with cls.cache_lock.acquire(2):
-                with codecs.open(cls.cache_file, "w", encoding="utf-8") as f:
+                with open(cls.cache_file, "w", encoding="utf-8", errors='strict') as f:
                     f.write(json.dumps(cls.cache, sort_keys=True, indent=4, separators=(',', ': ')))
         except Exception:
             errormsg(cls.ERR_SAVE_CACHE_FAILED)

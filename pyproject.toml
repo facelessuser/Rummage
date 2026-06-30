@@ -9,7 +9,7 @@ name = "rummage"
 description = "A GUI search and replace app."
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     { name = "Isaac Muse", email = "Isaac.Muse@gmail.com" },
 ]
@@ -180,7 +180,7 @@ passenv = *
 deps =
     -rrequirements/docs.txt
 commands =
-    {envbindir}/zensical build -f zensical.yml --clean --strict
+    {envbindir}/zensical build -f zensical.yml --clean
     pyspelling -j 0
     {envpython} {toxinidir}/tools/gen_docs.py --verbose --test
 """

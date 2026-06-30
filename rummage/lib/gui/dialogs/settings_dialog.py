@@ -202,7 +202,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
                 color.set('alpha', 1.0).mix(
                     'black' if color.luminance() > 0.5 else 'white', factor, space='srgb', in_place=True
                 ).set('alpha', 1.0)
-                bg.SetRGB(color.to_wxbgr())
+                bg = wx.Colour(color.to_wxbgr(alpha=False))
             page.SetBackgroundColour(bg)
             if x == 0 and util.platform() != "linux":
                 self.m_settings_notebook.SetBackgroundColour(wx.Colour(bg))

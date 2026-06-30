@@ -1,10 +1,9 @@
 """Patch graphical user interface file."""
-import codecs
 import re
 
 filename = 'rummage/lib/gui/gui.py'
 
-with codecs.open(filename, 'r', encoding='utf-8') as f:
+with open(filename, 'r', encoding='utf-8', errors='strict') as f:
     text = f.read()
 
 # Add collapsible pane replacement
@@ -22,5 +21,5 @@ text = re.sub(
     text
 )
 
-with codecs.open(filename, 'w', encoding='utf-8') as f:
+with open(filename, 'w', encoding='utf-8', errors='strict') as f:
     f.write(text)
