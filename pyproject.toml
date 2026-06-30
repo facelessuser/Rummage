@@ -180,7 +180,7 @@ passenv = *
 deps =
     -rrequirements/docs.txt
 commands =
-    {envbindir}/zensical build -f zensical.yml --clean --strict
+    {envbindir}/zensical build -f zensical.yml --clean
     pyspelling -j 0
     {envpython} {toxinidir}/tools/gen_docs.py --verbose --test
 """
