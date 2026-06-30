@@ -448,7 +448,7 @@ class _RummageFileContent:
                 self._read_bin()
             else:
                 enc = self._get_encoding()
-                self.file_obj = codecs.open(self.name, 'r', encoding=enc)
+                self.file_obj = open(self.name, 'r', encoding=enc, errors='strict')
             return self.file_obj.read() if self.file_map is None else self.file_map
         except RummageException:
             # Bubble up `RummageExceptions`
@@ -777,7 +777,7 @@ class _FileSearch:
             # Write the BOM first, then write in `UTF` format out in the specified order.
             with open(file_name, 'wb') as f:
                 f.write(encoding.bom)
-            with codecs.open(file_name, 'a', encoding=encoding.encode) as f:
+            with open(file_name, 'a', encoding=encoding.encode, errors='strict') as f:
                 while content:
                     f.write(content.popleft())
         elif encoding.encode == 'bin':
@@ -791,7 +791,7 @@ class _FileSearch:
             # We choose `utf-8` because it is compatible with ASCII,
             # but we could just as easily have chosen `Latin-1` or `CP1252`.
             enc = encoding.encode
-            with codecs.open(file_name, 'w', encoding=('utf-8' if enc == 'ascii' else enc)) as f:
+            with open(file_name, 'w', encoding=('utf-8' if enc == 'ascii' else enc), errors='strict') as f:
                 while content:
                     f.write(content.popleft())
 

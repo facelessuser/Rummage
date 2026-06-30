@@ -3,7 +3,6 @@ import webbrowser
 import re
 import time
 import os
-import codecs
 import base64
 import json
 import subprocess
@@ -255,7 +254,7 @@ def export(export_html, chain, result_list, result_content_list):
 
     title = html_encode(_("Rummage Results"))
 
-    with codecs.open(export_html, "w", encoding="utf-8") as html:
+    with open(export_html, "w", encoding="utf-8", errors='strict') as html:
         html.write(
             HTML_HEADER % {
                 "js": data.get_file('sorttable.js'),

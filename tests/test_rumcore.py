@@ -250,7 +250,7 @@ class TestRummageFileContent(_FileTest):
                 with open(name, 'rb') as f:
                     text2 = f.read()
             else:
-                with codecs.open(name, 'r', encoding=enc) as f:
+                with open(name, 'r', encoding=enc, errors='strict') as f:
                     text2 = f.read()
         else:
             text2 = content
@@ -1018,7 +1018,7 @@ class TestFileSearch(_FileTest):
             if result.error is not None:
                 print(''.join(result.error))
 
-        with codecs.open(self.norm('searches.txt'), 'r', encoding='utf-8') as f:
+        with open(self.norm('searches.txt'), 'r', encoding='utf-8', errors='strict') as f:
             self.assertEqual(f.read(), after)
 
     def test_regex_chain_replace(self):
@@ -1084,7 +1084,7 @@ class TestFileSearch(_FileTest):
             if result.error is not None:
                 print(''.join(result.error))
 
-        with codecs.open(self.norm('searches.txt'), 'r', encoding='utf-8') as f:
+        with open(self.norm('searches.txt'), 'r', encoding='utf-8', errors='strict') as f:
             self.assertEqual(f.read(), after)
 
     def test_literal_chain_replace(self):
@@ -1149,7 +1149,7 @@ class TestFileSearch(_FileTest):
             if result.error is not None:
                 print(''.join(result.error))
 
-        with codecs.open(self.norm('searches.txt'), 'r', encoding='utf-8') as f:
+        with open(self.norm('searches.txt'), 'r', encoding='utf-8', errors='strict') as f:
             self.assertEqual(f.read(), after)
 
     def test_literal_binary_search(self):
@@ -1301,5 +1301,5 @@ class TestFileSearch(_FileTest):
             if result.error is not None:
                 print(''.join(result.error))
 
-        with codecs.open(self.norm('searches.txt'), 'rb') as f:
+        with open(self.norm('searches.txt'), 'rb') as f:
             self.assertEqual(f.read(), after)

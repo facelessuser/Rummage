@@ -25,10 +25,10 @@ import functools
 from collections import namedtuple
 try:
     from cchardet import UniversalDetector as CCDetect
-    from chardet.universaldetector import UniversalDetector as CDetect
+    from chardet import UniversalDetector as CDetect
     DetectEncoding = CCDetect
 except ImportError:  # pragma: no cover
-    from chardet.universaldetector import UniversalDetector as CDetect
+    from chardet import UniversalDetector as CDetect
     DetectEncoding = CDetect
     CCDetect = None
 
