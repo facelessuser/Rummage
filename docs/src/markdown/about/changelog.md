@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.24
+
+-   **NEW**: Drop support for Python 3.9.
+-   **NEW**: Upgrade dependencies to pick up enhancemnts and bug fixes.
+-   **FIX**: Fix issues compatibility issues with wxPython 4.2.5.
+
 ## 4.23.1
 
 -   **FIX**: Fix for latest ColorAide.

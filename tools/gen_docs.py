@@ -91,7 +91,10 @@ def build_internal_docs(verbose=False, debug=False):
     # Move to output location
     shutil.move('site', ZENSICAL_BUILD)
     # Remove unnecessary files
-    shutil.rmtree(os.path.join(ZENSICAL_BUILD, 'assets'))
+    try:
+        shutil.rmtree(os.path.join(ZENSICAL_BUILD, 'assets'))
+    except FileNotFoundError:
+        pass
     os.remove(os.path.join(ZENSICAL_BUILD, 'search.json'))
     gen_hash(verbose, debug)
 
