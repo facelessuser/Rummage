@@ -96,6 +96,8 @@ def build_internal_docs(verbose=False, debug=False):
     except FileNotFoundError:
         pass
     os.remove(os.path.join(ZENSICAL_BUILD, 'search.json'))
+    os.remove(os.path.join(ZENSICAL_BUILD, 'objects.inv'))
+    os.remove(os.path.join(ZENSICAL_BUILD, '.snippets', 'refs.html'))
     gen_hash(verbose, debug)
 
 

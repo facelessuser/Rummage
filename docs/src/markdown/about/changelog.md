@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.24.1
+
+-   **NEW**: Fix URL handling in documentation rendering in `webview`.
+
 ## 4.24
 
 -   **NEW**: Drop support for Python 3.9.
