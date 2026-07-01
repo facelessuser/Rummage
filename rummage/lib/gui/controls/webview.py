@@ -190,7 +190,7 @@ def parse_url(url):
     is_blank = False
     scheme, netloc, path, params, query, fragment = urlparse(html.unescape(url))
 
-    if scheme == 'about' and netloc == '' and path == "blank":
+    if scheme in ("about", "blank", "data", ""):
         is_blank = True
     elif RE_URL.match(scheme):
         # Clearly a URL
