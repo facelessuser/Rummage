@@ -664,6 +664,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         Settings.set_full_exclude_path(self.m_fullpath_checkbox.GetValue())
 
     def on_zsh_numrange_toggle(self, event):
+        """Handle ZSH number range toggle."""
 
         Settings.set_zsh_numrange(self.m_zsh_numrange_checkbox.GetValue())
 

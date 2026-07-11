@@ -298,7 +298,7 @@ class CustomLog(wx.Log):
 
         try:
             with self.file_lock:
-                with open(self.file_name, "w", encoding='utf-8', errors='strict') as f:
+                with open(self.file_name, "w", encoding='utf-8', errors='strict'):
                     pass
         except Exception:
             self.file_name = None
@@ -390,7 +390,7 @@ class CustomLogGui(wx.LogGui):
 
         try:
             with self.file_lock:
-                with open(self.file_name, "w", encoding='utf-8', errors='strict') as f:
+                with open(self.file_name, "w", encoding='utf-8', errors='strict'):
                     pass
         except Exception:
             self.file_name = None
