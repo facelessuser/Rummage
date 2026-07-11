@@ -297,9 +297,9 @@ class CustomLog(wx.Log):
         self.file_lock = FileLock(self.file_name + '.lock')
 
         try:
-            with self.file_lock.acquire(1):
-                with open(self.file_name, "w", "utf-8", errors='strict') as f:
-                    f.write("")
+            with self.file_lock:
+                with open(self.file_name, "w", encoding='utf-8', errors='strict') as f:
+                    pass
         except Exception:
             self.file_name = None
 
@@ -312,7 +312,7 @@ class CustomLog(wx.Log):
 
         try:
             if self.file_name is not None:
-                with self.file_lock.acquire(1):
+                with self.file_lock:
                     with open(self.file_name, 'a', encoding='utf-8', errors='strict') as f:
                         f.write(msg)
             else:
@@ -389,9 +389,9 @@ class CustomLogGui(wx.LogGui):
         self.debug = debug
 
         try:
-            with self.file_lock.acquire(1):
-                with open(self.file_name, "w", "utf-8", errors='strict') as f:
-                    f.write("")
+            with self.file_lock:
+                with open(self.file_name, "w", encoding='utf-8', errors='strict') as f:
+                    pass
         except Exception:
             self.file_name = None
 
@@ -402,7 +402,7 @@ class CustomLogGui(wx.LogGui):
 
         try:
             if self.file_name is not None:
-                with self.file_lock.acquire(1):
+                with self.file_lock:
                     with open(self.file_name, 'a', encoding='utf-8', errors='strict') as f:
                         f.write(msg)
             else:

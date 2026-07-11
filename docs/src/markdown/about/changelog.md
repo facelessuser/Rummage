@@ -4,6 +4,7 @@
 
 -   **NEW**: Require `wcmatch` 11.0+.
 -   **NEW**: Add new "ZSH number range" option in settings to enable ZSH style number ranges in glob patterns (`<0-9>`).
+-   **FIX**: Fix an issue where logging would break.
 
 ## 4.24.1
 
