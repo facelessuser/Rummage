@@ -39,7 +39,7 @@ class ImportSettingsDialog(gui.ImportSettingsDialog):
         "notify_enabled", "single_instance", "extmatch",
         "brace_expansion", "file_case_sensitive", "full_exclude_path", "full_file_path",
         "globstar", "international_time", "matchbase", "minusnegate", "alt_list_color",
-        "autocomplete"
+        "autocomplete", "zsh_numrange"
     )
     STRING = ("backup_ext", "backup_folder", "term_notifier", "editor", "notify_method", "notify_sound")
     INTEGER = ("backup_type", "regex_mode", "regex_version", "patten_limit")

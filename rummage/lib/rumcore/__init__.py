@@ -83,6 +83,7 @@ FILEPATHNAME = 0x1000000000  # Full file name path match
 GLOBSTAR = 0x2000000000      # Use globstar (**) in full paths
 MATCHBASE = 0x4000000000     # Match base names when no slashes are present (full path)
 MINUSNEGATE = 0x8000000000   # Use - instead of ! for exclusion patterns.
+NUMRANGE = 0x10000000000     # ZSH style number ranges.
 
 RE_MODE = 0
 BRE_MODE = 1
@@ -90,8 +91,8 @@ REGEX_MODE = 2
 BREGEX_MODE = 3
 
 SEARCH_MASK = 0x1FFFF
-FILE_MASK = 0xFFFFFE0000
-FNMATCH_FLAGS = 0xFF00000000
+FILE_MASK = 0x1FFFFFE0000
+FNMATCH_FLAGS = 0x1FF00000000
 
 RE_MODES = (RE_MODE, BRE_MODE)
 REGEX_MODES = (REGEX_MODE, BREGEX_MODE)
@@ -1334,6 +1335,8 @@ class Rummage:
             self.wcmatch_flags |= wcmatch.E
         if self.file_flags & BRACE:
             self.wcmatch_flags |= wcmatch.B
+        if self.file_flags & NUMRANGE:
+            self.wcmatch_flags |= wcmatch.NUMRANGE
         if self.file_flags & FILECASE:
             self.wcmatch_flags |= wcmatch.C
         if self.file_flags & DIRPATHNAME:

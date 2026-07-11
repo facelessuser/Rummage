@@ -2,7 +2,7 @@
 Rummage Dialog.
 
 Licensed under MIT
-Copyright (c) 2011 - 2015 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2011 - 2026 Isaac Muse <isaacmuse@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -328,6 +328,7 @@ class RummageArgs:
         self.full_exclude_path = False
         self.full_file_path = False
         self.globstar = False
+        self.zsh_numrange = False
         self.matchbase = False
         self.minusnegate = True
         self.encoding_options = {}
@@ -1217,6 +1218,9 @@ class RummageFrame(gui.RummageFrame):
         if args.brace_expansion:
             flags |= rumcore.BRACE
 
+        if args.zsh_numrange:
+            flags |= rumcore.NUMRANGE
+
         if args.file_case_sensitive:
             flags |= rumcore.FILECASE
 
@@ -1401,6 +1405,7 @@ class RummageFrame(gui.RummageFrame):
             args.globstar = bool(Settings.get_globstar())
             args.matchbase = bool(Settings.get_matchbase())
             args.minusnegate = bool(Settings.get_minusnegate())
+            args.zsh_numrange = bool(Settings.get_zsh_numrange())
 
             args.filepattern = self.m_filematch_textbox.Value
             if self.m_fileregex_checkbox.GetValue():

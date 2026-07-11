@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.25
+
+-   **NEW**: Require `wcmatch` 11.0+.
+-   **NEW**: Add new "ZSH number range" option in settings to enable ZSH style number ranges in glob patterns (`<0-9>`).
+
 ## 4.24.1
 
 -   **NEW**: Fix URL handling in documentation rendering in `webview`.

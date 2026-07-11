@@ -123,6 +123,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_brace_checkbox.SetValue(Settings.get_brace_expansion())
         self.m_case_checkbox.SetValue(Settings.get_file_case_sensitive())
         self.m_fullpath_checkbox.SetValue(Settings.get_full_exclude_path())
+        self.m_zsh_numrange_checkbox.SetValue(Settings.get_zsh_numrange())
         self.m_fullfile_checkbox.SetValue(Settings.get_full_file_path())
         self.m_globstar_checkbox.SetValue(Settings.get_globstar())
         self.m_matchbase_checkbox.SetValue(Settings.get_matchbase())
@@ -264,6 +265,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.BRACES = _("Brace expansion")
         self.CASE = _("Case sensitive")
         self.FULL_PATH = _("Full path directory match")
+        self.ZSH_NUMRANGE = _("ZSH number range")
         self.FULL_FILE = _("Full path file match")
         self.GLOBSTAR = _("Globstar (full path)")
         self.MATCHBASE = _("Match base (full path)")
@@ -339,6 +341,7 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         self.m_brace_checkbox.SetLabel(self.BRACES)
         self.m_case_checkbox.SetLabel(self.CASE)
         self.m_fullpath_checkbox.SetLabel(self.FULL_PATH)
+        self.m_zsh_numrange_checkbox.SetLabel(self.ZSH_NUMRANGE)
         self.m_fullfile_checkbox.SetLabel(self.FULL_FILE)
         self.m_globstar_checkbox.SetLabel(self.GLOBSTAR)
         self.m_matchbase_checkbox.SetLabel(self.MATCHBASE)
@@ -659,6 +662,10 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
         """Handle full path toggle."""
 
         Settings.set_full_exclude_path(self.m_fullpath_checkbox.GetValue())
+
+    def on_zsh_numrange_toggle(self, event):
+
+        Settings.set_zsh_numrange(self.m_zsh_numrange_checkbox.GetValue())
 
     def on_fullfile_toggle(self, event):
         """Handle full file toggle."""

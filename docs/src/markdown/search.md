@@ -144,6 +144,18 @@ Pattern           | Meaning
 > If you need to escape `-` or `|`, you can put them in a sequence: `[-|]`. Remember to place `-` at the beginning of
 > a sequence as `-` is also used to specify character ranges: `[a-z]`.
 
+#### ZSH Number Ranges
+
+ZSH number ranges are a simple syntax for specifying a simple range of numbers via `<0-100>`. Ends can also be omitted
+allowing for unbounded ranges: `<->`, `<-100>`, `<0-100>`, etc. It should be noted that numbers must be whole, positive
+numbers and manually specified numbers greater than 19 digits will be truncated.
+
+ZSH number ranges also handle numbers padded with zeros, so `<0-9>` would match `5`, `05`, `005`, etc. You can pad your
+match pattern with zeros (`<0010-0090>`), but it has no affect on the actual search. Input numbers will be normalized
+(`<10-90>`) and ZSH padding number handling is always the same.
+
+This can be enabled in [Preferences](./preferences.md#search).
+
 #### Extended Match Syntax
 
 In [Preferences](./preferences.md#search), you can also enable extended match patterns. Extended match patterns allow

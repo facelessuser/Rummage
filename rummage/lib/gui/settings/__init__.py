@@ -86,6 +86,7 @@ DEFAULT_SETTINGS = {
     "full_exclude_path": False,
     "full_file_path": False,
     "globstar": False,
+    "zsh_numrange": False,
     "hide_cols_content": [],
     "hide_cols_file": [],
     "international_time": False,
@@ -1522,6 +1523,27 @@ class Settings:
         return cls.settings.get('full_exclude_path', False)
 
     @classmethod
+    def _set_zsh_numrange(cls, value):
+        """Set `zsh_numrange`."""
+
+        cls.settings['zsh_numrange'] = value
+
+    @classmethod
+    def set_zsh_numrange(cls, value):
+        """Set `zsh_numrange."""
+
+        cls.reload_settings()
+        cls._set_zsh_numrange(value)
+        cls.save_settings()
+
+    @classmethod
+    def get_zsh_numrange(cls):
+        """Get `zsh_numrange`."""
+
+        cls.reload_settings()
+        return cls.settings.get('zsh_numrange', False)
+
+    @classmethod
     def _set_full_file_path(cls, value):
         """Set full_file_path."""
 
@@ -1649,6 +1671,8 @@ class Settings:
             cls._set_minusnegate(obj['minusnegate'])
         if 'pattern_limit' in obj:
             cls._set_pattern_limit(obj['pattern_limit'])
+        if 'zsh_numrange' in obj:
+            cls._set_zsh_numrange(obj['zsh_numrange'])
 
         # Notifications
         update_notify = False

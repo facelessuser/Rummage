@@ -1051,8 +1051,11 @@ class SettingsDialog ( wx.Dialog ):
         self.m_fullfile_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"Full path file match", wx.DefaultPosition, wx.DefaultSize, 0 )
         gbSizer7.Add( self.m_fullfile_checkbox, wx.GBPosition( 3, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 
+        self.m_zsh_numrange_checkbox = wx.CheckBox( sbSizer9.GetStaticBox(), wx.ID_ANY, u"ZSH Number Range", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gbSizer7.Add( self.m_zsh_numrange_checkbox, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+
         self.m_staticline14 = wx.StaticLine( sbSizer9.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        gbSizer7.Add( self.m_staticline14, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND |wx.ALL, 5 )
+        gbSizer7.Add( self.m_staticline14, wx.GBPosition( 5, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND |wx.ALL, 5 )
 
         gbSizer8 = wx.GridBagSizer( 0, 0 )
         gbSizer8.SetFlexibleDirection( wx.BOTH )
@@ -1073,7 +1076,7 @@ class SettingsDialog ( wx.Dialog ):
         gbSizer8.AddGrowableCol( 1 )
         gbSizer8.AddGrowableRow( 0 )
 
-        gbSizer7.Add( gbSizer8, wx.GBPosition( 5, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND, 5 )
+        gbSizer7.Add( gbSizer8, wx.GBPosition( 6, 0 ), wx.GBSpan( 1, 2 ), wx.EXPAND, 5 )
 
 
         gbSizer7.AddGrowableCol( 1 )
@@ -1350,6 +1353,7 @@ class SettingsDialog ( wx.Dialog ):
         self.m_matchbase_checkbox.Bind( wx.EVT_CHECKBOX, self.on_matchbase_toggle )
         self.m_fullpath_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullpath_toggle )
         self.m_fullfile_checkbox.Bind( wx.EVT_CHECKBOX, self.on_fullfile_toggle )
+        self.m_zsh_numrange_checkbox.Bind( wx.EVT_CHECKBOX, self.on_zsh_numrange_toggle )
         self.m_pattern_limit_textbox.Bind( wx.EVT_TEXT, self.on_pattern_limit_changed )
         self.m_pattern_limit_button.Bind( wx.EVT_BUTTON, self.on_pattern_limit_click )
         self.m_encoding_choice.Bind( wx.EVT_CHOICE, self.on_chardet )
@@ -1434,6 +1438,9 @@ class SettingsDialog ( wx.Dialog ):
         event.Skip()
 
     def on_fullfile_toggle( self, event ):
+        event.Skip()
+
+    def on_zsh_numrange_toggle( self, event ):
         event.Skip()
 
     def on_pattern_limit_changed( self, event ):
