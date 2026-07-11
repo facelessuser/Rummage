@@ -60,6 +60,10 @@
       <ul class="__toc_list_5">
       
       </ul>
+      <li class="__toc_level_5"><a href="#zsh-number-ranges">ZSH Number Ranges</a></li>
+      <ul class="__toc_list_5">
+      
+      </ul>
       <li class="__toc_level_5"><a href="#extended-match-syntax">Extended Match Syntax</a></li>
       <ul class="__toc_list_5">
       
@@ -345,6 +349,14 @@ which we will always be included.</p>
 <p>If you need to escape <code>-</code> or <code>|</code>, you can put them in a sequence: <code>[-|]</code>. Remember to place <code>-</code> at the beginning of
 a sequence as <code>-</code> is also used to specify character ranges: <code>[a-z]</code>.</p>
 </div>
+<h4 id="zsh-number-ranges"><abbr title="Z Shell">ZSH</abbr> Number Ranges</h4>
+<p><abbr title="Z Shell">ZSH</abbr> number ranges are a simple syntax for specifying a simple range of numbers via <code>&lt;0-100&gt;</code>. Ends can also be omitted
+allowing for unbounded ranges: <code>&lt;-&gt;</code>, <code>&lt;-100&gt;</code>, <code>&lt;0-100&gt;</code>, etc. It should be noted that numbers must be whole, positive
+numbers and manually specified numbers greater than 19 digits will be truncated.</p>
+<p><abbr title="Z Shell">ZSH</abbr> number ranges also handle numbers padded with zeros, so <code>&lt;0-9&gt;</code> would match <code>5</code>, <code>05</code>, <code>005</code>, etc. You can pad your
+match pattern with zeros (<code>&lt;0010-0090&gt;</code>), but it has no affect on the actual search. Input numbers will be normalized
+(<code>&lt;10-90&gt;</code>) and <abbr title="Z Shell">ZSH</abbr> padding number handling is always the same.</p>
+<p>This can be enabled in <a href="./preferences.html#search">Preferences</a>.</p>
 <h4 id="extended-match-syntax">Extended Match Syntax</h4>
 <p>In <a href="./preferences.html#search">Preferences</a>, you can also enable extended match patterns. Extended match patterns allow
 you to provide pattern lists to provide more advanced logic.</p>
