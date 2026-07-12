@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.25.1
+
+-   **FIX**: Fix issue where directory picker for target folder to search would not start with the current, specified
+    directory, even when it is valid.
+
 ## 4.25
 
 -   **NEW**: Require `wcmatch` 11.0+.

@@ -2159,7 +2159,9 @@ class RummageFrame(gui.RummageFrame):
     def on_searchin_changed(self):
         """Callback for when a directory changes via the `m_searchin_text` control."""
 
-        self.SetTitle(self.m_searchin_text.GetValue())
+        target = self.m_searchin_text.GetValue()
+        self.SetTitle(target)
+        self.m_searchin_dir_picker.target = target
 
     def on_save_search(self, event):
         """Open a dialog to save a search for later use."""
