@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.26.1
+
+-   **FIX**: Fix formatting of size limit controls.
+
 ## 4.26
 
 -   **NEW**: Show file sizes in proper, various increments: bytes, KB, MB, and GB.

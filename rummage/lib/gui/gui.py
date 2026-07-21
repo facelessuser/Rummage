@@ -252,31 +252,24 @@ class RummageFrame ( wx.Frame ):
         self.m_logic_choice.SetSelection( 0 )
         gbSizer3.Add( self.m_logic_choice, wx.GBPosition( 0, 1 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 
-        fgSizer37 = wx.FlexGridSizer( 0, 2, 0, 0 )
-        fgSizer37.SetFlexibleDirection( wx.HORIZONTAL )
-        fgSizer37.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-
-        self.m_size_text = wx.TextCtrl( self.m_limit_panel, wx.ID_ANY, u"1000", wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
-        fgSizer37.Add( self.m_size_text, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-
         m_size_type_choiceChoices = [ u"bytes", u"KB", u"MB", u"GB", u"TB" ]
         self.m_size_type_choice = wx.Choice( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_size_type_choiceChoices, 0 )
         self.m_size_type_choice.SetSelection( 1 )
-        fgSizer37.Add( self.m_size_type_choice, 0, wx.ALL, 5 )
+        gbSizer3.Add( self.m_size_type_choice, wx.GBPosition( 0, 3 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
-
-        gbSizer3.Add( fgSizer37, wx.GBPosition( 0, 2 ), wx.GBSpan( 1, 3 ), wx.EXPAND, 5 )
+        self.m_size_text = wx.TextCtrl( self.m_limit_panel, wx.ID_ANY, u"1000", wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
+        gbSizer3.Add( self.m_size_text, wx.GBPosition( 0, 2 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
         self.m_exclude_label = wx.StaticText( self.m_limit_panel, wx.ID_ANY, u"Exclude folders", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_exclude_label.Wrap( -1 )
 
-        gbSizer3.Add( self.m_exclude_label, wx.GBPosition( 0, 6 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+        gbSizer3.Add( self.m_exclude_label, wx.GBPosition( 0, 5 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
         self.m_exclude_textbox = AutoCompleteCombo(self.m_limit_panel, wx.ID_ANY)
-        gbSizer3.Add( self.m_exclude_textbox, wx.GBPosition( 0, 7 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
+        gbSizer3.Add( self.m_exclude_textbox, wx.GBPosition( 0, 6 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
         self.m_dirregex_checkbox = wx.CheckBox( self.m_limit_panel, wx.ID_ANY, u"Regex", wx.DefaultPosition, wx.DefaultSize, 0 )
-        gbSizer3.Add( self.m_dirregex_checkbox, wx.GBPosition( 0, 8 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+        gbSizer3.Add( self.m_dirregex_checkbox, wx.GBPosition( 0, 7 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 
         self.m_modified_label = wx.StaticText( self.m_limit_panel, wx.ID_ANY, u"Modified", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_modified_label.Wrap( -1 )
@@ -297,13 +290,13 @@ class RummageFrame ( wx.Frame ):
         self.m_filematch_label = wx.StaticText( self.m_limit_panel, wx.ID_ANY, u"Files which match", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_filematch_label.Wrap( -1 )
 
-        gbSizer3.Add( self.m_filematch_label, wx.GBPosition( 1, 6 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+        gbSizer3.Add( self.m_filematch_label, wx.GBPosition( 1, 5 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
         self.m_filematch_textbox = AutoCompleteCombo(self.m_limit_panel, wx.ID_ANY)
-        gbSizer3.Add( self.m_filematch_textbox, wx.GBPosition( 1, 7 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
+        gbSizer3.Add( self.m_filematch_textbox, wx.GBPosition( 1, 6 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 
         self.m_fileregex_checkbox = wx.CheckBox( self.m_limit_panel, wx.ID_ANY, u"Regex", wx.DefaultPosition, wx.DefaultSize, 0 )
-        gbSizer3.Add( self.m_fileregex_checkbox, wx.GBPosition( 1, 8 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+        gbSizer3.Add( self.m_fileregex_checkbox, wx.GBPosition( 1, 7 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 
         self.m_created_label = wx.StaticText( self.m_limit_panel, wx.ID_ANY, u"Created", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_created_label.Wrap( -1 )
@@ -322,7 +315,7 @@ class RummageFrame ( wx.Frame ):
         gbSizer3.Add( self.m_created_time_picker, wx.GBPosition( 2, 3 ), wx.GBSpan( 1, 1 ), wx.BOTTOM|wx.LEFT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
 
         self.m_staticline41 = wx.StaticLine( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
-        gbSizer3.Add( self.m_staticline41, wx.GBPosition( 0, 5 ), wx.GBSpan( 3, 1 ), wx.ALL|wx.EXPAND|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5 )
+        gbSizer3.Add( self.m_staticline41, wx.GBPosition( 0, 4 ), wx.GBSpan( 3, 1 ), wx.ALL|wx.EXPAND|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5 )
 
         fgSizer32 = wx.FlexGridSizer( 0, 6, 0, 0 )
         fgSizer32.AddGrowableCol( 0 )
@@ -353,7 +346,7 @@ class RummageFrame ( wx.Frame ):
         gbSizer3.Add( fgSizer32, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 9 ), wx.EXPAND, 5 )
 
 
-        gbSizer3.AddGrowableCol( 7 )
+        gbSizer3.AddGrowableCol( 6 )
         gbSizer3.AddGrowableRow( 0 )
         gbSizer3.AddGrowableRow( 1 )
         gbSizer3.AddGrowableRow( 2 )
