@@ -20,7 +20,6 @@ IN THE SOFTWARE.
 """
 import time
 import wx
-import decimal
 import os
 import functools
 from .dynamic_lists import DynamicList, USE_SAMPLE_SIZE
