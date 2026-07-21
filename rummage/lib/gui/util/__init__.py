@@ -22,8 +22,8 @@ WX_420 = wx.__version__ >= '4.2.0'
 
 # High Sierra and below
 MAC_OLD = _MAC_VER < (10, 14)
-MAC_LIGHT = 0.025
-MAC_DARK = 0.075
+MAC_LIGHT = 0.032
+MAC_DARK = 0.062
 
 def mac_ver():
     """Get macOS version."""
