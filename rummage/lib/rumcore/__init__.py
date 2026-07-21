@@ -431,36 +431,26 @@ class _RummageFileContent:
             enc = 'utf-32'
         return enc
 
-    def _read_bin(self):
-        """Setup binary file reading with `mmap`."""
+    def _read_file(self):
+        """Read the file in."""
+
+        if self.encoding.encode != "bin":
+            try:
+                self.file_obj = open(self.name, 'r', encoding=self._get_encoding(), errors='strict')
+                return self.file_obj.read()
+            except Exception:
+                self.encoding = text_decode.Encoding("bin", None)
+
+        if self.file_obj is not None:
+            self.file_obj.close()
+
         try:
             self.file_obj = open(self.name, "rb")
             if self.size != 0:
                 self.file_map = mmap.mmap(self.file_obj.fileno(), 0, access=mmap.ACCESS_READ)
-        except Exception as e:
-            # _read_bin has no other fallbacks, so we issue this if it fails.
-            raise RummageException("Could not access or read file.") from e
-
-    def _read_file(self):
-        """Read the file in."""
-
-        try:
-            if self.encoding.encode == "bin":
-                self._read_bin()
-            else:
-                enc = self._get_encoding()
-                self.file_obj = open(self.name, 'r', encoding=enc, errors='strict')
             return self.file_obj.read() if self.file_map is None else self.file_map
-        except RummageException:
-            # Bubble up `RummageExceptions`
-            raise
-        except Exception:
-            if self.encoding.encode != "bin":
-                if self.file_obj is not None:
-                    self.file_obj.close()
-                self.encoding = text_decode.Encoding("bin", None)
-                self._read_bin()
-                return self.file_map
+        except Exception as e:
+            raise RummageException("Could not access or read file.") from e
 
 
 class _FileSearch:
@@ -1083,10 +1073,7 @@ class _FileSearch:
                 if not file_record_sent:
                     yield FileRecord(file_info, None, None)
             except Exception:
-                yield FileRecord(
-                    file_info, None,
-                    get_exception()
-                )
+                yield FileRecord(file_info, None, get_exception())
 
     def run(self):
         """Start the file search."""

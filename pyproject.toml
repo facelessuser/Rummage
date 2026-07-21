@@ -181,6 +181,6 @@ deps =
     -rrequirements/docs.txt
 commands =
     {envbindir}/zensical build -f zensical.yml --clean
-    pyspelling -j 0
+    pyspelling -j 8
     {envpython} {toxinidir}/tools/gen_docs.py --verbose --test
 """
