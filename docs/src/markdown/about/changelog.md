@@ -1,7 +1,8 @@
 # Changelog
 
-## 4.25.1
+## 4.26
 
+-   **NEW**: Show file sizes in proper, various increments: bytes, KB, MB, and GB.
 -   **FIX**: Fix issue where directory picker for target folder to search would not start with the current, specified
     directory, even when it is valid.
 

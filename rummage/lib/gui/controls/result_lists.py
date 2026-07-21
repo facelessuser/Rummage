@@ -324,7 +324,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                 os.path.basename(obj.name),
                 0,
                 obj.ext,
-                decimal.Decimal(obj.size) / decimal.Decimal(1024),
+                obj.size,
                 os.path.dirname(obj.name),
                 '',
                 obj.modified,
@@ -342,7 +342,7 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
                     os.path.basename(obj.info.name),
                     1,
                     obj.info.ext,
-                    decimal.Decimal(obj.info.size) / decimal.Decimal(1024),
+                    obj.info.size,
                     os.path.dirname(obj.info.name),
                     obj.info.encoding,
                     obj.info.modified,
@@ -374,7 +374,17 @@ class ResultFileList(CommonOperationsMixin, DynamicList):
         if not absolute:
             item = self.itemIndexMap[item]
         if real == FILE_SIZE:
-            return '%.2fKB' % round(self.itemDataMap[item][FILE_SIZE], 2)
+            s = self.itemDataMap[item][FILE_SIZE]
+            if s < 1e3:
+                return f"{s:d} bytes"
+            elif s < 1e6:
+                return f'{s / 1e3:.2f} KB'
+            elif s < 1e9:
+                return f'{s / 1e6:.2f} MB'
+            elif s < 1e12:
+                return f'{s / 1e9:.2f} GB'
+            else:
+                return f'{s / 1e12:.2f} TB'
         elif real in (FILE_MOD, FILE_CRE):
             if self.international:
                 return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.itemDataMap[item][real]))
