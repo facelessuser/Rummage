@@ -3,6 +3,7 @@
 ## 4.26.1
 
 -   **FIX**: Fix formatting of size limit controls.
+-   **FIX**: Color adjustments for laterst macOS releases.
 
 ## 4.26
 
