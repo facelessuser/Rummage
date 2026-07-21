@@ -2,6 +2,7 @@
 
 ## 4.26.1
 
+-   **FIX**: Require `bracex` 3.0.1 for a bugfix related to an edge case with numerical and character sequences.
 -   **FIX**: Fix formatting of size limit controls.
 -   **FIX**: Color adjustments for laterst macOS releases.
 

@@ -1,6 +1,6 @@
 chardet>=7.4.3
 backrefs>=7.0
-bracex>=3.0
+bracex>=3.0.1
 wcmatch>=11.0,<12.0
 wxpython>=4.1.0
 filelock>=3.29.7
