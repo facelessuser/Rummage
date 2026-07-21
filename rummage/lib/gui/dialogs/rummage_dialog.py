@@ -68,7 +68,6 @@ from ... import __meta__
 from ... import rumcore
 from .. import util
 from ..util.colors import Color
-import decimal
 if rumcore.REGEX_SUPPORT:
     from backrefs import bregex
 else:
@@ -818,6 +817,9 @@ class RummageFrame(gui.RummageFrame):
             )
         )
         self.m_size_text.SetValue(Settings.get_search_setting("size_limit_string", "1000"))
+        self.m_size_type_choice.SetStringSelection(
+            Settings.get_search_setting("size_compare_type", "KB")
+        )
 
         self.m_case_checkbox.SetValue(not Settings.get_search_setting("ignore_case_toggle", False))
         self.m_dotmatch_checkbox.SetValue(Settings.get_search_setting("dotall_toggle", False))
@@ -1418,8 +1420,17 @@ class RummageFrame(gui.RummageFrame):
 
             cmp_size = self.m_logic_choice.GetSelection()
             if cmp_size:
-                size = decimal.Decimal(self.m_size_text.GetValue())
-                args.size_compare = (LIMIT_COMPARE[cmp_size], round(size * decimal.Decimal(1024)))
+                size = int(self.m_size_text.GetValue())
+                size_type = self.m_size_type_choice.GetStringSelection()
+                if size_type == "KB":
+                    size *= 1e3
+                elif size_type == "MB":
+                    size *= 1e6
+                elif size_type == "GB":
+                    size *= 1e9
+                elif size_type == "TB":
+                    size *= 1e12
+                args.size_compare = (LIMIT_COMPARE[cmp_size], size)
             else:
                 args.size_compare = None
             cmp_modified = self.m_modified_choice.GetSelection()
@@ -1573,7 +1584,20 @@ class RummageFrame(gui.RummageFrame):
         strings.append(("force_encode", self.m_force_encode_choice.GetStringSelection()))
 
         if eng_size != "any":
-            strings += [("size_limit_string", self.m_size_text.GetValue())]
+            size_limit = int(self.m_size_text.GetValue())
+            size_type = self.m_size_type_choice.GetStringSelection()
+            if size_type == 'KB':
+                size_limit *= 1e3
+            elif size_type == "MB":
+                size_limit *= 1e6
+            elif size_type == "GB":
+                size_limit *= 1e9
+            elif size_type == "TB":
+                size_limit *= 1e12
+            strings += [
+                ("size_limit_string", str(size_limit)),
+                ("size_compare_type", size_type)
+            ]
         if eng_mod != "on any":
             strings += [
                 ("modified_date_string", self.m_modified_date_picker.GetValue().Format("%m/%d/%Y")),

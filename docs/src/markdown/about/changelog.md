@@ -3,6 +3,7 @@
 ## 4.26
 
 -   **NEW**: Show file sizes in proper, various increments: bytes, KB, MB, and GB.
+-   **NEW**: Add control to select file size unit types in limiter panel.
 -   **FIX**: Fix issue where directory picker for target folder to search would not start with the current, specified
     directory, even when it is valid.
 

@@ -259,10 +259,10 @@ class RummageFrame ( wx.Frame ):
         self.m_size_text = wx.TextCtrl( self.m_limit_panel, wx.ID_ANY, u"1000", wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
         fgSizer37.Add( self.m_size_text, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 
-        self.m_size_type_label = wx.StaticText( self.m_limit_panel, wx.ID_ANY, u"KB", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_size_type_label.Wrap( -1 )
-
-        fgSizer37.Add( self.m_size_type_label, 0, wx.BOTTOM|wx.RIGHT|wx.TOP|wx.ALIGN_CENTER_VERTICAL, 5 )
+        m_size_type_choiceChoices = [ u"bytes", u"KB", u"MB", u"GB", u"TB" ]
+        self.m_size_type_choice = wx.Choice( self.m_limit_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_size_type_choiceChoices, 0 )
+        self.m_size_type_choice.SetSelection( 1 )
+        fgSizer37.Add( self.m_size_type_choice, 0, wx.ALL, 5 )
 
 
         gbSizer3.Add( fgSizer37, wx.GBPosition( 0, 2 ), wx.GBSpan( 1, 3 ), wx.EXPAND, 5 )
