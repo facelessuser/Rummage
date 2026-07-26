@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.26.2
+
+-   **FIX**: Upgrade to `backrefs` to 8.0 for some bug fixes.
+
 ## 4.26.1
 
 -   **FIX**: Require `bracex` 3.0.1 for a bug fix related to an edge case with numerical and character sequences.
