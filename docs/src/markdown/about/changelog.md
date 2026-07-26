@@ -2,7 +2,7 @@
 
 ## 4.26.2
 
--   **FIX**: Upgrade to `backrefs` to 8.0 for some bug fixes.
+-   **FIX**: Require `backrefs` 8.0 for some bug fixes.
 
 ## 4.26.1
 
