@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.26.3
+
+-   **FIX**: Background color fix for collapsible panes in wxPython 4.3.0.
+
 ## 4.26.2
 
 -   **FIX**: Require `backrefs` 8.0 for some bug fixes.

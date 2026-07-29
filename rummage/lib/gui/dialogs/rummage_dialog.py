@@ -93,6 +93,7 @@ LIMIT_COMPARE = {
 # Hide vertical separator as they don't look good on 4.2.1
 # TODO: Remove once wxWidgets or wxPython (which ever is the cause) fixes this.
 WX_VERT_LINE_WORKAROUND = '4.2.2' > wx.__version__ >= '4.2.0'
+WX_BACKGROUND_CORRECTION = wx.__version__ >= '4.3.0'
 
 
 def eng_to_i18n(string, mapping):
@@ -488,6 +489,9 @@ class RummageFrame(gui.RummageFrame):
                     self.m_grep_notebook.SetBackgroundColour(wx.Colour(bg))
                 self.m_options_collapse.SetBackgroundColour(wx.Colour(bg))
                 self.m_limit_collapse.SetBackgroundColour(wx.Colour(bg))
+                if WX_BACKGROUND_CORRECTION:
+                    self.m_options_panel.SetBackgroundColour(wx.Colour(bg))
+                    self.m_limit_panel.SetBackgroundColour(wx.Colour(bg))
 
     def localize(self):
         """Translate strings."""
