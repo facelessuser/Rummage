@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.26.4
+
+-   **FIX**: Require `wcmatch` 11.0.1 which fixes some dot cases related to extended glob patterns.
+
 ## 4.26.3
 
 -   **FIX**: Background color fix for collapsible panes in wxPython 4.3.0.
