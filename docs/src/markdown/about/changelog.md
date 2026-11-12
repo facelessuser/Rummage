@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.27
+
+-   **NEW**: Add Python 3.15 support.
+-   **NEW**: Drop Python 3.10 support.
+-   **NEW**: Update minimum dependencies for bugfixes.
+
 ## 4.26.4
 
 -   **FIX**: Require `wcmatch` 11.0.1 which fixes some dot cases related to extended glob patterns.
