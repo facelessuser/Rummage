@@ -4,7 +4,7 @@
 
 -   **NEW**: Add Python 3.15 support.
 -   **NEW**: Drop Python 3.10 support.
--   **NEW**: Update minimum dependencies for bugfixes.
+-   **NEW**: Update minimum dependencies for bug fixes.
 -   **NEW**: Fix color issues related to collapsible panels on latest wxPython.
 
 ## 4.26.4
