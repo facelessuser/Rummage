@@ -1,2 +1,2 @@
-faust-cchardet>=2.1.19
-regex>=2026.6.28
+faust-cchardet>=3.2.0
+regex>=2026.11.9

@@ -80,7 +80,7 @@ more about each feature:
 
 -   [Extended match](./search.md#extended-match-syntax).
 -   [Brace expansion](./search.md#brace-expansion-syntax).
--   Case sensitive for [wildcard match](./search.md#wildcard) and for [regular expression match](#regular-expression).
+-   Case sensitive for [wildcard match](./search.md#wildcard) and for [regular expression match](./search.md#regular-expression).
 -   [Globstar](./search.md#full-path-matching).
 -   [Exclude with `-`](./search.md#basic-wildcard-syntax) which is the default.
 -   [Match base](./search.md#full-path-matching).
@@ -251,10 +251,10 @@ Flags | Supported\ Libraries                       | Option
 `i`   | All                                        | [Search case-sensitive.](./search.md#common-options)
 `u`   | All                                        | [Use Unicode properties.](./search.md#common-options)
 `s`   | All                                        | [Dot matches newline.](./search.md#common-options)
-`f`   | Regex, Regex\ + \Backrefs                  | [Full case-folding.](./search.md#regex-options)
-`b`   | Regex, Regex\ + \Backrefs                  | [Best fuzzy match.](./search.md#regex-options)
-`e`   | Regex, Regex\ + \Backrefs                  | [Improve fuzzy fit.](./search.md#regex-options)
-`w`   | Regex, Regex\ + \Backrefs                  | [Unicode word breaks.](./search.md#regex-options)
-`r`   | Regex, Regex\ + \Backrefs                  | [Search backwards.](./search.md#regex-options)
-`p`   | Regex, Regex\ + \Backrefs                  | [Use POSIX matching.](./search.md#regex-options)
+`f`   | Regex, Regex\ + \Backrefs                  | [Full case-folding.](./search.md#regex-engine-options)
+`b`   | Regex, Regex\ + \Backrefs                  | [Best fuzzy match.](./search.md#regex-engine-options)
+`e`   | Regex, Regex\ + \Backrefs                  | [Improve fuzzy fit.](./search.md#regex-engine-options)
+`w`   | Regex, Regex\ + \Backrefs                  | [Unicode word breaks.](./search.md#regex-engine-options)
+`r`   | Regex, Regex\ + \Backrefs                  | [Search backwards.](./search.md#regex-engine-options)
+`p`   | Regex, Regex\ + \Backrefs                  | [Use POSIX matching.](./search.md#regex-engine-options)
 `F`   | Regex, Regex\ + \Backrefs, Re\ + \Backrefs | [Format style replacements.](./search.md#common-options)

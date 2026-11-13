@@ -25,6 +25,22 @@ MAC_OLD = _MAC_VER < (10, 14)
 MAC_LIGHT = 0.032
 MAC_DARK = 0.062
 
+def get_background_colour(window):
+    """
+    Get the effective background color of a window.
+
+    Newer wxWidgets (3.3+, wxPython 4.3+) report an unset background as a fully transparent
+    color (alpha 0) on macOS for natively drawn controls, as the native control paints the
+    real color itself. In that case, fall back to the system face color which is what the
+    native control uses.
+    """
+
+    bg = window.GetBackgroundColour()
+    if not bg.IsOk() or bg.GetAlpha() == 0:
+        bg = wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE)
+    return bg
+
+
 def mac_ver():
     """Get macOS version."""
 
