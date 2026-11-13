@@ -193,10 +193,10 @@ class SettingsDialog(webview.WebViewMixin, gui.SettingsDialog):
             page = self.m_settings_notebook.GetPage(x)
             if util.platform() == "linux":
                 self.m_settings_notebook.SetBackgroundColour(wx.NullColour)
-                bg = self.m_settings_notebook.GetBackgroundColour()
+                bg = util.get_background_colour(self.m_settings_notebook)
             else:
                 page.SetBackgroundColour(wx.NullColour)
-                bg = page.GetBackgroundColour()
+                bg = util.get_background_colour(page)
             if util.platform() == "macos" and not util.MAC_OLD:
                 color = Color.from_wxbgr(bg.GetRGB())
                 factor = util.MAC_LIGHT if color.luminance() > 0.5 else util.MAC_DARK
