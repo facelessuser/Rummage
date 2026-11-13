@@ -35,8 +35,7 @@ rummage3.6
 ```
 
 In some environments, it may make sense to run Rummage with `pythonw` which is mainly for launching GUI scripts
-(`pythonw` is not available on Linux). In some environments, it may be required (see
-[Running in Anaconda](./installation.md#running-in-anaconda)).
+(`pythonw` is not available on Linux). In some environments, it may be required.
 
 ```bash
 pythonw -m rummage
