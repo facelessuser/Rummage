@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.27.1
+
+-  **FIX**: Require latest `bracex`, `wcmatch`, and `backrefs` for recent bug fixes.
+
 ## 4.27
 
 -   **NEW**: Add Python 3.15 support.
